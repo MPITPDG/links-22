@@ -12,7 +12,7 @@ import { RequestRoutingModule } from './staffrequest.routing';
     imports: [RequestRoutingModule,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule,
         //SharedModule

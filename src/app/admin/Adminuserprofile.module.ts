@@ -15,7 +15,7 @@ import { AdminRoutingModule } from './admin-routing.module';
     CommonModule,
     AdminRoutingModule,  FormsModule,
     CommonModule,
-    TabsModule.forRoot(),
+    TabsModule,
     MyDatePickerModule,
     NgSelectModule
     

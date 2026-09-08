@@ -5,7 +5,7 @@ import { BranchRoutingModule } from './branch-routing.module';
 // Popover Component
 import { PopoverModule } from 'ngx-bootstrap/popover';
 @NgModule({
-    imports: [CommonModule, BranchRoutingModule, PopoverModule.forRoot()],
+    imports: [CommonModule, BranchRoutingModule, PopoverModule],
     declarations: [
         BranchComponent
     ]

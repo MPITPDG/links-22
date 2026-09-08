@@ -24,7 +24,7 @@ import { ChequePreviewComponent } from './cheque-preview.component';
     CommonModule,OrderModule,FilterPipeModule,
     PrintChequeRoutingModule, FormsModule,
     CommonModule,
-    TabsModule.forRoot(),
+    TabsModule,
     MyDatePickerModule,NgxPaginationModule,
     NgSelectModule,
     SharedModule

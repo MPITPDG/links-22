@@ -12,7 +12,7 @@ import  {bankConsigneemaster} from './Bank-Consignee.component'
     imports: [ CommonRouting,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule,NgxPaginationModule ],
     declarations: [Commonsearch,bankConsigneemaster

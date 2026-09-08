@@ -10,7 +10,7 @@ import { LoaderService } from '../../shared/service/loader.service';
  //import { SortService } from '../../shared/service/sortservice';
 
 
-import {Observable, Subject,Subscription} from 'rxjs/Rx';
+import {Observable, Subject,Subscription} from 'rxjs';
 //import { CustomTableOptions, CustomTableConfig, CustomTableColumnDefinition } from './customTable.component';
 
 // export class CustomTableColumnDefinition {

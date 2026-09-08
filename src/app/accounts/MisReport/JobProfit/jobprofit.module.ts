@@ -17,7 +17,7 @@ import {ConsigneeJobprofitComponent} from './consignee_jobprofit.component'
     CommonModule,
     JobProfitRoutingModule, FormsModule,
     CommonModule,
-    TabsModule.forRoot(),
+    TabsModule,
     MyDatePickerModule,NgxPaginationModule,
     NgSelectModule,
     SharedModule

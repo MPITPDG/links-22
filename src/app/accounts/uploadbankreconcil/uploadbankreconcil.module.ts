@@ -5,7 +5,6 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { MyDatePickerModule } from 'mydatepicker';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { uploadbankreconcilRoutingModule} from './uploadbankreconcil.routing'
-import { HttpClientModule } from '@angular/common/http';
 import { UploadBankReconcil } from './bank-reconcil-uploadstatement.component';
 import {UploadBankReconcilSearch} from './bank-reconcil-uploadsearch.component'
 import { BankReconcilShowStatement } from './bank-reconcil-showstatement.component';
@@ -15,10 +14,9 @@ import { BankReconcilStatement } from './bank-reconcil-statement.component';
     imports: [uploadbankreconcilRoutingModule,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
-        NgSelectModule,
-        HttpClientModule
+        NgSelectModule
         //SharedModule
     ],
     declarations: [UploadBankReconcil,UploadBankReconcilSearch,BankReconcilShowStatement,BankReconcilStatement

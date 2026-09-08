@@ -5,22 +5,15 @@ import { ErrorDataSerice } from '../../error/error-share-data.service';
 import { Router } from '@angular/router';
 import { PlatformLocation } from '@angular/common';
 import { HttpClient, HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import {RequestOptions,Headers } from '@angular/http';
 @Injectable()
 export class LoginService {
-    headers: Headers;
-    options: RequestOptions;
     constructor(
         private _router: Router,
         private _crypt: CryptoService,
         private _dataService: DataService,
         private _sharedError: ErrorDataSerice,
         private platformLocation: PlatformLocation,
-        private http: HttpClient ) {
-            this.headers = new Headers({ 'Content-Type': 'application/json', 
-                                       'Accept': 'q=0.8;application/json;q=0.9' });
-          this.options = new RequestOptions({headers: this.headers });
-         }
+        private http: HttpClient ) { }
 
     public removeLogin() {
         localStorage.removeItem('_user');

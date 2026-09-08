@@ -15,7 +15,7 @@ import { ExportJobSearch } from './exportjob.component';
     CommonModule,
     ExportJobSearchRoutingModule, FormsModule,
     CommonModule,
-    TabsModule.forRoot(),
+    TabsModule,
     MyDatePickerModule,NgxPaginationModule,
     NgSelectModule,
     SharedModule

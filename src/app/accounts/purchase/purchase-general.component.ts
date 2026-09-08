@@ -6,7 +6,6 @@ import { ToastCommonService } from '../../shared/service/toastService';
 import { IMyDpOptions } from 'mydatepicker';
 import { LoaderService } from '../../shared/service/loader.service';
 import { HttpClient } from '@angular/common/http';
-import { TruncatePipe } from 'angular-pipes';
 @Component({
   selector: 'app-purchase-general',
   templateUrl: './purchase-general.component.html',

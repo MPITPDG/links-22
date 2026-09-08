@@ -16,7 +16,7 @@ import { SundryExpensesjob } from './sundryexpjobno.component';
     CommonModule,
     SundryExpensesRoutingModule, FormsModule,
     CommonModule,
-    TabsModule.forRoot(),
+    TabsModule,
     MyDatePickerModule,NgxPaginationModule,
     NgSelectModule,
     SharedModule

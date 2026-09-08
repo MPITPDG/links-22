@@ -14,7 +14,7 @@ import {BankReceiptModule} from '../BankRecpt/bankrecpt.module';
     imports: [BankPaymentRoutingModule,BankReceiptModule,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule,
         SharedModule

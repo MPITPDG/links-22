@@ -12,7 +12,7 @@ import { OldEntryRoutingModule } from './oldentry.routing';
     imports: [OldEntryRoutingModule,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule,
         //SharedModule

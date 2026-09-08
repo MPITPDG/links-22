@@ -1,14 +1,16 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "module": "es2020",
+    "esModuleInterop": true,
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
+    "moduleResolution": "bundler",
     "experimentalDecorators": true,
-    "target": "es5",
+    "skipLibCheck": true,
+    "target": "ES2022",
     "typeRoots": [
       "node_modules/@types"
     ],
@@ -17,9 +19,30 @@
       "dom"
     ],
     "paths": {
+      "src/*": [
+        "./src/*"
+      ],
       "exceljs": [
-        "node_modules/exceljs/dist/exceljs.min"
+        "./node_modules/exceljs/dist/exceljs.min"
+      ],
+      "mydatepicker": [
+        "./src/app/shared/mydatepicker-shim/index"
+      ],
+      "angular2-toaster": [
+        "./src/app/shared/angular2-toaster-shim/index"
+      ],
+      "ng2-search-filter": [
+        "./src/app/shared/ng2-search-filter-shim/index"
+      ],
+      "ngx-order-pipe": [
+        "./src/app/shared/ngx-order-pipe-shim/index"
       ]
     },
+    "useDefineForClassFields": false,
+    "strict": false
+  },
+  "angularCompilerOptions": {
+    "fullTemplateTypeCheck": false,
+    "ivyTemplateTypeCheck": false
   }
 }

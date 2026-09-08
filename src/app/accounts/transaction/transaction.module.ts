@@ -11,7 +11,7 @@ import { TransactionComponent } from './transaction.component';
     imports: [TransactionRoutingModule,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule,
         SharedModule],

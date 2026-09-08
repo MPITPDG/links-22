@@ -22,7 +22,7 @@ import { ReqBankpaymentComponent } from './req-bankpayment.component';
     CommonModule,OrderModule,FilterPipeModule,
     ReqBpRoutingModule, FormsModule,
     CommonModule,
-    TabsModule.forRoot(),
+    TabsModule,
     MyDatePickerModule,NgxPaginationModule,
     NgSelectModule,
     SharedModule

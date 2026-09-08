@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { HttpClientModule } from '@angular/common/http';
 import { Tds26asRoutingModule } from './tds26as.routing';
 import { Tds26asReconcil } from './tds26as-reconcil.component';
 
@@ -11,9 +10,8 @@ import { Tds26asReconcil } from './tds26as-reconcil.component';
     imports: [Tds26asRoutingModule,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
-        NgSelectModule,
-        HttpClientModule
+        TabsModule,
+        NgSelectModule
     ],
     declarations: [Tds26asReconcil],
     providers: [],

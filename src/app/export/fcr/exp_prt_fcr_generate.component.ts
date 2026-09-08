@@ -1,4 +1,4 @@
-﻿
+
 import { Component, OnInit} from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
@@ -9,7 +9,6 @@ import { IMyDpOptions } from 'mydatepicker';
 import { ToastCommonService } from '../../shared/service/toastService';
 import { FcrSharedDataService } from '../export-share-data.service';
 import { LoaderService } from '../../shared/service/loader.service';
-import { TrimPipe } from 'angular-pipes';
 
 @Component({
     selector: 'app-fcr-iu',

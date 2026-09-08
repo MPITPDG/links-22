@@ -17,7 +17,7 @@ import { AccountpipefilterPipe } from './unauth.pipe'
     imports: [UnAuthorisationRoutingModule,ModalModule,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule,OrderModule,FilterPipeModule,NgxPaginationModule,
         SharedModule],

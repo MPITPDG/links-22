@@ -15,7 +15,7 @@ import { InvDelay } from './invdelay.component';
     CommonModule,
     InvoicingDelayRoutingModule, FormsModule,
     CommonModule,
-    TabsModule.forRoot(),
+    TabsModule,
     MyDatePickerModule,NgxPaginationModule,
     NgSelectModule,
     SharedModule

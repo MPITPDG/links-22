@@ -18,7 +18,7 @@ import { InvoicehistoryComponent } from './invoicehistory.component';
     CommonModule,
     AirFrtInvRoutingModule,
     FilterPipeModule,Ng2SearchPipeModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule,
         SharedModule,FormsModule

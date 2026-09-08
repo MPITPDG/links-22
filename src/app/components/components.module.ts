@@ -33,11 +33,11 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
 @NgModule({
     imports: [
         ComponentsRoutingModule,
-        BsDropdownModule.forRoot(),
-        ModalModule.forRoot(),
+        BsDropdownModule,
+        ModalModule,
         TabsModule,
-        PopoverModule.forRoot(),
-        TooltipModule.forRoot(),
+        PopoverModule,
+        TooltipModule,
     ],
     declarations: [
         ButtonsComponent,

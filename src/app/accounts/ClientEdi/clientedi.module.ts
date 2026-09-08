@@ -5,7 +5,6 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule } from '@angular/forms';
 import { MyDatePickerModule } from 'mydatepicker';
-import { HttpClientModule } from '@angular/common/http';
 import { ClientEdiDesignComponent } from './client-edi-design.component';
 import { ClientedifilterpipePipe } from './client-edifilterpipe.pipe';
 import { ClientEdiRoutingModule } from './clientedi.routing';
@@ -16,8 +15,7 @@ import { ClientEdiFileUploadComponent } from './client-fileupload.component';
       FormsModule,
       CommonModule,
         MyDatePickerModule,
-      NgSelectModule,
-      HttpClientModule
+      NgSelectModule
       //SharedModule
   ],
   declarations: [ClientEdiDesignComponent, ClientedifilterpipePipe,ClientEdiFileUploadComponent

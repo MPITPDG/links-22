@@ -19,7 +19,7 @@ import{ProformaInvfilterpipe} from './proformainvfilterpipe.pipe';
     imports: [InvoiceRoutingModule,
         FormsModule,
         CommonModule,FilterPipeModule,Ng2SearchPipeModule,OrderModule,NgxPaginationModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule,
         SharedModule],

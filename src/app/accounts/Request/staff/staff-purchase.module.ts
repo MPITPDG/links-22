@@ -17,7 +17,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
     imports: [staffPurchaseRoutingModule,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule,
         SharedModule,

@@ -6,7 +6,6 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule } from '@angular/forms';
 import { MyDatePickerModule } from 'mydatepicker';
-import { HttpClientModule } from '@angular/common/http';
 import { ResetJson  } from './einvoice-resetjson.component'; 
 import {EcreditNoteGenerateJson} from './ecreditnote-generatejson.component';
 import { CreditNoteResetJson  } from './ecreditnote-resetjson.component'; 
@@ -20,8 +19,7 @@ import { einvoiceRoutingModule } from './einvoice.routing';
       CommonModule,
       
       MyDatePickerModule,
-      NgSelectModule,
-      HttpClientModule
+      NgSelectModule
       //SharedModule
   ],
   declarations: [GenerateJson,UploadIRN,ResetJson,EcreditNoteGenerateJson,CreditNoteResetJson

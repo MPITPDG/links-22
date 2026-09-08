@@ -14,7 +14,7 @@ import { SharedModule } from '../../shared/shared.module';
     CommonModule,
     CompChequeRoutingModule, FormsModule,
     CommonModule,
-    TabsModule.forRoot(),
+    TabsModule,
     MyDatePickerModule,
     NgSelectModule,
     SharedModule

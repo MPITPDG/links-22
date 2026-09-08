@@ -12,7 +12,7 @@ import { MasterComponent } from './master.component';
     imports: [MasterRoutingModule,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule],
     declarations: [

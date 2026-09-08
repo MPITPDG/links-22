@@ -1,4 +1,4 @@
-﻿import { NgModule, CUSTOM_ELEMENTS_SCHEMA,NO_ERRORS_SCHEMA } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA,NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ExportRoutingModule } from './export-routing.module';
 import { FormsModule } from '@angular/forms';
@@ -29,12 +29,12 @@ import { AccordionModule } from 'ngx-bootstrap';
     imports: [ExportRoutingModule,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
-        ModalModule.forRoot(),
+        TabsModule,
+        ModalModule,
         MyDatePickerModule,
         NgSelectModule,
         SharedModule,
-        AccordionModule.forRoot(),],
+        AccordionModule,],
     declarations: [
         ExportComponent,
        

@@ -1,12 +1,9 @@
-﻿import 'rxjs/add/operator/map';
-import { HttpClient, HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest } from '@angular/common/http';
+﻿import { HttpClient, HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
- 
-import 'rxjs/add/observable/forkJoin';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { Configuration } from '../../app.constants';
-import { promise } from 'protractor';
 import { DatePipe } from '@angular/common';
 @Injectable()
 export class DataService {
@@ -631,7 +628,7 @@ ConvertNumberToWordsNew(number) {
     formData.append('key','fileup');
     return this.http
       .post(endpoint, formData,{headers})
-      .map(() => { return true; });     
+      .pipe(map(() => { return true; }));
 }
 }
 

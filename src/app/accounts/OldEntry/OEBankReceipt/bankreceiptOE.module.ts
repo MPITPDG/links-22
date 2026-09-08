@@ -13,7 +13,7 @@ import {SharedModule} from '../../../shared/shared.module';;
     imports: [BankReceiptOERoutingModule,///BankReceiptModule,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule,
         SharedModule

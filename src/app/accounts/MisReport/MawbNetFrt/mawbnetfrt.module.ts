@@ -16,7 +16,7 @@ import { MAWBFRT } from './netfrt.component';
     CommonModule,
     MAWBFRTRoutingModule, FormsModule,
     CommonModule,
-    TabsModule.forRoot(),
+    TabsModule,
     MyDatePickerModule,NgxPaginationModule,
     NgSelectModule,
     SharedModule

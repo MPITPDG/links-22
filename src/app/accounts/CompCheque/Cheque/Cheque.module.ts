@@ -23,7 +23,7 @@ import { FilterPipeModule } from 'ngx-filter-pipe';
     CommonModule,OrderModule,FilterPipeModule,
     ChequeRoutingModule, FormsModule,
     CommonModule,
-    TabsModule.forRoot(),
+    TabsModule,
     MyDatePickerModule,NgxPaginationModule,
     NgSelectModule,
     SharedModule

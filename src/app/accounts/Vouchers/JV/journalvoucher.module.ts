@@ -13,7 +13,7 @@ import {SharedModule} from '../../../shared/shared.module'
     imports: [JvRoutingModule,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule,
         SharedModule

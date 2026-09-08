@@ -1,0 +1,267 @@
+/*
+ * Tailwind CSS v4 + spartan/ui entry point.
+ *
+ * Two deliberate deviations from both the default `@import "tailwindcss"` and
+ * what `ng g @spartan-ng/cli:init` generates, driven by coexisting with the
+ * Bootstrap 4 / CoreUI stylesheet this app loads globally (src/scss/style.scss).
+ *
+ * 1. Preflight is NOT imported.
+ *    Bootstrap_s _reboot.scss is already a full base reset. Loading Preflight
+ *    too double-applies conflicting element resets and restyles every existing
+ *    page. spartan_s init re-added it; removed again deliberately. Tailwind v4
+ *    has no JS config, so opting out means importing the layers individually
+ *    and omitting "tailwindcss/preflight.css".
+ *
+ *    Consequence: spartan components do not get Preflight_s base resets. Where
+ *    one needs a reset Bootstrap does not provide, it sets it itself.
+ *
+ * 2. Utilities are imported UNLAYERED.
+ *    Per the cascade-layers spec unlayered CSS beats layered CSS regardless of
+ *    specificity or source order, and Bootstrap here is unlayered. Measured
+ *    against the real built stylesheet: with utilities in @layer utilities, an
+ *    element carrying both .btn-primary and .bg-emerald-500 computed to
+ *    Bootstrap_s #20a8d8; unlayered it computes to emerald. spartan_s own init
+ *    also emits utilities unlayered, which corroborates this.
+ *
+ * The theme below is scoped to .theme-gray rather than :root, so it applies
+ * only where that class is present. Existing pages are therefore untouched.
+ * To make it global later (e.g. once the app shell is redesigned), move the
+ * class onto <body> in src/index.html - no other change needed.
+ */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css";
+
+@import "@spartan-ng/brain/hlm-tailwind-preset.css";
+
+/*
+ * Scoped element reset.
+ *
+ * Preflight is deliberately not loaded (see the note at the top of this file),
+ * which means <button> keeps native UA styling - a grey rounded box - and
+ * <ul>/<ol> keep their list markers. Bootstrap's reboot does not flatten
+ * either. That is fine on legacy pages, which expect it, but wrong in the new
+ * UI where buttons are styled entirely with utilities.
+ *
+ * So: apply just the parts of Preflight the new components rely on, scoped to
+ * .theme-gray so no existing page is affected.
+ *
+ * Every selector is wrapped in :where(), which contributes ZERO specificity.
+ * Written as `.theme-gray button` this reset scores (0,1,1) and beats every
+ * Tailwind utility class at (0,1,0) - so `color: inherit` silently discarded
+ * the text colour on every button in a themed area. That is not theoretical:
+ * it made the financial-year menu render dark-on-black. With :where() the
+ * reset is a true baseline and any utility overrides it.
+ */
+:where(.theme-gray) :where(button, [type='button'], [type='submit']) {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: transparent;
+  background-image: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+:where(.theme-gray) :where(ul, ol) {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+:where(.theme-gray) :where(a) { color: inherit; text-decoration: none; }
+
+:where(.theme-gray) :where(img, svg) { display: block; }
+
+:where(.theme-gray) :where(table) { border-collapse: collapse; }
+
+/*
+ * Scrollbars are hidden inside themed scroll areas.
+ *
+ * A styled 6px bar still reserves layout width, so the rail visibly narrowed
+ * when a menu grew long enough to scroll. Hiding it entirely removes that -
+ * content still scrolls by wheel, trackpad, keyboard and touch, it just draws
+ * no track. This is what spartan does on HlmSidebarContent (`no-scrollbar`).
+ *
+ * Scoped: legacy pages keep their normal scrollbars, where the affordance
+ * matters more than the pixels.
+ */
+.theme-gray .no-scrollbar,
+.theme-gray nav,
+.theme-gray aside {
+  scrollbar-width: none;              /* Firefox */
+  -ms-overflow-style: none;           /* old Edge */
+}
+.theme-gray .no-scrollbar::-webkit-scrollbar,
+.theme-gray nav::-webkit-scrollbar,
+.theme-gray aside::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+/* Content panes keep a scrollbar, but a thin one that does not shift layout. */
+.theme-gray main { scrollbar-width: thin; scrollbar-gutter: stable; }
+
+/*
+ * Focus rings stay inside their container.
+ *
+ * The native focus ring is drawn outside the element's box, so on a sidebar row
+ * it painted over the rail edge and looked like the row had escaped the
+ * sidebar. Inset the ring and drop the default outline.
+ */
+.theme-gray :focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--sidebar-ring, var(--ring));
+  border-radius: inherit;
+}
+.theme-gray :focus:not(:focus-visible) { outline: none; }
+
+/*
+ * my-date-picker shim, styled to match UiInput.
+ *
+ * The picker itself is NOT replaced. It is used in 1,551 places across 225
+ * files and emits an object read as `.formatted` throughout the save and
+ * comparison logic; spartan's hlm-date-picker emits a Date, so swapping it is
+ * a data-shape migration, not a restyle. Styling the shim gives the same look
+ * with none of that risk.
+ */
+:where(.theme-gray) .mydp-shim { position: relative; display: block; width: 100%; }
+
+:where(.theme-gray) .mydp-shim-input {
+  display: flex;
+  height: 2.25rem;
+  width: 100%;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border);
+  background: var(--background);
+  padding: 0.25rem 2.25rem 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--foreground);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+:where(.theme-gray) .mydp-shim-input::placeholder { color: var(--muted-foreground); }
+:where(.theme-gray) .mydp-shim-input:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--ring) 25%, transparent);
+}
+:where(.theme-gray) .mydp-shim-input:disabled {
+  background: var(--muted); cursor: not-allowed; opacity: .6;
+}
+
+:where(.theme-gray) .mydp-shim-btn {
+  position: absolute;
+  right: 0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  height: 1.75rem;
+  width: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  color: var(--muted-foreground);
+  transition: background-color .15s, color .15s;
+}
+:where(.theme-gray) .mydp-shim-btn:hover {
+  background: var(--accent);
+  color: var(--foreground);
+}
+
+/* ng-select, same treatment - it is wired everywhere and stays as it is. */
+:where(.theme-gray) .ng-select .ng-select-container {
+  min-height: 2.25rem;
+  border-radius: 0.375rem;
+  border-color: var(--border);
+  background: var(--background);
+  font-size: 0.875rem;
+}
+:where(.theme-gray) .ng-select.ng-select-focused .ng-select-container {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--ring) 25%, transparent);
+}
+
+:root .theme-gray {
+color-scheme: light;
+
+--font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+--radius: 0.625rem;
+--background: oklch(1 0 0);
+--foreground: oklch(0.13 0.028 261.692);
+--card: oklch(1 0 0);
+--card-foreground: oklch(0.13 0.028 261.692);
+--popover: oklch(1 0 0);
+--popover-foreground: oklch(0.13 0.028 261.692);
+--primary: oklch(0.21 0.034 264.665);
+--primary-foreground: oklch(0.985 0.002 247.839);
+--secondary: oklch(0.967 0.003 264.542);
+--secondary-foreground: oklch(0.21 0.034 264.665);
+--muted: oklch(0.967 0.003 264.542);
+--muted-foreground: oklch(0.551 0.027 264.364);
+--accent: oklch(0.967 0.003 264.542);
+--accent-foreground: oklch(0.21 0.034 264.665);
+--destructive: oklch(0.577 0.245 27.325);
+--border: oklch(0.955 0.004 264.531);
+--input: oklch(0.928 0.006 264.531);
+--ring: oklch(0.707 0.022 261.325);
+/* Sidebar is deliberately near-black while the app surface stays light.
+   These are spartan's dedicated sidebar tokens, separate from the app palette
+   for exactly this case. Chroma is 0 throughout - a true neutral black, not
+   the blue-tinted slate the generated defaults use. */
+--sidebar: oklch(0.145 0 0);
+--sidebar-foreground: oklch(0.87 0 0);
+--sidebar-primary: oklch(0.985 0 0);
+--sidebar-primary-foreground: oklch(0.145 0 0);
+--sidebar-accent: oklch(0.25 0 0);
+--sidebar-accent-foreground: oklch(0.985 0 0);
+--sidebar-border: oklch(1 0 0 / 10%);
+--sidebar-ring: oklch(0.556 0 0);
+/* muted label text inside the sidebar */
+--sidebar-muted: oklch(0.6 0 0);
+}
+
+:root.dark .theme-gray {
+color-scheme: dark;
+
+--background: oklch(0.13 0.028 261.692);
+--foreground: oklch(0.985 0.002 247.839);
+--card: oklch(0.21 0.034 264.665);
+--card-foreground: oklch(0.985 0.002 247.839);
+--popover: oklch(0.21 0.034 264.665);
+--popover-foreground: oklch(0.985 0.002 247.839);
+--primary: oklch(0.928 0.006 264.531);
+--primary-foreground: oklch(0.21 0.034 264.665);
+--secondary: oklch(0.278 0.033 256.848);
+--secondary-foreground: oklch(0.985 0.002 247.839);
+--muted: oklch(0.278 0.033 256.848);
+--muted-foreground: oklch(0.707 0.022 261.325);
+--accent: oklch(0.278 0.033 256.848);
+--accent-foreground: oklch(0.985 0.002 247.839);
+--destructive: oklch(0.704 0.191 22.216);
+--border: oklch(1 0 0 / 10%);
+--input: oklch(1 0 0 / 15%);
+--ring: oklch(0.551 0.027 264.364);
+--sidebar: oklch(0.21 0.034 264.665);
+--sidebar-foreground: oklch(0.985 0.002 247.839);
+--sidebar-primary: oklch(0.985 0.002 247.839);
+--sidebar-primary-foreground: oklch(0.21 0.034 264.665);
+--sidebar-accent: oklch(0.278 0.033 256.848);
+--sidebar-accent-foreground: oklch(0.985 0.002 247.839);
+--sidebar-border: oklch(1 0 0 / 10%);
+--sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+@layer base {
+* {
+@apply border-border outline-ring/50;
+}
+body {
+@apply bg-background text-foreground;
+}
+}

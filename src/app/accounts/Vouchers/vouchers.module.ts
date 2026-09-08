@@ -12,7 +12,7 @@ import { VouchersRoutingModule } from './voucher.routing';
     imports: [VouchersRoutingModule,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule,
         //SharedModule

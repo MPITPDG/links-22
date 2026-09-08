@@ -22,7 +22,7 @@ import { printFCRPrintview,PrintMTOprintview } from './export/printdocument/prin
 @NgModule({
     imports: [CommonModule,
         FormsModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule,
         NewTabPageRoutingModule],

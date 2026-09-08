@@ -18,7 +18,7 @@ import { BalSheetStmtComponent } from './balsheetstmt.component';
     CommonModule,
     ActFinalizationRoutingModule, FormsModule,
     CommonModule,
-    TabsModule.forRoot(),
+    TabsModule,
     MyDatePickerModule,NgxPaginationModule,
     NgSelectModule,
     SharedModule

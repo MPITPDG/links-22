@@ -7,7 +7,6 @@ import {NgSelectModule} from '@ng-select/ng-select';
 import { RequestRouting } from './request.routing';
 import {clientmaster} from './client.component';
 import {RequestComponent} from './request.component';
-import { HttpClientModule } from '@angular/common/http';
  import {consigneemaster} from './consignee.component';
  import{ ReqMastersearch} from './request-search.component';
 //import { Http,   } from '@angular/http';
@@ -19,9 +18,9 @@ import {Linermaster} from './liner.component';
     imports: [RequestRouting,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
-        NgSelectModule,HttpClientModule,NgxPaginationModule ],
+        NgSelectModule,NgxPaginationModule ],
     declarations: [clientmaster,RequestComponent,
         consigneemaster,ReqMastersearch,suppliermaster,vesselAgentmaster,Linermaster
     ],

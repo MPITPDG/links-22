@@ -45,7 +45,7 @@ import {QuoteAirPrintComponent} from './Quotation/quote-air-print.component';
 @NgModule({
     imports: [CommonModule,
         FormsModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule,
         WindowPopPageRoutingModule],

@@ -14,7 +14,7 @@ import {MAWBPurchaseComponent} from './mawb-purchase.component';
     imports: [PurchaseRoutingModule,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule,
         SharedModule

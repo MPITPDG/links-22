@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { LoginService } from '../service/loginService';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ToastCommonService } from '../service/toastService';
 @Injectable()
 export class FinancialYearAuthGuard implements CanActivate {

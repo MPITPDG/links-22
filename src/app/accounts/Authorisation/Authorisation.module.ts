@@ -18,7 +18,7 @@ import { AuthfilterpipePipe } from './authfilterpipe.pipe';
     imports: [AuthorisationRoutingModule,ModalModule,
         FormsModule,
         CommonModule,
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule,OrderModule,FilterPipeModule,NgxPaginationModule,
         SharedModule],

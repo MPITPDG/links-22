@@ -16,7 +16,7 @@ import { AirDocketPrintSearchComponent } from './docket-print-search.component';
         FormsModule,
         CommonModule,
         SharedModule, 
-        TabsModule.forRoot(),
+        TabsModule,
         MyDatePickerModule,
         NgSelectModule],
     declarations: [

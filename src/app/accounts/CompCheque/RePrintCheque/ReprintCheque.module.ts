@@ -17,7 +17,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
     CommonModule,
     RePrintChequeRoutingModule, FormsModule,
     CommonModule,
-    TabsModule.forRoot(),
+    TabsModule,
     MyDatePickerModule,NgxPaginationModule,
     NgSelectModule,
     SharedModule
