@@ -1461,11 +1461,11 @@ export class ConsgMainComponent implements OnInit , OnChanges{
         if (this.shprgrosswt == null) { this._toasterService.toast('error', 'Error', "Shipper Gross Weight can not be blank"); return false; }
         if (this.grosswt == null) { this._toasterService.toast('error', 'Error', "Gross Weight can not be blank"); return false; }
         if (this.netwt == null) { this._toasterService.toast('error', 'Error', "Net Weight can not be blank"); return false; }
-        if (eval(this.netwt) > eval(this.grosswt)) { this._toasterService.toast('error', 'Error', "Net Weight should be less than or equal to Gross Weight"); return false; }
+        if (Number(this.netwt) > Number(this.grosswt)) { this._toasterService.toast('error', 'Error', "Net Weight should be less than or equal to Gross Weight"); return false; }
         if (this.volume == null) { this._toasterService.toast('error', 'Error', "Volume can not be blank"); return false; }
         if (this.modetype == "AIR") {
-            if (eval(this.modetype) == 0) { this._toasterService.toast('error', 'Error', "Gross Weight can not be blank"); return false; }
-            else if (eval(this.volume) > (eval(this.grosswt) * 0.25)) { this._toasterService.toast('error', 'Error', "Volume should not be greter than 25% of Gross wt."); return false; }
+            if (Number(this.grosswt) == 0) { this._toasterService.toast('error', 'Error', "Gross Weight can not be blank"); return false; }
+            else if (Number(this.volume) > (Number(this.grosswt) * 0.25)) { this._toasterService.toast('error', 'Error', "Volume should not be greter than 25% of Gross wt."); return false; }
         }
         return true;
     }
