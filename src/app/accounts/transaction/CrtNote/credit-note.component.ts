@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -70,6 +70,7 @@ a:hover,a:focus{
     resize: none;
 }
 `],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class CreditNoteComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IMyDpOptions } from 'mydatepicker';
 import { AuthService } from 'src/app/shared/service/authService';
@@ -16,6 +16,7 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
   templateUrl: './req-bp-auth-list.component.html',
   styles: [],
   providers: [DatePipe],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ReqBPAuthListComponent implements OnInit {

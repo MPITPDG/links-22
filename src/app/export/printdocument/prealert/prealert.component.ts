@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, OnChanges, ElementRef, Input, Output, EventEmitter } from '@angular/core';
+﻿import { Component, OnInit, OnChanges, ElementRef, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router } from '@angular/router';
@@ -12,6 +12,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
 
     selector: 'app-export-prealert-prepare',
     templateUrl: 'prealert.prepare.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PreAlertPrepareComponent implements OnChanges {
@@ -39,6 +40,7 @@ export class PreAlertPrepareComponent implements OnChanges {
 @Component({
     selector: 'app-export-prealert-auto',
     templateUrl: 'prealert.auto.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PreAlertAutoComponent implements OnChanges {
@@ -73,6 +75,7 @@ export class PreAlertAutoComponent implements OnChanges {
 @Component({
     selector: 'app-export-prealert-sending-through',
     templateUrl: 'prealert.sending.through.expt.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PreAlertPrepareSendingThroughComponent implements OnInit,OnChanges {
@@ -139,6 +142,7 @@ export class PreAlertPrepareSendingThroughComponent implements OnInit,OnChanges 
 
 @Component({
     templateUrl: 'prealert.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PreAlertComponent implements OnInit {

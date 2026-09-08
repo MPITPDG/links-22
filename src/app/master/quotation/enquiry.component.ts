@@ -1,5 +1,5 @@
 // enquiry-page.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IMyOptions} from 'mydatepicker';
 import { DataService } from '../../shared/service/dataService';
@@ -14,6 +14,7 @@ import { DatePipe } from '@angular/common'
   selector: 'app-enquiry-page',
   templateUrl: './enquiry.component.html',
      styleUrls: ['./quotation.search.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class EnquiryPageComponent implements OnInit {

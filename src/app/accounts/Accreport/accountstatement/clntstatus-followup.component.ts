@@ -1,4 +1,4 @@
-import { Component, OnInit ,OnChanges,Input} from '@angular/core';
+import { Component, OnInit, OnChanges, Input, ChangeDetectionStrategy } from '@angular/core';
 import { IMyDpOptions } from 'mydatepicker';
 import {DataService} from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
@@ -10,6 +10,7 @@ import { DatePipe } from '@angular/common';
 
 @Component({
     templateUrl: './clntstatus-followup.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ClientStatusFollowup implements OnInit  {

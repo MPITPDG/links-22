@@ -1,4 +1,4 @@
-import { Component, OnInit,EventEmitter,Output,Input ,OnChanges,AfterViewInit} from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Input, OnChanges, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../../shared/service/loginService';
@@ -7,6 +7,7 @@ import { ToastCommonService } from '../../../shared/service/toastService';
     selector: 'app-main-consignment-calcbm-add',
     templateUrl: 'consg_main_calccbm.component.html',
     styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

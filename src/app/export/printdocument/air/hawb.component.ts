@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, OnChanges, Input, Output, EventEmitter } from '@angular/core';
+﻿import { Component, OnInit, OnChanges, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -11,6 +11,7 @@ import { environment } from '../../../../environments/environment'; //'../../../
 @Component({
     selector: 'app-print-air-hawb-list',
     templateUrl: 'hawb.list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PrintDocumentHawbListComponent implements OnChanges {
@@ -81,6 +82,7 @@ export class PrintDocumentHawbListComponent implements OnChanges {
 @Component({
     selector: 'app-print-air-hawb-search',
     templateUrl: 'hawb.search.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PrintDocumentHawbSearchComponent implements OnChanges {
@@ -177,6 +179,7 @@ export class PrintDocumentHawbSearchComponent implements OnChanges {
 @Component({
     selector: 'app-print-air-hawb-update',
     templateUrl: 'hawb.update.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PrintDocumentHawbUpdateComponent implements OnChanges {
@@ -320,6 +323,7 @@ export class PrintDocumentHawbUpdateComponent implements OnChanges {
 
 @Component({
     templateUrl: 'hawb.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PrintDocumentHawbComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, ViewChild, ElementRef ,ViewEncapsulation} from '@angular/core';
+import { Component, OnInit, OnChanges, ViewChild, ElementRef, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -13,6 +13,7 @@ import { LoaderService } from '../../shared/service/loader.service';
     templateUrl: 'add.booking.component.html' ,
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class AddBookingComponent implements OnInit {

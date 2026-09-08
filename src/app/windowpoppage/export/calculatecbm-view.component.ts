@@ -1,4 +1,4 @@
-import { Component, OnInit,EventEmitter } from '@angular/core';
+import { Component, OnInit, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DataService } from '../../shared/service/dataService';
 import { LoginService } from '../../shared/service/loginService';
@@ -70,6 +70,7 @@ import { LoginService } from '../../shared/service/loginService';
                 </tr>
             </table>
         `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class CalCbmViewComponent implements OnInit {

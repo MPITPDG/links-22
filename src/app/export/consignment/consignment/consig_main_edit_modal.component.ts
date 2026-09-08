@@ -1,4 +1,4 @@
-﻿import { Component, Input, Output, ViewChild, EventEmitter, OnInit, OnChanges, ElementRef, ViewEncapsulation } from '@angular/core';
+﻿import { Component, Input, Output, ViewChild, EventEmitter, OnInit, OnChanges, ElementRef, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
 import { ToastCommonService } from '../../../shared/service/toastService';
@@ -14,6 +14,7 @@ import { environment } from '../../../../environments/environment';
 @Component({
     selector: 'app-consignment-edit-modal',
     templateUrl: 'consig_main_edit_modal.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ConsignmentEditModalComponent implements OnInit {
@@ -558,6 +559,7 @@ export class ConsignmentEditModalComponent implements OnInit {
 						    </tbody>
 						</table>
                 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ConsigneeViewPageComponent {
@@ -702,6 +704,7 @@ export class ConsigneeViewPageComponent {
 						</table>
                    		<app-consignment-consignee-view></app-consignment-consignee-view>
                 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ShipmentClearanceEditComponent {
@@ -854,6 +857,7 @@ export class ShipmentClearanceEditComponent {
 							</table>
 
                 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class MainEditComponent {
@@ -1368,6 +1372,7 @@ export class MainEditComponent {
         </div>
     </div>
                 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PortEditComponent {
@@ -2205,6 +2210,7 @@ export class PortEditComponent {
 							</table>
 
         `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class InvoiceEditComponent {
@@ -2777,6 +2783,7 @@ export class InvoiceEditComponent {
 
 						</table>
                 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class DocumentEditComponent {
@@ -3039,6 +3046,7 @@ export class DocumentEditComponent {
 								</table>
                               </div>
         `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ITCCodeEditComponent {
@@ -3409,6 +3417,7 @@ export class ITCCodeEditComponent {
 						    </table>
                         </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class OrderNoEditComponent {
@@ -3791,6 +3800,7 @@ export class OrderNoEditComponent {
 @Component({
     selector: 'app-consignment-orderno-quality-checking-edit',
     templateUrl: 'consg-main-orderno-qc.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class OrderNoQualityCheckingComponent implements OnInit {
@@ -3947,6 +3957,7 @@ export class OrderNoQualityCheckingComponent implements OnInit {
 							<tbody>
 						</table>
                 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PackageEditComponent {
@@ -4119,6 +4130,7 @@ export class PackageEditComponent {
 							</tbody>
 						</table>
                 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class MarksNumberEditComponent implements OnInit {
@@ -4210,6 +4222,7 @@ export class MarksNumberEditComponent implements OnInit {
 							</table>
 
                 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class QuotaEditComponent implements OnInit {
@@ -4323,6 +4336,7 @@ export class QuotaEditComponent implements OnInit {
 						</tbody>
 					</table>
                 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ConsigneeRemarkEditComponent implements OnInit {
@@ -4464,6 +4478,7 @@ export class ConsigneeRemarkEditComponent implements OnInit {
 								</tbody>
 							</table>
                 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ConsigneeViewComponent implements OnInit {
@@ -6861,6 +6876,7 @@ export class ConsigneeViewComponent implements OnInit {
     templateUrl: 'consign_main_mawb_rating.component.html',
     // styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
     // encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class MAWBEditComponent   {
@@ -11763,6 +11779,7 @@ export class MAWBEditComponent   {
     templateUrl: 'consign_main_hawb_rating.component.html'
     // styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
     // encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class HAWBEditComponent   {
@@ -16417,6 +16434,7 @@ tot_rate_net_cc_dc:any = null;
     templateUrl: 'consign_main_job_rating.component.html',
     // styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
     // encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class JobEditComponent implements OnChanges {
@@ -17259,6 +17277,7 @@ export class JobEditComponent implements OnChanges {
 						</tbody>
 					</table>
                 `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class CancelShipmentComponent implements OnInit {

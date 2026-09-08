@@ -1,4 +1,4 @@
-import{Component,OnInit,ViewChild} from '@angular/core';
+import{Component, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import{ActivatedRoute,Router} from '@angular/router';
 import{DataService} from '../../shared/service/dataService';
 import{AuthService} from '../../shared/service/authService';
@@ -11,6 +11,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-mastersearch',
     templateUrl: 'request-search.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

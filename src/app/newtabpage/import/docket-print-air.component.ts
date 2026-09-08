@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { ActivatedRoute } from '@angular/router';
 import { LoaderService } from '../../shared/service/loader.service';
@@ -51,6 +51,7 @@ import { LoaderService } from '../../shared/service/loader.service';
                  border-bottom:1pt solid black;
                }
     `],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ImportAirDocketPrintComponent implements OnInit {

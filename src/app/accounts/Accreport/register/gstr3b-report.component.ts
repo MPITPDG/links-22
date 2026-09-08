@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoginService } from '../../../shared/service/loginService';
 import { ToastCommonService } from '../../../shared/service/toastService';
@@ -12,6 +12,7 @@ import { DatePipe } from '@angular/common';
   selector: 'app-gstr3b-report',
   templateUrl: './gstr3b-report.component.html',
   styleUrls: ['./register-search.shared.css', './gstr3b-report.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class Gstr3bReportComponent implements OnInit {

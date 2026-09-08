@@ -1,4 +1,4 @@
-import { Component, OnInit ,OnChanges,ViewChild, OnDestroy ,Input} from '@angular/core';
+import { Component, OnInit, OnChanges, ViewChild, OnDestroy, Input, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router ,ActivatedRoute} from '@angular/router';
@@ -10,6 +10,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 
 @Component({
   templateUrl: 'staffpurchase-Auth.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

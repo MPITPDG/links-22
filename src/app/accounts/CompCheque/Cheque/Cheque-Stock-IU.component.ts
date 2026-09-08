@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IMyDpOptions } from 'mydatepicker';
 import { AuthService } from 'src/app/shared/service/authService';
@@ -12,6 +12,7 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
   selector: 'app-cheque-stock-iu',
   templateUrl: './cheque-stock-iu.component.html',
   styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ChequeStockIUComponent implements OnInit {

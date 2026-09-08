@@ -1,4 +1,4 @@
-﻿import { Component, OnInit,  ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
 import { Router} from '@angular/router';
@@ -13,6 +13,7 @@ import { TabsetComponent  } from 'ngx-bootstrap/tabs';
 @Component({
     selector: 'app-container-iu',
     templateUrl: 'exp_sp_container_IU.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ExptSpContainerIU implements OnInit {

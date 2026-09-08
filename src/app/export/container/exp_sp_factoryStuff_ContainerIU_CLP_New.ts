@@ -1,4 +1,4 @@
-import { Component, OnInit,  ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
 import { Router} from '@angular/router';
@@ -13,6 +13,7 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 @Component({
     selector: 'app-containerFS-iu',
     templateUrl: 'exp_sp_factoryStuff_ContainerIU_CLP_New.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ExptSpContainerIUFSNEW implements OnInit {

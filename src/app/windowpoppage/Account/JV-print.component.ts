@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DataService } from '../../shared/service/dataService';
 import { LoginService } from '../../shared/service/loginService';
@@ -49,6 +49,7 @@ import { HttpClient } from '@angular/common/http';
     color: black;
   }
       `],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
   export class JVPrintComponent implements OnInit {

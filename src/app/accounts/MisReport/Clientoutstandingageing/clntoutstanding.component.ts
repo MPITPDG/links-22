@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IMyDpOptions } from 'mydatepicker';
 import { DataService } from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
@@ -13,6 +13,7 @@ import { FilterPipe } from 'ngx-filter-pipe';
     selector: 'app-clntoutstanding',
     templateUrl: './clntoutstanding.component.html',
     styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
   export class ClientOutstanding implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnChanges } from '@angular/core';
+import { Component, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
 import { ToastCommonService } from '../../../shared/service/toastService';
@@ -9,6 +9,7 @@ import { environment } from '../../../../environments/environment';
 @Component({
     selector: 'app-consignment-main-view',
     templateUrl: 'cong-main-view.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ConsigneeMainViewComponent implements OnChanges {

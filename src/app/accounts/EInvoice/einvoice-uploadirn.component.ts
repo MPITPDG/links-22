@@ -1,4 +1,4 @@
-import { Component, OnInit,ViewChild,EventEmitter,Output,ElementRef} from '@angular/core';
+import { Component, OnInit, ViewChild, EventEmitter, Output, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 // import { HttpClient,HttpHeaders } from '@angular/common/http';
 import { HttpClient} from  '@angular/common/http';;
 import { DataService } from '../../shared/service/dataService';
@@ -10,6 +10,7 @@ import { LoaderService } from '../../shared/service/loader.service';
     selector: 'app-einvoice-uploadirn',
     templateUrl: './einvoice-uploadirn.component.html',
     styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
   export class UploadIRN implements OnInit {

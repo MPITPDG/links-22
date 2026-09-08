@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, ViewChild } from '@angular/core';
+﻿import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { OkModalComponent } from '../../../shared/common-modal.directive';
 import { SharedDataSerice } from '../../export-share-data.service';
@@ -8,6 +8,7 @@ import { LoginService } from '../../../shared/service/loginService';
 @Component({
     selector: 'app-consignment-edit-option',
     templateUrl: 'consig_main_edit.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ExportMasterEditComponent implements OnInit {

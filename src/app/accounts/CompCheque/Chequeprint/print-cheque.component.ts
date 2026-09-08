@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/shared/service/authService';
 import { DataService } from 'src/app/shared/service/dataService';
@@ -21,6 +21,7 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
   font-family:sans-serif
 }
 `],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PrintChequeComponent implements OnInit {

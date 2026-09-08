@@ -1,4 +1,4 @@
-import { Component,    Input, Output, ViewChild, EventEmitter, OnInit, OnChanges, ElementRef,ViewEncapsulation } from '@angular/core';
+import { Component, Input, Output, ViewChild, EventEmitter, OnInit, OnChanges, ElementRef, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
 import { ToastCommonService } from '../../../shared/service/toastService';
@@ -15,6 +15,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
     templateUrl: 'Mawb_Tarifrating.component.html',
     // styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
     // encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class MAWBModelpopupcomponent  implements OnInit {
@@ -1547,6 +1548,7 @@ export class MAWBModelpopupcomponent  implements OnInit {
     `,
     // styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
     // encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class MAWBTarifratingcomponent    {

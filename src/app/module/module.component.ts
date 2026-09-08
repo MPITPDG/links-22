@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../shared/service/dataService';
 import { AuthService } from '../shared/service/authService';
 import { Router } from '@angular/router';
@@ -9,6 +9,7 @@ import { environment } from '../../environments/environment';
 @Component({
     templateUrl: 'module.component.html',
     styleUrls: ['module.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ModuleComponent implements OnInit {

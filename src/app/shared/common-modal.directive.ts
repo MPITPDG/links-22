@@ -1,4 +1,4 @@
-﻿import {Component, Input, Output, ViewChild, EventEmitter, OnInit} from '@angular/core';
+﻿import {Component, Input, Output, ViewChild, EventEmitter, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 
 @Component({
@@ -27,6 +27,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
       </div>
     </div>
   `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class CommonModalComponent {
@@ -72,6 +73,7 @@ export class CommonModalComponent {
       </div>
     </div>
   `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class DeleteModalComponent {
@@ -135,6 +137,7 @@ export class DeleteModalComponent {
       </div>
     </div>
   `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ConfirmModalComponent {
@@ -177,6 +180,7 @@ export class ConfirmModalComponent {
       </div>
     </div>
   `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class OkModalComponent {
@@ -200,6 +204,7 @@ export class OkModalComponent {
     </div>
   `,
     styles: ['.modal{text-align:center;padding:0!important} .modal:before{content:""; display:inline-block;height:100%;vertical-align:middle;margin-right:-4px}.modal-dialog{display:inline-block;text-align:left;vertical-align:middle}'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PageLoadModalComponent {

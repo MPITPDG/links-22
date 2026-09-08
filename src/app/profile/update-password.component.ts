@@ -1,4 +1,4 @@
-import { Component, OnInit,OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../shared/service/dataService';
 import { AuthService } from '../shared/service/authService';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -9,6 +9,7 @@ import { LoaderService } from '../shared/service/loader.service';
 @Component({
     selector: 'app-updatepassword',
     templateUrl: 'update-password.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

@@ -1,4 +1,4 @@
-import { Component, OnInit,OnChanges } from '@angular/core';
+import { Component, OnInit, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 import{DataService} from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
 import { ToastCommonService } from '../../../shared/service/toastService';
@@ -12,6 +12,7 @@ import { BankReconcilAddEditExportService } from './bank-reconcil-addedit-export
     selector: 'app-BankReconcil',
     templateUrl: './bank-reconcil.component.html',
     styleUrls: ['./bank-reconcil.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
   export class BankReconcilComponent implements OnInit {

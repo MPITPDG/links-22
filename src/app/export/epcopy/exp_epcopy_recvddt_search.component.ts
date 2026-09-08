@@ -1,5 +1,5 @@
 
-import { Component, OnInit} from '@angular/core'; 
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'; 
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
 import { ActivatedRoute,Router} from '@angular/router';
@@ -13,6 +13,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-epcopy-search',
     templateUrl: 'exp_epcopy_recvddt_search.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 
@@ -81,6 +82,7 @@ export class ExptEpcopyRecvddtSearch {
 @Component({
     selector: 'app-epcopy-recvddt',
     templateUrl: 'exp_epcopy_recvddt.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

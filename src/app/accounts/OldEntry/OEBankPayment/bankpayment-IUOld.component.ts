@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IMyDpOptions } from 'mydatepicker';
 import{DataService} from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Configuration } from '../../../app.constants';
 @Component({
     templateUrl: 'bankpayment-IUOld.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class BankPaymentOEComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
 import { Router } from '@angular/router';
@@ -11,6 +11,7 @@ import {Configuration}  from '../../app.constants'
     selector: 'app-ecreditnote-generatejson',
     templateUrl: './ecreditnote-generatejson.component.html',
     styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
   export class EcreditNoteGenerateJson implements OnInit {

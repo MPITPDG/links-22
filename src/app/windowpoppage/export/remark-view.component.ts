@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DataService } from '../../shared/service/dataService';
 import { LoginService } from '../../shared/service/loginService';
@@ -25,6 +25,7 @@ import { LoginService } from '../../shared/service/loginService';
 								</tbody>
 							</table>
         `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class RemarkViewComponent implements OnInit {

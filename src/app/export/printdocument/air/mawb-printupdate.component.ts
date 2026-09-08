@@ -1,4 +1,4 @@
-import { Component, OnInit ,ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -13,6 +13,7 @@ import { SharedDataSerice } from '../../export-share-data.service';
 @Component({
     selector: 'app-print-air-Mawb-printupdate',
     templateUrl: 'mawb-printupdate.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PrintDocumentMawbprintupdateComponent implements OnInit {

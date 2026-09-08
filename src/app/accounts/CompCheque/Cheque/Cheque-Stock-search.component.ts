@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IMyDpOptions } from 'mydatepicker';
 import { AuthService } from 'src/app/shared/service/authService';
@@ -11,6 +11,7 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
   selector: 'app-cheque-stock-search',
   templateUrl: './Cheque-Stock-search.component.html',
   styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ChequeStockSearchComponent implements OnInit {

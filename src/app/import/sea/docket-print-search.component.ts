@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { DataService } from '../../shared/service/dataService';
 import { LoginService } from '../../shared/service/loginService';
@@ -7,6 +7,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-consignment-import-sea-docket-print-search',
     templateUrl: 'docket-print-search.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class SeaDocketPrintSearchComponent implements OnInit {

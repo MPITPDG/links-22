@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IMyDpOptions } from 'mydatepicker';
 import { DataService } from 'src/app/shared/service/dataService';
@@ -69,6 +69,7 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
       z-index: 2;
   }
   `],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class InvoiceprintTabsComponent implements OnInit {

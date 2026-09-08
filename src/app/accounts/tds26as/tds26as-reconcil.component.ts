@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DataService } from '../../shared/service/dataService';
 import { LoginService } from '../../shared/service/loginService';
@@ -10,6 +10,7 @@ import { Tds26asExportService } from './tds26as-export.service';
     selector: 'app-tds26as-reconcil',
     templateUrl: './tds26as-reconcil.component.html',
     styleUrls: ['./tds26as-reconcil.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class Tds26asReconcil implements OnInit {

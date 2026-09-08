@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IMyOptions} from 'mydatepicker';
 
 import { DataService } from '../../shared/service/dataService';
@@ -14,6 +14,7 @@ import { DatePipe } from '@angular/common'
   selector: 'app-quotation-entry',
   templateUrl: './quotation.component.html',
   styleUrls: ['./quotation.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class QuotationEntryComponent implements OnInit {

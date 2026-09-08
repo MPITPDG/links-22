@@ -1,4 +1,4 @@
-import { Component, OnInit,OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
  
 import { Router, ActivatedRoute } from '@angular/router';
  
@@ -14,6 +14,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-userprofilesearch',
     templateUrl: 'userprofile-search.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

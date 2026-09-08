@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../../shared/service/loginService';
 import { ToastCommonService } from '../../../shared/service/toastService';
@@ -12,6 +12,7 @@ import { JobprofitserviceService } from 'src/app/shared/service/jobprofitservice
     selector: 'app-clientjobprofit',
     templateUrl: './client_jobprofit.component.html',
     styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ClientJobprofitComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit,ViewChild,EventEmitter,Output,ElementRef} from '@angular/core';
+import { Component, OnInit, ViewChild, EventEmitter, Output, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient} from  '@angular/common/http';;
 import { DataService } from '../../shared/service/dataService';
 import { FormGroup, FormControl, Validators} from '@angular/forms';
@@ -11,6 +11,7 @@ import { IMyDpOptions } from 'mydatepicker';
     selector: 'app-bankreconcil-uploadstatement',
     templateUrl: './bank-reconcil-uploadstatement.component.html',
     styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
   export class UploadBankReconcil implements OnInit {

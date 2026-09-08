@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IMyDpOptions } from 'mydatepicker';
 import { Configuration } from 'src/app/app.constants';
@@ -11,6 +11,7 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
   selector: 'app-req-bankpayment',
   templateUrl: './req-bankpayment.component.html',
   styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ReqBankpaymentComponent implements OnInit {

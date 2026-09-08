@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IMyDpOptions } from 'mydatepicker';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
@@ -29,6 +29,7 @@ import { FilterPipe } from 'ngx-filter-pipe';
     display: flex;
     flex-direction: column;
   }`],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class GeneralInvoiceSearchComponent implements OnInit {

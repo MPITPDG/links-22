@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { IMyDpOptions } from 'mydatepicker';
 import { DataService } from '../../../shared/service/dataService';
@@ -11,6 +11,7 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
     selector: 'app-FinanceDashboard',
     templateUrl: './finance-dashboard.component.html',
     styleUrls: ['./finance-dashboard.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class FinanceDashboardComponent implements OnInit {

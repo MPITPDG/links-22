@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DataService } from '../../shared/service/dataService';
 import { LoginService } from '../../shared/service/loginService';
@@ -10,6 +10,7 @@ import { HttpClient } from '@angular/common/http';
   selector: 'app-salesquotation-print',
   templateUrl: './quote-sea-print.component.html',
   styleUrls: ['./quote-print.component.css'] // or .scss,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class QuoteSeaPrintComponent implements OnInit {

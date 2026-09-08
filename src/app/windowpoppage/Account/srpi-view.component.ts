@@ -1,4 +1,4 @@
-import { Component, OnInit,EventEmitter,Output,Input ,OnChanges,ViewChild} from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Input, OnChanges, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { LoaderService } from '../../shared/service/loader.service';
 import { ActivatedRoute } from '@angular/router';
@@ -8,6 +8,7 @@ import { ToastCommonService } from '../../shared/service/toastService';
   selector: 'app-srpi-view',
   templateUrl: './srpi-view.component.html',
   styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class srpiViewComponent implements OnInit, OnChanges  {

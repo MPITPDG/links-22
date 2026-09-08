@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataService } from 'src/app/shared/service/dataService';
 import { LoaderService } from 'src/app/shared/service/loader.service';
@@ -10,6 +10,7 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
   selector: 'app-reqbp-view',
   templateUrl: './reqbp-view.component.html',
   styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ReqbpViewComponent implements OnInit {

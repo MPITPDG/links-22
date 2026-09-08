@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import{ LoginService } from '../../shared/service/loginService'
 @Component({
     templateUrl: 'transaction.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class TransactionComponent implements OnInit {

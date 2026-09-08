@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, Input, Output, EventEmitter, ViewChild, OnChanges, ElementRef} from '@angular/core';
+﻿import { Component, OnInit, Input, Output, EventEmitter, ViewChild, OnChanges, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
 import { Router} from '@angular/router';
@@ -38,6 +38,7 @@ import { FcrSharedDataService } from '../export-share-data.service';
 					<p style="FONT-SIZE: 14px;font-family: Verdana;position:absolute;top: 1307px;left: 837px;color:black;z-index:0;white-space: pre;">{{PLACEDATE}}</p> 
                      </div>
         `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 
@@ -201,6 +202,7 @@ export class ExptFCRPrint implements OnInit,OnChanges {
 				<p style="FONT-SIZE: 14px;font-family: Verdana;position:absolute;top: 1227px;left:810px;color:black;z-index:0;white-space: pre;">{{PLACEDATE}}</p>
                 </div>
         `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 
@@ -334,6 +336,7 @@ export class ExptMTOprint implements OnInit, OnChanges {
 @Component({
     selector: 'app-seablprint',
     templateUrl: 'exp_prt_print.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ExptPrint implements OnInit {

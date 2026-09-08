@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IMyDpOptions } from 'mydatepicker';
 import { DataService } from 'src/app/shared/service/dataService';
@@ -10,6 +10,7 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
   selector: 'app-statement',
   templateUrl: './statement.component.html',
   styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class StatementComponent implements OnInit {

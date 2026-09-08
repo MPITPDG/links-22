@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IMyDpOptions } from 'mydatepicker';
 import{DataService} from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 @Component({
     templateUrl: 'purchase-IUOld.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PurchaseOEComponent implements OnInit {

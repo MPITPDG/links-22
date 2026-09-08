@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../shared/service/loginService';
 import { ToastCommonService } from '../../shared/service/toastService';
@@ -14,6 +14,7 @@ import { saveAs } from 'file-saver';
   selector: 'app-client-edi',
   templateUrl: './client-edi-design.component.html',
   styleUrls: ['./client-edi-design.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ClientEdiDesignComponent implements OnInit {

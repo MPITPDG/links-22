@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {ErrorDataSerice} from './error-share-data.service'
 import {Router} from '@angular/router';
 
 @Component({
   templateUrl: '404.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class P404Component implements OnInit {

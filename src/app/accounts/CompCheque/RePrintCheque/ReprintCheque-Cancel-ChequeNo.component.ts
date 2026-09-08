@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IMyDpOptions } from 'mydatepicker';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
@@ -13,6 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
     selector: 'app-RePrintCheque-Cancel-ChequeNo',
     templateUrl: './ReprintCheque-Cancel-ChequeNo.component.html',
     styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
   export class ReprintChequeCancelChequeNoComponent implements OnInit {

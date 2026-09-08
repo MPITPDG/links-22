@@ -1,4 +1,4 @@
-import { Component, OnInit ,OnChanges,ViewChild, OnDestroy ,Input} from '@angular/core';
+import { Component, OnInit, OnChanges, ViewChild, OnDestroy, Input, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { LoginService } from '../../../shared/service/loginService';
@@ -8,6 +8,7 @@ import { ActivatedRoute,Router } from '@angular/router';
 
 @Component({
     templateUrl: 'staffpur-GenCode.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
   export class ReqSRPGenerateComponent implements OnInit {

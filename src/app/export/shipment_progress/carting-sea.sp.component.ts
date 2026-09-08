@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, Input, Output, ViewChild, EventEmitter, OnChanges, ElementRef } from '@angular/core';
+﻿import { Component, OnInit, Input, Output, ViewChild, EventEmitter, OnChanges, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { Router } from '@angular/router';
 import { LoginService } from '../../shared/service/loginService';
@@ -10,6 +10,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-search-carting-sea',
     templateUrl: 'search-carting-sea.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class SearchCartingSea implements OnInit, OnChanges {
@@ -107,6 +108,7 @@ export class SearchCartingSea implements OnInit, OnChanges {
 @Component({
     selector: 'app-list-carting-sea',
     templateUrl: 'List-carting-sea.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ListCartingSea implements OnInit, OnChanges {
@@ -240,6 +242,7 @@ export class ListCartingSea implements OnInit, OnChanges {
 @Component({
     selector: 'app-manage-carting-sea',
     templateUrl: 'manage-carting-sea.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class manageCartingSea implements OnInit, OnChanges {
@@ -275,6 +278,7 @@ export class manageCartingSea implements OnInit, OnChanges {
 
 @Component({
     templateUrl: 'carting-sea.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class CartingSea implements OnInit, OnChanges {

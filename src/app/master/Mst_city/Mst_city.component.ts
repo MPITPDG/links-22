@@ -1,4 +1,4 @@
-import{Component,OnInit,ViewChild} from '@angular/core';
+import{Component, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import{ActivatedRoute,Router} from '@angular/router';
 //import { HttpClient, HttpEventType,   } from '@angular/common/http';
 
@@ -17,6 +17,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector:'app-Mst_city',
     templateUrl:'Mst_city.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

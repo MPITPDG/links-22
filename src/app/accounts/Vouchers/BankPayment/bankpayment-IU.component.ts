@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IMyDpOptions } from 'mydatepicker';
 ///import{DataService} from '../../..authServiceshared/service/dataService';
 import{DataService} from '../../../shared/service/dataService';
@@ -15,6 +15,7 @@ import { Configuration } from '../../../app.constants';
     // styles:[` table, tr, td, th{
     //           border: none;
     //        }`],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class BankPaymentComponent implements OnInit {

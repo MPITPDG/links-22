@@ -1,4 +1,4 @@
-import { Component, OnInit  ,ElementRef,ViewChild   } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -11,6 +11,7 @@ import { environment } from  '../../../../environments/environment'; //'../../..
 @Component({
     selector: 'app-print-air-Mawb-print',
     templateUrl: 'mawb-final-print.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

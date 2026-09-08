@@ -1,4 +1,4 @@
-import { Directive,Component, OnInit, Output, ViewChild, ElementRef ,ViewEncapsulation,Input, EventEmitter, OnDestroy, HostListener,ChangeDetectorRef} from '@angular/core';
+import { Directive, Component, OnInit, Output, ViewChild, ElementRef, ViewEncapsulation, Input, EventEmitter, OnDestroy, HostListener, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -58,6 +58,7 @@ import {Observable, Subject,Subscription} from 'rxjs';
     templateUrl: 'booking_orderNo_authorisation.component.html' ,
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
 import { Router } from '@angular/router';
@@ -10,6 +10,7 @@ import { TabHeadingDirective } from 'ngx-bootstrap';
 @Component({
     selector: 'app-epcopy-exl-rpt',
     templateUrl: 'exp-rpt-epcopy-search.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ExptRptEpCopyExl implements OnInit{
@@ -93,6 +94,7 @@ export class ExptRptEpCopyExl implements OnInit{
 @Component({
     selector: 'app-dsr-exl-rpt',
     templateUrl: 'exp-rpt-dsr.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 
@@ -250,6 +252,7 @@ export class ExptDSRExl implements OnInit {
 @Component({
     selector: 'app-tonnage-exl-rpt',
     templateUrl: 'exp-rpt-tonnage-search.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ExptTonnage implements OnInit {
@@ -455,6 +458,7 @@ export class ExptTonnage implements OnInit {
 @Component({
     selector: 'app-shipment-status',
     templateUrl: 'exp-rpt-shipment-status.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 
@@ -621,6 +625,7 @@ export class Exptshipmentstatus implements OnInit {
 @Component({
     selector: 'app-cargo-onhand',
     templateUrl: 'exp_rpt_cargo_onhand.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

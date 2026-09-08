@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+﻿import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import {Router} from '@angular/router';
 import { ToastCommonService } from '../../../shared/service/toastService';
@@ -8,6 +8,7 @@ import { ButtonService } from '../../../shared/common-font-changer.directive';
 
 @Component({
     templateUrl: 'order-booking-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class OrderBookingListComponent implements OnInit {

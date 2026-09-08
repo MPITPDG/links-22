@@ -1,4 +1,4 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { Router } from '@angular/router';
 import { ToastCommonService } from '../../shared/service/toastService';
@@ -13,6 +13,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 
          }
     `],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class DeleteContainer implements OnInit {

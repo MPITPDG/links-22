@@ -1,4 +1,4 @@
-﻿import { Component, OnInit ,Input,OnChanges,ViewChild} from '@angular/core';
+﻿import { Component, OnInit, Input, OnChanges, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router } from '@angular/router';
@@ -13,6 +13,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
     templateUrl: 'consg_main.component.html'
     //styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
    // encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ConsgMainComponent implements OnInit , OnChanges{

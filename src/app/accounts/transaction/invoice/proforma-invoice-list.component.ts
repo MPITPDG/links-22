@@ -1,4 +1,4 @@
-import { Component, OnInit ,TemplateRef} from '@angular/core';
+import { Component, OnInit, TemplateRef, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router } from '@angular/router';
@@ -21,6 +21,7 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap';
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
   }
   `],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ProformaInvoicePrintList implements OnInit {

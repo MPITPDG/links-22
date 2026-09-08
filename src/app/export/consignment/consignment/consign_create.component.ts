@@ -1,4 +1,4 @@
-import { Component, OnInit ,ViewEncapsulation} from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router } from '@angular/router';
@@ -19,6 +19,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
     ])
   ]
     // encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class CreateJobComponent implements OnInit {

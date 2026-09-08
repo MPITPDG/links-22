@@ -1,10 +1,11 @@
-﻿import {Component, Input, OnInit, OnChanges, Injectable} from '@angular/core';
+﻿import {Component, Input, OnInit, OnChanges, Injectable, ChangeDetectionStrategy} from '@angular/core';
 
 @Component({
     selector: 'app-font-changer',
     template: `
             <i class="{{fontClass}}"></i>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class FontChangerComponent implements OnInit {

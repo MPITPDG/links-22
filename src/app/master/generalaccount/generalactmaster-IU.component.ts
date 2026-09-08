@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import {DataService} from '../../shared/service/dataService';
 import { ToastCommonService } from '../../shared/service/toastService';
 import { LoaderService } from '../../shared/service/loader.service';
@@ -15,6 +15,7 @@ import { TokenizeResult } from '@angular/compiler/src/ml_parser/lexer';
     table, tr, td, th{
         border: none;
         } `],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

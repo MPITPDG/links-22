@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import{DataService} from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
 import { ToastCommonService } from '../../../shared/service/toastService';
@@ -25,6 +25,7 @@ import { BankReconcilCashbookStatementExportService } from './bank-reconcil-cash
     selector: 'app-BankReconcil-cashbook-statement',
     templateUrl: './bank-reconcil-cashbook-statement.component.html',
     styleUrls: ['./bank-reconcil-cashbook-statement.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
   export class BankReconcilCashbookStatementComponent implements OnInit {

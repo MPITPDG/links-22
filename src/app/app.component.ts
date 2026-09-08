@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges } from '@angular/core';
+import { Component, OnInit, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from './shared/service/dataService';
 import { Router,
     Event as RouterEvent,
@@ -19,6 +19,7 @@ import { LoaderService } from './shared/service/loader.service';
 				<div *ngIf="showLoader==true" class="loading" > </div>
             `,
 	styleUrls: ['./spinner.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class AppComponent implements OnInit,OnChanges {

@@ -1,4 +1,4 @@
-import{Component,OnInit,ViewChild} from '@angular/core';
+import{Component, OnInit, ViewChild, ChangeDetectionStrategy} from '@angular/core';
 import{ActivatedRoute,Router} from '@angular/router';
 import{DataService} from '../../shared/service/dataService';
 import{AuthService} from '../../shared/service/authService';
@@ -12,6 +12,7 @@ import { Configuration } from '../../app.constants';
 @Component({
     selector: 'app-masterLiner',
     templateUrl: 'liner.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })  
 

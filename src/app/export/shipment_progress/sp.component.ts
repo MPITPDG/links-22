@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, Output, EventEmitter, AfterViewInit,ViewEncapsulation,ViewContainerRef,ViewChildren,ContentChild } from '@angular/core';
+﻿import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, Output, EventEmitter, AfterViewInit, ViewEncapsulation, ViewContainerRef, ViewChildren, ContentChild, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -11,6 +11,7 @@ import {
 
 @Component({
     templateUrl: 'common.search.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class CommonSearchShipmentProgressComponent implements OnInit {
@@ -195,6 +196,7 @@ export class CommonSearchShipmentProgressComponent implements OnInit {
 @Component({
     selector: 'app-shipment-progress-common-view',
     templateUrl: 'common.view.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class CommonViewShipmentProgressComponent implements OnInit, OnChanges {
@@ -225,6 +227,7 @@ export class CommonViewShipmentProgressComponent implements OnInit, OnChanges {
 
 @Component({
     templateUrl: 'sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ShipmentProgressComponent implements OnInit {
@@ -237,6 +240,7 @@ export class ShipmentProgressComponent implements OnInit {
 @Component({
     selector: 'app-shipment-progress-shipping-bill',
     templateUrl: 'shipping-bill.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ShippingBillShipmentProgressComponent implements OnInit, OnChanges {
@@ -410,6 +414,7 @@ export class ShippingBillShipmentProgressComponent implements OnInit, OnChanges 
     templateUrl: 'receipt-cargo.sp.component.html',
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ReceiptCargoShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
@@ -667,6 +672,7 @@ export class ReceiptCargoShipmentProgressComponent implements OnInit, OnChanges,
 @Component({
     selector: 'app-shipment-progress-approval-received',
     templateUrl: 'approval-received.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ApprovalReceivedShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
@@ -770,6 +776,7 @@ export class ApprovalReceivedShipmentProgressComponent implements OnInit, OnChan
 @Component({
     selector: 'app-shipment-progress-measurement',
     templateUrl: 'measurement.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class MeasurementShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
@@ -852,6 +859,7 @@ export class MeasurementShipmentProgressComponent implements OnInit, OnChanges, 
 @Component({
     selector: 'app-shipment-progress-out-of-charge',
     templateUrl: 'out-of-charge.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class OutOfChargeShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
@@ -949,6 +957,7 @@ export class OutOfChargeShipmentProgressComponent implements OnInit, OnChanges, 
 @Component({
     selector: 'app-shipment-progress-bl-details',
     templateUrl: 'bl-details.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class BlDetailsShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
@@ -1061,6 +1070,7 @@ export class BlDetailsShipmentProgressComponent implements OnInit, OnChanges, Af
 @Component({
     selector: 'app-shipment-progress-carting-air',
     templateUrl: 'carting-air.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class CartingAirShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
@@ -1157,6 +1167,7 @@ export class CartingAirShipmentProgressComponent implements OnInit, OnChanges, A
 @Component({
     selector: 'app-shipment-progress-prealert-sent-on',
     templateUrl: 'prealert-sent-on.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PrealertSentOnShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
@@ -1253,6 +1264,7 @@ export class PrealertSentOnShipmentProgressComponent implements OnInit, OnChange
 @Component({
     selector: 'app-shipment-progress-destination-document',
     templateUrl: 'destination-document-on.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class DestinationDocumentShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
@@ -1409,6 +1421,7 @@ export class DestinationDocumentShipmentProgressComponent implements OnInit, OnC
     templateUrl: 'transfer-sea-to-air.sp.component.html',
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class SeaToAirShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
@@ -1497,6 +1510,7 @@ export class SeaToAirShipmentProgressComponent implements OnInit, OnChanges, Aft
     templateUrl: 'receipt-cargo-provision.sp.component.html',
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ReceiptCargoProvisionShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
@@ -1765,6 +1779,7 @@ export class ReceiptCargoProvisionShipmentProgressComponent implements OnInit, O
 @Component({
     selector: 'app-shipment-progress-scan-docs-sent',
     templateUrl: 'scan-docs-sent.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ScanDocSentShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
@@ -1876,6 +1891,7 @@ export class ScanDocSentShipmentProgressComponent implements OnInit, OnChanges, 
     templateUrl: 'pending-shipment.sp.component.html',
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PendingShipmentShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
@@ -2210,6 +2226,7 @@ export class PendingShipmentShipmentProgressComponent implements OnInit, OnChang
 @Component({
     selector: 'app-shipment-progress-pending-shipment-report',
     templateUrl: 'pending-shipment-report.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PendingShipReportShipmentProgressComponent implements OnInit, OnChanges {
@@ -2263,6 +2280,7 @@ export class PendingShipReportShipmentProgressComponent implements OnInit, OnCha
     templateUrl: 'container-loading-confirmation.sp.component.html',
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ContainerLoadingShipmentProgressComponent implements OnInit, OnChanges {
@@ -2386,6 +2404,7 @@ export class ContainerLoadingShipmentProgressComponent implements OnInit, OnChan
     selector: 'app-shipment-progress-container-loading-view',
     templateUrl: 'view-container-loading-confirmation.sp.component.html',
     styles: ['.scroll::-webkit-scrollbar{width:10px}.scroll::-webkit-scrollbar-track{background:#f1f1f1}.scroll::-webkit-scrollbar-thumb{background:#888}.scroll::-webkit-scrollbar-thumb:hover{background:#555}'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ViewContainerLoadingShipmentProgressComponent implements OnInit, OnChanges {
@@ -2425,6 +2444,7 @@ export class ViewContainerLoadingShipmentProgressComponent implements OnInit, On
     templateUrl: 'update-container-loading-confirmation.sp.component.html',
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class UpdateContainerLoadingShipmentProgressComponent implements OnInit, OnChanges {
@@ -2818,6 +2838,7 @@ export class UpdateContainerLoadingShipmentProgressComponent implements OnInit, 
 @Component({
     selector: 'app-shipment-progress-container-loading-report',
     templateUrl: 'report-container-loading-confirmation.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ReportContainerLoadingShipmentProgressComponent implements OnInit, OnChanges {
@@ -2876,6 +2897,7 @@ export class ReportContainerLoadingShipmentProgressComponent implements OnInit, 
 @Component({
     selector: 'app-shipment-progress-prepaid-frt',
     templateUrl: 'pre-frt-approved-shipper.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PrepaidfrtApprovShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
@@ -2980,6 +3002,7 @@ export class PrepaidfrtApprovShipmentProgressComponent implements OnInit, OnChan
 @Component({
     selector: 'app-shipment-progress-dimension',
     templateUrl: 'dimension.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class dimensionShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {

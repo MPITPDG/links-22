@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoginService } from '../shared/service/loginService';
 @Component({
     selector: 'app-dashboard',
     templateUrl: './full-layout.component_acct.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class FullLayoutComponent_acc implements OnInit {

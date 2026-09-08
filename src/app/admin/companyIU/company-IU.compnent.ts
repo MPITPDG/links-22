@@ -1,4 +1,4 @@
-import { Component, OnInit ,ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import{DataService} from '../../shared/service/dataService';
 import { ToastCommonService } from '../../shared/service/toastService';
 import { IMyDpOptions } from 'mydatepicker';
@@ -15,6 +15,7 @@ import { Configuration } from '../../app.constants';
 @Component({
     selector: 'app-Companycreation',
     templateUrl: 'company-IU.compnent.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

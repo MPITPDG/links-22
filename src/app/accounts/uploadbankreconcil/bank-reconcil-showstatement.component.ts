@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { LoginService } from '../../shared/service/loginService';
 import { ToastCommonService } from '../../shared/service/toastService';
@@ -9,6 +9,7 @@ import { IMyDpOptions } from 'mydatepicker';
     selector: 'app-bankreconcil-showstatement',
     templateUrl: './bank-reconcil-showstatement.component.html',
     styleUrls: ['./bank-reconcil-showstatement.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
   export class BankReconcilShowStatement implements OnInit {

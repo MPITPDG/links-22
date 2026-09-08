@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { LoaderService } from '../../shared/service/loader.service';
 import { ActivatedRoute } from '@angular/router';
@@ -7,6 +7,7 @@ import { LoginService } from '../../shared/service/loginService';
   selector: 'app-invoice-view',
   templateUrl: './invoice-view.component.html',
   styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class InvoiceViewComponent implements OnInit {

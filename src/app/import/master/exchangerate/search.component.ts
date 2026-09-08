@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { DataService } from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
@@ -8,6 +8,7 @@ import { IMyDpOptions } from 'mydatepicker';
 @Component({
     selector: 'app-consignment-import-master-exchange-rate-search',
     templateUrl: 'search.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class SearchExchangeRateMasterComponent implements OnInit {

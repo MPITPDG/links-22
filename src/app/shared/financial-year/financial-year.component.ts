@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { LoginService } from '../service/loginService';
 import { DataService } from '../service/dataService';
 import { BehaviorSubject } from 'rxjs';
@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 @Component({
     selector: 'app-financial-year',
     templateUrl: 'financial-year.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class FinancialYearComponent {

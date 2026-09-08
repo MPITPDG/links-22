@@ -1,4 +1,4 @@
-import { Component,  OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { LoginService } from '../../shared/service/loginService';
 import { ToastCommonService } from '../../shared/service/toastService';
@@ -164,6 +164,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 							    </table>
                                 
         `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ContainerjobviewComponent implements OnInit {

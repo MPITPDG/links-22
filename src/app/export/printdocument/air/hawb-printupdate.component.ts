@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -11,6 +11,7 @@ import { environment } from  '../../../../environments/environment'; //'../../..
 @Component({
     selector: 'app-print-air-hawb-printupdate',
     templateUrl: 'hawb-printupdate.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PrintDocumentHawbprintupdateComponent implements OnInit {

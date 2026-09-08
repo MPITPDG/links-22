@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/shared/service/authService';
 import { DataService } from 'src/app/shared/service/dataService';
@@ -26,6 +26,7 @@ import { environment } from 'src/environments/environment';
       right:0
     }
     `],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
   export class ChequePreviewComponent implements OnInit {

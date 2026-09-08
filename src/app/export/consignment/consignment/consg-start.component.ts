@@ -1,4 +1,4 @@
-﻿import { Component, OnInit ,ViewEncapsulation} from '@angular/core';
+﻿import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router } from '@angular/router';
@@ -11,6 +11,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
     templateUrl: 'consg-start.component.html',
  //   styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     // encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ConsgStartComponent implements OnInit {

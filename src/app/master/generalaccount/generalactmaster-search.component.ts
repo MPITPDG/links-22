@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import {DataService} from '../../shared/service/dataService';
 import {ToastCommonService} from '../../shared/service/toastService';
 import {LoaderService} from '../../shared/service/loader.service'; 
@@ -8,6 +8,7 @@ import { Router} from '@angular/router';
  @Component({
     selector: 'app-GeneralMastersearch',
     templateUrl: 'generalactmaster-search.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

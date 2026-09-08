@@ -1,6 +1,6 @@
 ﻿ 
  
-import { Component, OnInit, NgModule} from '@angular/core';
+import { Component, OnInit, NgModule, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
  
@@ -14,6 +14,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-container-iu',
     templateUrl: 'exp_sp_container_vessel_vw.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

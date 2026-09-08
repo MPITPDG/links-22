@@ -1,4 +1,4 @@
-import { Component, OnInit,OnChanges } from '@angular/core';
+import { Component, OnInit, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 import{DataService} from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
 import { ToastCommonService } from '../../../shared/service/toastService';
@@ -11,6 +11,7 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
     selector: 'app-BankReconcil-rpt',
     templateUrl: './bank-reconcil-rpt.component.html',
     styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
   export class BankReconcilStatementComponent implements OnInit {

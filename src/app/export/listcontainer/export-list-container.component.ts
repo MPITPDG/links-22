@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, Input, OnChanges} from '@angular/core';
+﻿import { Component, OnInit, Input, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 import { AuthService } from '../../shared/service/authService';
 import { DataService } from '../../shared/service/dataService';
 import { Router} from '@angular/router';
@@ -9,6 +9,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-container-list',
     templateUrl: 'export-list-container.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class listcontainer implements OnInit {

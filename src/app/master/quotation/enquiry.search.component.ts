@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { ToastCommonService } from '../../shared/service/toastService';
 import { LoaderService } from '../../shared/service/loader.service';
@@ -11,6 +11,7 @@ import { IMyDpOptions } from 'mydatepicker';
   selector: 'app-enquiry-search',
   templateUrl: './enquiry.search.component.html',
   styleUrls: ['./quotation.search.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class EnquirySearchComponent implements OnInit {

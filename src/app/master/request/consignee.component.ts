@@ -1,4 +1,4 @@
-import{Component,OnInit,ViewChild, ɵConsole} from '@angular/core';
+import{Component, OnInit, ViewChild, ɵConsole, ChangeDetectionStrategy} from '@angular/core';
 import{ActivatedRoute,Router} from '@angular/router';
 import{DataService} from '../../shared/service/dataService';
 import{AuthService} from '../../shared/service/authService';
@@ -12,6 +12,7 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 @Component({
     selector: 'app-masterconsignee',
     templateUrl: 'consignee.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class consigneemaster  implements OnInit  { 

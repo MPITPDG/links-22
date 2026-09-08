@@ -1,4 +1,4 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { LoginService } from '../../shared/service/loginService';
 import { ToastCommonService } from '../../shared/service/toastService';
@@ -8,6 +8,7 @@ import {IMyDpOptions} from 'mydatepicker';
 @Component({
     selector: 'app-mawbstockmaster',
     templateUrl: 'stockmaster.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class MawbStockMasterComponent implements OnInit {

@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { Router } from '@angular/router';
 import { LoginService } from '../../shared/service/loginService';
 import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     templateUrl: 'tracking-air-shipment.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class TrackingAirShipmentReportComponent implements OnInit {

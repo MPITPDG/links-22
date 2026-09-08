@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { LoaderService } from '../../shared/service/loader.service';
 import { ActivatedRoute } from '@angular/router';
@@ -30,6 +30,7 @@ import { LoginService } from '../../shared/service/loginService';
     font-family: Verdana,Arial;
   }
   `],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

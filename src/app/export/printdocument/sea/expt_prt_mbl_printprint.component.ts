@@ -1,4 +1,4 @@
-import { Component, OnInit ,ElementRef,ViewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router} from '@angular/router';
@@ -10,6 +10,7 @@ import { mblsharedservice } from '../../export-share-data.service';
 @Component({
     selector: 'app-mbl-print',
     templateUrl: 'expt_prt_mbl_printprint.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class Exptmblprint implements OnInit {

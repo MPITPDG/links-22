@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IMyDpOptions } from 'mydatepicker';
 import { DataService } from 'src/app/shared/service/dataService';
@@ -12,6 +12,7 @@ import { DatePipe } from '@angular/common'
   templateUrl: './Gen-Cash-Receipt.component.html',
   styles: [],
   providers: [DatePipe],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class GenCashReceiptComponent implements OnInit {

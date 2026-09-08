@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../../shared/service/loginService';
 import { ToastCommonService } from '../../../shared/service/toastService';
@@ -13,6 +13,7 @@ import { DataService } from 'src/app/shared/service/dataService';
   // table tbody { display:block; max-height:500px; overflow-y:scroll; }
   // table thead, table tbody tr { display:table; width:100%; table-layout:fixed; }
   `],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class InvoiceprintComponent implements OnInit {

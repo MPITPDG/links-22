@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef,ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
 import { ToastCommonService } from '../../../shared/service/toastService';
@@ -10,6 +10,7 @@ import {
     templateUrl: 'branch-job-transfer.component.html' ,
     styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class BranchJobTransferComponent implements OnInit {

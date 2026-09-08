@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IMyDpOptions } from 'mydatepicker';
 ///import{DataService} from '../../..authServiceshared/service/dataService';
 import{DataService} from '../../../shared/service/dataService';
@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { iif } from 'rxjs';
 @Component({
     templateUrl: 'journalvoucher_IU.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class JournalVoucherComponent implements OnInit {

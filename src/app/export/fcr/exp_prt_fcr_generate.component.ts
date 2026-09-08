@@ -1,5 +1,5 @@
 
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
 import { Router} from '@angular/router';
@@ -13,6 +13,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-fcr-iu',
     templateUrl: 'exp_prt_fcr_generate.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

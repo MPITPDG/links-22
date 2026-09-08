@@ -1,5 +1,5 @@
 
-import { Component, OnInit,ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DataService } from '../../../shared/service/dataService';
 //import { LoginService } from '../../authServiceshared/service/loginService';
@@ -16,6 +16,7 @@ import {environment}  from '../../../../environments/environment.prod'
     // styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
     providers:[        DatePipe    ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class BankReceiptSearchComponent implements OnInit {

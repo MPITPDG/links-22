@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../shared/service/dataService';
 import { AuthService } from '../shared/service/authService';
 import { Router } from '@angular/router';
@@ -29,6 +29,7 @@ import { ToastCommonService } from '../shared/service/toastService';
         font-family: Verdana, Arial;
       }
     `],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class LoginComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef ,AfterViewInit} from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { LoginService } from '../../shared/service/loginService';
 import { ToastCommonService } from '../../shared/service/toastService';
@@ -9,6 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 
 @Component({
     templateUrl: 'order-size-detail.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ExportConsignmentOrderSizeDetailComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, OnChanges} from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router} from '@angular/router';
@@ -149,6 +149,7 @@ import { ActivatedRoute } from '@angular/router';
 
              
         `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 
@@ -446,6 +447,7 @@ export class printFCRPrintview implements OnInit {
 						</table>  
             
         `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PrintMTOprintview implements OnInit  {

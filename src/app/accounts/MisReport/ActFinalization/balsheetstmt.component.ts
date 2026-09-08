@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { IMyDpOptions } from 'mydatepicker';
 import { DataService } from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
@@ -10,6 +10,7 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
     selector: 'app-BalSheetStmt',
     templateUrl: './balsheetstmt.component.html',
     styleUrls: ['./balsheetstmt.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class BalSheetStmtComponent implements OnInit {

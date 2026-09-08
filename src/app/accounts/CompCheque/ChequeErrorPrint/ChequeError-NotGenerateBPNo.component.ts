@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IMyDpOptions } from 'mydatepicker';
 import { DataService } from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
@@ -11,6 +11,7 @@ import { environment } from  '../../../../environments/environment';
     selector: 'app-ChequeErrorPrint-ChequeError-search',
     templateUrl: './ChequeError-NotGenerateBPNo.component.html',
     styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
   export class ChequeErrorPrintComponent implements OnInit {

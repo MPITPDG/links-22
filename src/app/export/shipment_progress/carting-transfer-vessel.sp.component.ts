@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, OnChanges} from '@angular/core';
+﻿import { Component, OnInit, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { Router} from '@angular/router';
 import { ToasterService } from 'angular2-toaster';
@@ -11,6 +11,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-transfer-carting-sea',
     templateUrl: 'carting-transfer-vessel.sp.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class TransfervslCartingSea implements OnInit, OnChanges {

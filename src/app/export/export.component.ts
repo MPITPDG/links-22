@@ -1,4 +1,4 @@
-﻿import { Component, OnInit } from '@angular/core'; 
+﻿import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'; 
 import { AuthService } from '../shared/service/authService';
 import { DataService } from '../shared/service/dataService';
 import { Router} from '@angular/router';
@@ -17,6 +17,7 @@ import { AccordionComponent } from 'ngx-bootstrap/accordion';
        
       color: #c14a1d;
 }`],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ExportComponent implements OnInit {

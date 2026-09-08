@@ -1,4 +1,4 @@
-import { Component, OnInit ,OnChanges,ViewChild, OnDestroy ,Input} from '@angular/core';
+import { Component, OnInit, OnChanges, ViewChild, OnDestroy, Input, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { LoginService } from '../../../shared/service/loginService';
@@ -9,6 +9,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 import { ActivatedRoute, Router } from '@angular/router';
 @Component({
     templateUrl: 'jv-auth.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
   export class journalvoucherAuth implements OnInit {

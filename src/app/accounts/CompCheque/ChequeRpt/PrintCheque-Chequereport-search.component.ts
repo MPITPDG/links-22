@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IMyDpOptions } from 'mydatepicker';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
@@ -13,6 +13,7 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
     selector: 'app-PrintCheque-Chequereport-search',
     templateUrl: './PrintCheque-Chequereport-search.component.html',
     styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

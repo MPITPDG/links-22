@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { FormGroup, FormControl, Validators} from '@angular/forms';
 import { LoginService } from '../../shared/service/loginService';
@@ -19,6 +19,7 @@ interface UploadedFile {
   selector: 'app-client-file-upload',
   templateUrl: './client-fileupload.component.html',
   styleUrls: ['./client-fileupload.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ClientEdiFileUploadComponent implements OnInit {

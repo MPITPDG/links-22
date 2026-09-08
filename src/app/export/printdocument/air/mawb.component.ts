@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, Output, EventEmitter } from '@angular/core';
+﻿import { Component, OnInit, OnChanges, ViewChild, ElementRef, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -10,6 +10,7 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 @Component({
     selector: 'app-print-air-mawb-list',
     templateUrl: 'mawb.list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PrintDocumentMawbListComponent implements OnChanges {
@@ -73,6 +74,7 @@ export class PrintDocumentMawbListComponent implements OnChanges {
 @Component({
     selector: 'app-print-air-mawb-update',
     templateUrl: 'mawb.update.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PrintDocumentMawbUpdateComponents implements OnChanges {
@@ -192,6 +194,7 @@ export class PrintDocumentMawbUpdateComponents implements OnChanges {
 
 @Component({
     templateUrl: 'mawb.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PrintDocumentMawbComponent implements OnInit {
@@ -398,6 +401,7 @@ export class PrintDocumentMawbComponent implements OnInit {
 @Component({
     selector: 'app-mawb-search',
     templateUrl: 'mawb.search.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PrintDocumentMawbSearchComponent implements OnChanges {
