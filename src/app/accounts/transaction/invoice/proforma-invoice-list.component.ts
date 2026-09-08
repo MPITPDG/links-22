@@ -7,7 +7,7 @@ import { ToastCommonService } from '../../../shared/service/toastService';
 import { LoaderService } from '../../../shared/service/loader.service';
 import { OrderPipe } from 'ngx-order-pipe';
 import { FilterPipe } from 'ngx-filter-pipe';
-import { BsModalService, BsModalRef } from 'ngx-bootstrap';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 @Component({
   templateUrl: 'proforma-invoice-list.component.html',
   styles:[`

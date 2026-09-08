@@ -50,6 +50,9 @@ import { LoaderService } from '../../shared/service/loader.service';
           this.uploadurl=this._config.ServerWithApiUrl;
           this.url=this.uploadurl + "Accounts/UploadIRNFile";
         }
+    lblchange(event: any) {
+        // rdbtype is kept in sync via [(ngModel)]; hook for Invoice / Credit Note toggle side effects
+    }
         onFileChange(event) {
           this.selectedFile= event.target.files[0];
           this.selfilename= this.selectedFile.name;

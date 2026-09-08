@@ -11,7 +11,7 @@ const routes: Routes = [
     },
     children: [
       {path: '', component: profileComponent, data: { title: 'Home' }},
-      { path: 'ChangePassword', component: updatePassword, data: { title: 'Change Password' },pathMatch :'ful' },
+      { path: 'ChangePassword', component: updatePassword, data: { title: 'Change Password' },pathMatch: 'full' },
       
     ]
   }

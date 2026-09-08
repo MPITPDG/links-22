@@ -6,7 +6,7 @@ import { LoginService } from '../../shared/service/loginService';
 import { IMyDpOptions } from 'mydatepicker';
 import { ToastCommonService } from '../../shared/service/toastService';
 import { LoaderService } from '../../shared/service/loader.service';
-import { TabHeadingDirective } from 'ngx-bootstrap';
+import { TabHeadingDirective } from 'ngx-bootstrap/tabs';
 @Component({
     selector: 'app-epcopy-exl-rpt',
     templateUrl: 'exp-rpt-epcopy-search.component.html',

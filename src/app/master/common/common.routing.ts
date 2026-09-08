@@ -10,8 +10,8 @@ const routes: Routes = [
         },
         children: [
             // { path: '', component: RequestComponent, data: { title: 'Home' }} ,
-            { path: 'Search', component: Commonsearch, data: { title: 'Common' },pathMatch :'ful' },
-            { path: 'ConsigneeBank/:BnkCode', component: bankConsigneemaster, data: { title: 'Consignee Bank' },pathMatch :'ful' },
+            { path: 'Search', component: Commonsearch, data: { title: 'Common' },pathMatch: 'full' },
+            { path: 'ConsigneeBank/:BnkCode', component: bankConsigneemaster, data: { title: 'Consignee Bank' },pathMatch: 'full' },
             
              
         ]

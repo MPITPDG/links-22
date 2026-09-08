@@ -11,11 +11,6 @@ import { ExportexcelService } from '../../shared/service/exportexcel.service';
     selector: 'app-bankreconcil-uploadsearch',
     templateUrl: './bank-reconcil-uploadsearch.component.html',
     styles: [`
-    // .form-control {
-    //    padding:0px !important;
-    //    margin:0px !important;
-    //    //height:20px !important;
-    // }
     a:hover,a:focus{
         text-decoration: none;
         outline: none;
@@ -68,9 +63,6 @@ import { ExportexcelService } from '../../shared/service/exportexcel.service';
         color: #212529;
         z-index: 2;
     }
-    // .tab-content .tab-pane {
-    //     padding-bottom: 0rem !important;
-    // }
     #autoresizing {
         display: block;
         overflow: hidden;

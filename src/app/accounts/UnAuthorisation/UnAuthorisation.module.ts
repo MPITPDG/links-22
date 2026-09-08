@@ -10,8 +10,7 @@ import {invoiceUnAuth} from './Invoice-UnAuth.component';
 import { OrderModule } from 'ngx-order-pipe'; 
 import { FilterPipeModule } from 'ngx-filter-pipe';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { ModalModule } from 'ngx-bootstrap'
-import { AccountpipefilterPipe } from './unauth.pipe'
+import { ModalModule } from 'ngx-bootstrap/modal';import { AccountpipefilterPipe } from './unauth.pipe'
 
 @NgModule({
     imports: [UnAuthorisationRoutingModule,ModalModule,

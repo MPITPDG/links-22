@@ -8,7 +8,6 @@ import { LoaderService } from '../../shared/service/loader.service';
 import { IMyDpOptions } from 'mydatepicker';
 import { HttpClient, HttpEventType,   } from '@angular/common/http'; 
 import { Configuration } from '../../app.constants';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 @Component({
     selector: 'app-masterconsignee',
     templateUrl: 'consignee.component.html',

@@ -106,6 +106,9 @@ export class CreateAutoJobComponent implements OnInit {
         this.trSubSea = 'Y'
         this.City = this._loginService.getLogin()[0].CITYCODE;
     }
+    changeIncoterm(_value?: any) {
+        // incoterm is bound via [(ngModel)]; hook kept for the (change) handler in the template
+    }
 
     ngOnInit(): void {
         

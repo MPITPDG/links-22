@@ -10,7 +10,7 @@ import {invoiceAuth} from './Invoice-Auth.component';
 import { OrderModule } from 'ngx-order-pipe'; 
 import { FilterPipeModule } from 'ngx-filter-pipe';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { ModalModule } from 'ngx-bootstrap';
+import { ModalModule } from 'ngx-bootstrap/modal';
 import { CNAuth } from './CN-Auth.component';
 import { AuthfilterpipePipe } from './authfilterpipe.pipe';
 

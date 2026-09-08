@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-quotation-print',
   templateUrl: './quotation-print.component.html',
-  styleUrls: ['./quotation-print.component.css'] // or .scss,
+  styleUrls: ['./quotation-print.component.css'], // or .scss
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

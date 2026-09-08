@@ -9,8 +9,8 @@ const routes: Routes = [
         title: 'Admin/UserProfile'
     },
     children: [
-        { path: 'userprofile/:userid', component: userprofilecreation, data: { title: 'Profile' },pathMatch :'ful' },
-        { path: 'ProfileSearch', component: userprofilesearch, data: { title: 'Search' },pathMatch :'ful' },
+        { path: 'userprofile/:userid', component: userprofilecreation, data: { title: 'Profile' },pathMatch: 'full' },
+        { path: 'ProfileSearch', component: userprofilesearch, data: { title: 'Search' },pathMatch: 'full' },
          
     ]
 }

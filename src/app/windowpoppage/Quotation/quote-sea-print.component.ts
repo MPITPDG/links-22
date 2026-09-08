@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-salesquotation-print',
   templateUrl: './quote-sea-print.component.html',
-  styleUrls: ['./quote-print.component.css'] // or .scss,
+  styleUrls: ['./quote-print.component.css'], // or .scss
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

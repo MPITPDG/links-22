@@ -621,9 +621,7 @@ export class PrintMTOprintview implements OnInit  {
 //     selector: 'app-printview',
 //     templateUrl: 'exp_prt_fcr_printview.component.html'
 
-//,
-    standalone: false
-})
+// })
 // export class ExptPrintview implements OnInit {
 //     Type: any = "";
 // 	buttonStatus = false;

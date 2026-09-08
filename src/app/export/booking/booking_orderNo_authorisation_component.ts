@@ -50,9 +50,7 @@ import {Observable, Subject,Subscription} from 'rxjs';
 
 // @Directive({
 //   selector: '[sortable-table]'
-//,
-    standalone: false
-})
+// })
 @Component({
     selector: 'app-export-orderno-authorisation',
     templateUrl: 'booking_orderNo_authorisation.component.html' ,

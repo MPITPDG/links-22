@@ -12,11 +12,11 @@ const routes: Routes = [
         title: 'Admin-Account'
     },
     children: [
-       { path: 'Financialyear/:YearId', component: financialYearIU, data: { title: 'Financial year Creation' },pathMatch :'ful' },
-       { path: 'FinancialYearsearch', component: financialYearsearch, data: { title: 'Search' },pathMatch :'ful' },
-      //  { path: 'QuotRate', component: QuotRateEntryComponent, data: { title: 'Quot Rate Master Entry' },pathMatch :'ful' }, 
-      //  { path: 'ClientRate/:pkqutid', component: ClientOriginRateEntryComponent, data: { title: 'Client Origin Rate' },pathMatch :'ful' },
-      //  { path: 'ClientRateSearch', component: ClientOriginRateSearchComponent, data: { title: 'Client Origin Rate Search' },pathMatch :'ful' },
+       { path: 'Financialyear/:YearId', component: financialYearIU, data: { title: 'Financial year Creation' },pathMatch: 'full' },
+       { path: 'FinancialYearsearch', component: financialYearsearch, data: { title: 'Search' },pathMatch: 'full' },
+      //  { path: 'QuotRate', component: QuotRateEntryComponent, data: { title: 'Quot Rate Master Entry' },pathMatch: 'full' }, 
+      //  { path: 'ClientRate/:pkqutid', component: ClientOriginRateEntryComponent, data: { title: 'Client Origin Rate' },pathMatch: 'full' },
+      //  { path: 'ClientRateSearch', component: ClientOriginRateSearchComponent, data: { title: 'Client Origin Rate Search' },pathMatch: 'full' },
       
         
          

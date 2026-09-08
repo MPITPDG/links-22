@@ -11,7 +11,7 @@ const routes: Routes = [
       },
       children: [
           { path: 'general/:crtno', component: CreditNoteComponent, data: { title: 'Home' } },
-          { path: 'creditnotesearch', component: CreditNoteSearchComponent, data: { title: 'Search' },pathMatch :'ful' },
+          { path: 'creditnotesearch', component: CreditNoteSearchComponent, data: { title: 'Search' },pathMatch: 'full' },
 
       ]
   }

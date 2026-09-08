@@ -16,6 +16,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
   export class EInvoiceList implements OnInit {
     EInvoiceListtbl: any = []
+    checkbox: boolean = false;
     newArray: any = [];
     rptdownloadurl:string;
     subheader:string="";
@@ -51,6 +52,10 @@ import { DomSanitizer } from '@angular/platform-browser';
             
           })
       }
+    checkAll(event: any) {
+        const checked = event.target.checked;
+        this.EInvoiceListtbl.forEach((item: any) => item.Checked = checked);
+    }
       getCheckboxValues(event, data) {
         var index = this.newArray.findIndex(x => x.InvNo == data);
         if (event) {

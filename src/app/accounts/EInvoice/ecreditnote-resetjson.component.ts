@@ -28,6 +28,7 @@ import {Configuration}  from '../../app.constants'
     rptdownloadurl:string;
     subheader:string="";
     JsonId:string="";
+    checkbox: boolean = false;
     constructor(
         private _router: Router,
         private _dataService: DataService,
@@ -60,6 +61,10 @@ import {Configuration}  from '../../app.constants'
             
           })
       }
+    checkAll(event: any) {
+        const checked = event.target.checked;
+        this.resetjsonlist.forEach((item: any) => item.Checked = checked);
+    }
       getCheckboxValues(event: boolean, jsonid: string, id: string, invno: string, i: number) {
         this.newArray = this.newArray || [];
         this.JsonId = jsonid;

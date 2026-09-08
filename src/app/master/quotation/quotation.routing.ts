@@ -14,12 +14,12 @@ const routes: Routes = [
       },
       children: [
         
-         { path: 'QuotRate', component: QuotRateEntryComponent, data: { title: 'Quot Rate Master Entry' },pathMatch :'ful' }, 
-         { path: 'Quotation/:quotationno', component: QuotationEntryComponent, data: { title: 'Quotation' },pathMatch :'ful' },
-         { path: 'QuotationSearch', component: QuotationSearchComponent, data: { title: 'Quotation Search' },pathMatch :'ful' },
-         { path: 'enquiry/:enquiryno', component: EnquiryPageComponent, data: { title: 'Enquiry Page' },pathMatch :'ful' },
-         { path: 'enquirysearch', component: EnquirySearchComponent, data: { title: 'Enquiry Search Page' },pathMatch :'ful' },
-        //  { path: 'QuotationDesign', component: QuotationDesignComponent, data: { title: 'Quotation Design' },pathMatch :'ful' },
+         { path: 'QuotRate', component: QuotRateEntryComponent, data: { title: 'Quot Rate Master Entry' },pathMatch: 'full' }, 
+         { path: 'Quotation/:quotationno', component: QuotationEntryComponent, data: { title: 'Quotation' },pathMatch: 'full' },
+         { path: 'QuotationSearch', component: QuotationSearchComponent, data: { title: 'Quotation Search' },pathMatch: 'full' },
+         { path: 'enquiry/:enquiryno', component: EnquiryPageComponent, data: { title: 'Enquiry Page' },pathMatch: 'full' },
+         { path: 'enquirysearch', component: EnquirySearchComponent, data: { title: 'Enquiry Search Page' },pathMatch: 'full' },
+        //  { path: 'QuotationDesign', component: QuotationDesignComponent, data: { title: 'Quotation Design' },pathMatch: 'full' },
           
            
       ]

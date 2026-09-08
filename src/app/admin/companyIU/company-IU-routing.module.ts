@@ -9,8 +9,8 @@ const routes: Routes = [
         title: 'Company'
     },
     children: [
-        { path: 'Company/:Id', component: companyIU, data: { title: 'Company Creation' },pathMatch :'ful' },
-        { path: 'Companysearch', component: companySearch, data: { title: 'Search' },pathMatch :'ful' },
+        { path: 'Company/:Id', component: companyIU, data: { title: 'Company Creation' },pathMatch: 'full' },
+        { path: 'Companysearch', component: companySearch, data: { title: 'Search' },pathMatch: 'full' },
          
     ]
 }

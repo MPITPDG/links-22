@@ -10,9 +10,9 @@ const routes: Routes = [
         title: 'General-Account'
     },
     children: [
-       { path: 'GeneralAccount/:ID', component: generalactmasterIU, data: { title: 'General account Creation' },pathMatch :'ful' },
-       { path: 'GeneralAccountsearch', component: generalactmastersearch, data: { title: 'Search' },pathMatch :'ful' },
-       { path: 'ItemCode', component: itemcodeIU, data: { title: 'Item Code Creation' },pathMatch :'ful' },
+       { path: 'GeneralAccount/:ID', component: generalactmasterIU, data: { title: 'General account Creation' },pathMatch: 'full' },
+       { path: 'GeneralAccountsearch', component: generalactmastersearch, data: { title: 'Search' },pathMatch: 'full' },
+       { path: 'ItemCode', component: itemcodeIU, data: { title: 'Item Code Creation' },pathMatch: 'full' },
         
          
     ]

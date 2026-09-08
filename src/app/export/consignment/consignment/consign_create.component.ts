@@ -17,7 +17,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
       state('closed', style({ height: '0px', opacity: 0, overflow: 'hidden' })),
       transition('open <=> closed', [animate('250ms ease-in-out')]),
     ])
-  ]
+  ],
     // encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false

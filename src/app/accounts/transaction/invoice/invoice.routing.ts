@@ -12,8 +12,8 @@ const routes: Routes = [
         },
         children: [
             { path: 'general/:invoiceno', component: InvoiceComponent, data: { title: 'Home' } },
-            { path: 'invoicesearch', component: GeneralInvoiceSearchComponent, data: { title: 'Search' },pathMatch :'ful' },
-            { path: 'proformainvoice', component: ProformaInvoicePrintList, data: { title: 'Search' },pathMatch :'ful' },
+            { path: 'invoicesearch', component: GeneralInvoiceSearchComponent, data: { title: 'Search' },pathMatch: 'full' },
+            { path: 'proformainvoice', component: ProformaInvoicePrintList, data: { title: 'Search' },pathMatch: 'full' },
            // { path: 'general', component: GeneralComponent, data: { title: 'General' } },
         ]
     }

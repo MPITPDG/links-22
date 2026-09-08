@@ -10,7 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Configuration } from '../../../app.constants';
 
 @Component({
-    templateUrl: 'bankpayment-IU.component.html'
+    templateUrl: 'bankpayment-IU.component.html',
     // ,
     // styles:[` table, tr, td, th{
     //           border: none;

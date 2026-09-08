@@ -11,9 +11,9 @@ const routes: Routes = [
           title: 'Air Freight Invoice'
       },
       children: [
-          { path: 'airfrtinvoiceList', component: InvoiceprintComponent, data: { title: 'Air Freight Invoice' } ,pathMatch :'ful'},
-          { path: 'airfrtinvoice-detailstab/:ID', component: InvoiceprintTabsComponent, data: { title: 'Air Freight Invoice TABs' } ,pathMatch :'ful'},
-          { path: 'airfrtInvoiceHistory', component: InvoicehistoryComponent, data: { title: 'Air Freight Invoice History' } ,pathMatch :'ful'},
+          { path: 'airfrtinvoiceList', component: InvoiceprintComponent, data: { title: 'Air Freight Invoice' } ,pathMatch: 'full'},
+          { path: 'airfrtinvoice-detailstab/:ID', component: InvoiceprintTabsComponent, data: { title: 'Air Freight Invoice TABs' } ,pathMatch: 'full'},
+          { path: 'airfrtInvoiceHistory', component: InvoicehistoryComponent, data: { title: 'Air Freight Invoice History' } ,pathMatch: 'full'},
 
         ]
   }

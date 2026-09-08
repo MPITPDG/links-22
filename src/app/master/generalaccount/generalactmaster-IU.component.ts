@@ -7,7 +7,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LoginService } from '../../shared/service/loginService';
 import { Configuration } from '../../app.constants';
 import { IMyDpOptions } from 'mydatepicker';
-import { TokenizeResult } from '@angular/compiler/src/ml_parser/lexer';
 @Component({
     selector: 'app-GeneralaccountCreation',
     templateUrl: 'generalactmaster-IU.component.html',

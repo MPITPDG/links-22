@@ -11,9 +11,9 @@ const routes : Routes = [
         },
         children: [
             
-            { path: 'add', component: Mst_citycomponent, data: { title: 'Add' },pathMatch :'ful'} ,
+            { path: 'add', component: Mst_citycomponent, data: { title: 'Add' },pathMatch: 'full'} ,
            
-            //{ path: 'client/:ReqType', component: clientmaster, data: { title: 'Client' },pathMatch :'ful' },
+            //{ path: 'client/:ReqType', component: clientmaster, data: { title: 'Client' },pathMatch: 'full' },
              
         ]
         

@@ -315,7 +315,7 @@ getCopyOfOptions(): IMyDpOptions {
       this.GetActName(this.AccountName)
     }
     Add_Main() {
-      if (this.Accountlist.length ==[]) {
+      if (this.Accountlist.length == 0) {
         this._toasterService.toast("error", "error", "Please Fill Account Details First.");
         return false
       }

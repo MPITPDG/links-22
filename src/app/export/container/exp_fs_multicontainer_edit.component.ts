@@ -9,7 +9,6 @@ import { ToastCommonService } from '../../shared/service/toastService';
 import { ContainerIUSharedDataService, VesselSearchSharedDataService} from '../export-share-data.service';
 import { LoaderService } from '../../shared/service/loader.service';
 import { ThemeService } from 'ng2-charts';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 @Component({
     selector: 'app-multicontainerFS-Edit',
     templateUrl: 'exp_fs_multicontainer_edit.component.html',
@@ -106,6 +105,9 @@ selectedRowId: number | null = null;
         selectorHeight: '180px',
         selectorWidth: '200px'
     };
+    GenerateContainer() {
+        // Containers are generated on the create screen; the button stays disabled here.
+    }
 
     ngOnInit(): void {
         this.loaderService.display(true);  

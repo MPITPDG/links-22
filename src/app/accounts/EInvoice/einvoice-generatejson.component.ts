@@ -16,6 +16,7 @@ import {Configuration}  from '../../app.constants'
 })
   export class GenerateJson implements OnInit {
     EInvoiceListtbl: any = []
+    checkbox: boolean = false;
     ECreditNoteListtbl:any=[];
     newArray: any = [];
     rptdownloadurl:string;
@@ -61,6 +62,10 @@ import {Configuration}  from '../../app.constants'
             this._loaderService.display(false);
           })
       }
+    checkAll(event: any) {
+        const checked = event.target.checked;
+        this.EInvoiceListtbl.forEach((item: any) => item.Checked = checked);
+    }
     
       getCheckboxValues(event, data) {
         var index = this.newArray.findIndex(x => x.InvNo == data);

@@ -8,7 +8,6 @@
     import { IMyDpOptions } from 'mydatepicker';
     import { HttpClient   } from '@angular/common/http';
     import { Configuration } from '../../app.constants';
-    import { IfStmt } from '@angular/compiler';
     
     @Component({
         selector: 'app-mastersupplier',

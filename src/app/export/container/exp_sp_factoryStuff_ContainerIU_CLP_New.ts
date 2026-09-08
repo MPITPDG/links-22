@@ -9,7 +9,6 @@ import { ToastCommonService } from '../../shared/service/toastService';
 import { ContainerIUSharedDataService, VesselSearchSharedDataService} from '../export-share-data.service';
 import { LoaderService } from '../../shared/service/loader.service';
 import { ThemeService } from 'ng2-charts';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 @Component({
     selector: 'app-containerFS-iu',
     templateUrl: 'exp_sp_factoryStuff_ContainerIU_CLP_New.html',

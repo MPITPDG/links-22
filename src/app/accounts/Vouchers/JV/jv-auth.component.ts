@@ -4,7 +4,7 @@ import { AuthService } from '../../../shared/service/authService';
 import { LoginService } from '../../../shared/service/loginService';
 import { ToastCommonService } from '../../../shared/service/toastService';
 import { LoaderService } from '../../../shared/service/loader.service';
-import { BsModalService, BsModalRef } from 'ngx-bootstrap';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { ActivatedRoute, Router } from '@angular/router';
 @Component({

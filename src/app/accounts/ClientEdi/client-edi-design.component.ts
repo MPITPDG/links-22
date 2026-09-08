@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/shared/service/dataService';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 import * as Excel from 'exceljs';
-import * as JSZip from 'jszip';
+import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 @Component({
   selector: 'app-client-edi',

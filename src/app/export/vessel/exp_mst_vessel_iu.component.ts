@@ -316,7 +316,7 @@ export class VesselMstComponent implements OnInit {
         if (this.VslAsail == "") { SAIL = "" } else { SAIL = this.VslAsail.formatted; }
         if (this.Vsletd == "") { ETD = "" } else { ETD = this.Vsletd.formatted; }
         this.loaderService.display(true);
-        const jsonExport = { TBL_INDEXID: this.TBL_INDEXID, PK_PORTID: this.ID, VSL_RTNO: this.vslRtno, ROTATION: this.VslRrotnNo, PORT: this.Vslport, ETA: ETA, ARRIVAL: ARRDT, ETD: ETD, SAILING: SAIL, CARTING: LCD, VSLDELAY: this.Vsldly, NOTCALLED: this.Vslnotcald, USERNAME:  this._loginService.getLogin()[0].CMP_USERNAME, cmpid: this._loginService.getLogin()[0].CMPID, GUID:  this._loginService.getLogin()[0].GUID, TBL_INDEXIDAGT: this.TBL_INDEXID_AGT, PK_AGTID: (this.AGTID = "" ? 0 : this.AGTID ), VSL_AGENT: this.VslAgent, AGT_LINER: this.VslspLine, AGT_CARTPLACE: this.Vslcrtpl, AGT_CARTCLERK: this.Vslcrtclrk };
+        const jsonExport = { TBL_INDEXID: this.TBL_INDEXID, PK_PORTID: this.ID, VSL_RTNO: this.vslRtno, ROTATION: this.VslRrotnNo, PORT: this.Vslport, ETA: ETA, ARRIVAL: ARRDT, ETD: ETD, SAILING: SAIL, CARTING: LCD, VSLDELAY: this.Vsldly, NOTCALLED: this.Vslnotcald, USERNAME:  this._loginService.getLogin()[0].CMP_USERNAME, cmpid: this._loginService.getLogin()[0].CMPID, GUID:  this._loginService.getLogin()[0].GUID, TBL_INDEXIDAGT: this.TBL_INDEXID_AGT, PK_AGTID: (this.AGTID == "" ? 0 : this.AGTID ), VSL_AGENT: this.VslAgent, AGT_LINER: this.VslspLine, AGT_CARTPLACE: this.Vslcrtpl, AGT_CARTCLERK: this.Vslcrtclrk };
         this._dataService.Common(this.baseUrl, jsonExport)
             .subscribe((data: any) => {
 

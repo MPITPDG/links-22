@@ -415,6 +415,17 @@ export class CreditNoteComponent implements OnInit {
            return final1;
         }
     }
+    Calcamount() {
+        var data = this.qty * this.rateperqty
+        this.Curamount = data;
+        var exchage = 1;
+        if (this.currencytype == "CR115") {
+            exchage = data * 1
+        } else { exchage = data * this.excrate }
+        var final = exchage.toFixed(3)
+        this.INV_Amt_INR = final;
+        this.taxamount_G_Inr = final;
+    }
     get taxamount_G() {
         var data = this.qty * this.rateperqty
         this.Curamount=data;

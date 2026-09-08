@@ -4592,9 +4592,7 @@ export class ConsigneeViewComponent implements OnInit {
 //     selector: 'app-consignment-mawb-edit',
 //     templateUrl: 'consign_main_mawb_rating.component.html',
 
-//,
-    standalone: false
-})
+// })
 // export class MAWBEditComponent   {
 
 //     @Input() exptno: any;
@@ -6880,6 +6878,10 @@ export class ConsigneeViewComponent implements OnInit {
     standalone: false
 })
 export class MAWBEditComponent   {
+
+    RatesChange(_event?: any) {
+        // TarFreight is bound via [(ngModel)]; hook kept for the (change) handler in the template
+    }
 
     @Input() exptno: any;
     @Input() type: string;
@@ -11776,7 +11778,7 @@ export class MAWBEditComponent   {
 
 @Component({
     selector: 'app-consignment-hawb-edit',
-    templateUrl: 'consign_main_hawb_rating.component.html'
+    templateUrl: 'consign_main_hawb_rating.component.html',
     // styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
     // encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,

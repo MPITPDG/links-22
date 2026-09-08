@@ -9,7 +9,6 @@ import { ToastCommonService } from '../../shared/service/toastService';
 import { ContainerIUSharedDataService, VesselSearchSharedDataService} from '../export-share-data.service';
 import { LoaderService } from '../../shared/service/loader.service';
 import { ThemeService } from 'ng2-charts';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 @Component({
     selector: 'app-multicontainerFS-iu',
     templateUrl: 'exp_fs_multicontainer_iu.component.html',

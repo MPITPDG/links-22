@@ -8,8 +8,6 @@ import { LoaderService } from '../../../shared/service/loader.service';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Configuration } from '../../../app.constants';
-import { getDate } from 'ngx-bootstrap/chronos/utils/date-getters';
-import { isNull } from '@angular/compiler/src/output/output_ast';
 
 @Component({
     templateUrl: 'bankreceipt-IU.component.html',

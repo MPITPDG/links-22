@@ -15,12 +15,12 @@ const routes: Routes = [
         },
         children: [
             { path: '', component: RequestComponent, data: { title: 'Home' }} ,
-            { path: 'client/:ReqType/:ExpCode', component: clientmaster, data: { title: 'Client' },pathMatch :'ful' },
-            { path: 'consignee/:ReqType/:ConCode', component: consigneemaster, data: { title: 'Consignee' },pathMatch :'ful' },
-            { path: 'search/:ReqType', component: ReqMastersearch, data: { title: 'Search' },pathMatch :'ful' },
-            { path: 'supplier/:ReqType/:SupCode', component: suppliermaster, data: { title: 'Supplier' },pathMatch :'ful' },
-            { path: 'AgentVessel/:ReqType/:VslAgtC', component: vesselAgentmaster, data: { title: 'AGENT(VESSEL)' },pathMatch :'ful' },
-            { path: 'Liner/:ReqType/:linerC', component: Linermaster, data: { title: 'Liner' },pathMatch :'ful' },
+            { path: 'client/:ReqType/:ExpCode', component: clientmaster, data: { title: 'Client' },pathMatch: 'full' },
+            { path: 'consignee/:ReqType/:ConCode', component: consigneemaster, data: { title: 'Consignee' },pathMatch: 'full' },
+            { path: 'search/:ReqType', component: ReqMastersearch, data: { title: 'Search' },pathMatch: 'full' },
+            { path: 'supplier/:ReqType/:SupCode', component: suppliermaster, data: { title: 'Supplier' },pathMatch: 'full' },
+            { path: 'AgentVessel/:ReqType/:VslAgtC', component: vesselAgentmaster, data: { title: 'AGENT(VESSEL)' },pathMatch: 'full' },
+            { path: 'Liner/:ReqType/:linerC', component: Linermaster, data: { title: 'Liner' },pathMatch: 'full' },
              
         ]
     }

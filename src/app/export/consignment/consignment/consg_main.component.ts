@@ -7,10 +7,9 @@ import { LoginService } from '../../../shared/service/loginService';
 import { IMyDpOptions } from 'mydatepicker';
 import { SharedDataSerice } from '../../export-share-data.service';
 import { LoaderService } from '../../../shared/service/loader.service';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 @Component({
-    templateUrl: 'consg_main.component.html'
+    templateUrl: 'consg_main.component.html',
     //styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
    // encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,

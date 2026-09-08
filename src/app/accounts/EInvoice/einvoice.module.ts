@@ -10,6 +10,7 @@ import { ResetJson  } from './einvoice-resetjson.component';
 import {EcreditNoteGenerateJson} from './ecreditnote-generatejson.component';
 import { CreditNoteResetJson  } from './ecreditnote-resetjson.component'; 
 import { einvoiceRoutingModule } from './einvoice.routing';
+import { EInvoiceList } from './einvoice-list.component';
 // import { ClientEdiDesignComponent } from './client-edi-design.component';
 // import { ClientedifilterpipePipe } from './client-edifilterpipe.pipe';
 @NgModule({
@@ -22,8 +23,8 @@ import { einvoiceRoutingModule } from './einvoice.routing';
       NgSelectModule
       //SharedModule
   ],
-  declarations: [GenerateJson,UploadIRN,ResetJson,EcreditNoteGenerateJson,CreditNoteResetJson
-    
+  declarations: [GenerateJson,UploadIRN,ResetJson,EcreditNoteGenerateJson,CreditNoteResetJson,
+      EInvoiceList
   ],
   providers: [
   ],

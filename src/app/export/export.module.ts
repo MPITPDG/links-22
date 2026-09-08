@@ -24,7 +24,7 @@ import {
     ConfirmModalComponent
 } from '../shared/common-modal.directive';
 import { mblsharedservice } from './export-share-data.service';
-import { AccordionModule } from 'ngx-bootstrap';
+import { AccordionModule } from 'ngx-bootstrap/accordion';
 @NgModule({ 
     imports: [ExportRoutingModule,
         FormsModule,

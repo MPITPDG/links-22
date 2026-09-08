@@ -16,6 +16,7 @@ import {Configuration}  from '../../app.constants'
 })
   export class EcreditNoteGenerateJson implements OnInit {
     EcreditnoteListtbl: any = []
+    checkbox: boolean = false;
     newArray: any = [];
     rptdownloadurl:string;
     subheader:string="";
@@ -52,6 +53,10 @@ import {Configuration}  from '../../app.constants'
             this._loaderService.display(false);
           })
       }
+    checkAll(event: any) {
+        const checked = event.target.checked;
+        this.EcreditnoteListtbl.forEach((item: any) => item.Checked = checked);
+    }
       getCheckboxValues(event, data) {
         var index = this.newArray.findIndex(x => x.InvNo == data);
         if (event) {

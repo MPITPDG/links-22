@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { LoginService } from '../../../shared/service/loginService';
 import { ToastCommonService } from '../../../shared/service/toastService';
 //import { markViewDirty } from '@angular/core/src/render3/instructions';
-import { analyzeAndValidateNgModules } from '@angular/compiler';
 import { prealertshareservice, SharedDataSerice } from '../../export-share-data.service';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({

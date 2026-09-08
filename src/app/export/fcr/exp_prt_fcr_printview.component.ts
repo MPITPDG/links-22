@@ -1017,6 +1017,7 @@ export class ExptPrintview implements OnInit {
     ISPRINT :string="";
     WaterMarkoption:boolean=false;
     watermarkval:string="0";
+    expressbill: boolean = false;
     @ViewChild(ExptFCRPrintview, {static: false}) public viewFCR: ExptFCRPrintview;
     @ViewChild(ExptMTOprintview, {static: false}) public viewMTO: ExptMTOprintview;
 

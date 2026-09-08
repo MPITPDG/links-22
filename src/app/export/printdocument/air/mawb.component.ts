@@ -6,7 +6,6 @@ import { ToastCommonService } from '../../../shared/service/toastService';
 import { LoginService } from '../../../shared/service/loginService';
 import { IMyDpOptions } from 'mydatepicker';
 import { LoaderService } from '../../../shared/service/loader.service';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 @Component({
     selector: 'app-print-air-mawb-list',
     templateUrl: 'mawb.list.component.html',
