@@ -1,0 +1,16 @@
+@use "sass:color";
+@use "sass:math";
+
+// Drop-in replacements for the removed global lighten()/darken().
+// Unlike color.adjust(), the legacy functions clamped lightness to 0-100%,
+// so darken(black) stays black and lighten(white) stays white. Results are
+// returned in the rgb space so the emitted CSS is unchanged.
+@function legacy-lighten($color, $amount) {
+  $l: color.channel($color, "lightness", $space: hsl);
+  @return color.to-space(color.change($color, $lightness: math.clamp(0%, $l + $amount, 100%), $space: hsl), rgb);
+}
+
+@function legacy-darken($color, $amount) {
+  $l: color.channel($color, "lightness", $space: hsl);
+  @return color.to-space(color.change($color, $lightness: math.clamp(0%, $l - $amount, 100%), $space: hsl), rgb);
+}
