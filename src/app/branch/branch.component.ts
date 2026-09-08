@@ -10,7 +10,7 @@ import { ToastCommonService } from '../shared/service/toastService';
     templateUrl: 'branch.component.html',
     styles: [
         `
-        :host >>> .popover {
+        :host ::ng-deep .popover {
           background-color: #009688;
             border-radius: 10px;
             padding:5px;

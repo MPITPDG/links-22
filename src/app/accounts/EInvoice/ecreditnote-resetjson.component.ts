@@ -13,7 +13,7 @@ import {Configuration}  from '../../app.constants'
     styles: [`
     .green-text {
         color: green; /* Adjust the styles as per your requirement */
-      },
+      }
       .disabled-row {
         opacity: 0.5; /* or any other styling to indicate a disabled state */
         pointer-events: none; /* Disable pointer events */
