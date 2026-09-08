@@ -2,7 +2,8 @@ import { Component, ViewChild } from '@angular/core';
 import { ModalDirective } from 'ngx-bootstrap';
 
 @Component({
-  templateUrl: 'modals.component.html'
+  templateUrl: 'modals.component.html',
+    standalone: false
 })
 export class ModalsComponent {
     public myModal;

@@ -13,6 +13,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 
          }
     `],
+    standalone: false
 })
 export class DeleteContainer implements OnInit {
     containerno;

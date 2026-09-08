@@ -13,7 +13,8 @@ import { DataService } from 'src/app/shared/service/dataService';
   .anchor-link{
     text-decoration:none !important
   }
-  `]
+  `],
+    standalone: false
 })
 export class InvoicehistoryComponent implements OnInit {
   Header:string="AIRFREIGHT - INVOICE - HISTORY"

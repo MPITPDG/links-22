@@ -12,8 +12,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 @Component({
     selector: 'app-RePrintCheque-Chequereport-search',
     templateUrl: './ReprintCheque-Assign-ChequeNo.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
 
   export class RePrintChequeAssignChequeNoComponent implements OnInit {
     data_list:any=[];

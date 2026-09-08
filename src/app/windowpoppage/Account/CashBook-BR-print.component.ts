@@ -49,7 +49,9 @@ import { param } from 'jquery';
   font-family: Verdana, Arial;
   color: black;
 }
-    `]})
+    `],
+    standalone: false
+})
 export class CashBookBRPrintComponent implements OnInit {
   PageType: any;
   EntryNo: any;

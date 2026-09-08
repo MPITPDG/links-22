@@ -8,7 +8,8 @@ import {
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-    templateUrl: 'order-size-detail.component.html'
+    templateUrl: 'order-size-detail.component.html',
+    standalone: false
 })
 export class ExportConsignmentOrderSizeDetailComponent implements OnInit {
     @ViewChild('submitButton', {static: false}) submitButton: ElementRef;

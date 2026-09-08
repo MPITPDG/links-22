@@ -12,8 +12,9 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-receivable-anyoneclient-ageing',
     templateUrl: './rcbl-anyoneClnt-ageing.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class ReceivableAnyOneClientAgeing implements OnInit {
   
     AccountList:any = [];

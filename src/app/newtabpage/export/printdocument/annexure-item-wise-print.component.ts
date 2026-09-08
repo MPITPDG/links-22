@@ -5,7 +5,8 @@ import { ActivatedRoute } from '@angular/router';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-print-document-annexure-item-wise',
-    templateUrl: 'annexure-item-wise-print.component.html'
+    templateUrl: 'annexure-item-wise-print.component.html',
+    standalone: false
 })
 export class AnnexureItemWisePrintComponent implements OnInit {
 

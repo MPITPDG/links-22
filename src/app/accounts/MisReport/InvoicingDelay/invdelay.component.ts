@@ -12,8 +12,9 @@ import { DatePipe } from '@angular/common';
 @Component({
     selector: 'app-InvoicingDelay',
     templateUrl: './invdelay.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class InvDelay implements OnInit {
 
       public myDatePickerOptionsRpt: IMyDpOptions = {

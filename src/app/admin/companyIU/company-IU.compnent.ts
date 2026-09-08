@@ -14,8 +14,8 @@ import { Configuration } from '../../app.constants';
  
 @Component({
     selector: 'app-Companycreation',
-    templateUrl: 'company-IU.compnent.html'
-
+    templateUrl: 'company-IU.compnent.html',
+    standalone: false
 })
 
 

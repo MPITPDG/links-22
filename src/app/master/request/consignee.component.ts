@@ -11,8 +11,8 @@ import { Configuration } from '../../app.constants';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 @Component({
     selector: 'app-masterconsignee',
-    templateUrl: 'consignee.component.html'
-
+    templateUrl: 'consignee.component.html',
+    standalone: false
 })
 export class consigneemaster  implements OnInit  { 
     document_Array: Array<any> = [];

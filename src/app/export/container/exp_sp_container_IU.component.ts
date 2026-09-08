@@ -12,7 +12,8 @@ import { TabsetComponent  } from 'ngx-bootstrap/tabs';
 //import { CLPList, ContainerCLP  } from  'ngx-bootstrap/tabs';
 @Component({
     selector: 'app-container-iu',
-    templateUrl: 'exp_sp_container_IU.component.html'
+    templateUrl: 'exp_sp_container_IU.component.html',
+    standalone: false
 })
 export class ExptSpContainerIU implements OnInit {
   //  this._loginService.getLogin

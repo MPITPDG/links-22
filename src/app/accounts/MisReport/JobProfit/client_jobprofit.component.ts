@@ -11,7 +11,8 @@ import { JobprofitserviceService } from 'src/app/shared/service/jobprofitservice
 @Component({
     selector: 'app-clientjobprofit',
     templateUrl: './client_jobprofit.component.html',
-    styles: []
+    styles: [],
+    standalone: false
 })
 export class ClientJobprofitComponent implements OnInit {
 

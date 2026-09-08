@@ -10,6 +10,7 @@ import { DatePipe } from '@angular/common';
 
 @Component({
     templateUrl: './clntstatus-followup.component.html',
+    standalone: false
 })
 export class ClientStatusFollowup implements OnInit  {
     @Input() AssignedDate: string = '';

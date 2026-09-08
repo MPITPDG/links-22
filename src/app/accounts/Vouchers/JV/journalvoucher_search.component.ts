@@ -10,7 +10,8 @@ import { ActivatedRoute } from '@angular/router';
     selector: 'app-accounts-vouchers-jv-journalvoucher-search',
     templateUrl: 'journalvoucher_search.component.html',
     // styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class JournalVoucherSearchComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {

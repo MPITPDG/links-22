@@ -12,9 +12,9 @@
     
     @Component({
         selector: 'app-mastersupplier',
-        templateUrl: 'supplier.component.html'
-
-    })  
+        templateUrl: 'supplier.component.html',
+    standalone: false
+})  
 
     export class suppliermaster  implements OnInit  { 
         CHECKC1 : any =null;CHECKC2 : any =null;CHECKC3 : any =null;CHECKC4 : any =null; CHECKC5 :any =null;

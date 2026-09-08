@@ -10,7 +10,8 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
 @Component({
   selector: 'app-cheque-stock-search',
   templateUrl: './Cheque-Stock-search.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class ChequeStockSearchComponent implements OnInit {
   public searchString: string;

@@ -12,7 +12,8 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 @Component({
     templateUrl: 'consg_main.component.html'
     //styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
-   // encapsulation: ViewEncapsulation.None
+   // encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class ConsgMainComponent implements OnInit , OnChanges{
     private baseUrl: string = 'Export/GetMainConsignment';

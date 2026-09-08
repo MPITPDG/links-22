@@ -29,7 +29,8 @@ import { LoginService } from '../../shared/service/loginService';
     color: black;
     font-family: Verdana,Arial;
   }
-  `]
+  `],
+    standalone: false
 })
 
   export class QuotationPrintComponent implements OnInit {

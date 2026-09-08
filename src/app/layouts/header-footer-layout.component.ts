@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import { LoginService } from '../shared/service/loginService';
 @Component({
     selector: 'app-header-footer',
-    templateUrl: './header-footer-layout.component.html'
+    templateUrl: './header-footer-layout.component.html',
+    standalone: false
 })
 export class HeaderFooterLayoutComponent implements OnInit {
 

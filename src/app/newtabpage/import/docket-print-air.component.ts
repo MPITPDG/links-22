@@ -50,7 +50,8 @@ import { LoaderService } from '../../shared/service/loader.service';
                 tr.border_right td {
                  border-bottom:1pt solid black;
                }
-    `]
+    `],
+    standalone: false
 })
 export class ImportAirDocketPrintComponent implements OnInit {
     dtData: Array<any> = [];

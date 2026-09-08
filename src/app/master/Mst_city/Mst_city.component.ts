@@ -16,7 +16,8 @@ import { LoaderService } from '../../shared/service/loader.service';
 
 @Component({
     selector:'app-Mst_city',
-    templateUrl:'Mst_city.component.html'
+    templateUrl:'Mst_city.component.html',
+    standalone: false
 })
 
 export class Mst_citycomponent implements OnInit{

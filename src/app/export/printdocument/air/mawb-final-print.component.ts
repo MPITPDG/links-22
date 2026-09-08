@@ -10,7 +10,8 @@ import { environment } from  '../../../../environments/environment'; //'../../..
 
 @Component({
     selector: 'app-print-air-Mawb-print',
-    templateUrl: 'mawb-final-print.component.html'
+    templateUrl: 'mawb-final-print.component.html',
+    standalone: false
 })
 
 export class PrintDocumentMawbfinalprint implements OnInit {

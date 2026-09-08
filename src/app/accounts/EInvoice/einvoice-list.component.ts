@@ -10,8 +10,9 @@ import { DomSanitizer } from '@angular/platform-browser';
 @Component({
     selector: 'app-einvoice-list',
     templateUrl: './einvoice-list.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class EInvoiceList implements OnInit {
     EInvoiceListtbl: any = []
     newArray: any = [];

@@ -5,7 +5,8 @@ import { BehaviorSubject } from 'rxjs';
 import { Subject } from 'rxjs';
 @Component({
     selector: 'app-financial-year',
-    templateUrl: 'financial-year.component.html'
+    templateUrl: 'financial-year.component.html',
+    standalone: false
 })
 export class FinancialYearComponent {
     newSubject: Subject<string> = new Subject();

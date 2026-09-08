@@ -9,8 +9,8 @@ import { LoaderService } from '../../shared/service/loader.service';
     selector: 'app-consignment-import-air-search',
     templateUrl: 'search.component.html',
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    encapsulation: ViewEncapsulation.None
-
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class AirSearchComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {

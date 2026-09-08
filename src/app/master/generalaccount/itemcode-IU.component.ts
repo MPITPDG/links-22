@@ -12,8 +12,8 @@ import { Configuration } from '../../app.constants';
  
 @Component({
     selector: 'app-ItemCodeCreation',
-    templateUrl: 'itemcode-IU.component.html'
-
+    templateUrl: 'itemcode-IU.component.html',
+    standalone: false
 })
 
 

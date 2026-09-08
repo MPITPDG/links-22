@@ -12,7 +12,8 @@ import { LoaderService } from '../../shared/service/loader.service';
 
 @Component({
     selector: 'app-fcr-iu',
-    templateUrl: 'exp_prt_fcr_generate.component.html' 
+    templateUrl: 'exp_prt_fcr_generate.component.html',
+    standalone: false
 })
 
 export class ExptFCRGenerate  implements OnInit {

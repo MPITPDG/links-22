@@ -12,8 +12,9 @@ import { FilterPipe } from 'ngx-filter-pipe';
 @Component({
     selector: 'app-clntoutstanding',
     templateUrl: './clntoutstanding.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class ClientOutstanding implements OnInit {
     expandContent = true;
     cloutList= [];

@@ -29,7 +29,9 @@
 //         font-family: Verdana, Arial;
 //       }
 //     `]
-// })
+//,
+    standalone: false
+})
 // export class FreightLoginComponent implements OnInit {
 //     public username: string = '';
 //     public password: string = '';

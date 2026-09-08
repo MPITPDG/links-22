@@ -48,7 +48,9 @@ import { HttpClient } from '@angular/common/http';
     font-family: Verdana, Arial;
     color: black;
   }
-      `]})
+      `],
+    standalone: false
+})
   export class JVPrintComponent implements OnInit {
     Type: any;
     EntryNo: any;

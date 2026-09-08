@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import{ LoginService } from '../../shared/service/loginService'
 @Component({
-    templateUrl: 'transaction.component.html'
+    templateUrl: 'transaction.component.html',
+    standalone: false
 })
 export class TransactionComponent implements OnInit {
 

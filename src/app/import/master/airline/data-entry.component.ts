@@ -6,7 +6,8 @@ import { ToastCommonService } from '../../../shared/service/toastService';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-consignment-import-master-airline-data-entry',
-    templateUrl: 'data-entry.component.html'
+    templateUrl: 'data-entry.component.html',
+    standalone: false
 })
 export class EntryAirlineMasterComponent implements OnInit {
     Header: string = "AIRLINE MASTER - ADD";

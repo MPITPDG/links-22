@@ -11,8 +11,8 @@ import { DatePipe } from '@angular/common'
   selector: 'app-gen-cash-receipt',
   templateUrl: './Gen-Cash-Receipt.component.html',
   styles: [],
-  providers: [DatePipe]
-
+  providers: [DatePipe],
+    standalone: false
 })
 export class GenCashReceiptComponent implements OnInit {
   Header: string = " Generate Cash Receipt from Cash Expenses"

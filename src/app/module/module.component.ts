@@ -8,7 +8,8 @@ import { environment } from '../../environments/environment';
 
 @Component({
     templateUrl: 'module.component.html',
-    styleUrls: ['module.component.css']
+    styleUrls: ['module.component.css'],
+    standalone: false
 })
 export class ModuleComponent implements OnInit {
     @ViewChild('selector', {static: false}) selector: ElementRef;

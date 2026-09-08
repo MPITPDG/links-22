@@ -70,6 +70,7 @@ a:hover,a:focus{
     resize: none;
 }
 `],
+    standalone: false
 })
 export class CreditNoteComponent implements OnInit {
     Header: string = "Credit Note ";

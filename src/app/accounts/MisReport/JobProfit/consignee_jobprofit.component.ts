@@ -11,7 +11,8 @@ import {Configuration}  from '../../../app.constants'
 @Component({
     selector: 'app-consigneejobprofit',
     templateUrl: './consignee_jobprofit.component.html',
-    styles: []
+    styles: [],
+    standalone: false
 })
 export class ConsigneeJobprofitComponent implements OnInit {
 

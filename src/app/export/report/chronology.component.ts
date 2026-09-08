@@ -5,7 +5,8 @@ import { LoginService } from '../../shared/service/loginService';
 import { IMyDpOptions } from 'mydatepicker';
 import { LoaderService } from '../../shared/service/loader.service';
 @Component({
-    templateUrl: 'chronology.component.html'
+    templateUrl: 'chronology.component.html',
+    standalone: false
 })
 export class ChrnologyReportComponent implements OnInit {
     CityList: Array<any> = [];

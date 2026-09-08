@@ -10,8 +10,9 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-BankReconcil-rpt',
     templateUrl: './bank-reconcil-rpt.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class BankReconcilStatementComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {
          dateFormat: 'dd/mm/yyyy',

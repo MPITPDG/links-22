@@ -9,7 +9,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Configuration } from '../../../app.constants';
  
 @Component({
-    templateUrl: 'staffpurchase_IU.component.html'
+    templateUrl: 'staffpurchase_IU.component.html',
+    standalone: false
 })
 export class StaffPurchaseComponent implements OnInit {
     Allitemlist:any=[];

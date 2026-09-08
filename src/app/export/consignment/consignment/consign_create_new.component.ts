@@ -11,8 +11,8 @@ import { ToasterConfig } from 'angular2-toaster';
 @Component({
     templateUrl: 'consign_create_new.component.html',
  //   styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    // encapsulation: ViewEncapsulation.None
-     
+    // encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class CreateAutoJobComponent implements OnInit {
     private baseUrl: string = 'Export/GetExportConsignmentNew';

@@ -10,7 +10,8 @@ import { environment } from '../../../../environments/environment'; //'../../../
 
 @Component({
     selector: 'app-print-air-hawb-list',
-    templateUrl: 'hawb.list.component.html'
+    templateUrl: 'hawb.list.component.html',
+    standalone: false
 })
 export class PrintDocumentHawbListComponent implements OnChanges {
     //this._dataService.stringdttoArry(data.Table[0].CARTEDDT); set Date
@@ -79,7 +80,8 @@ export class PrintDocumentHawbListComponent implements OnChanges {
 
 @Component({
     selector: 'app-print-air-hawb-search',
-    templateUrl: 'hawb.search.component.html'
+    templateUrl: 'hawb.search.component.html',
+    standalone: false
 })
 export class PrintDocumentHawbSearchComponent implements OnChanges {
 
@@ -174,7 +176,8 @@ export class PrintDocumentHawbSearchComponent implements OnChanges {
 
 @Component({
     selector: 'app-print-air-hawb-update',
-    templateUrl: 'hawb.update.component.html'
+    templateUrl: 'hawb.update.component.html',
+    standalone: false
 })
 export class PrintDocumentHawbUpdateComponent implements OnChanges {
     @Input() hawbno: any = '';
@@ -316,7 +319,8 @@ export class PrintDocumentHawbUpdateComponent implements OnChanges {
 
 
 @Component({
-    templateUrl: 'hawb.component.html'
+    templateUrl: 'hawb.component.html',
+    standalone: false
 })
 export class PrintDocumentHawbComponent implements OnInit {
 

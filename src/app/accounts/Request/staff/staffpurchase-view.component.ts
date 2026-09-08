@@ -7,7 +7,8 @@ import { ToastCommonService } from '../../../shared/service/toastService';
 @Component({
   selector: 'app-staffpurchase-view',
   templateUrl: './staffpurchase-view.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class staffpurchaseViewComponent implements OnInit, OnChanges  {
     display='none';

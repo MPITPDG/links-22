@@ -11,8 +11,9 @@ import { DatePipe } from '@angular/common';
 @Component({
     selector: 'app-ClientwiseIncome',
     templateUrl: './clientwiseincome.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
 
   export class ClientwiseIncomeComponent implements OnInit {
 

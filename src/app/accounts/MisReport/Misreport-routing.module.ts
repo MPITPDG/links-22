@@ -13,59 +13,59 @@ const routes: Routes = [
       
             {
                 path: 'FinanceDashboard',
-                loadChildren: './FinanceDashboard/financedashboard.module#FinanceDashboardModule',
+                loadChildren: () => import('./FinanceDashboard/financedashboard.module').then(m => m.FinanceDashboardModule),
                 canActivate: [FinancialYearAuthGuard],
             },
             {
                 path: 'AdminReport',
-                loadChildren: './AdminReport/Adminreport.module#AccountAdminReportModule',
+                loadChildren: () => import('./AdminReport/Adminreport.module').then(m => m.AccountAdminReportModule),
                 canActivate: [FinancialYearAuthGuard],
             },
         {
             path: 'ActFinalization',
-            loadChildren: './ActFinalization/actfinalization.module#ActFinalizationModule',
+            loadChildren: () => import('./ActFinalization/actfinalization.module').then(m => m.ActFinalizationModule),
             canActivate: [FinancialYearAuthGuard],
         },
         {
           path: 'InvoicingDelay',
-          loadChildren: './InvoicingDelay/invoicingdelay.module#InvoicingDelayModule',
+          loadChildren: () => import('./InvoicingDelay/invoicingdelay.module').then(m => m.InvoicingDelayModule),
           canActivate: [FinancialYearAuthGuard],
       },
      
       {
         path: 'MawbNetFrt',
-        loadChildren: './MawbNetFrt/mawbnetfrt.module#MAWBFRTModule',
+        loadChildren: () => import('./MawbNetFrt/mawbnetfrt.module').then(m => m.MAWBFRTModule),
         canActivate: [FinancialYearAuthGuard],
       },
       {
         path: 'AirFreight',
-        loadChildren: './AirFreight/airfreight.module#AirFreightModule',
+        loadChildren: () => import('./AirFreight/airfreight.module').then(m => m.AirFreightModule),
         canActivate: [FinancialYearAuthGuard],
      },
       {
         path: 'SundryExpense',
-        loadChildren: './SundryExpenselateact/sundryexpenselateact.module#SundryExpensesModule',
+        loadChildren: () => import('./SundryExpenselateact/sundryexpenselateact.module').then(m => m.SundryExpensesModule),
         canActivate: [FinancialYearAuthGuard],
       },
       {
         path: 'Clientoutstandingageing',
-        loadChildren: './Clientoutstandingageing/clientoutstandingageing.module#ClientOutstandingModule',
+        loadChildren: () => import('./Clientoutstandingageing/clientoutstandingageing.module').then(m => m.ClientOutstandingModule),
         canActivate: [FinancialYearAuthGuard],
       }  ,
   
       {
         path: 'ExJobSearch',
-        loadChildren: './ExJobSearch/exjobsearch.module#ExJobSearchModule',
+        loadChildren: () => import('./ExJobSearch/exjobsearch.module').then(m => m.ExJobSearchModule),
         canActivate: [FinancialYearAuthGuard],
       }   ,
         {
         path: 'JobProfit',
-        loadChildren: './JobProfit/jobprofit.module#JobProfitModule',
+        loadChildren: () => import('./JobProfit/jobprofit.module').then(m => m.JobProfitModule),
         canActivate: [FinancialYearAuthGuard],
       } 
 // {
 // path: 'Generalactallbranch',
-// loadChildren: './Generalactallbranch/generalactallbranch.module#GeneralActAllBranchModule',
+// loadChildren: () => import('./Generalactallbranch/generalactallbranch.module').then(m => m.GeneralActAllBranchModule),
 // canActivate: [FinancialYearAuthGuard],
 // }    
 

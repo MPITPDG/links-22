@@ -8,8 +8,8 @@ import { LoaderService } from '../../shared/service/loader.service';
  
 @Component({
     selector: 'app-container-list',
-    templateUrl: 'export-list-container.component.html'
-
+    templateUrl: 'export-list-container.component.html',
+    standalone: false
 })
 export class listcontainer implements OnInit {
     Searchdata: any=[];

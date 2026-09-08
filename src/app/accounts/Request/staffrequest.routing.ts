@@ -11,7 +11,7 @@ const routes: Routes = [
         children: [
             {
                 path: 'staff',
-                loadChildren: './staff/staff-purchase.module#staffPurchaseModule',
+                loadChildren: () => import('./staff/staff-purchase.module').then(m => m.staffPurchaseModule),
                 canActivate: [FinancialYearAuthGuard],
             },
         ]

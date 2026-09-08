@@ -24,7 +24,7 @@ export const routes: Routes = [
     //     children: [
     //         {
     //             path: '',
-    //             loadChildren: './dashboard/dashboard.module#DashboardModule'
+    //             loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule)
     //         }
     //     ]
     // },
@@ -37,7 +37,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './dashboard/dashboard.module#DashboardModule'
+                loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule)
             }
         ]
     },
@@ -50,7 +50,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './export/export.module#ExportModule'
+                loadChildren: () => import('./export/export.module').then(m => m.ExportModule)
             }
         ]
     },
@@ -63,7 +63,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './login/login.module#LoginModule',
+                loadChildren: () => import('./login/login.module').then(m => m.LoginModule),
             }
         ]
     },
@@ -76,7 +76,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './windowpoppage/window-pop-page.module#WindowPopPageModule',
+                loadChildren: () => import('./windowpoppage/window-pop-page.module').then(m => m.WindowPopPageModule),
             }
         ]
     },
@@ -89,7 +89,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './newtabpage/new-tab-page.module#NewTabPageModule',
+                loadChildren: () => import('./newtabpage/new-tab-page.module').then(m => m.NewTabPageModule),
             }
         ]
     },
@@ -102,7 +102,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './branch/branch.module#BranchModule',
+                loadChildren: () => import('./branch/branch.module').then(m => m.BranchModule),
             }
         ]
     },
@@ -115,7 +115,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './company/company.module#CompanyModule',
+                loadChildren: () => import('./company/company.module').then(m => m.CompanyModule),
             }
         ]
     },
@@ -128,7 +128,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './module/module.module#ModulesModule',
+                loadChildren: () => import('./module/module.module').then(m => m.ModulesModule),
             }
         ]
     },
@@ -141,7 +141,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './accounts/accounts.module#AccountModule',
+                loadChildren: () => import('./accounts/accounts.module').then(m => m.AccountModule),
             }
         ]
     },
@@ -154,7 +154,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './accounts/accounts.module#AccountModule',
+                loadChildren: () => import('./accounts/accounts.module').then(m => m.AccountModule),
             }
         ]
     },
@@ -168,7 +168,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './export/export.module#ExportModule',
+                loadChildren: () => import('./export/export.module').then(m => m.ExportModule),
             }
         ]
     },
@@ -181,7 +181,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './import/import.module#ImportModule',
+                loadChildren: () => import('./import/import.module').then(m => m.ImportModule),
             }
         ]
     },
@@ -194,7 +194,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './information/information.module#InformationModule',
+                loadChildren: () => import('./information/information.module').then(m => m.InformationModule),
             }
         ]
     },
@@ -207,7 +207,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './error/error.module#ErrorModule',
+                loadChildren: () => import('./error/error.module').then(m => m.ErrorModule),
             }
         ]
     },
@@ -221,7 +221,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './profile/profile.module#ProfileModule',
+                loadChildren: () => import('./profile/profile.module').then(m => m.ProfileModule),
             }
         ]
     },
@@ -235,7 +235,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './export/export.module#ExportModule',
+                loadChildren: () => import('./export/export.module').then(m => m.ExportModule),
             }
         ]
     } ,
@@ -248,7 +248,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './master/master-master.module#MastermasterModules',
+                loadChildren: () => import('./master/master-master.module').then(m => m.MastermasterModules),
             }
         ]
     },     
@@ -261,7 +261,7 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './admin/Adminuserprofile.module#AdminuserprofileModule',
+                loadChildren: () => import('./admin/Adminuserprofile.module').then(m => m.AdminuserprofileModule),
             }
         ]
     },

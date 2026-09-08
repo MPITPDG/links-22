@@ -13,7 +13,7 @@ const routes: Routes = [
         { path: '', component: AdminReportComponent, data: { title: 'Home' } },
         {
             path: 'ClientRegister',
-            loadChildren: './ClientRegister/clientregister.module#ClientRegisterModule',
+            loadChildren: () => import('./ClientRegister/clientregister.module').then(m => m.ClientRegisterModule),
             canActivate: [FinancialYearAuthGuard],
         },
         { path: 'DrCrDiffAudit', component: FyDrCrDiffAuditComponent, data: { title: 'FY Debit/Credit Difference Audit' } },

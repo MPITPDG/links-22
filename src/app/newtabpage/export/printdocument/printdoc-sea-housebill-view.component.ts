@@ -148,7 +148,8 @@ import { ActivatedRoute } from '@angular/router';
 										</table>	
 
              
-        `
+        `,
+    standalone: false
 })
 
 export class printFCRPrintview implements OnInit {
@@ -444,7 +445,8 @@ export class printFCRPrintview implements OnInit {
 							</tr> 
 						</table>  
             
-        `
+        `,
+    standalone: false
 })
 export class PrintMTOprintview implements OnInit  {
     paramData: any = { FCRNO: null ,FcrType :null };
@@ -617,7 +619,9 @@ export class PrintMTOprintview implements OnInit  {
 //     selector: 'app-printview',
 //     templateUrl: 'exp_prt_fcr_printview.component.html'
 
-// })
+//,
+    standalone: false
+})
 // export class ExptPrintview implements OnInit {
 //     Type: any = "";
 // 	buttonStatus = false;

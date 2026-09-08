@@ -21,7 +21,8 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap';
     top: 0; /* Don't forget this, required for the stickiness */
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
   }
-  `]
+  `],
+    standalone: false
 })
 export class invoiceAuth implements OnInit {
   public searchString: string;

@@ -7,7 +7,8 @@ import { LoaderService } from '../../../shared/service/loader.service';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 @Component({
-    templateUrl: 'purchase-IUOld.component.html'
+    templateUrl: 'purchase-IUOld.component.html',
+    standalone: false
 })
 export class PurchaseOEComponent implements OnInit {
     chkrules:string="N";

@@ -8,8 +8,8 @@ import { LoaderService } from '../shared/service/loader.service';
  
 @Component({
     selector: 'app-updatepassword',
-    templateUrl: 'update-password.component.html'
-
+    templateUrl: 'update-password.component.html',
+    standalone: false
 })
 
 export class updatePassword implements OnInit {

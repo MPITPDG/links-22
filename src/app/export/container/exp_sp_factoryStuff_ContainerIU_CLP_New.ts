@@ -12,7 +12,8 @@ import { ThemeService } from 'ng2-charts';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 @Component({
     selector: 'app-containerFS-iu',
-    templateUrl: 'exp_sp_factoryStuff_ContainerIU_CLP_New.html'
+    templateUrl: 'exp_sp_factoryStuff_ContainerIU_CLP_New.html',
+    standalone: false
 })
 export class ExptSpContainerIUFSNEW implements OnInit {
     Add:string="Add";

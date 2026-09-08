@@ -11,8 +11,8 @@ import { Configuration } from '../../app.constants';
  
 @Component({
     selector: 'app-masterAgentVessel',
-    templateUrl: 'vessel_Agent.component.html'
-
+    templateUrl: 'vessel_Agent.component.html',
+    standalone: false
 })  
 
 

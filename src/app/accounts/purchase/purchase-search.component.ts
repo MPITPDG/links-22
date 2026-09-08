@@ -11,7 +11,8 @@ import { DatePipe } from '@angular/common';
 @Component({
   selector: 'app-purchase-search',
   templateUrl: './purchase-search.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class PurchaseSearchComponent implements OnInit {
   public myDatePickerOptions: IMyDpOptions = {

@@ -16,8 +16,9 @@ import { AccordionComponent } from 'ngx-bootstrap/accordion';
     .hoverTable tr:hover {
        
       color: #c14a1d;
-}`]
- })
+}`],
+    standalone: false
+})
 export class ExportComponent implements OnInit {
   constructor(
     private _router: Router,

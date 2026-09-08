@@ -10,7 +10,8 @@ import {
     ButtonService } from '../../shared/common-font-changer.directive';
 
 @Component({
-    templateUrl: 'common.search.sp.component.html'
+    templateUrl: 'common.search.sp.component.html',
+    standalone: false
 })
 export class CommonSearchShipmentProgressComponent implements OnInit {
     @ViewChild('searchButton', {static: false}) searchButton: ElementRef;    
@@ -193,7 +194,8 @@ export class CommonSearchShipmentProgressComponent implements OnInit {
 
 @Component({
     selector: 'app-shipment-progress-common-view',
-    templateUrl: 'common.view.sp.component.html'
+    templateUrl: 'common.view.sp.component.html',
+    standalone: false
 })
 export class CommonViewShipmentProgressComponent implements OnInit, OnChanges {
     @Input() ExptNo: any;
@@ -222,7 +224,8 @@ export class CommonViewShipmentProgressComponent implements OnInit, OnChanges {
 }
 
 @Component({
-    templateUrl: 'sp.component.html'
+    templateUrl: 'sp.component.html',
+    standalone: false
 })
 export class ShipmentProgressComponent implements OnInit {
     constructor() { }
@@ -233,7 +236,8 @@ export class ShipmentProgressComponent implements OnInit {
 
 @Component({
     selector: 'app-shipment-progress-shipping-bill',
-    templateUrl: 'shipping-bill.sp.component.html'
+    templateUrl: 'shipping-bill.sp.component.html',
+    standalone: false
 })
 export class ShippingBillShipmentProgressComponent implements OnInit, OnChanges {
     public myDatePickerOptions: IMyDpOptions = {
@@ -405,7 +409,8 @@ export class ShippingBillShipmentProgressComponent implements OnInit, OnChanges 
     selector: 'app-shipment-progress-receipt-cargo',
     templateUrl: 'receipt-cargo.sp.component.html',
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class ReceiptCargoShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
     @ViewChild('addButton', {static: false}) addButton: ElementRef;
@@ -661,7 +666,8 @@ export class ReceiptCargoShipmentProgressComponent implements OnInit, OnChanges,
 
 @Component({
     selector: 'app-shipment-progress-approval-received',
-    templateUrl: 'approval-received.sp.component.html'
+    templateUrl: 'approval-received.sp.component.html',
+    standalone: false
 })
 export class ApprovalReceivedShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
     @ViewChild('submitButton', {static: false}) submitButton: ElementRef;
@@ -763,7 +769,8 @@ export class ApprovalReceivedShipmentProgressComponent implements OnInit, OnChan
 
 @Component({
     selector: 'app-shipment-progress-measurement',
-    templateUrl: 'measurement.sp.component.html'
+    templateUrl: 'measurement.sp.component.html',
+    standalone: false
 })
 export class MeasurementShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
     @ViewChild('submitButton', {static: false}) submitButton: ElementRef;
@@ -844,7 +851,8 @@ export class MeasurementShipmentProgressComponent implements OnInit, OnChanges, 
 
 @Component({
     selector: 'app-shipment-progress-out-of-charge',
-    templateUrl: 'out-of-charge.sp.component.html'
+    templateUrl: 'out-of-charge.sp.component.html',
+    standalone: false
 })
 export class OutOfChargeShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
     @ViewChild('submitButton', {static: false}) submitButton: ElementRef;
@@ -940,7 +948,8 @@ export class OutOfChargeShipmentProgressComponent implements OnInit, OnChanges, 
 
 @Component({
     selector: 'app-shipment-progress-bl-details',
-    templateUrl: 'bl-details.sp.component.html'
+    templateUrl: 'bl-details.sp.component.html',
+    standalone: false
 })
 export class BlDetailsShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
     @ViewChild('submitButton', {static: false}) submitButton: ElementRef;
@@ -1051,7 +1060,8 @@ export class BlDetailsShipmentProgressComponent implements OnInit, OnChanges, Af
 
 @Component({
     selector: 'app-shipment-progress-carting-air',
-    templateUrl: 'carting-air.sp.component.html'
+    templateUrl: 'carting-air.sp.component.html',
+    standalone: false
 })
 export class CartingAirShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
     @ViewChild('submitButton', {static: false}) submitButton: ElementRef;
@@ -1146,7 +1156,8 @@ export class CartingAirShipmentProgressComponent implements OnInit, OnChanges, A
 
 @Component({
     selector: 'app-shipment-progress-prealert-sent-on',
-    templateUrl: 'prealert-sent-on.sp.component.html'
+    templateUrl: 'prealert-sent-on.sp.component.html',
+    standalone: false
 })
 export class PrealertSentOnShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
     @ViewChild('submitButton', {static: false}) submitButton: ElementRef;
@@ -1241,7 +1252,8 @@ export class PrealertSentOnShipmentProgressComponent implements OnInit, OnChange
 
 @Component({
     selector: 'app-shipment-progress-destination-document',
-    templateUrl: 'destination-document-on.sp.component.html'
+    templateUrl: 'destination-document-on.sp.component.html',
+    standalone: false
 })
 export class DestinationDocumentShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
     @ViewChild('submitButton', {static: false}) submitButton: ElementRef;
@@ -1396,7 +1408,8 @@ export class DestinationDocumentShipmentProgressComponent implements OnInit, OnC
     selector: 'app-shipment-progress-sea-to-air',
     templateUrl: 'transfer-sea-to-air.sp.component.html',
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class SeaToAirShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
     @ViewChild('submitButton', {static: false}) submitButton: ElementRef;
@@ -1483,7 +1496,8 @@ export class SeaToAirShipmentProgressComponent implements OnInit, OnChanges, Aft
     selector: 'app-shipment-progress-receipt-cargo-provision',
     templateUrl: 'receipt-cargo-provision.sp.component.html',
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class ReceiptCargoProvisionShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
 
@@ -1750,7 +1764,8 @@ export class ReceiptCargoProvisionShipmentProgressComponent implements OnInit, O
 
 @Component({
     selector: 'app-shipment-progress-scan-docs-sent',
-    templateUrl: 'scan-docs-sent.sp.component.html'
+    templateUrl: 'scan-docs-sent.sp.component.html',
+    standalone: false
 })
 export class ScanDocSentShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
 
@@ -1860,7 +1875,8 @@ export class ScanDocSentShipmentProgressComponent implements OnInit, OnChanges, 
     selector: 'app-shipment-progress-pending-shipment',
     templateUrl: 'pending-shipment.sp.component.html',
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class PendingShipmentShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
 
@@ -2193,7 +2209,8 @@ export class PendingShipmentShipmentProgressComponent implements OnInit, OnChang
 
 @Component({
     selector: 'app-shipment-progress-pending-shipment-report',
-    templateUrl: 'pending-shipment-report.sp.component.html'
+    templateUrl: 'pending-shipment-report.sp.component.html',
+    standalone: false
 })
 export class PendingShipReportShipmentProgressComponent implements OnInit, OnChanges {
 
@@ -2245,7 +2262,8 @@ export class PendingShipReportShipmentProgressComponent implements OnInit, OnCha
 @Component({
     templateUrl: 'container-loading-confirmation.sp.component.html',
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class ContainerLoadingShipmentProgressComponent implements OnInit, OnChanges {
 
@@ -2367,7 +2385,8 @@ export class ContainerLoadingShipmentProgressComponent implements OnInit, OnChan
 @Component({
     selector: 'app-shipment-progress-container-loading-view',
     templateUrl: 'view-container-loading-confirmation.sp.component.html',
-    styles: ['.scroll::-webkit-scrollbar{width:10px}.scroll::-webkit-scrollbar-track{background:#f1f1f1}.scroll::-webkit-scrollbar-thumb{background:#888}.scroll::-webkit-scrollbar-thumb:hover{background:#555}']
+    styles: ['.scroll::-webkit-scrollbar{width:10px}.scroll::-webkit-scrollbar-track{background:#f1f1f1}.scroll::-webkit-scrollbar-thumb{background:#888}.scroll::-webkit-scrollbar-thumb:hover{background:#555}'],
+    standalone: false
 })
 export class ViewContainerLoadingShipmentProgressComponent implements OnInit, OnChanges {
 
@@ -2405,7 +2424,8 @@ export class ViewContainerLoadingShipmentProgressComponent implements OnInit, On
     selector: 'app-shipment-progress-container-loading-update',
     templateUrl: 'update-container-loading-confirmation.sp.component.html',
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class UpdateContainerLoadingShipmentProgressComponent implements OnInit, OnChanges {
 
@@ -2797,7 +2817,8 @@ export class UpdateContainerLoadingShipmentProgressComponent implements OnInit, 
 
 @Component({
     selector: 'app-shipment-progress-container-loading-report',
-    templateUrl: 'report-container-loading-confirmation.sp.component.html'
+    templateUrl: 'report-container-loading-confirmation.sp.component.html',
+    standalone: false
 })
 export class ReportContainerLoadingShipmentProgressComponent implements OnInit, OnChanges {
 
@@ -2854,7 +2875,8 @@ export class ReportContainerLoadingShipmentProgressComponent implements OnInit, 
 
 @Component({
     selector: 'app-shipment-progress-prepaid-frt',
-    templateUrl: 'pre-frt-approved-shipper.component.html'
+    templateUrl: 'pre-frt-approved-shipper.component.html',
+    standalone: false
 })
 export class PrepaidfrtApprovShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
     @ViewChild('submitButton', {static: false}) submitButton: ElementRef;
@@ -2957,7 +2979,8 @@ export class PrepaidfrtApprovShipmentProgressComponent implements OnInit, OnChan
 
 @Component({
     selector: 'app-shipment-progress-dimension',
-    templateUrl: 'dimension.sp.component.html'
+    templateUrl: 'dimension.sp.component.html',
+    standalone: false
 })
 export class dimensionShipmentProgressComponent implements OnInit, OnChanges, AfterViewInit {
     @ViewChild('submitButton', {static: false}) submitButton: ElementRef;

@@ -9,8 +9,9 @@ import { ToastCommonService } from '../../shared/service/toastService';
 @Component({
     selector: 'app-JV-view',
     templateUrl: './jv-view.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class JVViewComponent implements OnInit  {
     AccountNameList:any=[]; 
     EntryNo:string=""; 

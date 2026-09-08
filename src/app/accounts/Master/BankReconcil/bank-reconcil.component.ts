@@ -11,8 +11,9 @@ import { BankReconcilAddEditExportService } from './bank-reconcil-addedit-export
 @Component({
     selector: 'app-BankReconcil',
     templateUrl: './bank-reconcil.component.html',
-    styleUrls: ['./bank-reconcil.component.css']
-  })
+    styleUrls: ['./bank-reconcil.component.css'],
+    standalone: false
+})
   export class BankReconcilComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {
          dateFormat: 'dd/mm/yyyy',

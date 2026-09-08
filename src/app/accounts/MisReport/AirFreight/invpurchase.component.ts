@@ -11,8 +11,9 @@ import { DatePipe } from '@angular/common';
 @Component({
     selector: 'app-InvPurchase',
     templateUrl: './invpurchase.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class AIRFREIGHT implements OnInit {
 
     public myDatePickerOptionsRpt: IMyDpOptions = {

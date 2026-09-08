@@ -18,8 +18,9 @@ import {Configuration}  from '../../app.constants'
         opacity: 0.5; /* or any other styling to indicate a disabled state */
         pointer-events: none; /* Disable pointer events */
       }
-    `]
-  })
+    `],
+    standalone: false
+})
   export class ResetJson implements OnInit {
     resetjsonlist: any = []
     newArray: any = [];

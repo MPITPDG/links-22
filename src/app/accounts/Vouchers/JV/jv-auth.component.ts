@@ -9,8 +9,8 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 import { ActivatedRoute, Router } from '@angular/router';
 @Component({
     templateUrl: 'jv-auth.component.html',
-    
-  })
+    standalone: false
+})
   export class journalvoucherAuth implements OnInit {
     authstatus:string="";
     authstat:string="";

@@ -18,8 +18,8 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
       transition('open <=> closed', [animate('250ms ease-in-out')]),
     ])
   ]
-    // encapsulation: ViewEncapsulation.None
-     
+    // encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class CreateJobComponent implements OnInit {
     private baseUrl: string = 'Export/GetExportConsignmentNew';

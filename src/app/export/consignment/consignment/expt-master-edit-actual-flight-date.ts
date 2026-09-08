@@ -10,7 +10,8 @@ import { IMyDpOptions } from 'mydatepicker';
     selector: 'app-edit-actual-flight-date',
     templateUrl: 'expt-master-edit-actual-flight-date.html',
     styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class EditActualFlightDateComponent implements OnInit {
     @ViewChild('submitButton', {static: false}) submitButton: ElementRef;

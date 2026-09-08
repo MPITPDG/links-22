@@ -5,7 +5,8 @@ import { ActivatedRoute } from '@angular/router';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-print-document-annexure-deec-epcg-print',
-    templateUrl: 'annexure-deec-epcg-print.component.html'
+    templateUrl: 'annexure-deec-epcg-print.component.html',
+    standalone: false
 })
 export class AnnexureDeecEpcgPrintComponent implements OnInit {
     dtDeecEpcg: Array<any> = [];

@@ -11,7 +11,8 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
 @Component({
   selector: 'app-cheque-stock-iu',
   templateUrl: './cheque-stock-iu.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class ChequeStockIUComponent implements OnInit {
   Header: string = "Cheque - Stock"

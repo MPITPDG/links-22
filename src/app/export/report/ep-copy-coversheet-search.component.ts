@@ -12,8 +12,8 @@ import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-epcopy-rpt',
-    templateUrl: 'ep-copy-coversheet-search.component.html'
-
+    templateUrl: 'ep-copy-coversheet-search.component.html',
+    standalone: false
 })
 
 export class ExptRptEpCopySheet implements OnInit {

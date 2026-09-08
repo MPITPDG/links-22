@@ -7,7 +7,8 @@ import { IMyDpOptions } from 'mydatepicker';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-consignment-import-master-exchange-rate-data-entry',
-    templateUrl: 'data-entry.component.html'
+    templateUrl: 'data-entry.component.html',
+    standalone: false
 })
 export class EntryExchangeRateMasterComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {

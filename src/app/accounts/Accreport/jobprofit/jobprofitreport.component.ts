@@ -11,7 +11,8 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-jobprofitreport',
   templateUrl: './jobprofitreport.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class JobprofitreportComponent implements OnInit {
 

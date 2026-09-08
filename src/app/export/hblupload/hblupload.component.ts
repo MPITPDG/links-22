@@ -9,8 +9,9 @@ import { IMyDpOptions } from 'mydatepicker';
 @Component({
     selector: 'app-export-uploadhbl',
     templateUrl: './hblupload.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class HBLUploadComponent implements OnInit {
      public myDatePickerOptions: IMyDpOptions = {
             dateFormat: 'dd/mm/yyyy',

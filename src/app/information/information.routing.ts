@@ -12,7 +12,7 @@ const routes: Routes = [
             { path: '', component: InformationComponent, data: { title: 'Home' } },
             {
                 path: 'import',
-                loadChildren: './import/import-i.module#ImportInfoModule',
+                loadChildren: () => import('./import/import-i.module').then(m => m.ImportInfoModule),
             }
         ]
     }

@@ -11,28 +11,28 @@ const routes: Routes = [
         children: [
             {
                 path: 'OEBankPaymnt',
-                loadChildren: './OEBankPayment/bankpaymentOE.module#BankPaymentOEModule',
+                loadChildren: () => import('./OEBankPayment/bankpaymentOE.module').then(m => m.BankPaymentOEModule),
                 canActivate: [FinancialYearAuthGuard],
             }, 
          
              {
                  path: 'OEBankRecpt',
-                  loadChildren: './OEBankReceipt/bankreceiptOE.module#BankReceiptOEModule',
+                  loadChildren: () => import('./OEBankReceipt/bankreceiptOE.module').then(m => m.BankReceiptOEModule),
                  canActivate: [FinancialYearAuthGuard],
              },
              {
                 path: 'OEJV',
-                 loadChildren: './OEJV/journalvoucherOE.module#JVOEModule',
+                 loadChildren: () => import('./OEJV/journalvoucherOE.module').then(m => m.JVOEModule),
                 canActivate: [FinancialYearAuthGuard],
             },
             {
                 path: 'OEPurchase',
-                 loadChildren: './OEPurchase/purchaseOE.module#PurchaseOEModule',
+                 loadChildren: () => import('./OEPurchase/purchaseOE.module').then(m => m.PurchaseOEModule),
                 canActivate: [FinancialYearAuthGuard],
             },
             // {
             //     path: 'OECreditNote',
-            //      loadChildren: './OECreditNote/creditnoteOE.module#CreditNoteOEModule',
+            //      loadChildren: () => import('./OECreditNote/creditnoteOE.module').then(m => m.CreditNoteOEModule),
             //     canActivate: [FinancialYearAuthGuard],
             // },
          

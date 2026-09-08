@@ -15,28 +15,28 @@ const routes: Routes = [
             },
             {
                 path: 'request',
-                loadChildren: './request/request.module#RequestModules',
+                loadChildren: () => import('./request/request.module').then(m => m.RequestModules),
             },
            
             {
                 path: 'city',
-                loadChildren: './Mst_city/Mst_city.module#Mst_citymodule',
+                loadChildren: () => import('./Mst_city/Mst_city.module').then(m => m.Mst_citymodule),
             },
 
             {
                 path: 'common',
-                loadChildren: './common/commonRoute.module#CommonRoutingModules',
+                loadChildren: () => import('./common/commonRoute.module').then(m => m.CommonRoutingModules),
             },
             {
                 path: 'generalaccount',
-                loadChildren: './generalaccount/generalactmaster.module#GeneralactmasterModule',
+                loadChildren: () => import('./generalaccount/generalactmaster.module').then(m => m.GeneralactmasterModule),
                // path: 'MasterAccount',
-               // loadChildren: './MasterAccount/MasterAccount.module#GeneralactmasterModule',
+               // loadChildren: () => import('./MasterAccount/MasterAccount.module').then(m => m.GeneralactmasterModule),
               
            },
            {
             path: 'quotation',
-            loadChildren: './quotation/quotation.module#QuotationModule',
+            loadChildren: () => import('./quotation/quotation.module').then(m => m.QuotationModule),
          
               },
         ]

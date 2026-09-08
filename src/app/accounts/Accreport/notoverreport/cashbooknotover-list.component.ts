@@ -11,8 +11,9 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-CashBookNotOver-search',
     templateUrl: './cashbooknotover-list.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class NotOverReport implements OnInit {
     NotOverList:any = [];
     exceldata_list: any = [];

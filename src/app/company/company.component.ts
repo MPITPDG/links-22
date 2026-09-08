@@ -5,7 +5,8 @@ import { Router } from '@angular/router';
 import { LoginService } from '../shared/service/loginService';
 @Component({
     selector: 'app-company',
-    templateUrl: 'company.component.html'
+    templateUrl: 'company.component.html',
+    standalone: false
 })
 export class CompanyComponent implements OnInit {
     public companylist: Array<any> = [];

@@ -12,8 +12,9 @@ import { DatePipe } from '@angular/common';
 @Component({
     selector: 'app-ExJobSearch',
     templateUrl: './exportJob.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class ExportJobSearch implements OnInit {
 
    

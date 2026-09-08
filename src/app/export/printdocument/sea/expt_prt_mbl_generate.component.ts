@@ -12,8 +12,8 @@ import { mblsharedservice } from '../../export-share-data.service';
 
 @Component({
     selector: 'app-mbl-iu',
-    templateUrl: 'expt_prt_mbl_generate.component.html' 
-  
+    templateUrl: 'expt_prt_mbl_generate.component.html',
+    standalone: false
 })
 
 export class ExptMBLGenerate  implements OnInit  {

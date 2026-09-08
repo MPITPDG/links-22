@@ -4,7 +4,8 @@ import { LoginService } from '../../../shared/service/loginService';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-print-document-annexure-search',
-    templateUrl: 'search-annexure.component.html'
+    templateUrl: 'search-annexure.component.html',
+    standalone: false
 })
 export class AnnexureSearchComponent implements OnInit {
     @ViewChild('searchButton', {static: false}) searchButton: ElementRef;

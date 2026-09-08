@@ -5,7 +5,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 @Component({
     selector: 'app-menu-sidebar',
     templateUrl: 'menu.component.html',
-    providers: [LoginService]
+    providers: [LoginService],
+    standalone: false
 })
 export class MenuComponent implements OnInit {
     public menuList: any = [];

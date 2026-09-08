@@ -12,7 +12,8 @@ import {Configuration}  from '../../app.constants'
 @Component({
   selector: 'app-ReportDownload',
   templateUrl: './report-download.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class ReportDownload implements OnInit {
     constructor(

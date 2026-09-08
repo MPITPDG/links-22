@@ -4,7 +4,8 @@ import { DataService } from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
-    templateUrl: 'dossier-job-view.component.html'   
+    templateUrl: 'dossier-job-view.component.html',
+    standalone: false
 })
 export class DossierJobViewConsolidationComponent implements OnInit {
     displayTblOne: any = {};

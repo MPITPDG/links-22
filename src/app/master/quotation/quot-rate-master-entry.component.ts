@@ -12,7 +12,8 @@ import { DatePipe } from '@angular/common'
 @Component({
   selector: 'app-quot-rate-master-entry',
   templateUrl: './quot-rate-master-entry.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class QuotRateEntryComponent implements OnInit {
   Header: String = 'QUOTATION RATE MASTER ENTRY ' ;

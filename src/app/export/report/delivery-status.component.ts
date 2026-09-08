@@ -4,7 +4,8 @@ import { LoginService } from '../../shared/service/loginService';
 import { IMyDpOptions } from 'mydatepicker';
 import { LoaderService } from '../../shared/service/loader.service';
 @Component({
-    templateUrl: 'delivery-status.component.html'
+    templateUrl: 'delivery-status.component.html',
+    standalone: false
 })
 export class DeliveryStatusReportComponent implements OnInit {
     CityList: Array<any> = [];

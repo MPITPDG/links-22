@@ -13,7 +13,8 @@ import { DatePipe } from '@angular/common'
 @Component({
   selector: 'app-enquiry-page',
   templateUrl: './enquiry.component.html',
-     styleUrls: ['./quotation.search.component.scss']
+     styleUrls: ['./quotation.search.component.scss'],
+    standalone: false
 })
 export class EnquiryPageComponent implements OnInit {
   enquiryForm!: FormGroup;

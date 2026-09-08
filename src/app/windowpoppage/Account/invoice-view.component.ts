@@ -6,7 +6,8 @@ import { LoginService } from '../../shared/service/loginService';
 @Component({
   selector: 'app-invoice-view',
   templateUrl: './invoice-view.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class InvoiceViewComponent implements OnInit {
   inv_jobno:string=""

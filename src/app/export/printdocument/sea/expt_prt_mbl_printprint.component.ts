@@ -9,7 +9,8 @@ import { mblsharedservice } from '../../export-share-data.service';
 
 @Component({
     selector: 'app-mbl-print',
-    templateUrl: 'expt_prt_mbl_printprint.component.html'
+    templateUrl: 'expt_prt_mbl_printprint.component.html',
+    standalone: false
 })
 export class Exptmblprint implements OnInit {
 	@ViewChild("print", {static: false}) public MBL: ElementRef;

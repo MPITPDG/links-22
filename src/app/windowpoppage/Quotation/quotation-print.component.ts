@@ -9,7 +9,8 @@ import { HttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-quotation-print',
   templateUrl: './quotation-print.component.html',
-  styleUrls: ['./quotation-print.component.css'] // or .scss
+  styleUrls: ['./quotation-print.component.css'] // or .scss,
+    standalone: false
 })
 export class SalesQuotationPrintComponent implements OnInit {
   // Replace this with your actual data binding

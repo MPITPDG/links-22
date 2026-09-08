@@ -11,8 +11,9 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-receivable-anyoneclient-allbranch',
     templateUrl: './rcbl-anyoneClnt-allbrnch.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class ReceivableAnyOneClientAllBranch implements OnInit {
   
     AccountList:any = [];

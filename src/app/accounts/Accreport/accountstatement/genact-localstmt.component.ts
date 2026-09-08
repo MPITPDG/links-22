@@ -12,8 +12,9 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 @Component({
     selector: 'app-General-AccountStmt-Local',
     templateUrl: './genact-localstmt.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class GenActStatementLocal implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {
         dateFormat: 'dd-mmm-yyyy',

@@ -11,7 +11,8 @@ import { ButtonService } from '../../shared/common-font-changer.directive';
     selector: 'app-export-order-new-booking',
     templateUrl: 'new.booking.component.html' ,
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class NewBookingComponent implements OnInit {
     @ViewChild('searchButton', {static: false}) searchButton: ElementRef;

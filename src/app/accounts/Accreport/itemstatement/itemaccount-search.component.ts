@@ -14,8 +14,9 @@ import { DatePipe } from '@angular/common';
     selector: 'app-ItemAccountStatement-search',
     templateUrl: './itemaccount-search.component.html',
     styles: [],
-    providers: [DatePipe]
-  })
+    providers: [DatePipe],
+    standalone: false
+})
   export class ItemAccountStatement implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {
         dateFormat: 'dd/mm/yyyy',

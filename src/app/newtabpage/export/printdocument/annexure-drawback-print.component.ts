@@ -5,7 +5,8 @@ import { ActivatedRoute } from '@angular/router';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-print-document-annexure-drawback',
-    templateUrl: 'annexure-drawback-print.component.html'
+    templateUrl: 'annexure-drawback-print.component.html',
+    standalone: false
 })
 export class AnnexureDrawbackPrintComponent implements OnInit {
     dtDrawback: Array<any> = [];

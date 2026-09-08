@@ -11,8 +11,8 @@ import { LoaderService } from '../../shared/service/loader.service';
  
 @Component({
     selector: 'app-Companysearch',
-    templateUrl: 'company-search.componet.html'
-
+    templateUrl: 'company-search.componet.html',
+    standalone: false
 })
 
 

@@ -12,7 +12,8 @@ import { DataService } from 'src/app/shared/service/dataService';
   styles: [`
   // table tbody { display:block; max-height:500px; overflow-y:scroll; }
   // table thead, table tbody tr { display:table; width:100%; table-layout:fixed; }
-  `]
+  `],
+    standalone: false
 })
 export class InvoiceprintComponent implements OnInit {
   Header:string="AirFreight-invoice-generate"

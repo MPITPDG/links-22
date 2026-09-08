@@ -13,7 +13,8 @@ import { saveAs } from 'file-saver';
 @Component({
   selector: 'app-client-edi',
   templateUrl: './client-edi-design.component.html',
-  styleUrls: ['./client-edi-design.component.scss']
+  styleUrls: ['./client-edi-design.component.scss'],
+    standalone: false
 })
 export class ClientEdiDesignComponent implements OnInit {
   

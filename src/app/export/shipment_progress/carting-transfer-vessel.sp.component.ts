@@ -10,8 +10,8 @@ import { LoaderService } from '../../shared/service/loader.service';
 
 @Component({
     selector: 'app-transfer-carting-sea',
-    templateUrl: 'carting-transfer-vessel.sp.component.html'
-
+    templateUrl: 'carting-transfer-vessel.sp.component.html',
+    standalone: false
 })
 export class TransfervslCartingSea implements OnInit, OnChanges {
     private baseUrl: string = 'Export/Carting_vsl_agent_populate';

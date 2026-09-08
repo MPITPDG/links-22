@@ -10,8 +10,8 @@ import { LoaderService } from '../../shared/service/loader.service';
  
 @Component({
     selector: 'app-mastersearch',
-    templateUrl: 'request-search.component.html'
-
+    templateUrl: 'request-search.component.html',
+    standalone: false
 })
 
 

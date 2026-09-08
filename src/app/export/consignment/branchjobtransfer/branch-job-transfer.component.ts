@@ -9,8 +9,8 @@ import {
 @Component({
     templateUrl: 'branch-job-transfer.component.html' ,
     styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    encapsulation: ViewEncapsulation.None
-  
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class BranchJobTransferComponent implements OnInit {
     @ViewChild('submitButton', {static: false}) submitButton: ElementRef;

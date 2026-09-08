@@ -4,7 +4,8 @@ import { LoginService } from '../../../shared/service/loginService';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-print-document-annexure-dfrc',
-    templateUrl: 'dfrc-annexure.component.html'
+    templateUrl: 'dfrc-annexure.component.html',
+    standalone: false
 })
 export class DfrcAnnexureComponent implements OnInit {
     @Output() result = new EventEmitter();

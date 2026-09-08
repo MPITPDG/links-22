@@ -9,7 +9,8 @@ import { Tds26asExportService } from './tds26as-export.service';
 @Component({
     selector: 'app-tds26as-reconcil',
     templateUrl: './tds26as-reconcil.component.html',
-    styleUrls: ['./tds26as-reconcil.component.css']
+    styleUrls: ['./tds26as-reconcil.component.css'],
+    standalone: false
 })
 export class Tds26asReconcil implements OnInit {
 

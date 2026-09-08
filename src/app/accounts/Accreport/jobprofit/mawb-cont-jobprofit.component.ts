@@ -19,7 +19,8 @@ import { AccordionComponent } from 'ngx-bootstrap/accordion';
     font-size:18px;
     font-weight:bold
   }
-  `]
+  `],
+    standalone: false
 })
 export class MawbContJobprofitComponent implements OnInit {
   PageName: string = "MAWB-job profit report"

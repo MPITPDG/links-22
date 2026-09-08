@@ -11,7 +11,8 @@ import { DatePipe } from '@angular/common';
 @Component({
   selector: 'app-gstr3b-report',
   templateUrl: './gstr3b-report.component.html',
-  styleUrls: ['./register-search.shared.css', './gstr3b-report.component.css']
+  styleUrls: ['./register-search.shared.css', './gstr3b-report.component.css'],
+    standalone: false
 })
 export class Gstr3bReportComponent implements OnInit {
 

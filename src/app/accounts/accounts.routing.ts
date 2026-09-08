@@ -10,77 +10,77 @@ const routes: Routes = [
             { path: '', component: AccountComponent, data: { title: 'Home' } },
             {
                 path: 'Master',
-                loadChildren: './Master/actmaster.module#ActMasterModule',
+                loadChildren: () => import('./Master/actmaster.module').then(m => m.ActMasterModule),
                 canActivate: [FinancialYearAuthGuard]
             },
             {
                 path: 'uploadbankreconcil',
-                loadChildren: './uploadbankreconcil/uploadbankreconcil.module#uploadbankreconcilModule',
+                loadChildren: () => import('./uploadbankreconcil/uploadbankreconcil.module').then(m => m.uploadbankreconcilModule),
                 canActivate: [FinancialYearAuthGuard],
             },
             {
                 path: 'tds26as',
-                loadChildren: './tds26as/tds26as.module#Tds26asModule',
+                loadChildren: () => import('./tds26as/tds26as.module').then(m => m.Tds26asModule),
                 canActivate: [FinancialYearAuthGuard],
             },
             {
                 path: 'transaction',
-                loadChildren: './transaction/transaction.module#TransactionModule',
+                loadChildren: () => import('./transaction/transaction.module').then(m => m.TransactionModule),
                 canActivate: [FinancialYearAuthGuard]
             },
             {
                 path: 'purchase',
-                loadChildren: './purchase/purchase.module#PurchaseInvModule',
+                loadChildren: () => import('./purchase/purchase.module').then(m => m.PurchaseInvModule),
                 canActivate: [FinancialYearAuthGuard]
             },
             {
                 path: 'Request',
-                loadChildren: './Request/staffrequest.module#RequestModule',
+                loadChildren: () => import('./Request/staffrequest.module').then(m => m.RequestModule),
                 canActivate: [FinancialYearAuthGuard]
             },
             {
                 path: 'Voucher',
-                loadChildren: './Vouchers/vouchers.module#VouchersModule',
+                loadChildren: () => import('./Vouchers/vouchers.module').then(m => m.VouchersModule),
                 canActivate: [FinancialYearAuthGuard]
             },
             {
                 path: 'Authorisation',
-                loadChildren: './Authorisation/Authorisation.module#AuthorisationModule',
+                loadChildren: () => import('./Authorisation/Authorisation.module').then(m => m.AuthorisationModule),
                 canActivate: [FinancialYearAuthGuard]
             }, 
             {
                 path: 'UnAuthorisation',
-                loadChildren: './UnAuthorisation/UnAuthorisation.module#UnAuthorisationModule',
+                loadChildren: () => import('./UnAuthorisation/UnAuthorisation.module').then(m => m.UnAuthorisationModule),
                 canActivate: [FinancialYearAuthGuard]
             }, 
             {
                 path: 'CompCheque',
-                loadChildren: './CompCheque/CompCheque.module#CompChequeModule',
+                loadChildren: () => import('./CompCheque/CompCheque.module').then(m => m.CompChequeModule),
                 canActivate: [FinancialYearAuthGuard]
             }, 
             {
                 path: 'report',
-                loadChildren: './Accreport/report.module#AccountReportModules',
+                loadChildren: () => import('./Accreport/report.module').then(m => m.AccountReportModules),
                 canActivate: [FinancialYearAuthGuard]
             },
             {
                 path: 'MisReport',
-                loadChildren: './MisReport/Misreport.module#AccountMisReportModule',
+                loadChildren: () => import('./MisReport/Misreport.module').then(m => m.AccountMisReportModule),
                 canActivate: [FinancialYearAuthGuard]
             },
             {
                 path: 'OldEntry',
-                loadChildren: './OldEntry/oldentry.module#OldEntryModule',
+                loadChildren: () => import('./OldEntry/oldentry.module').then(m => m.OldEntryModule),
                 canActivate: [FinancialYearAuthGuard]
             },
             {
                 path: 'EInvoice',
-                loadChildren: './EInvoice/einvoice.module#einvoicemodule',
+                loadChildren: () => import('./EInvoice/einvoice.module').then(m => m.einvoicemodule),
                 canActivate: [FinancialYearAuthGuard]
             },
                  {
                 path: 'ClientEdi',
-                loadChildren: './ClientEdi/clientedi.module#ClientEdiModule',
+                loadChildren: () => import('./ClientEdi/clientedi.module').then(m => m.ClientEdiModule),
                 canActivate: [FinancialYearAuthGuard]
             },
             

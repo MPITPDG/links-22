@@ -12,7 +12,8 @@ import { LoaderService } from '../../shared/service/loader.service';
 
 @Component({
     selector: 'app-epcopy-search',
-    templateUrl: 'exp_epcopy_recvddt_search.component.html' 
+    templateUrl: 'exp_epcopy_recvddt_search.component.html',
+    standalone: false
 })
 
 export class ExptEpcopyRecvddtSearch {
@@ -79,8 +80,8 @@ export class ExptEpcopyRecvddtSearch {
 
 @Component({
     selector: 'app-epcopy-recvddt',
-    templateUrl: 'exp_epcopy_recvddt.component.html' 
-  
+    templateUrl: 'exp_epcopy_recvddt.component.html',
+    standalone: false
 })
 
 export class ExptEpcopyRecvddt {

@@ -13,8 +13,8 @@ import { LoaderService } from '../../shared/service/loader.service';
  
 @Component({
     selector: 'app-userprofilesearch',
-    templateUrl: 'userprofile-search.component.html'
-
+    templateUrl: 'userprofile-search.component.html',
+    standalone: false
 })
 
 

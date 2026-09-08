@@ -145,7 +145,8 @@ import { environment } from   '../../../environments/environment';
     
 
              
-        `
+        `,
+    standalone: false
 })
 
 export class ExptFCRPrintview implements OnChanges {
@@ -619,7 +620,8 @@ export class ExptFCRPrintview implements OnChanges {
                          
 						</table>  
             
-        `
+        `,
+    standalone: false
 })
 export class ExptMTOprintview implements OnChanges {
    // private baseUrl: string = 'Export/Export_FCR_PRINTPREVIEW';
@@ -1003,8 +1005,8 @@ export class ExptMTOprintview implements OnChanges {
 
 @Component({
     selector: 'app-printview',
-    templateUrl: 'exp_prt_fcr_printview.component.html'
-
+    templateUrl: 'exp_prt_fcr_printview.component.html',
+    standalone: false
 })
 export class ExptPrintview implements OnInit {
     Type: any = "";

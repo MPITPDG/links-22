@@ -12,19 +12,19 @@ const routes: Routes = [
             { path: '', component: MasterImportComponent, data: { title: 'Home' } },
             {
                 path: 'vessel',
-                loadChildren: './vessel/vessel.module#VesselMasterImportModule',
+                loadChildren: () => import('./vessel/vessel.module').then(m => m.VesselMasterImportModule),
             },
             {
                 path: 'exchange-rate',
-                loadChildren: './exchangerate/exchange-rate.module#ExchangeRateMasterImportModule',
+                loadChildren: () => import('./exchangerate/exchange-rate.module').then(m => m.ExchangeRateMasterImportModule),
             },
             {
                 path: 'airline',
-                loadChildren: './airline/airline.module#AirlineMasterImportModule',
+                loadChildren: () => import('./airline/airline.module').then(m => m.AirlineMasterImportModule),
             },
             {
                 path: 'misc-job',
-                loadChildren: './miscjob/misc-job.module#MiscJobMasterImportModule',
+                loadChildren: () => import('./miscjob/misc-job.module').then(m => m.MiscJobMasterImportModule),
             }
         ]
     }

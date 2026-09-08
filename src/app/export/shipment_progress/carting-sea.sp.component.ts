@@ -9,8 +9,8 @@ import { LoaderService } from '../../shared/service/loader.service';
 
 @Component({
     selector: 'app-search-carting-sea',
-    templateUrl: 'search-carting-sea.sp.component.html'
-
+    templateUrl: 'search-carting-sea.sp.component.html',
+    standalone: false
 })
 export class SearchCartingSea implements OnInit, OnChanges {
     private baseUrl: string = 'Export/Carting_vsl_agent_populate';
@@ -106,8 +106,8 @@ export class SearchCartingSea implements OnInit, OnChanges {
 
 @Component({
     selector: 'app-list-carting-sea',
-    templateUrl: 'List-carting-sea.sp.component.html'
-
+    templateUrl: 'List-carting-sea.sp.component.html',
+    standalone: false
 })
 export class ListCartingSea implements OnInit, OnChanges {
     @Input() CartingList: any = [];
@@ -239,8 +239,8 @@ export class ListCartingSea implements OnInit, OnChanges {
 }
 @Component({
     selector: 'app-manage-carting-sea',
-    templateUrl: 'manage-carting-sea.sp.component.html'
-
+    templateUrl: 'manage-carting-sea.sp.component.html',
+    standalone: false
 })
 export class manageCartingSea implements OnInit, OnChanges {
     @Input() manageList: any = [];
@@ -274,7 +274,8 @@ export class manageCartingSea implements OnInit, OnChanges {
 }
 
 @Component({
-    templateUrl: 'carting-sea.sp.component.html'
+    templateUrl: 'carting-sea.sp.component.html',
+    standalone: false
 })
 export class CartingSea implements OnInit, OnChanges {
     public _viewType: string = "Search"; // "Search";

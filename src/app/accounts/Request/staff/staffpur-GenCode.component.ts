@@ -8,7 +8,8 @@ import { ActivatedRoute,Router } from '@angular/router';
 
 @Component({
     templateUrl: 'staffpur-GenCode.component.html',
-    })
+    standalone: false
+})
   export class ReqSRPGenerateComponent implements OnInit {
     datatable:any=[];  
     Status:string="";

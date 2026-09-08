@@ -9,7 +9,8 @@ import { LoaderService } from '../../../shared/service/loader.service';
 
 @Component({
     selector: 'app-mbl-printview',
-    templateUrl: 'expt_prt_mbl_printprintview.component.html'
+    templateUrl: 'expt_prt_mbl_printprintview.component.html',
+    standalone: false
 })
 export class Exptmblprintview implements OnInit {
 

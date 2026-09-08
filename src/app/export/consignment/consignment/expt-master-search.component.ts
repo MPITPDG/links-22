@@ -8,7 +8,8 @@ import { SharedDataSerice } from '../../export-share-data.service';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-consignment-search-modal',
-    templateUrl: 'expt-master-search.component.html'
+    templateUrl: 'expt-master-search.component.html',
+    standalone: false
 })
 export class ExportMasterSearchComponent implements OnInit {
     @ViewChild('okModal', {static: false}) okModal: OkModalComponent;

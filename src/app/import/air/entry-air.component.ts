@@ -9,7 +9,8 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     templateUrl: 'entry-air.component.html',
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class EntryAirImportComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {

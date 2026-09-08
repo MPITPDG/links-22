@@ -13,8 +13,9 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 @Component({
     selector: 'app-ItemStatement-search',
     templateUrl: './item-search.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class ItemwiseStatement implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {
       dateFormat: 'dd/mm/yyyy',

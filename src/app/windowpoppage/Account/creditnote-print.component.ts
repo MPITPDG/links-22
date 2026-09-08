@@ -29,7 +29,8 @@ import { DataService } from '../../shared/service/dataService';
   color: black;
   font-family: Verdana,Arial;
 }
-  `]
+  `],
+    standalone: false
 })
 export class CreditnotePrintComponent implements OnInit {
   currencyname

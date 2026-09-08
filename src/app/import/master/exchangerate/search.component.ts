@@ -7,7 +7,8 @@ import { ToastCommonService } from '../../../shared/service/toastService';
 import { IMyDpOptions } from 'mydatepicker';
 @Component({
     selector: 'app-consignment-import-master-exchange-rate-search',
-    templateUrl: 'search.component.html'
+    templateUrl: 'search.component.html',
+    standalone: false
 })
 export class SearchExchangeRateMasterComponent implements OnInit {
     CurrencyType: string = "0";

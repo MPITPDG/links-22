@@ -13,8 +13,8 @@ import { Configuration } from '../../app.constants';
  
 @Component({
     selector: 'app-Financialyearcreation',
-    templateUrl: 'financialYear-IU.component.html'
-
+    templateUrl: 'financialYear-IU.component.html',
+    standalone: false
 })
 
 

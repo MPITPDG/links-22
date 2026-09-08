@@ -5,7 +5,8 @@ import { IMyDpOptions } from 'mydatepicker';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-print-document-annexure-edit',
-    templateUrl: 'edit-annexure.component.html'
+    templateUrl: 'edit-annexure.component.html',
+    standalone: false
 })
 export class EditAnnexureComponent implements OnInit {
     @ViewChild('searchButton', {static: false}) searchButton: ElementRef;

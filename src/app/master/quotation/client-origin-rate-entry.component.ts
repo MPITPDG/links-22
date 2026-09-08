@@ -12,7 +12,8 @@ import { OnlyNumberDirective } from '../../shared/onlynumber.directive';
 @Component({
   selector: 'app-client-origin-rate-entry',
   templateUrl: './client-origin-rate-entry.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class ClientOriginRateEntryComponent implements OnInit {
   Header: String = 'CLIENT ORIGIN WISE RATE ENTRY  ' ;

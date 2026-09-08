@@ -4,7 +4,8 @@ import { Router } from '@angular/router';
 import { LoginService } from '../../shared/service/loginService';
 import { LoaderService } from '../../shared/service/loader.service';
 @Component({
-    templateUrl: 'tracking-air-shipment.component.html'
+    templateUrl: 'tracking-air-shipment.component.html',
+    standalone: false
 })
 export class TrackingAirShipmentReportComponent implements OnInit {
     ConsigneeFormatList: Array<any> = [];

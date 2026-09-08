@@ -10,8 +10,9 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-advancefromClient',
     templateUrl: './advancefromclientPopUp.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class AdvanceFromClientPopUp implements OnInit {
     ExporterList:any = [];
     ClAdvList:any = [];

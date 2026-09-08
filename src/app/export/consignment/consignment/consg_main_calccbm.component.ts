@@ -6,7 +6,8 @@ import { ToastCommonService } from '../../../shared/service/toastService';
 @Component({
     selector: 'app-main-consignment-calcbm-add',
     templateUrl: 'consg_main_calccbm.component.html',
-    styles: []
+    styles: [],
+    standalone: false
 })
 
 export class MainCalCbmAddComponent implements OnInit , OnChanges {

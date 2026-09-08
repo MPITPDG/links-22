@@ -11,7 +11,8 @@ import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
 
     selector: 'app-export-prealert-prepare',
-    templateUrl: 'prealert.prepare.component.html'
+    templateUrl: 'prealert.prepare.component.html',
+    standalone: false
 })
 export class PreAlertPrepareComponent implements OnChanges {
     @Input() searchList: any = [];
@@ -37,7 +38,8 @@ export class PreAlertPrepareComponent implements OnChanges {
 
 @Component({
     selector: 'app-export-prealert-auto',
-    templateUrl: 'prealert.auto.component.html'
+    templateUrl: 'prealert.auto.component.html',
+    standalone: false
 })
 export class PreAlertAutoComponent implements OnChanges {
     @Input() searchList: any = [];
@@ -70,7 +72,8 @@ export class PreAlertAutoComponent implements OnChanges {
 
 @Component({
     selector: 'app-export-prealert-sending-through',
-    templateUrl: 'prealert.sending.through.expt.component.html'
+    templateUrl: 'prealert.sending.through.expt.component.html',
+    standalone: false
 })
 export class PreAlertPrepareSendingThroughComponent implements OnInit,OnChanges {
     @Input() Mawbno: any = null;
@@ -135,7 +138,8 @@ export class PreAlertPrepareSendingThroughComponent implements OnInit,OnChanges 
 }
 
 @Component({
-    templateUrl: 'prealert.component.html'
+    templateUrl: 'prealert.component.html',
+    standalone: false
 })
 export class PreAlertComponent implements OnInit {
     viewType: string = '';

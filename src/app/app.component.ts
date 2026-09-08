@@ -18,7 +18,8 @@ import { LoaderService } from './shared/service/loader.service';
                 <router-outlet></router-outlet>
 				<div *ngIf="showLoader==true" class="loading" > </div>
             `,
-	styleUrls: ['./spinner.scss']
+	styleUrls: ['./spinner.scss'],
+    standalone: false
 })
 export class AppComponent implements OnInit,OnChanges {
 	showLoader: boolean=false;

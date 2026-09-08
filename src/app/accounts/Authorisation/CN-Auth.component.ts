@@ -11,7 +11,8 @@ import { FilterPipe } from 'ngx-filter-pipe';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap';
 
 @Component({
-    templateUrl: 'CN-Auth.component.html'
+    templateUrl: 'CN-Auth.component.html',
+    standalone: false
 })
 export class CNAuth implements OnInit {
   public searchString: string;

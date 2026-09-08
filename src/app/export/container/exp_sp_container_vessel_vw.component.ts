@@ -13,9 +13,8 @@ import { VesselSearchSharedDataService, ContainerIUSharedDataService } from '../
 import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-container-iu',
-    templateUrl: 'exp_sp_container_vessel_vw.component.html' 
-     
-
+    templateUrl: 'exp_sp_container_vessel_vw.component.html',
+    standalone: false
 })
 
 

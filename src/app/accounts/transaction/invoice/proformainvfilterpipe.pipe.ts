@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'proformainvfilterpipe'
+  name: 'proformainvfilterpipe',
+    standalone: false
 })
 export class ProformaInvfilterpipe implements PipeTransform {
   transform(value: any[], searchString: string) {

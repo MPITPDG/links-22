@@ -6,7 +6,8 @@ import { IMyDpOptions } from 'mydatepicker';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-consignment-import-master-vessel-data-entry',
-    templateUrl: 'data-entry.component.html'
+    templateUrl: 'data-entry.component.html',
+    standalone: false
 })
 export class EntryVesselMasterComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {

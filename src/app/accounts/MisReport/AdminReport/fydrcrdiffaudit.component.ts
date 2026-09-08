@@ -9,7 +9,8 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-FyDrCrDiffAudit',
     templateUrl: './fydrcrdiffaudit.component.html',
-    styleUrls: ['./fydrcrdiffaudit.component.css']
+    styleUrls: ['./fydrcrdiffaudit.component.css'],
+    standalone: false
 })
 export class FyDrCrDiffAuditComponent implements OnInit {
 

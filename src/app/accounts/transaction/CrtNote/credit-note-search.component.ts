@@ -26,7 +26,8 @@ import {environment}  from '../../../../environments/environment.prod'
     height: 100%;
     display: flex;
     flex-direction: column;
-  }`]
+  }`],
+    standalone: false
 })
 export class CreditNoteSearchComponent implements OnInit {
     clientable: any = []; exampleRadios1: string = 'CreditNo'; client: string = ""; crtno: string = "";

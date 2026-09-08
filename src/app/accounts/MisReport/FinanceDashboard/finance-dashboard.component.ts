@@ -10,7 +10,8 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-FinanceDashboard',
     templateUrl: './finance-dashboard.component.html',
-    styleUrls: ['./finance-dashboard.component.css']
+    styleUrls: ['./finance-dashboard.component.css'],
+    standalone: false
 })
 export class FinanceDashboardComponent implements OnInit {
 

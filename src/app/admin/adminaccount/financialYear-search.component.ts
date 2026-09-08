@@ -14,8 +14,8 @@ import { Configuration } from '../../app.constants';
  
 @Component({
     selector: 'app-FinancialYearsearch',
-    templateUrl: 'financialYear-search.component.html'
-
+    templateUrl: 'financialYear-search.component.html',
+    standalone: false
 })
 
 export class financialYearsearch implements OnInit   {

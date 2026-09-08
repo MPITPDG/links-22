@@ -24,7 +24,8 @@ import { LoginService } from '../../shared/service/loginService';
 								  </tr>
 								</tbody>
 							</table>
-        `
+        `,
+    standalone: false
 })
 export class RemarkViewComponent implements OnInit {
     exptno: string;

@@ -15,47 +15,47 @@ const routes: Routes = [
         //
         {
             path: 'register',
-            loadChildren: './register/register.module#RegisterModule',
+            loadChildren: () => import('./register/register.module').then(m => m.RegisterModule),
             canActivate: [FinancialYearAuthGuard],
         },
         {
           path: 'JobProfit',
-          loadChildren: './jobprofit/jobprofit.module#JobprofitModules',
+          loadChildren: () => import('./jobprofit/jobprofit.module').then(m => m.JobprofitModules),
           canActivate: [FinancialYearAuthGuard],
         },      
         {
           path: 'accountstatement',
-          loadChildren: './accountstatement/accountstatement.module#AccountStatementModule',
+          loadChildren: () => import('./accountstatement/accountstatement.module').then(m => m.AccountStatementModule),
           canActivate: [FinancialYearAuthGuard],
         },      
        {
         path: 'itemstatement',
-        loadChildren: './itemstatement/itemstatement.module#ItemStatementModules',
+        loadChildren: () => import('./itemstatement/itemstatement.module').then(m => m.ItemStatementModules),
         canActivate: [FinancialYearAuthGuard],
        },
       {
         path: 'notoverreport',
-        loadChildren: './notoverreport/notover.module#NotOverModule',
+        loadChildren: () => import('./notoverreport/notover.module').then(m => m.NotOverModule),
         canActivate: [FinancialYearAuthGuard],
       },
       {
         path: 'advancefromclient',
-        loadChildren: './advfrmclient/advfrmclient.module#AdvanceFromClientModules',
+        loadChildren: () => import('./advfrmclient/advfrmclient.module').then(m => m.AdvanceFromClientModules),
         canActivate: [FinancialYearAuthGuard],
       },
       {
         path: 'specialreport',
-        loadChildren: './specialreport/specialreport.module#SpecialReportModule',
+        loadChildren: () => import('./specialreport/specialreport.module').then(m => m.SpecialReportModule),
         canActivate: [FinancialYearAuthGuard],
       },
       {
         path: 'Receivables',
-        loadChildren: './Receivables/receivables.module#ReceivablesModule',
+        loadChildren: () => import('./Receivables/receivables.module').then(m => m.ReceivablesModule),
         canActivate: [FinancialYearAuthGuard],
       },
       {
         path: 'Trialbalance',
-        loadChildren: './Trialbalance/trialbalance.module#TrialBalanceModules',
+        loadChildren: () => import('./Trialbalance/trialbalance.module').then(m => m.TrialBalanceModules),
         canActivate: [FinancialYearAuthGuard],
       }
     ]

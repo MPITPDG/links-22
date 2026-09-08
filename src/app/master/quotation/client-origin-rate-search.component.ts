@@ -10,7 +10,8 @@ import { IMyDpOptions } from 'mydatepicker';
 @Component({
   selector: 'app-client-origin-rate-search',
   templateUrl: './client-origin-rate-search.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class ClientOriginRateSearchComponent implements OnInit {
 

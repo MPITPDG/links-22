@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'chqstockFilter'
+  name: 'chqstockFilter',
+    standalone: false
 })
 export class ChqstockFilterPipe implements PipeTransform {
 
@@ -32,7 +33,8 @@ export class ChqstockFilterPipe implements PipeTransform {
 
 
 @Pipe({
-  name: 'ReqBPFilter'
+  name: 'ReqBPFilter',
+    standalone: false
 })
 export class ReqBPFilterPipe implements PipeTransform {
 

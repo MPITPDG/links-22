@@ -14,8 +14,9 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-SpecialLedger-search',
     templateUrl: './specialledger.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class SpecialLedger implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {
       dateFormat: 'dd-mmm-yyyy',

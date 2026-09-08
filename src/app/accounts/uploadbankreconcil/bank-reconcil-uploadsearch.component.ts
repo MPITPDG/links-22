@@ -78,8 +78,9 @@ import { ExportexcelService } from '../../shared/service/exportexcel.service';
     }
 
 
-    `]
-  })
+    `],
+    standalone: false
+})
   export class UploadBankReconcilSearch implements OnInit {
 
     public myDatePickerOptions: IMyDpOptions = {

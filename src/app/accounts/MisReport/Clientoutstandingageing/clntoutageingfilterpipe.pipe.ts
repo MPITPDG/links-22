@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'clntoutageingfilterpipe'
+  name: 'clntoutageingfilterpipe',
+    standalone: false
 })
 export class Clntoutageingfilterpipe implements PipeTransform {
   transform(value: any[], searchString: string) {

@@ -12,8 +12,8 @@ import { LoaderService } from '../../shared/service/loader.service';
 
 @Component({
     selector: 'app-vessel-iu',
-    templateUrl: 'exp_mst_vessel_iu.component.html'
-
+    templateUrl: 'exp_mst_vessel_iu.component.html',
+    standalone: false
 })
 
 

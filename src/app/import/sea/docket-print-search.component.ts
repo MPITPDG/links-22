@@ -6,7 +6,8 @@ import { ToastCommonService } from '../../shared/service/toastService';
 import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-consignment-import-sea-docket-print-search',
-    templateUrl: 'docket-print-search.component.html'
+    templateUrl: 'docket-print-search.component.html',
+    standalone: false
 })
 export class SeaDocketPrintSearchComponent implements OnInit {
     inputValue: any = '';

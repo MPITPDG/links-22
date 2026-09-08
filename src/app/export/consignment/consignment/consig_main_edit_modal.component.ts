@@ -14,6 +14,7 @@ import { environment } from '../../../../environments/environment';
 @Component({
     selector: 'app-consignment-edit-modal',
     templateUrl: 'consig_main_edit_modal.component.html',
+    standalone: false
 })
 export class ConsignmentEditModalComponent implements OnInit {
     @ViewChild('ConsignmentEditModal', { static: false }) public editModal: ModalDirective;
@@ -556,7 +557,8 @@ export class ConsignmentEditModalComponent implements OnInit {
 							    </tr>
 						    </tbody>
 						</table>
-                `
+                `,
+    standalone: false
 })
 export class ConsigneeViewPageComponent {
 
@@ -699,7 +701,8 @@ export class ConsigneeViewPageComponent {
 						    </tbody>
 						</table>
                    		<app-consignment-consignee-view></app-consignment-consignee-view>
-                `
+                `,
+    standalone: false
 })
 export class ShipmentClearanceEditComponent {
 
@@ -850,8 +853,8 @@ export class ShipmentClearanceEditComponent {
 								</tbody>
 							</table>
 
-                `
-
+                `,
+    standalone: false
 })
 export class MainEditComponent {
 
@@ -1364,7 +1367,8 @@ export class MainEditComponent {
             </div>
         </div>
     </div>
-                `
+                `,
+    standalone: false
 })
 export class PortEditComponent {
 
@@ -2200,7 +2204,8 @@ export class PortEditComponent {
 								</tbody>
 							</table>
 
-        `
+        `,
+    standalone: false
 })
 export class InvoiceEditComponent {
 
@@ -2771,7 +2776,8 @@ export class InvoiceEditComponent {
 
 
 						</table>
-                `
+                `,
+    standalone: false
 })
 export class DocumentEditComponent {
 
@@ -3032,7 +3038,8 @@ export class DocumentEditComponent {
 									<tbody>
 								</table>
                               </div>
-        `
+        `,
+    standalone: false
 })
 export class ITCCodeEditComponent {
 
@@ -3401,7 +3408,8 @@ export class ITCCodeEditComponent {
 							    <tbody>
 						    </table>
                         </div>
-    `
+    `,
+    standalone: false
 })
 export class OrderNoEditComponent {
 
@@ -3783,6 +3791,7 @@ export class OrderNoEditComponent {
 @Component({
     selector: 'app-consignment-orderno-quality-checking-edit',
     templateUrl: 'consg-main-orderno-qc.component.html',
+    standalone: false
 })
 export class OrderNoQualityCheckingComponent implements OnInit {
     @Input() exptno: string;
@@ -3937,7 +3946,8 @@ export class OrderNoQualityCheckingComponent implements OnInit {
 									</tr>
 							<tbody>
 						</table>
-                `
+                `,
+    standalone: false
 })
 export class PackageEditComponent {
 
@@ -4108,7 +4118,8 @@ export class PackageEditComponent {
                               </tr>
 							</tbody>
 						</table>
-                `
+                `,
+    standalone: false
 })
 export class MarksNumberEditComponent implements OnInit {
 
@@ -4198,7 +4209,8 @@ export class MarksNumberEditComponent implements OnInit {
 								</tbody>
 							</table>
 
-                `
+                `,
+    standalone: false
 })
 export class QuotaEditComponent implements OnInit {
 
@@ -4310,7 +4322,8 @@ export class QuotaEditComponent implements OnInit {
 							</tr>
 						</tbody>
 					</table>
-                `
+                `,
+    standalone: false
 })
 export class ConsigneeRemarkEditComponent implements OnInit {
 
@@ -4450,7 +4463,8 @@ export class ConsigneeRemarkEditComponent implements OnInit {
 								  </tr>
 								</tbody>
 							</table>
-                `
+                `,
+    standalone: false
 })
 export class ConsigneeViewComponent implements OnInit {
 
@@ -4563,7 +4577,9 @@ export class ConsigneeViewComponent implements OnInit {
 //     selector: 'app-consignment-mawb-edit',
 //     templateUrl: 'consign_main_mawb_rating.component.html',
 
-// })
+//,
+    standalone: false
+})
 // export class MAWBEditComponent   {
 
 //     @Input() exptno: any;
@@ -6844,7 +6860,8 @@ export class ConsigneeViewComponent implements OnInit {
     selector: 'app-consignment-mawb-edit',
     templateUrl: 'consign_main_mawb_rating.component.html',
     // styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
-    // encapsulation: ViewEncapsulation.None
+    // encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class MAWBEditComponent   {
 
@@ -11745,7 +11762,8 @@ export class MAWBEditComponent   {
     selector: 'app-consignment-hawb-edit',
     templateUrl: 'consign_main_hawb_rating.component.html'
     // styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
-    // encapsulation: ViewEncapsulation.None
+    // encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class HAWBEditComponent   {
 
@@ -16398,7 +16416,8 @@ tot_rate_net_cc_dc:any = null;
     selector: 'app-consignment-job-edit',
     templateUrl: 'consign_main_job_rating.component.html',
     // styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
-    // encapsulation: ViewEncapsulation.None
+    // encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class JobEditComponent implements OnChanges {
 
@@ -17239,7 +17258,8 @@ export class JobEditComponent implements OnChanges {
                             </tr>
 						</tbody>
 					</table>
-                `
+                `,
+    standalone: false
 })
 export class CancelShipmentComponent implements OnInit {
 

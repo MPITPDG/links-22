@@ -5,7 +5,8 @@ import { LoginService } from '../../../shared/service/loginService';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-consignment-import-master-misc-job-data-entry',
-    templateUrl: 'data-entry.component.html'
+    templateUrl: 'data-entry.component.html',
+    standalone: false
 })
 export class EntryMiscJobMasterComponent implements OnInit {
     Header: string = "VESSEL MASTER - ADD";

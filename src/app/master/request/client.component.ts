@@ -11,8 +11,8 @@ import { HttpClient   } from '@angular/common/http';
 import { Configuration } from '../../app.constants';
 @Component({
     selector: 'app-masterclient',
-    templateUrl: 'client.component.html'
-
+    templateUrl: 'client.component.html',
+    standalone: false
 })
 
 

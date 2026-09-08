@@ -4,7 +4,8 @@ import { LoginService } from '../../../shared/service/loginService';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-print-document-annexure-item-detail',
-    templateUrl: 'item-detail-annexure.component.html'
+    templateUrl: 'item-detail-annexure.component.html',
+    standalone: false
 })
 export class ItemDetailAnnexureComponent implements OnInit {
     @Output() result = new EventEmitter();

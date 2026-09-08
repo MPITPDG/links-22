@@ -8,7 +8,8 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Configuration } from '../../../app.constants';
 @Component({
-    templateUrl: 'bankpayment-IUOld.component.html'
+    templateUrl: 'bankpayment-IUOld.component.html',
+    standalone: false
 })
 export class BankPaymentOEComponent implements OnInit {
     EntryNo: string="";

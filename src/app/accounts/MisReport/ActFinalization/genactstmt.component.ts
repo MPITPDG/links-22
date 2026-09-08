@@ -12,8 +12,9 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 @Component({
     selector: 'app-genactstatement',
     templateUrl: './genactstmt.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class GenActStatementAllBranch implements OnInit {
     @ViewChild('Advance', {static: false}) public Advancemodel: ModalDirective;
      public myDatePickerOptions: IMyDpOptions = {

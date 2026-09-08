@@ -7,7 +7,8 @@ import { LoaderService } from '../../../shared/service/loader.service';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 @Component({
-    templateUrl: 'journalvoucher-IUOld.component.html'
+    templateUrl: 'journalvoucher-IUOld.component.html',
+    standalone: false
 })
 export class JournalVoucherOEComponent implements OnInit {
 

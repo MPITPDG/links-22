@@ -12,8 +12,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 @Component({
     selector: 'app-RePrintCheque-Cancel-ChequeNo',
     templateUrl: './ReprintCheque-Cancel-ChequeNo.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class ReprintChequeCancelChequeNoComponent implements OnInit {
     BPNo:string;
     Remark:string;

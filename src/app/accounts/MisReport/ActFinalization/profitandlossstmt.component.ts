@@ -9,7 +9,8 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-ProfitandLossStmt',
     templateUrl: './profitandlossstmt.component.html',
-    styleUrls: ['./profitandlossstmt.component.css']
+    styleUrls: ['./profitandlossstmt.component.css'],
+    standalone: false
 })
 export class ProfitandLossStmtComponent implements OnInit {
 

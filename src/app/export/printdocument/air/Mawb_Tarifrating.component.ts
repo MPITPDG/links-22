@@ -14,7 +14,8 @@ import { LoaderService } from '../../../shared/service/loader.service';
     selector: 'app-MAWB_Model',
     templateUrl: 'Mawb_Tarifrating.component.html',
     // styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
-    // encapsulation: ViewEncapsulation.None
+    // encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class MAWBModelpopupcomponent  implements OnInit {
     @ViewChild('MAWBModelpopup', {static: false}) public editModal: ModalDirective;
@@ -1545,7 +1546,8 @@ export class MAWBModelpopupcomponent  implements OnInit {
 
     `,
     // styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
-    // encapsulation: ViewEncapsulation.None
+    // encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class MAWBTarifratingcomponent    {
 

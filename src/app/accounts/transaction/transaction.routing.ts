@@ -12,17 +12,17 @@ const routes: Routes = [
             { path: '', component: TransactionComponent, data: { title: 'Home' } },
             {
                 path: 'invoice',
-                loadChildren: './invoice/invoice.module#InvoiceModule',
+                loadChildren: () => import('./invoice/invoice.module').then(m => m.InvoiceModule),
                 canActivate: [FinancialYearAuthGuard],
             },
             {
                 path: 'creditnote',
-                loadChildren: './CrtNote/credit-note.module#CreditNoteModule',
+                loadChildren: () => import('./CrtNote/credit-note.module').then(m => m.CreditNoteModule),
                 canActivate: [FinancialYearAuthGuard],
             },
             {
                 path: 'airfrtinvoice',
-                loadChildren: './air-frt-inv/air-frt-inv.module#AirFrtInvModule',
+                loadChildren: () => import('./air-frt-inv/air-frt-inv.module').then(m => m.AirFrtInvModule),
                 canActivate: [FinancialYearAuthGuard],
             }
         ]

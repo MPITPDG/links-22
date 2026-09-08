@@ -13,37 +13,37 @@ const routes: Routes = [
         { path: '', component: CompChequeComponent, data: { title: 'Home' } },
         {
             path: 'Cheque',
-            loadChildren: './Cheque/Cheque.module#ChequeModule',
+            loadChildren: () => import('./Cheque/Cheque.module').then(m => m.ChequeModule),
             canActivate: [FinancialYearAuthGuard],
         },
         {
           path: 'ReqBP',
-          loadChildren: './ReqBP/Req-BP.module#ReqBpModule',
+          loadChildren: () => import('./ReqBP/Req-BP.module').then(m => m.ReqBpModule),
           canActivate: [FinancialYearAuthGuard],
       },
       {
         path: 'prntchque',
-        loadChildren: './Chequeprint/print-cheque.module#printchequeModule',
+        loadChildren: () => import('./Chequeprint/print-cheque.module').then(m => m.printchequeModule),
         canActivate: [FinancialYearAuthGuard],
     },
     {
       path: 'ChequeRpt',
-      loadChildren: './ChequeRpt/ChequeReport.module#ChequeReportModule',
+      loadChildren: () => import('./ChequeRpt/ChequeReport.module').then(m => m.ChequeReportModule),
       canActivate: [FinancialYearAuthGuard],
   },
     {
       path: 'ChequeErrorPrint',
-      loadChildren: './ChequeErrorPrint/ChequeErrorPrint.module#ChequeErrorPrintModule',
+      loadChildren: () => import('./ChequeErrorPrint/ChequeErrorPrint.module').then(m => m.ChequeErrorPrintModule),
       canActivate: [FinancialYearAuthGuard],
   },
   {
     path: 'ReprintExistingCheque',
-    loadChildren: './ReprintExistingCheque/ReprintExistingCheque.module#ReprintExistingChequeModule',
+    loadChildren: () => import('./ReprintExistingCheque/ReprintExistingCheque.module').then(m => m.ReprintExistingChequeModule),
     canActivate: [FinancialYearAuthGuard],
 },
 {
   path: 'RePrintCheque',
-  loadChildren: './RePrintCheque/ReprintCheque.module#RePrintChequeModule',
+  loadChildren: () => import('./RePrintCheque/ReprintCheque.module').then(m => m.RePrintChequeModule),
   canActivate: [FinancialYearAuthGuard],
 },
 ]

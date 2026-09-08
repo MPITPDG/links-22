@@ -12,7 +12,8 @@ import { getDate } from 'ngx-bootstrap/chronos/utils/date-getters';
 import { isNull } from '@angular/compiler/src/output/output_ast';
 
 @Component({
-    templateUrl: 'bankreceipt-IU.component.html'
+    templateUrl: 'bankreceipt-IU.component.html',
+    standalone: false
 })
 export class BankReceiptComponent implements OnInit {
     EntryNo: string="";

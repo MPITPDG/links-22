@@ -7,7 +7,8 @@ import {AuthService} from '../../shared/service/authService';
 import { Router} from '@angular/router';
  @Component({
     selector: 'app-GeneralMastersearch',
-    templateUrl: 'generalactmaster-search.component.html'
+    templateUrl: 'generalactmaster-search.component.html',
+    standalone: false
 })
 
 export class generalactmastersearch implements OnInit   {

@@ -11,19 +11,19 @@ const routes: Routes = [
        
         {
             path: 'admin',
-            loadChildren: './userprofile/userprofile.module#UserprofileModule',
+            loadChildren: () => import('./userprofile/userprofile.module').then(m => m.UserprofileModule),
         },       
         {
             path: 'company',
-            loadChildren: './companyIU/company-IU.module#CompanyIUModule',
+            loadChildren: () => import('./companyIU/company-IU.module').then(m => m.CompanyIUModule),
         },       
         {
             path: 'financialyear',
-            loadChildren: './adminaccount/adminaccount.module#AdminAccountModule',
+            loadChildren: () => import('./adminaccount/adminaccount.module').then(m => m.AdminAccountModule),
         },   
         {
             path: 'Adminacct',
-            loadChildren: './adminaccount/adminaccount.module#AdminAccountModule',
+            loadChildren: () => import('./adminaccount/adminaccount.module').then(m => m.AdminAccountModule),
         }, 
     ]
 }

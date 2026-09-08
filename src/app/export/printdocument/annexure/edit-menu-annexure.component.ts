@@ -5,7 +5,8 @@ import { LoaderService } from '../../../shared/service/loader.service';
 import { Router } from '@angular/router';
 @Component({
     selector: 'app-print-document-annexure-edit-menu',
-    templateUrl: 'edit-menu-annexure.component.html'
+    templateUrl: 'edit-menu-annexure.component.html',
+    standalone: false
 })
 export class EditMenuAnnexureComponent implements OnInit {
     @Output() result = new EventEmitter();

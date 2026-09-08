@@ -1,7 +1,8 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 
 @Component({
-    templateUrl: 'annexure.component.html'
+    templateUrl: 'annexure.component.html',
+    standalone: false
 })
 export class AnnexureComponent {
     @ViewChild('submitButton', {static: false}) submitButton: ElementRef;

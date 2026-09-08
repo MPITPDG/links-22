@@ -13,6 +13,7 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap';
 
 @Component({
   templateUrl: 'Invoice-UnAuth.component.html',
+    standalone: false
 })
 export class invoiceUnAuth implements OnInit {
   aaa: any = []

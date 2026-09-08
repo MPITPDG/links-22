@@ -10,7 +10,8 @@ import { environment } from  '../../../../environments/environment'; //'../../..
 
 @Component({
     selector: 'app-print-air-hawb-printupdate',
-    templateUrl: 'hawb-printupdate.component.html'
+    templateUrl: 'hawb-printupdate.component.html',
+    standalone: false
 })
 export class PrintDocumentHawbprintupdateComponent implements OnInit {
 

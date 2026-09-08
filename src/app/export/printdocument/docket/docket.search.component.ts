@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import { DataService } from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
 @Component({
-    templateUrl: 'docket.search.component.html'
+    templateUrl: 'docket.search.component.html',
+    standalone: false
 })
 export class DocketSearchComponent implements OnInit {
     @ViewChild('submitButton', {static: false}) submitButton: ElementRef;

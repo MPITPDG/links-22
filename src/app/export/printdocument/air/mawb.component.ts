@@ -9,7 +9,8 @@ import { LoaderService } from '../../../shared/service/loader.service';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 @Component({
     selector: 'app-print-air-mawb-list',
-    templateUrl: 'mawb.list.component.html'
+    templateUrl: 'mawb.list.component.html',
+    standalone: false
 })
 export class PrintDocumentMawbListComponent implements OnChanges {
     //this._dataService.stringdttoArry(data.Table[0].CARTEDDT); set Date
@@ -71,7 +72,8 @@ export class PrintDocumentMawbListComponent implements OnChanges {
 
 @Component({
     selector: 'app-print-air-mawb-update',
-    templateUrl: 'mawb.update.component.html'
+    templateUrl: 'mawb.update.component.html',
+    standalone: false
 })
 export class PrintDocumentMawbUpdateComponents implements OnChanges {
     @Input() mawbno;
@@ -189,7 +191,8 @@ export class PrintDocumentMawbUpdateComponents implements OnChanges {
 }
 
 @Component({
-    templateUrl: 'mawb.component.html'
+    templateUrl: 'mawb.component.html',
+    standalone: false
 })
 export class PrintDocumentMawbComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {
@@ -394,7 +397,8 @@ export class PrintDocumentMawbComponent implements OnInit {
 }
 @Component({
     selector: 'app-mawb-search',
-    templateUrl: 'mawb.search.component.html'
+    templateUrl: 'mawb.search.component.html',
+    standalone: false
 })
 export class PrintDocumentMawbSearchComponent implements OnChanges {
     @Output() searchoutput: EventEmitter<any> = new EventEmitter<any>();

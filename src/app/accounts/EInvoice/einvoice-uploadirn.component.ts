@@ -9,8 +9,9 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-einvoice-uploadirn',
     templateUrl: './einvoice-uploadirn.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class UploadIRN implements OnInit {
     @ViewChild('inputFile',{static:false}) myInputVariable: ElementRef;
     //form: FormGroup;

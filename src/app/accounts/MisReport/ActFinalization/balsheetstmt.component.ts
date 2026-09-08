@@ -9,7 +9,8 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-BalSheetStmt',
     templateUrl: './balsheetstmt.component.html',
-    styleUrls: ['./balsheetstmt.component.css']
+    styleUrls: ['./balsheetstmt.component.css'],
+    standalone: false
 })
 export class BalSheetStmtComponent implements OnInit {
 

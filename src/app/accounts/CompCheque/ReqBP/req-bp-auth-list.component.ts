@@ -15,7 +15,8 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
   selector: 'app-req-bp-auth-list',
   templateUrl: './req-bp-auth-list.component.html',
   styles: [],
-  providers: [DatePipe]
+  providers: [DatePipe],
+    standalone: false
 })
 export class ReqBPAuthListComponent implements OnInit {
   checkbox: boolean;

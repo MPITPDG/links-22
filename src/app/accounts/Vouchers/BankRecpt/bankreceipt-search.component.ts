@@ -15,7 +15,8 @@ import {environment}  from '../../../../environments/environment.prod'
     templateUrl: 'bankreceipt-search.component.html',
     // styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
-    providers:[        DatePipe    ]
+    providers:[        DatePipe    ],
+    standalone: false
 })
 export class BankReceiptSearchComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {
@@ -523,7 +524,9 @@ export class BankReceiptSearchComponent implements OnInit {
 //     templateUrl: 'bankreceipt-search.component.html',
 //     // styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
 //     encapsulation: ViewEncapsulation.None
-// })
+//,
+    standalone: false
+})
 // export class BankReceiptSearchComponent implements OnInit {
 //     public myDatePickerOptions: IMyDpOptions = {
 //         dateFormat: 'dd/mm/yyyy',

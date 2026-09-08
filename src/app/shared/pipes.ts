@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
     name: 'filter',
-    pure: false
+    pure: false,
+    standalone: false
 })
 export class FilterPipe implements PipeTransform {
     transform(items: any[], keys: string, term: string): any[] {
@@ -14,7 +15,8 @@ export class FilterPipe implements PipeTransform {
 }
 
 @Pipe({
-    name: 'sortBy'
+    name: 'sortBy',
+    standalone: false
 })
 export class SortByPipe implements PipeTransform {
     transform(items: any[], sortedBy: string): any {

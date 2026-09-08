@@ -25,7 +25,8 @@ import { environment } from 'src/environments/environment';
     margin-bottom: 30px;
     right:0
   }
-  `]
+  `],
+    standalone: false
 })
 export class ChequeReviewComponent implements OnInit {
   Header: string = "cheque preview"

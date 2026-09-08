@@ -8,7 +8,8 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
 @Component({
   selector: 'app-reqbp-bill-list',
   templateUrl: './reqbp-bill-list.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class ReqbpBillListComponent implements OnInit {
   bill_list: any;

@@ -37,7 +37,8 @@ import { FcrSharedDataService } from '../export-share-data.service';
 					<p style="FONT-SIZE: 14px;font-family: Verdana;position:absolute;top: 1227px;left: 380px;color:black;z-index:0;white-space: pre;">{{TOTCC}}</p>
 					<p style="FONT-SIZE: 14px;font-family: Verdana;position:absolute;top: 1307px;left: 837px;color:black;z-index:0;white-space: pre;">{{PLACEDATE}}</p> 
                      </div>
-        `
+        `,
+    standalone: false
 })
 
 export class ExptFCRPrint implements OnInit,OnChanges {
@@ -199,7 +200,8 @@ export class ExptFCRPrint implements OnInit,OnChanges {
 				<p style="FONT-SIZE: 14px;font-family: Verdana;position:absolute;top: 1227px;left:542px;color:black;z-index:0;white-space: pre;">{{CC}}</p>
 				<p style="FONT-SIZE: 14px;font-family: Verdana;position:absolute;top: 1227px;left:810px;color:black;z-index:0;white-space: pre;">{{PLACEDATE}}</p>
                 </div>
-        `
+        `,
+    standalone: false
 })
 
 export class ExptMTOprint implements OnInit, OnChanges {
@@ -331,8 +333,8 @@ export class ExptMTOprint implements OnInit, OnChanges {
 
 @Component({
     selector: 'app-seablprint',
-    templateUrl: 'exp_prt_print.component.html'
-
+    templateUrl: 'exp_prt_print.component.html',
+    standalone: false
 })
 export class ExptPrint implements OnInit {
     PType: any = "";

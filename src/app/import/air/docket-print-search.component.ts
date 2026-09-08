@@ -6,7 +6,8 @@ import { ToastCommonService } from '../../shared/service/toastService';
 import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-consignment-import-air-docket-print-search',
-    templateUrl: 'docket-print-search.component.html'
+    templateUrl: 'docket-print-search.component.html',
+    standalone: false
 })
 export class AirDocketPrintSearchComponent implements OnInit {
     inputValue: any = '';

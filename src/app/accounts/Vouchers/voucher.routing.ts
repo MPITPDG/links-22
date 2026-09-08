@@ -12,39 +12,39 @@ const routes: Routes = [
             
             {
                 path: 'JV',
-                loadChildren: './JV/journalvoucher.module#JvModule',
+                loadChildren: () => import('./JV/journalvoucher.module').then(m => m.JvModule),
                 canActivate: [FinancialYearAuthGuard],
             },
             {
                 path: 'BankRecpt',
-                loadChildren: './BankRecpt/bankrecpt.module#BankReceiptModule',
+                loadChildren: () => import('./BankRecpt/bankrecpt.module').then(m => m.BankReceiptModule),
                 canActivate: [FinancialYearAuthGuard],
             },
           
             {
                 path: 'BankPaymnt',
-                loadChildren: './BankPayment/bankpayment.module#BankPaymentModule',
+                loadChildren: () => import('./BankPayment/bankpayment.module').then(m => m.BankPaymentModule),
                 canActivate: [FinancialYearAuthGuard],
             }, 
             
             {
                 path: 'CashRecpt',
-                loadChildren: './cashrecipt/cashrecipt.module#CashreciptModule',
+                loadChildren: () => import('./cashrecipt/cashrecipt.module').then(m => m.CashreciptModule),
                 canActivate: [FinancialYearAuthGuard],
             },
             // {
             //     path: 'CashPaymnt',
-            //     loadChildren: './BankRecpt/bankrecpt.module#BankReceiptModule',
+            //     loadChildren: () => import('./BankRecpt/bankrecpt.module').then(m => m.BankReceiptModule),
             //     canActivate: [FinancialYearAuthGuard],
             // },
             {
                 path: 'CashExpence',
-                loadChildren: './CashExpense/cash-expense.module#CashExpenseModule',
+                loadChildren: () => import('./CashExpense/cash-expense.module').then(m => m.CashExpenseModule),
                 canActivate: [FinancialYearAuthGuard],
             },
             {
                 path: 'CashPayment',
-                loadChildren: './CashPayment/cashpayment.module#CashPaymentModule',
+                loadChildren: () => import('./CashPayment/cashpayment.module').then(m => m.CashPaymentModule),
                 canActivate: [FinancialYearAuthGuard],
             },
 

@@ -13,7 +13,8 @@ import { DatePipe } from '@angular/common'
 @Component({
   selector: 'app-quotation-entry',
   templateUrl: './quotation.component.html',
-  styleUrls: ['./quotation.component.css']
+  styleUrls: ['./quotation.component.css'],
+    standalone: false
 })
 export class QuotationEntryComponent implements OnInit {
   Header: String = 'QUOTATION ENTRY';

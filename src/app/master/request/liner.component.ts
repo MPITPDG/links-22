@@ -11,8 +11,8 @@ import { Configuration } from '../../app.constants';
  
 @Component({
     selector: 'app-masterLiner',
-    templateUrl: 'liner.component.html'
-
+    templateUrl: 'liner.component.html',
+    standalone: false
 })  
 
 

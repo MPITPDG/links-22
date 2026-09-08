@@ -11,7 +11,8 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
   selector: 'app-invoice-register',
   templateUrl: './invoice-register.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class InvoiceRegisterComponent implements OnInit {
 

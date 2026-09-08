@@ -7,7 +7,8 @@ import {
 } from '../../../shared/common-font-changer.directive';
 
 @Component({
-    templateUrl: 'pss.component.html'
+    templateUrl: 'pss.component.html',
+    standalone: false
 })
 export class PSSComponent implements OnInit {
     @ViewChild('searchButton', {static: false}) searchButton: ElementRef;

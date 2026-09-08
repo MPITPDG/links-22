@@ -10,7 +10,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 
 @Component({
   templateUrl: 'staffpurchase-Auth.component.html',
-  
+    standalone: false
 })
 
 export class StaffPurchaseAuth implements OnInit {

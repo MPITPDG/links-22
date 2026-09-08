@@ -5,7 +5,8 @@ import { LoginService } from '../../../shared/service/loginService';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-consignment-import-master-vessel-search',
-    templateUrl: 'search.component.html'
+    templateUrl: 'search.component.html',
+    standalone: false
 })
 export class SearchVesselMasterComponent implements OnInit {
     Input: string = '';

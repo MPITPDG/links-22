@@ -14,7 +14,8 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-clientoutstanding-search',
   templateUrl: './clientoutstanding-allcity-search.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class ClientOutstandingAllCityComponent implements OnInit {
   @ViewChild('Advance', { static: false }) public Advancemodel: ModalDirective;

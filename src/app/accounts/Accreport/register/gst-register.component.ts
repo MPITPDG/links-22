@@ -11,7 +11,8 @@ import { DatePipe } from '@angular/common';
 @Component({
   selector: 'app-Gst-register',
   templateUrl: './gst-register.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class GstRegisterComponent implements OnInit {
 

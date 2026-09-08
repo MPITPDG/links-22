@@ -82,8 +82,8 @@ import { DatePipe } from '@angular/common';
     
     
     `],
-    providers: [DatePipe]
-
+    providers: [DatePipe],
+    standalone: false
 })
 export class InvoiceComponent implements OnInit    {
     term: string;

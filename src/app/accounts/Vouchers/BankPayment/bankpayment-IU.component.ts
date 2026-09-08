@@ -14,7 +14,8 @@ import { Configuration } from '../../../app.constants';
     // ,
     // styles:[` table, tr, td, th{
     //           border: none;
-    //        }`]
+    //        }`],
+    standalone: false
 })
 export class BankPaymentComponent implements OnInit {
     EntryNo: string="";

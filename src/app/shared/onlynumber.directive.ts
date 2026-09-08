@@ -1,7 +1,8 @@
 ﻿import { Directive, HostListener, ElementRef, Input } from '@angular/core';
 
 @Directive({
-    selector: '[OnlyNumber]'
+    selector: '[OnlyNumber]',
+    standalone: false
 })
 export class OnlyNumberDirective {
     regexStr = '^[0-9]*$';
@@ -36,7 +37,8 @@ export class OnlyNumberDirective {
 }
 
 @Directive({
-    selector: '[OnlyAmount]'
+    selector: '[OnlyAmount]',
+    standalone: false
 })
 export class OnlyAmountDirective {
     constructor(private el: ElementRef) { }
@@ -83,7 +85,8 @@ export class OnlyAmountDirective {
 }
 
 @Directive({
-    selector: '[OnlyCharacter]'
+    selector: '[OnlyCharacter]',
+    standalone: false
 })
 export class OnlyCharacterDirective {
 

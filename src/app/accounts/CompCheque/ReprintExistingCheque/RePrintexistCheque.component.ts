@@ -10,8 +10,9 @@ import { environment } from  '../../../../environments/environment';
 @Component({
     selector: 'app-RePrint-ExistingCheque-search',
     templateUrl: './RePrintexistCheque.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class RePrintexistChequeComponent implements OnInit {
     ChequeNo:string;
     public myDatePickerOptions: IMyDpOptions = {

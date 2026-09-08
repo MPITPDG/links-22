@@ -6,7 +6,7 @@ import { LoginService } from '../../shared/service/loginService';
 @Component({
   selector: 'app-invoicehistory-purchaseprint',
   templateUrl: './invoicehistory-purchaseprint.component.html',
-
+    standalone: false
 })
 export class InvoicehistoryPurchaseprintComponent implements OnInit {
   EntryNo: any;

@@ -7,7 +7,8 @@ import { SharedDataSerice } from '../../export-share-data.service';
 import { ButtonService } from '../../../shared/common-font-changer.directive';
 
 @Component({
-    templateUrl: 'order-booking-list.component.html'
+    templateUrl: 'order-booking-list.component.html',
+    standalone: false
 })
 export class OrderBookingListComponent implements OnInit {
 

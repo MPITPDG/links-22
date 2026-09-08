@@ -11,8 +11,8 @@ import { Configuration } from '../../app.constants';
  
 @Component({
     selector: 'app-masterConsigneebank',
-    templateUrl: 'Bank-Consignee.component.html'
-
+    templateUrl: 'Bank-Consignee.component.html',
+    standalone: false
 })  
 
 

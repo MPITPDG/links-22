@@ -9,7 +9,8 @@ import { HttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-purchase-general',
   templateUrl: './purchase-general.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class PurchaseGeneralComponent implements OnInit {
   Allitemlist: any = [];

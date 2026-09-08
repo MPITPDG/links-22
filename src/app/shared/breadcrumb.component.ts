@@ -12,7 +12,8 @@ import { filter } from 'rxjs/operators';
       <a *ngIf="!last" [routerLink]="breadcrumb.url">{{breadcrumb.label.title}}</a>
       <span *ngIf="last" [routerLink]="breadcrumb.url">{{breadcrumb.label.title}}</span>
     </li>
-  </ng-template>`
+  </ng-template>`,
+    standalone: false
 })
 export class BreadcrumbsComponent {
   breadcrumbs: Array<Object>;

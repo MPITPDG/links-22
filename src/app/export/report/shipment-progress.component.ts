@@ -4,7 +4,8 @@ import { LoginService } from '../../shared/service/loginService';
 import { IMyDpOptions } from 'mydatepicker';
 import { LoaderService } from '../../shared/service/loader.service';
 @Component({
-    templateUrl: 'shipment-progress.component.html'
+    templateUrl: 'shipment-progress.component.html',
+    standalone: false
 })
 export class ShipmentProgressReportComponent implements OnInit {
     CityList: Array<any> = [];

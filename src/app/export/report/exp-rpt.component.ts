@@ -9,8 +9,8 @@ import { LoaderService } from '../../shared/service/loader.service';
 import { TabHeadingDirective } from 'ngx-bootstrap';
 @Component({
     selector: 'app-epcopy-exl-rpt',
-    templateUrl: 'exp-rpt-epcopy-search.component.html'
-
+    templateUrl: 'exp-rpt-epcopy-search.component.html',
+    standalone: false
 })
 export class ExptRptEpCopyExl implements OnInit{
     checkWise: string = "1";
@@ -92,8 +92,8 @@ export class ExptRptEpCopyExl implements OnInit{
 
 @Component({
     selector: 'app-dsr-exl-rpt',
-    templateUrl: 'exp-rpt-dsr.component.html'
-
+    templateUrl: 'exp-rpt-dsr.component.html',
+    standalone: false
 })
 
 export class ExptDSRExl implements OnInit {
@@ -249,7 +249,8 @@ export class ExptDSRExl implements OnInit {
 
 @Component({
     selector: 'app-tonnage-exl-rpt',
-    templateUrl: 'exp-rpt-tonnage-search.component.html'
+    templateUrl: 'exp-rpt-tonnage-search.component.html',
+    standalone: false
 })
 export class ExptTonnage implements OnInit {
     checkmode: string = "1";
@@ -453,8 +454,8 @@ export class ExptTonnage implements OnInit {
 
 @Component({
     selector: 'app-shipment-status',
-    templateUrl: 'exp-rpt-shipment-status.html'
-
+    templateUrl: 'exp-rpt-shipment-status.html',
+    standalone: false
 })
 
 export class Exptshipmentstatus implements OnInit {
@@ -619,8 +620,8 @@ export class Exptshipmentstatus implements OnInit {
 
 @Component({
     selector: 'app-cargo-onhand',
-    templateUrl: 'exp_rpt_cargo_onhand.component.html'
-
+    templateUrl: 'exp_rpt_cargo_onhand.component.html',
+    standalone: false
 })
 
 export class ExptRptCargoOnHand implements OnInit {

@@ -10,8 +10,9 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-trialbalance-datewise',
     templateUrl: './trialbal-datewise.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class TrialBalanceDatewise implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {
       dateFormat:  'dd/mm/yyyy',

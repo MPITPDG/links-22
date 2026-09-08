@@ -12,7 +12,8 @@ import { ThemeService } from 'ng2-charts';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 @Component({
     selector: 'app-multicontainerFS-Edit',
-    templateUrl: 'exp_fs_multicontainer_edit.component.html'
+    templateUrl: 'exp_fs_multicontainer_edit.component.html',
+    standalone: false
 })
 export class FSmulticontainerEdit implements OnInit {
     latestEntryID: number | null = null;

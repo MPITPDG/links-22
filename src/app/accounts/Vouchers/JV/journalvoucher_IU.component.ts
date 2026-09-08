@@ -9,7 +9,8 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { iif } from 'rxjs';
 @Component({
-    templateUrl: 'journalvoucher_IU.component.html'
+    templateUrl: 'journalvoucher_IU.component.html',
+    standalone: false
 })
 export class JournalVoucherComponent implements OnInit {
 

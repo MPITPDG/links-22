@@ -20,7 +20,8 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
   color:green;
   font-family:sans-serif
 }
-`]
+`],
+    standalone: false
 })
 export class PrintChequeComponent implements OnInit {
   Header: string = "COMP BP ENTRYNO - LIST - ASSIGN TO - CHEQUE NO AND PRINT"

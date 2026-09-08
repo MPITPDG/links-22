@@ -10,8 +10,9 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-OutstandingOverseasClient',
     templateUrl: './rcbl-overseasagent.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class OutstandingOverseasClient implements OnInit {
     NetOutstanding:string
     AccountList:any = [];

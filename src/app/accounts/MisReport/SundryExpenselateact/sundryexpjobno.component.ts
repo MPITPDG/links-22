@@ -11,8 +11,9 @@ import { DatePipe } from '@angular/common';
 @Component({
     selector: 'app-SundryExpenses',
     templateUrl: './sundryexpense.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class SundryExpensesjob implements OnInit {
 
     public myDatePickerOptions: IMyDpOptions = {

@@ -50,7 +50,8 @@ import { environment } from '../../../environments/environment';
   font-family: Verdana, Arial;
   color: black;
 }
-    `]
+    `],
+    standalone: false
 })
 export class PurchasePrintComponent implements OnInit {
   SuppNo:string=""

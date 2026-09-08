@@ -12,8 +12,8 @@ import { Configuration } from '../../app.constants';
  
 @Component({
     selector: 'app-userprofilecreation',
-    templateUrl: 'userprofile-creation.component.html'
-
+    templateUrl: 'userprofile-creation.component.html',
+    standalone: false
 })
 
 

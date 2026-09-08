@@ -27,6 +27,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
       </div>
     </div>
   `,
+    standalone: false
 })
 export class CommonModalComponent {
 
@@ -71,6 +72,7 @@ export class CommonModalComponent {
       </div>
     </div>
   `,
+    standalone: false
 })
 export class DeleteModalComponent {
 
@@ -133,6 +135,7 @@ export class DeleteModalComponent {
       </div>
     </div>
   `,
+    standalone: false
 })
 export class ConfirmModalComponent {
 
@@ -174,6 +177,7 @@ export class ConfirmModalComponent {
       </div>
     </div>
   `,
+    standalone: false
 })
 export class OkModalComponent {
 
@@ -195,7 +199,8 @@ export class OkModalComponent {
           <i class="fa fa-spinner fa-spin" style="font-size:48px;color:blue"></i>
     </div>
   `,
-    styles: ['.modal{text-align:center;padding:0!important} .modal:before{content:""; display:inline-block;height:100%;vertical-align:middle;margin-right:-4px}.modal-dialog{display:inline-block;text-align:left;vertical-align:middle}']
+    styles: ['.modal{text-align:center;padding:0!important} .modal:before{content:""; display:inline-block;height:100%;vertical-align:middle;margin-right:-4px}.modal-dialog{display:inline-block;text-align:left;vertical-align:middle}'],
+    standalone: false
 })
 export class PageLoadModalComponent {
 

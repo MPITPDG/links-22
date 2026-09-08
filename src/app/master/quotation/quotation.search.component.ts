@@ -10,7 +10,8 @@ import { IMyDpOptions } from 'mydatepicker';
 @Component({
   selector: 'app-quotation-search',
   templateUrl: './quotation.search.component.html',
-   styleUrls: ['./quotation.search.component.scss']
+   styleUrls: ['./quotation.search.component.scss'],
+    standalone: false
 })
 export class QuotationSearchComponent implements OnInit {
 

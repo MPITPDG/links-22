@@ -10,8 +10,9 @@ import { IMyDpOptions } from 'mydatepicker';
 @Component({
     selector: 'app-bankreconcil-uploadstatement',
     templateUrl: './bank-reconcil-uploadstatement.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class UploadBankReconcil implements OnInit {
 
     public myDatePickerOptions: IMyDpOptions = {

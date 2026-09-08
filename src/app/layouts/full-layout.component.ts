@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import { LoginService } from '../shared/service/loginService';
 @Component({
     selector: 'app-dashboard',
-    templateUrl: './full-layout.component.html'
+    templateUrl: './full-layout.component.html',
+    standalone: false
 })
 export class FullLayoutComponent implements OnInit {
 

@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'authfilterpipe'
+  name: 'authfilterpipe',
+    standalone: false
 })
 export class AuthfilterpipePipe implements PipeTransform {
   transform(value: any[], searchString: string) {

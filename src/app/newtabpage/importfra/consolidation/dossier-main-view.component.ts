@@ -5,7 +5,8 @@ import { LoginService } from '../../../shared/service/loginService';
 import { LoaderService } from '../../../shared/service/loader.service';
 
 @Component({
-    templateUrl: 'dossier-main-view.component.html'   
+    templateUrl: 'dossier-main-view.component.html',
+    standalone: false
 })
 export class DossierMainViewConsolidationComponent implements OnInit {
     mainData: any = {};

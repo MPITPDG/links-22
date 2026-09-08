@@ -10,7 +10,8 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
 @Component({
   selector: 'app-req-bankpayment',
   templateUrl: './req-bankpayment.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class ReqBankpaymentComponent implements OnInit {
   EntryNo: string = " ";

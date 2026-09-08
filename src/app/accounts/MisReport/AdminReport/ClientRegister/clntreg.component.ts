@@ -12,8 +12,9 @@ import { DatePipe } from '@angular/common';
 @Component({
     selector: 'app-Client-register',
     templateUrl: './clntreg.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class ClientRegisterComponent implements OnInit {
     registerdata_details = []
     registerdata = []

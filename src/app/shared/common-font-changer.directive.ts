@@ -5,6 +5,7 @@
     template: `
             <i class="{{fontClass}}"></i>
     `,
+    standalone: false
 })
 export class FontChangerComponent implements OnInit {
     @Input() fontIndex: number;

@@ -8,7 +8,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-accounts-transaction-purchase-search',
     templateUrl: 'staffpurchase_search.component.html',
-    
+    standalone: false
 })
 export class StaffPurchaseSearchComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {

@@ -7,8 +7,8 @@ import {IMyDpOptions} from 'mydatepicker';
 
 @Component({
     selector: 'app-mawbstockmaster',
-    templateUrl: 'stockmaster.component.html'
-
+    templateUrl: 'stockmaster.component.html',
+    standalone: false
 })
 export class MawbStockMasterComponent implements OnInit {
 

@@ -69,6 +69,7 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
       z-index: 2;
   }
   `],
+    standalone: false
 })
 export class InvoiceprintTabsComponent implements OnInit {
   Header: string = "proforama airfreight invoice and share of profit Credit Note"

@@ -220,7 +220,8 @@ import { ActivatedRoute } from '@angular/router';
 								</tbody>
 							</table>
 
-        `
+        `,
+    standalone: false
 })
 export class ChronologyViewComponent implements OnInit {
 	exptno: string;

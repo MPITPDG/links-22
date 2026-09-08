@@ -7,7 +7,8 @@ import { LoginService } from '../../shared/service/loginService';
 @Component({
   selector: 'app-creditnote-view',
   templateUrl: './creditnote-view.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class CreditnoteViewComponent implements OnInit {
 

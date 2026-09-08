@@ -12,7 +12,8 @@ import {MAWBModelpopupcomponent } from './Mawb_Tarifrating.component'
 import { SharedDataSerice } from '../../export-share-data.service';
 @Component({
     selector: 'app-print-air-Mawb-printupdate',
-    templateUrl: 'mawb-printupdate.component.html'
+    templateUrl: 'mawb-printupdate.component.html',
+    standalone: false
 })
 export class PrintDocumentMawbprintupdateComponent implements OnInit {
     @ViewChild('MAWBModelpopup', {static: false}) public editModal: MAWBModelpopupcomponent;

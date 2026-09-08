@@ -7,7 +7,8 @@ import { ToastCommonService } from '../../../shared/service/toastService';
 import { LoginService } from '../../../shared/service/loginService';
 @Component({
     selector: 'app-consignment-edit-option',
-    templateUrl: 'consig_main_edit.component.html'
+    templateUrl: 'consig_main_edit.component.html',
+    standalone: false
 })
 export class ExportMasterEditComponent implements OnInit {
     @ViewChild('okModal', {static: false}) okModal: OkModalComponent;

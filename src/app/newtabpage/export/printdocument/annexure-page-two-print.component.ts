@@ -4,7 +4,8 @@ import { ActivatedRoute } from '@angular/router';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-print-document-annexure-page-two',
-    templateUrl: 'annexure-page-two-print.component.html'
+    templateUrl: 'annexure-page-two-print.component.html',
+    standalone: false
 })
 export class AnnexurePageTwoPrintComponent implements OnInit {
 

@@ -6,7 +6,8 @@ import { ActivatedRoute } from '@angular/router';
 import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-consignment-invoice-view',
-    templateUrl: 'invoice-details.component.html' 
+    templateUrl: 'invoice-details.component.html',
+    standalone: false
 })
 export class InvoiceDetailsComponent implements OnInit {
 

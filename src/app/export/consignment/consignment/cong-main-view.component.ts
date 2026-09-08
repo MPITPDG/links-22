@@ -8,7 +8,8 @@ import { environment } from '../../../../environments/environment';
  
 @Component({
     selector: 'app-consignment-main-view',
-    templateUrl: 'cong-main-view.component.html'
+    templateUrl: 'cong-main-view.component.html',
+    standalone: false
 })
 export class ConsigneeMainViewComponent implements OnChanges {
 

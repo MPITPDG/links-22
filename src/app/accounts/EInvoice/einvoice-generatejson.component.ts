@@ -10,8 +10,9 @@ import {Configuration}  from '../../app.constants'
 @Component({
     selector: 'app-einvoice-generatejson',
     templateUrl: './einvoice-generatejson.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class GenerateJson implements OnInit {
     EInvoiceListtbl: any = []
     ECreditNoteListtbl:any=[];

@@ -4,7 +4,8 @@ import { LoginService } from '../../../shared/service/loginService';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-print-document-annexure-deec-epcg',
-    templateUrl: 'deec-epcg-annexure.component.html'
+    templateUrl: 'deec-epcg-annexure.component.html',
+    standalone: false
 })
 export class DeecEpcgAnnexureComponent implements OnInit {
     @Output() result = new EventEmitter();

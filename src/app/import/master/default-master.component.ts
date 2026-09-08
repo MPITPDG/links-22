@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-    templateUrl: 'default-master.component.html'
+    templateUrl: 'default-master.component.html',
+    standalone: false
 })
 export class MasterImportComponent implements OnInit {
 

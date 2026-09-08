@@ -11,7 +11,8 @@ import { LoaderService } from '../../shared/service/loader.service';
 
 @Component({
     selector: 'app-container-iu',
-    templateUrl: 'exp_sp_vessel_search.component.html'
+    templateUrl: 'exp_sp_vessel_search.component.html',
+    standalone: false
 })
 
 export class ExptSpVesselSearch implements OnInit {

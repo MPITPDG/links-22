@@ -4,7 +4,8 @@ import {Router} from '@angular/router';
 import {Location} from '@angular/common';
 
 @Component({
-    templateUrl: 'error-rights.component.html'
+    templateUrl: 'error-rights.component.html',
+    standalone: false
 })
 export class UserRightsComponent implements OnInit {
 

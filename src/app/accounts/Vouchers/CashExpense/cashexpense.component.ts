@@ -9,7 +9,8 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
   
   selector: 'app-cashexpense',
   templateUrl: './cashexpense.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class CashexpenseComponent implements OnInit {
   EntryNo: string = " "

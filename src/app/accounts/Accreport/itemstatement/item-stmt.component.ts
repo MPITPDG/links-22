@@ -12,8 +12,9 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap';
 @Component({
     selector: 'app-ItemStatement',
     templateUrl: './item-stmt.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
 
   export class ItemStatement implements OnInit {
 

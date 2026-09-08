@@ -7,7 +7,8 @@ import { LoaderService }  from '../../shared/service/loader.service';
 import { environment } from '../../../environments/environment';
 @Component({
     selector: 'app-consignment-view',
-    templateUrl: 'consign-view.component.html'
+    templateUrl: 'consign-view.component.html',
+    standalone: false
 })
 export class ConsigneeViewComponent implements OnChanges {
 

@@ -28,7 +28,8 @@ import { FilterPipe } from 'ngx-filter-pipe';
     height: 100%;
     display: flex;
     flex-direction: column;
-  }`]
+  }`],
+    standalone: false
 })
 export class GeneralInvoiceSearchComponent implements OnInit {
   order: string = 'CLIENTNAME';

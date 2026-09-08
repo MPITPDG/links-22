@@ -12,15 +12,15 @@ const routes: Routes = [
             { path: '', component: ImportComponent, data: { title: 'Home' } },
             {
                 path: 'sea',
-                loadChildren: './sea/sea.module#SeaImportModule',
+                loadChildren: () => import('./sea/sea.module').then(m => m.SeaImportModule),
             },
             {
                 path: 'air',
-                loadChildren: './air/air.module#AirImportModule',
+                loadChildren: () => import('./air/air.module').then(m => m.AirImportModule),
             },
             {
                 path: 'master',
-                loadChildren: './master/default-master.module#DefaultMasterImportModule',
+                loadChildren: () => import('./master/default-master.module').then(m => m.DefaultMasterImportModule),
             }
         ]
     }

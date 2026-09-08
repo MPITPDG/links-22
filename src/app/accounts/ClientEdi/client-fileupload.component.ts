@@ -18,7 +18,8 @@ interface UploadedFile {
 @Component({
   selector: 'app-client-file-upload',
   templateUrl: './client-fileupload.component.html',
-  styleUrls: ['./client-fileupload.component.scss']
+  styleUrls: ['./client-fileupload.component.scss'],
+    standalone: false
 })
 export class ClientEdiFileUploadComponent implements OnInit {
 

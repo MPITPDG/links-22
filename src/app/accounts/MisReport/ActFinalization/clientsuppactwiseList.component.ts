@@ -11,8 +11,9 @@ import { DatePipe } from '@angular/common';
 @Component({
     selector: 'app-ClientSupplierActWiseList',
     templateUrl: './clientsuppactwiseList.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class ClientSupplierActWiseList implements OnInit {
 
     public myDatePickerOptions: IMyDpOptions = {

@@ -7,8 +7,9 @@ import { ToastCommonService } from '../../shared/service/toastService';
 @Component({
     selector: 'app-actstatement-advance-print',
     templateUrl: './actstatement-advance-Print.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
 
   export class ActstatAdvancePrintComponent implements OnInit  {
     display='none';

@@ -12,79 +12,79 @@ const routes: Routes = [
             { path: '', component: ExportComponent, data: { title: 'Home' } },           
               {
                 path: 'Consignment',
-                loadChildren: './consignment/consignment/expt-consignment-module#ExportConsignmentModule',
+                loadChildren: () => import('./consignment/consignment/expt-consignment-module').then(m => m.ExportConsignmentModule),
             },            
             {
                 path: 'print-document',
-                loadChildren: './printdocument/air/printdoc-air.module#ExportPrintdocaircontModule',
+                loadChildren: () => import('./printdocument/air/printdoc-air.module').then(m => m.ExportPrintdocaircontModule),
             },
             {
                 path: 'print-documents',
-                loadChildren: './printdocument/prealert/exp-prealert.module#ExportPrealertModule',
+                loadChildren: () => import('./printdocument/prealert/exp-prealert.module').then(m => m.ExportPrealertModule),
             },             
             {
                 path: 'shipment-progress',
-                loadChildren: './shipment_progress/expt-shipment-process.module#ExportshipmentprocessModule',
+                loadChildren: () => import('./shipment_progress/expt-shipment-process.module').then(m => m.ExportshipmentprocessModule),
             },
             {
                 path: 'shipment-progress',
-                loadChildren: './epcopy/exp-epcopy-recvd.module#ExportEpcopyrecvdModule',
+                loadChildren: () => import('./epcopy/exp-epcopy-recvd.module').then(m => m.ExportEpcopyrecvdModule),
             },           
             {
                 path: 'vessel',
-                loadChildren: './vessel/expt-mst-vessel.module#ExportmstvesselModule',
+                loadChildren: () => import('./vessel/expt-mst-vessel.module').then(m => m.ExportmstvesselModule),
             },  
             {
                 path: 'mawbstock',
-                loadChildren: './mawbstockmaster/mawb-stk-module#MawbStockModule',
+                loadChildren: () => import('./mawbstockmaster/mawb-stk-module').then(m => m.MawbStockModule),
             },         
             {
                 path: 'fcr',
-                loadChildren: './fcr/exp-prnt-fcr.module#ExportprntfcrModule',
+                loadChildren: () => import('./fcr/exp-prnt-fcr.module').then(m => m.ExportprntfcrModule),
             },            
             {
                 path: 'container',
-                loadChildren: './container/exp-sp-container.module#ExportContainerModule',
+                loadChildren: () => import('./container/exp-sp-container.module').then(m => m.ExportContainerModule),
             },             
             {
                 path: 'list-container',
-                loadChildren: './listcontainer/container-view.module#ExportViewcontModule',
+                loadChildren: () => import('./listcontainer/container-view.module').then(m => m.ExportViewcontModule),
             },             
             {
                 path: 'print-document',
-                loadChildren: './printdocument/sea/expt-prt-mbl.module#ExportPrtMblModule',
+                loadChildren: () => import('./printdocument/sea/expt-prt-mbl.module').then(m => m.ExportPrtMblModule),
             },
             {
                 path: 'Booking',
-                loadChildren: './booking/booking-module#BookingExportModule',
+                loadChildren: () => import('./booking/booking-module').then(m => m.BookingExportModule),
             },
             {
                 path: 'Pss',
-                loadChildren: './consignment/pss/export-pss.module#ExportPssModule',
+                loadChildren: () => import('./consignment/pss/export-pss.module').then(m => m.ExportPssModule),
             },
             {
                 path: 'Job',
-                loadChildren: './consignment/job/export-job.module#ExportJobModule',
+                loadChildren: () => import('./consignment/job/export-job.module').then(m => m.ExportJobModule),
             },
             {
                 path: 'branch-job-transfer',
-                loadChildren: './consignment/branchjobtransfer/branch-job-transfer.module#BranchJobTrasExportModule',
+                loadChildren: () => import('./consignment/branchjobtransfer/branch-job-transfer.module').then(m => m.BranchJobTrasExportModule),
             },
             {
                 path: 'print-document',
-                loadChildren: './printdocument/docket/exp-docket.module#ExportdocketModule',
+                loadChildren: () => import('./printdocument/docket/exp-docket.module').then(m => m.ExportdocketModule),
             },            
             {
                 path: 'print-document',
-                loadChildren: './printdocument/annexure/exp-annexure.module#ExportAnnexureModule',
+                loadChildren: () => import('./printdocument/annexure/exp-annexure.module').then(m => m.ExportAnnexureModule),
             },
             {
                 path: 'report',
-                loadChildren: './report/report.module#ReportExportModule',
+                loadChildren: () => import('./report/report.module').then(m => m.ReportExportModule),
             },
             {
                 path: 'hblupload',
-                loadChildren: './hblupload/hblupload.module#HblUploadModule',
+                loadChildren: () => import('./hblupload/hblupload.module').then(m => m.HblUploadModule),
             },
         ]
     }

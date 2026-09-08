@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 
 @Component({
-  templateUrl: 'formlayout.component.html'
+  templateUrl: 'formlayout.component.html',
+    standalone: false
 })
 export class FormLayoutComponent {
 

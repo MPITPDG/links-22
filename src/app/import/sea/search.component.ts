@@ -9,7 +9,8 @@ import { LoaderService } from '../../shared/service/loader.service';
     selector: 'app-consignment-import-sea-search',
     templateUrl: 'search.component.html',
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class SeaSearchComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {

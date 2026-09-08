@@ -249,7 +249,8 @@ import { LoaderService } from '../../shared/service/loader.service';
 								      </tr>
 								    </tbody>
 							    </table>
-        `
+        `,
+    standalone: false
 })
 export class CLPViewComponent implements OnInit {
 

@@ -163,7 +163,8 @@ import { LoaderService } from '../../shared/service/loader.service';
                                     </tbody>
 							    </table>
                                 
-        `
+        `,
+    standalone: false
 })
 export class ContainerjobviewComponent implements OnInit {
 

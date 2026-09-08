@@ -9,8 +9,9 @@ import { IMyDpOptions } from 'mydatepicker';
 @Component({
     selector: 'app-bankreconcil-statement',
     templateUrl: './bank-reconcil-statement.component.html',
-    styleUrls: ['./bank-reconcil-statement.component.css']
-  })
+    styleUrls: ['./bank-reconcil-statement.component.css'],
+    standalone: false
+})
   export class BankReconcilStatement implements OnInit {
 
     public myDatePickerOptions: IMyDpOptions = {

@@ -9,7 +9,8 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
 @Component({
   selector: 'app-reqbp-view',
   templateUrl: './reqbp-view.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class ReqbpViewComponent implements OnInit {
   entryno: any;

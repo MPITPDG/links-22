@@ -12,7 +12,8 @@ import { ThemeService } from 'ng2-charts';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 @Component({
     selector: 'app-multicontainerFS-iu',
-    templateUrl: 'exp_fs_multicontainer_iu.component.html'
+    templateUrl: 'exp_fs_multicontainer_iu.component.html',
+    standalone: false
 })
 export class FSmulticontainerIU implements OnInit {
     Add:string="Add";

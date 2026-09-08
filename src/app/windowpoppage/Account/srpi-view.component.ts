@@ -7,7 +7,8 @@ import { ToastCommonService } from '../../shared/service/toastService';
 @Component({
   selector: 'app-srpi-view',
   templateUrl: './srpi-view.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class srpiViewComponent implements OnInit, OnChanges  {
     display='none';

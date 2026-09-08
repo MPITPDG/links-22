@@ -7,7 +7,8 @@ import { LoginService } from '../../../shared/service/loginService';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-print-air-mawb-update1',
-    templateUrl: 'mawb.update.component.html' 
+    templateUrl: 'mawb.update.component.html',
+    standalone: false
 })
 export class PrintDocumentMawbUpdateComponent implements OnChanges {
     @Input()

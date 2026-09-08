@@ -62,7 +62,8 @@ import { HttpClient } from '@angular/common/http';
         z-index: 2;
     }
     `],
-  })
+    standalone: false
+})
   @Component({
     selector: 'app-mawb-purchase',
     templateUrl: './mawb-purchase.component.html',
@@ -119,7 +120,8 @@ import { HttpClient } from '@angular/common/http';
         z-index: 2;
     }
     `],
-  })
+    standalone: false
+})
   export class MAWBPurchaseComponent implements OnInit {
 
     purchasedate_step1: any = null; purchasedate_step2: any = null

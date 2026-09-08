@@ -18,7 +18,8 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
 @Component({
   selector: 'app-singlejobno-report',
   templateUrl: './singlejobno-report.component.html',
-  styleUrls: ['./singlejobno-report.component.css']
+  styleUrls: ['./singlejobno-report.component.css'],
+    standalone: false
 })
 export class SinglejobnoReportComponent implements OnInit {
   JobNo: any = '';

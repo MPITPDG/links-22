@@ -12,7 +12,8 @@ import { LoaderService } from '../../shared/service/loader.service';
     selector: 'app-export-booking',
     templateUrl: 'add.booking.component.html' ,
     styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class AddBookingComponent implements OnInit {
     @ViewChild('searchButton', {static: false}) searchButton: ElementRef;

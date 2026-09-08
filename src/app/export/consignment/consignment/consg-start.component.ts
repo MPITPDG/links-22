@@ -10,8 +10,8 @@ import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     templateUrl: 'consg-start.component.html',
  //   styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    // encapsulation: ViewEncapsulation.None
-     
+    // encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class ConsgStartComponent implements OnInit {
     private baseUrl: string = 'Export/GetExportConsignment';

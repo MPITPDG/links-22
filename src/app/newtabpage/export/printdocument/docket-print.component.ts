@@ -3,7 +3,8 @@ import { DataService } from '../../../shared/service/dataService';
 import { ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../../shared/service/loginService';
 @Component({
-    templateUrl: 'docket-print.component.html'
+    templateUrl: 'docket-print.component.html',
+    standalone: false
 })
 export class DocketPrintComponent implements OnInit {
     paramData: any = { exptno: null };

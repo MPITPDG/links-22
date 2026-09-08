@@ -11,8 +11,8 @@ import {ITEMS,REQITEMS} from './Cls-common.item';
  
 @Component({
     selector: 'app-commonsearch',
-    templateUrl: 'Common-Search.component.html'
-
+    templateUrl: 'Common-Search.component.html',
+    standalone: false
 })
 
 

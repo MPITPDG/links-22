@@ -10,8 +10,9 @@ import {Configuration}  from '../../app.constants'
 @Component({
     selector: 'app-ecreditnote-generatejson',
     templateUrl: './ecreditnote-generatejson.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class EcreditNoteGenerateJson implements OnInit {
     EcreditnoteListtbl: any = []
     newArray: any = [];

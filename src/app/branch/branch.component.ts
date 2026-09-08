@@ -16,7 +16,8 @@ import { ToastCommonService } from '../shared/service/toastService';
             padding:5px;
         }
   `
-    ]
+    ],
+    standalone: false
 })
 export class BranchComponent implements OnInit {
     countries: any = [];

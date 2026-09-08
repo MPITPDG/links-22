@@ -11,7 +11,8 @@ import { DataService } from 'src/app/shared/service/dataService';
 @Component({
   selector: 'app-ServiceTax-register',
   templateUrl: './service-tax-support.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class serviceTaxSupport implements OnInit {
 

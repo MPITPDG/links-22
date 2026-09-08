@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'clientedifilterpipe'
+  name: 'clientedifilterpipe',
+    standalone: false
 })
 export class ClientedifilterpipePipe implements PipeTransform {
   transform(value: any[], searchString: string) {

@@ -10,7 +10,8 @@ import { IMyDpOptions } from 'mydatepicker';
 @Component({
   selector: 'app-enquiry-search',
   templateUrl: './enquiry.search.component.html',
-  styleUrls: ['./quotation.search.component.scss']
+  styleUrls: ['./quotation.search.component.scss'],
+    standalone: false
 })
 export class EnquirySearchComponent implements OnInit {
 

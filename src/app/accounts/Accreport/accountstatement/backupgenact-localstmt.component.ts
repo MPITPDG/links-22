@@ -13,7 +13,9 @@
 //     selector: 'app-General-AccountStmt-Local',
 //     templateUrl: './genact-localstmt.component.html',
 //     styles: []
-//   })
+//,
+    standalone: false
+})
 //   export class GenActStatementLocal implements OnInit {
 //     public myDatePickerOptions: IMyDpOptions = {
 //         dateFormat: 'dd-mmm-yyyy',

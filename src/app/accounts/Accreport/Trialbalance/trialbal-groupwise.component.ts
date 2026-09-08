@@ -11,8 +11,9 @@ import { networkInterfaces } from 'os';
 @Component({
     selector: 'app-trialbalance-groupwise',
     templateUrl: './trialbal-groupwise.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class TrialBalanceGroupwise implements OnInit {
    
 

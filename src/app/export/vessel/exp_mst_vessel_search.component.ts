@@ -9,8 +9,8 @@ import { LoaderService } from '../../shared/service/loader.service';
 
 @Component({
     selector: 'app-vessel-search',
-    templateUrl: 'exp_mst_vessel_search.component.html'
-
+    templateUrl: 'exp_mst_vessel_search.component.html',
+    standalone: false
 })
 export class VesselSearchComponent implements OnInit {
     

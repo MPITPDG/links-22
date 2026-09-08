@@ -28,7 +28,8 @@ import { ToastCommonService } from '../shared/service/toastService';
         color: #ffffff;
         font-family: Verdana, Arial;
       }
-    `]
+    `],
+    standalone: false
 })
 export class LoginComponent implements OnInit {
     public username: string = '';

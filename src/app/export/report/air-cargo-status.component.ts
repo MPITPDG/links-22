@@ -4,7 +4,8 @@ import { Router } from '@angular/router';
 import { LoginService } from '../../shared/service/loginService';
 import { LoaderService } from '../../shared/service/loader.service';
 @Component({
-    templateUrl: 'air-cargo-status.component.html'
+    templateUrl: 'air-cargo-status.component.html',
+    standalone: false
 })
 export class AirCargoStatusReportComponent implements OnInit {
     ConsigneeList: Array<any> = [];

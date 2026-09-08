@@ -10,8 +10,9 @@ import { environment } from  '../../../../environments/environment';
 @Component({
     selector: 'app-ChequeErrorPrint-ChequeError-search',
     templateUrl: './ChequeError-NotGenerateBPNo.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class ChequeErrorPrintComponent implements OnInit {
     ChequeNo:string;
     public myDatePickerOptions: IMyDpOptions = {

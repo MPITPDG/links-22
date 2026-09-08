@@ -69,7 +69,8 @@ import { LoginService } from '../../shared/service/loginService';
                         </td>
                 </tr>
             </table>
-        `
+        `,
+    standalone: false
 })
 export class CalCbmViewComponent implements OnInit {
      //Calculate CBM 

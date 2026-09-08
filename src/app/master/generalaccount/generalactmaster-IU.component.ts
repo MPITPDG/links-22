@@ -14,7 +14,8 @@ import { TokenizeResult } from '@angular/compiler/src/ml_parser/lexer';
     styles: [`
     table, tr, td, th{
         border: none;
-        } `]
+        } `],
+    standalone: false
 })
 
 export class generalactmasterIU implements OnInit {

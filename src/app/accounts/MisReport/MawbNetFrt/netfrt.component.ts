@@ -11,8 +11,9 @@ import { DatePipe } from '@angular/common';
 @Component({
     selector: 'app-MAWBNetfrt',
     templateUrl: './netfrt.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
   export class MAWBFRT implements OnInit {
 
     public myDatePickerOptionsRpt: IMyDpOptions = {

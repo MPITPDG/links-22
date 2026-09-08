@@ -9,7 +9,8 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
 @Component({
   selector: 'app-statement',
   templateUrl: './statement.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class StatementComponent implements OnInit {
 Header:string="Cash expenses"

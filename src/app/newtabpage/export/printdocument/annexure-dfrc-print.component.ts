@@ -5,7 +5,8 @@ import { ActivatedRoute } from '@angular/router';
 import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-print-document-annexure-dfrc',
-    templateUrl: 'annexure-dfrc-print.component.html'
+    templateUrl: 'annexure-dfrc-print.component.html',
+    standalone: false
 })
 export class AnnexureDfrcPrintComponent implements OnInit {
     dtDfrc: Array<any> = [];

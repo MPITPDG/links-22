@@ -12,8 +12,9 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-PrintCheque-Chequereport-search',
     templateUrl: './PrintCheque-Chequereport-search.component.html',
-    styles: []
-  })
+    styles: [],
+    standalone: false
+})
 
   export class ChequeReportSearchComponent implements OnInit {
     exampleRadios1: string = 'No';

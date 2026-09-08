@@ -12,7 +12,7 @@ const routes: Routes = [
             
             {
                 path: 'Reconcil',
-                loadChildren: './BankReconcil/BankReconcil.module#BankReconcilModule',
+                loadChildren: () => import('./BankReconcil/BankReconcil.module').then(m => m.BankReconcilModule),
                 canActivate: [FinancialYearAuthGuard],
             },
                 

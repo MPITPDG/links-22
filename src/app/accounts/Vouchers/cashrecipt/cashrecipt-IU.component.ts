@@ -9,7 +9,8 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
 @Component({
   selector: 'app-cashrecipt-IU',
   templateUrl: './cashrecipt-IU.component.html',
-  styles: []
+  styles: [],
+    standalone: false
 })
 export class CashreciptIUComponent implements OnInit {
   EntryNo: string = " "
