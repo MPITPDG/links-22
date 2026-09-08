@@ -55,25 +55,21 @@ export class DashboardComponent implements OnInit {
   public lineChart1Options: any = {
     maintainAspectRatio: false,
     scales: {
-      xAxes: [{
-        gridLines: {
+      x: {
+        grid: {
           color: 'transparent',
           zeroLineColor: 'transparent'
         },
         ticks: {
           fontSize: 2,
-          fontColor: 'transparent',
+          color: 'transparent',
         }
 
-      }],
-      yAxes: [{
+      },
+      y: {
         display: false,
-        ticks: {
-          display: false,
-          min: 40 - 5,
-          max: 84 + 5,
-        }
-      }],
+        ticks: { display: false }, min: 40 - 5, max: 84 + 5
+      },
     },
     elements: {
       line: {
@@ -85,9 +81,7 @@ export class DashboardComponent implements OnInit {
         hoverRadius: 4,
       },
     },
-    legend: {
-      display: false
-    }
+    plugins: { legend: { display: false } }
   };
   public lineChart1Colours: Array<any> = [
     { // grey
@@ -109,25 +103,21 @@ export class DashboardComponent implements OnInit {
   public lineChart2Options: any = {
     maintainAspectRatio: false,
     scales: {
-      xAxes: [{
-        gridLines: {
+      x: {
+        grid: {
           color: 'transparent',
           zeroLineColor: 'transparent'
         },
         ticks: {
           fontSize: 2,
-          fontColor: 'transparent',
+          color: 'transparent',
         }
 
-      }],
-      yAxes: [{
+      },
+      y: {
         display: false,
-        ticks: {
-          display: false,
-          min: 1 - 5,
-          max: 34 + 5,
-        }
-      }],
+        ticks: { display: false }, min: 1 - 5, max: 34 + 5
+      },
     },
     elements: {
       line: {
@@ -140,9 +130,7 @@ export class DashboardComponent implements OnInit {
         hoverRadius: 4,
       },
     },
-    legend: {
-      display: false
-    }
+    plugins: { legend: { display: false } }
   };
   public lineChart2Colours: Array<any> = [
     { // grey
@@ -165,12 +153,12 @@ export class DashboardComponent implements OnInit {
   public lineChart3Options: any = {
     maintainAspectRatio: false,
     scales: {
-      xAxes: [{
+      x: {
         display: false
-      }],
-      yAxes: [{
+      },
+      y: {
         display: false
-      }]
+      }
     },
     elements: {
       line: {
@@ -182,9 +170,7 @@ export class DashboardComponent implements OnInit {
         hoverRadius: 4,
       },
     },
-    legend: {
-      display: false
-    }
+    plugins: { legend: { display: false } }
   };
   public lineChart3Colours: Array<any> = [
     {
@@ -207,17 +193,15 @@ export class DashboardComponent implements OnInit {
   public barChart1Options: any = {
     maintainAspectRatio: false,
     scales: {
-      xAxes: [{
+      x: {
         display: false,
         barPercentage: 0.6,
-      }],
-      yAxes: [{
+      },
+      y: {
         display: false
-      }]
+      }
     },
-    legend: {
-      display: false
-    }
+    plugins: { legend: { display: false } }
   };
   public barChart1Colours: Array<any> = [
     {
@@ -260,8 +244,8 @@ export class DashboardComponent implements OnInit {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
-      xAxes: [{
-        gridLines: {
+      x: {
+        grid: {
           drawOnChartArea: false,
         },
         ticks: {
@@ -269,15 +253,13 @@ export class DashboardComponent implements OnInit {
             return value.charAt(0);
           }
         }
-      }],
-      yAxes: [{
-        ticks: {
-          beginAtZero: true,
-          maxTicksLimit: 5,
+      },
+      y: {
+        beginAtZero: true, ticks: { maxTicksLimit: 5,
           stepSize: Math.ceil(250 / 5),
           max: 250
         }
-      }]
+      }
     },
     elements: {
       line: {
@@ -290,9 +272,7 @@ export class DashboardComponent implements OnInit {
         hoverBorderWidth: 3,
       }
     },
-    legend: {
-      display: false
-    }
+    plugins: { legend: { display: false } }
   };
   public mainChartColours: Array<any> = [
     { // brandInfo
@@ -348,12 +328,12 @@ export class DashboardComponent implements OnInit {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
-      xAxes: [{
+      x: {
         display: false,
-      }],
-      yAxes: [{
+      },
+      y: {
         display: false,
-      }]
+      }
     },
     elements: {
       line: {
@@ -366,9 +346,7 @@ export class DashboardComponent implements OnInit {
         hoverBorderWidth: 3,
       }
     },
-    legend: {
-      display: false
-    }
+    plugins: { legend: { display: false } }
   };
   public socialChartColours: Array<any> = [
     {
@@ -400,12 +378,12 @@ export class DashboardComponent implements OnInit {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
-      xAxes: [{
+      x: {
         display: false,
-      }],
-      yAxes: [{
+      },
+      y: {
         display: false,
-      }]
+      }
     },
     elements: {
       line: {
@@ -418,9 +396,7 @@ export class DashboardComponent implements OnInit {
         hoverBorderWidth: 3,
       }
     },
-    legend: {
-      display: false
-    }
+    plugins: { legend: { display: false } }
   };
   public sparklineChartDefault: Array<any> = [
     {

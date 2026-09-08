@@ -139,18 +139,18 @@ export class FinanceDashboardComponent implements OnInit {
     barOptions: any = {
         responsive: true,
         maintainAspectRatio: false,
-        legend: { display: false },
+        plugins: { legend: { display: false } },
         tooltips: { backgroundColor: '#171717', xPadding: 10, yPadding: 8, cornerRadius: 8 },
         scales: {
-            yAxes: [{
-                ticks: { beginAtZero: true, fontColor: '#737373' },
-                gridLines: { color: 'rgba(115,115,115,.12)', borderDash: [4, 4], drawBorder: false },
-                scaleLabel: { display: true, labelString: 'Days', fontColor: '#737373' }
-            }],
-            xAxes: [{
-                ticks: { autoSkip: false, maxRotation: 60, minRotation: 30, fontColor: '#737373' },
-                gridLines: { display: false }
-            }]
+            y: {
+                beginAtZero: true, ticks: { color: '#737373' },
+                grid: { color: 'rgba(115,115,115,.12)', borderDash: [4, 4], drawBorder: false },
+                title: { display: true, text: 'Days', color: '#737373' }
+            },
+            x: {
+                ticks: { autoSkip: false, maxRotation: 60, minRotation: 30, color: '#737373' },
+                grid: { display: false }
+            }
         }
     };
 
@@ -160,9 +160,9 @@ export class FinanceDashboardComponent implements OnInit {
     donutOptions: any = {
         responsive: true,
         maintainAspectRatio: false,
-        legend: { position: 'bottom', labels: { usePointStyle: true, fontColor: '#737373', padding: 16 } },
+        legend: { position: 'bottom', labels: { usePointStyle: true, color: '#737373', padding: 16 } },
         tooltips: { backgroundColor: '#171717', xPadding: 10, yPadding: 8, cornerRadius: 8 },
-        cutoutPercentage: 62
+        cutout: '62%'
     };
 
     ageingLabels: string[] = ['0-30', '31-60', '61-90', '91-120', '121-180', '181-365', '366-730', '731-1095', '1095+'];
@@ -174,14 +174,14 @@ export class FinanceDashboardComponent implements OnInit {
     hbarOptions: any = {
         responsive: true,
         maintainAspectRatio: false,
-        legend: { display: false },
+        plugins: { legend: { display: false } },
         tooltips: { backgroundColor: '#171717', xPadding: 10, yPadding: 8, cornerRadius: 8 },
         scales: {
-            xAxes: [{
-                ticks: { beginAtZero: true, fontColor: '#737373' },
-                gridLines: { color: 'rgba(115,115,115,.12)', borderDash: [4, 4], drawBorder: false }
-            }],
-            yAxes: [{ ticks: { fontColor: '#737373' }, gridLines: { display: false } }]
+            x: {
+                beginAtZero: true, ticks: { color: '#737373' },
+                grid: { color: 'rgba(115,115,115,.12)', borderDash: [4, 4], drawBorder: false }
+            },
+            y: { ticks: { color: '#737373' }, grid: { display: false } }
         }
     };
 

@@ -18,7 +18,7 @@ import { TabsetComponent  } from 'ngx-bootstrap/tabs';
 })
 export class ExptSpContainerIU implements OnInit {
   //  this._loginService.getLogin
-    @ViewChild('containerTabs', {static: false}) containerTabs: TabsetComponent;
+    @ViewChild('containerTabs', {static: true}) containerTabs: TabsetComponent;
 
     private baseUrl: string = "";
     showLoader: boolean = false;
@@ -158,8 +158,11 @@ export class ExptSpContainerIU implements OnInit {
          
         if (this._vslsharedvataSerice.RtnosharedData == undefined || this._vslsharedvataSerice.RtnosharedData == null) {
             this._toasterService.toast('error', 'Error', "Please select Vessel Details first ");
-            this.disableEnable_clp();
-            this.disableEnable_pallet();
+            // The tabset registers its tabs after this ngOnInit runs; defer until they exist.
+            setTimeout(() => {
+                this.disableEnable_clp();
+                this.disableEnable_pallet();
+            });
         }
         else {
             this._loaderService.display(true);
