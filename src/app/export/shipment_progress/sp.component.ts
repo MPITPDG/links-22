@@ -412,7 +412,6 @@ export class ShippingBillShipmentProgressComponent implements OnInit, OnChanges 
 @Component({
     selector: 'app-shipment-progress-receipt-cargo',
     templateUrl: 'receipt-cargo.sp.component.html',
-    styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
@@ -1419,7 +1418,6 @@ export class DestinationDocumentShipmentProgressComponent implements OnInit, OnC
 @Component({
     selector: 'app-shipment-progress-sea-to-air',
     templateUrl: 'transfer-sea-to-air.sp.component.html',
-    styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
@@ -1508,7 +1506,6 @@ export class SeaToAirShipmentProgressComponent implements OnInit, OnChanges, Aft
 @Component({
     selector: 'app-shipment-progress-receipt-cargo-provision',
     templateUrl: 'receipt-cargo-provision.sp.component.html',
-    styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
@@ -1889,7 +1886,6 @@ export class ScanDocSentShipmentProgressComponent implements OnInit, OnChanges, 
 @Component({
     selector: 'app-shipment-progress-pending-shipment',
     templateUrl: 'pending-shipment.sp.component.html',
-    styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
@@ -2278,7 +2274,6 @@ export class PendingShipReportShipmentProgressComponent implements OnInit, OnCha
 
 @Component({
     templateUrl: 'container-loading-confirmation.sp.component.html',
-    styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
@@ -2442,7 +2437,6 @@ export class ViewContainerLoadingShipmentProgressComponent implements OnInit, On
 @Component({
     selector: 'app-shipment-progress-container-loading-update',
     templateUrl: 'update-container-loading-confirmation.sp.component.html',
-    styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false

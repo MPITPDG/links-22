@@ -9,7 +9,6 @@ import { IMyDpOptions } from 'mydatepicker';
 @Component({
     selector: 'app-edit-actual-flight-date',
     templateUrl: 'expt-master-edit-actual-flight-date.html',
-    styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false

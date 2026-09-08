@@ -54,7 +54,6 @@ import {Observable, Subject,Subscription} from 'rxjs';
 @Component({
     selector: 'app-export-orderno-authorisation',
     templateUrl: 'booking_orderNo_authorisation.component.html' ,
-    styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false

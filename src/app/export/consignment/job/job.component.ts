@@ -9,7 +9,6 @@ import {
 
 @Component({
     templateUrl: 'job.component.html',
-    styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false

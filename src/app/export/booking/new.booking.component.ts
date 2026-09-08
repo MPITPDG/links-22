@@ -10,7 +10,6 @@ import { ButtonService } from '../../shared/common-font-changer.directive';
 @Component({
     selector: 'app-export-order-new-booking',
     templateUrl: 'new.booking.component.html' ,
-    styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false

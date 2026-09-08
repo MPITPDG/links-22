@@ -8,7 +8,6 @@ import { ActivatedRoute } from '@angular/router';
 import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     templateUrl: 'entry-sea.component.html',
-    styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false

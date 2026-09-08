@@ -11,7 +11,6 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-export-booking',
     templateUrl: 'add.booking.component.html' ,
-    styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
