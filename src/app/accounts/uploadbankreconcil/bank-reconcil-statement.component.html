@@ -1,0 +1,405 @@
+<div class="br-page">
+
+  <!-- ========================================================= -->
+  <!-- SEARCH SCREEN -->
+  <!-- ========================================================= -->
+
+  <div *ngIf="!showResult">
+    <div class="br-card search-card-clean">
+      <div class="clean-row-layout">
+
+        <!-- BANK ACCOUNT -->
+        <div class="clean-field clean-bank">
+          <label>Bank Account <span class="br-req">*</span></label>
+          <ng-select
+            [items]="BankList"
+            bindLabel="acctname"
+            bindValue="acctcodename"
+            [(ngModel)]="Bank"
+            [appendTo]="'body'"
+            placeholder="Select Bank Account">
+          </ng-select>
+        </div>
+
+        <!-- FROM DATE -->
+        <div class="clean-field clean-date">
+          <label>From Date <span class="br-req">*</span></label>
+          <my-date-picker
+            name="FromDate"
+            (dateChanged)="FromDateChanged($event)"
+            [options]="myDatePickerOptions"
+            [selDate]="FromDate"
+            class="search-date-control">
+          </my-date-picker>
+        </div>
+
+        <!-- TO DATE -->
+        <div class="clean-field clean-date">
+          <label>As On Date <span class="br-req">*</span></label>
+          <my-date-picker
+            name="ToDate"
+            (dateChanged)="ToDateChanged($event)"
+            [options]="myDatePickerOptions"
+            [selDate]="ToDate"
+            class="search-date-control">
+          </my-date-picker>
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="clean-actions">
+          <button class="br-btn br-btn--primary" type="button" (click)="SearchData()">
+            <i class="fa fa-search"></i> Show Statement
+          </button>
+          <button class="br-btn br-btn--ghost" type="button" (click)="Reset()">
+            <i class="fa fa-refresh"></i> Reset
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- RESULT SCREEN -->
+  <!-- ========================================================= -->
+
+  <div *ngIf="showResult" class="br-result-view">
+
+    <!-- TOP BAR -->
+
+    <div class="br-topbar">
+
+      <button
+        class="br-back-btn"
+        type="button"
+        (click)="BackToSearch()">
+
+        <i class="fa fa-arrow-left"></i>
+        Back To Search
+
+      </button>
+
+      <div class="br-topbar-right">
+
+        <span class="br-record-chip">
+          {{ bankreconcilList.length }} Records
+        </span>
+
+        <button
+          class="br-btn br-btn--export"
+          type="button"
+          (click)="exportToExcel()">
+
+          <i class="fa fa-file-excel-o"></i>
+          Export To Excel
+
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- RECONCILIATION SCHEDULE (compact strip) -->
+
+    <div
+      class="br-card recon-schedule"
+      [title]="crossCheckOk
+        ? ('Verified against ' + outstandingCount + ' outstanding transaction(s) in the detail below.')
+        : 'Schedule total doesn\'t match the outstanding transaction detail below — please review.'">
+
+      <div class="recon-topline">
+
+        <div class="recon-title-group">
+          <span class="recon-schedule-title">Bank Reconciliation Statement</span>
+          <span class="recon-meta" *ngIf="selectedBankName">{{ selectedBankName }}</span>
+          <span class="recon-meta">{{ FromDate }} – {{ ToDate }}</span>
+          <span class="recon-meta">Opening : {{ OpBalDr || OpBalCr || '—' }}</span>
+        </div>
+
+        <span
+          class="recon-check-badge"
+          [ngClass]="crossCheckOk ? 'ok' : 'warn'">
+
+          <i class="fa" [ngClass]="crossCheckOk ? 'fa-check-circle' : 'fa-exclamation-triangle'"></i>
+          {{ crossCheckOk ? 'Verified' : 'Mismatch' }}
+
+        </span>
+
+      </div>
+
+      <div class="recon-equation">
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">Balance as per Books</span>
+          <span class="recon-seg-val">{{ BalanceDr || BalanceCr || '—' }}</span>
+        </div>
+
+        <span class="recon-op">+</span>
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">
+            Payments Not Presented
+            <em *ngIf="outstandingCreditCount">({{ outstandingCreditCount }})</em>
+          </span>
+          <span class="recon-seg-val add">{{ CrNotRef || '—' }}</span>
+        </div>
+
+        <span class="recon-op">−</span>
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">
+            Deposits In Transit
+            <em *ngIf="outstandingDebitCount">({{ outstandingDebitCount }})</em>
+          </span>
+          <span class="recon-seg-val less">{{ DrNotRef || '—' }}</span>
+        </div>
+
+        <span class="recon-op">=</span>
+
+        <div class="recon-seg recon-seg--result">
+          <span class="recon-seg-label">Balance as per Bank</span>
+          <span class="recon-seg-val result">{{ DrRef || CrRef || 'Pending' }}</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- VIEW TOGGLE -->
+
+    <div class="br-view-toggle">
+
+      <button
+        class="toggle-btn"
+        [class.active]="activeView === 'OUTSTANDING'"
+        (click)="setActiveView('OUTSTANDING')">
+
+        Outstanding Items
+        <span class="toggle-count">{{ outstandingCount }}</span>
+
+      </button>
+
+      <button
+        class="toggle-btn"
+        [class.active]="activeView === 'ALL'"
+        (click)="setActiveView('ALL')">
+
+        All Entries
+        <span class="toggle-count">{{ bankreconcilList.length }}</span>
+
+      </button>
+
+    </div>
+
+    <!-- TABLE CARD -->
+
+    <div class="br-card br-table-card">
+
+      <!-- TABLE -->
+
+      <div class="br-table-wrap">
+
+        <table class="br-table">
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Entry No
+              </th>
+
+              <th>
+                Date
+              </th>
+
+              <th>
+                Type
+              </th>
+
+              <th>
+                Party / Reference
+              </th>
+
+              <th>
+                Chq Type
+              </th>
+
+              <th>
+                Cheque No
+              </th>
+
+              <th>
+                Cheque Dt
+              </th>
+
+              <th class="num">
+                Debit
+              </th>
+
+              <th class="num">
+                Credit
+              </th>
+
+              <th>
+                Clearance Status
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            <tr
+              *ngFor="let data of displayList"
+              [class.br-row--receipt]="data.STATUS === 'BR'"
+              [class.br-row--payment]="data.STATUS === 'BP'">
+
+              <!-- ENTRY -->
+
+              <td class="mono">
+                {{ data.ENTRYNO }}
+              </td>
+
+              <!-- DATE -->
+
+              <td class="mono">
+                {{ data.ENTRYDT }}
+              </td>
+
+              <!-- TYPE -->
+
+              <td>
+
+                <span
+                  class="br-badge"
+                  [ngClass]="data.STATUS === 'BR'
+                  ? 'br-badge--br'
+                  : 'br-badge--bp'">
+
+                  {{ data.STATUS }}
+
+                </span>
+
+              </td>
+
+              <!-- PARTY -->
+
+              <td>
+
+                <div
+                 class="br-party-name"
+                  [innerHTML]="data.PARTYNAME">
+                </div>
+
+                <div
+                  class="br-party-ref"
+                  *ngIf="data.CHEQUENO">
+
+                  {{ data.CHEQUETYPE }}
+                  |
+                  {{ data.CHEQUENO }}
+
+                </div>
+
+              </td>
+
+              <!-- CHQ TYPE -->
+
+              <td class="mono">
+                {{ data.CHEQUETYPE || '—' }}
+              </td>
+
+              <!-- CHQ NO -->
+
+              <td class="mono">
+                {{ data.CHEQUENO || '—' }}
+              </td>
+
+              <!-- CHQ DATE -->
+
+              <td class="mono">
+                {{ data.CHEQUEDT || '—' }}
+              </td>
+
+              <!-- DR -->
+
+              <td class="num dr-amt">
+
+                <span *ngIf="data.DRAMT">
+                  {{ data.DRAMT | number:'1.2-2' }}
+                </span>
+
+                <span
+                  *ngIf="!data.DRAMT"
+                  class="muted">
+                  —
+                </span>
+
+              </td>
+
+              <!-- CR -->
+
+              <td class="num cr-amt">
+
+                <span *ngIf="data.CRAMT">
+                  {{ data.CRAMT | number:'1.2-2' }}
+                </span>
+
+                <span
+                  *ngIf="!data.CRAMT"
+                  class="muted">
+                  —
+                </span>
+
+              </td>
+
+              <!-- CLEARANCE STATUS (read-only) -->
+
+              <td>
+
+                <span
+                  *ngIf="data.CLEARANCEDATE"
+                  class="br-cleared">
+                  <i class="fa fa-check-circle"></i>
+                  {{ data.CLEARANCEDATE }}
+                </span>
+
+                <span
+                  *ngIf="!data.CLEARANCEDATE"
+                  class="br-uncleared">
+                  Not Cleared
+                </span>
+
+              </td>
+
+            </tr>
+
+            <tr *ngIf="displayList.length === 0">
+              <td colspan="10" class="text-center text-muted">
+                <ng-container *ngIf="activeView === 'OUTSTANDING'">Nothing outstanding — fully reconciled for this period</ng-container>
+                <ng-container *ngIf="activeView === 'ALL'">No entries found for this period</ng-container>
+              </td>
+            </tr>
+
+          </tbody>
+
+          <tfoot *ngIf="displayList.length > 0">
+            <tr>
+              <td colspan="7" class="totals-label">Total</td>
+              <td class="num">{{ displayDebitTotal | number:'1.2-2' }}</td>
+              <td class="num">{{ displayCreditTotal | number:'1.2-2' }}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

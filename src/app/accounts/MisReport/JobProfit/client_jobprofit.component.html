@@ -1,0 +1,111 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>{{PageName|uppercase}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-2 col-lg-2">
+        </div>
+        <div class="col-sm-12 col-md-8 col-lg-8 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr >
+                    <td colspan="3" style="text-align: left;"><input type="radio"  name="searchclient" value='CLIENT'  
+                        [(ngModel)]="searchclient">&nbsp;<span class="col-form-span-label"><b>Any One Client</b> </span></td>
+                    <td colspan="3">
+                        <ng-select   [items]="ClientList" bindLabel="EXP_NAME_CITY" [disabled]="searchclient == 'ALLCLIENT' "
+                               bindValue="EXP_CODE"  [(ngModel)]="Client"  
+                               class="custom" placeholder="--Please Select--"> 
+                                </ng-select>
+            
+                    </td>
+                </tr>
+                <tr >
+                    <td colspan="2" style="text-align: left;"><input type="radio"  name="searchclient" value='ALLCLIENT'  
+                        [(ngModel)]="searchclient">&nbsp;<span class="col-form-span-label"><b>All Client</b> </span></td>
+                    <td colspan="4">
+                        <ng-select [items]="AllClientList"  [(ngModel)]="allclient" class="custom" 
+                        placeholder="--Please Select Client--" [disabled]="searchclient == 'CLIENT'" style="width: 400px;">
+                 </ng-select>
+                    </td>
+                </tr>
+                <tr >
+                    <td colspan="2" style="text-align: left;" ><input type="radio"  name="searchtype" value='DATEWISE'
+                        [(ngModel)]="searchtype">&nbsp;<span class="col-form-span-label"><b>{{dtlable}}</b> </span></td>
+                    <td colspan="4 " style="text-align: left;">
+                        <div style="display: inline-flex;gap: 5px;">
+                            <span class="col-form-span-label">From </span>
+                             <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)" [disabled]="searchtype == 'JOBWISE'"  [options]="myDatePickerOptions"
+                          [selDate]="FromDate"    ></my-date-picker>
+                            <!-- <my-date-picker name="FromDate" [options]="myDatePickerOptions" 
+                                [(ngModel)]="FromDate" [disabled]="searchtype == 'JOBWISE'"></my-date-picker> &nbsp; -->
+                            <span class="col-form-span-label">To </span>
+                            <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)" [disabled]="searchtype == 'JOBWISE'" [options]="myDatePickerOptionsInv"
+                             [selDate]="ToDate"   ></my-date-picker>
+                            <!-- <my-date-picker name="ToDate" [options]="myDatePickerOptions"
+                                [(ngModel)]="ToDate" [disabled]="searchtype == 'JOBWISE'"></my-date-picker> -->
+                        </div>
+                       <br>
+                        <div style="display: inline-flex;" class="col-form-span-label">
+                            <input type="radio"  name="modetype_radio" value='SEA_exp' (change)="updateDtlable(modetype)"
+                                [(ngModel)]="modetype" [disabled]="searchtype == 'JOBWISE'" >&nbsp;<b>Sea Export </b>
+                                &nbsp;<input type="radio"name="modetype_radio" value='AIR_exp' (change)="updateDtlable(modetype)"
+                                [(ngModel)]="modetype" [disabled]="searchtype == 'JOBWISE'">&nbsp;<b>Air  Export</b>
+                                &nbsp;<input type="radio"name="modetype_radio" value='SEA_imp' (change)="updateDtlable(modetype)"
+                                [(ngModel)]="modetype" [disabled]="searchtype == 'JOBWISE'">&nbsp;<b>Sea Import </b>
+                                &nbsp;<input type="radio"name="modetype_radio" value='AIR_imp' (change)="updateDtlable(modetype)"
+                                [(ngModel)]="modetype" [disabled]="searchtype == 'JOBWISE'">&nbsp;<b>Air Import </b>
+                                &nbsp;<input type="radio"name="modetype_radio" value='DateAll' (change)="updateDtlable(modetype)"
+                                [(ngModel)]="modetype" [disabled]="searchtype == 'JOBWISE'">&nbsp;<b>All (For Any One Cllient) </b>
+                        </div>
+                       
+                    </td>
+                </tr>
+               
+                <tr >
+                    <td colspan="2" style="text-align: left;"><input type="radio"  name="searchtype" value='JOBWISE'
+                        [(ngModel)]="searchtype">&nbsp;<span class="col-form-span-label"><b>Job No</b> </span></td>
+                    <td colspan="4" style="text-align: left;">
+                        <div style="display: inline-flex;">
+                            <span class="col-form-span-label">From &nbsp;</span>
+
+                            <input [(ngModel)]="fromjobno" type="text" class="form-control width130"   [disabled]="searchtype == 'DATEWISE' "
+                                maxlength="40">
+                                &nbsp;
+                            <span class="col-form-span-label">To  &nbsp;</span>
+
+                            <input [(ngModel)]="tojobno" type="text" class="form-control width130"   [disabled]="searchtype == 'DATEWISE' " maxlength="40">
+                        </div>
+                    </td>
+
+                </tr>
+              
+                <tr  >
+                    <td colspan="6" class="centerlabel">
+                   
+                            <button class="btn btn-sm btn-primary" type="submit" (click)="calculate()">
+                                <span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Calculate</span>
+                               </button> &nbsp;
+                               <!-- <button class="btn btn-sm btn-primary" type="submit" (click)="download()">
+                                <span class="col-form-span-label"><i class="fa fa-download"></i> download</span>
+       
+                               </button> -->
+                  
+                <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                        (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
+                    </td>
+                    </tr>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-2 col-lg-2">
+        </div>
+    </div>
+</div>

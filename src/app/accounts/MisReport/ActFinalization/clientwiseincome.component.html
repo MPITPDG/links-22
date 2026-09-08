@@ -1,0 +1,79 @@
+<div class="animated fadeIn" >  
+    <div class="row no-gutters" *ngIf="displayType=='SEARCH'" >
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>{{Header}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters" *ngIf="displayType=='SEARCH'">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+
+                <tr>
+                    <td class="col-form-span-heading" colspan="6"> <b>{{PageType}}</b> </td>
+           </tr>
+           <tr class="trbg">
+            <td  class="width150">
+                <span  class="col-form-span-label"><b>City</b> </span><span
+                class="col-form-span-error">*</span>
+            </td>
+            <td colspan="3">
+              
+                <div class="leftlabel">
+                    <span class="col-form-span-label">
+                        <input type="radio" name="radioDisplay" value="ALL" [(ngModel)]="CITYCODE" />&nbsp;All </span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="col-form-span-label">
+                        <input type="radio" name="radioDisplay" value="1" [(ngModel)]="CITYCODE"  />&nbsp;Only {{CITYNAME}}</span>
+                </div>
+            </td>
+        </tr>
+                <tr>
+                    <td >
+                        <span  class="col-form-span-label"><b>Account </b> </span><span
+                        class="col-form-span-error">*</span>
+                    </td>
+
+                            <td colspan="3" >
+                               <ng-select   [items]="AccountList" bindLabel="ACCTNAME"
+                               bindValue="ACCTCODE"  [(ngModel)]="Account" (ngModelChange)="GetAccountName($event)"
+                               class="custom" placeholder="--Please Select--">
+                                </ng-select>
+                            </td>
+                </tr>
+                <tr>
+
+                    <td><span class="col-form-span-label"><b>From</b> </span><span
+                        class="col-form-span-error">*</span></td>
+                <td>
+                    <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)"  [options]="myDatePickerOptions"
+                        class="form-control"  [selDate]="FromDate"    ></my-date-picker>
+                </td>
+                    <td><span class="col-form-span-label"><b>To </b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td><my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)"  [options]="myDatePickerOptions"
+                            class="form-control"  [selDate]="ToDate"   ></my-date-picker>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6" class="centerlabel">
+                        <button class="btn btn-sm btn-primary" type="submit" (click)="ExportData()" > <span
+                                class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
+                                Export To Excel </span></button>&nbsp;
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+    </div>
+</div>
+

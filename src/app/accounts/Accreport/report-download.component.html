@@ -1,0 +1,118 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+      <div class="col-sm-12">
+        <div class="card">
+          <div class="card-header formheading">
+            <strong>Report Log View</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row no-gutters" >
+      <div class="col-sm-12 col-md-1 col-lg-1">  </div>
+      <div class="col-sm-12 col-md-10 col-lg-10 ">
+        <!-- <div class="col  yscroll" style="height:250px;" >  -->
+          <table class="table table-bordered table-sm-new  "  >
+            <thead class="title-head formheading" >
+          
+              <tr  style="white-space:nowrap;">
+                <th class="col-form-span-label"  >  &nbsp; </th>
+                <th class="col-form-span-label"   > STATUS </th>
+                <th class="col-form-span-label"  > REPORT NAME </th>
+                <th class="col-form-span-label"  >SEARCH CRITERIA </th>
+                <th class="col-form-span-label"   >STARTED </th>
+                <th class="col-form-span-label"  > COMPLETED </th>
+                <th class="col-form-span-label"   > USER NAME </th>
+              </tr>
+            </thead>
+            <tbody class="bgwhite">
+            
+              <ng-container *ngFor="let obj of DTTablelog3" >  
+                <tr *ngIf="obj.STATUS=='IN PROCESS'"(click)="fn_InProcess(obj.PKID)"> 
+                    <td class="col-form-span-label"><div align="Center"> {{obj.PERCENTAGE}} % </div>   </td>
+                    <td class="col-form-span-label"><i class="fa fa-tasks" aria-hidden="true"></i>     </td>
+                    <td class="col-form-span-label">{{obj.REPORTNAME}}</td>
+                    
+                    <td class="col-form-span-label">{{obj.SEARCHCRITERIA}}</td>
+                    <td class="col-form-span-label">{{obj.STARTED}}</td>
+                    <td class="col-form-span-label">{{obj.COMPLETED}}</td>
+                    <td class="col-form-span-label">{{obj.USERNAME}}</td>
+                </tr>
+                
+                <tr *ngIf="obj.STATUS=='DOWNLOAD PENDING'" > 
+                  <td class="col-form-span-label">
+                    <a href="{{rptdownloadurl}}ExportToExcel/output/{{obj.FILENAME}}"  (click)="fn_Download(obj.PKID,obj.MODE)"  download="{{obj.FILENAME}}">
+                      <i class="fa fa-cloud-download"></i>
+                    Download
+                    </a>
+                    <!-- <a href="http://localhost:45896//DATA//ExportToExcel//output//{{obj.FILENAME}}"  (click)="fn_Download(obj.PKID,obj.MODE)"  download="Download">
+                      <i class="fa fa-cloud-download"></i>
+                    Download
+                    </a> -->
+                    <!-- <button class="btn btn-sm btn-success" type="submit" (click)="fn_Download(obj.PKID,obj.MODE)"> <span   class="col-form-span-label"><i class="fa fa-cloud-download"></i>Download</span></button>    -->
+                  </td>
+                  <td class="col-form-span-label"><i class="fa fa-tasks" aria-hidden="true"></i></td>
+                  <td class="col-form-span-label">{{obj.REPORTNAME}}</td>
+                  <td class="col-form-span-label">{{obj.SEARCHCRITERIA}}</td>
+                  <td class="col-form-span-label">{{obj.STARTED}}</td>
+                  <td class="col-form-span-label">{{obj.COMPLETED}}</td>
+                  <td class="col-form-span-label">{{obj.USERNAME}}</td>
+              </tr>
+              <tr *ngIf="obj.STATUS=='CANCELLED'"> 
+                <td class="col-form-span-label"><i class="fa fa-ban" aria-hidden="true" ></i>     </td>
+                <td class="col-form-span-label">{{obj.STATUS}} </td>
+                <td class="col-form-span-label">{{obj.REPORTNAME}}</td>
+                <td class="col-form-span-label">{{obj.SEARCHCRITERIA}}</td>
+                <td class="col-form-span-label">{{obj.STARTED}}</td>
+                <td class="col-form-span-label">{{obj.COMPLETED}}</td>
+                <td class="col-form-span-label">{{obj.USERNAME}}</td>
+              </tr>
+             </ng-container>    
+             <ng-container *ngFor="let obj of DTTableHistory" >  
+              <tr *ngIf="Mode=='HISTROY'"> 
+                <td *ngIf="obj.STATUS=='COMPLETED'" class="col-form-span-label"><a href="{{rptdownloadurl}}ExportToExcel/output/{{obj.FILENAME}}"  (click)="fn_Download(obj.PKID,obj.MODE)"
+                  download="{{obj.FILENAME}}"><i class="fa fa-cloud-download"></i>
+                  Download
+                </a>
+                  <!-- <button class="btn btn-sm btn-success" type="submit" (click)="fn_Download(obj.PKID,obj.MODE)"> <span   class="col-form-span-label"><i class="fa fa-cloud-download"></i>Download</span></button>    -->
+                </td>
+                <td *ngIf="obj.STATUS=='CANCELLED'"  class="col-form-span-label"><i class="fa fa-ban" aria-hidden="true" ></i> 
+               
+                  <!-- <button class="btn btn-sm btn-success" type="submit" (click)="fn_Download(obj.PKID,obj.MODE)"> <span   class="col-form-span-label"><i class="fa fa-cloud-download"></i>Download</span></button>    -->
+                </td>
+                <td class="col-form-span-label">{{obj.STATUS}} </td>
+                <td class="col-form-span-label">{{obj.REPORTNAME}}</td>
+                <td class="col-form-span-label">{{obj.SEARCHCRITERIA}}</td>
+                <td class="col-form-span-label">{{obj.STARTED}}</td>
+                <td class="col-form-span-label">{{obj.COMPLETED}}</td>
+                <td class="col-form-span-label">{{obj.USERNAME}}</td>
+              </tr>
+            </ng-container>               
+          </table>
+          
+        <table class="table table-bordered table-sm-new yscroll "    >         
+          <tbody class="bgwhite">
+            <tr  *ngFor="let obj of DTTablelog1" >              
+              <td class="col-form-span-label"  >{{obj.REPORTHEADER}}</td> 
+            </tr>
+          </tbody>         
+        </table>
+        <div class="col yscroll" style="height:250px;" >
+              <table class="table table-bordered table-sm-new"     >         
+                <tbody class="bgwhite">
+                  <tr  *ngFor="let obj of DTTablelog2" >              
+                    <td class="col-form-span-label" style="color:green ;"  >{{obj.DATETIMEST}}</td> 
+                    <td class="col-form-span-label" style="color:green ;">{{obj.STEPNAME}} <br>
+                        {{obj.REMARKS}}
+                    </td> 
+                  </tr>
+                </tbody> 
+              </table>  
+        </div>
+     
+      </div>
+
+      <div class="col-sm-12 col-md-1 col-lg-1">  </div>
+    </div>
+  </div>
+  

@@ -1,0 +1,66 @@
+<div class="animated fadeIn" >  
+    <div class="row no-gutters" >
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>{{Header}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters" >
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+
+                <tr>
+                    <td class="col-form-span-heading" colspan="6"> <b>{{PageName}}</b> </td>
+           </tr>
+                <tr>
+                    <td ><span class="col-form-span-label"><b>Item</b> </span><span 
+                        class="col-form-span-error">*</span>
+                     </td>
+                            <td colspan="3" >
+                                <ng-select   [items]="ItemList" bindLabel="ITEMACTNAME"
+                                bindValue="ITEMCODE"   [(ngModel)]="Item" (ngModelChange)="GetItemName($event)"
+                                class="custom" placeholder="--Please Select--">
+                             </ng-select>
+                            </td>
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>From Date</b> </span><span
+                        class="col-form-span-error">*</span></td>
+                    <td>              
+                        <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)" [options]="myDatePickerOptionsInv"
+                            class="form-control"  [selDate]="FromDate"    ></my-date-picker>
+                    </td>
+                    <td><span class="col-form-span-label"><b>To </b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td>              
+                        <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)" [options]="myDatePickerOptionsInv"
+                            class="form-control"  [selDate]="ToDate"   ></my-date-picker>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6" class="centerlabel">
+                        <button class="btn btn-sm btn-primary" type="submit" (click)="ExportToExcel()" > <span
+                                class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
+                                Export To Excel </span></button>&nbsp;
+                                <button class="btn btn-sm btn-primary" type="submit" (click)="download()" > <span
+                                    class="col-form-span-label"><i class="fa fa-download"></i>
+                                    Download </span></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+    </div>
+
+  
+</div>

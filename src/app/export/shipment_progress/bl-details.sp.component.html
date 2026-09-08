@@ -1,0 +1,81 @@
+﻿<div class="animated fadeIn">
+	<div class="row">
+		<div class="col-sm-2">
+		</div>
+		<div class="col-sm-8">
+			<app-shipment-progress-common-view [ExptNo]="ExptNo"></app-shipment-progress-common-view>
+			<table class="table table-bordered table-sm-new">
+				<tr class="trbg">
+					<td colspan="8"><span class="col-form-span-label"><b>BL Detail </b></span></td>
+				</tr>
+				<tr>
+					<td colspan="8">
+						<span class="col-form-span-label">
+							<input type="radio" name="BLType" [checked]="BlType == 'M'" (change)="BlType='M'"/>Master B/L 
+							<input type="radio" name="BLType" [checked]="BlType == 'S'" (change)="BlType='S'"/>Seaway B/L 
+						</span>
+					</td>
+				</tr>
+				<tr>
+					<td class="width150"><span class="col-form-span-label">B/L No. </span></td>
+					<td colspan="3">
+						<input type="text" [(ngModel)]="BLNo" class="form-control"/>
+					</td>
+					<td class="width150"><span class="col-form-span-label">B/L Date  </span></td>
+					<td colspan="3">
+						<span class="col-form-span-label">
+							<my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="BLDate"></my-date-picker>
+						</span>
+					</td>
+				</tr>
+				<tr>
+					<td class="width150"><span class="col-form-span-label">B/L Freight  </span></td>
+					<td colspan="7">
+						<!-- <ng-select [items]="[{VALUEFIELD: 'PP', TEXTFIELD: 'PP'},{VALUEFIELD: 'CC', TEXTFIELD: 'CC'}]"
+								   bindLabel="TEXTFIELD"
+								   bindValue="VALUEFIELD"
+								   placeholder="--Select--"
+								   [(ngModel)]="BLFreight"
+								   class="form-control width75"
+								   >
+						</ng-select> -->
+						<select class="form-control width75"   [(ngModel)]="BLFreight">
+							<option value="-1">Please select</option>
+							<option value="CC">CC</option>
+							<option value="PP">PP</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td class="width150"><span class="col-form-span-label">HBL No.  </span></td>
+					<td colspan="3">
+						<input type="text" [(ngModel)]="HBLNo" class="form-control" />
+					</td>
+					<td class="width150"><span class="col-form-span-label">HBL Date  </span></td>
+					<td colspan="3">
+						<span class="col-form-span-label">
+							<my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="HBLDate"></my-date-picker>
+						</span>
+					</td>
+				</tr>
+				<tr class="trbg centerlabel" *ngIf="ErrorMessage != ''">
+					<td colspan="8">
+						<span class="col-form-span-error">{{ErrorMessage}}</span>
+					</td>
+				</tr>
+				<tr class="trbg centerlabel">
+					<td colspan="8">
+						<button type="button" name="submitButton" class="btn btn-l btn-success" (click)="submit();" [disabled]="ErrorMessage != ''" #submitButton>
+							<span class="col-form-span-label"><app-font-changer [fontIndex]="'14'"></app-font-changer> Submit</span>
+						</button>
+						<button type="button" name="abortButton" class="btn btn-l btn-danger" (click)="abort();">
+							<span class="col-form-span-label"><app-font-changer [fontIndex]="'7'"></app-font-changer> Abort</span>
+						</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-sm-2">
+		</div>
+	</div>
+</div>

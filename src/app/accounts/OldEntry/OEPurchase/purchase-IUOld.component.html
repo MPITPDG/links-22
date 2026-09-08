@@ -1,0 +1,381 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>PURCHASE UPDATE OLD ENTRY</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-2 col-lg-2">
+        </div>
+        <div class="col-sm-12 col-md-8 col-lg-8 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr class="trheader">
+                    <td  class="col-form-span-label" style="color: whitesmoke;"  colspan="4">
+                        <i [ngClass]="(chkrules=='N') ? 'fa fa-plus-square-o': 'fa fa-minus-square-o'" (click)="showrules('R')"></i>  
+                        <b> Rules for Old Entry </b>
+                    </td>
+                </tr>
+                <tr *ngIf="chkrules=='Y'">
+                    <td colspan="4">
+                        <table>
+                            <td>
+                                <tr>
+                                    <span  class="col-form-span-label">1. Main General Details and Cheque Details is non-editable.</span>
+                                </tr>
+                                <tr>
+                                    <span  class="col-form-span-label"  style="font-weight:lighter ;color: red;" >{{lblNetSummary}}</span>
+                                </tr>
+                                <tr>
+                                    <span  class="col-form-span-label">3. Accounts and Account's Net Total (Amount-Deduction) should be same. </span>
+                                </tr>
+                                <tr>
+                                    <span  class="col-form-span-label">4. Entry wise: Item, Entry Type, Department, Bill No., Job No., Amount, Deduction, Narration are editable.</span>
+                                </tr>
+                            </td>
+                        </table>
+                     </td>
+                </tr>
+                <tr>
+                    <td class="col-form-span-heading" colspan="4">
+                        <b> General Details</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>Purchase No</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <!-- <td> <input [(ngModel)]="PurchaseNo" type="text" class="form-control width150" maxlength="40" 
+                            [disabled]="true"> </td> -->
+                            <td >
+                                <table >
+                                    <tbody  style="border: none;">
+                                    <tr>
+                                           <td >  <input [(ngModel)]="PurchaseNo" type="text"  [disabled]='disablePurchaseno' class="form-control width150" maxlength="40" ></td>
+                                           <td *ngIf="showhidebtn==false"> <button type="submit" (click)="ShowoldData(PurchaseNo)"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Search</span></button> </td> 
+                                    </tr>
+                                </tbody>
+                                </table>
+                       
+                            </td>        
+                    <td><span class="col-form-span-label"><b>Purchase Date</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                
+                    <td>
+                        <input [(ngModel)]="PurchaseDate" disabled="disabled" [OnlyNumber]="true" type="text"  class="form-control width150" >
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>Narration</b> </span></td>
+                    <td colspan="3"> <input [(ngModel)]="Narration" type="text" aria-multiline="true" class="form-control width500"
+                        [maxlength]="4000" > </td>
+                </tr>
+                <tr>
+                    <td class="col-form-span-heading" colspan="4">
+                        <b>Supplier Details</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>Supplier Name</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td colspan="3">
+                      
+                        <ng-select [items]="supplierlist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                            [(ngModel)]="suppliername" (ngModelChange)="GetSupplierName($event)" class="custom "
+                            placeholder="--Select--">
+                        </ng-select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>Bill To Address</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td colspan="3">
+                        <select class="form-control" [(ngModel)]="billaddress">
+                            <option value="">Please select</option>
+                            <option *ngFor="let d of billaddressfilter" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+
+                    <td><span class="col-form-span-label"><b>Inv No</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td> <input [(ngModel)]="InvNo" type="text" OnlyNumber="true" class="form-control width150"
+                            maxlength="40"> </td>
+                    <td><span class="col-form-span-label"><b>Inv Date</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td style="text-align: left;">
+                        <my-date-picker name="InvDate" [options]="myDatePickerOptions" class="width170"
+                            [(ngModel)]="InvDate"></my-date-picker>
+                    </td>
+                </tr>
+                <tr>
+
+                    <td><span class="col-form-span-label"><b>Bill Received On</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td style="text-align: left;"> 
+                        <my-date-picker name="BillReceive" [options]="myDatePickerOptions" class="width170"
+                            [(ngModel)]="BillReceive"></my-date-picker>
+                    </td>
+                    <td><span class="col-form-span-label"><b>Due Date</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td style="text-align: left;">
+                        <my-date-picker name="DueDate" [options]="myDatePickerOptions" class="form-control width170"
+                            [(ngModel)]="DueDate"></my-date-picker>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-form-span-heading" colspan="2">
+                        <b> Passing Details</b>
+                    </td>
+                    <td class="col-form-span-heading" colspan="2">
+
+                        <div style="display: flex;">
+                            <span class="col-form-span-label"><b>Passed&nbsp;&nbsp;</b> </span>
+                            <span class="col-form-span-label"> <input type="checkbox" [(ngModel)]="IsPassed"
+                                    (change)="changeEvent($event)" /> </span>
+                        </div>
+                    </td>
+                    <!-- <td >
+                        <span class="col-form-span-label" > <input type="checkbox" [(ngModel)]="IsPassed"   class="form-control width20" /> </span>
+                     </td>  -->
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>Passed By</b> </span></td>
+                    <td>
+                        <select class="form-control width150" [(ngModel)]="passedby" [disabled]='togglepassedby'>
+                            <option value="">Please select</option>
+                            <option *ngFor="let d of PassedBylist" value={{d.CMPID}}>{{d.CMP_USERNAME}}</option>
+                        </select>
+                    </td>
+                    <td><span class="col-form-span-label"><b>Passed Amount</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td> <input [(ngModel)]="PassedAmount" OnlyNumber="true" type="text" [disabled]='togglepamount'
+                            class="form-control width150" maxlength="40"> </td>
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>Invoice Amount</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td> <input [(ngModel)]="InvoiceAmount" OnlyNumber="true" type="text" [disabled]='toggleinvamount'
+                            class="form-control width150" maxlength="40"> </td>
+                    <td><span class="col-form-span-label"><b>Voucher No</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td> <input [(ngModel)]="VoucherNo" OnlyNumber="true" type="text" [disabled]='togglevno'
+                            class="form-control width150" maxlength="40"> </td>
+                </tr>
+                <tr class="trheader">
+                    <td  class="col-form-span-label" style="color: whitesmoke;"  colspan="4">
+                        <i [ngClass]="(chkoriginactdtl==false) ? 'fa fa-plus-square-o': 'fa fa-minus-square-o'" (click)="showrules('OA')"></i>  
+                        <b> Original Accounts Detail </b>
+                    </td>
+                </tr>
+                <tr *ngIf="chkoriginactdtl==true">
+                    <td colspan="4" class="table table-bordered table-sm-new bgblue">
+                        <table>
+                            <div class="row xyscroll"  style="width:715px;" >
+                                <table class="table table-responsive-sm table-bordered" *ngIf="OriginalAccountlist.length>0" >
+                                    <thead>
+                                        <tr class="bakgrdliteBlue">
+                                        
+                                            <th class="col-form-span-label font-weight-bold headerwhite">Account Name</th>
+                                            <th  class="col-form-span-label font-weight-bold headerwhite">Amount</th>
+                                            <th  class="col-form-span-label font-weight-bold headerwhite">Deduction</th>
+                                            <th  class="col-form-span-label font-weight-bold headerwhite">Item</th>
+                                            <th  class="col-form-span-label font-weight-bold headerwhite">Entry Type </th>
+                                            <th class="col-form-span-label font-weight-bold headerwhite">Job No</th>
+                                            <th class="col-form-span-label font-weight-bold headerwhite">Bill No</th>
+                                            <th class="col-form-span-label font-weight-bold headerwhite">Department</th>
+                                            <th class="col-form-span-label font-weight-bold headerwhite">Narration</th>
+                                        </tr>
+                                    </thead>
+                                     <tbody   >
+                                        <tr *ngFor="let obj of OriginalAccountlist">
+                                         
+                                           <td><span class="col-form-span-label"  [innerHtml]="obj.ACCOUNT_NAME"> </span></td>
+                                           <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.DEDUCTION}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.ITEM}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.ET}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.BILLNO}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.DEPARTMENT}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                           </div>
+                        </table>
+    
+                    </td>
+                </tr>
+                <tr class="trheader">
+                    <td  class="col-form-span-label" style="color: whitesmoke;"  colspan="4">
+                        <i [ngClass]="(chkactwisedtl==false) ? 'fa fa-plus-square-o': 'fa fa-minus-square-o'" (click)="showrules('A')"></i>  
+                        <b> Accounts Wise Detail </b>
+                    </td>
+                </tr>
+                <tr *ngIf="chkactwisedtl==true">
+                    <td colspan="4">
+                        <table class="table table-bordered table-sm-new bgblue">
+                            <div class="row xyscroll"  style="width:715px;" >
+                                <table class="table table-responsive-sm table-bordered" *ngIf="Accountwiselist.length>0" >
+                                    <thead>
+                                        <tr class="bakgrdliteBlue">
+                                            <th class="col-form-span-label font-weight-bold headerwhite">Account Name</th>
+                                            <th  class="col-form-span-label font-weight-bold headerwhite">Amount Total</th>
+                                            <th  class="col-form-span-label font-weight-bold headerwhite">Deduction Total</th>
+                                            <th  class="col-form-span-label font-weight-bold headerwhite">Net Total</th>
+                                        </tr>
+                                    </thead>
+                                     <tbody   >
+                                        <tr *ngFor="let obj of Accountwiselist">
+                                           <td><span class="col-form-span-label"  [innerHtml]="obj.ACCOUNT_NAME"> </span></td>
+                                           <td><span class="col-form-span-label">{{obj.TOT_AMOUNT}}</span></td>
+                                           <td><span class="col-form-span-label">{{obj.TOT_DEDUCTION}}</span></td>
+                                           <td><span class="col-form-span-label">{{obj.NET_AMOUNT}}</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                           </div>
+                        </table>
+    
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-form-span-heading" colspan="4">
+                        <b>Accounts Details</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>Account Name</b> </span><span
+                        class="col-form-span-error">*</span></td>
+                    <td colspan="3">
+                            <ng-select [items]="AccountNameList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
+                            (ngModelChange)="GetActName($event)" [(ngModel)]="AccountName" class="custom "
+                            placeholder="--Select--">
+                        </ng-select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>Item</b> </span><span
+                        class="col-form-span-error">*</span></td>
+                    <td colspan="3">
+                        <ng-select [items]="Itemslist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Item"
+                            class="custom " placeholder="--Select--">
+                        </ng-select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b> Amount</b> </span><span
+                            class="col-form-span-error">*</span>
+                    </td>
+                    <td> <input [(ngModel)]="Amount" OnlyNumber="true" type="text" class="form-control width150"
+                            maxlength="40"> </td>
+                    <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
+                    <td> <input [(ngModel)]="Deduction" type="text" OnlyNumber="true" class="form-control width150"
+                            maxlength="40"> </td>
+
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b> Job No</b> </span><span
+                            class="col-form-span-error">*</span>
+                    </td>
+                    <td> <input [(ngModel)]="JobNo" type="text" OnlyNumber="true" class="form-control width150"
+                            maxlength="40"> </td>
+                    <td><span class="col-form-span-label"><b>Pass Amount</b> </span></td>
+                    <td> <input [(ngModel)]="actpassedamount" type="text" OnlyNumber="true"
+                            class="form-control width150" maxlength="40">
+                    </td>
+
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>Narration</b> </span></td>
+                    <td colspan="3">
+                        <input [(ngModel)]="ActNarration" type="text" class="form-control width500" [maxlength]="30" >
+                    </td>
+                </tr>
+
+                <tr  *ngIf="showhidebtn==true">
+                    <td colspan="4" class="centerlabel">
+                        <button class="btn btn-sm btn-success" type="submit" (click)="Addchildrcrd()"> <span
+                                class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>
+                                {{txtchild}}</span></button>
+                        <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                                (click)="Resetchildrcrd();"><i class="fa fa-ban"></i> Reset</span></button>
+                    </td>
+                </tr>
+              
+                <tr>
+
+                    <td><span class="col-form-span-heading"><b> Net Total</b> </span></td>
+                    <td> <input [(ngModel)]="NetAmt" disabled="disabled" type="text" class="form-control width150"
+                            maxlength="40"> </td>
+                    <td colspan="2"></td>
+                </tr>
+
+                <tr>
+                    <td><span class="col-form-span-label"><b> Amount</b> </span></td>
+                    <td> <input [(ngModel)]="NetAmount" OnlyNumber="true" disabled="disabled" type="text"
+                            class="form-control width150" maxlength="40"> </td>
+                    <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
+                    <td> <input [(ngModel)]="Netdeduction" OnlyNumber="true" disabled="disabled" type="text"
+                            class="form-control width150" maxlength="40"> </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <div class="row xyscroll">
+                            <table class="table table-responsive-sm table-bordered" *ngIf="Accountlist.length>0">
+                                <thead>
+                                    <tr class="bakgrdliteBlue">
+                                        <th class="col-form-span-label"></th>
+                                        <th class="col-form-span-label font-weight-bold headerwhite">Account Name</th>
+                                        <th class="col-form-span-label font-weight-bold headerwhite">Amount</th>
+                                        <th class="col-form-span-label font-weight-bold headerwhite">Deduction</th>
+                                        <th class="col-form-span-label font-weight-bold headerwhite">Pass Amt</th>
+                                        <th class="col-form-span-label font-weight-bold headerwhite">Item</th>
+                                        <th class="col-form-span-label font-weight-bold headerwhite">Job No</th>
+                                        <th class="col-form-span-label font-weight-bold headerwhite">Narration</th>
+                                    </tr>
+                                </thead>
+                                <tbody *ngIf="Accountlist.length>0">
+                                    <tr *ngFor="let obj of Accountlist">
+                                        <td class="centerlabel">
+                                            <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)"></i>
+                                            &nbsp;
+                                            <i class="fa fa-trash" (click)="deletechildrecd(obj.ID)"></i>
+                                        </td>
+                                        <td><span class="col-form-span-label" [innerHtml]="obj.ACCOUNT_NAME"> </span>
+                                        </td>
+                                        <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.DEDUCTION}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.SRPIPASSAMOUNT}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.ITEM}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+                <tr *ngIf="showhidebtn==true">
+                    <td colspan="4" class="centerlabel">
+                        <button class="btn btn-sm btn-success" type="submit" (click)="supplier_validation()"> <span
+                                class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> {{text}}</span></button>
+                        <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                                (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-2 col-lg-2">
+        </div>
+ 
+</div>

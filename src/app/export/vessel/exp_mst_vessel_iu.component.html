@@ -1,0 +1,214 @@
+﻿<div class="row">
+    <div class="col-sm-2">
+	</div>
+	<div class="col-sm-8">
+		<table class="table table-bordered table-sm-new bgwhite">
+			<tr>
+				<td class="col-form-span-heading" colspan="4">
+					VESSEL DETAILS
+				</td>
+			</tr>
+			 <tr> 
+				<td> 
+					<span class="col-form-span-label">Global Rotation No</span> 
+				</td> 
+				<td colspan="3"> <span class="col-form-span-label "><b>{{vslRtno}}</b></span>
+					<!-- <label class="col-md-3 form-control-label" [(ngModel)]="vslRtno"></label>-->
+				</td> 
+		   </tr> 
+			 <tr>
+				<td>
+					<span class="col-form-span-label ">Vessel Name</span><span class="col-form-span-error">*</span>
+				</td>
+				<td >
+					<input [(ngModel)]="vslname" type="text" id="txtvessel" name="txtvessel" class="form-control width180" placeholder="">
+				</td>
+		  
+				<td>
+					<span class="col-form-span-label">Voyage No</span><span class="col-form-span-error">*</span>
+				</td>
+				<td colspan="3">
+					<input type="text" [(ngModel)]="vslvoyno" id="txtvoyno" name="txtvoyno" class="form-control width180 " placeholder="">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<span class="col-form-span-label">Short Name</span>
+				</td>
+				<td colspan="3">
+					<input type="text" [(ngModel)]="vslSname" id="txtVshortName" name="txtVshortName" class="form-control width180" placeholder="">
+				</td>
+			</tr>
+			<tr>
+				<td class="col-form-span-heading" colspan="4">Port Details</td>
+			</tr>
+			<tr>
+				<td>
+					<span class="col-form-span-label">Port of Calling</span><span class="col-form-span-error">*</span>
+				</td>
+				<td>
+					<select class="form-control width150" id="selePrt" name="selePrt" [(ngModel)]="Vslport">
+						<option value="-1">Please select</option>
+						 <option *ngFor="let d of ports" value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
+					</select>
+				</td>
+				<td>
+					<span class="col-form-span-label">Rotation No.</span>
+				</td>
+				<td>
+					<input type="text" [(ngModel)]="VslRrotnNo" id="txtRtnoNo" name="txtVrtno" class="form-control width150  " placeholder="">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<span class="col-form-span-label">Last Carting Date</span>
+				</td>
+				<td>
+					<my-date-picker name="dtLCD" [options]="myDatePickerOptions" [(ngModel)]="vslLCD" required></my-date-picker>
+				</td>
+				<td>
+					<span class="col-form-span-label">ETA</span>
+				</td>
+				<td>
+					<my-date-picker name="dtLCD" [options]="myDatePickerOptions" [(ngModel)]="Vsleta" required></my-date-picker>	
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<span class="col-form-span-label">Actual Arrival</span>
+				</td>
+				<td>      
+					<my-date-picker name="dtLCD" [options]="myDatePickerOptions" [(ngModel)]="VslArvldt" required></my-date-picker>
+					
+				</td>
+				<td>
+					<span class="col-form-span-label">ETD</span><span class="col-form-span-error">*</span>
+				</td>
+				<td>     
+					<my-date-picker name="dtLCD" [options]="myDatePickerOptions" [(ngModel)]="Vsletd" required></my-date-picker>
+					
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<span class="col-form-span-label">Actual Sailing</span>
+				</td> 
+				<td >
+					<my-date-picker name="dtAsail" [options]="myDatePickerOptions" [(ngModel)]="VslAsail" required></my-date-picker>
+				</td>
+				<td>
+				   <span class="col-form-span-label"> 
+						<input type="checkbox" [(ngModel)]="Vsldly" id="chkVsld" name="chkVsld" >&nbsp; Vessel Delayed
+				   </span>
+				   
+				</td>
+				<td>
+				  <span class="col-form-span-label">
+				   <input type="checkbox" [(ngModel)]="Vslnotcald" id="chkNtCall" name="chkNtCall"  >&nbsp; Not Called 
+				  </span>									
+				</td>
+			</tr>
+		 
+			 
+			<tr>
+				<td class="col-form-span-heading" colspan="4"> Agent Details </td>
+			</tr>
+			<tr>
+				<td>
+					<span class="col-form-span-label">Agent</span><span class="col-form-span-error">*</span>
+				</td>
+				<td>
+					<select class="form-control width200" id="seleAgnt" name="seleAgnt" (change)="onAgentSelect($event.target.value)" [(ngModel)]="VslAgent" >
+						<option value="0">Please select</option>
+						<option *ngFor="let a of Agents" value={{a.AGT_CODE}}>{{a.AGT_NAME}}</option>
+					</select>
+				</td>
+				<td>
+					<span class="col-form-span-label">Shipping Line.</span><span class="col-form-span-error">*</span>
+				</td>
+				<td>
+					<select class="form-control width200" id="SeleShpLine" name="SeleShpLine" [(ngModel)]="VslspLine">
+						<option value="0">Please select</option>
+							<option *ngFor="let l of Arrliner" value={{l.LINER_CODE}}>{{l.LINER_NAME}}</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<span class="col-form-span-label">Carting Place</span>
+				</td>
+				<td>
+					<input type="text" id="txtCrtPlce" name="txtCrtPlce" class="form-control width150 " placeholder="" [(ngModel)]="Vslcrtpl">
+				</td>
+				<td>
+					<span class="col-form-span-label">Carting Clerk.</span>
+				</td>
+				<td>
+					<input type="text" id="txtcrtClrk" name="txtcrtClrk" class="form-control  width150" placeholder="" [(ngModel)]="Vslcrtclrk">
+				</td>
+			</tr>
+			<tr>
+				<td colspan="4" class="centerlabel" >
+					<button class="btn btn-sm btn-primary  center-block" type="submit" id="btnAgtAdd" name="btnAgtAdd" (click)="AddEdit_childRcd()"><span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{Addchild}}</span></button>
+					<button class="btn btn-sm btn-danger center-block" type="reset" id="btnAgtRest" name="btnAgtrest" (click)="Clear_childRcd()"><span class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
+				</td>
+			</tr>
+			<tr>
+				<td class="col-form-span-heading" colspan="4">
+					PORT AND AGENT DETAILS
+				</td>
+			</tr>
+		</table>
+		<div class="row xyscroll" style="height:150px;background-color: white;border-left: 1px solid #d5e5f5;">								
+			<table class="table table-bordered table-striped table-sm-new bgwhite">
+				<thead>
+					<tr class="title-head formheading">
+						<th class="col-form-span-label"></th>
+						<th class="col-form-span-label">Rotation</th>
+						<th class="col-form-span-label">Port</th>
+						<th class="col-form-span-label">ETA</th>
+						<th class="col-form-span-label">Arrival</th>
+						<th class="col-form-span-label">ETD</th>
+						<th class="col-form-span-label">Sailing</th>
+						<th class="col-form-span-label">Last Cart on</th>
+						<th class="col-form-span-label">Agent</th>
+						<th class="col-form-span-label">Shpg Line</th>
+						<th class="col-form-span-label">Carting</th>
+						<th class="col-form-span-label">Cart Clrek </th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let prtAgt of SavPrtAgt">									 
+						<td>											
+							<i class="fa fa-pencil" (click)="Edit_prtAgtDtls(prtAgt.TBL_INDEXID)"></i>	
+							<i class="fa fa-trash" (click)="delete_prtagt(prtAgt.TBL_INDEXID)" ></i>											 
+						</td> 
+						<td><span class="col-form-span-label">{{prtAgt.ROTATION}}</span></td>
+						<td><span class="col-form-span-label">{{prtAgt.PORT}}</span></td>
+						<td><span class="col-form-span-label">{{prtAgt.ETA}}</span></td>
+						<td><span class="col-form-span-label">{{prtAgt.ARRIVAL}}</span></td>
+						<td><span class="col-form-span-label">{{prtAgt.ETD}}</span></td>
+						<td><span class="col-form-span-label">{{prtAgt.SAILING}}</span></td>
+						<td><span class="col-form-span-label">{{prtAgt.CARTING}}</span></td>
+						<td><span class="col-form-span-label">{{prtAgt.AGTNAME}}</span></td>
+						<td><span class="col-form-span-label">{{prtAgt.LINERNAME}}</span></td>
+						<td><span class="col-form-span-label">{{prtAgt.AGT_CARTPLACE}}</span></td>
+						<td><span class="col-form-span-label">{{prtAgt.AGT_CARTCLERK}}</span></td>
+						
+					</tr>
+				</tbody>									
+			</table>
+		</div>
+		<table class="table table-bordered table-sm-new">
+			<tr>
+				<td class="col-form-span-heading right-text" colspan="4">
+					<button class="btn btn-sm btn-success" type="submit" id="btnAgtAdd" name="btnAgtAdd" (click)="AddVslMst()" ><span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Submit</span></button>
+					<button class="btn btn-sm btn-danger" type="reset" id="btnAgtRest" name="btnAgtrest" (click)="ResetAll()"><span class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="col-sm-2">
+	</div>
+</div>
+	

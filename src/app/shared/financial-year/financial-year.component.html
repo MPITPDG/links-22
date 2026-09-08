@@ -1,0 +1,12 @@
+<span [ngStyle]="{'font-family': 'Verdana','font-size': '10pt','font-weight': 'bold','color': '#c12727'}" *ngIf="financialYearList.length==0">
+    {{'Choose Financial Year First'}}
+</span>
+<span [ngStyle]="{'font-family': 'Verdana','font-size': '8pt','font-weight': 'bold','color': 'captiontext', 'cursor': 'pointer'}"
+    data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" dropdownToggle (click)="false">
+    &nbsp;{{financialYearText}}
+</span>
+<div class="dropdown-menu dropdown-menu-right" *dropdownMenu aria-labelledby="simple-dropdown">
+    <a class="dropdown-item" href="javascript:void(0);" style="color: #549c00;" (click)="selectYear(obj)" *ngFor="let obj of financialYearList">
+        {{obj.STARTDATE+' To '+obj.ENDDATE}}
+    </a>
+</div>

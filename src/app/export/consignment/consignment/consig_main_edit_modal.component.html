@@ -1,0 +1,50 @@
+﻿<div bsModal #ConsignmentEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" [config]="{backdrop: 'static'}" >
+  <div class="modal-dialog modal-lg">
+	<div class="modal-content">
+	  <div class="modal-header formheading">
+		<span class="modal-title pull-left">
+			<strong>{{title}}</strong>
+		</span>
+	  </div>
+	  <div class="modal-body modal-fix-body">
+			<app-consignment-view [exptno]="exptno" [type]="'VIEW'" [hidden]="(type == 'VIEW')? false : true" #View></app-consignment-view>
+			<app-consignment-main-edit [exptno]="exptno" [type]="'MAIN'" [hidden]="(type == 'MAIN')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #MainEdit></app-consignment-main-edit>
+			<app-consignment-port-edit [exptno]="exptno" [type]="'PORT'" [hidden]="(type == 'PORT')? false : true"  (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #PortEdit></app-consignment-port-edit>
+			<app-consignment-shipment-clearance-edit [exptno]="exptno" [type]="'SHIPCLEAR'" [hidden]="(type == 'SHIPCLEAR')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #ShipmentClearanceEdit></app-consignment-shipment-clearance-edit>
+			<app-consignment-invoice-edit [exptno]="exptno" [type]="'INVOICE'" [hidden]="(type == 'INVOICE')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #InvoiceEdit></app-consignment-invoice-edit>
+			<app-consignment-orderno-edit [exptno]="exptno" [type]="'ORDER'" [hidden]="(type == 'ORDER')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #OrderNoEdit></app-consignment-orderno-edit>
+			<app-consignment-itc-code-edit [exptno]="exptno" [type]="'ITC'" [hidden]="(type == 'ITC')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #ITCCodeEdit></app-consignment-itc-code-edit>
+			<app-consignment-marks-number-edit [exptno]="exptno" [type]="'MARKS_NUMBERS'" [hidden]="(type == 'MARKS_NUMBERS')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #MarksNumberEdit></app-consignment-marks-number-edit>
+			<app-consignment-quota-edit [exptno]="exptno" [type]="'QUOTA'" [hidden]="(type == 'QUOTA')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #QuotaEdit></app-consignment-quota-edit>
+			<app-consignment-package-edit [exptno]="exptno" [type]="'PKG'" [hidden]="(type == 'PKG')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #PackageEdit></app-consignment-package-edit>
+			<app-consignment-document-edit [exptno]="exptno" [type]="'DOC'" [hidden]="(type == 'DOC')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #DocumentEdit></app-consignment-document-edit>
+			<app-consignment-consignree-remark-edit [exptno]="exptno" [type]="'CONREMARK'" [hidden]="(type == 'CONREMARK')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #ConsigneeRemarkEdit></app-consignment-consignree-remark-edit>
+			<app-consignment-mawb-edit [exptno]="exptno" [type]="'MAWB'" [hidden]="(type == 'MAWB')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #MawbEdit></app-consignment-mawb-edit>
+			<app-consignment-hawb-edit [exptno]="exptno" [type]="'HAWB'" [hidden]="(type == 'HAWB')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #HawbEdit></app-consignment-hawb-edit>
+			<app-consignment-job-edit [exptno]="exptno" [type]="'EXPJOB'" [hidden]="(type == 'EXPJOB')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #JobEdit></app-consignment-job-edit>
+			<app-consignment-orderno-quality-checking-edit [exptno]="exptno" [type]="'QUALITYCHECKING'" [hidden]="(type == 'QUALITYCHECKING')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #QualityChecking></app-consignment-orderno-quality-checking-edit>
+			<app-consignment-cancel-shipemnt [exptno]="exptno" [type]="'CANCEL'" [hidden]="(type == 'CANCEL')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #CANCEL ></app-consignment-cancel-shipemnt>
+	  </div>`
+	  <div class="modal-footer">
+		<div class="pull-left">
+		  <button class='btn btn-primary' (click)="updateData()" name="updateButton" *ngIf="type != 'VIEW'" #updateButton><app-font-changer [fontIndex]="'4'"></app-font-changer> Update</button>
+		  <button class="btn btn-danger" (click)="hide()"><i class="fa fa-ban" aria-hidden="true"></i> Abort</button>
+		</div>
+	  </div>
+	</div>
+   </div>
+</div>
+<!-- <div bsModal #CalculateCBM="bs-modal" class="modal fade in show" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="false" [config]="{backdrop: 'static'}">
+	<div class="modal-dialog modal-md" >
+	  <div class="modal-content" style="width:530px;">
+		<div class="modal-header">
+		  <span class="modal-title pull-left">
+			  <strong>{{title}}</strong>
+		  </span>
+		</div>
+		<div class="modal-body modal-fix-body" style="height:400px;width:530px;">
+	  <app-main-consignment-calcbm-add (result)="changevolume($event)" [grosswt]="grosswt"  [noofpkgs]="noofpackages"  [exptno]="exptno"></app-main-consignment-calcbm-add>
+		</div>
+  </div>
+ </div>
+</div> -->

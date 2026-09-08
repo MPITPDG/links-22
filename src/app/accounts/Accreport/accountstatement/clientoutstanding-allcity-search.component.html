@@ -1,0 +1,449 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters" *ngIf="displayType=='SEARCH'" >
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                         <div class="col-sm-12">
+                            <strong>{{searchHeaderText}}</strong>
+                        </div>  
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row no-gutters" *ngIf="displayType=='SEARCH'">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+
+                <tr>
+                    <td class="col-form-span-heading" colspan="4">
+                        <b>{{PageName}}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>Client Name</b> </span><span
+                        class="col-form-span-error">*</span></td>
+                       
+                            <td  colspan="3" >
+                                 
+                                <ng-select [items]="ClientList" bindLabel="acctname"
+                                bindValue="acctcodename" (ngModelChange)="GetClientName($event)"
+                                [(ngModel)]="Client" class="custom" placeholder="--Please Select--">
+                            </ng-select>
+                            </td>
+                </tr>
+                <tr>
+                     
+                    <td><span class="col-form-span-label"><b>From Date</b> </span><span
+                        class="col-form-span-error">*</span></td>
+                    <td>              
+                        <my-date-picker name="FromDate" [options]="myDatePickerOptions"
+                            class="form-control"  (dateChanged)="FromDateChanged($event)" [selDate]="FromDate"    ></my-date-picker>
+                    </td>
+                    <td><span class="col-form-span-label"><b>To </b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td>              
+                        <my-date-picker name="ToDate" [options]="myDatePickerOptions"
+                            class="form-control"  (dateChanged)="ToDateChanged($event)" [selDate]="ToDate"   ></my-date-picker>
+                    </td>
+                </tr>
+        
+
+                <tr>
+                    <td colspan="4" class="centerlabel">
+                        <button class="btn btn-sm btn-primary" type="submit" (click)="ShowOutstanding()" > <span
+                                class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
+                                Search List</span></button>&nbsp;
+                                <button class="btn btn-sm btn-primary" type="submit" (click)="expt_exlwithcolums()"> <span
+                                    class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
+                                    Export To Excel Columnwise </span></button>&nbsp;
+                        <!-- <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                                (click)="clear();"><i class="fa fa-ban"></i>Clear</span></button> -->
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+    </div>
+
+    <div class="row no-gutters" *ngIf="displayType=='LIST'">
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+        <div class="col-sm-12 col-md-10 col-lg-10 ">
+            <table class="table table-bordered table-sm-new bgwhite" >
+                <tr align="right" class="title-head formheading">
+                    <td colspan="8" >
+                  <a href="javascript:void(0);" (click)="displayType='SEARCH';Searchdata_list=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
+                    </td>
+                </tr>
+                <tr class="title-head formheading table-primary">
+                    <td colspan="12" class="centerlabel">
+                        <strong>{{searchHeaderText}}</strong>
+                    </td>
+                </tr>
+                <tr class="title-head formheading table-primary">
+                    <td colspan="12" class="centerlabel">
+                        <strong> {{ClientName}}</strong>
+                    </td>
+                </tr>
+            </table>
+
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td align="right">
+                        <table  class="table table-bordered table-sm-new bgwhite" style="width:300px">             
+                 
+                            <tr>
+                                <td class="col-form-span-label" align="left">Opening:   </td>
+                                <td  class="col-form-span-label" align="right">{{OpDrBal|number:'2.2-4'}} Dr </td>
+                                <td class="col-form-span-label" align="right">{{OpCrBal|number:'2.2-4'}} </td>                               
+                            </tr>
+                            <tr>
+                              <td class="col-form-span-label" align="right">Current Total:</td>
+                              <td  class="col-form-span-label" align="right">{{currTotalDr|number:'2.2-4'}}  </td>
+                              <td  class="col-form-span-label" align="right">{{currTotalcr|number:'2.2-4'}} </td>                           
+                            </tr>
+                              <tr>
+                                 <td class="col-form-span-label" align="right">Closing:  </td>
+                                 <td  class="col-form-span-label" align="right">{{CLDrBal}}  </td>
+                                <td  class="col-form-span-label" align="right">{{CLCrBal}} </td>
+                             </tr>
+                             <tr>
+                                <td class="col-form-span-label anchor-link" (click)="AdvanceViewData()" align="right">Advance:  </td>
+                                <td  class="col-form-span-label" align="right">{{AdvCrAmt|number:'2.2-4'}}  </td>
+                                <td  class="col-form-span-label" align="right">{{AdvDrAmt}} </td>                                      
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+    </div>
+
+    <div class="row no-gutters"   *ngIf="displayType=='LIST'">
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+        <div class="col-sm-12 col-md-10 col-lg-10 ">
+
+           
+            <div class="row  xyscroll"  style="height: 370px;">
+                <!-- <table class="table table-bordered table-sm-new table-striped table-hover" > -->
+                    
+                    <table class="table table-bordered table-sm-new bgwhite" >
+                    <thead>
+                        <tr class="title-head formheading table-primary">
+                            <th class="col-form-span-label" align="center"></th>
+                            <th class="col-form-span-label" align="center">Number</th>
+                            <th class="col-form-span-label" align="center">Date</th>
+                            <th class="col-form-span-label" align="center">Particulars</th>
+                            <th class="col-form-span-label" align="center">	Debit</th>
+                            <th class="col-form-span-label" align="center">Credit</th>                          
+                        </tr>
+                    </thead>
+                    <tbody *ngIf="Searchdata_list.length > 0">
+                        <tr *ngFor="let data of Searchdata_list">
+                            <td  style="width: 30px;"><span  class="col-form-span-label" >{{data.TRANSTYPE}}</span> </td> 
+                             <td  style="width: 130px;"><span   class="col-form-span-label anchor-link " (click)="Openprint(data.TRANSCODE,data.TRANSTYPE)" >{{data.TRANSCODE}}</span> </td> 
+                             <td  style="width: 90px;"><span  class="col-form-span-label">{{data.TRANSDATE}}</span> </td>
+                             <td  style="width:200px; " class="col-form-span-label">
+                               
+                                <p    style="white-space: pre-wrap;width: 400px; " > {{data.NARR}}{{data.EXP_SNAME}}{{data.SUP_SNAME}} {{data.ACCTNAME}}</p>
+                               
+                                     
+                             </td> 
+                            <td  style="width: 100px;"align="right"><span class="col-form-span-label" align="right">{{data.DRAMT|number:'2.2-4'}}</span>  </td>                             
+                            <td  style="width: 100px;"align="right"><span class="col-form-span-label" align="right">{{data.CRAMT|number:'2.2-4'}}</span>  </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <table class="table table-bordered table-sm-new bgwhite ">
+                <tr>
+                    <td colspan="4" align="center">
+                        <!-- <button class="btn btn-sm btn-success" type="submit" (click)="Print()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Print</span></button>
+                        <button class="btn btn-sm btn-success" type="submit" (click)="expt_exlwithadv()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> ExportToExcel</span></button>
+                        <button class="btn btn-sm btn-danger" (click)="close()"><span class="col-form-span-label"><i class="fa fa-ban"
+                          aria-hidden="true"></i> Close</span></button> -->
+                          <button class="btn btn-sm btn-primary" type="submit" (click)="expt_exlwithadv()" > <span class="col-form-span-label"><i class="fa fa-file-excel-o"></i>Export To Excel </span></button>&nbsp;
+                            <button class="btn btn-sm btn-primary" type="submit" (click)="expt_exlwithcolums()"> <span  class="col-form-span-label"><i class="fa fa-file-excel-o"></i> Export To Excel Columnwise </span></button>&nbsp;
+                            <button class="btn btn-sm btn-primary" type="submit" (click)="ShowRemark()"> <span class="col-form-span-label"  ><i class="fa fa-ban"></i>Add Remark</span></button>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+      
+                      
+    </div>  
+</div>       
+               
+
+ 
+  <div class="modal" [style.display]="showModal_Advance ? 'block' : 'none'">
+    <div class="modal-dialog modal-lg" role="document"  >
+        <div class="modal-content " style="height:400px; width:800px;overflow-x: auto;">
+            <div class="modal-header">   </div>
+            <div class="modal-body">
+                <table class="table table-sm-new table-responsive-sm" >
+                    <tr class="title-head formheading table-primary">
+                        <td colspan="6" class="centerlabel">   <strong>{{advheader}}</strong>  </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" class="centerlabel"> <strong> {{ClientName}}</strong>  </td>
+                    </tr>
+                </table>
+                <div class="row">
+                        <div class="col" >
+                            <table align="right" class="table  table-sm-new bgwhite" style="width:150px">
+                                <tr>
+                                    <td align="right">  <span class="col-form-span-label">Advance Total:</span>        </td>
+                                    <td>  <span  class="col-form-span-label">{{AdvTotal}}</span>   </td>
+                                </tr>
+                            </table>
+                            <table class="table table-bordered table-sm-new bgwhite ">
+                                <thead>
+                                  <tr class="col-form-span-heading ">                                 
+                                    <th class="col-form-span-label"></th>
+                                    <th class="col-form-span-label">Number</th>
+                                    <th class="col-form-span-label">Date</th>
+                                    <th class="col-form-span-label">Particulars</th>
+                                    <th class="col-form-span-label">Amount</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr *ngFor="let data of AdvanceTable">
+                                    <td class="col-form-span-label">{{data.transtype}}</td>
+                                    <td class="col-form-span-label">{{data.Transcode}}</td>
+                                    <td class="col-form-span-label">{{data.Transdate}}</td>
+                                    <td class="col-form-span-label">{{data.exp_sname}},{{data.sup_sname}},{{data.acctname}}</td>
+                                    <td class="col-form-span-label">{{data.cramt}}</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                              <table class="table table-bordered table-sm-new bgwhite ">
+                                    <tr>
+                                        <td colspan="4" align="center">
+                                            <button class="btn btn-sm btn-success" type="submit" (click)="Print()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Print</span></button>
+                                            <button class="btn btn-sm btn-success" type="submit" (click)="expt_exlwithadv()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> ExportToExcel</span></button>
+                                            <button class="btn btn-sm btn-danger" (click)="close()"><span class="col-form-span-label"><i class="fa fa-ban"
+                                              aria-hidden="true"></i> Close</span></button>
+                                        </td>
+                                    </tr>
+                             </table>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row no-gutters">
+    <div class="col-sm-12 col-md-1 col-lg-1">
+    </div>
+    <div class="col-sm-12 col-md-10 col-lg-10 ">
+    <div class="modal" [style.display]="showModal_Remark ? 'block' : 'none'">
+        <div class="modal-dialog modal-lg" role="document"  >
+            <div class="modal-content " style="height:465px; width:700px;overflow-x: auto;">
+                <div class="modal-body">
+                    <div class="row no-gutters">
+                    <div class="col-sm-12 col-md-1 col-lg-1">
+                    </div>
+                    <div class="col-sm-12 col-md-10 col-lg-10 ">
+                    <div class="form-group row d-flex justify-content-center "> <strong> Client Remark </strong>  </div></div>
+                    <div class="col-sm-12 col-md-1 col-lg-1">
+                    </div>
+                </div>
+                <div class="row no-gutters">
+                    <div class="col-sm-12 col-md-1 col-lg-1">
+                    </div>
+                    <div class="col-sm-12 col-md-10 col-lg-10 ">
+                    <div class="form-group row d-flex justify-content-center "> <strong>  {{ClientName}}</strong>  </div></div>
+                    <div class="col-sm-12 col-md-1 col-lg-1">
+                    </div>
+                </div>
+                    <div class="form-group row d-flex justify-content-center ">
+                    
+                        <!-- <div > <strong> {{ClientName}}</strong> </div> -->
+                            <br>
+                            <br>
+                        <div class="row no-gutters"   >
+                            <div class="col-sm-12 col-md-1 col-lg-1">
+                            </div>
+                            <div class="col-sm-12 col-md-10 col-lg-10 ">
+                    
+                        
+                            <table class="table table-bordered table-sm-new bgwhite" style="width:500px ;"> 
+                                <tr>
+                                    <td colspan="2"> 
+                                        <table class="table table-bordered table-sm-new bgwhite" > 
+                                            <tr>
+                                                <td><span class="col-form-span-label">Opening : </span> </td>
+                                                <td><span class="col-form-span-label">{{OpDrBal}}</span></td>
+                                                <td><span class="col-form-span-label"> {{OpCrBal}}</span></td>
+                                                <td align="right"><span class="col-form-span-label">Current Total:</span></td>
+                                                <td><span class="col-form-span-label">{{currTotalDr}}</span></td>
+                                                <td><span class="col-form-span-label">{{currTotalcr}}</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td ><span class="col-form-span-label">Closing : </span> </td>
+                                                <td><span class="col-form-span-label">{{CLDrBal}}</span></td>
+                                                <td><span class="col-form-span-label"> {{CLCrBal}}</span></td>
+                                                <td align="right"><span class="col-form-span-label">Advance:</span></td>
+                                                <td><span class="col-form-span-label">{{AdvCrAmt}}</span></td>
+                                                <td><span class="col-form-span-label">{{AdvDrAmt}}</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span style= "min-height: 100px;display: inline-flex;  align-items: center; "
+                                         class="col-form-span-label"> Remark</span>
+                                    </td>
+                                    <td  align ="left" >
+                                     
+                                             <textarea rows="5" cols="50" class="form-control" OnlyCharacter="true" [(ngModel)]="Remark"></textarea>
+                                  
+                                        </td>
+                                    
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <div class="row  d-flex justify-content-center">
+                            
+                                            <button class="btn btn-sm btn-success" type="submit" [disabled]='disableAddbtn' (click)="AddRemark()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Add</span></button>
+                                            <button class="btn btn-sm btn-danger" [disabled]='disableCancelAddbtn' (click)="Clearctrl()"><span class="col-form-span-label"><i class="fa fa-ban"
+                                              aria-hidden="true"></i> Cancel</span></button>
+                                             
+                                        </div> 
+                                    </td>
+                                </tr>
+                                <tr>
+                                   <td colspan="2">
+                            
+                               <div class="row  xyscroll"  style="height: 200px;">
+                                <table class="table table table-responsive-sm  table-bordered " >
+                                    <thead>
+                                        <tr class="title-head formheading table-primary">
+                                            <th class="col-form-span-label" align="center">User Name</th>
+                                            <th class="col-form-span-label" align="center">Remark</th>                          
+                                        </tr>
+                                    </thead>
+                                    <tbody >
+                                        <tr *ngFor="let data of RemarkList">
+                                            <td  style="width: 25%;"><span class="col-form-span-label" (click)="DisplayRemark(data.remark)">{{data.entrydt}}</span>  </td>                             
+                                            <td  style="width: 75%;" class="col-form-span-label">
+                                            <p    style="white-space: pre-wrap;word-break:break-all;" > {{data.remark}}</p>  </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                               
+                            </div>
+                           
+                                   </td> 
+                                </tr>
+                              <tr>
+                                    <td colspan="2">
+                                        <div class="col-md-12"  style="text-align: right;">
+                                            <button   class="btn btn-sm btn-success" (click)="UploadDoc()"><span class="col-form-span-label"><i class="fa fa-ban"
+                                                aria-hidden="true"></i> Upload Document</span></button>
+                                            <button  class="btn btn-sm btn-danger" (click)="closeRemark()"><span class="col-form-span-label"><i class="fa fa-ban"
+                                                aria-hidden="true"></i> Close</span></button>
+                                        </div>   
+                                    </td>
+                                </tr> 
+                            </table>  
+                        <!-- </div> -->
+                         </div>
+                         <div class="col-sm-12 col-md-1 col-lg-1">
+                        </div>
+                        
+                    </div> 
+                   
+          </div>
+    </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="col-sm-12 col-md-1 col-lg-1">
+    </div>
+    
+</div>   
+<!-- <div class="modal" [style.display]="showModal_Remark ? 'block' : 'none'">
+    <div class="modal-dialog modal-lg" role="document"  >
+        <div class="modal-content " style="height:400px; width:800px;overflow-x: auto;">
+         <div class="modal-body">
+                <div > <strong> Client Remark </strong>  </div>
+                <div class="form-group row d-flex justify-content-center ">
+                    <div > <strong> {{ClientName}}</strong> </div>
+                    <br>
+                    <div class="col-md-10"> 
+                        <table class="table table-sm-new table-responsive-sm table-bordered"> 
+                            <tr>
+                                <td><span class="col-form-span-label">Opening : </span> </td>
+                                <td><span class="col-form-span-label">{{OpDrBal}}</span></td>
+                                <td><span class="col-form-span-label"> {{OpCrBal}}</span></td>
+                                <td align="right"><span class="col-form-span-label">Current Total:</span></td>
+                                <td><span class="col-form-span-label">{{currTotalDr}}</span></td>
+                                <td><span class="col-form-span-label">{{currTotalcr}}</span></td>
+                            </tr>
+                            <tr>
+                                <td ><span class="col-form-span-label">Closing : </span> </td>
+                                <td><span class="col-form-span-label">{{CLDrBal}}</span></td>
+                                <td><span class="col-form-span-label"> {{CLCrBal}}</span></td>
+                                <td align="right"><span class="col-form-span-label">Advance:</span></td>
+                                <td><span class="col-form-span-label">{{AdvCrAmt}}</span></td>
+                                <td><span class="col-form-span-label">{{AdvDrAmt}}</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <br>
+                    <div class="col-md-5">
+                        <div class="row  d-flex justify-content-center">                           
+                             <select class="form-control " [(ngModel)]="selectedToAdd"  (change)="FillRemark($event)" multiple name="myselectoption1"
+                            style="height: 250px;width:200px;margin-top:8px;">
+                            <option *ngFor="let item of UserList"                                
+                                 value={{item.remark}}>{{item.entrydt}}</option> >
+                        </select>                        
+                        </div>
+                    </div>
+                   
+                    <div class="col-md-5">
+                        <div class="row  d-flex justify-content-center">
+                            <span class="col-form-span-label"><b> {{lblRemark}}</b></span>
+                             <textarea rows="5" cols="25" class="form-control" OnlyCharacter="true" [(ngModel)]="Remark"></textarea>
+                        </div>
+                        <br>
+                        <div>
+                            <button class="btn btn-sm btn-success" type="submit" [disabled]='disableNewbtn' (click)="EnableAddCancel()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> New</span></button>
+                            <button class="btn btn-sm btn-success" type="submit" [disabled]='disableAddbtn' (click)="AddRemark()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Add</span></button>
+                            <button class="btn btn-sm btn-danger" [disabled]='disableCancelAddbtn' (click)="Clearctrl()"><span class="col-form-span-label"><i class="fa fa-ban"
+                              aria-hidden="true"></i> Cancel</span></button>
+                        </div>
+                        <br>
+                        <div class="row  d-flex justify-content-center">
+                            <span class="col-form-span-label"><b> {{lblLastRemark}}</b></span>
+                            <textarea rows="5" cols="25" class="form-control" OnlyCharacter="true" [(ngModel)]="LastRemark"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+         </div>
+            <div class="row  d-flex justify-content-center">
+                <button class="btn btn-sm btn-danger" (click)="closeRemark()"><span class="col-form-span-label"><i class="fa fa-ban"
+                    aria-hidden="true"></i> Close</span></button>
+            </div>
+          
+        </div>
+    </div>
+</div> -->
+ 

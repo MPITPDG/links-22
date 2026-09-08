@@ -1,0 +1,175 @@
+      <table class="table table-bordered table-sm-new bgwhite">
+        <tr>
+          <td class="col-form-span-heading " colspan="4">
+            General Details
+          </td>
+        </tr>
+        <tr>
+          <td><span class="col-form-span-label"><b>Purchase No </b> </span></td>
+          <td> <span class="col-form-span-label">{{PUR_CODE}}</span> </td>
+          <td><span class="col-form-span-label"><b>Purchase Date </b> </span></td>
+          <td><span class="col-form-span-label">{{PUR_DATE}}</span> </td>
+        </tr>
+        <tr>
+            <td><span class="col-form-span-label"><b>Narration </b> </span></td>
+            <td colspan="3"> <span class="col-form-span-label">{{REMARKS}}</span> </td>
+        </tr>
+        <tr>
+          <td class="col-form-span-heading  " colspan="4">
+            Staff Details
+          </td>
+        </tr>
+        <tr>
+            <td><span class="col-form-span-label"><b>Staff Name </b> </span></td>
+            <td> <span class="col-form-span-label">{{PUR_SUPPLIERNAME}}</span> </td>
+            
+        </tr>
+        <tr>
+            <td class="col-form-span-heading " colspan="2">
+                Passing Details 
+            </td>
+            <td  colspan="2"
+              class="col-form-span-label"> 
+              <span class="col-form-span-label" ><b>IsPassed</b>  </span>  
+              <input type="checkbox" disabled="disabled" [(ngModel)]="IsPassed">
+          </td>
+          </tr>
+          <tr>
+            <td><span class="col-form-span-label"><b>Passed By </b> </span></td>
+            <td> <span class="col-form-span-label">{{PASSEDBYPERSON}}</span> </td>
+            <td><span class="col-form-span-label"><b>Passed Amount </b> </span></td>
+            <td><span class="col-form-span-label">{{PASSEDAMOUNT}}</span> </td>
+          </tr>
+          <tr>
+              <td><span class="col-form-span-label"><b>Invoice Amount </b> </span></td>
+              <td> <span class="col-form-span-label">{{SUPINVAMT}}</span> </td>
+              <td><span class="col-form-span-label"><b>Voucher No. </b> </span></td>
+              <td> <span class="col-form-span-label">{{VOUCHERNO}}</span> </td>
+          </tr>
+         
+        <tr>
+          <td class="col-form-span p-1" colspan="4">
+          </td>
+        </tr>
+        <td class="col-form-span-heading " colspan="4">
+            Account Details 
+        </td>
+        <tr *ngIf=" flag != 'Y' &&  flag == 'EDIT'">
+          <td><span class="col-form-span-label"><b>Account Name</b> </span><span class="col-form-span-error">*</span></td>
+          <td colspan="3">
+            <span class="col-form-span-label">{{ACCTNAME}}</span>  
+              <!-- <ng-select [items]="AccountNameList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
+              [(ngModel)]="AccountName" [disabled]="disable_Accountname" class="custom " placeholder="--Select--">
+          </ng-select> -->
+
+          </td>
+      </tr>
+      <tr *ngIf=" flag == 'VIEW'">
+          <td><span class="col-form-span-label"><b>Item</b> </span><span class="col-form-span-error">*</span></td>
+          <td colspan="3">
+            <span class="col-form-span-label">{{ItemName}}</span>
+              <!-- <ng-select [items]="Allitemlist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Item"
+              class="custom " [disabled]="disable_Item" placeholder="--Select--">
+          </ng-select> -->
+          </td>
+      </tr>
+      <tr *ngIf=" flag == 'EDIT'">
+          <td><span class="col-form-span-label"><b> Amount</b> </span><span class="col-form-span-error">*</span></td>
+          <td> <span class="col-form-span-label">{{Amount}}</span> </td>
+          <!-- <td >  <input [(ngModel)]="Amount"  [disabled]="disable_Amount" type="text"    class="form-control width150" maxlength="40" > </td> -->
+          <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
+          <!-- <td >  <input [(ngModel)]="Deduction"  type="text"    class="form-control width150" maxlength="40" > </td> -->
+          <td> <span class="col-form-span-label">{{Deduction}}</span> </td>
+      </tr>
+      <tr *ngIf=" flag == 'EDIT'">
+          <td><span class="col-form-span-label"><b> Job No</b> </span><span class="col-form-span-error">*</span></td>
+          <td> <span class="col-form-span-label">{{JobNo}}</span> </td>
+          <!-- <td >  <input [(ngModel)]="JobNo" type="text" [disabled]="disable_JobNo"  class="form-control width150" maxlength="40" > </td> -->
+          <td><span class="col-form-span-label"><b>Pass Amount</b> </span></td>
+          <td >  <input [(ngModel)]="actpassedamount"  type="text"    class="form-control width150" maxlength="40" > </td>
+
+      </tr>
+      <tr *ngIf=" flag != 'VIEW'">
+          <td><span class="col-form-span-label"><b>Narration</b> </span></td>
+          <td colspan="3">
+              <input [(ngModel)]="ActNarration" type="text"    class="form-control width500" maxlength="40" >
+          </td>
+      </tr>
+
+      <tr *ngIf=" flag == 'EDIT'">
+          <td colspan="4"  class="centerlabel">
+              <button class="btn btn-sm btn-success" type="submit" (click)="Addchildrcrd()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{txtchild}}</span></button>
+              <!-- <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Resetchildrcrd();"><i class="fa fa-ban"></i> Reset</span></button> -->
+          </td>
+      </tr>
+      <tr>
+
+      </tr>
+      <tr >
+
+          <td><span class="col-form-span-heading"><b> Net Total</b> </span></td>
+          <td *ngIf=" flag == 'EDIT'" colspan="3">  <input [(ngModel)]="NetAmt" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
+          <td *ngIf=" flag == 'VIEW'" colspan="3"> <span class="col-form-span-label">{{NetAmt}}</span> </td>
+  </tr>
+
+  <tr>
+      <td><span class="col-form-span-label"><b> Amount</b> </span></td>
+      <td *ngIf=" flag == 'EDIT'">  <input [(ngModel)]="NetAmount" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
+      <td *ngIf=" flag == 'VIEW'"> <span class="col-form-span-label">{{NetAmount}}</span> </td>
+      <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
+      <td *ngIf=" flag == 'EDIT'">  <input [(ngModel)]="Netdeduction" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
+      <td *ngIf=" flag == 'VIEW'"> <span class="col-form-span-label">{{Netdeduction}}</span> </td>
+  </tr>
+  <!-- <tr>
+      <td colspan="4"  class="centerlabel">
+          <button class="btn btn-sm btn-success" type="submit" (click)="Add_Main()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{text}}</span></button>
+         
+      </td>
+  </tr> -->
+        <tr>
+          <td colspan="4">
+            <table class="table table-bordered table-sm-new bgwhite ">
+              <thead>
+                <tr class="col-form-span-heading ">
+                  <th  *ngIf=" flag == 'EDIT'" class="col-form-span-label" ></th>
+                  <th class="col-form-span-label">Account Name</th>
+                  <th class="col-form-span-label">Amount</th>
+                  <th class="col-form-span-label">Deduction</th>
+                  <th class="col-form-span-label">Pass Amt</th>
+                  <th class="col-form-span-label">Item</th>
+                  <th class="col-form-span-label">Job No</th>
+                  <th class="col-form-span-label">Narration </th>
+                 
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let data of datatabl_1">
+                  <td *ngIf=" flag == 'EDIT'" class="centerlabel">
+                    <i class="fa fa-pencil" (click)="Editchildrecd(data.ID)" ></i>
+                    &nbsp;
+                    <i class="fa fa-trash" (click)="deletechildrecd(data.ID,obj.ACC_PURCHASEDTLS_ID)"></i>
+                </td>
+                <td><span class="col-form-span-label"  [innerHtml]="data.ACCOUNT_NAME"> </span></td>
+                  <td class="col-form-span-label">{{data.AMOUNT}}</td>
+                  <td class="col-form-span-label">{{data.DEDUCTION}}</td>
+                  <td class="col-form-span-label">{{data.SRPIPASSAMOUNT}}</td>
+                  <td class="col-form-span-label">{{data.ITEM}}</td>
+                  <td class="col-form-span-label anchor-link" (click)="jobprofitreport(data.JOBNO)">{{data.JOBNO}}</td>
+                  <td class="col-form-span-label">{{data.NARRATION}}</td>
+                </tr>
+            
+              </tbody>
+            </table>
+          </td>
+        </tr>
+        <tr  >
+          <td colspan="4"  class="centerlabel">
+              <button class="btn btn-sm btn-success" *ngIf=" flag == 'EDIT'" type="submit" (click)="SaveVerify()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{text}}</span></button>
+              <button *ngIf=" flag == 'EDIT'" class="btn btn-sm btn-danger" (click)="abortModal()"><span class="col-form-span-label"><i class="fa fa-ban"
+                aria-hidden="true"></i> Abort</span></button>
+                
+          </td>
+      </tr>
+        
+      </table>
+  

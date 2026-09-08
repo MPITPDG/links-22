@@ -1,0 +1,77 @@
+﻿<div class="animated fadeIn">
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="card">
+				<div class="card-header formheading">
+				   <strong><u>{{headerType}}</u></strong>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-4">
+		</div>
+		<div class="col-sm-4">
+			<table class="table table-sm-new">
+				<tr class="trbg">
+					<td class="width90"><span class="col-form-span-label"><b>Type</b></span></td>
+					<td colspan="2">
+						<span class="col-form-span-label"><input type="radio" name="check"  (click)="changeType('EXPORT_NO')" [checked]="checkType == 'EXPORT_NO'"/>Export No.</span>&nbsp;&nbsp;
+						<span class="col-form-span-label"><input type="radio" name="check"  (click)="changeType('ORDER_NO')" [checked]="checkType == 'ORDER_NO'"/>Order No.</span>&nbsp;&nbsp;
+						<span class="col-form-span-label"><input type="radio" name="check"  (click)="changeType('REF_NO')" [checked]="checkType == 'REF_NO'"/>Ref No.</span>
+					</td>
+				</tr>
+				<tr class="trbg">
+					<td class="width90"><span class="col-form-span-label"><b>Values</b></span></td>
+					<td>
+						<input type="text" [(ngModel)]="SearchValue" class="form-control width120"/>
+					</td>
+					<td><span class="col-form-span-error">{{ErrorMessage}}</span></td>
+				</tr>
+				
+				<tr class="trbg centerlabel">
+					<td colspan="3">
+						<button type="button" name="searchButton" class="btn btn-l btn-primary" (click)="search();" #searchButton >
+							<span class="col-form-span-label"><app-font-changer [fontIndex]="'0'"></app-font-changer> Search</span>
+						</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-sm-4">
+		</div>
+	</div>
+	<div class="row" *ngIf="searchList.length > 0">
+		<div class="col-sm-12">
+			<br />
+			<table class="table table-bordered table-striped table-sm-new bgwhite">
+				<thead>
+					<tr class="title-head formheading" style="white-space: nowrap;">
+						<th>M.P.REFERENCE</th>
+						<th>SHIPPER NAME</th>
+						<th>CONSIGNEE NAME</th>
+						<th>TOTAL NO. OF PACKAGES</th>
+						<th>TOTAL NO. OF PIECES</th>
+						<th>ORDER NO./REF DETAILS</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let obj of searchList" (click)="rowClick(obj['M.P.REFERENCE'])" style="cursor: pointer;">
+						<td><span class="col-form-span-label">{{obj["exptno_view"]}}</span></td>
+						<td><span class="col-form-span-label">{{obj["SHIPPER NAME"]}}</span></td>
+						<td><span class="col-form-span-label">{{obj["CONSIGNEE NAME"]}}</span></td>
+						<td><span class="col-form-span-label">{{obj["TOTAL NO. OF PACKAGES"]}}</span></td>
+						<td><span class="col-form-span-label">{{obj["TOTAL NO. OF PIECES"]}}</span></td>
+						<td><span class="col-form-span-label">{{obj["ORDER NO./REF DETAILS"]}}</span></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="row" *ngIf="searchListLength == 1">
+		<div class="col-sm-12 centerlabel">
+			<br /><br />
+			<span class="col-form-span-label">No Record Found!</span>
+		</div>
+	</div>
+</div>

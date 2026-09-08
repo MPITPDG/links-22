@@ -1,0 +1,164 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-body"> 
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">	
+						
+						<table class="table table-bordered table-sm-new">
+							<tbody style='height:30px'>
+								<tr>
+									<td class="col-form-span-heading"  colspan="4">
+										MASTER B/L
+									</td>
+								</tr>							
+								<tr>
+									<td  >
+										<span class="col-form-span-label ">Job No</span><span class="col-form-span-error">*</span>
+									</td>
+									<td colspan="2">
+										<input [(ngModel)]="exJobno" type="text"  maxlength="15" class="form-control width150">
+									</td>
+									
+									<td colspan="2" class="centerlabel" >
+										<button class="btn btn-sm btn-success" type="submit" id="btnSearch" name="btnSearch"    (click)="jobserch()"> <i class="fa fa-search"></i> Search</button>
+										<button *ngIf="exptdt.length>0" class="btn btn-sm btn-danger   " type="reset"     (click)="onprint()"><i class="fa fa-print "></i> Print</button>
+			
+									</td>
+								</tr>
+							</tbody>
+							<tbody *ngIf="exptdt.length>0">
+								<tr>
+									<td class="col-form-span-heading"  colspan="4">
+										LIST OF CONSIGNMENTS
+									</td>
+								</tr>
+								
+								 
+								<tr>
+									<td>
+										<span class="col-form-span-label ">Vessel </span>
+									</td>
+									<td>
+										<label class="col-form-span-label" >{{ VSL_NAME }}</label>	  
+									</td>						
+									
+									<td>
+										<span class="col-form-span-label "> Voyage</span>
+									</td>
+									<td>
+										<label class="col-form-span-label" >{{ VOYNO }}</label>	  
+									</td>							 
+								</tr>
+                                 
+                                <tr>
+                                        <td>
+												<span class="col-form-span-label "> Master B/LNo</span>
+												<span class="col-form-span-error">*</span>
+                                            </td>
+                                            <td>
+                                                    <input [(ngModel)]="mblno" type="text"  class="form-control width150">
+                                            </td>
+                                    <td>
+										<span class="col-form-span-label "> Master B/L Date</span><span class="col-form-span-error">*</span>
+									</td>
+									<td>
+										<my-date-picker name="mbldate" [options]="myDatePickerOptions" [(ngModel)]="mbldate" required></my-date-picker>
+									</td>
+                                </tr>
+								<tr>
+									<td>
+										<span class="col-form-span-label "> Freight Type</span><span class="col-form-span-error">*</span>
+									</td>
+									<td>
+										<select class="form-control width150"   [(ngModel)]="frttype">
+											<option value="-1">Please select</option>
+											<option value="CC">CC</option>
+											<option value="PP">PP</option>
+										</select>
+									</td>
+									<td>
+										<span class="col-form-span-label ">Freight Currency </span>
+									</td>
+									<td>
+										<select class="form-control width150" [(ngModel)]="currency">
+											<option value="-1">Please select</option>
+											<option *ngFor="let d of listCurreny" value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<span class="col-form-span-label ">Freight Amount </span>
+									</td>
+									<td  >
+										<input [(ngModel)]="frtAmt" type="text"  class="form-control width150">
+									</td>
+									<td>
+										<span class="col-form-span-label "> Freight Type</span>
+									</td>
+									<td>
+										<select class="form-control width150"   [(ngModel)]="BLTYPE">
+											<option value="-1">Please select</option>
+											<option value="M">Master Bl</option>
+											<option value="S">Seaway Bill</option>
+										</select>
+									</td>
+								</tr>
+								 
+								
+								 
+								<tr>
+									<td class="col-form-span-heading"  colspan="4">
+                                            FOLLOWING CONSIGNMENT IN ABOVE VESSEL
+									</td>
+								</tr>
+								<tr>
+									<td colspan="4" *ngIf="exptdt.length>0">
+										
+										<table class="table table-hover">
+											<thead>
+												
+												<th class="col-form-span-label"   >Select</th>
+                                                <th class="col-form-span-label">Jobno</th>
+                                                <th class="col-form-span-label">Shipper</th>
+												<th class="col-form-span-label">Consignee</th>
+												<th class="col-form-span-label">Pkgs</th>												
+                                                <th class="col-form-span-label">Pcs</th>
+                                                <th class="col-form-span-label">grwt</th>
+											</thead>
+											 
+											<tbody>
+												<tr *ngFor="let d of exptdt"  >	
+													<td><input type="checkbox" [disabled]="JOBSELE" [(ngModel)]="d.SELETJOB" > </td>
+                                                    <td class="col-form-span-label">{{d.EXPTNO}}</td>
+                                                    <td class="col-form-span-label">{{d.SHIPPER}}</td>
+													<td class="col-form-span-label">{{d.CONSIGNEE}}</td>													 
+													<td class="col-form-span-label">{{d.PKGS}}</td>													
+													<td class="col-form-span-label">{{d.PCS}}</td>
+													<td class="col-form-span-label">{{d.GRWT}}</td>													
+												</tr>
+											</tbody>
+										</table>									
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					
+					<!-- <pre>{{exptdt | json}}</pre> -->
+				</div>
+				<div class="col-md-2"></div>
+			</div>
+		</div>
+		
+		<div class="card-footer rightlabel "*ngIf="exptdt.length>0">
+			
+			<button class="btn btn-sm btn-success   " type="submit" id="btnAgtAdd" name="btnAgtAdd"   (click)="AddMbl()" ><i class="fa fa-dot-circle-o" ></i> Submit</button>
+			<button class="btn btn-sm btn-danger   " type="reset" id="btnAgtRest" name="btnAgtrest" (click)="ResetAll()"><i class="fa fa-ban"></i> Reset</button>
+			
+		</div>
+	</div>
+	
+</div>

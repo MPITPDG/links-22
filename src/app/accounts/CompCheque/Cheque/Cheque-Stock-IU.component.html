@@ -1,0 +1,68 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>{{Header| uppercase}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-3 col-lg-3"> </div>
+        <div class="col-sm-12 col-md-6 col-lg-6">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td class="col-form-span-heading" colspan="2">
+                        <b>Cheque Add</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td ><span class="col-form-span-label"><b>Our Bank</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td >
+                        <select class="form-control"  [(ngModel)]="OurBank" >
+                            <option value="">Please select</option>
+                            <option *ngFor="let d of OurBankList"  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+                        </select>
+                    </td>
+                </tr>
+                 <tr>
+                    <td>
+                        <span class="col-form-span-label "><b>From Cheque No</b></span><span
+                        class="col-form-span-error">*</span> </td>
+                    <td>
+                        <input [(ngModel)]="from_chqno" type="text"  class="form-control width180" maxlength="40" >
+                    </td>                    
+                </tr>  
+                <tr>
+                    <td> <span class="col-form-span-label "><b>To Cheque No</b></span> <span
+                        class="col-form-span-error">*</span></td>
+                    <td>
+                        <input [(ngModel)]="to_chqno" type="text"   class="form-control width180" maxlength="40" >
+                    </td>
+                </tr> 
+                <tr>
+                    <td>
+                        <span class="col-form-span-label "><b> Cheque Entry Date</b></span><span
+                        class="col-form-span-error">*</span> </td>
+                    <td>
+                        <my-date-picker name="cheque_create_date" [options]="myDatePickerOptions" [(ngModel)]="cheque_create_date"></my-date-picker>
+                    </td>
+                </tr> 
+                <tr>
+                    <td colspan="2" align="center">
+                        <button class="btn btn-sm btn-success" type="submit" (click)="addchequestock()">
+                            <span class="col-form-span-label"><i
+                                    class="fa fa-dot-circle-o"></i>Add</span></button>
+                        <button class="btn btn-sm btn-danger" type="reset"> <span
+                                class="col-form-span-label" (click)="resetchequestock();"><i
+                                    class="fa fa-ban"></i> Reset</span></button>
+                    </td>
+                </tr>            
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3"> </div>
+    </div>
+
+    </div>

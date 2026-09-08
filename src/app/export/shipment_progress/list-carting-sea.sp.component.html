@@ -1,0 +1,57 @@
+﻿<div class="row">	
+	<div class="col-sm-1">
+	</div>
+	<div class="col-sm-10">	 
+		<table class="table table-bordered table-sm-new">	
+		<thead class="">
+			<tr *ngFor="let d of SearchHead"  class="col-form-span-heading">
+				<th colspan="12" class="col-form-span-label"> 
+					<span class="col-form-span-label" >{{d.vsl}}</span>
+				</th>
+			</tr> 
+		</thead>
+		<thead>
+		 <tr class="col-form-span-heading">		 	 
+				<th class="col-form-span-label" >Select</th>
+				<th class="col-form-span-label">M.P Ref. No</th>
+				<th class="col-form-span-label">Shipper</th>
+				<th class="col-form-span-label">Consignee</th>
+				<th class="col-form-span-label">Tot. Pkgs</th>
+				<th class="col-form-span-label">Tot. Pieces</th>
+				<th class="col-form-span-label">Tot. Pkgs Recvd</th>
+				<th class="col-form-span-label">Order No.</th>
+				<th class="col-form-span-label">Carton</th>
+				<th class="col-form-span-label">Pkgs</th>
+				<th class="col-form-span-label">Remark</th>
+				<th class="col-form-span-label"></th>
+				
+		 </tr>
+		 </thead>
+			<tbody class="bgwhite">
+				<tr *ngFor="let d of CartingList"  [ngStyle]="{'background-color':d.SELEJOB!=true ? '' : 'white' }" >	
+					<td><input type="checkbox" [(ngModel)]="d.SELEJOB" > </td>
+					<td class="col-form-span-label">{{d.EXPTNO}}</td>
+					<td class="col-form-span-label">{{d.SHIPPER}}</td>													 
+					<td class="col-form-span-label">{{d.CONSIGNEE}}</td>													
+					<td class="col-form-span-label">{{d.EXP_NOPKGS}}</td>
+					<td class="col-form-span-label">{{d.EXP_NOPCS}}</td>
+					<td class="col-form-span-label">{{d.RCVDPKGS}}</td>
+					<td class="col-form-span-label">{{d.ORDERNO}}</td>					
+					<td> 
+						<my-date-picker name="dtbld" [options]="myDatePickerOptions" [(ngModel)]="d.CARTEDON" [disabled]="d.SELEJOB!=true" ></my-date-picker>
+					</td>
+					<td><input type="Textbox"  class="form-control width150" [(ngModel)]="d.NOOFPKG" [disabled]="d.SELEJOB!=true" (keyup)="vslidaionPkgs(d.RCVDPKGS,d.NOOFPKG)" > </td>
+					<td><input type="Textbox" class="form-control width150" [(ngModel)]="d.REMARK" [disabled]="d.SELEJOB!=true"  > </td>
+					<td><button class="btn btn-sm btn-danger" type="submit"   name="btndelete" [disabled]="d.CARTID==0"   (click)="OnDelete(d.containerno,d.CARTID)"><span class="col-form-span-label "> <i class="fa fa-trash"></i>  </span> </button>				 </td>
+				</tr>
+				
+			</tbody>
+		</table>
+		<div style="float:right">
+		<button class="btn btn-sm btn-success" type="submit"   name="btnAdd" [disabled]="buttondis"  (click)="OnCartSave()"><span class="col-form-span-label "> <i class="fa fa-search"></i> Submit</span> </button>				 
+		</div> 
+	</div>
+		<div class="col-sm-1">
+		</div>
+	</div>
+	

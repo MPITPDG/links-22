@@ -1,0 +1,90 @@
+﻿<div class="row">
+	<div class="col-sm-12">
+		<div class="card">
+			<div class="card-header formheading centerlabel">
+			   <strong><u>CONSOLE PENDING LIST (AIR)</u></strong>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row" *ngIf="searchListLength == 0">
+	<div class="col-sm-12 centerlabel">
+		<img src="assets/img/loading.gif" />
+	</div>
+</div>
+<div class="row" *ngIf="searchListLength == -1">
+	<div class="col-sm-12 centerlabel">
+		<span class="col-form-span-label">No Record Found!</span>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-12">
+		<div class="row y350heightscroll" *ngIf="searchList.length > 0">
+			<table class="table table-bordered table-striped table-sm-new bgwhite">
+				<thead>
+					<tr class="title-head formheading">
+						<th>View</th>
+						<th></th>
+						<th>MAWB No</th>
+						<th>MAWB DT.</th>
+						<th>ETD</th>
+						<th>ETA</th>
+						<th>HAWB No.</th>
+						<th>HAWB DT.</th>
+						<th>Ex-Jobno.</th>
+						<th>No of Pkgs</th>
+						<th>GRWT</th>
+						<th>CBM</th>
+						<th>Consignee</th>
+						<th>Flight Details</th>
+						<th>MAWB FRT</th>
+						<th>Invoice Type</th>
+						<th>MAWBDEST</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let obj of searchList">
+						<td>
+							<button (click)="autoClick(obj.MAWBNO,obj.CITY)" class="btn btn-sm btn-success" *ngIf="obj.MAWBNO != ''">
+								<span class="col-form-span-label"><i class="fa fa-window-maximize"></i>&nbsp;Generate</span>
+							</button>
+							<!-- <button class="btn btn-sm btn-warning" *ngIf="obj.ISDISABLED == true" [disabled]="obj.ISDISABLED">
+								<span class="col-form-span-label"><i class="fa fa-download"></i>Processing..</span>
+							</button> -->
+						</td>
+						<td>
+							<!-- <ng-select [items]="[{VALUEFIELD: 'LIL', TEXTFIELD: 'LIL'},{VALUEFIELD: 'LIL', TEXTFIELD: 'PAR'}]"
+									   bindLabel="TEXTFIELD"
+									   bindValue="VALUEFIELD"
+									   placeholder="--Select--"
+									   [(ngModel)]="obj.CITY"
+									   class="form-control width120"
+									   >
+							</ng-select> -->
+							<select class="form-control width120"  [(ngModel)]="obj.CITY" >
+									<option value="null">--Select--</option>
+									<option value="LIL">LIL</option>
+									<option value="PAR">PAR</option>
+								</select>
+						</td>
+						<td><span class="col-form-span-label">{{obj.MAWBNO}}</span></td>
+						<td><span class="col-form-span-label">{{obj.AEROBILLDT}}</span></td>
+						<td><span class="col-form-span-label">{{obj.ETD}}</span></td>
+						<td><span class="col-form-span-label">{{obj.ETA}}</span></td>
+						<td><span class="col-form-span-label">{{obj.HOUSEBILLNO}}</span></td>
+						<td><span class="col-form-span-label">{{obj.HOUSEBILLDT}}</span></td>
+						<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
+						<td><span class="col-form-span-label">{{obj.EXPT_NOOFPGS}}</span></td>
+						<td><span class="col-form-span-label">{{obj.EXPT_GRWT}}</span></td>
+						<td><span class="col-form-span-label">{{obj.EXPT_VOLUME}}</span></td>
+						<td><span class="col-form-span-label">{{obj.CONS_NAME}}</span></td>
+						<td><span class="col-form-span-label">{{obj.FLIGHTDET}}</span></td>
+						<td><span class="col-form-span-label">{{obj.MAWBFRT}}</span></td>
+						<td><span class="col-form-span-label">{{obj.EXPT_INVTYPE}}</span></td>
+						<td><span class="col-form-span-label">{{obj.MAWBDEST}}</span></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

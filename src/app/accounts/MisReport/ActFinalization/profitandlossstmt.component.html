@@ -1,0 +1,315 @@
+<div class="br-page">
+
+  <!-- ========================================================= -->
+  <!-- SEARCH -->
+  <!-- ========================================================= -->
+
+  <div class="br-card search-card-clean" *ngIf="!Searched">
+    <div class="clean-row-layout">
+
+      <!-- BRANCH -->
+      <div class="clean-field clean-branch">
+        <label>Branch <span class="br-req">*</span></label>
+        <select class="form-control" name="Branch" [(ngModel)]="Branch">
+          <option *ngFor="let b of BranchList" value="{{b.CITYCODE1}}">{{b.CITYNAME}}</option>
+        </select>
+      </div>
+
+      <!-- FROM DATE -->
+      <div class="clean-field clean-date">
+        <label>From (F.Y. Start) <span class="br-req">*</span></label>
+        <my-date-picker
+          name="FromDate"
+          (dateChanged)="FromDateChanged($event)"
+          [options]="myDatePickerOptions"
+          [selDate]="FromDate">
+        </my-date-picker>
+      </div>
+
+      <!-- TO DATE -->
+      <div class="clean-field clean-date">
+        <label>To / As On <span class="br-req">*</span></label>
+        <my-date-picker
+          name="ToDate"
+          (dateChanged)="ToDateChanged($event)"
+          [options]="myDatePickerOptions"
+          [selDate]="ToDate">
+        </my-date-picker>
+      </div>
+
+      <!-- SUBMIT -->
+      <div class="clean-actions">
+        <button class="br-btn br-btn--primary" type="button" (click)="Submit()">
+          <i class="fa fa-search"></i> Submit
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- RESULT -->
+  <!-- ========================================================= -->
+
+  <div *ngIf="Searched" class="br-result-view">
+
+    <!-- TOP BAR -->
+
+    <div class="br-topbar">
+
+      <div class="br-topbar-title">
+        <span class="pl-title">{{ Header }}</span>
+        <span class="pl-meta" *ngIf="cmpnyname">{{ cmpnyname }}</span>
+      </div>
+
+      <div class="br-topbar-right">
+        <button class="br-back-btn" type="button" (click)="BackToSearch()">
+          <i class="fa fa-arrow-left"></i> Back To Search
+        </button>
+        <button class="br-btn br-btn--export" type="button" (click)="ExportStatement()">
+          <i class="fa fa-file-excel-o"></i> Export To Excel
+        </button>
+      </div>
+
+    </div>
+
+    <!-- SUMMARY EQUATION STRIP -->
+
+    <div class="br-card recon-schedule" *ngIf="Summary">
+
+      <div class="recon-topline">
+
+        <div class="recon-title-group">
+          <span class="recon-schedule-title">Profit &amp; Loss Summary</span>
+          <span class="recon-meta">{{ Summary.PERIOD_FROM }} – {{ Summary.PERIOD_TO }}</span>
+          <span class="recon-meta">{{ BranchLabel }}</span>
+        </div>
+
+        <span
+          class="recon-check-badge"
+          [ngClass]="Summary.NET_PROFIT >= 0 ? 'ok' : 'warn'">
+
+          <i class="fa" [ngClass]="Summary.NET_PROFIT >= 0 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+          NET {{ Summary.NET_PROFIT >= 0 ? 'PROFIT' : 'LOSS' }}
+
+        </span>
+
+      </div>
+
+      <div class="recon-equation">
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">Trading Income</span>
+          <span class="recon-seg-val add">{{ Summary.TRADING_INCOME | number:'1.2-2' }}</span>
+        </div>
+
+        <span class="recon-op">−</span>
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">Trading Expenses</span>
+          <span class="recon-seg-val less">{{ Summary.TRADING_EXPENSES | number:'1.2-2' }}</span>
+        </div>
+
+        <span class="recon-op">=</span>
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">Gross {{ Summary.GROSS_PROFIT >= 0 ? 'Profit' : 'Loss' }}</span>
+          <span class="recon-seg-val" [ngClass]="Summary.GROSS_PROFIT >= 0 ? 'add' : 'less'">
+            {{ Summary.GROSS_PROFIT | number:'1.2-2' }}
+          </span>
+        </div>
+
+        <span class="recon-op">+</span>
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">Indirect Income</span>
+          <span class="recon-seg-val add">{{ Summary.INDIRECT_INCOME | number:'1.2-2' }}</span>
+        </div>
+
+        <span class="recon-op">−</span>
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">Indirect Expenses</span>
+          <span class="recon-seg-val less">{{ Summary.INDIRECT_EXPENSES | number:'1.2-2' }}</span>
+        </div>
+
+        <span class="recon-op">=</span>
+
+        <div class="recon-seg recon-seg--result">
+          <span class="recon-seg-label">Net {{ Summary.NET_PROFIT >= 0 ? 'Profit' : 'Loss' }}</span>
+          <span class="recon-seg-val result" [ngClass]="Summary.NET_PROFIT >= 0 ? 'add' : 'less'">
+            {{ Summary.NET_PROFIT | number:'1.2-2' }}
+          </span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- GROUPS TABLE (drill-down into ledgers) -->
+
+    <div class="br-card br-table-card">
+
+      <div class="br-card-header">
+        <div class="br-card-title">
+          <i class="fa fa-sitemap"></i>
+          Particulars
+          <span class="br-hint">click a group to see its ledgers</span>
+        </div>
+        <span class="br-record-chip">{{ Groups.length }} Groups</span>
+      </div>
+
+      <div class="br-table-wrap">
+        <table class="br-table">
+          <thead>
+            <tr>
+              <th>Particulars</th>
+              <th class="num">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let g of Groups">
+
+              <tr class="pl-grp-row" (click)="Toggle(g.SECTION, g.GROUPNAME)">
+                <td>
+                  <i
+                    class="fa pl-chevron"
+                    [ngClass]="IsExpanded(g.SECTION, g.GROUPNAME) ? 'fa-minus-square-o' : 'fa-plus-square-o'">
+                  </i>
+                  <span class="pl-section-badge">{{ SectionLabel(g.SECTION) }}</span>
+                  {{ g.GROUPNAME }}
+                </td>
+                <td class="num">{{ g.AMOUNT | number:'1.2-2' }}</td>
+              </tr>
+
+              <tr *ngIf="IsExpanded(g.SECTION, g.GROUPNAME)" class="pl-ledger-row">
+                <td colspan="2">
+                  <div class="pl-ledger-wrap">
+                    <table class="br-table pl-ledger-table">
+                      <thead>
+                        <tr>
+                          <th>Code</th>
+                          <th>Ledger Name</th>
+                          <th class="num">Debit</th>
+                          <th class="num">Credit</th>
+                          <th class="num">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let l of GetLedgers(g.SECTION, g.GROUPNAME)">
+                          <td>
+                            <a href="javascript:void(0)" class="anchor-link" (click)="OpenLedger(l)" title="Open Ledger Statement">
+                              {{ l.CODE }}
+                            </a>
+                          </td>
+                          <td>
+                            <a href="javascript:void(0)" class="anchor-link" (click)="OpenLedger(l)" title="Open Ledger Statement">
+                              {{ l.LEDGERNAME }}
+                            </a>
+                          </td>
+                          <td class="num dr-amt">{{ l.DRAMT | number:'1.2-2' }}</td>
+                          <td class="num cr-amt">{{ l.CRAMT | number:'1.2-2' }}</td>
+                          <td class="num" [ngClass]="l.AMOUNT < 0 ? 'less' : ''">{{ l.AMOUNT | number:'1.2-2' }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- LEDGER STATEMENT POPUP -->
+  <!-- ========================================================= -->
+
+  <div class="pl-overlay" *ngIf="ShowLedger" (click)="CloseLedger()">
+    <div
+      class="br-card pl-modal"
+      (click)="$event.stopPropagation()"
+      [ngStyle]="{'transform': 'translate(' + DragX + 'px,' + DragY + 'px)'}">
+
+      <div class="pl-modal-head" (mousedown)="StartDrag($event)">
+
+        <div class="pl-modal-title">
+          <i class="fa fa-arrows"></i>
+          Ledger Statement : {{ LedgerTitle }}
+        </div>
+
+        <div class="pl-modal-actions">
+          <button
+            type="button"
+            class="br-btn br-btn--export"
+            (click)="ExportLedger()"
+            (mousedown)="$event.stopPropagation()"
+            [disabled]="LedgerLoading">
+            <i class="fa fa-file-excel-o"></i> Export To Excel
+          </button>
+          <button
+            type="button"
+            class="br-btn br-btn--danger"
+            (click)="CloseLedger()"
+            (mousedown)="$event.stopPropagation()">
+            <i class="fa fa-close"></i> Close
+          </button>
+        </div>
+
+      </div>
+
+      <div class="pl-modal-body">
+
+        <div class="pl-loading" *ngIf="LedgerLoading">
+          <i class="fa fa-spinner fa-spin"></i> Loading Ledger Statement ...
+        </div>
+
+        <table class="br-table pl-ledger-table" *ngIf="!LedgerLoading">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Number</th>
+              <th>Particulars</th>
+              <th class="num">Debit</th>
+              <th class="num">Credit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="LedgerSummary" class="pl-summary-row">
+              <td colspan="4">OPENING BALANCE</td>
+              <td class="num">{{ LedgerSummary.OPBAL >= 0 ? (LedgerSummary.OPBAL | number:'1.2-2') : '' }}</td>
+              <td class="num">{{ LedgerSummary.OPBAL < 0 ? (LedgerSummary.OPBAL * -1 | number:'1.2-2') : '' }}</td>
+            </tr>
+            <tr *ngFor="let t of LedgerRows">
+              <td>{{ t.TRANSDATE }}</td>
+              <td>{{ t.TRANSTYPE }}</td>
+              <td>{{ t.TRANSCODE }}</td>
+              <td>{{ t.NARR }} {{ t.EXP_SNAME }} {{ t.SUP_SNAME }} {{ t.ACCTNAME }}</td>
+              <td class="num dr-amt">{{ t.DRAMT | number:'1.2-2' }}</td>
+              <td class="num cr-amt">{{ t.CRAMT | number:'1.2-2' }}</td>
+            </tr>
+            <tr class="pl-summary-row" *ngIf="LedgerSummary">
+              <td colspan="4">CURRENT TOTAL</td>
+              <td class="num">{{ LedgerSummary.TLDR | number:'1.2-2' }}</td>
+              <td class="num">{{ LedgerSummary.TLCR | number:'1.2-2' }}</td>
+            </tr>
+            <tr class="pl-summary-row" *ngIf="LedgerSummary">
+              <td colspan="4">CLOSING BALANCE</td>
+              <td class="num">{{ LedgerSummary.CLBAL >= 0 ? (LedgerSummary.CLBAL | number:'1.2-2') : '' }}</td>
+              <td class="num">{{ LedgerSummary.CLBAL < 0 ? (LedgerSummary.CLBAL * -1 | number:'1.2-2') : '' }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>

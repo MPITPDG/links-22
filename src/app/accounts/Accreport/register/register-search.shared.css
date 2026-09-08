@@ -1,0 +1,203 @@
+/* ==============================================================================================
+   Shared search-screen styling for the Accreport > Register pages.
+
+   Referenced from both gst-register and gstr3b-report via styleUrls, so the two search boxes
+   cannot drift apart. Angular still scopes the rules to each component separately.
+
+   Page-specific styling (result tables, tabs, section tinting) belongs in the component's own
+   stylesheet, listed after this one in styleUrls.
+
+   Derived from the same design system as balsheetstmt.component.css / profitandlossstmt.
+   ============================================================================================== */
+
+:host {
+  display: block;
+}
+
+/* No height/overflow here on purpose: a page with a scrolling result area (gstr3b) sets those
+   itself. Forcing them here would clip the date picker's pop-up on a form-only page. */
+.br-page {
+  display: flex;
+  flex-direction: column;
+  padding: 5px 10px !important;
+  gap: 8px !important;
+  box-sizing: border-box;
+}
+
+/* ============================= */
+/* CARD                          */
+/* ============================= */
+
+.br-card {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.br-req {
+  color: #DC2626;
+}
+
+.form-control {
+  border-radius: 10px !important;
+  border: 1px solid #D1D5DB !important;
+  min-height: 30px;
+  font-size: 13px;
+}
+
+/* ============================= */
+/* BUTTONS                       */
+/* ============================= */
+
+.br-btn {
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.br-btn--primary { background: #2563EB; color: #fff; }
+.br-btn--primary:hover { background: #1D4ED8; }
+.br-btn--export  { background: #059669; color: #fff; }
+.br-btn--export:hover { background: #047857; }
+.br-btn--danger  { background: #DC2626; color: #fff; }
+.br-btn--danger:hover { background: #B91C1C; }
+.br-btn--filed   { background: #7C3AED; color: #fff; }
+.br-btn--filed:hover  { background: #6D28D9; }
+
+/* ============================= */
+/* REPORT TITLE                  */
+/* ============================= */
+
+.pl-title  { font-size: 18px; font-weight: 700; color: #111827; }
+.pl-meta   { font-size: 12px; color: #6B7280; }
+
+/* ============================= */
+/* SEARCH SCREEN                 */
+/* ============================= */
+
+.search-card-clean {
+  padding: 16px 20px !important;
+  flex-shrink: 0;
+}
+
+.clean-row-layout {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.clean-field { display: flex; flex-direction: column; }
+
+/* report title sits inside the search row; margin-right:auto pushes the fields and the
+   buttons over to the right of the same row */
+.clean-title {
+  margin-right: auto;
+  gap: 2px;
+  justify-content: center;
+}
+
+.clean-field label {
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  white-space: nowrap;
+}
+
+.clean-date {
+  flex: 0 0 150px;
+  width: 150px;
+  min-width: 150px;
+}
+
+/* inline radio group, e.g. the branch selector */
+.clean-radio {
+  justify-content: flex-end;
+}
+
+.clean-radio .radio-line {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 32px;
+  font-size: 12px;
+  color: #111827;
+}
+
+.clean-radio label.opt {
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.clean-radio input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.clean-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  margin-bottom: 1px;
+  white-space: nowrap;
+}
+
+.search-note {
+  font-size: 11px;
+  color: #6B7280;
+  padding: 10px 20px 0 20px;
+}
+
+/* ============================= */
+/* DATE PICKER OVERRIDES         */
+/* ============================= */
+
+::ng-deep .clean-date .mydp {
+  width: 150px !important;
+  min-width: 150px !important;
+  display: block !important;
+}
+
+::ng-deep .clean-date .selectiongroup {
+  height: 32px !important;
+  border: 1px solid #D1D5DB !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  overflow: visible !important;
+}
+
+::ng-deep .clean-date input {
+  height: 32px !important;
+  line-height: 32px !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  font-size: 12px !important;
+  padding-left: 8px !important;
+  background: transparent !important;
+}
+
+::ng-deep .clean-date .btnpicker,
+::ng-deep .clean-date .btnclear {
+  width: 26px !important;
+  min-width: 26px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  border: none !important;
+  background: #f8fafc !important;
+}

@@ -1,0 +1,144 @@
+
+<div class="animated fadeIn">
+  <div class="row">
+      <div class="col-sm-12">
+          <div class="card">
+               <div class="card-header formheading">
+                  <strong>{{Header| uppercase}}</strong>
+              </div> 
+          </div>
+      </div>
+  
+    <div class="row">
+         <!-- <div class="col-sm-1">  </div> -->
+        <div class="col-sm-12"> 
+          <div  class="modal-fix-body2" >
+                <table class="table table-bordered table-sm-new bgwhite">               
+                  <tr>
+                    <td  class="card-header formheading">
+                        <span class="col-form-span-label"><b>Unauthorise Booking List</b></span>
+                        
+                     </td>
+                </tr>  
+                <tr>
+                    <td>
+                            <table class="table table-bordered table-sm-new bgwhite" *ngIf ="orderbookinglist.length>0">                    
+                               
+                              <tr>
+                                <td colspan="16">
+                                   
+                                    <!-- <div  class="modal-fix-body2" > -->
+                                        <table class="table table-hover" >
+                                             
+                                                <thead>
+                                    <!-- <table class="table table-bordered table-sm-new bgwhite">  
+                                      <thead> -->
+                                                                     
+                                        <!-- <tr class="col-form-span-heading" style="white-space:nowrap;"> -->
+                                            <th class="col-form-span-label"><input type="checkbox" [(ngModel)] = "selectedAll"   (click) = "allNonTrades($event.target.checked);"></th>
+                                            <th class="col-form-span-label">Order No</th>
+                                            <th class="col-form-span-label">Style No</th>
+                                            <th class="col-form-span-label">City</th>
+                                            <th class="col-form-span-label">Mode</th>
+                                            <th class="col-form-span-label">Consignee</th>
+                                            <!-- <th class="col-form-span-label"  sortable="name" (sort)="onSort($event)" > -->
+                                                <!-- <a href="#" (click)="sortType('bdate')"[class.active]="sortBy==='bdate'"> -->
+                                                    <th class="col-form-span-label" style="color: rgb(47, 0, 255);"  >
+                                                    Booking Dt         
+                                                <!-- </a> -->
+                                                 <i (click)="onSortClick($event)" class="my-icon fa fa-chevron-up"></i>  
+                                            </th>
+                                            <th class="col-form-span-label">Docs Expect</th>
+                                            <th class="col-form-span-label">Approval Expect</th>
+                                            <th class="col-form-span-label">Cargo Expect</th>
+                                            <th class="col-form-span-label">ETD Origin</th>
+                                            <th class="col-form-span-label">Trans ETA</th>
+                                            <th class="col-form-span-label">Trans ETD</th>
+                                            <th class="col-form-span-label">ETA Dest</th>
+                                            <th class="col-form-span-label">Prepared By</th>
+
+                                            <th class="col-form-span-label" style="color: rgb(47, 0, 255);" >Prepared On
+                                                <i (click)="onSortClick1($event)" class="my-icon fa fa-chevron-up"></i>  
+                                            </th>
+                                           
+                                            
+                                                                                  
+                                        <!-- </tr> -->
+                                     </thead>
+                                    <tbody>
+                                            <tr *ngFor="let obj of orderbookinglist; let i = index">                                                        
+                                                
+                                                <td><span class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.CLIENTLOC" [checked]="obj.selected" (change)="chkonchange(obj.ORDERNO,obj.STYLENO,obj.CLIENTLOC)"/> </span></td>
+                                                <td class="col-form-span-label">{{obj.ORDERNO}}</td>  
+                                                 <td class="col-form-span-label">{{obj.STYLENO}}</td>  
+                                                 <td class="col-form-span-label">{{obj.CITY}}</td>  
+                                                 <td class="col-form-span-label">{{obj.MODE}}</td>  
+                                                 <td class="col-form-span-label">{{obj.CONSGN}}</td> 
+                                                 <td class="col-form-span-label">{{obj.BOOKINGON }}</td>  
+                                                 <td class="col-form-span-label">{{obj.DOCSEXPECT}}</td>  
+                                                 <td class="col-form-span-label">{{obj.APPROVALEXPECT}}</td>  
+                                                 <td class="col-form-span-label">{{obj.CARGOEXPECT}}</td>  
+                                                 <td class="col-form-span-label">{{obj.ETD_ORIGIN}}</td>  
+                                                 <td class="col-form-span-label">{{obj.TRANS_ETA}}</td>  
+                                                 <td class="col-form-span-label">{{obj.TRANS_ETD}}</td>  
+                                                 <td class="col-form-span-label">{{obj.ETA_DEST}}</td>  
+                                                 <td class="col-form-span-label">{{obj.CREATEDBY}}</td>  
+                                                 <td class="col-form-span-label">{{obj.CREATEDON}}</td>  
+                                                  
+                                            </tr>
+                                    </tbody>
+                                      <!-- <thead>
+                                        <tr>
+                                          <th class="th-checkbox">
+                                            <tri-state-checkbox class="toggle-all" [items]="filteredDataObservable"></tri-state-checkbox>
+                                          </th>
+                                          <th *ngFor="let column of options.columns" (click)="sortHeaderClick(column.value)" [ngClass]="{ 'sorting': isSorting(column.value), 'sorting_asc': isSortAsc(column.value), 'sorting_desc': isSortDesc(column.value) }">
+                                            <span [innerHTML]="column.name"></span>
+                                          </th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr *ngFor="let row of filteredData">
+                                           <td class="td-checkbox">
+                                            <input type="checkbox" [(ngModel)]="row.isSelected">
+                                          </td> -->
+                                          <!-- <td *ngFor="let column of options.columns">{{getCellValue(row, column)}}</td>
+                                        </tr>
+                                      </tbody> --> 
+                       
+                                 
+                                   </table>
+                                  </tr>
+                                  <!-- <tr >
+                                   <td colspan="16" class="col-form-span-heading"><b>Total Unauthorised Order Nos :</b>{{orderbookinglist.length}} </td>  
+                                     </tr>  -->
+                                       </table>
+                                     
+                                   <!-- </div> -->
+                                   </td>
+                               </tr> 
+                           </table>
+                          
+                       </div>
+                       </div>
+                     
+                      </div>
+                      <div class="col-sm-12">
+                      <table class="table table-bordered table-sm-new bgwhite">
+                          <tr >
+                              <td  colspan="16" class="col-form-span-heading"  >                                
+                                  <button class="btn btn-sm btn-success" style="float: right;"  type="submit" (click)="Add_data()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{text}}</span></button>
+                                  <button class="btn btn-sm btn-danger" style="float: right;" type="reset"> <span class="col-form-span-label" (click)="RestMain();"><i class="fa fa-ban"></i> Reset</span></button>
+                              </td>
+                          </tr>
+                          <tr >
+                              <td colspan="16" class="col-form-span-heading"><b>Total Unauthorised Order Nos :</b>{{orderbookinglist.length}} </td>  
+                                </tr> 
+                      </table>
+                  </div>
+                      <!-- <div class="col-sm-1">  </div> -->
+                  </div>
+                  
+                  
+                  
+                  

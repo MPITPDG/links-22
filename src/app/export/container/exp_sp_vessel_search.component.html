@@ -1,0 +1,75 @@
+﻿<div class="row">
+	<div class="col-sm-12">
+		<div class="card">
+			<div class="card-body"> 
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						
+						
+						<table class="table table-bordered table-sm-new">
+							 
+							<tr>
+								<td>
+									<label class="radio inline">
+										<input type="radio" value="1"   name="rlist" [(ngModel)]="vsllist" /><span class="col-form-span-label ">Vessel Name</span>
+									</label>
+								</td>
+								<td>
+									<input [(ngModel)]="vslName" type="text"  maxlength="15" class="form-control width150" [disabled]="vsllist != '1'"   maxlength="40"  >
+								</td>
+								<td>
+									<span class="col-form-span-label ">Voyage No</span>
+								</td>
+								<td>
+									<input [(ngModel)]="vsl_voyno" type="text"  maxlength="10" [disabled]="vsllist != '1'" class="form-control width150">
+								</td>
+							 
+							</tr>
+							<tr>
+								<td>
+								 	<label class="radio inline">
+										<input type="radio" value="2" [(ngModel)]="vsllist"     name="rlist"/><span class="col-form-span-label ">List Name</span>
+									</label>
+								</td>
+								<td colspan="3">								 
+									<select class="form-control width250" [(ngModel)]="vslcmpName" [disabled]="vsllist != '2'">
+										<option value="-1">Please select</option>
+										<option *ngFor="let d of vessel" value={{d.VALUEFILED}}>{{d.VSLNAME}}</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="4" class="centerlabel">
+									<button class="btn btn-sm btn-success"  type="submit" id="btnAgtAdd" name="btnAgtAdd" [disabled]="buttonStatus" (click)="onSearch()" ><span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Search</span></button>
+									
+								</td>	
+							</tr>
+						</table>
+						<table class="table table-bordered table-sm-new bgwhite" *ngIf="this.vesselSearch.length>1">
+								<thead>
+									<tr class="col-form-span-heading" style="white-space:nowrap;">
+										<th class="col-form-span-label">Vessel det</th>
+										<th class="col-form-span-label">Port</th>
+										<th class="col-form-span-label">ETD</th>
+										
+									</tr>
+								</thead>
+								<tbody class="bgwhite">
+									<tr *ngFor="let prtAgt of this.vesselSearch">
+										<td><span class="col-form-span-label anchor-link" (click)="ListOnclick(prtAgt.VSL_RTNO,prtAgt.PORT)"
+												style="cursor:pointer;">{{prtAgt.VSLNAME}}</span></td>
+				
+										<td class="col-form-span-label">{{prtAgt.PORT}}</td>
+										<td class="col-form-span-label">{{prtAgt.ETD}}</td>
+									   
+									</tr>
+								</tbody>
+							</table>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>

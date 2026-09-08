@@ -1,0 +1,329 @@
+﻿<table class="table table-bordered table-sm-new bglightmaroon">
+   <tbody>
+	  <tr *ngIf="ErrorMessage != null || ErrorMessage != ''"><td colspan="8"><span class="col-form-span-label red"><b><small>{{ErrorMessage}}</small></b></span></td></tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Chargable Weight</strong></span></td>
+		 <td colspan="5"><span class="col-form-span-label">{{Wgt}}</span></td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Gross Weight</strong></span></td>
+		 <td colspan="5"><span class="col-form-span-label">{{GrossWeight}}</span></td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Freight INR/Kg </strong></span></td>
+		 <td colspan="5">                                        
+			<ng-select [items]="[{VALUEFIELD: 'PP', TEXTFIELD: 'Prepaid'},{VALUEFIELD: 'CC', TEXTFIELD: 'Collect'},{VALUEFIELD: 'PC', TEXTFIELD: 'Prepaid + Collect'}]"
+					   bindLabel="TEXTFIELD"
+					   bindValue="VALUEFIELD"
+					   placeholder="--Select--"
+					   [(ngModel)]="FreightRate"
+					   class="form-control width120"
+					   (change)="changeFreight(FreightRate)"
+					   >
+			</ng-select>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Prepaid</strong></span></td>
+		 <td>  
+			<span class="display-inline">
+				<ng-select [items]="[{VALUEFIELD: '10'},{VALUEFIELD: '15'},{VALUEFIELD: '20'},{VALUEFIELD: '25'},{VALUEFIELD: '30'},{VALUEFIELD: '35'},{VALUEFIELD: '40'},{VALUEFIELD: '45'},{VALUEFIELD: '50'},{VALUEFIELD: '55'},{VALUEFIELD: '60'},{VALUEFIELD: '65'},{VALUEFIELD: '70'},{VALUEFIELD: '75'},{VALUEFIELD: '80'},{VALUEFIELD: '85'},{VALUEFIELD: '90'}]"
+						   bindLabel="VALUEFIELD"
+						   bindValue="VALUEFIELD"
+						   placeholder="--Select--"
+						   [(ngModel)]="PrepaidPercent"
+						   class="form-control width75"
+						   (change)="changePrepaidPercentage(PrepaidPercent)"
+						   [disabled]="FreightRate != 'PC'"
+						   >
+				</ng-select>
+				<span class="col-form-span-label"><strong>%</strong></span>
+			</span>
+		 </td>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Collect</strong></span></td>
+		 <td>
+			<span class="display-inline">
+				<input type="text" [(ngModel)]="CollectPer" class="form-control width75" [OnlyAmount]="CollectPer" [disabled]="true" />
+				<span class="col-form-span-label"><strong>%</strong></span>
+			</span>
+		</td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Freight Chargeble As </strong></span></td>
+		 <td colspan="5">
+			<span class="col-form-span-label">
+				<input type="radio" name="FreightType" [checked]="FreightChargeble == 1" (click)="changeFreightChargebleAs(1)"/>All Inclusive&nbsp;
+				<input type="radio" name="FreightType" [checked]="FreightChargeble == 2" (click)="changeFreightChargebleAs(2)"/>Freight + Surcharge
+			</span>
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><span class="col-form-span-label"><strong>Rate Agreed by</strong></span></td>
+		<td><input type="text" [(ngModel)]="RateAgreedby" class="form-control width100"/></td>
+		<td colspan="3"><span class="col-form-span-label"><strong>Rate Agreed On</strong></span></td>
+		<td><my-date-picker name="RateAgreedOn" [options]="myDatePickerOptions" [(ngModel)]="RateAgreedOn"></my-date-picker></td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><span class="col-form-span-label"><strong>Exch. Rate</strong></span></td>
+		<td><input type="text" [(ngModel)]="TxtExchRate" class="form-control width100" (keyup)="fnChkExchangeRateDrp()" [OnlyAmount]="TxtExchRate"/></td>
+		<td colspan="3">
+			<span class="display-inline">
+				<ng-select [items]="rateList"
+							bindLabel="CUR_CODE"
+							bindValue="CUR_CODE"
+							placeholder="--Select--"
+							[(ngModel)]="DrpExchRate"
+							class="form-control width120"
+							(change)="checkExchRateCurDrp(DrpExchRate)"
+							>
+				</ng-select><span class="col-form-span-label"><strong>=</strong></span>
+			</span>
+		</td>
+		<td>
+			<span class="display-inline">
+				<input type="text" [(ngModel)]="InrRate" class="form-control width120" (keyup)="fnChkExchangeRateDrp()" [OnlyAmount]="InrRate"/>
+				<span class="col-form-span-label"><strong>[INR]</strong></span>
+			</span>
+		</td>
+	  </tr>
+	  <tr>
+		 <td class="col-form-span-heading" colspan="8"><span class="col-form-span-label"><strong>Fright (Selling Rate) </strong></span></td>
+	  </tr>
+	</tbody>
+</table>
+<table class="table table-bordered table-sm-new bglightmaroon">
+   <tbody>	  
+	  <tr>
+		<td colspan="3" class="centerlabel"><span class="col-form-span-label"><strong><u>DESCRIPTION</u></strong></span></td>
+		<td colspan="2" class="centerlabel"><span class="col-form-span-label"><strong><u>PAYABLE ON / RATE</u></strong></span></td>
+		<td class="centerlabel"><span class="col-form-span-label"><strong><u>PREPAID [INR]</u></strong></span></td>
+		<td colspan="2" class="centerlabel"><span class="col-form-span-label"><strong><u>COLLECT</u></strong></span></td>
+		<td class="centerlabel"><span class="col-form-span-label"><strong><u>COLLECT [INR]</u></strong></span></td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">{{FrtSell}}</span></strong></td>
+		<td>
+			<ng-select [items]="[{VALUEFIELD: 'CW', TEXTFIELD: 'Chargeable Weight'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--Select--"
+						[(ngModel)]="RateFreightPayOn"
+						class="form-control width130"
+						>
+			</ng-select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="RateFreight" class="form-control width60" [maxlength]="9" (keyup)="fn_ChangeRate_Basic()" [OnlyAmount]="RateFreight"/>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="Ppchrg_Selling" class="form-control width100" [maxlength]="20" [OnlyAmount]="Ppchrg_Selling" [disabled]="true" />
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="Ccchrg_Selling" class="form-control width70" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--Select--"
+						[(ngModel)]="Ccchrg_SellingCur"
+						class="form-control width90"
+						(change)="fnChkExchangeRate(1, 'CC', Ccchrg_SellingCur)"
+						>
+			</ng-select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="Ccchrg_SellingInr" class="form-control width100" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		 <td class="col-form-span-heading" colspan="11"><span class="col-form-span-label"><strong>FREIGHT (SURCHARGE)</strong></span></td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">FSC</span></strong></td>
+		<td>
+			<ng-select [items]="[{VALUEFIELD: 'CW', TEXTFIELD: 'Chargeable Weight'},{VALUEFIELD: 'GW', TEXTFIELD: 'Gross Weight'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--Select--"
+						[(ngModel)]="RateFscPayOn"
+						class="form-control width130"
+						(change)="fn_ChangePayableOn('FSC')"
+						[disabled]="FreightChargeble == 1"
+						>
+			</ng-select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="RateFsc" class="form-control width60" [maxlength]="20" [OnlyAmount]="Ccchrg_SellingInr" [disabled]="FreightChargeble == 1" (keyup)="fn_ChangeRate_Surcharge('FSC')"/>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="PpFsc_Selling" class="form-control width100" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="CcFsc_Selling" class="form-control width70" [maxlength]="20"  [disabled]="true" />
+		</td>
+		<td>
+			<ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--Select--"
+						[(ngModel)]="CcFsc_SellingCur"
+						class="form-control width90"
+						(change)="fnChkExchangeRate(2, 'CC', CcFsc_SellingCur)"
+						[disabled]="FreightChargeble == 1"
+						>
+			</ng-select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="CcFsc_SellingInr" class="form-control width100" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">IRC </span></strong></td>
+		<td>
+			<ng-select [items]="[{VALUEFIELD: 'CW', TEXTFIELD: 'Chargeable Weight'},{VALUEFIELD: 'GW', TEXTFIELD: 'Gross Weight'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--Select--"
+						[(ngModel)]="RateIrcPayOn"
+						class="form-control width130"
+						(change)="fn_ChangePayableOn('IRC')"
+						[disabled]="FreightChargeble == 1"
+						>
+			</ng-select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="RateIrc" class="form-control width60" [maxlength]="20" [OnlyAmount]="RateIrc" [disabled]="FreightChargeble == 1"  (keyup)="fn_ChangeRate_Surcharge('IRC')"/>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="PpIrc_Selling" class="form-control width100" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="CcIrc_Selling" class="form-control width70" [maxlength]="20" [OnlyAmount]="CcIrc_Selling" [disabled]="true" />
+		</td>
+		<td>
+			<ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--Select--"
+						[(ngModel)]="CcIrc_SellingCur"
+						class="form-control width90"
+						(change)="fnChkExchangeRate(3, 'CC', CcIrc_SellingCur)"
+						[disabled]="FreightChargeble == 1"
+						>
+			</ng-select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="CcIrc_SellingInr" class="form-control width100" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">X-RAY</span></strong></td>
+		<td>
+			<ng-select [items]="[{VALUEFIELD: 'CW', TEXTFIELD: 'Chargeable Weight'},{VALUEFIELD: 'GW', TEXTFIELD: 'Gross Weight'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--Select--"
+						[(ngModel)]="RateXrayPayOn"
+						class="form-control width130"
+						(change)="fn_ChangePayableOn('XRAY')"
+						[disabled]="FreightChargeble == 1"
+						>
+			</ng-select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="RateXray" class="form-control width60" [maxlength]="20" [disabled]="FreightChargeble == 1" [OnlyAmount]="RateXray" (keyup)="fn_ChangeRate_Surcharge('XRAY')"/>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="PpXray_Selling" class="form-control width100" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="CcXray_Selling" class="form-control width70" [maxlength]="20"  [disabled]="true"/>
+		</td>
+		<td>
+			<ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--Select--"
+						[(ngModel)]="CcXray_SellingCur"
+						class="form-control width90"
+						(change)="fnChkExchangeRate(4, 'CC', CcXray_SellingCur)"
+						[disabled]="FreightChargeble == 1"
+						>
+			</ng-select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="CcXray_SellingInr" class="form-control width100" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">DUE AGENT</span></strong></td>
+		<td></td>
+		<td></td>
+		<td>
+			<input type="text" [(ngModel)]="Pptotagt_Selling" class="form-control width100" [maxlength]="20" (keyup)="fnCalPP_JOBFreight()"/>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="Cctotagt_Selling" class="form-control width70" [maxlength]="20" (keyup)="fnCalCC_JOBFreight()"/>
+		</td>
+		<td>
+			<ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--Select--"
+						[(ngModel)]="Cctotagt_SellingCur"
+						class="form-control width90"
+						(change)="fnChkExchangeRate(5, 'CC', Cctotagt_SellingCur)"
+						>
+			</ng-select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="Cctotagt_SellingInr" class="form-control width100" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3">
+			<strong><span class="col-form-span-label">DUE CARRIER</span></strong>
+		</td>
+		<td></td>
+		<td></td>
+		<td><input type="text" [(ngModel)]="Pptotcarr_Selling" class="form-control width100" [maxlength]="20" (keyup)="fnCalPP_JOBFreight()"/></td>
+		<td>
+			<input type="text" [(ngModel)]="Cctotcarr_Selling" class="form-control width70" [maxlength]="20" (keyup)="fnCalCC_JOBFreight()"/>
+		</td>
+		<td>
+			<ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--Select--"
+						[(ngModel)]="Cctotcarr_SellingCur"
+						class="form-control width90"
+						(change)="fnChkExchangeRate(6, 'CC', Cctotcarr_SellingCur)"
+						>
+			</ng-select>
+		</td>
+		<td><input type="text" [(ngModel)]="Cctotcarr_SellingInr" class="form-control width100" [maxlength]="20" [disabled]="true" /></td>
+	  </tr>	  
+	  <tr class="col-form-span-heading">
+		<td colspan="3"><strong><span class="col-form-span-label">TOTAL</span></strong></td>
+		<td></td>
+		<td></td>
+		<td>
+			<input type="text" [(ngModel)]="Pptot_Selling" class="form-control width100" [maxlength]="20" [disabled]="true"/>
+		</td>
+		<td></td>
+		<td></td>
+		<td>
+			<input type="text" [(ngModel)]="Cctot_Selling" class="form-control width100" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">MISCELLANEOUS CHARGES</span></strong></td>
+		<td colspan="6"><input type="text" [(ngModel)]="Othchrg_Selling" class="form-control" /></td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">REMARK</span></strong></td>
+		<td colspan="6"><input type="text" [(ngModel)]="Remark" class="form-control" /></td>
+	  </tr>
+	</tbody>
+</table>

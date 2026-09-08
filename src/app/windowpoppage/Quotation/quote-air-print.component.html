@@ -1,0 +1,162 @@
+
+<!-- <div class="watermark-layer"></div> -->
+<div class="  quotation-wrapper" id="printable-area">
+      <img src="../../../assets/img/Untitled-1.png" alt="Watermark" class="watermark-print" />
+     <div class="quotation-container ">
+
+     <header class="row header-section align-items-center">
+
+  <div class="col-8 quote-details-block">
+
+    <h6 class="quotation-title">Quote #{{quotno}}</h6>
+
+    <p class="meta-item client-company d-flex align-items-center">
+      <img src="../../../assets/icons/circle.png" alt="" class="meta-icon" />  
+      <span class="label ms-1">{{cmpname}}</span>
+    </p>
+
+    <p class="meta-item date-info d-flex align-items-center">
+      <i class="fa fa-calendar meta-icon"></i>
+      <span class="label ms-1">
+         Issued {{quotdate}} (Valid {{quotdate}} - {{validupto}})
+      </span>
+    </p>
+
+    <p class="contact-line d-flex align-items-center">
+      <i class="fa fa-user meta-icon"></i>
+      <span class="contact-email ms-1">
+        <i class="fa fa-envelope text-primary me-1"></i>
+        <a href="mailto:Info@manilal.com">Info@manilal.com</a>
+      </span>
+    </p>
+
+  </div>
+
+  <div class="col-4 text-end">
+    <img [src]="cmpimage" alt="Company Logo" class="logo">
+  </div>
+
+</header>
+
+   <section class="row item-details-section">
+  <div class="col-12 p-0">
+    <div class="summary-bar">
+      <div class="summary-item">
+        <span class="label">Incoterms:</span>
+        <span class="value">{{ incoterm }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Direction:</span>
+        <span class="value">{{ shipmenttype}}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Shipment Type:</span>
+        <span class="value">{{shipmode }}</span>
+      </div>
+   
+    </div>
+      <div class="summary-bar">
+      <div class="summary-item">
+        <span class="label">Volume</span>
+        <span class="value">{{ volume }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Weight:</span>
+        <span class="value">{{ weight }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Ch Wt:</span>
+        <span class="value">{{ chblwt }}</span>
+      </div>
+   
+    </div>
+      <div class="summary-bar">
+          
+            <div class="summary-item">
+                <span class="label">Pol:</span>
+                <span class="value">{{pol}}</span>
+            </div>
+            <div class="summary-item">
+              <!-- <img *ngIf="shipmode=='SEA'" src="assets/icons/ship-icon.svg" alt="Ship Mode" class="ship-icon-image"> -->
+                <i *ngIf="shipmode=='SEA'" class="fa fa-ship"></i> &nbsp; 
+                <span *ngIf="shipmode=='SEA'" class="label">Ocean:</span>
+                 <span *ngIf="shipmode=='AIR'" class="fa fa-air">Air:</span>
+                <span class="value">{{ocean}}</span>
+            </div>
+            <div class="summary-item ">
+                <span class="label">Pod:</span>
+                  <span class="value">{{pod}}</span>
+            </div>
+           
+        </div>
+  </div>
+</section>
+
+
+  <section class="item-details-section">
+    <table class="table item-table">
+      <thead>
+        <tr>
+          <th style="width: 55%;" class="label">Fee</th>
+          <th style="width: 10%;" class="label text-right">Units</th>
+          <th style="width: 15%;" class="label text-right">Unit Price</th>
+          <th style="width: 15%;" class="label text-right">Total Price</th>
+        </tr>
+      </thead>
+      <tbody>
+      <tr
+  *ngFor="let item of quotdtltable; let i = index"
+  [ngClass]="{
+    'charge-group-divider': item.CHARGENAME === 'TOTAL',
+    'charge-header-row': item.CHARGETYPEHEADER === 'ORIGIN' || item.CHARGETYPEHEADER === 'DESTINATION' || item.CHARGETYPEHEADER === 'PICKUP' || item.CHARGETYPEHEADER === 'OCEANFREIGHT' || item.CHARGETYPEHEADER === 'DELIVERY' 
+  }"
+>   
+          <!-- <td>{{ i + 1 }}</td> -->
+          <td>
+          
+             <span 
+        class="label"
+        [ngClass]="{
+            'labelheader': item.CHARGENAME === 'ORIGIN CHARGES' || item.CHARGENAME === 'DESTINATION CHARGES' || item.CHARGENAME === 'TOTAL'
+        }"
+    >
+        {{ item.CHARGENAME }} 
+        
+        <span 
+            *ngIf="item.CHARGENAME !== 'ORIGIN CHARGES' && item.CHARGENAME !== 'DESTINATION CHARGES' && item.CHARGENAME !== 'TOTAL'" 
+            class="small-box-separator"
+        ></span>
+    </span> 
+    
+    <span class="labelseperator" > {{item.UNITNAME}} </span>
+          </td>
+          <td class="text-right">
+            <span class="label">{{ item.UNIT }}</span>
+          </td>
+          <td class="text-right">
+            <span class="label"
+             [ngClass]="{
+            'labelheader': item.CHARGENAME  === 'TOTAL'
+        }"
+            >{{ item.UNITPRICE  }}</span>
+          </td>
+          <td class="text-right">
+            <span class="label"
+             [ngClass]="{
+            'labelheader': item.CHARGENAME  === 'TOTAL'
+        }"
+            >{{ item.TOTPRICE}}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+</div>
+
+<div class="d-flex justify-content-end no-print">
+  <button class="btn btn-primary" (click)="printDocument()">
+    <i class="fa fa-print"></i> Print Quotation
+  </button>
+</div>

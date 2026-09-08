@@ -1,0 +1,259 @@
+<div class="animated fadeIn">
+
+<!-- <div class="row no-gutters">
+    <div class="col-sm-12">
+      <div class="card">
+        <div class="card-header formheading">
+          <strong>CLP</strong>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+    <div class="row no-gutters">
+    <!-- <div class="col-md-1 col-sm-12 col-lg-1">
+    </div> -->
+    <div class="col-md-10  col-sm-12 col-lg-12" >
+         <table class="table table-bordered table-striped table-sm-new">
+                            <tr>
+                                <td class="col-form-span-heading"  colspan="12">
+                                    <span class="col-form-span-label centerlabel"> 
+                                      VESSEL DETAILS
+                                    </span>	
+                                </td>
+                            </tr>
+                              <tr class="col-form-span-heading">
+                               <td class="width500"><span class="col-form-span-label">Vessel</span></td>
+                                <td class="width230"><span class="col-form-span-label">Vessel Agent</span></td>
+                                <td class="width240"> <span class="col-form-span-label">Shpg. Line</span></td>
+                              </tr>
+                            <tr>
+                               
+                                <td >
+                                        <ng-select [items]="vessel" bindLabel="VSLNAME" bindValue="VALUEFILED"
+                                        (ngModelChange)="onfillAgent($event)" [(ngModel)]="Vsl" class="custom width500"
+                                        placeholder="--Please Select--">
+                                     </ng-select>
+                                </td>
+                               
+                                <td >
+                                    <select class="form-control width230 "  [(ngModel)]="Vslagt" (change)="onfillshipline($event.target.value)">
+                                        <option value="">Please select</option>
+                                        <option *ngFor="let d of vslAgent" value={{d.AGT_CODE}}>{{d.AGT_NAME}}</option>
+                                    </select>
+                                </td>
+                                
+                                <td >
+                                    <select class="form-control width240 "  [(ngModel)]="Vslshpgline">
+                                        <option value="">Please select</option>
+                                        <option *ngFor="let d of vslshpline" value={{d.AGT_LINER}}>{{d.LINER_NAME}}</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            
+                           
+          </table>
+           <table class="table table-bordered table-sm-new" style="width:100%">  
+             
+                           <tr>
+                            <td colspan="12">
+                                <table class="table table-bordered table-sm-new">
+                                 <tr class="col-form-span-heading">
+                               <td class="width250"><span class="col-form-span-label ">Expt No.</span></td>
+                                <td class="width200" ><span class="col-form-span-label">Pkgs</span></td>
+                                <td class="width200"><span class="col-form-span-label">Cbm</span></td>
+                                <td class="width200"><span class="col-form-span-label">Pcs</span></td>
+                                <td class="width200" ><span class="col-form-span-label">GrWt</span></td>
+                                <td class="width200"  ><span class="col-form-span-label">NetWt</span></td>  
+                              
+                            </tr>
+                            <tr>                               
+                               
+                               
+                                <td class="width250">
+                                    <select class="form-control "  [disabled]='disable_exptno' [(ngModel)]="exptno" (change)="OnChangeExjob($event.target.value)">
+                                        <option value="">Please select</option>
+                                        <option *ngFor="let d of ExptNoList" value={{d.EXPTNO}}>{{d.EXPTNO}}</option>
+                                    </select>
+                                </td>
+                                <td class="col-form-span-label width200">{{TOTAL_NOOFPKGS}}</td>
+                                <td class="col-form-span-label width200">{{TOTAL_CBM}}</td>
+                                <td class="col-form-span-label width200">{{TOTAL_NO_OF_PCS}}</td>
+                                <td  class="col-form-span-label width200">{{TOTAL_NO_GR_WT}}</td>
+                                <td  class="col-form-span-label width200">{{TOTAL_NO_NET_WT}}</td>
+                             
+                             
+                            </tr>  
+                                </table>
+
+                            </td>
+                           </tr>
+                           <tr>
+                            <td colspan="12">
+                                <table class="table table-bordered table-sm-new">
+                                <tr class="col-form-span-heading">
+                               
+                                <td class="width250"><span class="col-form-span-label">No Of Containers to Split</span></td>
+                                <td class="width200"><span class="col-form-span-label">Container Size</span></td>
+                                <td class="width200"><span class="col-form-span-label ">Container Status</span></td>
+                                <td class="width200" ><span class="col-form-span-label">Destination Port</span></td>
+                                <td class="width200" ><span class="col-form-span-label">Move Type</span></td>  
+                                <td class="width200" ><span class="col-form-span-label"></span></td>                               
+                            </tr>  
+                             <tr>
+                                <td class="width250"> <input [(ngModel)]="noofcontainers" type="text"  [disabled] ='disable_noofcontainer' class="form-control width80" maxlength="2" ></td>
+                                 <td class="width200"><div class="form-check form-check-inline"  style="display: flex;">
+                                    <select class="form-control width40 form-check-inline"  [disabled] ='disable_contsize' [(ngModel)]="cntsize">
+                                        <option value="20">20</option>
+                                        <option value="40">40</option>
+                                    </select>
+                                    <select class="form-control width50 form-check-inline" [disabled] ='disable_contsize1' [(ngModel)]="cntsize1">
+                                        <option value="F">F</option>
+                                        <option value="H">H</option>
+                                        <option value="G">GOH</option>
+                                    </select>                                    
+                                </div></td>
+                                  <td class="width200">
+                                    <select class="form-control width70"  [(ngModel)]="contstatus" [disabled] ='disable_contstatus'>
+                                        <option value="LCL/FCL">LCL/FCL </option>
+                                        <option value="FCL/FCL">FCL/FCL </option>
+                                        <option value="LCL/LCL">LCL/LCL </option>
+                                        <option value="FCL/LCL">FCL/LCL </option>
+                                        <option value="GROUPAGE">GROUPAGE </option>
+                                    </select>
+                                </td>
+
+                                <td class="width200">
+                                    <select class="form-control width150"  [(ngModel)]="destport" [disabled] ='disable_destport'>
+                                        <option value="">Please select</option>												 
+                                        <option *ngFor="let d of city" value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
+                                    </select>
+                                </td>
+                                <td class="width200"><select class="form-control width100"  [(ngModel)]="Movetype" [disabled] ='disable_movetype'>
+                                    <option value="">Please select</option>
+                                    <option value="CY/CY">CY/CY</option>
+                                    <option value="CFS/CY">CFS/CY</option>	
+                                    <option value="CFS/CFS">CFS/CFS</option>	
+                                </select>
+                                </td>
+                                 <td class="width200">
+                                      <button type="button" class="btn btn-sm btn-primary" [disabled]='disable_grnerate_btn' (click)="GenerateContainer()"><span class="col-form-span-label">
+                                        <i class="fa fa-plus"></i> Generate</span></button>
+                                 </td>
+                            </tr>      
+                                </table>
+                            </td>
+                           </tr>
+                            
+                            
+                                       
+                            <tr>
+                                <td class="col-form-span-heading"  colspan="9">
+                                    <span class="col-form-span-label centerlabel"> 
+                                      CONTAINER DETAILS
+                                    </span>	
+                                </td>
+                            </tr>
+                           <tr>
+                            <td colspan="10">
+                                <table class="table table-bordered table-sm-new" style="width:100%;"> 
+                                  <tr class="col-form-span-heading">
+                                <td><span class="col-form-span-label">Container No</span></td>
+                                 <td > <span class="col-form-span-label"><b>Steamer Seal No</b></span></td>
+                                <td> <span class="col-form-span-label "><b>Custom Seal No</b></span></td>
+                                <td><span class="col-form-span-label"><b>Freight</b></span></td>
+                                <td > <span class="col-form-span-label font-weight-bold">Pkgs</span></td>
+                                <td><span class="col-form-span-label font-weight-bold">Pcs</span></td>
+                                <td><span class="col-form-span-label font-weight-bold ">GrWt</span></td>
+                                <td  ><span class="col-form-span-label font-weight-bold ">NetWt</span></td>
+                                <td><span class="col-form-span-label font-weight-bold ">CBM</span></td>
+                                <td ><span class="col-form-span-label font-weight-bold">CLP Sq.</span></td> 
+                            </tr>
+                               <tr >
+                                <td ><input type="text" [(ngModel)]="THIS_CONTAINER_NO" class="form-control width100" maxlength="11" /></td>
+                               
+                              
+                                <td> <input [(ngModel)]="SteAgtSealno" type="text"    class="form-control width100" maxlength="20" ></td>                              
+                                <td><input [(ngModel)]="CustSealNo" type="text"    class="form-control width100" maxlength="20" ></td>	
+                                <td>
+                                    <select class="form-control width50"   [(ngModel)]="freight">
+                                        <option value="PP">PP</option>
+                                        <option value="CC">CC</option>												 
+                                    </select>
+                                </td>	
+                                <td ><input type="text" [(ngModel)]="THIS_CONTAINER_NOOFPKGS" class="form-control width100"/></td>
+                                <td><input type="text" [(ngModel)]="THIS_CONTAINER_NO_OF_PCS" class="form-control width100"/></td>
+                                <td><input type="text" [(ngModel)]="THIS_CONTAINER_NO_GR_WT" class="form-control width100"/></td>
+                                <td ><input type="text" [(ngModel)]="THIS_CONTAINER_NO_NET_WT" class="form-control width100"/></td>
+                                 <td><input type="text" [(ngModel)]="THIS_CONTAINER_CBM" class="form-control width100"/></td>
+                                  <td  ><input type="text" [(ngModel)]="THIS_CONTAINER_NO_CLP_SEQ" class="form-control width100" maxlength="2" /></td> 
+                            </tr>
+                                </table>
+
+                            </td>
+                           </tr>
+                    
+                            <tr>
+                                <td colspan="12" class="centerlabel" >
+                                    <button type="button" class="btn btn-sm btn-primary" (click)="AddChild()"><span class="col-form-span-label"><i class="fa fa-plus"></i> {{Add}}</span></button>
+                                    <button type="reset" class="btn btn-sm btn-danger" (click)="childreset()"><span class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
+                                
+                                </td>
+                            </tr>
+                            
+           </table>
+           <div class="row xyscroll" style="height:200px;background-color: white;border-left: 1px solid #d5e5f5;">								
+                            <table class="table table-bordered table-striped table-sm-new bgwhite">
+                                <thead>
+                                    <tr class="title-head formheading">
+                                        <th class="col-form-span-label"></th>
+                                        <th class="col-form-span-label">Container No</th>
+                                        <th class="col-form-span-label">Size</th>
+                                        <th class="col-form-span-label">Expt No</th>
+                                        <th class="col-form-span-label">No Of Pkg</th>
+                                        <th class="col-form-span-label">CBM</th>
+                                        <th class="col-form-span-label">No Of Pcs</th>
+                                        <th class="col-form-span-label">Grwt</th>
+                                        <th class="col-form-span-label">NetWt</th>
+                                        <th class="col-form-span-label">CLP Seq.</th>                                      
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                     <tr *ngFor="let obj of containerClp ">									 
+                                        <td>											
+                                            <i class="fa fa-pencil" (click)="EditchildExptNo(obj.ID)"></i>	
+                                            <i class="fa fa-trash" (click)="deletechildExptNo(obj.ID,obj.CONTAINERID)" ></i>											 
+                                        </td> 
+                                        <td><span class="col-form-span-label">{{obj.CONTAINERNO}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.SIZEDET}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.PKGS}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.CBM}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.PCS}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.GRWT}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.NETWT}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.CLP_SEQ}}</span></td>                                        
+                                    </tr>  
+                                </tbody>									
+                            </table>
+             </div>   
+    </div>
+    <!-- <div class="col-md-1  col-sm-12 col-lg-1">
+    </div> -->
+    </div>
+     <div class="row no-gutters">
+    <div class="col-md-1 col-sm-12 col-lg-1">
+    </div>
+     <div class="col-md-10  col-sm-12 col-lg-10 " >
+         <div class="d-flex justify-content-center">
+             <button type="button" class="btn btn-sm btn-primary mx-2" (click)="finalSubmit()"><span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Submit</span></button>
+              <button type="reset" class="btn btn-sm btn-danger mx-2" (click)="masterReset()"><span class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
+              </div>
+     </div>
+        <div class="col-md-1 col-sm-12 col-lg-1">
+    </div>
+     </div>
+ 
+    
+   
+</div>

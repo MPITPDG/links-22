@@ -1,0 +1,27 @@
+﻿<div class="animated fadeIn">
+	<div class="row">
+		<div class="col-sm-3">
+		</div>
+		<div class="col-sm-6 centerlabel">
+			<img src="assets/img/loading.gif" *ngIf="loader" />
+			<span *ngIf="errorMessage!=''">{{errorMessage}}</span>
+			<div class="card" *ngIf="companylist.length>0">
+				<div class="card-body">
+					<table class="table table-responsive-sm table-borderless table-hover">
+						<tbody>
+							<tr *ngFor="let d of companylist" (click)="setCompany(d.CMP_CODE,d.CMP_NAME,d.IS_HBLISSUE,d.IS_HAWISSUE);">
+								<td [ngStyle]="{'cursor': 'pointer'}">
+									<div [ngStyle]="{'text-decoration': 'underline', 'text-align': 'left', 'color': '#0000ff', 'font-weight':'bold','font-size': '12px'}">
+										<i class="fa fa-angle-double-right"></i>&nbsp;{{ d.CMP_NAME }}
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-3">
+		</div>
+	</div>
+</div>

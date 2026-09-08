@@ -1,0 +1,110 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>SEARCH CURRENCY EXCHANGE RATE</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">
+        </div>
+        <div class="col-sm-4">
+            <table class="table table-sm-new bgwhite">
+                <tr class="trbg">
+                    <td colspan="2">
+                        <span class="col-form-span-label"><b>SEARCH CURRENCY EXCHANGE RATE</b></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width150">
+                        <span class="col-form-span-label">Currency Type</span>
+                    </td>
+                    <td>
+                        <select class="form-control" [(ngModel)]="CurrencyType">
+                            <option value="0">-- Select --</option>
+                            <ng-template ngFor let-item [ngForOf]="CurrencyList">
+                                <option value="{{item.DATAVALUEFIELD}}">{{item.DATATEXTFIELD}}</option>
+                            </ng-template>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width150">
+                        <span class="col-form-span-label">Branch Name</span>
+                    </td>
+                    <td>
+                        <select class="form-control" [(ngModel)]="BranchName">
+                            <option value="0">-- Select --</option>
+                            <ng-template ngFor let-item [ngForOf]="BranchList">
+                                <option value="{{item.DATAVALUEFIELD}}">{{item.DATATEXTFIELD}}</option>
+                            </ng-template>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width150">
+                        <span class="col-form-span-label">From Date</span>
+                    </td>
+                    <td>
+                        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate"></my-date-picker>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width150">
+                        <span class="col-form-span-label">To Date</span>
+                    </td>
+                    <td>
+                        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate"></my-date-picker>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width90">
+                        <span class="col-form-span-label">Exchange Rate </span>
+                    </td>
+                    <td>
+                        <input type="text" [(ngModel)]="Input" class="form-control" />
+                    </td>
+                </tr>
+                <tr class="trbg centerlabel">
+                    <td colspan="2">
+                        <button type="button" name="submitButton" class="btn btn-sm btn-info" (click)="search();">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-search"></i>&nbsp;Search</span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-4">
+        </div>
+    </div><br />
+    <div class="row" *ngIf="DisplayList.length > 0">
+        <div class="col-sm-2">
+        </div>
+        <div class="col-sm-8">
+            <div class="yscroll" style="max-height: 250px">
+                <table class="table table-bordered table-sm-new bgwhite">
+                    <tr class="col-form-span-heading">
+                        <th class="width100"><span class="col-form-span-label">CURRENCY TYPE</span></th>
+                        <th><span class="col-form-span-label">BRANCH NAME</span> </th>
+                        <th class="width100"><span class="col-form-span-label">FROM</span></th>
+                        <th><span class="col-form-span-label">TO</span> </th>
+                        <th><span class="col-form-span-label">EXCHANGE RATE</span> </th>
+                    </tr>
+                    <tr *ngFor="let obj of DisplayList" class="tr-hover" (click)="goTo(obj.pk_ExchangeRateId)" style="cursor:pointer;">
+                        <td class="width150"><span class="col-form-span-label">{{obj["CURRENCY TYPE"]}}</span></td>
+                        <td><span class="col-form-span-label">{{obj["BRANCH NAME"]}}</span> </td>
+                        <td class="width150"><span class="col-form-span-label">{{obj["FROM"]}}</span></td>
+                        <td><span class="col-form-span-label">{{obj["TO"]}}</span> </td>
+                        <td class="width150"><span class="col-form-span-label">{{obj["EXCHANGE RATE"]}}</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="col-sm-2">
+        </div>
+    </div>
+</div>

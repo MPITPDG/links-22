@@ -1,0 +1,65 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>{{Header| uppercase}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">  </div>
+        <div class="col-sm-6">
+            <table class="table table-bordered table-sm-new bgwhite">       
+                <tr>
+                    <td class="col-form-span-heading" colspan="2">
+                        CITY DETAILS
+                    </td>
+                </tr>
+                <tr>   
+                    <td><span class="col-form-span-label"><b>City Code(3 digit IATA code)</b> </span></td>         
+                    <td>  <input [(ngModel)]="txtcity_code" type="text"    class="form-control width180"   >   </td> 
+                   
+                </tr>
+                
+                <tr >
+                    <td><span class="col-form-span-label"><b>City Name</b> </span></td>         
+                    <td>  <input [(ngModel)]="txtcity_name" type="text"    class="form-control width180"   >   </td>      
+                </tr>
+                 <tr>
+                    <td><span class="col-form-span-label"><b>Country</b> </span></td>         
+                    <td> 
+                        <select class="form-control width180"  [(ngModel)]="drpcity_country">
+                            <option value="">Please select</option>
+                            <option *ngFor="let d of Countrylist" value={{d.country_name}}>{{d.country_name}}</option>
+                        </select>
+                    </td> 
+                    
+                </tr>
+                <tr>
+                    <!-- <td><span class="col-form-span-label"><b></b> </span></td>          -->
+                    <td colspan="2" class="" > 
+                        <div *ngFor="let data of Transpoints" class="col-form-span-label ">
+                                <input type="checkbox" class="centerlabel" (change)="onChange(data.Transpoint, $event.target.checked)"   > {{data.Transpoint}}<br>
+                        </div>
+                        <!-- <input  type="checkbox"  [(ngModel)]="chkcity"   >  -->
+                    </td> 
+                </tr>
+                <tr class="trheader">
+                    <td colspan="2"><span class="col-form-span-label"><b> DOCUMENTATION</b> </span></td>  
+                </tr>
+                <tr>
+                    <td colspan="2" class="centerlabel"> 
+                    <button type="button" class="btn btn-sm btn-primary" (click)="finalSubmit()"><span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Submit</span></button>
+                    <button type="reset" class="btn btn-sm btn-danger"><span class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
+                    </td>
+                </tr>
+            </table>    
+        </div>
+        <!-- <div class="card-footer">
+                <button type="button" class="btn btn-sm btn-primary" (click)="finalSubmit()"><span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Submit</span></button>
+                <button type="reset" class="btn btn-sm btn-danger"><span class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
+        </div> -->
+        <div class="col-sm-3">  </div>
+    </div>

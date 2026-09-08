@@ -1,0 +1,179 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>{{Header| uppercase}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+       <div class="col-sm-2">  </div>
+        <div class="col-sm-8">
+            <table class="table table-bordered table-sm-new bgwhite">               
+                <tr >
+                    <td class="col-form-span-heading" colspan="4">
+                        User Details
+                    </td>
+                </tr>                 
+                    <tr> 
+                        <td>
+                            <span class="col-form-span-label"><b>User Name</b> </span>
+                            <span class="col-form-span-error">*</span>
+                        </td>          
+                        <td>  
+                            <input [(ngModel)]="username" type="text" class="form-control width250" maxlength="40" >   
+                        </td> 
+                        <td colspan="2" rowspan="4">
+                            <!-- <div class="image-preview mb-3" *ngIf="previewUrl">
+                                <img [src]="previewUrl" height="300" />                 
+                            </div> -->
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="col-form-span-label"><b>Password</b> </span>
+                            <span class="col-form-span-error">*</span>
+                        </td>         
+                        <td>  
+                            <input [(ngModel)]="password" type="password" class="form-control width250" maxlength="20" placeholder="New Password"   (keydown)="onKeydown($event.target.value)" required pattern="a-zA-Z0–9"  > 
+                            <span id="8char" class="col-form-span-label"> <i class="fa fa-check"  style="color:#FF0004;" ></i>&nbsp; 8 Characters Long</span>  &nbsp;  
+                            <span id="ucase" class="col-form-span-label"> <i class="fa fa-check"  style="color:#FF0004;" ></i>&nbsp;  1 Uppercase Letter </span><br>
+                        
+                                <span id="lcase" class="col-form-span-label"> <i class="fa fa-check"  style="color:#FF0004;" ></i>&nbsp;1 Lowercase Letter</span>  &nbsp; 
+                                <span id="1num" class="col-form-span-label"> <i class="fa fa-check"  style="color:#FF0004;" ></i>&nbsp;1 Number </span>
+                        </td>         
+                    </tr>
+                    <tr>                       
+                        <td>
+                            <span class="col-form-span-label"><b>Full Name</b> </span>
+                            <span class="col-form-span-error">*</span>
+                        </td>         
+                        <td>
+                            <input [(ngModel)]="fullname" type="text" class="form-control width250"> 
+                        </td>         
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="col-form-span-label"><b>Greeting</b> </span>
+                            <span class="col-form-span-error">*</span>
+                        </td>         
+                    <td>  
+                        <input [(ngModel)]="greeting" type="text" class="form-control width250" maxlength="40" > 
+                    </td>  
+                    </tr>    
+                    <tr>
+                        <td>
+                            <span class="col-form-span-label"><b>Location</b> </span>
+                            <span class="col-form-span-error">*</span>
+                        </td>         
+                    <td colspan="3"> 
+                        <select [(ngModel)]="location" placeholder="Selet Location" class="form-control width250">
+                            <option *ngFor="let ct of Locationlist" value={{ct.LOCATION}}>{{ct.LOCATION}}</option>
+                        </select> 
+                        <!-- <input [(ngModel)]="location" type="text" class="form-control width250" maxlength="40" >  -->
+                    </td>  
+                    </tr>   
+                    <tr>
+                        <td>
+                            <span class="col-form-span-label"><b>Image Name</b> </span>
+                            <span class="col-form-span-error">*</span>
+                        </td>         
+                    <td colspan="3">  
+                        <input #fileUpload type="file" accept=".png, .jpg, .jpeg" (change)="onFileChanged($event)" class="form-control width180"> 
+                         <!-- <input #fileUpload type="file" class="col-form-span-label" (change)="fileChangeEvent($event)" placeholder="Upload file..." multiple accept=".pdf" /> -->
+                    </td>  
+                    </tr>   
+                    <tr>
+                        <td>
+                            <span class="col-form-span-label"><b>E-Mail</b> </span>
+                            <!-- <span class="col-form-span-error">*</span> -->
+                        </td>         
+                    <td colspan="3">  
+                        <input [(ngModel)]="email" type="text" class="form-control width250"  (change)="onChange(email)">  
+                    </td>  
+                    </tr>
+                    <tr>
+                        <td > 
+                            <span class="col-form-span-label"><b>Date Limit</b> </span>
+                            <span class="col-form-span-error">*</span>
+                        </td>         
+                        <td colspan="3">   
+                            <my-date-picker name="datelimit" [options]="myDatePickerOptions" [(ngModel)]="datelimit"></my-date-picker>
+                        </td>  
+                    </tr>
+                    <tr>
+                        <td colspan="4" style=" display: flex; " >
+                            <span class="col-form-span-label" ><b>Equivalent to Admin</b> </span> 
+                        
+                            <span class="col-form-span-label" ><input type="checkbox" [(ngModel)]="equadmin"  class="form-control width180"  /> </span>    
+                         </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="col-form-span-label"><b>List Branch</b> </span>
+                            <span class="col-form-span-error">*</span>
+                        </td>         
+                    <td colspan="3">
+                    
+
+                    <ng-select [items]="Branchlist"  class="form-control width350"
+                    bindLabel="CITYNAME"
+                    bindValue="CITYCODE" 
+                    appendTo="body"
+                    multiple="true"  [closeOnSelect]="false"
+                    [selectableGroup]="true"
+                    [(ngModel)]="branchcode"
+                    (change)="onchnage(branchcode)">
+                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                        <input  type="checkbox" [(ngModel)]="item$.selected"  /> 
+                        {{ item.CITYNAME}}
+                     </ng-template>
+                    </ng-select>
+
+                    </td>  
+                    </tr>
+                    <tr>
+                        <td colspan="4" style=" display: flex; ">
+                            <span class="col-form-span-label" ><b>Is Resigned</b>  </span>    
+                         
+                            <span class="col-form-span-label" > <input type="checkbox" [(ngModel)]="isresigned"   class="form-control width180" /> </span>    
+                         </td> 
+                    </tr>
+                    <tr >
+                        <td class="col-form-span-heading" colspan="4">
+                            Unblock Details
+                        </td>
+                    </tr> 
+                    <tr>
+                        <td>
+                            <span class="col-form-span-label"><b>No of Days</b> </span>
+                        </td>         
+                    <td  >   
+                        <span class="col-form-span-label" colspan="3">                
+                             <input [(ngModel)]="noofdays" pattern="^[0-9]+$" type="text" class="form-control width180" maxlength="40" >  
+                        </span>    
+                    </td>
+                  
+                    </tr>
+                    
+                    <tr>
+                        <td colspan="4" style=" display: flex; ">
+                            <span class="col-form-span-label" ><b> Unblock User</b>  </span>    
+                         
+                            <span class="col-form-span-label" > <input type="checkbox" [(ngModel)]="unblock"   class="form-control width180" /> </span>    
+                         </td> 
+                    </tr>
+                     
+                    <tr>
+                        <td class="centerlabel" colspan="4">                                
+                            <button class="btn btn-sm btn-success" type="submit" (click)="Add_Profile()"> <span class="col-form-span-label"><i class="fa fa-plus" ></i> {{text}}</span></button>
+                            <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="RestMain();"><i class="fa fa-ban"></i> Reset</span></button>
+                        </td>
+                    </tr>
+            </table>
+        </div>
+        <div class="col-sm-2">  </div>
+    </div>
+</div>

@@ -1,0 +1,162 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-2">
+        </div>
+        <div class="col-sm-8">
+            <div *ngIf="links == 'L'"></div>
+            <div *ngIf="links == 'M'">
+                <table class="table table-bordered table-sm-new bgwhite">
+                    <tbody>
+                        <tr *ngIf="viewData?.Table[0]?.EXPTCANCEL == 'Y'">
+                            <td colspan="4">
+                                <span class="col-form-span-label red">
+                                    <strong>CONSIGNMENT IS CANCELLED</strong>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr *ngIf="edocView == 1">
+                            <th class="col-form-span-heading centerlabel  link-label" colspan="4">
+                                <span (click)="openEdoc()">E-Document - View/Upload File</span>
+                            </th>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">EXPORT NO </span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPTNO}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Mode Of Shipment</span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_MODE}}</span>
+                            </td>
+                            <td class="width130 centerlabel" rowspan="14">
+                                <span class="col-form-span-label" *ngIf="viewData?.Table[0]?.CLEARANCE == 'S'">
+                                    <strong>SHIPMENT CLEARANCE BY SHIPPER'S AGENT</strong>
+                                </span>
+                                <span class="col-form-span-label" *ngIf="viewData?.Table[0]?.CLEARANCE != 'S'">
+                                    <strong>SHIPMENT CLEARANCE BY US</strong>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Exporter/Shipper </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXP_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Bill To </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.BILLTO_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Agent </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.AGENT_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Consignee </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.CON_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Sourcing Agent </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.SRCAGT_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Consignee Bank </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.BANK_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Buyer Name </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.BUYER_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Loading Port </span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_LDGPORT}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">Origin City : {{viewData?.Table[0]?.ORIGIN}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Port Of Discharge </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.PORT_OF_DISCHARGE}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">I / T </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.IT}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Destination City </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.DEST_CITY}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Destination Country </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.DEST_COUNTRY}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Doc Recd. Date </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_DOCRECD}}</span>
+                            </td>
+                        </tr>
+                     
+                        <tbody>
+                </table>
+                      </div>
+          
+        </div>
+        <div class="col-sm-2">
+        </div>
+    </div>
+</div>

@@ -1,0 +1,78 @@
+﻿<div class="animated fadeIn">
+	<div class="row">
+		<div class="col-sm-2">
+		</div>
+		<div class="col-sm-8">
+			<table class="table table-bordered table-sm-new">
+				<tr class="trbg">
+					<td colspan="8"><span class="col-form-span-label"><b>SCAN DOCS SENT DATE</b></span></td>
+				</tr>
+			</table>
+			<table class="table table-bordered table-sm-new" *ngIf="viewType=='Search'">
+				<tr>
+					<td class="width150"><span class="col-form-span-label">Container No<span class="col-form-span-error"> *</span></span></td>
+					<td class="width100">
+						<input type="text" [(ngModel)]="ContainerNo" class="form-control width100" [maxlength]="11"/>
+					</td>
+					<td colspan="6">
+						<button type="button" class="btn btn-sm btn-info" name="searchButton" (click)="Search()"><span class="col-form-span-label"><i class="fa fa-search"></i>&nbsp;Search</span></button>
+					</td>
+				</tr>
+			</table>
+			<table class="table table-bordered table-sm-new" *ngIf="viewType=='List'">
+				<tr class="trbg">
+					<td class="width150"><span class="col-form-span-label"><strong>Container No</strong></span></td>
+					<td colspan="7"><span class="col-form-span-label">{{ContainerNo}}</span></td>
+				</tr>
+			</table>
+			<table class="table table-bordered table-sm-new" *ngIf="viewType=='List'">
+				<thead>
+					<tr class="col-form-span-heading" style="white-space:nowrap;">
+						<th class="centerlabel"><span class="col-form-span-label">Sent</span></th>
+						<th class="centerlabel"><span class="col-form-span-label">Origin City</span></th>
+						<th class="centerlabel"><span class="col-form-span-label">Rotation No.</span></th>
+						<th class="centerlabel"><span class="col-form-span-label">Vessel Name</span></th>
+						<th class="centerlabel"><span class="col-form-span-label">Voyage No</span></th>
+						<th class="centerlabel"><span class="col-form-span-label">ETD</span></th>
+						<th class="centerlabel"><span class="col-form-span-label">Agent Name</span></th>
+						<th class="centerlabel"><span class="col-form-span-label">SHPG Line</span></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let obj of searchList">
+						<td>
+							<input type="checkbox" [(ngModel)]="obj.Sent" *ngIf="obj.SCANDOCS === 'NO'"/>
+							<span class="col-form-span-label" *ngIf="obj.SCANDOCS !== 'NO'">{{obj.SCANDOCS}}</span>
+						</td>
+						<td><span class="col-form-span-label">{{obj.CITYCODE}}</span></td>
+						<td><span class="col-form-span-label">{{obj.EXPT_VESSEL}}</span></td>
+						<td><span class="col-form-span-label">{{obj.VSL_NAME}}</span></td>
+						<td><span class="col-form-span-label">{{obj.VSL_VOYNO}}</span></td>
+						<td><span class="col-form-span-label">{{obj.ETD}}</span></td>
+						<td><span class="col-form-span-label">{{obj.AGT_NAME}}</span></td>
+						<td><span class="col-form-span-label">{{obj.LINER}}</span></td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="table table-bordered table-sm-new">
+				<tr class="trbg centerlabel" *ngIf="ErrorMessage != ''">
+					<td colspan="8">
+						<span class="error-text">{{ErrorMessage}}</span>
+					</td>
+				</tr>
+				<tr class="trbg centerlabel">
+					<td colspan="8">
+						<button type="button" name="submitButton" class="btn btn-l btn-success" (click)="submit();" *ngIf="getCount() > 0" [disabled]="ErrorMessage != ''" #submitButton>
+							<span class="col-form-span-label"><app-font-changer [fontIndex]="'14'"></app-font-changer> Submit</span>
+						</button>
+						<button type="button" name="abortButton" class="btn btn-l btn-danger" (click)="searchList=[];ContainerNo='';viewType='Search';ErrorMessage=''">
+							<span class="col-form-span-label"><app-font-changer [fontIndex]="'6'"></app-font-changer> Reset</span>
+						</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-sm-2">
+		</div>
+	</div>
+</div>

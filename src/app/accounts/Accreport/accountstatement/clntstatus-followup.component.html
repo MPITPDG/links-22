@@ -1,0 +1,117 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header formheading">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <strong>{{Header| uppercase}}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-3">
+    </div>
+    <div class="col-sm-7">
+         <table class="table table-bordered table-sm-new bgwhite">
+
+            <tr class="trheader">
+                <td class="col-form-span-label" style="color: whitesmoke;" colspan="4">
+                    <b> CLIENT FOLLOWUP STATUS </b>
+                </td>
+            </tr>
+            <tr>
+                <td width="150px"><span class="col-form-span-label"><b>Client Name</b> </span><span class="col-form-span-error">*</span></td>
+                <td colspan="3">
+
+                    <ng-select [items]="ClientNameList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                    [(ngModel)]="ClientName" (change)="GetFollowupdtls($event.VALUEFIELD)" class="custom " placeholder="--Select--">
+                </ng-select>
+
+                </td>
+            </tr>
+            <tr>
+
+                <td width="150px"><span  class="col-form-span-label"><b>Followup Assigned To</b> </span><span class="col-form-span-error">*</span></td>
+                <td colspan="3" >  <input [(ngModel)]="AssignedTo" type="text"    class="form-control width150" maxlength="40" > </td>
+             
+
+                </tr>
+             <tr>
+                <td width="150px"><span class="col-form-span-label"><b>Client Status</b> </span></td>
+                <td colspan="3">  <input [(ngModel)]="ClStatus" type="text"  class="form-control"  > </td>
+             </tr>
+
+
+            <!-- <tr>
+                <td width="150px"><span class="col-form-span-label"><b>Assigned On</b> </span><span class="col-form-span-error">*</span>  </td>
+               <td colspan="3">
+                   <my-date-picker name="AssignedDate"   [options]="myDatePickerOptions" [(ngModel)]="AssignedDate"></my-date-picker> 
+                  
+                </td>
+            
+            </tr> -->
+            <tr>
+                <td class="width150"><span class="col-form-span-label">Assigned On</span></td>
+                <!-- <td>
+                    <span class="col-form-span-label">{{AssignedDate}}</span>
+                </td>
+                <td ><span class="col-form-span-label">{{formData.ASSIGNDT.text}}</span></td> -->
+                <td>
+                    <div class="row">
+                        <my-date-picker name="SurrenderedDate" [options]="myDatePickerOptions" [(ngModel)]="formData.ASSIGNDT.main"
+                            (ngModelChange)="setTime('ASSIGNDT','main')"></my-date-picker>
+                        <input type="text" class="form-control width30" placeholder="hh" [(ngModel)]="formData.ASSIGNDT.hour"
+                            maxlength="2" [OnlyNumber]="true" (ngModelChange)="restrictHour01to24number('ASSIGNDT')" />:
+                        <input type="text" class="form-control width30" placeholder="mm" [(ngModel)]="formData.ASSIGNDT.minute"
+                            maxlength="2" [OnlyNumber]="true" (ngModelChange)="restrictMinute00to60number('ASSIGNDT')" />
+                    </div>
+                </td>
+            </tr> 
+            <tr>
+                <td colspan="4"  class="centerlabel">
+                    <button class="btn btn-sm btn-success" type="submit" (click)="Addrcrd()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{txtchild}}</span></button>
+                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Resetrcrd();"><i class="fa fa-ban"></i> Reset</span></button>
+                </td>
+            </tr>
+          
+
+        <tr>
+             <td colspan="4" >
+                <div class="row xyscroll"    > 
+                    <table class="table table-responsive-sm table-bordered"  *ngIf="clntflpList.length>0" >
+                        <thead>
+                            <tr class="bakgrdliteBlue">
+                             
+                                <th class="col-form-span-label  font-weight-bold headerwhite">Client Name</th>
+                                <th  class="col-form-span-label  font-weight-bold headerwhite">Assigned To</th>
+                                <th  class="col-form-span-label  font-weight-bold headerwhite">Client Status</th>
+                                <th  class="col-form-span-label  font-weight-bold headerwhite">Assigned On</th>
+                                <th  class="col-form-span-label  font-weight-bold headerwhite">Assigned By</th>
+                            </tr>
+                        </thead>
+                         <tbody  >
+                            <tr *ngFor="let obj of clntflpList">
+                            
+                               <td><span class="col-form-span-label"  [innerHtml]="obj.EXP_NAME"> </span></td>
+                               <td><span class="col-form-span-label">{{obj.FOLLOW_ASSIGNTO}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.CLIENT_STATUS}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.ASSIGN_ON}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.ASSIGN_BY}}</span></td>
+                             
+                            </tr>
+                        </tbody>  
+                    </table>
+               </div> 
+             </td>
+        </tr>
+        
+    </table>   
+    </div>
+
+
+    <div class="col-sm-2">
+    </div>
+</div>

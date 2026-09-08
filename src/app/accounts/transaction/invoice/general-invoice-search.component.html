@@ -1,0 +1,175 @@
+<div class="animated fadeIn">
+    <div class="container">
+        <div class="row" *ngIf="Searchdata_list.length==0">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-6">
+                <table class="table table-bordered table-sm-new bgwhite" style="font-family:  Verdana;font-size: 12px;">
+                    <tbody style='height:30px'>
+                        <tr>
+                            <td class="col-form-span-heading" colspan="5">
+                                INVOICE SEARCH
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="radio" name="exampleRadios" value='INVOICENO'  [(ngModel)]="exampleRadios1">&nbsp;  Invoice No
+                            </td>
+                            <td class="col-form-span-label width240" colspan="4">
+                                <div style="display:flex;">
+                                    <input type="text" class="form-control width180" [maxlength]="15" [OnlyNumber]="true" [(ngModel)]="invoiceno" [disabled]="exampleRadios1 != 'INVOICENO'">
+                                    <button class="btn btn-sm btn-success" type="submit"  (click)="InvoicePrint(invoiceno)"><span class="col-form-span-label"><i   class="fa fa-print"></i>Print</span></button>
+                                    <button class="btn btn-sm btn-danger" type="reset"> <span  class="col-form-span-label" (click)="InvoiceView(invoiceno);"><i  class="fa fa-search"></i>View</span></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">
+                                <table>
+                                    <tr>
+                                        <td class="col-form-span-label width100">
+                                            <input type="radio" name="exampleRadios" value='CLIENT'  [(ngModel)]="exampleRadios1"> Client Name
+                                        </td>
+                                        <td class="col-form-span-label width500" colspan="4">
+                                            <ng-select [items]="clientable"
+                                                      bindLabel="EXP_NAME_CITY"
+                                                      bindValue="EXP_CODE"
+                                                      [(ngModel)]="client" class="custom"
+                                                      placeholder="--Please Select Client --" 
+                                                     [disabled]="exampleRadios1 != 'CLIENT'">
+                                             </ng-select>
+
+                                    
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <span class="col-form-span-label width150"><b>Start Date</b> </span>
+                                            <span class="col-form-span-error">*</span>
+                                        </td>
+                                        <td>
+                                            <my-date-picker name="StartDate" [options]="myDatePickerOptions"  [(ngModel)]="client_startdate" [disabled]="exampleRadios1 != 'CLIENT'">
+                                            </my-date-picker>
+                                        </td>
+                                        <td>
+                                            <span class="col-form-span-label width150"><b>End Date</b> </span>
+                                            <span class="col-form-span-error">*</span>
+                                        </td>
+                                        <td>
+                                            <my-date-picker name="EndDate" [options]="myDatePickerOptions"  [(ngModel)]="client_enddate" [disabled]="exampleRadios1 != 'CLIENT'">
+                                            </my-date-picker>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-form-span-label width100">
+                                <input type="radio" name="exampleRadios" value='JOBNO' [(ngModel)]="exampleRadios1">&nbsp;   Job No
+                            </td>
+                            <td class="col-form-span-label width240" colspan="4">
+                                <input type="text" class="form-control width180" [(ngModel)]="jobno"  [maxlength]="15" [OnlyNumber]="true" [disabled]="exampleRadios1 != 'JOBNO'">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-form-span-label width100">
+                                <input type="radio" name="exampleRadios" value='AMOUNT'  [(ngModel)]="exampleRadios1">&nbsp;  Amount
+                            </td>
+                            <td class="col-form-span-label width240" colspan="4">
+                                <input type="text" class="form-control width180" [(ngModel)]="amount"  [disabled]="exampleRadios1 != 'AMOUNT'">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-form-span-label width100">
+                             <input type="radio" name="exampleRadios" id="exampleRadios2" value="DATE"  [(ngModel)]="exampleRadios1"> Date Wise
+                            </td>
+                            <td>
+                                <span class="col-form-span-label width150"><b>Start Date</b> </span>
+                                <span class="col-form-span-error">*</span>
+                            </td>
+                            <td>
+                                <my-date-picker name="StartDate" [options]="myDatePickerOptions"   [(ngModel)]="datewise_startdate" [disabled]="exampleRadios1 != 'DATE'">
+                                </my-date-picker>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label width150"><b>End Date</b> </span>
+                                <span class="col-form-span-error">*</span>
+                            </td>
+                            <td>
+                                <my-date-picker name="EndDate" [options]="myDatePickerOptions"   [(ngModel)]="datewise_enddate" [disabled]="exampleRadios1 != 'DATE'">
+                                </my-date-picker>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td class="col-form-span-label width100" colspan="2">
+                                <input type="radio" name="exampleRadios" value="6" [(ngModel)]="exampleRadios1"> Print  All Invoice of That Day
+                            </td>
+                            <td colspan="3">
+                                <my-date-picker name="StartDate" [options]="myDatePickerOptions"
+                                    [(ngModel)]="printall_date" [disabled]="exampleRadios1 != '6'">
+                                </my-date-picker>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td colspan="5" class="centerlabel">
+                                <button class="btn btn-sm btn-success" type="submit" (click)="searchlist()"><span
+                                        class="col-form-span-label"><i class="fa fa-search"></i> Search</span></button>
+                                <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                                        (click)="reset();"><i class="fa fa-ban"></i> Reset</span></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-3"></div>
+        </div>
+         <div *ngIf="Searchdata_list.length >1" >  
+            <!-- <button class="btn btn-sm btn-warning" style="float: right;" (click)="back();"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to search</u></span></button> -->
+            <button class="btn btn-sm btn-warning" style="float: right;" (click)="Searchdata_list=[]"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to search</u></span></button>
+       </div>
+      
+       
+                <main *ngIf="Searchdata_list.length >1"> 
+                <div id="content"> 
+                <div class="table-wrapper">
+                <table class="table table-bordered table-sm-new bgwhite"> 
+                    <thead class="title-head formheading" >
+                        <tr > 
+                            <th *ngIf="exampleRadios1=='6'" class="centerlabel"><input type="checkbox" [(ngModel)]='checkbox'  (change)="checkAll($event)" /> &nbsp; </th>
+                            <th align="center">INV NO</th>
+                            <th align="center"  [class.active]="order === 'INV_DATE'" (click)="setOrder('INV_DATE')">INV DATE  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
+                            <th align="center" [class.active]="order === 'EXP_NAME'" (click)="setOrder('EXP_NAME')" >CLIENT  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
+                            <th align="center"  [class.active]="order === 'INV_BILLTYPE'" (click)="setOrder('INV_BILLTYPE')">BILLTYPE  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
+                           
+                            <th  *ngIf="exampleRadios1!='6'"  [class.active]="order === 'INVOICED_ON'" (click)="setOrder('INVOICED_ON')"  align="center">INVOICED ON <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
+                            <th  *ngIf="exampleRadios1!='6'"  align="center">AUTHORISED ON</th>
+                            <th  *ngIf="exampleRadios1!='6'"  [class.active]="order === 'AUTHORISEDBY'" (click)="setOrder('AUTHORISEDBY')"  align="center">AUTHORISED BY  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
+                            <th  *ngIf="exampleRadios1=='6'"  [class.active]="order === 'TOTALAMT'" (click)="setOrder('TOTALAMT')"  align="center">TOTAL AMT  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
+                        </tr>
+                    </thead>
+                    <tbody *ngIf="Searchdata_list.length > 1">                       
+                        <tr *ngFor="let data of Searchdata_list | orderBy: order:reverse:'case-insensitive'">
+                            <td *ngIf="exampleRadios1=='6'" class="centerlabel"> <input type="checkbox" [(ngModel)]="data.Checked" (ngModelChange)="getCheckboxValues($event,data.INV_NO)"> &nbsp; </td>
+                            <td><span class="col-form-span-label anchor-link"  (click)="ListOnclick(data.INV_NO)">{{data.INV_NO}}</span>  </td>
+                            <td><span class="col-form-span-label">{{data.INV_DATE}}</span></td>
+                            <td><span class="col-form-span-label">{{data.EXP_NAME}}</span></td>
+                            <td><span class="col-form-span-label">{{data.INV_BILLTYPE}}</span></td>                           
+                            <td *ngIf="exampleRadios1!='6'" ><span class="col-form-span-label">{{data.INVOICED_ON}}</span></td>
+                            <td *ngIf="exampleRadios1!='6'"><span class="col-form-span-label">{{data.AUTHORISEDON}}</span></td>
+                            <td *ngIf="exampleRadios1!='6'"><span class="col-form-span-label">{{data.AUTHORISEDBY}}</span></td>
+                            <td *ngIf="exampleRadios1=='6'"><span class="col-form-span-label">{{data.TOTALAMT}}</span></td>
+                        </tr>
+                    </tbody>
+                    <tr>
+                        <td *ngIf="exampleRadios1=='6'" colspan="10" class="right-text pr-2">
+                            <button class="btn btn-sm btn-success" type="submit" (click)="PrintInvoice()"> <span  class="col-form-span-label"><i class="fa fa-print"></i>&nbsp;Print</span></button>
+                        </td>
+                    </tr>
+                </table>
+                </div>                    
+            </div>
+        </main>     
+    </div>
+</div>

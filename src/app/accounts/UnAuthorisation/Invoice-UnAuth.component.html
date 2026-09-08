@@ -1,0 +1,347 @@
+<div class="animated fadeIn">
+  <div class="row no-gutters">
+    <div class="col-sm-12">
+      <div class="card">
+        <div class="card-header formheading">
+          <strong>UnAuthorise Printing Invoice List</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row no-gutters">
+    <div class="col-md-1 col-sm-12 col-lg-1">
+    </div>
+    <div class="col-md-10  col-sm-12 col-lg-10" style="overflow-y: auto;height: 500px;">
+      <table class="table table-bordered table-sm-new bgwhite  ">
+        <thead>
+          <tr>
+            <td colspan="8">
+                <div class="input-group input-group-rounded"  style="float: right;width: 300px;font-family: verdana;font-size:11px;padding: 1px;">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" style="padding: 0px;"><i class="fa fa-search"></i></span>
+                    </div>
+                    <input class="form-control" type="search" [(ngModel)]="searchString" autocomplete="off"
+                        placeholder="Search">
+                </div>
+              <!-- <input type="text"  [(ngModel)]="searchString"
+                style="float: right;width: 200px;font-family: verdana;font-size:11px;padding: 1px;"
+                placeholder="Search by Crt Number"> -->
+            </td>
+          </tr>
+          <tr class="col-form-span-heading" style="white-space:nowrap;">
+            <th class="col-form-span-label"  style="  background-color: #004980; color: white;" > <input type="checkbox" [(ngModel)]='checkbox' (change)="checkAll($event)" />   &nbsp; </th>
+            <th class="col-form-span-label"  style="  background-color: #004980; color: white;" > Trans Type</th>
+            <th  class="col-form-span-label"  style="  background-color: #004980; color: white;"  [class.active]="order === 'INV_CRTNO'" (click)="setOrder('INV_CRTNO')">  Inv No   <span [hidden]="reverse">▼  </span>   <span [hidden]="!reverse">▲</span>  </th>
+            <th class="col-form-span-label"  style="  background-color: #004980; color: white;"  [class.active]="order === 'INV_CRTDT'" (click)="setOrder('INV_CRTDT')">   Inv Date  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span>  </th>
+            <th class="col-form-span-label"  style="  background-color: #004980; color: white;"   [class.active]="order === 'CREATEDBY'" (click)="setOrder('CREATEDBY')">  Prepared By  <span [hidden]="reverse">▼</span> <span [hidden]="!reverse">▲</span>  </th>
+            <th class="col-form-span-label"  style="  background-color: #004980; color: white;"  [class.active]="order === 'INV_CRT_DAT'" (click)="setOrder('INV_CRT_DAT')" >Prepared On  <span [hidden]="reverse">▼</span> <span [hidden]="!reverse">▲</span>  </th>
+            <th class="col-form-span-label"  style="  background-color: #004980; color: white;"  [class.active]="order === 'CLIENTNAME'" (click)="setOrder('CLIENTNAME')"> Client  <span [hidden]="reverse">▼</span>   <span [hidden]="!reverse">▲</span>   </th>
+            <th class="col-form-span-label"  style="  background-color: #004980; color: white;" [class.active]="order === 'TOTAL_AMT'" (click)="setOrder('TOTAL_AMT')"> Amount  <span [hidden]="reverse">▼</span> <span [hidden]="!reverse">▲</span>  </th>
+          </tr>
+        </thead>
+        <tbody class="bgwhite">
+          <tr
+            *ngFor="let obj of unauthtable | accountpipefilter: searchString|orderBy: order:reverse:'case-insensitive'|paginate: { itemsPerPage:25, currentPage: PageActual }">
+            <td class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.Checked" (ngModelChange)="getCheckboxValues($event,obj.INV_CRTNO)"> &nbsp; </td>
+            <td class="col-form-span-label">{{obj.TRNS_TYPE}}</td>
+            <td class="col-form-span-label"  (click)="datapopup(obj.INV_CRTNO,template)" >{{obj.INV_CRTNO}}</td> 
+          
+            <td class="col-form-span-label">{{obj.INV_CRTDT}}</td>
+            <td class="col-form-span-label">{{obj.CREATEDBY}}</td>
+            <td class="col-form-span-label">{{obj.INV_CRT_DAT}}</td>
+            <td class="col-form-span-label" [innerHTML]="obj.CLIENTNAME"></td>
+            <td class="col-form-span-label" style="text-align: right;">{{obj.TOTAL_AMT|number:'2.2-4'}}</td>
+          </tr>
+        </tbody>
+        <tr>
+          <td colspan="8" class="right-text pr-2">
+            <button class="btn btn-sm btn-success" type="submit" (click)="unauthdata()"> <span
+                class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Authorize</span></button>
+            <button class="btn btn-sm btn-danger" type="submit" (click)="abortdata()">
+              <span class="col-form-span-label"><i class="fa fa-ban"></i>Abort</span></button>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="8">
+            <div class="row justify-content-center no-gutters"
+              style="font-family:verdana;font-size: 11px;padding: 1px;">
+              <pagination-controls (pageChange)="PageActual=$event" autoHide="true"></pagination-controls>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+    </div>
+    <div class="col-md-1  col-sm-12 col-lg-1">
+    </div>
+  </div>
+</div>
+ 
+ <!-- <ng-template #template>
+    <div class="modal-header" style="background-color: #62bada">
+      <strong>INVOICE DETAIL VIEW</strong>        
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button> 
+  </div>
+<div class="modal-body"  style="height:500px;overflow-y: auto;">
+<div class="container">
+<div class="row">
+<div class="col-md-12">
+  <table class="table table-bordered table-sm-new bgwhite">                                 
+    <tr>
+        <td class="col-form-span-heading " colspan="4">
+          General Details
+        </td>
+    </tr>
+    <tr>
+      <td><span class="col-form-span-label"><b>Invoice No </b> </span></td>         
+      <td> <span class="col-form-span-label" >{{INV_NO}}</span> </td>  
+      <td><span class="col-form-span-label"><b>Invoice Date	 </b> </span></td>         
+      <td><span class="col-form-span-label" >{{INV_DATE}}</span>  </td>   
+    </tr>
+    <tr>
+      <td class="col-form-span-heading  " colspan="4">
+        Job Details
+      </td>
+  </tr>
+  <tr>
+    <td class="col-form-span p-1" colspan="4">
+    </td>
+</tr>
+<tr>
+<td colspan="4">
+<table class="table table-bordered table-sm-new bgwhite ">   
+  <thead>
+    <tr class="col-form-span-heading">
+      <th class="col-form-span-label" colspan="2">Job No</th>
+      <th class="col-form-span-label">Packages</th>
+      <th class="col-form-span-label">Prop.Weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of datatabl_1">
+      <td class="col-form-span-label" colspan="2">{{data.inv_jobno}}</td>
+      <td class="col-form-span-label">{{data.inv_pkgs}}</td>
+      <td class="col-form-span-label">{{data.inv_grwt}}</td>
+    </tr>
+    </tbody>
+    </table>
+    </td>
+</tr>
+<tr>
+  <td class="col-form-span-heading  " colspan="4">
+    Main Details
+  </td>
+</tr>
+<tr>
+<td><span class="col-form-span-label" ><b>Client Name	 </b> </span></td>         
+<td colspan="3"> <span class="col-form-span-label" >{{CLIENTNAME}}</span> </td>    
+</tr>
+<tr>
+<td><span class="col-form-span-label" ><b>Bill To Address</b> </span></td>         
+<td colspan="3"> <span class="col-form-span-label"  [innerHTML]="BILLTO_INVADDR"></span> </td>   
+</tr>
+<tr><td  colspan="4">
+<hr style="border:2px solid #c2cfd6;padding: 0px;margin:0px;"></td></tr>
+
+<tr>
+<td><span class="col-form-span-label"><b>Document Through	 </b> </span></td>         
+<td colspan="3"> <span class="col-form-span-label" >{{CLIENTNAME}}</span> </td>   
+</tr>
+<tr>
+<td><span class="col-form-span-label"><b>Bill Type</b> </span></td>         
+<td> <span class="col-form-span-label" >{{INV_BILLTYPE}}</span> </td>  
+<td><span class="col-form-span-label"><b>Advanced Received </b> </span></td>         
+<td><span class="col-form-span-label" >{{INV_ADVANCE}}</span>  </td>   
+</tr>
+<tr>
+<td><span class="col-form-span-label"><b>Number Of Packages</b> </span></td>         
+<td> <span class="col-form-span-label" >{{INV_PKGS}}</span> </td>  
+<td><span class="col-form-span-label"><b>	Volume </b> </span></td>         
+<td><span class="col-form-span-label" >{{INV_VOL}}</span>  </td>   
+</tr>
+<tr>
+<td><span class="col-form-span-label"><b>Number Of Pieces</b> </span></td>         
+<td> <span class="col-form-span-label" >{{INV_NOOFPCS}}</span> </td>  
+<td><span class="col-form-span-label"><b>Weight Kilo </b> </span></td>         
+<td><span class="col-form-span-label" >{{INV_WT}}</span>  </td>   
+</tr>
+<tr>
+<td><span class="col-form-span-label"><b>Client Reference </b> </span></td>         
+<td> <span class="col-form-span-label" >{{INV_CLIENTREF}}</span> </td>  
+<td><span class="col-form-span-label"><b>Carrier</b> </span></td>         
+<td><span class="col-form-span-label" >{{INV_CARRIER}}</span>  </td>   
+</tr>
+<tr>
+<td><span class="col-form-span-label"><b>Goods </b> </span></td>         
+<td> <span class="col-form-span-label" >{{INV_GOODS}}</span> </td>  
+<td><span class="col-form-span-label"><b>Service Tax Rate </b> </span></td>         
+<td><span class="col-form-span-label" >{{INV_TAX}}</span>  </td>   
+</tr>
+<tr>
+<td><span class="col-form-span-label"><b>HOUSE (A.W.B./B/L) </b> </span></td>         
+<td> <span class="col-form-span-label" >{{INV_HAWBNO}}</span> </td>  
+<td><span class="col-form-span-label"><b>Date	 </b> </span></td>         
+<td><span class="col-form-span-label" >{{INV_HAWBDT}}</span>  </td>   
+</tr>
+<tr>
+<td><span class="col-form-span-label" colspan="4"><b>Pay By Date </b> </span></td>         
+<td colspan="3"> <span class="col-form-span-label" >{{PAYBLEBYDT}}</span> </td>    
+</tr>
+<tr>
+<td class="col-form-span-heading  " colspan="4">
+  Narration  Details
+</td>
+</tr>
+<tr>
+<td><span class="col-form-span-label" colspan="4"><b>Narration </b> </span></td>         
+<td colspan="3"> <span class="col-form-span-label"  [innerHTML]="NARRATION"></span> </td>    
+</tr>
+<tr>
+<td class="col-form-span-heading  " colspan="4">
+Currency Details
+
+</td>
+</tr>
+<tr>
+<td><span class="col-form-span-label" colspan="4"><b>Invoice Currency	 </b> </span></td>         
+<td colspan="3"> <span class="col-form-span-label" >{{CUR_NAME}}</span> </td>    
+</tr>
+<tr>
+<td><span class="col-form-span-label" colspan="4"><b>Exchange Rate
+</b> </span></td>         
+<td colspan="3"> <span class="col-form-span-label" ></span> </td>    
+</tr>
+<tr>
+<td><span class="col-form-span-label" colspan="4"><b>Rupees </b> </span></td> 
+<td>{{INV_CURRATE}}</td>        
+<td> <span class="col-form-span-label" >{{CUR_NAME}}</span> </td>  
+<td></td>  
+</tr>
+<tr>
+<td class="col-form-span-heading  " colspan="4">
+Charges  Details
+</td>
+</tr>
+<tr>
+<td class="col-form-span p-1" colspan="4">
+</td>
+</tr>
+<tr>
+<td colspan="4">
+<table class="table table-bordered table-sm-new bgwhite ">   
+<thead>
+<tr class="col-form-span-heading ">
+  <th class="col-form-span-label">Charg Code</th>
+  <th class="col-form-span-label">Account Name</th>
+  <th class="col-form-span-label">Description</th>
+  <th class="col-form-span-label">Description</th>
+  <th class="col-form-span-label">Tax</th>
+  <th class="col-form-span-label">Qty	</th>
+  <th class="col-form-span-label">Rate/Qty	</th>
+  <th class="col-form-span-label">Amount</th>
+  <th class="col-form-span-label">	Taxable Amount</th>
+</tr>
+</thead>
+<tbody>
+<tr *ngFor="let data of datatabl_4">
+  <td class="col-form-span-label" >{{data.INV_CHRGCODE}}</td>
+  <td class="col-form-span-label" > <span [innerHTML]="data.ACCTNAME"></span> </td>
+  <td class="col-form-span-label">{{data.CHRG_DESC}}</td>
+  <td class="col-form-span-label">{{data.INV_DESC}}</td>
+  <td class="col-form-span-label">{{data.INV_TAXABLE}}</td>
+  <td class="col-form-span-label"></td>
+  <td class="col-form-span-label" >{{data.RATE}}</td>
+  <td class="col-form-span-label">{{data.INV_AMOUNT}}</td>
+  <td class="col-form-span-label">{{data.TAXABLEAMT}}</td>
+</tr>
+<tr *ngFor="let data of datatabl_5">
+  <td  colspan="5"> </td>
+  <td></td>
+  <td></td>
+  <td class="col-form-span-label" style="font-weight: bold;">{{data.NONTAXABLEAMT}}</td>
+  <td  class="col-form-span-label" style="font-weight: bold;"> {{data.TAXAMT}}</td>
+</tr>
+<tr *ngFor="let data of datatabl_9">
+  <td class="col-form-span-label" colspan="5"> <span [innerHTML]="data.DESC1"></span> </td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="col-form-span-label" > <span [innerHTML]="data.INV_INRAMT"></span> </td>
+</tr>
+<tr  *ngFor="let data of datatabl_5">
+  <td colspan="3"> </td>
+  <td class="col-form-span-label" colspan="4" style="font-weight: bold;">Total Invoice Amount</td>
+  <td></td>
+  <td class="col-form-span-label" style="font-weight: bold;">{{data.TOTALAMT}}</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr>
+<td class="col-form-span-heading  " colspan="4">
+Enclosure Details
+</td>
+</tr>
+<tr>
+<td class="col-form-span p-1" colspan="4">
+</td>
+</tr>
+<tr>
+<td colspan="4">
+<table class="table table-bordered table-sm-new bgwhite ">   
+<thead>
+<tr class="col-form-span-heading ">
+  <th class="col-form-span-label">Enclosure Code	</th>
+  <th class="col-form-span-label">Description</th>
+  <th class="col-form-span-label">Numbers</th>
+</tr>
+</thead>
+<tbody>
+<tr *ngFor="let data of datatabl_6">
+  <td class="col-form-span-label" >{{data.inv_enclcode}}</td>
+  <td class="col-form-span-label">{{data.inv_desc}}</td>
+  <td class="col-form-span-label">{{data.inv_number}}</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr>
+<td class="col-form-span-heading " colspan="4">
+Despatch Details
+</td>
+</tr>
+<tr>
+<td class="col-form-span p-1" colspan="4">
+</td>
+</tr>
+<tr>
+<td colspan="4">
+<table class="table table-bordered table-sm-new bgwhite ">   
+<thead>
+<tr class="col-form-span-heading ">
+  <th class="col-form-span-label">Despatch Code	</th>
+  <th class="col-form-span-label">Description</th>
+  <th class="col-form-span-label">Numbers</th>
+</tr>
+</thead>
+<tbody>
+<tr *ngFor="let data of datatabl_7">
+  <td class="col-form-span-label" >{{data.inv_despcode}}</td>
+  <td class="col-form-span-label">{{data.inv_desc}}</td>
+  <td class="col-form-span-label">{{data.inv_number}}</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+    </table>
+</div></div>
+</div>
+</div>
+<div class="modal-footer" style="background-color: #62bada;height: 30px;">
+</div>
+</ng-template>     -->

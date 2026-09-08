@@ -1,0 +1,221 @@
+import { Component, OnInit } from '@angular/core';
+import { IMyDpOptions } from 'mydatepicker';
+import { DataService } from '../../../shared/service/dataService';
+import { LoginService } from '../../../shared/service/loginService';
+import { ToastCommonService } from '../../../shared/service/toastService';
+import { LoaderService } from '../../../shared/service/loader.service';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
+import { DatePipe } from '@angular/common';
+@Component({
+    selector: 'app-InvPurchase',
+    templateUrl: './invpurchase.component.html',
+    styles: []
+  })
+  export class AIRFREIGHT implements OnInit {
+
+    public myDatePickerOptionsRpt: IMyDpOptions = {
+      dateFormat: 'dd/mm/yyyy',
+      inline: false,
+      height: '20px',
+      width: '150px',
+      componentDisabled: false,
+      selectionTxtFontSize: '12px',
+      editableDateField: false,
+      sunHighlight: true,
+      satHighlight: true,
+      firstDayOfWeek: 'su',
+      openSelectorTopOfInput: false,
+      openSelectorOnInputClick: true,
+      selectorHeight: '180px',
+      selectorWidth: '200px'
+    };
+    FromDate;
+    ToDate;
+    DataList = [] ;
+    DataListxl= [] ;
+    dataForExcel = [];
+    Branch:string="";
+    BranchName:string="";
+    City:string="";
+    Header:string="MIS - AIR FREIGHT ";
+    DataHeader= [];
+    subheader:string="MIS -AIR FREIGHT  ";
+    Ondate: any;
+    Ondatetime: any;
+    cmpnyname:string;
+    Mode:string;
+    constructor(private _dataService: DataService,
+        private _toasterService: ToastCommonService,
+        private loaderService: LoaderService,
+        private http: HttpClient, private datePipe: DatePipe,
+        private _activatedRoute: ActivatedRoute,private _router:Router,
+        private _loginService: LoginService,
+        private exportser: ExportexcelService,
+      ) { }
+      ngOnInit() { 
+        this._activatedRoute.params.subscribe(params => {
+            this.Mode = params["Mode"]})
+            if(this.Mode=='FRTP'){
+              this.Header='FREIGHT PAYABLE';
+              this.subheader='FREIGHT PAYABLE';
+              this.verifyPermission('380','View')  
+             }
+             else  {
+              this.Header='AIR FREIGHT';
+              this.subheader='AIR FREIGHT';
+              this.verifyPermission('339','View')  
+              
+             }
+        this.City=this._loginService.getLogin()[0].CITYNAME
+        // this.FromDate=this._loginService.getLogin()[0].FINANCIAL_YEAR.STARTDATE///this._dataService.datechnge(this._loginService.getLogin()[0].FINANCIAL_YEAR.STARTDATE)
+        // this.ToDate = new Date();
+        // this.ToDate =  this._dataService.datechnge1(this.ToDate)
+        this.Ondate=new Date();
+        this.Ondatetime=new Date();
+        this.Ondate=this._dataService.datechnge1(this.Ondate)
+        this.GetCompanyName();    
+      }
+      verifyPermission(formId, userMode) {
+        this.loaderService.display(true);
+        this._loginService.verifyRights(formId, '')
+            .subscribe((data: any) => {          
+               this._loginService.checkVerify(userMode, data);
+               this.loaderService.display(false);
+    
+            });
+    }
+      FromDateChanged(ev){
+        this.FromDate=ev.formatted
+      }
+      ToDateChanged(ev){
+      this.ToDate=ev.formatted
+      }
+
+      GetCompanyName()
+      {
+      const jsonmaster = {
+          CmpCode: this._loginService.getLogin()[0].CMPCODE,
+          CityCode: this._loginService.getLogin()[0].CITYCODE,
+        }
+        this._dataService.getData("Accounts/fn_Acc_Rpt_Common_CompanyDetails", jsonmaster).subscribe((data: any) => {
+          this.cmpnyname = data.Table[0].cmp_name
+        })
+      }
+      ExportData() {
+        if(this.Mode=='FRTP'){
+          this.ExportFrtPayable();
+        }
+      else {
+        this.ExportInvPur();
+      }
+    }
+    ExportInvPur(){
+      if (!this.FromDate) {
+        alert("Please select From Date.");
+        return false;
+      }
+      else if (!this.ToDate) {
+          alert("Please select To Date.");
+          return false;
+      }
+   
+      const jsonItem = {
+        FromDate:this.FromDate,
+        ToDate:this.ToDate,
+        cmpcode: this._loginService.getLogin()[0].CMPCODE,
+      }
+      this._dataService.getData("Accounts/ACC_MIS_AIRFREIGHT_STATEMENT", jsonItem)
+      .subscribe((data: any) => {
+          if (data.Table.length > 0){
+            this.DataList = data.Table
+            this.DataList.forEach((row: any) => {
+              this.dataForExcel.push(Object.values(row)) // array format push 
+            })
+            let reportData = {
+              title:this.cmpnyname,
+              subtitle: 'AIRFREIGHT STATEMENT REPORT',
+              subtitle1: ' Timeline:  ' + this.FromDate + ' - ' + this.ToDate,
+              subtitle2:  ' Report Generated by : ' + this._loginService.getLogin()[0].FULLNAME,
+              subtitle3:  ' Report Generate on  : ' + this.Ondate + ' ' + this.datePipe.transform(this.Ondatetime, 'hh:mm'),
+              data: this.dataForExcel,
+              headers: Object.keys(this.DataList[0]),
+              pagetype: "InvPurchase"
+            }
+            this.exportser.exportExceltry(reportData, "AIRFREIGHT_STATEMENT_" + " - " + this.FromDate + " - " +  this.ToDate  );
+            this.dataForExcel= [];
+          }
+          else{
+            this._toasterService.toast("warning","warning","No Record Found !")
+            this.loaderService.display(false);
+          }
+        })
+     } 
+
+     ExportFrtPayable(){
+      if (!this.FromDate) {
+        alert("Please select From Date.");
+        return false;
+      }
+      else if (!this.ToDate) {
+          alert("Please select To Date.");
+          return false;
+      }
+      const jsonItem = {
+      FromDate:this.FromDate,
+      ToDate:this.ToDate,
+      citycode1: this._loginService.getLogin()[0].CITYCODE1,
+      }
+      this._dataService.getData("Accounts/ACC_RPT_AIRFRT_INVO_SERACH_LIST", jsonItem)
+      .subscribe((data: any) => {
+        if (data.Table.length > 0){
+      this.DataList = data.Table
+      this.DataList.forEach(function(x){delete x.PP_XRAY_PREPAID});
+      this.DataList.forEach(function(x){delete x.HAWB_TOT_RATE});
+      this.DataList.forEach(function(x){delete x.TOT_RATE});
+      for (var obj in this.DataList) {
+        this.DataListxl.push({
+            MAWBNO:this.DataList[obj]["MAWBNO"],
+            MAWBDT: this.DataList[obj]["MAWBDT"],
+            CHBL_WT: this.DataList[obj]["CHBL_WT"],
+            MAWB_FREIGHT: this.DataList[obj]["MAWB_FREIGHT"],
+            FRT_RATE: this.DataList[obj]["FRT_RATE"],
+            FSC_RATE: this.DataList[obj]["FSC_RATE"],
+            IRC_RATE: this.DataList[obj]["IRC_RATE"],
+            XRAY_RATE: this.DataList[obj]["XRAY_RATE"],
+            MAWB_TOT_AMT: this.DataList[obj]["MAWB_TOT_AMT"],
+            HAWBNO: this.DataList[obj]["HAWBNO"],
+            CON_NAME: this.DataList[obj]["CON_NAME"],
+            HAWB_FREIGHT: this.DataList[obj]["HAWB_FREIGHT"],
+            H_CHBL_WT: this.DataList[obj]["H_CHBL_WT"],
+            HAWB_FRT_RATE: this.DataList[obj]["HAWB_FRT_RATE"],
+            HAWB_FSC_RATE: this.DataList[obj]["HAWB_FSC_RATE"],
+            HAWB_IRC_RATE: this.DataList[obj]["HAWB_IRC_RATE"],
+            HAWB_XRAY_RATE: this.DataList[obj]["HAWB_XRAY_RATE"],
+            CC_HAWB_TOT_AMT: this.DataList[obj]["CC_HAWB_TOT_AMT"],
+            PP_FRTAMT: this.DataList[obj]["PP_FRTAMT"],
+            BP_RATE: this.DataList[obj]["BP_RATE"],
+            BP_AMT: this.DataList[obj]["BP_AMT"]
+          });
+        } 
+        this.DataListxl.forEach((row: any) => {
+        this.dataForExcel.push(Object.values(row)) // array format push 
+      })
+       let reportData = {
+          title:'FREIGHT PAYABLE FROM  ' + this.FromDate + ' To ' + this.ToDate,
+          subtitle: this.cmpnyname,
+          data: this.dataForExcel,
+          headers: ['Mawb No','Mawb Dt','CHBL Wt','Freight','Mawb Freight','Mawb Fsc','Mawb IRC','Mawb X-RAY','Mawb Total','Hawb No','Consignee','Hawb Freight','Hawb Chbl wt','Hawb Freight','Hawb FSC','Hawb IRC','Hawb X-RAY','Hawb Freight CC','Hawb Freight PP','Bus. Prom Rate','Bus.Prom Amt'],
+          pagetype: "FRTPAYABLE"
+        }
+      this.exportser.exportExceltry(reportData, "FreightPayable");
+      this.dataForExcel= [];
+      }
+      else{
+        this._toasterService.toast("warning","warning","No Record Found !")
+        this.loaderService.display(false);
+      }
+    })
+  }   
+}       

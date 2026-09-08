@@ -1,0 +1,79 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header formheading">
+                <strong>TRACKING AIR Shipment</strong>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-3">
+    </div>
+    <div class="col-sm-6">
+        <table class="table table-bordered table-sm-new bgwhite">
+            <tr>
+                <td class="width180">
+                    <input type="radio" value="ConsigneeFormat" name="rbType" [(ngModel)]="Type" />
+                    <span class="col-form-span-label">
+                        <b>Consignee Format :</b>
+                    </span>
+                </td>
+                <td colspan="3">
+                    <ng-select [items]="ConsigneeFormatList" bindLabel="CON_NAME" bindValue="CON_CODE" placeholder="--Select--" [(ngModel)]="ConsigneeFormat"
+                        class="form-control" [disabled]="Type=='Consignee'||Type=='Sourcing'">
+                    </ng-select>
+                </td>
+            </tr>
+            <tr>
+                <td class="width180">
+                    <input type="radio" value="Consignee" name="rbType" [(ngModel)]="Type" />
+                    <span class="col-form-span-label">
+                        <b>Consignee Name :</b>
+                    </span>
+                </td>
+                <td colspan="3">
+                    <ng-select [items]="ConsigneeList" bindLabel="CON_NAME" bindValue="CON_CODE" placeholder="--Select--" [(ngModel)]="Consignee"
+                        class="form-control" [disabled]="Type=='ConsigneeFormat'||Type=='Sourcing'">
+                    </ng-select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="radio" value="Sourcing" name="rbType" [(ngModel)]="Type" />
+                    <span class="col-form-span-label">
+                        <b>Sourcing Agent :</b>
+                    </span>
+                </td>
+                <td colspan="3">
+                    <ng-select [items]="SourcingAgentList" bindLabel="EXP_NAME" bindValue="EXP_CODE" placeholder="--Select--" [(ngModel)]="SourcingAgent"
+                        class="form-control" [disabled]="Type=='ConsigneeFormat'||Type=='Consignee'">
+                    </ng-select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="col-form-span-label">
+                        <b>Shipment From (Origin) :</b>
+                    </span>
+                </td>
+                <td colspan="3">
+                    <ng-select [items]="CityList" bindLabel="cityname" bindValue="citycode" placeholder="--Select--" [(ngModel)]="Shipment" class="form-control">
+                    </ng-select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" class="centerlabel">
+                    <button class="btn btn-sm btn-success" type="button" (click)="onSearch()">
+                        <span class="col-form-span-label">
+                            <i class="fa fa-download"></i>&nbsp; Export To Excel
+                        </span>
+                    </button>
+                </td>
+
+            </tr>
+        </table>
+    </div>
+    <div class="col-sm-3">
+    </div>
+</div>

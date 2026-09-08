@@ -1,0 +1,284 @@
+﻿<div class="row">	
+	<div class="col-sm-2">
+	</div>
+	<div class="col-sm-8">	 
+		<table class="table table-bordered table-striped table-sm-new" *ngIf="Searchdata.length===0" >
+				<tbody style='height:30px'>
+                        <tr>
+                            <td class="col-form-span-heading" colspan="2"  >
+                               CONTAINER SEARCH
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="col-form-span-label "><b>Container No.</b></span>
+                            </td>
+                            <td>
+                                <input [(ngModel)]="Containerno" type="text" maxlength="20" name="txtContainerno" class="form-control width150">
+                            </td>
+						</tr>
+						 
+                        
+                        <tr>
+                            <td colspan="2" class="centerlabel" >
+                                <button class="btn btn-sm btn-success   " type="submit" id="btnAgtAdd" name="btnAgtAdd"  (click)="serchList()"> <i class="fa fa-search"></i> Search</button>
+                            </td>
+                        </tr>
+						 </tbody>
+		</table>
+		<table class="table table-bordered table-striped table-sm-new" *ngIf="Searchdata.length>0">
+			<tbody>
+				<tr class="col-form-span-heading">
+					<td colspan="4" class="centerlabel"><span class="col-form-span-label red "><strong>CLP</strong></span></td>
+				</tr>
+				
+				<tr>
+					<td class="width150"><span class="col-form-span-label"><b>ORIGIN VESSEL DETAILS</b></span></td>
+					<td  ><span class="col-form-span-label">{{Searchdata[0]?.ORIGINVSEEL}}</span></td>
+					<td class="width150"><span class="col-form-span-label"><b>Port dtls</b></span></td>
+					<td><span class="col-form-span-label">{{Searchdata[0]?.VSL_PORT}}</span></td>
+				</tr>
+				
+				
+				<tr>
+					<td colspan="2" class="width150"><span class="col-form-span-label"><b>CONTAINER LOADING AT ORIGIN CONFIRMATION DATE</b> </span></td>
+					<td colspan="2"><span class="col-form-span-label">{{Searchdata[0]?.LOADDT}}</span></td>
+				</tr>
+				
+				<tr *ngIf="Searchdata[0]?.VSLDELAY != ''">
+					<td class="width150" colspan="4"><span class="col-form-span-label"><b>VESSEL DELAYED</b></span></td>					 
+				</tr>
+				
+				<tr *ngIf="Searchdata[0]?.DIRECTVSL == 'yes'">
+					<td class="width150" colspan="4" style="BACKGROUND-COLOR: aquamarine;"><span class="col-form-span-label centerlabel"><b>DIRECT</b></span></td>					 
+				</tr>
+				<tr *ngIf="Searchdata[0]?.DIRECTVSL == 'no'">
+					<td class="width150" colspan="4" >
+						<table class="table table-bordered table-striped table-sm-new">
+							<tr class="col-form-span-heading">
+								<td class="width150  centerlabel" colspan="4"><span class="col-form-span-label "><b>TRANSHIPMENT DETAILS</b> </span></td>
+							</tr>
+							<tr>
+								<td class="width150"><span class="col-form-span-label"><b>NAME OF TRANSHIPMENT PORT #1</b></span></td>
+								<td  ><span class="col-form-span-label">{{Searchdata[0]?.TRANSPORT1}}</span></td>
+								<td class="width150"><span class="col-form-span-label"><b>TRANSHIPMENT VESSEL #1 DETAILS</b></span></td>
+								<td><span class="col-form-span-label">{{Searchdata[0]?.VESSEL1}}</span></td>
+							</tr>
+							<tr>
+								<td colspan="3" class="width150"><span class="col-form-span-label"><b>CONTAINER LOADING AT TRANSHIPMENT PORT1 CONFIRMATION DATE </b></span></td>
+								<td><span class="col-form-span-label">{{Searchdata[0]?.PORT1LOADDT}}</span></td>
+							</tr>
+							<tr *ngIf="transport2 != ''">
+								<td class="width150"><span class="col-form-span-label"><b>NAME OF TRANSHIPMENT PORT #2</b></span></td>
+								<td  ><span class="col-form-span-label">{{Searchdata[0]?.TRANSPORT2}}</span></td>
+								<td class="width150"><span class="col-form-span-label"><b>TRANSHIPMENT VESSEL #2 DETAILS</b></span></td>
+								<td><span class="col-form-span-label">{{Searchdata[0]?.VESSEL2}}</span></td>
+							</tr>
+							<tr *ngIf="transport2 != ''">
+								<td colspan="3" class="width150"><span class="col-form-span-label"><b>CONTAINER LOADING AT TRANSHIPMENT PORT2 CONFIRMATION DATE </b></span></td>
+								<td  ><span class="col-form-span-label">{{Searchdata[0]?.PORT2LOADDT}}</span></td>
+							</tr>
+						</table>
+					</td>					
+				</tr>
+				
+				<tr>
+					<td class="width150"><span class="col-form-span-label"><b>Liner</b> </span></td>
+					<td ><span class="col-form-span-label">{{Searchdata[0]?.SHPGLINE}}</span></td>
+					<td class="width150"><span class="col-form-span-label"><b>Vessel gent</b> </span></td>
+					<td  ><span class="col-form-span-label">{{Searchdata[0]?.EXPT_AGENT}}</span></td>
+				</tr>
+				
+				<tr>
+					<td class="width150"><span class="col-form-span-label"><b>Container No. </b></span></td>
+					<td  ><span class="col-form-span-label">{{Searchdata[0]?.CONTAINERNO}}</span></td>
+					<td class="width150"><span class="col-form-span-label"><b>Container Size/Status</b></span></td>
+					<td  ><span class="col-form-span-label">{{Searchdata[0]?.CONTAINERSIZE}} </span></td>
+				</tr>
+				
+				<tr> 
+					<td class="width150"><span class="col-form-span-label"><b>DESTINATION PORT</b></span></td>
+					<td><span class="col-form-span-label">{{Searchdata[0]?.DESTORT}}</span></td>
+					<td class="width150"><span class="col-form-span-label"><b>REAL ETA</b></span></td>
+					<td><span class="col-form-span-label">{{Searchdata[0]?.REALETA}}</span></td>
+				</tr>
+				<tr *ngIf="SINGLESHPR == 'Y'">
+					<td class="width150" class="centerlabel" style="BACKGROUND-COLOR: #2eb1b5;" colspan="4"><span class="col-form-span-label"><b>SINGLE SHIPPER </b></span></td>
+					
+				</tr>
+				<tr>
+					<td class="width150"><span class="col-form-span-label"><b>STEAMER AGENT SEAL NO. </b></span></td>
+					<td ><span class="col-form-span-label">{{Searchdata[0]?.AGTSEALNO}}</span></td>
+					<td *ngIf="Searchdata[0]?.HSTUFFED == 'YES'" class="width150"><span class="col-form-span-label"><b>HOUSE STUFFED AT</b></span></td>
+					<td *ngIf="Searchdata[0]?.HSTUFFED == 'NO'" class="width150"><span class="col-form-span-label"><b>STUFFED AT</b></span></td>
+					<td><span class="col-form-span-label">{{Searchdata[0]?.STUFFWHERE}}</span></td>
+				</tr>
+				 
+				<tr>
+					<td class="width150"><span class="col-form-span-label"><b>CUSTOM SEAL NO.</b></span></td>
+					<td  ><span class="col-form-span-label">{{Searchdata[0]?.CUSTSEALNO}}</span></td>
+					<td class="width150"><span class="col-form-span-label"><b>FREIGHT</b></span></td>
+					<td  ><span class="col-form-span-label">{{Searchdata[0]?.CONTRACTMSG}}</span></td>
+				</tr>
+				<tr>
+					<td class="width150"><span class="col-form-span-label"><b>FREIGHT</b></span></td>
+					<td  ><span class="col-form-span-label">{{Searchdata[0]?.FREIGHTUSD}}</span></td>
+					<td class="width150"><span class="col-form-span-label"><b>BAF</b></span></td>
+					<td  ><span class="col-form-span-label">{{Searchdata[0]?.BAFCUR}}{{Searchdata[0]?.BAFUSD}}</span></td>
+				</tr>
+				<tr>
+					<td class="width150" colspan="4"><span class="col-form-span-label"><b>OTHER CHARGES</b> </span></td>					 
+				</tr>
+				
+				<tr>
+					<td class="width150"><span class="col-form-span-label">{{Searchdata[0]?.THCNAME}}</span></td>
+					<td><span class="col-form-span-label">{{Searchdata[0]?.THCCUR}}</span></td>
+					<td colspan="2"><span class="col-form-span-label">{{Searchdata[0]?.THCINR}}</span></td>
+				</tr>
+				<tr>
+					<td class="width150"><span class="col-form-span-label">{{Searchdata[0]?.OTHERNAME}}</span></td>
+					<td><span class="col-form-span-label">{{Searchdata[0]?.OTHERCUR}}</span></td>
+					<td  colspan="2"><span class="col-form-span-label">{{Searchdata[0]?.OTHERAMT}}</span></td>
+				</tr>
+				<tr>
+					<td class="width150"><span class="col-form-span-label"><b>REMARK</b></span></td>
+					<td colspan="3"><span class="col-form-span-label">{{Searchdata[0]?.REMARK}}</span></td>
+				</tr>
+				
+				<tr>
+					<td class="width150" colspan="4" >
+						<table class="table table-bordered table-striped table-sm-new">
+							<thead>
+								<tr class="col-form-span-heading">
+									<th class="centerlabel"><span class="col-form-span-label"></span></th>
+									<th class="width100 centerlabel"><span class="col-form-span-label"><b>Currency</b></span></th>
+									<th class="width100 centerlabel"><span class="col-form-span-label"><b>Value</b></span></th>
+									<th class="centerlabel"><span class="col-form-span-label"></span></th>
+									<th class="width100 centerlabel"><span class="col-form-span-label"><b>Currency</b></span></th>
+									<th class="width100 centerlabel"><span class="col-form-span-label"><b>Value</b></span></th>	
+								</tr>
+							</thead>
+							
+							 <tbody>
+							<tr>
+								<td><span class="col-form-span-label"><b>ORIGIN PORT</b> </span></td>
+								<td><span class="col-form-span-label">{{Searchdata[0]?.OCUR1}}</span></td>
+								<td><span class="col-form-span-label">{{Searchdata[0]?.OCURRATE1}}</span></td>
+								<td><span class="col-form-span-label">=</span></td>
+								<td><span class="col-form-span-label">{{Searchdata[0]?.OCUR2}}</span></td>
+								<td><span class="col-form-span-label">{{Searchdata[0]?.OCURRATE2}}</span></td>									
+							</tr>
+							<tr>
+								<td><span class="col-form-span-label"><b>DESTINATION PORT</b></span></td>
+								<td><span class="col-form-span-label">{{Searchdata[0]?.DCUR1}}</span></td>
+								<td><span class="col-form-span-label">{{Searchdata[0]?.DCURRATE1}}</span></td>
+								<td><span class="col-form-span-label">=</span></td>
+								<td><span class="col-form-span-label">{{Searchdata[0]?.DCUR2}}</span></td>
+								<td><span class="col-form-span-label">{{Searchdata[0]?.DCURRATE2}}</span></td>
+								
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<table class="table table-bordered table-striped table-sm-new" *ngIf="Searchdata.length>0">
+			<tbody>
+				<tr class="col-form-span-heading">
+					<td class="centerlabel"><span class="col-form-span-label"><strong>Consignment Details :</strong></span></td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="row xscroll" *ngIf="Searchdata.length>0">
+			<table class="table table-bordered table-striped table-sm-new" *ngIf="Searchdata.length>0">
+				<thead>
+					<tr class="col-form-span-heading">
+						<th class="centerlabel"><span class="col-form-span-label">Exptno No.</span></th>
+						<th class="width100 centerlabel"><span class="col-form-span-label">Shipper</span></th>
+						<th class="width100 centerlabel"><span class="col-form-span-label">Consignee</span></th>
+						<th class="width100 centerlabel"><span class="col-form-span-label">Pieces</span></th>
+						<th class="width100 centerlabel"><span class="col-form-span-label"> Pkgs</span></th>
+						<th class="width100 centerlabel"><span class="col-form-span-label">Gr. Wt</span></th>
+						<th class="width100 centerlabel"><span class="col-form-span-label">Net Wt</span></th>
+						<th class="width100 centerlabel"><span class="col-form-span-label">CBM</span></th>
+						<th class="width100 centerlabel"><span class="col-form-span-label">Order No./Ref Details</span></th>
+						<th class="width100 centerlabel"><span class="col-form-span-label">CLP sequence</span></th>
+						 
+					</tr>
+				</thead>
+				<tbody>
+						<ng-container *ngFor="let obj of Exportdata" >
+					<tr  >
+						<td rowspan="3" class="centerlabel"><span class="col-form-span-label" >
+								<a href="javascript:void(0);"   (click)="consignmentview(obj.EXPTNO);">{{obj.EXPTNO}}</a>
+								 </span>
+						 </td>
+						<td class="width100"><span class="col-form-span-label">{{obj.EXPNAME}}</span></td>
+						<td class="width100"><span class="col-form-span-label">{{obj.CONNAME}}</span></td>
+						<td class="width100"><span class="col-form-span-label">{{obj.CON_NOOFPCS}}</span></td>
+						<td class="width100"><span class="col-form-span-label">{{obj.NOOFPKGS}}</span></td>
+						<td class="width100"><span class="col-form-span-label">{{obj.GRWT}}</span></td>
+						<td class="width100"><span class="col-form-span-label">{{obj.CON_NETWT}}</span></td>
+						<td class="width100"><span class="col-form-span-label">{{obj.CON_CBM}}</span></td>
+						<td class="width100"><span class="col-form-span-label">{{obj.ORDERNO}}</span></td>
+						<td class="width100"><span class="col-form-span-label">{{obj.CLPSEQUENCE}}</span></td>						 
+					</tr>
+					<tr>
+						<td  class="centerlabel"><span class="col-form-span-label"> <b>Description</b></span></td>
+						<td colspan="9" class="centerlabel"><span class="col-form-span-label">{{obj.DESCRIPTION1}}</span></td>
+					</tr>
+					<tr style=" background-color: #ceb469;">
+					<td  class="centerlabel"><span class="col-form-span-label"> <b>FCR No</b></span></td>
+						<td colspan="3" class="centerlabel"><span class="col-form-span-label">{{obj.EXPT_HBLNO}}</span></td>
+						<td  class="centerlabel"><span class="col-form-span-label"> <b>FCR Date</b></span></td>
+						<td colspan="4" class="centerlabel"><span class="col-form-span-label">{{obj.EXPT_HBLDT}}</span></td>
+					</tr>
+				</ng-container>	
+				</tbody>
+			</table>
+		</div> 	
+		<table class="table table-bordered table-striped table-sm-new" *ngIf="Searchdata.length>0">
+			<tbody>
+				<tr class="col-form-span-heading">
+					<td class="centerlabel"><span class="col-form-span-label"><strong>No. of Pallets Details</strong></span></td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="row xscroll" *ngIf="Searchdata.length>0">
+			<table class="table table-bordered table-striped table-sm-new" *ngIf="Searchdata.length>0">
+				<thead>
+					<tr class="col-form-span-heading">
+						<th class="centerlabel"><span class="col-form-span-label">Exporter</span></th>
+						<th class="width100 centerlabel"><span class="col-form-span-label">No. of Pallets</span></th>
+						 
+						 
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let obj of Palletdata">
+						<td rowspan="2" class="centerlabel"><span class="col-form-span-label">{{obj.EXP_NAME}}</span></td>
+						<td class="width100"><span class="col-form-span-label">{{obj.NO_OF_PALLETS}}</span></td>
+						 			 
+					</tr>
+					 
+				</tbody>
+			</table>
+			
+		</div> 	
+		<table class="table table-bordered table-striped table-sm-new" *ngIf="Searchdata.length>0">
+			<tbody>
+				<tr>
+					<td class="col-form-span-label font-weight-bold">Download Clp <i class="fa fa-download" (click)="ClpDownload(Containerno)"></i></td>	
+				 
+					<!-- <td class="col-form-span-heading" >
+						 
+						
+						<button class="btn btn-sm btn-warning" style="float: right;" (click)="back();"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to search</u></span></button>
+					</td> -->
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="col-sm-2">
+	</div>
+</div>

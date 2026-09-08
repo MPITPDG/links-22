@@ -1,0 +1,211 @@
+<div class="animated fadeIn" >  
+    <div class="row no-gutters"  >
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>{{Header}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+
+                <tr>
+                    <td class="col-form-span-heading" colspan="6"> <b>Bank Reconciliation</b> </td>
+           </tr>
+                <tr>
+                    <td >
+                        <span  class="col-form-span-label"><b>Bank</b> </span><span
+                        class="col-form-span-error">*</span>
+                    </td>
+
+                            <td colspan="3" >
+                               <ng-select   [items]="BankList" bindLabel="acctname"
+                               bindValue="acctcodename"  [(ngModel)]="Bank"
+                               class="custom" placeholder="--Select OurBank--">
+                                </ng-select>
+                            </td>
+                </tr>
+                <tr>
+
+                    <td><span class="col-form-span-label"><b>From</b> </span><span
+                        class="col-form-span-error">*</span></td>
+                <td>
+                    <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)"  [options]="myDatePickerOptions"
+                     class="form-control"  [selDate]="FromDate"  ></my-date-picker>
+                </td>
+                    <td><span class="col-form-span-label"><b>To </b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td><my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)"  [options]="myDatePickerOptions"
+                            class="form-control"  [selDate]="ToDate"   ></my-date-picker>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>Balance As Per Bank</b> </span><span
+                        class="col-form-span-error">*</span></td>
+                <td colspan="3">
+                 <input [(ngModel)]="BankBalance" type="text"  [OnlyNumber]="true"  class="form-control width150" maxlength="40" > 
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6" class="centerlabel">
+                        <button class="btn btn-sm btn-primary" type="submit" (click)="SearchData()" > <span
+                                class="col-form-span-label"><i class="fa fa-search"></i>
+                                Search </span></button>&nbsp;
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+    </div>
+    <div class="row no-gutters" *ngIf="bankrecList.length > 0">
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+        <div class="col-sm-12 col-md-10 col-lg-10 ">
+            <div>
+                <span class="col-form-span-label"><b>
+                    Cheque Issued But Not Clear  </b> </span>
+            </div>
+           <div class="row  xyscroll"  style="height: 150px;">
+                <table class="table table-bordered table-sm-new table-striped " >
+                 <thead>
+                        <tr class="title-head formheading ">
+                            <th class="col-form-span-label" align="center">	Entry No </th>
+                            <th class="col-form-span-label" align="center">Entry Date</th>   
+                            <th class="col-form-span-label" align="center">Chq Type</th>   
+                            <th class="col-form-span-label" align="center">Cheque No</th>    
+                            <th class="col-form-span-label" align="center">Cheque Date</th>   
+                            <th class="col-form-span-label" align="center">Amount</th>   
+                         </tr>
+                    </thead>
+                    <tbody *ngIf="bankpayList.length > 0">
+                        <tr *ngFor="let data of bankpayList">
+                            <td ><span  class="col-form-span-label anchor-link " (click)="Openprint(data.ENTRYNO,data.STATUS)" >{{data.ENTRYNO}}</span> </td> 
+                            <td  ><span class="col-form-span-label">{{data.ENTRYDT}}</span>  </td>                             
+                            <td  ><span class="col-form-span-label">{{data.STATUS}}</span>  </td> 
+                            <td ><span class="col-form-span-label">{{data.CHEQUENO}}</span>  </td> 
+                            <td ><span class="col-form-span-label">{{data.CHEQUEDT}}</span>  </td>
+                            <td  ><span class="col-form-span-label">{{data.ACTUALAMOUNT|number:'2.2-4'}}</span>  </td> 
+                       
+                        </tr>
+                      
+                    </tbody>
+                </table>
+                     </div>
+            <div  style="float: right;">
+                <span class="col-form-span-label"><b>
+                    {{IssueTotal}} </b> </span>
+            </div>
+         </div>
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+                    
+    </div>  
+    <div class="row no-gutters" *ngIf="bankrecList.length > 0">
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+        <div class="col-sm-12 col-md-10 col-lg-10 ">
+         
+             <div>
+                <span class="col-form-span-label"><b>
+                    Cheque Received But Not Clear  </b> </span>
+            </div>
+            <div class="row  xyscroll"  style="height: 150px;">
+             <table class="table table-bordered table-sm-new table-striped " >
+              
+                <thead>
+                    <tr class="title-head formheading ">
+                        <th class="col-form-span-label" align="center">	Entry No </th>
+                        <th class="col-form-span-label" align="center">Entry Date</th>   
+                        <th class="col-form-span-label" align="center">Chq Type</th>   
+                        <th class="col-form-span-label" align="center">Cheque No</th>    
+                        <th class="col-form-span-label" align="center">Cheque Date</th>   
+                        <th class="col-form-span-label" align="center">Amount</th>   
+                         
+                    </tr>
+                </thead>
+                <tbody *ngIf="bankrecList.length > 0">
+                    <tr *ngFor="let data of bankrecList">
+                        <td ><span  class="col-form-span-label anchor-link " (click)="Openprint(data.ENTRYNO,data.STATUS)" >{{data.ENTRYNO}}</span> </td> 
+                        <td  ><span class="col-form-span-label">{{data.ENTRYDT}}</span>  </td>                             
+                        <td  ><span class="col-form-span-label">{{data.STATUS}}</span>  </td> 
+                        <td ><span class="col-form-span-label">{{data.CHEQUENO}}</span>  </td> 
+                        <td ><span class="col-form-span-label">{{data.CHEQUEDT}}</span>  </td>
+                        <td  ><span class="col-form-span-label">{{data.ACTUALAMOUNT|number:'2.2-4'}}</span>  </td> 
+                     </tr>
+               </tbody>
+            </table>
+            </div>
+            <div style="float: right;" >
+                <span class="col-form-span-label"><b>
+                     {{RecTotal}} </b> </span>
+            </div>
+            </div>
+             <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+                    
+    </div>  
+    <div class="row no-gutters"  *ngIf="bankrecList.length > 0" >
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+        <div class="col-sm-12 col-md-10 col-lg-10">
+            <div style="float:right" class="row no-gutters">
+            
+                <table  class="table  table-sm-new bgwhite" style="width:325px">     
+                       
+                    <tr>
+                      <td class="col-form-span-label" align="right">Opening Balance:</td>
+                      <td class="col-form-span-label" align="left">{{lblOpBal}}</td>
+                     
+                    </tr>
+                    <tr>
+                      <td  class="col-form-span-label" align="right">Dr. Amt :</td>
+                      <td  class="col-form-span-label" align="left">{{CurrentDrBal}} </td>
+                      <td  class="col-form-span-label" align="right">Cr. Amt :</td>
+                      <td  class="col-form-span-label" align="left">{{CurrentCrbal}} </td>
+                    </tr>
+                    <tr>
+                        <td  class="col-form-span-label" align="right">Closing Balance  :</td>
+                        <td  class="col-form-span-label" align="left">{{lblclbal}} </td>
+                      
+                      </tr>
+                      <tr>
+                        <td  class="col-form-span-label" align="right">Difference Amount:</td>
+                        <td  class="col-form-span-label" align="left">{{lbldiff}} </td>
+                      
+                      </tr>
+              </table>
+            </div>
+         
+        </div>
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+        <div class="col-sm-12 col-md-10 col-lg-10" >
+            <div style="float:center" class="row no-gutters">
+                <table  class="table  table-sm-new bgwhite" > 
+                    <tr>
+                        <td align="center">
+                            <button class="btn btn-sm btn-success" type="submit" (click)="ExportOutstand()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Outstanding</span></button>
+            <button class="btn btn-sm btn-success" type="reset"> <span class="col-form-span-label" (click)="Exportrecstatement();"><i class="fa fa-ban"></i> Statement</span></button>
+                        </td>
+                    </tr>
+                </table>
+                </div>
+        </div>
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div> 
+            </div>
+</div>
+
+

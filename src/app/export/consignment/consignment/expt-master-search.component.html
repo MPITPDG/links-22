@@ -1,0 +1,390 @@
+﻿<div class="animated fadeIn">
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="card">
+				<div class="card-header formheading">
+					<strong>Search</strong>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-2">
+		</div>
+		<div class="col-sm-8">
+			<table class="table table-sm-new bgwhite">
+				<tr class="title-head formheading">
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="check" (click)="mainCheck('1')" [checked]="checkWise == '1'" />Number Wise</span>
+					</td>
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="check" (click)="mainCheck('2')" [checked]="checkWise == '2'" />Vessel Wise</span>
+					</td>
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="check" (click)="mainCheck('3')" [checked]="checkWise == '3'" />Shipper Wise</span>
+					</td>
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="check" (click)="mainCheck('4')" [checked]="checkWise == '4'" />Consignee Wise</span>
+					</td>
+					<td>
+
+					</td>
+				</tr>
+			</table>
+			<table class="table table-sm-new bgwhite">
+				<tr *ngIf="checkWise == '1'" class="trbg">
+					<td class="width150" rowspan="3">
+						<span class="col-form-span-label">Title </span>
+					</td>
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="NumberWise" (click)="numberOption('Export No.','EXPORTNO')" [checked]="numberWise == 'EXPORTNO'"
+							/>Export No.</span>
+					</td>
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="NumberWise" (click)="numberOption('Invoice No.','INV_NO')" [checked]="numberWise == 'INV_NO'" />Invoice No.</span>
+					</td>
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="NumberWise" (click)="numberOption('FCR No.','FCR_NO')" [checked]="numberWise == 'FCR_NO'" />FCR No.</span>
+					</td>
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="NumberWise" (click)="numberOption('BL No.','BL_NO')" [checked]="numberWise == 'BL_NO'" />BL No.</span>
+					</td>
+				</tr>
+				<tr *ngIf="checkWise == '1'" class="trbg">
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="NumberWise" (click)="numberOption('HAWB No.','HAWB_NO')" [checked]="numberWise == 'HAWB_NO'" /> HAWB No.</span>
+					</td>
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="NumberWise" (click)="numberOption('MAWB No.','MAWB_NO')" [checked]="numberWise == 'MAWB_NO'" /> MAWB No.</span>
+					</td>
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="NumberWise" (click)="numberOption('GRI No.','GRI_NO')" [checked]="numberWise == 'GRI_NO'" />GRI No.</span>
+					</td>
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="NumberWise" (click)="numberOption('Shipping Bill No.','SHIP_BILL_NO')" [checked]="numberWise == 'SHIP_BILL_NO'"
+							/>Shipping Bill No.</span>
+					</td>
+				</tr>
+				<tr *ngIf="checkWise == '1'" class="trbg">
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="NumberWise" (click)="numberOption('Order No.','ORDER_NO')" [checked]="numberWise == 'ORDER_NO'"
+							/> Order No.</span>
+					</td>
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="NumberWise" (click)="numberOption('Ref. No.','REF_NO')" [checked]="numberWise == 'REF_NO'" />Ref. No.</span>
+					</td>
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="NumberWise" (click)="numberOption('No. of Pkgs','NO_OF_PKGS')" [checked]="numberWise == 'NO_OF_PKGS'"
+							/>No. of Pkgs</span>
+					</td>
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="NumberWise" (click)="numberOption('No. of Pcs','NO_OF_PCS')" [checked]="numberWise == 'NO_OF_PCS'"
+							/>No. of Pcs</span>
+					</td>
+				</tr>
+				<tr *ngIf="checkWise == '1'" class="trbg">
+					<td class="width75">
+						<span class="col-form-span-label">{{numberName}}</span>
+					</td>
+					<td colspan="4">
+						<input type="text" [(ngModel)]="numberText" class="form-control width130" />
+					</td>
+				</tr>
+				<tr *ngIf="checkWise == '2'" class="trbg">
+					<td class="width75">
+						<span class="col-form-span-label">Vessel Name </span>
+					</td>
+					<td>
+						<input type="text" [(ngModel)]="vesselname" class="form-control width100" />
+					</td>
+					<td class="width75">
+						<span class="col-form-span-label">Voyage No.</span>
+					</td>
+					<td>
+						<input type="text" [(ngModel)]="voyageno" class="form-control width100" />
+					</td>
+					<td class="width50">
+						<i class="fa fa-eye" aria-hidden="true" (click)="getVessel()"></i>
+					</td>
+				</tr>
+				<tr *ngIf="checkWise == '2'" class="trbg">
+					<td class="width150">
+						<span class="col-form-span-label">Vessel Name </span>
+					</td>
+					<td colspan="4">
+						<!-- <ng-select [items]="vesselList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" placeholder="--Select--" [(ngModel)]="searchby"
+						 class="form-control">
+						</ng-select> -->
+						<select class="form-control width450"  [(ngModel)]="searchby">
+							<option value="">Please select</option>
+							<option *ngFor="let d of vesselList" value={{d.VALUE_FIELD}}>{{d.TEXT_FIELD}}</option>
+						</select> 
+					</td>
+				</tr>
+				<tr *ngIf="checkWise == '3'" class="trbg">
+					<td class="width150" rowspan="2">
+						<span class="col-form-span-label">Title </span>
+					</td>
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="Shipments" value="" (click)="changeShipmentType('SHIP_CUR')" [checked]="shipmentWise == 'SHIP_CUR'"
+							/>Shipper (current shipments)</span>
+					</td>
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="Shipments" (click)="changeShipmentType('SHIP_ALL')" [checked]="shipmentWise == 'SHIP_ALL'" />Shipper (all shipments) </span>
+					</td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr *ngIf="checkWise == '3'" class="trbg">
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="Shipments" (click)="changeShipmentType('BILL_CUR')" [checked]="shipmentWise == 'BILL_CUR'" />Bill To (current shipments)</span>
+					</td>
+					<td class="width250">
+						<span class="col-form-span-label">
+							<input type="radio" name="Shipments" (click)="changeShipmentType('BILL_ALL')" [checked]="shipmentWise == 'BILL_ALL'" />Bill To (all shipments)</span>
+					</td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr *ngIf="checkWise == '3'" class="trbg">
+					<td class="width150">
+						<span class="col-form-span-label">Search By</span>
+					</td>
+					<td colspan="4">
+						<ng-select [items]="[{VALUEFIELD: 'COUNTRY', TEXTFIELD: 'Of a Country'},{VALUEFIELD: 'CITY', TEXTFIELD: 'Of a City'},{VALUEFIELD: 'NAME', TEXTFIELD: 'By Name'},{VALUEFIELD: 'ALL', TEXTFIELD: 'All'}]"
+						 bindLabel="TEXTFIELD" bindValue="VALUEFIELD"   [(ngModel)]="shippersearchby" class="form-control width150">
+						</ng-select>
+					</td>
+				</tr>
+				<tr *ngIf="checkWise == '3'" class="trbg">
+					<td class="width150">
+						<span class="col-form-span-label">{{shippersearchby}}</span>
+					</td>
+					<td colspan="3">
+						<ng-select [items]="countryList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"  [(ngModel)]="shippercountry"
+						 class="form-control" *ngIf="shippersearchby == 'COUNTRY'">
+						</ng-select>
+						<ng-select [items]="cityList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"   [(ngModel)]="shippercity"
+						 class="form-control" *ngIf="shippersearchby == 'CITY'">
+						</ng-select>
+						<input type="text" [(ngModel)]="shippername" class="form-control width150" *ngIf="shippersearchby == 'NAME'" />
+					</td>
+					<td class="width50">
+						<i class="fa fa-eye" aria-hidden="true" (click)="getShipper()"></i>
+					</td>
+				</tr>
+				<tr *ngIf="checkWise == '3'" class="trbg">
+					<td class="width150 title-head">
+						<span class="col-form-span-label">Shipper</span>
+					</td>
+					<td colspan="4">
+						<ng-select [items]="shipperList" bindLabel="TEXT_FIELD" bindValue="VALUE_FIELD"   [(ngModel)]="shipper"
+						 class="form-control">
+						</ng-select>
+					</td>
+				</tr>
+				<tr *ngIf="checkWise == '4'" class="trbg">
+					<td class="width150">
+						<span class="col-form-span-label">Title </span>
+					</td>
+					<td class="width300">
+						<span class="col-form-span-label">
+							<input type="radio" name="Consingee" value="" (click)="changeConsigneeType('CON_CUR')" [checked]="consigneeWise == 'CON_CUR'"
+							/>Consignee(current shipements)</span>
+					</td>
+					<td class="width300">
+						<span class="col-form-span-label">
+							<input type="radio" name="Consingee" (click)="changeConsigneeType('CON_ALL')" [checked]="consigneeWise == 'CON_ALL'" />Consignee(all shipments)</span>
+					</td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr *ngIf="checkWise == '4'" class="trbg">
+					<td class="width150">
+						<span class="col-form-span-label">Search By</span>
+					</td>
+					<td colspan="4" class="width150">
+						<ng-select [items]="[{VALUEFIELD: 'COUNTRY', TEXTFIELD: 'Of a Country'},{VALUEFIELD: 'NAME', TEXTFIELD: 'By Name'},{VALUEFIELD: 'ALL', TEXTFIELD: 'All'}]"
+						 bindLabel="TEXTFIELD" bindValue="VALUEFIELD"   [(ngModel)]="consigneesearchby" class="form-control width150">
+						</ng-select>
+					</td>
+				</tr>
+				<tr *ngIf="checkWise == '4'" class="trbg">
+					<td class="width150">
+						<span class="col-form-span-label">{{consigneesearchby}}</span>
+					</td>
+					<td colspan="3">
+						<ng-select [items]="countryList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"   [(ngModel)]="consigneecountry"
+						 class="form-control" *ngIf="consigneesearchby == 'COUNTRY'">
+						</ng-select>
+						<input type="text" [(ngModel)]="consigneename" class="form-control width150" *ngIf="consigneesearchby == 'NAME'" />
+					</td>
+					<td class="width50">
+						<i class="fa fa-eye" aria-hidden="true" (click)="getConsignee()"></i>
+					</td>
+				</tr>
+				<tr *ngIf="checkWise == '4'" class="trbg">
+					<td class="width150 title-head">
+						<span class="col-form-span-label">Consignee </span>
+					</td>
+					<td colspan="4">
+						<ng-select [items]="consigneeList" bindLabel="TEXT_FIELD" bindValue="VALUE_FIELD"   [(ngModel)]="consignee"
+						 class="form-control">
+						</ng-select>
+					</td>
+				</tr>
+				<tr class="trbg centerlabel">
+					<td colspan="5">
+						<button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="search();">
+							<span class="col-form-span-label">
+								<i class="fa fa-search"> Search</i></span>
+						</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-sm-2">
+		</div>
+	</div>
+	<div class="row">
+		<br />
+	</div>
+	<div class="row" *ngIf="searchList.length > 0">
+		<div class="col-sm-12" style="height:300px;overflow-y: scroll;">
+			<table class="table table-sm-new bgwhite">
+				<thead>
+					<tr class="title-head formheading">
+						<th colspan="11">{{searchHeaderText}}</th>
+					</tr>
+				</thead>
+			</table>
+			<table class="table table-sm-new bgwhite" *ngIf ="numberWise == 'MAWB_NO'">
+				<thead>
+						<tr class="title-head formheading">
+								<th> MAWB NO.</th>
+								<th>DESTINATION </th>
+								<th> PKGS</th>
+								<th>GR. WT. </th>
+								<th>CHBL WT. </th>
+								<th>PLANNED FLIGHT DETAILS </th>
+								<th> ACTUAL FLIGHT DETAILS</th>
+								<th> ETA</th>
+						</tr>
+						<tr>
+							<td>
+								<span class="col-form-span-label">{{MAWBNO}}</span>
+							</td>
+							<td>
+									<span class="col-form-span-label">{{DESTINATION}}</span>
+							</td>
+							<td>
+								<span class="col-form-span-label">{{ PKGS}}</span>
+							</td>
+							<td>
+								<span class="col-form-span-label">{{ GRWT}}</span>
+							</td>
+							<td>
+								<span class="col-form-span-label">{{CHBLWT }}</span>
+							</td>
+							<td >
+								<span class="col-form-span-label">{{PLANNEDFLIGHT}}</span>
+							</td>
+							<td>
+								<span class="col-form-span-label">{{ACTUALFLIGHT}}</span>
+							</td>
+							<td>
+								<span class="col-form-span-label">{{ETA }}</span>
+							</td>
+						</tr>
+				</thead>
+				</table>
+			<table class="table table-sm-new bgwhite">
+				<thead>
+					<tr class="title-head formheading">
+						<th></th>
+						<th>EXPTNO</th>
+						<th>INVOICE NO</th>
+						<th>SHIPPER</th>
+						<th>CONSIGNEE</th>
+						<th>GR. WT</th>
+						<th>VOL.</th>
+						<th>VOL.WT</th>
+						<th>CHBL WT</th>
+						<th>PKGS</th>
+						<th>HAWBNO</th>
+						<th>HAWBDT</th>
+						<th>ORDER_NO</th>
+						<th>FREIGHT</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let obj of searchList">
+						<td class="centerlabel">
+							<i class="fa fa-pencil" aria-hidden="true" (click)="setValue(obj)"></i>
+						</td>
+						<td>
+							<span class="col-form-span-label">{{obj.EXPTNO}}</span>
+						</td>
+						<td>
+							<span class="col-form-span-label">{{obj.INVNO}}</span>
+						</td>
+						<td>
+							<span class="col-form-span-label">{{obj.SHIPPER}}</span>
+						</td>
+						<td>
+							<span class="col-form-span-label">{{obj.CONSIGNEE}}</span>
+						</td>
+						<td>
+							<span class="col-form-span-label">{{obj.GRWT}}</span>
+						</td>
+						<td>
+							<span class="col-form-span-label">{{obj.VOLUME}}</span>
+						</td>
+						<td>
+							<span class="col-form-span-label">{{obj.VOLWT}}</span>
+						</td>
+						<td>
+							<span class="col-form-span-label">{{obj.CHBLWT}}</span>
+						</td>
+						
+						<td>
+							<span class="col-form-span-label">{{obj.PKGS}}</span>
+						</td>
+						<td>
+							<span class="col-form-span-label">{{obj.HAWBNO}}</span>
+						</td>
+						<td>
+							<span class="col-form-span-label">{{obj.HAWBDT}}</span>
+						</td>
+						 
+						<td>
+							<span class="col-form-span-label" [innerHTML]="obj.ORDER_NO"></span>
+						</td>
+						<td><span class="col-form-span-label">{{obj.FREIGHT}}</span></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<app-ok-modal #okModal> </app-ok-modal>

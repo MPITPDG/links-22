@@ -1,0 +1,73 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+      <div class="col-sm-12">
+        <div class="card">
+          <div class="card-header formheading">
+            <strong>{{strheader}}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row no-gutters" >
+      <div class="col-md-1">
+        </div>
+      <div   class="col-md-10" style="overflow-y: auto;height: 500px;">
+        <table  class="table table-bordered table-sm-new bgwhite table-hover" >
+          <thead>
+           
+            <tr class="col-form-span-heading" style="white-space:nowrap;">
+              <th  class="col-form-span-label"> GENERATE </th>
+              <th class="col-form-span-label">
+                STATUS
+              </th>
+              <th class="col-form-span-label">
+                REQ CODE
+              </th>
+              <th class="col-form-span-label" >
+                REQUESTED BY 
+              </th>
+              <th class="col-form-span-label" >
+                REQUESTED ON 
+              </th>
+              <th *ngIf=" Status == 'SRPI' || Status == 'RPI'" class="col-form-span-label" >
+                AMOUNT 
+              </th>
+              <th *ngIf=" Status == 'JVREQ'"class="col-form-span-label" >
+                DEBIT 
+              </th>
+              <th *ngIf="Status == 'JVREQ'" class="col-form-span-label" >
+               CREDIT
+              </th>
+              <th class="col-form-span-label" >
+                AUTHORISED BY 
+              </th>
+              <th class="col-form-span-label" >
+                AUTHORISED ON 
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bgwhite">
+            <tr *ngFor="let obj of datatable "     >
+              <td >  <button class="btn btn-sm btn-success" type="submit" (click)="GenerateCodeJVCPSRPI(obj.REQCODE,obj.PSTATUS,obj.AUTHORISATIONSTATUS,obj.ISGEN_RIGHTS)"> <span
+                *ngIf="obj.ISGEN_RIGHTS !='1' && obj.PSTATUS =='JVREQ'" class="col-form-span-label"><i  class="fa fa-lock"></i>lock</span>
+                <span *ngIf="obj.ISGEN_RIGHTS =='1' && obj.PSTATUS =='JVREQ'" class="col-form-span-label"><i  class="fa fa-laptop"></i>Generate</span>
+                <span *ngIf="obj.PSTATUS =='RCP' || obj.PSTATUS =='RPI' || obj.PSTATUS =='SRPI'" class="col-form-span-label"> <i  class="fa fa-laptop"></i>Generate</span></button> </td>
+              <td class="col-form-span-label" >{{obj.AUTHORISESTATUS}}</td>
+              <td class="col-form-span-label link-label"  (click)="ViewData(obj.REQCODE,obj.PSTATUS)"><u> {{obj.REQCODE}}</u> </td> 
+              <td class="col-form-span-label">{{obj.REQUESTEDBY}}</td>
+              <td class="col-form-span-label">{{obj.REQUESTEDON}}</td>
+              <td *ngIf=" obj.PSTATUS == 'SRPI' || obj.PSTATUS == 'RPI'" class="col-form-span-label">{{obj.AMOUNT}}</td>
+              <td *ngIf=" obj.PSTATUS == 'JVREQ'"class="col-form-span-label" style="text-align: right;">{{obj.DEBIT|number:'2.2-4'}}</td>
+              <td *ngIf=" obj.PSTATUS == 'JVREQ'"class="col-form-span-label" style="text-align: right;">{{obj.CREDIT|number:'2.2-4'}}</td>
+              <td class="col-form-span-label" >{{obj.AUTHORISEDBY}}</td>
+              <td class="col-form-span-label" >{{obj.AUTHORISATIONDATE}}</td>
+              
+            </tr>
+          </tbody>
+       
+        </table>
+          </div>
+      <div class="col-md-1">
+      </div>
+    </div>           
+  </div>  

@@ -1,0 +1,102 @@
+<div class="animated fadeIn">
+	<div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>MAWB Stock Master</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+		<div class="col-sm-3">
+		</div>
+		<div class="col-sm-6">
+
+            <table class="table table-bordered table-sm-new bgwhite">
+                <!-- <tr class="centerlabel">
+                    <td colspan="4">
+                        <input type="radio" name="RADIO" value="0"  [(ngModel)]="stocktype"><span class="col-form-span-label"><b> Our Stock</b></span>
+                        &nbsp;
+                        <input type="radio" name="RADIO" value="1" [(ngModel)]="stocktype"><span class="col-form-span-label"><b> Agent Stock</b></span>
+                    </td>
+                </tr> -->
+                    <!-- <tr>
+                        <td><span class="col-form-span-label"><b>IATA</b></span><span class="col-form-span-error">*</span></td>
+                        <td colspan="4"><input type="text" class="form-control width100" disabled="disabled" [(ngModel)]="IATA" ></td>
+                    </tr> -->
+                    <tr>
+
+                        <td colspan="4"  >
+                            <div style="float: right;">
+                            <button class="btn btn-sm btn-success" type="submit"  (click)="AddNew()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i>Add New</span></button>
+                        </div>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Doc No.</b> </span></td>
+                        <td><input type="text" class="form-control width150" disabled="disabled"  [(ngModel)]="DocNo">
+                        <td><span class=col-form-span-label><b>Doc Date</b></span><span class="col-form-span-error">*</span></td>
+                        <td >
+                        <my-date-picker name="DocDate"  [selDate]="DocDate" [options]="myDatePickerOptions" (dateChanged)="DocDateChanged($event)" ></my-date-picker>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>IATA Agent</b> </span><span class="col-form-span-error">*</span></td>
+                      <td colspan="4">
+                        <select class="form-control width400"  [(ngModel)]="iataagent" [disabled]='disable_iataagent' >
+                            <option value="">Please select</option>
+                            <option *ngFor="let i of iataagentlist" value={{i.DATAVALUEFIELD}}>{{i.DATATEXTFIELD}}</option>
+                        </select>
+                    </td>
+                    </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Airline</b> </span><span class="col-form-span-error">*</span></td>
+                        <td colspan="4">
+                            <select class="form-control width400"  [(ngModel)]="airline"  [disabled]='disable_airline'  (change)="getAirlinecodee(airline);" >
+                                <option value="">Please select</option>
+                                <option *ngFor="let a of airlinelist" value={{a.DATAVALUEFIELD}}>{{a.DATATEXTFIELD}}</option>
+                            </select>
+                             </td>
+                        </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>MAWB From No</b></span><span class="col-form-span-error">*</span></td>
+                        <td><input type="text" class="form-control width50" disabled="disabled" maxlength="3" [(ngModel)]="airlinecode">
+                         <input type="text" [OnlyNumber]="true" class="form-control width100" [(ngModel)]="FrommawbNo" (change)="fn_validateMawbNo(airlinecode + FrommawbNo);" style="margin-left: 70px;margin-top: -18px;" maxlength="8" ></td>
+                        <td><span class="col-form-span-label"><b>No of Stock </b></span><span class="col-form-span-error">*</span></td>
+                        <td><input type="text" class="form-control width30" [OnlyNumber]="true"  maxlength="3" [(ngModel)]="noofstock" ></td>
+                    </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>MAWB To No</b></span><span class="col-form-span-error">*</span></td>
+                        <td colspan="3"><input type="text" class="form-control width50" disabled="disabled" maxlength="3" [(ngModel)]="airlinecode">
+                         <input type="text" [OnlyNumber]="true" class="form-control width100" [(ngModel)]="TomawbNo" disabled="disabled"  style="margin-left: 70px;margin-top: -18px;" maxlength="8" ></td>
+                    </tr>
+                    <!-- <tr>
+                        <td><span class=col-form-span-label><b>Date</b></span><span class="col-form-span-error">*</span></td>
+                        <td >
+                               <my-date-picker name="DocDate"  [selDate]="DocDate" [options]="myDatePickerOptions" (dateChanged)="DocDateChanged($event)" ></my-date-picker>
+                        </td>
+                     </tr> -->
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Type</b></span><span class="col-form-span-error">*</span></td>
+                        <td >
+                            <select class="form-control width120" [(ngModel)]="Type">
+                                <option  value="">Please select</option>
+                                <option *ngFor="let c of typelist" value={{c.CODE}}>{{c.SNAME}}</option>
+                            </select>
+                        </td>
+                    </tr>
+                             <tr>
+                                <td colspan="4"  class="centerlabel">
+                                    <button class="btn btn-sm btn-success" type="submit" [disabled]='disable_submitbtn'  (click)="AddMain()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i>Submit</span></button>
+                                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="RestMain();"><i class="fa fa-ban"></i> Reset</span></button>
+                                </td>
+                            </tr>
+					</table>
+			</div>
+		</div>
+		<div class="col-sm-3">
+		</div>
+
+</div>

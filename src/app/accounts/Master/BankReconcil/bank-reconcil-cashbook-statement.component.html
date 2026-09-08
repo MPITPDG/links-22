@@ -1,0 +1,263 @@
+<div class="br-page">
+
+  <!-- ========================================================= -->
+  <!-- SEARCH -->
+  <!-- ========================================================= -->
+
+  <div class="br-card search-card-clean" *ngIf="!showResult">
+    <div class="clean-row-layout">
+
+      <!-- BANK ACCOUNT -->
+      <div class="clean-field clean-bank">
+        <label>Bank Account <span class="br-req">*</span></label>
+        <ng-select
+          [items]="BankList"
+          bindLabel="acctname"
+          bindValue="acctcodename"
+          [(ngModel)]="Bank"
+          [appendTo]="'body'"
+          placeholder="Select Bank Account">
+        </ng-select>
+      </div>
+
+      <!-- FROM DATE -->
+      <div class="clean-field clean-date">
+        <label>From Date <span class="br-req">*</span></label>
+        <my-date-picker
+          name="FromDate"
+          (dateChanged)="FromDateChanged($event)"
+          [options]="myDatePickerOptions"
+          [selDate]="FromDate"
+          class="search-date-control">
+        </my-date-picker>
+      </div>
+
+      <!-- TO DATE -->
+      <div class="clean-field clean-date">
+        <label>To Date <span class="br-req">*</span></label>
+        <my-date-picker
+          name="ToDate"
+          (dateChanged)="ToDateChanged($event)"
+          [options]="myDatePickerOptions"
+          [selDate]="ToDate"
+          class="search-date-control">
+        </my-date-picker>
+      </div>
+
+      <!-- BALANCE AS PER BANK -->
+      <div class="clean-field clean-balance">
+        <label>Balance As Per Bank <span class="br-req">*</span></label>
+        <input
+          [(ngModel)]="BankBalance"
+          type="text"
+          [OnlyNumber]="true"
+          class="form-control"
+          maxlength="40"
+          placeholder="0.00">
+      </div>
+
+      <!-- BUTTONS -->
+      <div class="clean-actions">
+        <button class="br-btn br-btn--primary" type="button" (click)="SearchData()">
+          <i class="fa fa-search"></i> Search
+        </button>
+        <button class="br-btn br-btn--ghost" type="button" (click)="Reset()">
+          <i class="fa fa-refresh"></i> Reset
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- RESULT -->
+  <!-- ========================================================= -->
+
+  <div *ngIf="showResult" class="br-result-view">
+
+    <!-- RECONCILIATION SUMMARY -->
+
+    <div class="br-card recon-schedule">
+
+      <div class="recon-topline">
+
+        <div class="recon-title-group">
+          <span class="recon-schedule-title">Bank Reconciliation Statement</span>
+          <span class="recon-meta" *ngIf="OurBankName">{{ OurBankName }}</span>
+          <span class="recon-meta">{{ FromDate }} – {{ ToDate }}</span>
+        </div>
+
+        <span
+          class="recon-check-badge"
+          [ngClass]="lbldiff == 0 ? 'ok' : 'warn'">
+
+          <i class="fa" [ngClass]="lbldiff == 0 ? 'fa-check-circle' : 'fa-exclamation-triangle'"></i>
+          {{ lbldiff == 0 ? 'Reconciled' : 'Difference Found' }}
+
+        </span>
+
+      </div>
+
+      <div class="recon-equation">
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">Opening Balance</span>
+          <span class="recon-seg-val">{{ lblOpBal | number:'1.2-2' }}</span>
+        </div>
+
+        <span class="recon-op">+</span>
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">Dr. Amount</span>
+          <span class="recon-seg-val add">{{ CurrentDrBal | number:'1.2-2' }}</span>
+        </div>
+
+        <span class="recon-op">−</span>
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">Cr. Amount</span>
+          <span class="recon-seg-val less">{{ CurrentCrbal | number:'1.2-2' }}</span>
+        </div>
+
+        <span class="recon-op">=</span>
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">Closing (As Per Cash Book)</span>
+          <span class="recon-seg-val">{{ lblclbal | number:'1.2-2' }}</span>
+        </div>
+
+        <span class="recon-op">vs</span>
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">Balance As Per Bank</span>
+          <span class="recon-seg-val">{{ BankBalance | number:'1.2-2' }}</span>
+        </div>
+
+        <span class="recon-op">=</span>
+
+        <div class="recon-seg recon-seg--result">
+          <span class="recon-seg-label">Difference</span>
+          <span
+            class="recon-seg-val result"
+            [ngClass]="lbldiff == 0 ? 'add' : 'less'">
+            {{ lbldiff | number:'1.2-2' }}
+          </span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- CHEQUE ISSUED BUT NOT CLEAR -->
+
+    <div class="br-card br-table-card">
+
+      <div class="br-card-header">
+        <div class="br-card-title">
+          <i class="fa fa-file-text"></i>
+          Cheque Issued But Not Clear
+        </div>
+        <span class="br-record-chip">{{ bankpayList.length }} Items &nbsp;|&nbsp; {{ IssueTotal }}</span>
+      </div>
+
+      <div class="br-table-wrap">
+        <table class="br-table">
+          <thead>
+            <tr>
+              <th>Entry No</th>
+              <th>Entry Date</th>
+              <th>Chq Type</th>
+              <th>Cheque No</th>
+              <th>Cheque Date</th>
+              <th class="num">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of bankpayList">
+              <td class="mono">
+                <a href="javascript:void(0);" class="anchor-link" (click)="Openprint(data.ENTRYNO,data.STATUS)">{{ data.ENTRYNO }}</a>
+              </td>
+              <td class="mono">{{ data.ENTRYDT }}</td>
+              <td>
+                <span class="br-badge br-badge--bp">{{ data.STATUS }}</span>
+              </td>
+              <td class="mono">{{ data.CHEQUENO || '—' }}</td>
+              <td class="mono">{{ data.CHEQUEDT || '—' }}</td>
+              <td class="num dr-amt">{{ data.ACTUALAMOUNT | number:'1.2-2' }}</td>
+            </tr>
+            <tr *ngIf="bankpayList.length === 0">
+              <td colspan="6" class="text-center text-muted">Nothing outstanding for this period</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- CHEQUE RECEIVED BUT NOT CLEAR -->
+
+    <div class="br-card br-table-card">
+
+      <div class="br-card-header">
+        <div class="br-card-title">
+          <i class="fa fa-file-text"></i>
+          Cheque Received But Not Clear
+        </div>
+        <span class="br-record-chip">{{ bankrecList.length }} Items &nbsp;|&nbsp; {{ RecTotal }}</span>
+      </div>
+
+      <div class="br-table-wrap">
+        <table class="br-table">
+          <thead>
+            <tr>
+              <th>Entry No</th>
+              <th>Entry Date</th>
+              <th>Chq Type</th>
+              <th>Cheque No</th>
+              <th>Cheque Date</th>
+              <th class="num">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of bankrecList">
+              <td class="mono">
+                <a href="javascript:void(0);" class="anchor-link" (click)="Openprint(data.ENTRYNO,data.STATUS)">{{ data.ENTRYNO }}</a>
+              </td>
+              <td class="mono">{{ data.ENTRYDT }}</td>
+              <td>
+                <span class="br-badge br-badge--br">{{ data.STATUS }}</span>
+              </td>
+              <td class="mono">{{ data.CHEQUENO || '—' }}</td>
+              <td class="mono">{{ data.CHEQUEDT || '—' }}</td>
+              <td class="num cr-amt">{{ data.ACTUALAMOUNT | number:'1.2-2' }}</td>
+            </tr>
+            <tr *ngIf="bankrecList.length === 0">
+              <td colspan="6" class="text-center text-muted">Nothing outstanding for this period</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- EXPORT -->
+
+    <div class="br-action-bar">
+      <button
+        class="br-back-btn"
+        type="button"
+        (click)="BackToSearch()">
+        <i class="fa fa-arrow-left"></i>
+        Back To Search
+      </button>
+      <button class="br-btn br-btn--export" type="button" (click)="ExportOutstand()">
+        <i class="fa fa-file-excel-o"></i> Export Outstanding
+      </button>
+      <button class="br-btn br-btn--export" type="button" (click)="Exportrecstatement()">
+        <i class="fa fa-file-excel-o"></i> Export Statement
+      </button>
+    </div>
+
+  </div>
+
+</div>

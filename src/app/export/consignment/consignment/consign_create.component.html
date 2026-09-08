@@ -1,0 +1,443 @@
+<div class="animated fadeIn">
+<!-- Include Bootstrap CSS -->
+
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header trheader">
+                    <strong>AUTO JOB</strong>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-borderlessjob table-sm-new ">
+                            <!-- <tr>
+                                <td class="col-form-span-heading" colspan="12">
+                                    EXPORT CONSINGNMENT DETAILS
+                                </td>
+                            </tr> -->
+                            <tr>
+                                <!-- <td>
+                                    <span class="col-form-span-label">Mode<span
+                                            class="col-form-span-error">*</span></span>
+                                </td>
+                                <td colspan="3">
+
+                                    <span class="col-form-span-label">
+                                        <input type="radio" name="rbexporter" [checked]="rbexporter === 1" value="1"
+                                            (click)="fill(1)" /> Exporter/Shipper
+                                        <input type="hidden" name="shipper" [(ngModel)]="hdshipper" />
+                                    </span>
+                                    <span class="col-form-span-label">
+                                        <input type="radio" name="rbexporter" [checked]="rbexporter === 2" value="2"
+                                            (click)="fill(2)" /> Bill To
+                                        <input type="hidden" name="expt_billto" [(ngModel)]="hdexpt_billto" />
+                                    </span>
+                                    <span class="col-form-span-label">
+                                        <input type="radio" name="rbexporter" [checked]="rbexporter === 3" value="3"
+                                            (click)="fill(3)" /> Manufacture
+                                        <input type="hidden" name="manufacturer" [(ngModel)]="hdmanufacturer" />
+                                    </span>
+
+                                </td> -->
+                                <td class="width150">
+                                    <span class="col-form-span-label">Shipper<span
+                                            class="col-form-span-error">*</span></span>
+                                </td>
+                                <td colspan="5">
+                                    <ng-select [items]="exporters" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                                        [(ngModel)]="drpShipper" (change)="drpfill(drpShipper)" class="custom"
+                                        placeholder="--Select--">
+                                    </ng-select>
+
+
+                                </td>
+
+                            </tr>
+                            <tr *ngIf="showjobdtls">
+                                <td colspan="7">
+<div class="collapsible-container"  >
+  <!-- Header Row with + / - toggle -->
+  <div class="collapsible-header" (click)="toggleJobDetails()">
+    <span class="toggle-icon">{{ jobDetailsVisible ? '−' : '+' }}</span>
+    <span class="header-title">Job Details</span>
+  </div>
+
+  <!-- Collapsible Table -->
+  <div class="collapsible-body" *ngIf="jobDetailsVisible"  [@slideToggle]="jobDetailsVisible ? 'open' : 'closed'">
+    <div class="table-container" style="height:250px">
+    <table class="table table-borderlessjob table-sm-new " style="width:100%" >
+      <thead>
+        <tr class="trheader">
+          <th></th>
+          <th><span class="col-form-span-label-console"><b>Job No.</b></span></th>
+          <th><span class="col-form-span-label-console"><b>Shipper</b></span></th>
+          <th><span class="col-form-span-label-console"><b>Consignee</b></span></th>
+          <th><span class="col-form-span-label-console"><b>Inv No</b></span></th>
+          <th><span class="col-form-span-label-console"><b>Pkgs</b></span></th>
+          <th><span class="col-form-span-label-console"><b>Pcs</b></span></th>
+        </tr>
+      </thead>
+      <tbody> 
+        <tr *ngFor="let obj of joblist">
+          <td>
+            <input type="checkbox" [(ngModel)]="obj.CHECKED"
+                   (ngModelChange)="getCheckboxValues($event, obj)">
+          </td>
+          <td><span class="col-form-span-label">{{ obj.EXPTNO }}</span></td>
+          <td><span class="col-form-span-label">{{ obj.EXP_NAME }}</span></td>
+          <td><span class="col-form-span-label">{{ obj.CON_NAME }}</span></td>
+          <td><span class="col-form-span-label">{{ obj.INVNO }}</span></td>
+          <td><span class="col-form-span-label">{{ obj.PKGS }}</span></td>
+          <td><span class="col-form-span-label">{{ obj.PCS }}</span></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+     </div>
+    </td>
+        </tr>                
+                    <!-- <tr>
+                        <td colspan="12">
+                            <table class="table table-borderlessjob  table-sm-new" style="width:100%">
+                                <thead>
+                                    <tr class="trheader">
+                                         <th><span class="col-form-span-label-console"> </span></th>
+                                        <th><span class="col-form-span-label-console"><b>Job No.</b> </span></th>
+                                        <th><span class="col-form-span-label-console"><b>Shipper</b> </span></th>
+                                        <th><span class="col-form-span-label-console"><b>Consignee</b> </span></th>
+                                        <th><span class="col-form-span-label-console"><b>Inv No</b> </span></th>
+                                        <th><span class="col-form-span-label-console"><b>Pkgs</b> </span></th>
+                                        <th><span class="col-form-span-label-console"><b>Pcs</b> </span></th>
+                                    </tr>
+                                </thead>
+								  <tbody>
+								  <tr *ngFor="let obj of joblist">
+                                     <td class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.Checked"
+                                            (ngModelChange)="getCheckboxValues($event,obj.EXPTNO)"> &nbsp; </td>
+								  <td > <span
+                                             class="col-form-span-label">{{obj.EXPTNO}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.EXP_NAME}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.CON_NAME}}</span></td>
+                                             <td><span class="col-form-span-label">{{obj.INVNO}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.PKGS}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.PCS}}</span></td>
+                                            
+                                       
+
+								   </tr>
+								  </tbody>
+                            </table>
+                        </td>
+                    </tr> -->
+                            <!-- <tr>
+                                 <td>
+                                    <span class="col-form-span-label">Prev Jobs <span
+                                            class="col-form-span-error">*</span></span>
+                                </td>
+                                 <td colspan="5">
+                            
+                                     <ng-select [items]="joblist" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD"
+                                        [(ngModel)]="jobno" class="custom"      [clearable]="false" 
+                                            [virtualScroll]="true"  (change)="onItemSelect()"
+                                        placeholder="--Select--">
+                                       
+                                    <ng-template ng-option-tmp let-item="item" let-index="index">
+                                    <div class="option-item"
+                                        (mouseenter)="showPopupItem(item, $event)"
+                                        (mouseleave)="hidePopup()">
+                                    {{ item.DATATEXTFIELD }}
+                                    </div>
+                                </ng-template>
+                                 </ng-select>
+                                  </td>
+                                 
+                            </tr> -->
+                            <!-- <tr>
+                                <td>
+                                    <span class="col-form-span-label">Exporter/Shipper<span
+                                            class="col-form-span-error">*</span></span>
+                                </td>
+                                <td colspan="3">
+                                    <input type="text" id="txtshipper" class="form-control match-ngselect" [(ngModel)]="txtshipper"
+                                        disabled />
+                                </td>
+                                <td style="width:150px;">
+                                    <span class="col-form-span-label">Bill To<span
+                                            class="col-form-span-error">*</span></span>
+                                </td>
+                                <td colspan="3">
+                                    <input type="text" id="txtexpt_billto" class="form-control match-ngselect"
+                                        [(ngModel)]="txtexpt_billto" disabled />
+                                </td>
+
+                            </tr> -->
+                            <!-- <tr>
+                                <td>
+                                    <span class="col-form-span-label">Manufacturer</span>
+                                </td>
+                                <td colspan="3">
+                                    <input type="text" id="txtmanufacturer" [(ngModel)]="txtmanufacturer"
+                                        class="form-control match-ngselect" disabled />
+                                </td>
+                                   <td>
+                                    <span class="col-form-span-label">Incoterm</span>
+                                </td>
+                                <td>
+                                      <ng-select [items]="incotermlist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="incoterm"
+                                        (change)="changeIncoterm(incoterm)" class="custom width120" placeholder="--Select--">
+                                        </ng-select>
+                                </td>
+                            </tr> -->
+
+                            <!-- <tr>
+                                <td >
+                                    <span class="col-form-span-label">Agent</span>
+                                </td>
+                                <td colspan="3">
+                                    <ng-select [items]="agents" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                                        [(ngModel)]="drpAgent" class="custom" placeholder="--Select--">
+                                    </ng-select>
+                                </td>
+                                <td >
+                                    <span class="col-form-span-label">Sub Agent</span>
+                                </td>
+                                <td colspan="3">
+                                    <ng-select [items]="subagents" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                                        [(ngModel)]="drpSubAgent" class="custom" placeholder="--Select--">
+                                    </ng-select>
+                                </td>
+                            </tr> -->
+                            <!-- <tr>
+                                <td colspan="4">
+                                    <input type="checkbox" id="chknotify" class="col-form-span-label" name="checkbox1"
+                                        value="option1" (change)="onChangeNotify(chknotify)" [(ngModel)]="chknotify">
+                                    <span class="col-form-span-label">
+                                        Notify whether consignee & buyer are the same
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="col-form-span-label" for="inline-radio1">
+                                        <input type="radio" name="rbconsig" value="cons" [checked]="rbCons === 1"
+                                            (click)="fill1(1)"> Consignee
+                                    </span>
+                                    <span class="col-form-span-label" for="inline-radio2">
+                                        <input type="radio" name="rbconsig" value="buy" [checked]="rbCons === 2"
+                                            [disabled]="rbConsDisabled == 2" (click)="fill1(2)"> Buyer
+                                    </span>
+                                </td>
+                                <td colspan="3">
+                                    <ng-select [items]="consignees" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                                        [(ngModel)]="drpexpt_consignee" class="custom" placeholder="--Select--"
+                                        (change)="consfill(drpexpt_consignee)">
+                                    </ng-select>
+                                </td>
+                            </tr> -->
+                            <!-- <tr>
+                                <td>
+                                    <span class="col-form-span-label">Consignee<span
+                                            class="col-form-span-error">*</span></span>
+                                </td>
+                                <td colspan="3">
+                                    <input type="text" id="txtConsignee" class="form-control match-ngselect" [(ngModel)]="txtConsignee"
+                                        disabled />
+                                    <input type="hidden" name="shipper" [(ngModel)]="hdexpt_consignee" />
+                                </td>
+                                <td>
+                                    <span class="col-form-span-label">Buyer <span
+                                            class="col-form-span-error">*</span></span>
+                                </td>
+                                <td colspan="3">
+                                    <input type="text" id="txtBuyername" class="form-control match-ngselect" [(ngModel)]="txtBuyername"
+                                        disabled />
+                                    <input type="hidden" name="shipper" [(ngModel)]="hdexpt_buyer" />
+                                </td>
+                            </tr> -->
+                        
+                          
+                            <tr>
+                                <td><span class="col-form-span-label">Exporter Inv No.<span
+                                            class="col-form-span-error">*</span></span> </td>
+                                <td><input type="text" [(ngModel)]="expinvno" class="form-control match-ngselect width150" /></td>
+                                <td><span class="col-form-span-label">Inv Date<span
+                                            class="col-form-span-error">*</span></span> </td>
+                                <td><my-date-picker name="mydate3" [options]="myDatePickerOptions"
+                                        [(ngModel)]="exptinvdt" required></my-date-picker></td>
+                                <td><span class="col-form-span-label">Doc Recd. Date <span
+                                            class="col-form-span-error">*</span></span> </td>
+                                <td><my-date-picker name="mydate3" [options]="myDatePickerOptions"
+                                        [(ngModel)]="docrecdt"></my-date-picker></td>
+                            </tr>
+                                <tr>
+                                <!-- <td>
+                                    <span class="col-form-span-label">If consigned to bank<span
+                                            class="col-form-span-error">*</span></span>
+                                </td>
+                                <td colspan="3">
+                                    <ng-select [items]="banks" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                                        [(ngModel)]="drpBank" class="custom" placeholder="--Select--">
+                                    </ng-select>
+                                </td> -->
+                                <td>
+                                    <span class="col-form-span-label">Mode of Shipment</span>
+                                </td>
+                                <td colspan="3" style="background-color: yellowgreen; ">
+                                    <span class="col-form-span-label" for="inline-radio1">
+                                        <input type="radio" name="stuff" [checked]="rbstuff === 1" value="shipmentMode"
+                                            (click)="vsl(1, 'SEA')">Factory Stuffing
+                                    </span>
+                                    <span class="col-form-span-label" for="inline-radio2">
+                                        <input type="radio" name="stuff" [checked]="rbstuff === 2" value="shipmentMode"
+                                            (click)="vsl(2, 'SEA')">Docks/Godown Stuffing
+                                    </span>
+                                    <span class="col-form-span-label" for="inline-radio3">
+                                        <input type="radio" name="stuff" [checked]="rbstuff === 3" value="shipmentMode"
+                                            (click)="vsl(3, 'AIR')"> Air Shipment
+                                    </span>
+                                </td>
+                            </tr>
+                              <tr *ngIf="trSubAir == 'Y'" class="col-form-span-heading">
+                                <td colspan="12">
+                                    <table class="table table-borderless table-sm-new" style="width:100%">
+                                        <tr>
+
+                                            <td colspan="12" style="text-align: center;">
+                                                <span class="col-form-span-label">Air
+                                                    Shipment</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                                <span class="col-form-span-label" for="inline-radio1">
+                                                    <input type="radio" name="SubAir" value="0"
+                                                        [checked]="rbsubair === 0" (click)="subAir(0)">Air [Normal Air]
+                                                </span>
+                                                <span class="col-form-span-label" for="inline-radio2">
+                                                    <input type="radio" name="SubAir" value="1"
+                                                        [checked]="rbsubair === 1" (click)="subAir(1)">Differed Air
+                                                </span>
+                                                <span class="col-form-span-label" for="inline-radio2">
+                                                    <input type="radio" name="SubAir" value="2"
+                                                        [checked]="rbsubair === 2" (click)="subAir(2)">SEA-AIR
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td colspan="12" class="centerlabel">
+                                    <button type="button" class="btn btn-sm btn-primary" (click)="autojobsubmit()"><span
+                                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>
+                                            Submit</span></button>
+                                    <button type="reset" class="btn btn-sm btn-danger" (click)="Reset()"><span
+                                            class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </div>
+                    <!-- <div class="centerlabel" >
+                    <button type="button" class="btn btn-sm btn-primary" (click)="finalSubmit()"><span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Submit</span></button>
+                    <button type="reset" class="btn btn-sm btn-danger" (click)="Reset()"><span class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
+                </div> -->
+                </div>
+
+                <!-- <div class="card-footer">
+                    <button type="button" class="btn btn-sm btn-primary" (click)="finalSubmit()"><span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Submit</span></button>
+                    <button type="reset" class="btn btn-sm btn-danger" (click)="Reset()"><span class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
+                </div> -->
+                <div class="row" style="height:220px;overflow-y: auto; ">
+
+                    <div class="col-sm-12">
+
+                        <table class="table table-borderlessjob  table-sm-new">
+                            <thead>
+                                <tr class="trheader" >
+                                    <th class="width50 centerlabel"><span class="col-form-span-label-console"></span></th>
+                                    <th class="width100 centerlabel"><span class="col-form-span-label-console">Expt No.</span>
+                                    </th>
+                                    <th class="width100 centerlabel"><span class="col-form-span-label-console">Mode</span></th>
+                                    <th class="width100 centerlabel"><span class="col-form-span-label-console">Shipper</span>
+                                    </th>
+                                    <th class="width100 centerlabel"><span class="col-form-span-label-console">Consignee</span>
+                                    </th>
+                                    <th class="width100 centerlabel"><span class="col-form-span-label-console">Ship
+                                            Mode</span></th>
+                                    <th class="width100 centerlabel"><span class="col-form-span-label-console">Inv No</span>
+                                    </th>
+                                    <!-- <th class="width100 centerlabel"><span class="col-form-span-label">Inv Date</span></th> -->
+                                    <th class="width100 centerlabel"><span class="col-form-span-label-console">Doc Rec
+                                            Date</span></th>
+                                    <th class="width100 centerlabel"><span class="col-form-span-label-console">Created By</span></th>    
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let obj of exptnolist" [class.updated-row]="obj.JOBTYPE=== 'AUTOJOB'">
+                                    <td style="width: 30px;" class="centerlabel">
+                                        <i class="fa fa-pencil" (click)="Redirecttoedit(obj.EXPTNO)"></i>
+
+                                    </td>
+                                    <td style="width: 100px;"><span class="col-form-span-label">{{obj.EXPTNO}}</span>
+                                    </td>
+                                    <td class="centerlabel" style="width: 30px;"><span class="col-form-span-label">{{obj.MODE}}</span></td>
+                                    <td style="width: 225px;"><span class="col-form-span-label">{{obj.SHIPPER}}</span>
+                                    </td>
+                                    <td style="width: 225px;"> <span
+                                            class="col-form-span-label">{{obj.CONSIGNEE}}</span></td>
+                                    <td class="centerlabel" style="width: 100px;"><span
+                                            class="col-form-span-label">{{obj.MODEOFSHIPMENT}}</span></td>
+                                    <td style="width: 100px;"><span class="col-form-span-label">{{obj.INVNO}}</span>
+                                    </td>
+                                    <!--<td><span class="col-form-span-label">{{obj.INVDATE}}</span></td>  -->
+                                    <td style="width: 100px;"><span
+                                            class="col-form-span-label">{{obj.DOCRECDATE}}</span></td>
+                                            <td style="width: 100px;"><span
+                                            class="col-form-span-label">{{obj.USERNAME}}</span></td>
+
+                                </tr>
+                            <tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div *ngIf="showPopup" class="popup-card" 
+     [ngStyle]="{ top: popupPosition.top + 'px', left: popupPosition.left + 'px' }">
+  <!-- <div class="popup-header">
+    <h3>Job Details</h3>
+  </div> -->
+  <div class="popup-body">
+    <div class="popup-row"><span class="label">Job:</span> <span class="value">{{ filteredjobno }}</span></div>
+    <div class="popup-row"><span class="label">Consignee:</span> <span class="value">{{ filteredjobconsignee }}</span></div>
+    <div class="popup-row"><span class="label">Shipper:</span> <span class="value">{{ filteredjobshipper }}</span></div>
+    <div class="popup-row"><span class="label">Invoice:</span> <span class="value">{{ filteredjobinvno }}</span></div>
+    <div class="popup-row"><span class="label">Pkgs:</span> <span class="value">{{ filteredjobpkgs }}</span></div>
+    <div class="popup-row"><span class="label">Pcs:</span> <span class="value">{{ filteredjobpcs }}</span></div>
+  </div>
+</div>
+<!-- <div *ngIf="showPopup"  class="popup-card absolute"
+     [ngStyle]="{ top: popupPosition.top + 'px', left: popupPosition.left + 'px' }">
+  
+
+  <div class="popup-card"   [ngStyle]="{ top: popupPosition.top + 'px', left: popupPosition.left + 'px' }">
+    
+       <div class="popup-header">
+      <h2>Job Details</h2>
+      <button (click)="closeJobDetails()" aria-label="Close">✕</button>
+    </div>
+
+     <div class="popup-body p-4">
+    <p><strong>Job:</strong> {{filteredjobno}}</p>
+    <p><strong>Consignee:</strong> {{ filteredjobconsignee }}</p>
+    <p><strong>Shipper:</strong> {{ filteredjobshipper }}</p>
+    <p><strong>Invoice No:</strong> {{ filteredjobinvno }}</p>
+    <p><strong>Pkgs:</strong> {{ filteredjobpkgs }}</p>
+    <p><strong>Pcs:</strong> {{ filteredjobpcs }}</p>
+</div>
+
+  </div>
+</div> -->

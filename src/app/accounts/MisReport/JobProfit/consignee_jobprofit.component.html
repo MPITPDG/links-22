@@ -1,0 +1,83 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>{{PageName|uppercase}}</strong>
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr >
+                    <td  >
+                       <span class="col-form-span-label"><b>Consignee :</b> </span></td>
+                    <td colspan="3">
+                        <ng-select   [items]="ConsigneeList" bindLabel="con_name" 
+                               bindValue="concode"  [(ngModel)]="consignee"   (change)="GetconsigneeName($event.con_name)"
+                               class="custom width300" placeholder="--All--"> 
+                                </ng-select>
+            
+                    </td>
+                </tr>
+     
+                <tr >
+                    <td  >
+                       <span class="col-form-span-label"><b>Mode :</b> </span></td>
+                    <td  colspan="3" style="text-align: left;">
+                       
+                   
+                        <div style="display: inline-flex;" class="col-form-span-label">
+                            <input type="radio"  name="modetype_radio" value='SEA' (change)="getmodevalue(modetype)"
+                                [(ngModel)]="modetype"  >&nbsp;<b>Sea  </b>
+                                &nbsp;<input type="radio"name="modetype_radio" value='AIR' (change)="updateDtlable(modetype)"
+                                [(ngModel)]="modetype" >&nbsp;<b>Air  </b>
+                                &nbsp;
+                        </div>
+                       
+                    </td>
+                </tr>
+               
+                <tr >
+                    <td  >
+                       <span class="col-form-span-label"><b>Date :</b> </span></td>
+                    <td colspan="3" style="text-align: left;">
+                        <div style="display: inline-flex;">
+                            <span class="col-form-span-label">From &nbsp;</span>
+                            <my-date-picker name="FromDate" [options]="myDatePickerOptions" 
+                                [(ngModel)]="FromDate" ></my-date-picker> &nbsp;
+                            <span class="col-form-span-label">To &nbsp;</span>
+
+                            <my-date-picker name="ToDate" [options]="myDatePickerOptions"
+                                [(ngModel)]="ToDate" ></my-date-picker>
+                        </div>
+                    </td>
+
+                </tr>
+              
+                <tr  >
+                    <td colspan="6" class="centerlabel">
+                   
+                            <button class="btn btn-sm btn-primary" type="submit" (click)="Exporttoexcel()">
+                                <span class="col-form-span-label"><i class="fa fa-file-excel-o"></i> Export to Excel</span>
+                               </button> 
+                             
+                <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                        (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
+                    </td>
+                    </tr>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+    </div>
+</div>

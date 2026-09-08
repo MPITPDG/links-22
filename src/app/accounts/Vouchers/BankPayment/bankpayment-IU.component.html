@@ -1,0 +1,569 @@
+<div class="row" >
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header formheading">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <strong>{{Header| uppercase}}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row no-gutters">
+    <div class="col-sm-12 col-md-2 col-lg-2">
+    </div>
+    <div class="col-sm-12 col-md-8 col-lg-8 ">
+        <table class="table table-bordered table-sm-new bgwhite">
+           
+            
+            <tr class="trheader">
+                <td class="col-form-span-label" style="color: whitesmoke;"  colspan="4">
+                    <b> General Details </b>
+                </td>
+            </tr>
+            <tr>
+
+                <td><span  class="col-form-span-label"><b>Entry No</b> </span><span class="col-form-span-error">*</span></td>
+                <td >  <input [(ngModel)]="EntryNo" type="text"   disabled="disabled" class="form-control width150" maxlength="40" > </td>
+                <td ><span class="col-form-span-label"><b>Entry Date</b> </span><span class="col-form-span-error">*</span>  </td>
+                <td>
+                    <my-date-picker name="EntryDate"   [options]="myDatePickerOptions" class="form-control" (dateChanged)="EntryDateChanged($event)" [selDate]="EntryDate"></my-date-picker>
+                </td>
+
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b>Narration</b> </span></td>
+                <!-- <td colspan="3">  <input [(ngModel)]="Narration" type="text"  class="form-control"  > </td> -->
+                <td colspan="3">
+                    <textarea class="form-control" id="autoresizing" (change)="TextareaValueChange($event)"
+                      placeholder="text" cols="50" rows="3" [innerHTML]="Narration"></textarea>
+                   </td>
+             </tr>
+             <tr class="trheader">
+                <td class="col-form-span-label" style="color: whitesmoke;"  colspan="4">
+                   <b> Payment Details</b>
+                </td>
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b> Payment Mode</b> </span></td>
+                <td  style=" display: flex; ">
+                    <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
+                        <select class="form-control width150"  [(ngModel)]="ChqType" (change)="fnchequeType()" >
+
+                        <option value="CHQ" > CHEQUE</option>
+                        <option value="Y">NOT OVER</option>
+                        <option value="PO">PAY ORDER</option>
+                        <option value="NEFT">NEFT</option>
+                        <option value="RTGS">RTGS</option>
+                          </select>
+
+            </td>
+
+                <!-- <td colspan="2"><span style="color: red;">
+                    Normal Cheque Print
+                </span></td> -->
+                <td colspan="2">
+                    <span class="col-form-span-error">{{chequelabel}}</span>
+                </td>
+
+            </tr>
+             <tr>
+
+                <td><span class="col-form-span-label"><b>Cheque No.</b> </span></td>
+                <!-- <td  >
+                       <input [(ngModel)]="ChequeNo"  [OnlyNumber]="true" type="text"  class="form-control width50" >
+                       <button align="left" class="btn btn-sm btn-success" type="submit" (click)="fnChqValidate()">  <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Status</span></button>
+
+                     </td> -->
+                     <td >
+                        <table style="width:200px ;">
+                            <tbody  style="border: none;">
+                            <tr>
+                                   <td >  <input [(ngModel)]="ChequeNo"  [OnlyNumber]="true" type="text"  class="form-control width100" maxlength="40" ></td>
+                                    <td > <button type="submit" (click)="fnChqValidate()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Status</span></button> </td>
+                            </tr>
+                        </tbody>
+                        </table>
+
+                    </td>
+                       <td ><span class="col-form-span-label"><b>Cheque Date</b> </span><span class="col-form-span-error">*</span>  </td>
+
+                     <td>
+                        <my-date-picker name="ChequeDate"  (dateChanged)="ChequeDateChanged($event)" [options]="myDatePickerOptions" class="form-control" [selDate]="ChequeDate" ></my-date-picker>
+                    </td>
+            </tr>
+               <tr>
+                <td><span class="col-form-span-label"><b>Our Bank</b> </span></td>
+                <td colspan="3">
+                <select class="form-control width500"  [(ngModel)]="OurBank" (change)="GetOurBankName($event)" >
+                    <option value="0">Please select</option>
+                    <option *ngFor="let d of OurBankList"  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+
+                </select>
+            </td>
+
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b>Bank Name</b> </span></td>
+                <td >  <input [(ngModel)]="BankName"   type="text"   class="form-control width150" maxlength="40" > </td>
+                <td><span class="col-form-span-label"><b>Bank Ref. No.</b> </span></td>
+                <td >  <input [(ngModel)]="BankRefNo"   type="text"   class="form-control width150" maxlength="40" > </td>
+            </tr>
+            <tr class="trheader">
+                <td class="col-form-span-label" style="color: whitesmoke;"  colspan="4">
+                   <b> Accounts Details</b>
+                </td>
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b>Account Name</b> </span><span class="col-form-span-error">*</span></td>
+                <td colspan="3">
+
+                    <ng-select [items]="AccountNameList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
+                    [(ngModel)]="AccountName" (change)="GetActName($event.ACCTCODENAME)" class="custom " placeholder="--Select--">
+                </ng-select>
+
+                </td>
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b>Item</b> </span><span class="col-form-span-error">*</span></td>
+                <td >
+
+                    <ng-select [items]="ItemList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Item"
+                    class="custom " placeholder="--Select--">
+                </ng-select>
+                </td>
+
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b> TDS Applicable</b> </span><span
+                        class="col-form-span-error">*</span>
+                </td>
+                <td style=" display: flex; ">
+                    <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
+                        <select class="form-control width150"  [(ngModel)]="TDSApplicable"   >
+                        <option value="">--Please select--</option>
+                        <option value="Y">Y</option>
+                        <option value="N">N</option>
+                       </select>
+
+            </td>
+            <td  class="col-form-span-heading" colspan="2">
+
+                <div style="display: flex;float: left;" >
+                    <span class="col-form-span-label" style="color: crimson;"><b>{{chktdslbl}}</b> </span>
+                    <span class="col-form-span-label"> <input type="checkbox"
+                          [(ngModel)]="chkIsTDS"  [disabled]='disablecheckbox'
+                            /> </span>
+                </div>
+            </td>
+
+
+            </tr>
+            <TR>
+                <td><span class="col-form-span-label"><b>GST Applicable</b> </span></td>
+                <td style=" display: flex; ">
+                    <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
+                        <select class="form-control width150"  [(ngModel)]="GSTApplicable"   >
+                            <option  value="" >-- Please Select --</option>
+                            <option value="1">Y</option>
+                            <option value="0" >N</option>
+                            <option value="2" >RCM</option>
+                       </select>
+                </td>
+                <!-- <td><span class="col-form-span-label"><b>GST Rate</b> </span></td>
+                <td style=" display: flex; ">
+                    
+                        <select class="form-control width150"  [(ngModel)]="gstrate"   >
+                            <option value="0">--Please select--</option>
+                            <option *ngFor="let d of gstratelist"  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                       </select>
+                </td> -->
+            </TR>
+            <tr>
+                <td><span class="col-form-span-label"><b> Entry Type</b> </span></td>
+                <td style=" display: flex; ">
+                    <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
+                        <select class="form-control width150"  [(ngModel)]="EntryType" [disabled]='disableEntryType' (change)="listbillpopup($event.target.value)"  [disabled]="disable_EntryType" >
+                        <option value="0">Please select</option>
+                        <option *ngFor="let d of EntryTypeList"  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                        </select>
+
+            </td>
+                <td><span class="col-form-span-label"><b> Department</b> </span></td>
+                <td>
+                 <select class="form-control width150"  [(ngModel)]="Department" (change)="GetDepartmentName($event)" >
+                    <option value="0">--Please select--</option>
+                    <option *ngFor="let d of Departmentlist"  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+
+                </select>
+
+            </td>
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b> Bill No</b> </span><span class="col-form-span-error">*</span></td>
+                <td >  <input [(ngModel)]="BillNo" type="text"  [OnlyNumber]="true" [disabled]="disable_BillNo" (change)="fnBillNoChk()" class="form-control width150" maxlength="40" > </td>
+                <td><span class="col-form-span-label"><b>Job No</b> </span></td>
+                <td >  <input [(ngModel)]="JobNo" [OnlyNumber]="true" type="text" (blur)="ValidateJobNo($event.target.value)"   class="form-control width150" maxlength="40" > </td>
+                <!-- <td >  <input [(ngModel)]="JobNo" [OnlyNumber]="true" type="text" (blur)="ValidateJobNo($event.target.value)" (change)="FillDepartment()"  class="form-control width150" maxlength="40" > </td> -->
+
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b> Amount</b> </span><span class="col-form-span-error">*</span></td>
+                <td >  <input [(ngModel)]="Amount" type="text"  [OnlyNumber]="true" [disabled]='toggledebit' class="form-control width150" maxlength="40" > </td>
+                <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
+                <td >  <input [(ngModel)]="Deduction" [OnlyNumber]="true" type="text"  [disabled]='disable_deduction'   class="form-control width150" maxlength="40" > </td>
+
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b>Narration</b> </span></td>
+                <td colspan="3">
+                    <input [(ngModel)]="ShortNarration" type="text"    class="form-control width500" maxlength="40" >
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4"  class="centerlabel">
+                    <button class="btn btn-sm btn-success" type="submit" [disabled]="disable_cmdadd" (click)="Addchildrcrd()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{txtchild}}</span></button>
+                    <button class="btn btn-sm btn-danger" type="reset" [disabled]="disable_cmdcancel"> <span class="col-form-span-label" (click)="Resetchildrcrd();"><i class="fa fa-ban"></i> Reset</span></button>
+
+                        <button class="btn btn-sm btn-success" type="submit" [disabled]='disabletdsbtn'> <span class="col-form-span-label"
+                               (click)="!disabletdsbtn && OpenTdsModal();"><i class="fa fa-dot-circle-o"></i> Cal TDS</span></button>
+                               <button class="btn btn-sm btn-danger" type="reset"  [disabled]='disableresetbtn'> <span class="col-form-span-label"
+                                (click)="!disableresetbtn && ResetTDS()"><i class="fa fa-ban"></i> Reset TDS</span></button>
+                    <!-- <button class="btn btn-sm btn-danger" type="List"> <span class="col-form-span-label" (click)="Resetchildrcrd();"><i class="fa fa-ban"></i> List</span></button> -->
+                </td>
+            </tr>
+            <tr>
+
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b> Net Total</b> </span></td>
+                <td colspan="3" >  <input [(ngModel)]="NetTotal" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b> Amount</b> </span></td>
+                <td >  <input [(ngModel)]="TotalAmount" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
+                <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
+                <td >  <input [(ngModel)]="TotalDeduction" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
+            </tr>
+
+       <tr>
+        <td colspan="4">
+        <!-- <table class="table table-bordered table-sm-new bgwhite">
+            <tr>
+                 <td colspan="4" > style="width:615px;" -->
+                    <div class="row xyscroll"  style="width:800px;" >
+                        <table class="table table-responsive-sm table-bordered" *ngIf="Accountlist.length>0" >
+                            <thead>
+                                <tr class="bakgrdliteBlue">
+                                    <th  class="col-form-span-label font-weight-bold headerwhite" ></th>
+                                    <th class="col-form-span-label font-weight-bold headerwhite">Account Name</th>
+                                    <th  class="col-form-span-label font-weight-bold headerwhite">Amount</th>
+                                    <th  class="col-form-span-label font-weight-bold headerwhite">Deduction</th>
+                                    <th class="col-form-span-label font-weight-bold headerwhite">TDS</th>
+                                    <th class="col-form-span-label font-weight-bold headerwhite">GST</th>
+                                    <th  class="col-form-span-label font-weight-bold headerwhite">Item</th>
+                                    <th  class="col-form-span-label font-weight-bold headerwhite">Entry Type </th>
+                                    <th class="col-form-span-label font-weight-bold headerwhite">Job No</th>
+                                    <th class="col-form-span-label font-weight-bold headerwhite">Bill No</th>
+                                    <th class="col-form-span-label font-weight-bold headerwhite">Department</th>
+                                    <th class="col-form-span-label font-weight-bold headerwhite">Narration</th>
+                                </tr>
+                            </thead>
+                             <tbody   >
+                                <tr *ngFor="let obj of Accountlist">
+                                    <td class="centerlabel">
+                                        <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)" ></i>
+                                        &nbsp;
+                                        <i class="fa fa-trash" (click)="deletechildrecd(obj.ID,obj.ACC_BANKDTLS_ID,obj.CLIENT,obj.IS_NOT_EDIT_ABLE)"></i>
+                                    </td>
+                                   <td><span class="col-form-span-label"  [innerHtml]="obj.ACCOUNT_NAME"> </span></td>
+                                   <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>
+                                    <td><span class="col-form-span-label">{{obj.DEDUCTION}}</span></td>
+                                    <td><span class="col-form-span-label">{{obj.IS_TDS}}</span></td>
+                                    <td><span class="col-form-span-label">{{obj.GST}}</span></td>
+                                    <td><span class="col-form-span-label">{{obj.ITEM}}</span></td>
+                                    <td><span class="col-form-span-label">{{obj.ET}}</span></td>
+                                    <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
+                                    <td><span class="col-form-span-label">{{obj.BILLNO}}</span></td>
+                                    <td><span class="col-form-span-label">{{obj.DEPARTMENT}}</span></td>
+                                    <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                   </div>
+                 <!-- </td>
+            </tr>
+
+        </table>   -->
+
+    </td>
+</tr>
+<tr>
+    <td colspan="4"  class="centerlabel">
+        <button class="btn btn-sm btn-success" type="submit" (click)="Add_Main()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{text}}</span></button>
+        <button class="btn btn-sm btn-danger" type="reset" (click)="Reset();" ><span class="col-form-span-label" ><i class="fa fa-ban"></i> Reset</span></button>
+    </td>
+</tr>
+ </table>
+    </div>
+    <div class="col-sm-12 col-md-2 col-lg-2">
+    </div>
+</div>
+<div class="modal" [style.display]="showModal_ChqList ? 'block' : 'none'">
+    <div class="modal-dialog modal-mg" role="document"  >
+        <div class="modal-content " style="height:400px; width:600px;overflow-x: auto;">
+            <div class="modal-header">
+                <h5 class="modal-title">BILL DETAILS</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- <div class="col" style="height:400px;overflow-y: auto;" > -->
+                        <div class="col" >
+                        <table class="table table-bordered table-sm-new bgwhite">
+                            <tr>
+                                <td>
+                                    <span class="col-form-span-label"><b>Details For Cheque No. {{ChequeNo}}</b></span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="col-form-span-label"><b>Bank {{OurBankName}}</b></span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <thead style="text-align: center;">
+                                        <tr>
+
+                                            <th class="col-form-span-label">Entry No.</th>
+                                            <th class="col-form-span-label">Entry Date</th>
+                                            <th class="col-form-span-label">Cheque No</th>
+                                            <th class="col-form-span-label">Cheque Date</th>
+                                            <th class="col-form-span-label">Account Name</th>
+                                            <th class="col-form-span-label">Account Date</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody >
+
+                                        <tr *ngFor="let obj of ListChq ">
+
+                                            <td class="col-form-span-label">{{obj.entryno}}</td>
+                                            <td class="col-form-span-label">{{obj.entrydt}}</td>
+                                            <td class="col-form-span-label">{{obj.chequeno}}</td>
+                                            <td class="col-form-span-label">{{obj.chequedt}}</td>
+                                            <td class="col-form-span-label">{{obj.acctname}}</td>
+                                            <td class="col-form-span-label">{{obj.actualamount}}</td>
+
+
+
+                                        </tr>
+                                    </tbody>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+                </div>
+                <div style="float: right;">
+
+                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                            (click)="close()"><i class="fa fa-ban"></i>
+                            Close</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" [style.display]="showModal_ListBill ? 'block' : 'none'">
+    <div class="modal-dialog modal-mg" role="document"  >
+        <div class="modal-content " style="height:400px; width:500px;overflow-x: auto;">
+            <div class="modal-header">
+                <h5 class="modal-title">BILL DETAILS</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- <div class="col" style="height:400px;overflow-y: auto;" > -->
+                        <div class="col" style="height:300px;overflow-y: auto;" >
+                        <table class="table table-bordered table-sm-new bgwhite" align="center">
+                            <tr>
+                                <td><span class="col-form-span-label"><b> Supplier:  </b> </span>
+                                    <span class="col-form-span-label"><b>{{client}}</b></span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <thead style="text-align: center;">
+                                        <tr>
+                                            <th class="col-form-span-label"></th>
+                                            <th class="col-form-span-label">INVOICE NO.</th>
+                                            <th class="col-form-span-label">JOB NO.</th>
+                                            <th class="col-form-span-label">AMOUNT</th>
+                                            <!-- <th class="col-form-span-label">DEDUCTION</th>
+                                            <th class="col-form-span-label">NARRATION</th> -->
+                                        </tr>
+                                    </thead>
+                                    <tbody >
+
+                                        <tr *ngFor="let obj of ListBill ">
+                                            <td class="col-form-span-label">
+                                                <input type="checkbox" [(ngModel)]="obj.CHECKED" [id]="i" [value]="i"
+                                                    (ngModelChange)="getCheckboxValues($event,obj.INV_NO,obj.INV_JOBNO,obj.TOTALAMT,obj.SUPPLIER)">
+                                                &nbsp; </td>
+                                            <td class="col-form-span-label">{{obj.INV_NO}}</td>
+                                            <td class="col-form-span-label">{{obj.INV_JOBNO}}</td>
+                                            <td class="col-form-span-label">{{obj.TOTALAMT}}</td>
+                                            <!-- <td class="col-form-span-label">{{obj.DEDUCTION}}</td>
+                                            <td class="col-form-span-label"> <input [(ngModel)]="obj.NARRATION"  type="text" maxlenght="40"  class="form-control width150" ></td> -->
+
+                                        </tr>
+                                    </tbody>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div style="float: right;">
+                    <button class="btn btn-sm btn-success" type="submit" (click)="popup_listbill()"> <span
+                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Add</span></button>
+                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                            (click)="closeBill()"><i class="fa fa-ban"></i>
+                            Close</span></button>
+                </div>
+            </div>
+        </div>
+        </div>
+</div>
+<div class="modal" [style.display]="showModal_TDS ? 'block' : 'none' "  >
+    <div class="modal-dialog modal-lg" role="document" style="width: 700px;">
+        <div class="modal-content">
+            <div class="card-header formheading">
+                <!-- <h5 class="modal-title">TDS Details</h5> -->
+                <strong>TDS Details</strong>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col" style="height:400px;overflow-y: auto; ">
+                        <table class="table table-bordered table-sm-new bgwhite">
+                            <tr>
+                                <td colspan="6">
+                                    <!-- <input type="text" [(ngModel)]="term"
+                                        style="float: right;width: 200px;font-family: verdana;font-size:11px;padding: 1px;"
+                                        placeholder="Search by Job Number"> -->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <thead style="text-align: center;">
+                                        <tr>
+                                            <th class="col-form-span-label"></th>
+                                            <th class="col-form-span-label">Acct Name.</th>
+                                            <th class="col-form-span-label">Section</th>
+                                            <th class="col-form-span-label">LDC Limit</th>
+                                            <th class="col-form-span-label">Utilized Amt</th>
+                                            <th class="col-form-span-label">LDC Rate %</th>
+                                            <th class="col-form-span-label">Base Rate %</th>
+                                            <th class="col-form-span-label">BP Amt</th>
+                                            <th class="col-form-span-label">TDS Amount</th>
+                                            <th class="col-form-span-label">Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                           <tr *ngFor="let obj of TDSList ">
+                                            <td class="col-form-span-label">
+                                                <input type="checkbox" [(ngModel)]="obj.Checked" [id]="i" [value]="i" [disabled]="obj.Disabled"
+                                                     (ngModelChange)="getCheckedTDSData($event,obj.TDSACCTID,obj.RATE,obj.TDSAMOUNT,obj.AMOUNT,obj.ITEMCODE,obj.NARRATION,obj.RATETYPE,obj.LDCRATE,obj.ACCTID,obj.OFFLAG)">
+                                                &nbsp;
+                                            </td>
+                                            <td class="col-form-span-label">{{obj.ACCTNAME}}</td>
+                                            <td class="col-form-span-label">{{obj.SECTIONNAME}}</td>
+                                            <td class="col-form-span-label">{{obj.TDS_LIMIT_AMT}}</td>
+                                            <td class="col-form-span-label">{{obj.UTIAMT}}</td>
+                                            <td class="col-form-span-label">{{obj.LDCRATE}}</td>
+                                            <td class="col-form-span-label">{{obj.RATE}}</td>
+                                            <td class="col-form-span-label">{{obj.AMOUNT}}</td>
+                                            <td class="col-form-span-label">{{obj.TDSAMOUNT}}</td>
+                                            <td class="col-form-span-label">{{obj.NARRATION}}</td>
+
+
+                                        </tr>
+
+
+                        </tbody>
+                    </td>
+                </tr>
+                        </table>
+                         <table class="table table-bordered table-sm-new bgwhite">
+                            <td colspan="9" align="center">
+                                <tr >
+                                    <td colspan="5"><span class="col-form-span-label">Total BP Amount :  </span>
+                                        <span class="col-form-span-label"><b>{{totpiamt}}</b> </span>
+                                    </td>
+                                    <td align="right" colspan="4"><span class="col-form-span-label">Selected Amount  :  </span>
+                                        <span class="col-form-span-label"><b>{{seltaxableamt}}</b> </span>
+                                    </td>
+                                    <td>
+                                        <thead style="text-align: center;">
+                                            <tr>
+                                              <th class="col-form-span-label">Section</th>
+                                              <th class="col-form-span-label">Total Tds Amount</th>
+                                             </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let obj of TotalTDSList ">
+                                             <td class="col-form-span-label"><b>{{obj.SECTIONNAME}}</b></td>
+                                             <td class="col-form-span-label"><b>{{obj.TOTTDSAMOUNT}}</b></td>
+                                         </tr>
+                                         </tbody>
+                                    </td>
+                                </tr>
+
+                            </td>
+                         </table>
+                    </div>
+                </div>
+                <div class="card-header formheading" style="height:25px" >
+                    <button class="btn btn-sm btn-danger" style="float: right;" type="reset"> <span class="col-form-span-label"
+                        (click)="closeTdsModal()"><i class="fa fa-ban"></i>
+                        Close</span></button>
+                    <button class="btn btn-sm btn-success" style="float: right;" type="submit" (click)="AddtdsDetails()"> <span
+                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Add</span></button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+                <!-- <div class="modal" [style.display]="showModal_ChqValidate ? 'block' : 'none'">
+                    <div class="modal-dialog modal-sg" role="document"  >
+                        <div class="modal-content " >
+                            < <div class="modal-header">
+                                <h5 class="modal-title">CHQ DETAILS</h5>
+                            </div> >
+                            <div class="modal-body">
+                                <div class="row">
+
+                                        <div class="col" style="height:200px; width:500px;overflow-x: auto;">
+                                        <table class="table table-bordered table-sm-new bgwhite">
+                                            <tr>
+                                                <td colspan="4">
+                                                    <span class="col-form-span-label"><b>{{Msg}}</b></span>
+                                                </td>
+
+                                            </tr>
+                                         <tr>
+                                            <td colspan="4"  class="centerlabel">
+                                                <button class="btn btn-sm btn-success" type="submit" (click)="winclose()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Yes</span></button>
+                                                <button class="btn btn-sm btn-danger" type="reset" (click)="winclose();" ><span class="col-form-span-label" ><i class="fa fa-ban"></i> No</span></button>
+                                            </td>
+                                         </tr>
+
+                                        </table>
+
+                                    </div>
+                                </div> -->

@@ -1,0 +1,247 @@
+﻿<div class="animated fadeIn">
+   <div class="row">
+      <div class="col-sm-12">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="card">
+					<div class="card-header formheading">
+						<div class="row">
+							<div class="col-sm-6"><strong>EDIT CONSIGNMENT </strong></div>
+							<div class="col-sm-6 right-text">
+								<button class="btn btn-success" (click)="redirectTo('N')">
+									<span class="col-form-span-label"><i class="fa fa-plus"></i> Add New</span>
+								</button>
+								<button class="btn btn-primary" (click)="redirectTo('S')">
+									<!-- <span class="col-form-span-label"><i class="fa fa-arrow-left"></i> Back to Search</span> -->
+										<span *ngIf="jobtype=='M'" class="col-form-span-label"><i class="fa fa-arrow-left"></i> Back to Search</span>
+									<span *ngIf="jobtype=='A'" class="col-form-span-label"><i class="fa fa-arrow-left"></i> Back to Auto Job list</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-2">
+			</div>
+			<div class="col-sm-8">
+			  <div class="card">
+				<div class="card-header centerlabel formheading">
+					<strong>{{exportHeader}}</strong>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-sm-12">
+							<table *ngIf=" jobno != ''   else other">
+								<tr>
+									<td class="width30 align-top" ><img src="assets/icon/buy.jpg" class="normal-icon"></td>
+									<td class="width300"><span class="link-label" (click)="edit('VIEW')">Consignment View</span></td>
+									 
+										<td class="width30 align-top"  ><img src="assets/icon/registeruser16.jpg" class="normal-icon"></td>
+										<td class="width300"><span class="link-label" (click)="edit('Airshipment')">EDIT AIR SHIPMENT</span></td>
+									 
+								</tr>
+								<tr> 
+										<td>&nbsp;</td>
+										<td>&nbsp;</td>
+										<td>&nbsp;</td>
+										<td>&nbsp;</td>
+								</tr>
+									 
+								<tr>
+									<td class="width30 align-top" rowspan="2"><img src="assets/icon/company.png" class="normal-icon"></td>
+									<td class="width300"><span class="link-label" (click)="edit('MAWB')">Edit MAWB Freight Rate</span></td>
+									<td class="width30 align-top"  ><img src="assets/icon/contact.jpg" class="normal-icon"></td>
+									<td class="width300"><span class="link-label" (click)="edit('HAWB')">Edit HAWB Freight Rate</span></td>								
+								</tr>
+								<tr> 
+										<td>&nbsp;</td>
+										<td>&nbsp;</td>
+										<td>&nbsp;</td>
+										<td>&nbsp;</td>
+									</tr>
+								<tr>
+									<td class="width30 align-top" rowspan="2"><img src="assets/icon/company.png" class="normal-icon"></td>
+									<td class="width300" colspan="3"><span class="link-label" (click)="edit('JOB')">Edit Job Freight Rate</span></td>
+								</tr>
+							</table>
+							<ng-template #other>
+                            <table class="table-sm-new bgwhite">
+								<tr>
+										<td class="width30 align-top" rowspan="2"><img src="assets/icon/buy.jpg" class="normal-icon"></td>
+										<td class="width300"><span class="link-label" (click)="edit('VIEW')">Consignment View</span></td>
+										<td class="width30 align-top" rowspan="2" ><img src="assets/icon/registeruser16.jpg" class="normal-icon"></td>
+										<td class="width300"><span  class="link-label" (click)="edit('SHIPCLEAR')">SHIPMENT CLEARANCE BY US</span></td>
+									 
+								</tr>
+									<tr>
+											<td>&nbsp;</td>
+											<td colspan="5"><span class="col-form-span-label">Click here to change </span></td>
+										</tr>
+									<tr>
+										<td>&nbsp;</td>
+										<td>&nbsp;</td>
+									</tr>
+							 
+								<tr>
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+								</tr>
+							</table>
+						</ng-template>
+						</div>
+					</div>
+					<div class="row">
+					</div>
+					
+					<div class="row">
+						<div class="col-sm-12">
+                            <table class="table-sm-new bgwhite"  *ngIf="jobno ==''" >
+								<tr>
+									<td class="width30 align-top" rowspan="3"><img src="assets/icon/1265187760.png" class="normal-icon"></td>
+									<td class="width300"><span class="link-label" (click)="edit('MAIN')">Shipper / BillTo / Manufature / Consignee / Consignee Bank / Buyer / Source Agent</span></td>
+									<td class="width30 align-top" rowspan="3"><img src="assets/icon/1262723459.png" *ngIf="editList.IS_EDITABLE != 'NO'" class="normal-icon"></td>
+									<td class="width300">
+										<span class="link-label" (click)="edit('PORT')" *ngIf="editList.IS_EDITABLE != 'NO'">Edit Shipment Details / Origin / Destination / Pkgs / Pcs / GrWt / NetWt / Cbm Etc</span>
+										<span class="link-label" *ngIf="editList.IS_EDITABLE == 'NO' && ISDIFFAIR == '1'">Edit Vessel/Shipment Details / Origin / Destination / Pkgs / Pcs / GrWt / NetWt / Cbm Etc</span>
+										<span class="link-label" (click)="edit('PORT')" *ngIf="editList.IS_EDITABLE == 'NO' && ISDIFFAIR == '2'">Edit Shipment Details/Shipment Details / Origin / Destination / Pkgs / Pcs / GrWt / NetWt / Cbm Etc</span>
+									</td>
+								</tr>
+								<tr>
+									<td><span class="col-form-span-label">Edit Shipper, BillTo, Manufature, Consignee, Consignee Bank, Buyer, Source Agent, Etc...</span></td>
+									<td>
+										<span class="col-form-span-label" *ngIf="editList.IS_EDITABLE != 'NO'">Edit Shipment Details, Origin, Destination, Pkgs, Pcs, GrWt, NetWt, Cbm, Etc...</span>
+										<span class="col-form-span-label red" *ngIf="editList.IS_EDITABLE == 'NO' "><strong>Consignment is already containerised, hence you can not change the pkgs,pcs,grwt,netwt,cbm etc.</strong></span>
+										<span class="col-form-span-label " *ngIf="editList.IS_EDITABLE == 'NO' && ISDIFFAIR == '2'">Edit Shipment Details, Origin, Destination, Pkgs, Pcs, GrWt, NetWt, Cbm, Etc...</span>
+									</td>
+								</tr>
+								<tr>
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="row">
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+                            <table class="table-sm-new bgwhite" *ngIf="jobno ==''">
+								<tr>
+									<td class="width30 align-top"  rowspan="2"><img src="assets/icon/home-features_why.gif" class="normal-icon"></td>
+									<td class="width300" ><span class="link-label"  (click)="edit('INVOICE')">Invoice Details</span></td>
+									<td class="width30 align-top" rowspan="2"><img src="assets/icon/1265187760.png" class="normal-icon"></td>
+									<td class="width300"><span class="link-label"  (click)="edit('ITC')">ITC Code Details</span></td>
+								</tr>
+								<tr>
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="row">
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+                            <table class="table-sm-new bgwhite" *ngIf="jobno ==''">
+								<tr>
+									<td class="width30 align-top" rowspan="2"><img src="assets/icon/1264378617.png" class="normal-icon"></td>
+									<td class="width300"><span class="link-label" (click)="edit('ORDER')">Order No. Details</span></td>
+									<td class="width30 align-top" rowspan="2"><img src="assets/icon/1265278270.png" class="normal-icon"></td>
+									<td class="width300"><span class="link-label" (click)="edit('PKG')">Package No. Details</span></td>
+								</tr>
+								<tr>
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="row">
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+                            <table class="table-sm-new bgwhite" *ngIf="jobno ==''">
+								<tr>
+									<td class="width30 align-top" rowspan="2"><img src="assets/icon/1265194537.png" class="normal-icon"></td>
+									<td class="width300"><span class="link-label" (click)="edit('MARKS_NUMBERS')">Marks & Numbers Details</span></td>
+									<!-- <td class="width30 align-top" rowspan="2"><img src="assets/icon/00.png" class="normal-icon"></td>
+									<td class="width300">
+										<span class="link-label" (click)="edit('QUOTA')">Quota Details</span>
+									</td> -->
+									<td class="width30 align-top" rowspan="2"><img src="assets/icon/company.png" class="normal-icon"></td>
+									<td class="width300"><span class="link-label" (click)="edit('DOC')">Edit Documents</span></td>
+								</tr>
+								<tr>
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="row">
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+               <table class="table-sm-new bgwhite" *ngIf="jobno ==''">
+								<tr>
+									<td class="width30 align-top" rowspan="2"><img src="assets/icon/contact.jpg" class="normal-icon"></td>
+									<td class="width300"><span class="link-label" (click)="edit('CONREMARK')">Consignee Remark Details</span></td>
+									<div *ngIf=" mode ==='AIR' || ISDIFFAIR=='2' else seamode">
+										<td class="width30 align-top" rowspan="2"><img src="assets/icon/company.png" class="normal-icon"></td>
+										<td class="width300"><span class="link-label" (click)="edit('MAWB')">Edit MAWB Freight Rate</span></td>
+									</div>
+									<ng-template #seamode>
+											<td> &nbsp;</td>
+											<td>&nbsp;</td>
+									</ng-template>
+									
+								</tr>
+								<tr>
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+              <table class="table-sm-new bgwhite" *ngIf="jobno ==''" >
+								<tr>
+									<div *ngIf=" mode ==='AIR' || ISDIFFAIR=='2'"  >
+										<td class="width30 align-top" rowspan="2"><img src="assets/icon/company.png" class="normal-icon"></td>
+										<td class="width300"><span class="link-label" (click)="edit('HAWB')">Edit HAWB Freight Rate</span></td>
+										<td class="width30 align-top" rowspan="2"><img src="assets/icon/company.png" class="normal-icon"></td>
+										<td class="width300"><span class="link-label" (click)="edit('JOB')">Edit Job Freight Rate</span></td>
+									</div>
+								</tr>
+								<tr>
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+								</tr>
+								<tr >
+										<div  *ngIf="jobno ==''">
+									<td class="width30 align-top" rowspan="2"><img src="assets/icon/1265194537.png" class="normal-icon"></td>
+									<td class="width300"><span class="link-label" (click)="edit('CANCEL')">Cancel Shipment</span></td>
+									<td>&nbsp;</td>
+									<td>&nbsp;</td>
+									</div>
+								</tr>
+							</table>
+						</div>
+					</div>
+				
+				</div>
+			  </div>
+			</div>
+			<div class="col-sm-2">
+			</div>
+		</div>
+	  </div>
+	</div>
+</div>
+<app-consignment-edit-modal #ConsignmentEditModal></app-consignment-edit-modal>

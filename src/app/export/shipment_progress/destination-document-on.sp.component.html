@@ -1,0 +1,117 @@
+﻿<div class="animated fadeIn">
+	<div class="row">
+		<div class="col-sm-2">
+		</div>
+		<div class="col-sm-8">
+			<app-shipment-progress-common-view [ExptNo]="ExptNo"></app-shipment-progress-common-view>
+			<table class="table table-bordered table-sm-new">
+				<tr class="trbg">
+					<td colspan="8"><span class="col-form-span-label"><b>DESTINATION DOCUMENTS DETAILS</b></span></td>
+				</tr>
+			</table>
+			<table class="table table-bordered table-sm-new" *ngIf="docRecdList.length>0">
+				<tr class="trbg">
+					<td colspan="8"><span class="col-form-span-label"><b>DOCUMENTS RECEIVED</b></span></td>
+				</tr>
+			</table>
+			<table class="table table-bordered table-sm-new" *ngIf="docRecdList.length>0">
+				<thead>
+					<tr class="trbg">
+						<th class="width100"><span class="col-form-span-label"></span></th>
+						<th><span class="col-form-span-label">DOCUMENT NAME</span></th>
+						<th><span class="col-form-span-label">RECD DATE</span></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let obj of docRecdList">
+						<td class="width100"><span class="col-form-span-label">{{obj.DOCCODE}}</span></td>
+						<td><span class="col-form-span-label">{{obj.DOCUMENT}}</span></td>
+						<td><span class="col-form-span-label">{{obj.RECDDT}}</span></td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="table table-bordered table-sm-new">
+				<tr class="trbg">
+					<td colspan="8"><span class="col-form-span-label"><b>OTHER DOCUMENTS</b></span></td>
+				</tr>
+			</table>
+			<table class="table table-bordered table-sm-new" *ngIf="mainList.length>0">
+				<thead>
+					<tr class="trbg">
+						<th class="width100"><span class="col-form-span-label"></span></th>
+						<th class="centerlabel" colspan="3"><span class="col-form-span-label">DOCUMENT NAME</span></th>
+						<th class="centerlabel width100" colspan="2"><span class="col-form-span-label">RECD</span></th>
+						<th class="centerlabel width80"><span class="col-form-span-label">CALL FOR</span></th>
+						<th class="centerlabel width80"><span class="col-form-span-label">NA</span></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let obj of mainList">
+						<td class="width100"><span class="col-form-span-label">{{obj.DOCCODE}}</span></td>
+						<td colspan="3"><span class="col-form-span-label">{{obj.DOCUMENT}}</span></td>
+						<td class="centerlabel">
+							<span class="col-form-span-label">
+								<input type="radio" name="{{obj.DOCCODE}}" value="{{'R'+obj.DOCCODE}}" [(ngModel)]="obj.RECD" (change)="obj.CALL=null;obj.NA=null;obj.RECDDT=null" />
+							</span>
+						</td>
+						<td [ngClass]="(obj.RECD !== null && obj.RECDDT === null)? 'width100 bgred' : 'width100'">
+							<my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="obj.RECDDT" [disabled]="obj.RECD == null"></my-date-picker>
+						</td>
+						<td class="centerlabel">
+							<span class="col-form-span-label">
+								<input type="radio" name="{{obj.DOCCODE}}" value="{{'C'+obj.DOCCODE}}" [(ngModel)]="obj.CALL" (change)="obj.RECD=null;obj.NA=null;obj.RECDDT=null" />
+							</span>
+						</td>
+						<td class="centerlabel">
+							<span class="col-form-span-label">
+								<input type="radio" name="{{obj.DOCCODE}}" value="{{'N'+obj.DOCCODE}}" [(ngModel)]="obj.NA" (change)="obj.RECD=null;obj.CALL=null;obj.RECDDT=null" />
+							</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="table table-bordered table-sm-new" *ngIf="IsDocumentSent">
+				<tr class="trbg">
+					<td colspan="8"><span class="col-form-span-label"><b>DOCUMENT SENT TO CONSIGNEE</b></span></td>
+				</tr>
+			</table>
+			<table class="table table-bordered table-sm-new" *ngIf="IsDocumentSent">
+				<tr>
+					<td class="width150"><span class="col-form-span-label">Date</span></td>
+					<td colspan="3">
+						<my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="Date"></my-date-picker>
+					</td>
+					<td class="width150"><span class="col-form-span-label">Courier No.</span></td>
+					<td colspan="3">
+						<input type="text" [(ngModel)]="CourierNo" class="form-control" [maxlength]="40" />
+					</td>
+				</tr>
+				<tr>
+					<td class="width150"><span class="col-form-span-label">Remark</span></td>
+					<td colspan="7">
+						<textarea rows="2" class="form-control" [(ngModel)]="Remark" [maxlength]="400"></textarea>
+					</td>
+				</tr>
+			</table>
+			<table class="table table-bordered table-sm-new">
+				<tr class="trbg centerlabel" *ngIf="ErrorMessage != ''">
+					<td colspan="8">
+						<span class="col-form-span-error">{{ErrorMessage}}</span>
+					</td>
+				</tr>
+				<tr class="trbg centerlabel">
+					<td colspan="8">
+						<button type="button" name="submitButton" class="btn btn-l btn-success" (click)="submit();" [disabled]="ErrorMessage != ''" #submitButton>
+							<span class="col-form-span-label"><app-font-changer [fontIndex]="'14'"></app-font-changer> Submit</span>
+						</button>
+						<button type="button" name="abortButton" class="btn btn-l btn-danger" (click)="abort();">
+							<span class="col-form-span-label"><app-font-changer [fontIndex]="'7'"></app-font-changer> Abort</span>
+						</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-sm-2">
+		</div>
+	</div>
+</div>

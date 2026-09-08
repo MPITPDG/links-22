@@ -1,0 +1,680 @@
+<!-- Styles moved to component SCSS: client-origin-rate-entry.component.scss (backup preserved there) -->
+<div class="sales-form-wrapper">
+
+<div class="animated fadeIn bg-body-tertiary min-vh-100 d-flex flex-column justify-content-center align-items-center">
+    <div class="card shadow-lg rounded-5 border-0  w-100" style="width: 100%;">
+        <div class="card-body p-1">
+            <table class="table table-borderless   table-sm align-middle mb-0 w-100">
+                    <tr>
+                        <td class="col-form-span-heading py-1 bg-body-secondary text-start fw-semibold text-primary" style="font-size: 1.05rem; line-height: 1.2;" colspan="4">
+                            Master Details
+                        </td>
+                    </tr>
+                    <tr>
+                    <td style="width:150px;" >
+                        <label for="enqrefno" class="form-label">Quot No.</label>
+                        <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Quot No.</span><span class="col-form-span-error">*</span> -->
+                    </td>
+                        <td> <input type="text" class="form-control width180" [disabled]=true [(ngModel)]="quotno"> </td>
+                        <td>
+                             <label for="enqrefno" class="form-label">Quot Dt.</label>
+                            <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Quot Dt.</span> -->
+                        </td>
+                        <td  style="text-align: left;">
+                            <!-- <app-date-picker-wrapper [(dateString)]="quotdate" > </app-date-picker-wrapper> -->
+                                <my-date-picker name="quotdate" [options]="myDatePickerOptions"
+                                (dateChanged)="onquotDateChanged($event)" [selDate]=quotdate></my-date-picker>
+
+                        </td>
+                      
+                    </tr>
+                  <tr>
+                        <td >
+                            <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Shipment Mode</span><span class="col-form-span-error">*</span> -->
+                            <label for="enqrefno" class="form-label">Shipment Mode</label>
+
+                        </td>
+                        <td>
+                            <ng-select [items]="shpmodetable"
+                                bindLabel="DATATEXTVALUE"
+                                bindValue="DATAVALUE"
+                                [(ngModel)]="shipmode"  (ngModelChange)="changeshipmentmode($event)"
+                                class="custom rounded-pill  short-select"
+                                placeholder="--Please Select Shipment Mode--">
+                            </ng-select>
+                        </td>
+                        <td class="width150">
+                            <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Shipment Type</span><span class="col-form-span-error">*</span> -->
+                             <label for="shipmenttype" class="form-label">Shipment Type</label>
+                        </td>
+                        <td>
+                            <ng-select [items]="shipmentable"
+                                bindLabel="DATATEXTVALUE"
+                                bindValue="DATAVALUE"
+                                [(ngModel)]="shiptype"
+                                class="custom rounded-pill  short-select"
+                                placeholder="--Please Select Shipment Type--">
+                            </ng-select>
+                        </td>
+                                     
+                    </tr>
+                    <tr>
+                        <td>
+                            <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Client</span><span class="col-form-span-error">*</span> -->
+                        <label for="client" class="form-label">Client</label>
+                        </td>
+                        <td class="client-td">
+                            <ng-select [items]="clientable"
+                                bindLabel="DATATEXTVALUE"
+                                bindValue="DATAVALUE"
+                                [(ngModel)]="client"
+                                class="custom rounded-pill  fixed-select client-select"
+                                placeholder="--Please Select Client--">
+                            </ng-select>
+                        </td>
+
+                        <td>
+                             <label *ngIf="shipmode=='SEA'" for="client" class="form-label">Shipping Line</label>
+                              <span *ngIf="shipmode=='SEA'" class="col-form-span-error">*</span>
+                               <label *ngIf="shipmode=='AIR'" for="client" class="form-label">Air Line</label>
+                            <!-- <span *ngIf="shipmode=='SEA'" class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Shipping Line</span> -->
+                            <!-- <span *ngIf="shipmode=='SEA'" class="col-form-span-error">*</span> -->
+                             <!-- <span *ngIf="shipmode=='AIR'" class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Air Line</span> -->
+                             <span *ngIf="shipmode=='AIR'" class="col-form-span-error">*</span>
+                        
+                        </td>
+                        <td class="liner-td">
+                            <ng-select *ngIf="shipmode=='SEA'" [items]="linertable"
+                                bindLabel="DATATEXTVALUE"
+                                bindValue="DATAVALUE"
+                                [(ngModel)]="liner"
+                                class="custom rounded-pill  fixed-select liner-select"
+                                placeholder="--Please Select Shipping Line--">
+                            </ng-select>
+                             <ng-select *ngIf="shipmode=='AIR'" [items]="airlinetable"
+                                bindLabel="DATATEXTVALUE"
+                                bindValue="DATAVALUE"
+                                [(ngModel)]="airline"
+                                class="custom rounded-pill  fixed-select liner-select"
+                                placeholder="--Please Select Airline Line--">
+                            </ng-select>
+                        </td>
+                    </tr>
+                    <!-- <tr>
+                        <td colspan="4">
+                            <table class="table table-bordered table-sm-new bgwhite">
+                                <tr>
+                                    <td><span class="col-form-span-label"><b>Origin </b> </span><span
+                                        class="col-form-span-error">*</span>
+                                </td>
+                                <td>
+                                    <select class="form-control width120" [(ngModel)]="origin">
+                                        <option value="">--Please Select--</option>
+                                        <option *ngFor="let d of origintable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+                                    <tr>
+                                        <td><span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Client</span><span class="col-form-span-error">*</span></td>
+                                        <td class="client-td">
+                                            <ng-select [items]="clientable"
+                                                bindLabel="DATATEXTVALUE"
+                                                bindValue="DATAVALUE"
+                                                [(ngModel)]="client"
+                                                class="custom rounded-pill w-100 fixed-select"
+                                                placeholder="--Please Select Client--">
+                                            </ng-select>
+                                        </td>
+
+                                        <td><span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Shipping Line</span><span class="col-form-span-error">*</span></td>
+                                        <td class="liner-td">
+                                            <ng-select [items]="linertable"
+                                                bindLabel="DATATEXTVALUE"
+                                                bindValue="DATAVALUE"
+                                                [(ngModel)]="liner"
+                                                class="rounded-pill w-100 fixed-select"
+                                                placeholder="--Please Select Shipping Line--">
+                                            </ng-select>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Company</span><span class="col-form-span-error">*</span></td>
+                                        <td colspan="3" class="company-td">
+                                            <ng-select [items]="compnytable"
+                                                bindLabel="DATATEXTVALUE"
+                                                bindValue="DATAVALUE"
+                                                [(ngModel)]="company"
+                                                class="rounded-pill w-100 fixed-select"
+                                                placeholder="--Please Select Company--">
+                                            </ng-select>
+                                        </td>
+                                    </tr>
+                                </tr>
+                            </table>
+
+                        </td>
+                    </tr> -->
+                    <tr>
+                        <td>
+                          <!--   <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Origin</span><span class="col-form-span-error">*</span> -->
+                             <label for="origin" class="form-label">Origin</label>
+                        </td>
+                        <td>
+                            <ng-select [items]="origintable"
+                                bindLabel="DATATEXTVALUE"
+                                bindValue="DATAVALUE"
+                                [(ngModel)]="origin"
+                                class="custom rounded-pill   short-select"
+                                placeholder="--Please Select Origin--" > 
+                            </ng-select>
+                        </td>
+                            <td>
+                                <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Valid Upto</span><span class="col-form-span-error">*</span> -->
+                                 <label for="validupto" class="form-label">Valid Upto</label>
+                        </td>
+                        <td>
+                            <!-- <app-date-picker-wrapper [(dateString)]="Quotvaliddate" > </app-date-picker-wrapper> -->
+                            <my-date-picker name="Quotvaliddate" [options]="myDatePickerOptions"
+                                (dateChanged)="QuotValidDateChanged($event)" [selDate]="Quotvaliddate"></my-date-picker>
+                        </td>
+                    </tr>
+                 
+
+                      <tr *ngIf="shipmode=='AIR'">
+                        <td>
+                            <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Volume</span><span class="col-form-span-error">*</span> -->
+                            <label for="volume" class="form-label">Volume</label>
+                        </td>
+                        <td>
+                             <input [(ngModel)]="volume" type="text"  class="form-control text-end rounded-pill width150"  />
+                                        
+                        </td>
+                        <td>
+                            <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Weight</span><span class="col-form-span-error">*</span> -->
+                            <label for="weight" class="form-label">Weight</label>
+                             </td>
+                        <td>
+                            <input [(ngModel)]="weight" type="text"  class="form-control text-end rounded-pill width150 "  />
+                        </td>
+                                     
+                    </tr>
+                     <tr *ngIf="shipmode=='AIR'">
+                        <td>
+                            <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Ch Weight</span><span class="col-form-span-error">*</span> -->
+                            <label for="chweight" class="form-label">Ch Weight</label>
+                        </td>
+                        <td>
+                             <input [(ngModel)]="chweight" type="text"  class="form-control text-end rounded-pill width150"  />
+                                        
+                        </td>
+                        <td>
+                            <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Load</span><span class="col-form-span-error">*</span> -->
+                            <label for="load" class="form-label">Load</label>
+                        </td>
+                        <td>
+                            <input [(ngModel)]="load" type="text"  class="form-control text-end rounded-pill width250"  />
+                        </td>
+                                     
+                    </tr>
+
+
+                       <tr>
+                        <td>
+                            <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Incoterm</span><span class="col-form-span-error">*</span> -->
+                           <label for="incoterm" class="form-label">Incoterm</label>      
+                        </td>
+                        <td>
+                            <ng-select [items]="incotermtable"
+                                bindLabel="DATATEXTFIELD"
+                                bindValue="DATAVALUEFIELD"
+                                [(ngModel)]="incoterm"
+                                class="custom rounded-pill   short-select"
+                                placeholder="--Please Select Incoterm--">
+                            </ng-select>
+                        </td>
+                        <td *ngIf="shipmode=='SEA'" >
+                            <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Load Type</span><span class="col-form-span-error">*</span> -->
+                            <label for="loadtype" class="form-label">Load Type</label>
+                        </td>
+                        <td *ngIf="shipmode=='SEA'">
+                            <ng-select [items]="containerloadtypetable"
+                                bindLabel="DATATEXTVALUE"
+                                bindValue="DATAVALUE"
+                                [(ngModel)]="contloadtype"
+                                class="custom rounded-pill  short-select"
+                                placeholder="--Please Select Load Type--">
+                             </ng-select>
+                        </td>
+                        
+                    
+                    </tr>
+                    <!-- Shipping Line moved to Client row; duplicate row removed -->
+                    <!-- <tr>
+                        <td><span class="col-form-span-label"><b>Shipping Line </b> </span><span class="col-form-span-error">*</span></td>
+                        <td >
+                            <ng-select [items]="linertable"
+                                bindLabel="DATATEXTVALUE"
+                                bindValue="DATAVALUE"
+                                [(ngModel)]="liner"
+                                class="rounded-pill"
+                                placeholder="--Please Select Shipping Line--">
+                            </ng-select>
+                        </td>
+                    </tr> -->
+                    <!-- <tr>
+                
+                    <td><span class="col-form-span-label"><b>Shipment Type </b> </span><span
+                            class="col-form-span-error">*</span>
+                        </td>
+                    <td>
+                        <select class="form-control width120" [(ngModel)]="shiptype">
+                            <option value="">--Please Select --</option>
+                            <option *ngFor="let d of shipmentable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                            </option>
+                        </select>
+                    </td>
+                    <td colspan="2"></td>
+                    </tr> -->
+                    <!-- <tr>
+                        <td><span class="col-form-span-label"><b>Quotation Valid Upto </b> </span><span
+                                class="col-form-span-error">*</span>
+                        </td>
+                        <td>
+                            <app-date-picker-wrapper [(dateString)]="Quotvaliddate" > </app-date-picker-wrapper>
+                             <my-date-picker name="Quotvaliddate" [options]="myDatePickerOptions"
+                                (dateChanged)="QuotValidDateChanged($event)" [selDate]="Quotvaliddate"></my-date-picker> 
+                        </td>
+                        </tr>  -->
+                    <!-- <tr>
+                        <td colspan="4" align="center" class="col-form-span-heading">
+                            <button class="btn btn-sm btn-success" type="submit" (click)="SearchLinerData()"> <span
+                                    class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Search</span></button>
+                        
+                        </td>
+                    </tr> -->
+                    <!-- Port Details header removed per request -->
+                    <tr>
+                        <td>
+                            <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Pol</span><span class="col-form-span-error">*</span> -->
+                            <label for="pol" class="form-label">Pol</label>
+                            <!-- #region -->
+                        </td>
+                        <td>
+                            <ng-select [items]="commoncities"
+                                bindLabel="CITY_NAME"
+                                bindValue="CITY_CODE"
+                                [(ngModel)]="pol"
+                                class="custom rounded-pill  short-select"
+                                placeholder="--Please Select POL--">
+                            </ng-select>
+                        </td>
+                        <td>
+                            <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Pod</span><span class="col-form-span-error">*</span> -->
+                            <label for="pod" class="form-label">Pod</label>
+                            <!-- #region -->
+                        </td>
+                        <td>
+                            <ng-select [items]="commoncities"
+                                bindLabel="CITY_NAME"
+                                bindValue="CITY_CODE"
+                                [(ngModel)]="pod"
+                                class="custom rounded-pill  short-select"
+                                placeholder="--Please Select POD--">
+                            </ng-select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> 
+                            <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Narration</span> -->
+                            <label for="narration" class="form-label ">Narration</label>
+                         </td>
+                        <td colspan="3">
+                            <!-- (input)="Narrationarea()" -->
+                            <textarea class="form-control" id="autoresizing" (change)="TextareaValueChange($event)"
+                            placeholder="text" cols="50" rows="4" [innerHTML]="narration"></textarea>
+                        </td>
+                    </tr>
+    <tr>
+                        <td class="col-form-span-heading py-1 bg-body-secondary text-start fw-semibold text-primary" style="font-size: 1.05rem; line-height: 1.2;" colspan="4">
+                            Charges Details
+                        </td>
+                    </tr>  
+                    <tr>
+  <td colspan="4">
+    <div class="container-fluid py-0">
+
+      <!-- 🔹 Header Row -->
+      <div class="row fw-semibold  border-bottom pb-1 align-items-center">
+        <!-- <div class="col-md-3 text-dark fw-semibold" style="font-size: 1rem;">Chrg Type</div> -->
+         <div class="col-md-3" >
+            <label class="form-label">Charge Type</label>
+        </div> 
+          <div class="col-md-5" >
+            <label class="form-label">Account</label>
+        </div> 
+         <div class="col-md-2" >
+            <label class="form-label">Currency</label>
+        </div> 
+         <div class="col-md-2" >
+            <label class="form-label">&nbsp;</label>
+        </div> 
+        <!-- <div class="col-md-5 text-dark fw-semibold" style="font-size: 1rem;">Account / Charge Name</div>
+        <div class="col-md-2 text-dark fw-semibold" style="font-size: 1rem;">Currency</div>
+        <div class="col-md-2 text-dark fw-semibold" style="font-size: 1rem;">&nbsp;</div> -->
+      </div>
+
+      <!-- 🔹 First Row Inputs -->
+      <div class="row g-2 mt-2 align-items-center">
+        <div class="col-md-3">
+          <ng-select [items]="chngetypetable"
+            bindLabel="DATATEXTVALUE"
+            bindValue="DATAVALUE"
+            [(ngModel)]="chargetype"
+            class="custom rounded-pill w-100"
+            placeholder="--Select--">
+          </ng-select>
+        </div>
+        <div class="col-md-5">
+          <ng-select [items]="accountable"
+            bindLabel="DATATEXTVALUE"
+            bindValue="DATAVALUE"
+            [(ngModel)]="acccode"
+            class="custom rounded-pill w-100"
+            placeholder="--Select Account / Charge--">
+          </ng-select>
+        </div>
+        <div class="col-md-3">
+          <ng-select [items]="currencytable"
+            bindLabel="DATATEXTVALUE"
+            bindValue="DATAVALUE"
+            [(ngModel)]="currency"
+            (ngModelChange)="getexchangerate($event)"
+            class="custom rounded-pill w-100"
+            placeholder="--Currency--">
+          </ng-select>
+        </div>
+        <div class="col-md-1"></div>
+      </div>
+
+      <!-- 🔹 Second Header Row -->
+      <div class="row fw-semibold  border-bottom mt-3 pb-1 align-items-center">
+        <div class="col-md-2" > 
+            <label class="form-label">Rate</label>
+        </div> 
+         <div class="col-md-2" > 
+            <label class="form-label">Ex. Rate</label>
+        </div> 
+         <div class="col-md-2" > 
+            <label class="form-label">Min Rate</label>
+        </div> 
+         <div class="col-md-2" > 
+            <label class="form-label">Unit</label>
+        </div> 
+         <div class="col-md-2" > 
+            <label class="form-label">Unit Type</label>
+        </div> 
+         <div class="col-md-2" > 
+            <label class="form-label">Actions</label>
+        </div>
+        <!-- <div class="col-md-2 text-dark fw-semibold" style="font-size: 1rem;">Rate</div>
+        <div class="col-md-2 text-dark fw-semibold" style="font-size: 1rem;">Ex. Rate</div>
+        <div class="col-md-2 text-dark fw-semibold" style="font-size: 1rem;">Min Rate</div>
+        <div class="col-md-2 text-dark fw-semibold" style="font-size: 1rem;">Unit</div>
+        <div class="col-md-2 text-dark fw-semibold" style="font-size: 1rem;">Unit Type</div>
+        <div class="col-md-2 text-dark fw-semibold" style="font-size: 1rem;">Actions</div> -->
+      </div>
+
+      <!-- 🔹 Second Row Inputs + Buttons -->
+      <div class="row g-2 mt-2 align-items-center">
+         <div class="col-md-2">
+          <input [(ngModel)]="rate" OnlyNumber="true" type="text"
+            class="form-control text-end" placeholder="Rate" />
+        </div>
+        <div class="col-md-2">
+          <input [(ngModel)]="exrate" OnlyNumber="true" type="text" [disabled]="disableexrate"
+            class="form-control text-end" placeholder="Ex. Rate" />
+        </div>
+       
+        <div class="col-md-2">
+          <input [(ngModel)]="minrate" OnlyNumber="true" type="text"
+            class="form-control text-end" placeholder="Min Rate" />
+        </div>
+         <div class="col-md-2">
+          <input [(ngModel)]="unit" OnlyNumber="true" type="text"
+            class="form-control text-end" placeholder="Unit" />
+        </div>
+        <div class="col-md-2">
+          <ng-select [items]="unittabel"
+            bindLabel="DATATEXTVALUE"
+            bindValue="DATAVALUE"
+            [(ngModel)]="unittype"
+            class="custom rounded-pill w-100"
+            placeholder="--Unit--">
+          </ng-select>
+        </div>
+
+        <div class="col-md-2 d-flex justify-content-start">
+          <button class="btn btn-success btn-sm rounded-pill px-3 me-2" (click)="Addchilddata()">
+            <i class="fa fa-plus me-1"></i> {{childbtntext}}
+          </button>
+          <button class="btn btn-warning btn-sm rounded-pill px-3" (click)="Resetchildrecd()">
+            <i class="fa fa-undo me-1"></i> Reset
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </td>
+</tr>
+           
+
+    
+            
+
+  
+
+                  <!-- <tr>
+    <td colspan="4">
+        
+        <table class="table table-borderless mb-0 w-100 charges-inputs" style="table-layout: fixed;">
+            <colgroup>
+                <col style="width:120px">  
+                <col>                     
+                <col style="width:110px"> 
+            </colgroup>
+            <thead>
+                <tr class="table-light">
+                    <th class="small text-muted text-center">Chrg Type</th>
+                    <th class="small text-muted">Account / Charge Name</th>
+                    <th class="small text-muted text-center">Currency</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="align-middle">
+                        <ng-select [items]="chngetypetable"
+                            bindLabel="DATATEXTVALUE"
+                            bindValue="DATAVALUE"
+                            [(ngModel)]="chngetype"
+                            class="rounded-pill"
+                            placeholder="--Select--">
+                        </ng-select>
+                    </td>
+                    <td class="align-middle">
+                        <ng-select [items]="accountable"
+                            bindLabel="DATATEXTVALUE"
+                            bindValue="DATAVALUE"
+                            [(ngModel)]="acccode"
+                            class="custom w-100 fixed-select"
+                            placeholder="--Select Account / Charge--">
+                        </ng-select>
+                    </td>
+                    <td class="align-middle text-center">
+                        <ng-select [items]="currencytable"
+                            bindLabel="DATATEXTVALUE"
+                            bindValue="DATAVALUE"
+                            [(ngModel)]="currency"
+                            class="rounded-pill"
+                            placeholder="--Currency--">
+                        </ng-select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+      
+        <table class="table table-borderless mb-0 w-100 charges-inputs" style="table-layout: fixed; margin-top: -5px;">
+            <colgroup>
+                <col style="width:110px"> 
+                <col style="width:110px">
+                <col style="width:110px"> 
+                <col style="width:90px"> 
+            </colgroup>
+            <thead>
+                <tr class="table-light">
+                    <th class="small text-muted text-end">Ex. Rate</th>
+                    <th class="small text-muted text-end">Rate</th>
+                    <th class="small text-muted text-end">Min Rate</th>
+                    <th class="small text-muted text-center">Unit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="align-middle text-end">
+                        <input [(ngModel)]="exrate" OnlyNumber="true" type="text" class="form-control width110 text-end" (blur)="onchangefindcomma(exrate)" />
+                    </td>
+                    <td class="align-middle text-end">
+                        <input [(ngModel)]="rate" OnlyNumber="true" type="text" class="form-control width110 text-end" (blur)="onchangefindcomma(rate)" />
+                    </td>
+                    <td class="align-middle text-end">
+                        <input [(ngModel)]="minrate" type="text" class="form-control width110 text-end" OnlyNumber="true" (blur)="onchangefindcomma(minrate)" />
+                    </td>
+                    <td class="align-middle text-center">
+                        <ng-select [items]="unitabel"
+                            bindLabel="DATATEXTVALUE"
+                            bindValue="DATAVALUE"
+                            [(ngModel)]="unit"
+                            class="rounded-pill"
+                            placeholder="--Unit--">
+                        </ng-select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </td>
+</tr>   -->
+
+                    <!-- <tr>
+                        <td   ><span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Unit</span><span class="col-form-span-error">*</span></td>
+                        <td  >
+                            <ng-select [items]="unitabel"
+                                bindLabel="DATATEXTVALUE"
+                                bindValue="DATAVALUE"
+                                [(ngModel)]="unit"
+                                class="rounded-pill"
+                                placeholder="--Please Select Unit--">
+                            </ng-select>
+                        </td>
+
+                       
+                    </tr> -->
+
+
+                    <!-- <tr>
+                        <td colspan="4" class="centerlabel py-3">
+                            <button class="btn btn-success btn-sm rounded-pill px-4 shadow fw-semibold me-2" type="submit" (click)="Addchilddata()">
+                                <i class="fa fa-dot-circle-o me-2"></i>{{txtchild}}
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm rounded-pill px-4 shadow fw-semibold" type="reset" (click)="ResetClientrate();">
+                                <i class="fa fa-ban me-2"></i> Reset
+                            </button>
+                        </td>
+                    </tr> -->
+<tr>
+  <td colspan="4">
+    <table class="table table-sm  align-middle mb-0 w-100 shadow-sm charges-table rounded-4 overflow-hidden">
+      <thead class="table-primary">
+        <tr class="text-primary bg-body-secondary text-center">
+          <th style="width: 50px;">✏️</th>
+          <!-- <th *ngIf="visible == '1'" style="width: 60px;">Index</th> -->
+          <th style="width: 100px;">Charge Type</th>
+          <th style="width: 250px;" >Charge Name</th>
+          <th style="width: 180px;">Unit</th>
+           <th style="width: 180px;">Unit Type</th>
+          <th style="width: 120px;">Currency</th>
+          <th style="width: 110px;" class="text-end">Rate</th>
+          <th style="width: 110px;" class="text-end">Min Rate</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let obj of chargesdetails; index as i" class=    "border-bottom">
+          <td class="text-center width100">
+            <i class="fa fa-pencil text-primary cursor-pointer" (click)="Editchildrecd(obj)"></i> &nbsp;
+            <i class="fa fa-trash text-primary cursor-pointer" (click)="Deletechildrecd(obj.PKID,obj.QUOTDTLID)"></i>
+          </td>
+
+          <!-- <td *ngIf="visible == '1'" class="text-center">
+            {{ i + 1 }}
+          </td> -->
+           <td 
+    class="text-start"   [ngClass]="{
+        'text-success': obj.CHARGE_TYPETEXT === 'ORIGIN',     
+        'text-info': obj.CHARGE_TYPETEXT === 'DESTINATION'
+        
+    }">    {{ obj.CHARGE_TYPETEXT }}</td>
+          <td class="label text-start">{{ obj.CHRG_DESC }}</td>
+          <td class="label text-start">{{ obj.UNIT}}</td>
+          <td class="label text-start">{{ obj.UNITTYPENAME }}</td>
+          <td class="label text-start">{{ obj.CUR_SNAME }}</td>
+          <td class="label text-end">{{ obj.RATE }}</td>
+          <td class="label text-end"> {{ obj.MIN_RATE }} </td>   </tr>
+      </tbody>
+    </table>
+  </td>
+</tr>
+
+                    <!-- <tr>
+                        <td colspan="4">
+                            
+    <table class="table table-borderless table-sm align-middle mb-0 w-100 rounded-4 overflow-hidden shadow-sm charges-table" style="table-layout: fixed;">
+    <thead class="table-primary">
+        <tr class="col-form-span-heading py-1 bg-body-secondary text-start fw-semibold text-primary">
+            <th class="col-form-span-label text-center" style="width: 48px;"></th> <th *ngIf="visible=='1'" class="col-form-span-label text-center" style="width: 64px;">Index</th>
+            <th class="col-form-span-label text-start">Charge name</th>
+            <th class="col-form-span-label text-center" style="width: 180px;">Unit</th>
+            <th class="col-form-span-label text-center" style="width: 100px;">Currency</th>
+            <th class="col-form-span-label text-end" style="width: 110px;">Rate</th>
+            <th class="col-form-span-label text-end" style="width: 110px;">Min Rate</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let obj of chargesdetails;index as i">
+            <td class="centerlabel text-center">
+                <i class="fa fa-pencil text-primary" (click)="Editchildrecd(obj)"></i>
+            </td>
+            <td *ngIf="visible=='1'" class="text-center"><span class="col-form-span-label">{{i}}</span></td>
+            
+            <td class="text-start"><span class="col-form-span-label">{{obj.chrg_desc}}</span></td> 
+            <td class="text-center"><span class="col-form-span-label">{{obj.STR_TEXT}}</span></td>
+            <td class="text-center"><span class="col-form-span-label">{{obj.CUR_SNAME}}</span></td>
+            <td class="text-end"><span class="col-form-span-label">{{obj.RATE}}</span></td>
+            <td class="text-end"><span class="col-form-span-label">{{obj.MIN_RATE}}</span></td>
+        </tr>
+    </tbody>
+</table>
+                        </td>
+                    </tr> -->
+                    <tr class="align-middle py-1">
+                        <td colspan="4" class="centerlabel py-4">
+                            <button class="btn btn-success btn-sm rounded-pill px-4 shadow fw-semibold me-2" type="submit" (click)="Add_Final()">
+                                <i class="fa fa-dot-circle-o me-2"></i> Submit
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm rounded-pill px-4 shadow fw-semibold" type="reset" (click)="ResetFinal();">
+                                <i class="fa fa-ban me-2"></i> Reset
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    </div>

@@ -1,0 +1,157 @@
+<div class="animated fadeIn">
+    <div class="container">
+        <!-- <div class="row" *ngIf="Searchdata_list.length==0"> -->
+            <div class="row">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-6">
+                <table class="table table-bordered table-sm-new bgwhite" style="font-family:  Verdana;font-size: 12px;">
+                    <tbody style='height:30px'>
+                        <tr>
+                            <td class="col-form-span-heading" colspan="9">
+                                COMP BP ENTRYNO - LIST - ASSIGN TO - CHEQUE NO AND PRINT
+                            </td>
+                        </tr>
+                        <tr> 
+                            <td>
+                                <span class="col-form-span-label width200"><b>Bank</b> </span>                               
+                            </td>
+                            <td>
+                                <select class="form-control width250"  [(ngModel)]="OurBank"  >
+                                    <option value="0">Please select</option>
+                                    <option *ngFor="let d of OurBankList"  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>                
+                                </select>
+                            </td>                         
+                            <td colspan="2">
+                                <button class="btn btn-sm btn-primary" type="submit" (click)="ViewChequeStockhelp()"><span
+                                    class="col-form-span-label"><i class="fa fa-search"></i> View Available Cheque No.</span></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td >
+                                <span class="col-form-span-label width350"><b>Starting Cheque No</b> </span>
+                            </td>
+                            <td > 
+                                <input type="text" class="form-control width100" [(ngModel)]="SChequeNo" >
+                            </td>  
+                           <td colspan="2">
+                            <button class="btn btn-sm btn-primary" type="submit" (click)="CheckStatus()"><span
+                                class="col-form-span-label"><i class="fa fa-search"></i>Check Status </span></button>
+                           </td>                                   
+                        </tr>
+                        <tr>
+                            <td align="center" colspan="4" >
+                                <span  align="center"  class="col-form-span-label width200">{{MSG}}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-3"></div> 
+        </div>  
+        <div class="row xyscroll" *ngIf="displayType=='LIST'">
+        <div class="col-12">
+            <table class="table table-sm-new table-responsive-sm table-bordered"  >
+                <thead>                    
+                    <tr class="title-head formheading">
+                        <th  class="col-form-span-label"><input type="checkbox"  [(ngModel)]='checkbox' (change)="checkAll($event)" /> &nbsp; </th>
+                        <th class="col-form-span-label" align="center">Status</th>
+                        <th class="col-form-span-label" align="center">Entry No</th>
+                        <th class="col-form-span-label" align="center">Cheque No</th>
+                        <th class="col-form-span-label" align="center">Payee Name</th>
+                        <th class="col-form-span-label" align="center">	Pay Date</th>
+                        <th class="col-form-span-label" align="center">Amount</th>
+                        <th class="col-form-span-label" align="center">	Requested By</th>
+                        <th class="col-form-span-label" align="center">Requested On</th>                            
+                    </tr>
+                </thead>
+                <tbody *ngIf="data_list.length > 0">
+                    <tr *ngFor="let data of data_list">
+                        <td  class="col-form-span-label"> <input type="checkbox" [(ngModel)]="data.Checked"
+                            (ngModelChange)="getCheckboxValues($event,data.ENTRYNO,data.CHEQUETYPE)"   > &nbsp; </td>
+                            <td><span
+                            class="col-form-span-label" >{{data.PRINTSTATUS}}</span>
+                        </td> 
+                        <td><span class="col-form-span-label link-label" (click)="ViewReqBP(data.ENTRYNO,data.PAYEENAME)"><u>{{data.ENTRYNO}}</u></span>
+                        </td>
+                        <td> 
+                            <span [ngClass]="{'red': data.CHEQUENO  === 'Not Available', 'blue': data.CHEQUENO != 'Not Available'}"
+                            class="col-form-span-label"><b>{{data.CHEQUENO}}</b></span>
+                        </td>
+                        <td><span
+                                class="col-form-span-label">{{data.PAYEENAME}}</span>
+                        </td>                             
+                        <td><span
+                            class="col-form-span-label">{{data.CHEQUEDT}}</span>
+                    </td>
+                    
+                    
+                    <td><span
+                            class="col-form-span-label">{{data.AMOUNT}}</span>
+                    </td> 
+                            <td><span
+                            class="col-form-span-label">{{data.RequestedBy}}</span>
+                            </td>
+                        <td><span
+                        class="col-form-span-label">{{data.ENTRYDT}}</span>
+                        </td>
+                    
+            </table>
+        </div>
+    </div>
+</div>
+         
+</div>
+<div>
+            <table class="table table-bordered table-sm-new bgwhite" style="font-family:  Verdana;font-size: 12px;">
+                <tr>
+                    <td style="float: right;" colspan="9">
+                        <button class="btn btn-sm btn-success" type="submit" (click)="AssignToPrint()"><span
+                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Assign Cheque No To Entry No</span></button>
+                    </td>
+
+                </tr>
+            </table>
+        </div>
+        <div class="modal" [style.display]="showModal_ChqList ? 'block' : 'none'">
+            <div class="modal-dialog modal-sg" role="document"  >
+                <!-- <div class="modal-content " style="height:400px; width:600px;overflow-x: auto;"> -->
+                    <div class="modal-content ">
+                    <div class="modal-header">
+                        <h5 class="modal-title">CHEQUE STOCK VIEW</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                             <div class="col" style="height:400px;overflow-y: auto;" > 
+                                <!-- <div class="col" > -->
+                                <table class="table table-bordered table-sm-new bgwhite">
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label"><b> Cheque Stock List</b></span>
+                                        </td>                                         
+                                    </tr>                                 
+                                    <tr>
+                                        <td>
+                                            <thead style="text-align: center;">
+                                                <tr>                                                    
+                                                    <th class="col-form-span-label">Cheque No</th>                                                 
+                                                </tr>
+                                            </thead>
+                                            <tbody >                                               
+                                                <tr *ngFor="let obj of ListChq ">                                                
+                                                    <td class="col-form-span-label">{{obj.CHEQUENO}}</td>                                                 
+                                                </tr>
+                                            </tbody>
+                                        </td>
+                                    </tr> 
+                                </table>        
+                            </div>
+                        </div>
+                        <div style="float: right;">                            
+                            <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                                    (click)="close()"><i class="fa fa-ban"></i>
+                                    Close</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>

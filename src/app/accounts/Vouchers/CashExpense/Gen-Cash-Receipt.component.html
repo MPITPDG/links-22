@@ -1,0 +1,105 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>{{Header| uppercase}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td colspan="5">
+                        <table class="table table-bordered table-sm-new bgwhite">
+                            <tr>
+                                <td><span class="col-form-span-label"><b>Entry No</b> </span><span
+                                        class="col-form-span-error">*</span></td>
+                                <td> <input [(ngModel)]="EntryNo" type="text" class="form-control width150"
+                                        maxlength="40" [disabled]="true"> </td>
+                                <td><span class="col-form-span-label"><b>Select Date</b> </span><span
+                                        class="col-form-span-error">*</span></td>
+                                <td>
+                                    <my-date-picker name="SelectDate" [options]="myDatePickerOptionsInv"
+                                        (dateChanged)="getdate($event)" class="form-control width170"
+                                        [selDate]="SelectDate"></my-date-picker>
+                                </td>
+                                <td class="centerlabel">
+                                    <button class="btn btn-sm btn-success" type="submit" (click)="populatedata()"> <span
+                                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>
+                                            SHOW</span></button>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="5" height="10" style="border-top: 4px solid gray;">
+                        <span class="col-form-span-label" style="font-size: 9pt;"> <b>Details:</b></span>
+                        <br>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="5">
+                        <table class="table table-responsive-sm table-sm-new bgwhite table-bordered">
+                            <thead class="formheading">
+                                <tr>
+                                    <th class="col-form-span-label ">Sr No.</th>
+                                    <th class="col-form-span-label">Employee Name
+                                    </th>
+                                    <th class="col-form-span-label">Amount</th>
+                                    <th class="col-form-span-label ">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody *ngIf="details.length>0">
+                                <tr *ngFor="let obj of details; index as i">
+                                    <td><span class="col-form-span-label">{{i+1}}
+                                        </span>
+                                    </td>
+                                    <td><span class="col-form-span-label">{{obj.acctname}}</span></td>
+                                    <td><span class="col-form-span-label">{{obj.amount}}</span></td>
+                                    <td><span class="col-form-span-label">{{obj.CRParentEntryNo}}</span></td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td> <span class="col-form-span-label "><b>Narration</b></span> </td>
+                    <td colspan="4">
+                        <textarea type="textarea" rows="2" cols="50" [(ngModel)]="narration"></textarea>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-form-span-label" style="font-weight: bold;">Total Amount </td>
+                    <td>
+                        <input type="text" class="form-control width150" [(ngModel)]="totalamount" [disabled]="true">
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" colspan="5">
+                        <button [disabled]='disable_generatebtn'  class="btn btn-sm btn-success" type="submit" (click)="generate_CR()"> <span
+                                class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>
+                                {{txtsave}}
+                            </span></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+    </div>
+</div>

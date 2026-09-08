@@ -1,0 +1,896 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>{{Header| uppercase}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-1 col-lg-1"> </div>
+        <div class="col-sm-12 col-md-10 col-lg-10">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td><span class="col-form-span-label"><b>Invoice No.</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td> <input type="text" class="form-control width180" [disabled]=true [(ngModel)]="invno"> </td>
+                    <td><span class="col-form-span-label"><b>Invoice dt.</b> </span></td>
+                    <td  style="text-align: left;">
+                        <my-date-picker name="invdate" [options]="myDatePickerOptionsInv"
+                            (dateChanged)="InvoiceDateChanged($event)" [selDate]="invdate">
+                        </my-date-picker>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label "><b>Mode</b></span> </td>
+                    <td > 
+                        <select class="form-control width180" [(ngModel)]="mode" [disabled]="modecondition">
+                            <option value="">--Please select--</option>
+                            <option *ngFor="let d of table5_mode" value={{d.DTATVALUE}}>{{d.DTATTEXT}}</option>
+                        </select>
+                    </td>
+                    <td> <span class="col-form-span-label "><b>Pay By Date :</b></span> </td>
+                    <td  style="text-align: left;">
+                        <my-date-picker name="paybydate" (dateChanged)="PayByDateDateChanged($event)" [options]="myDatePickerOptions" [selDate]="paybydate"
+                            [disabled]="mode=='1'||mode=='2'||mode=='5'||mode=='6'"></my-date-picker>
+                    </td>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-1 col-lg-1"> </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-1 col-lg-1"> </div>
+        <div class="col-sm-12 col-md-10 col-lg-10">
+            <div class="tab" role="tabpanel">
+                <div class="bor">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item"> 
+                            <a  class="nav-link active" id="zero-tab" data-toggle="tab" href="#zero">JobDetail</a>  
+                            <!-- <a   [ngClass]="{'activetab active' : value == 1 , 'nav-link' :value == 2 }" id="zero-tab" data-toggle="tab" href="#zero">JobDetail</a>  -->
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " id="one-tab" data-toggle="tab" href="#one"  >General</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="two-tab" data-toggle="tab" href="#two"  >Charges</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="three-tab" data-toggle="tab" href="#three" >Enclosure</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="four-tab" data-toggle="tab" href="#four"  >Despatch</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tab-content" style="height:400px;overflow-y:auto">
+                    <div role="tabpanel" class="tab-pane active"  id="zero"> 
+                        <!-- <div role="tabpanel" [ngClass]="{'tab-pane active' : value == 1 , 'tab-pane' :value == 2 }"  id="zero"> -->
+                        <div class="row">
+                            <div class="col">
+
+                                <table class="table table-bordered table-sm-new">
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label"><b>Job No.</b> </span>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control width180" maxlength="15"
+                                                minlength="15" [(ngModel)]="jobno" [disabled]="jobno_disable" [OnlyNumber]="true">
+                                        </td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                    <tr *ngIf="show_pkg_piece">
+                                        <td><span class="col-form-span-label"><b>Packages</b> </span><span
+                                                class="col-form-span-error">*</span></td>
+                                        <td> <input type="text" class="form-control width180"  [OnlyNumber]="true" [(ngModel)]="packages">
+                                        </td>
+                                        <td><span class="col-form-span-label"><b>Prop.Wt.</b> </span></td>
+                                        <div style="display: flex;">
+                                            <input type="text" class="form-control width180" [OnlyNumber]="true" [(ngModel)]="propweight">
+                                        </div>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" align="center">
+                                            <div style="margin: 0 auto;margin-top:3px;">
+                                                <span *ngIf="addjob">
+                                                    <button class="btn btn-sm btn-success" type="submit"
+                                                        (click)="listjobpopup()"> <span class="col-form-span-label"><i
+                                                                class="fa fa-plus"></i> Add</span></button>
+                                                </span>
+                                                <span *ngIf="jobupdate">
+                                                    <button class="btn btn-sm btn-success" type="submit"
+                                                        (click)="updatejob()"> <span class="col-form-span-label"><i
+                                                                class="fa fa-plus"></i>
+                                                            Update</span></button>
+                                                </span>
+                                                <button class="btn btn-sm btn-danger" type="submit"
+                                                    (click)="resetjob()"> <span class="col-form-span-label"><i
+                                                            class="fa fa-plus"></i> Reset</span></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <table class="table table-responsive-sm table-bordered">
+                                                        <thead>
+                                                            <tr class="col-form-span-heading">
+                                                                <th class="width20 centerlabel"></th>
+
+                                                                <th class="width100 centerlabel"><span  class="col-form-span-label">Job No</span>
+                                                                </th>
+                                                                <th class="width100 centerlabel"><span  class="col-form-span-label">Packages</span></th>
+                                                                <th class="width100 centerlabel"><span class="col-form-span-label">Prop.Wt</span></th>
+                                                                <th class="width100 centerlabel"><span  class="col-form-span-label">INV Number</span> </th>
+                                                                <th class="width100 centerlabel"><span class="col-form-span-label">BR/JV NO</span></th>
+                                                                <th class="width100 centerlabel"><span class="col-form-span-label">BR/JV CLIENT</span>  </th>
+                                                                <th class="width100 centerlabel"><span class="col-form-span-label">ADV. AMOUNT</span>
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr *ngFor="let obj of jobdatalist">
+                                                                <td align="center">
+                                                                    <i class="fa fa-pencil" (click)="Editjob(obj)"></i>                                                                  
+                                                                    <i class="fa fa-trash" (click)="deletejob(obj)"></i>
+                                                                </td>
+                                                                <td><span class="col-form-span-label">{{obj.INV_JOBNO}}</span>  </td>
+                                                                <td><span  class="col-form-span-label">{{obj.INV_PKGS}}</span>  </td>
+                                                                <td><span  class="col-form-span-label">{{obj.INV_GRWT}}</span>  </td>
+                                                                <td><span class="col-form-span-label  anchor-link" [innerHtml]="obj.INV_STR" (click)="viewjob($event)"   > </span> </td>
+                                                                <td><span  class="col-form-span-label">{{obj.BRJV_NO}}</span>  </td>
+                                                                <td><span class="col-form-span-label">{{obj.BRJV_CLIENT}}</span> </td>
+                                                                <td><span class="col-form-span-label">{{obj.ADV_AMOUNT}}</span> </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane " id="one">
+                        <div class="row">
+                            <div class="col">
+                                <table class="table table-bordered table-sm-new">
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label "><b>Client</b><span
+                                                    class="col-form-span-error">*</span></span>
+                                        </td>
+                                        <td colspan="3">
+                                            <ng-select [items]="table_client" bindLabel="EXP_NAME_CITY"
+                                                bindValue="EXP_CODE" (ngModelChange)="fillAddress($event)"
+                                                [(ngModel)]="client" class="custom" placeholder="--Please Select--">
+                                            </ng-select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label "><b>Bill To Address</b><span
+                                                    class="col-form-span-error">*</span></span>
+                                        </td>
+                                        <td colspan="3">
+                                            <ng-select [items]="updated_billaddress" bindLabel="DATATEXTFIELD"
+                                                bindValue="DATAVALUEFIELD" [(ngModel)]="billaddress" class="custom"
+                                                placeholder="--Please Select--">
+                                            </ng-select>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label "><b>Document Through</b><span
+                                                    class="col-form-span-error">*</span></span>
+                                        </td>
+                                        <td colspan="3">
+                                            <ng-select [items]="table2_document" bindLabel="EXP_NAME_CITY"
+                                                bindValue="EXP_CODE" [(ngModel)]="document" class="custom"
+                                                placeholder="--Please Select--">
+                                            </ng-select>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label "><b>Bill Type</b></span>
+                                        </td>
+                                        <td>
+                                            <select class="form-control width180" [(ngModel)]="billtype">
+                                                <option value="">--Please select--</option>
+                                                <option *ngFor="let d of table4_billtype" value={{d.DTATVALUE}}>
+                                                    {{d.DTATTEXT}}</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <span class="col-form-span-label "><b>Advance Received</b></span>
+                                        </td>
+                                        <td>
+                                            <input class="form-control width180" maxlength="20" [OnlyNumber]="true" [(ngModel)]="Adv_rec">
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label "><b>Invoice Currency</b><span
+                                                    class="col-form-span-error">*</span></span>
+                                        </td>
+                                        <td>
+                                            <select class="form-control width180" [(ngModel)]="currency" [disabled]="disablegeninvcur"
+                                                (ngModelChange)="GetCurrencyName($event)">
+                                                <option value="">Please select</option>
+                                                <option *ngFor="let d of table3_curreny" value={{d.cur_code}}>
+                                                    {{d.curname}}</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label "><b>INR Rupees</b><span
+                                                class="col-form-span-error">*</span></span>
+                                        </td>
+                                        <td> <input class="form-control width120" maxlength="20" [OnlyNumber]="true"
+                                            (input)="onInput($event)"  (blur)="onBlur($event)"   [(ngModel)]="inv_currate" [disabled]="disablegencurrate">
+                                        </td>
+                                        <td align="center">
+                                            <span class="col-form-span-label"><b>={{currencyname}}</b><span
+                                                class="col-form-span-error">*</span></span>
+                                        </td>
+                                        <td>
+                                            <input class="form-control width120" [OnlyNumber]="true" maxlength="20"
+                                                [(ngModel)]="inv_currate1" [disabled]="disablegencurrate1">
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label "><b>Pkgs</b></span>
+                                        </td>
+                                        <td>
+                                            <div style="display: flex; ">
+
+                                                <input type="text" class="form-control width80 " [(ngModel)]="no_pkgs" [OnlyNumber]="true">
+                                                <select class="form-control width120" [(ngModel)]="pkgs">
+                                                    <option value="">--Please select--</option>
+                                                    <option *ngFor="let d of table6_pkgs" value={{d.UNIT_CODE}}>
+                                                        {{d.UNIT_NAME}}</option>
+                                                </select>
+
+                                            </div>
+                                        </td>
+
+
+                                        <td> <span class="col-form-span-label "><b>Volume</b></span></td>
+                                        <td> <input class="form-control width180" maxlength="20" [OnlyNumber]="true" [(ngModel)]="volume">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label "><b>Pieces</b></span>
+                                        </td>
+                                        <td>
+
+                                            <div style="display: flex;">
+                                                <input type="text" class="form-control  width80" [OnlyNumber]="true"
+                                                    [(ngModel)]="no_pieces">
+                                                <select class="form-control width120" [(ngModel)]="pieces">
+                                                    <option value="">--Please select--</option>
+                                                    <option *ngFor="let d of table7_pieces" value={{d.UNIT_CODE}}>
+                                                        {{d.UNIT_NAME}}</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td> <span class="col-form-span-label "><b>Weight in Kilo</b></span></td>
+                                        <td> <input class="form-control width180" maxlength="20" [OnlyNumber]="true" [(ngModel)]="weight">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label "><b>Client Reference</b></span>
+                                        </td>
+                                        <td>
+                                            <input class="form-control width180" maxlength="20"
+                                                [(ngModel)]="client_ref">
+                                        </td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label "><b>Carrier</b></span>
+                                        </td>
+                                        <td colspan="3">
+                                            <input class="form-control width500" maxlength="100" [(ngModel)]="carrier">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label "><b>Goods :</b></span> </td>
+                                        <td colspan="3"> <input class="form-control width500" maxlength="250"
+                                                [(ngModel)]="goods">
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label "><b>MASTER (A.W.B./B/L) :</b></span>
+                                        </td>
+                                        <td> <input class="form-control width180" maxlength="20" [(ngModel)]="master">
+                                        </td>
+                                        <td> <span class="col-form-span-label "><b>MASTER (A.W.B./B/L) Date :</b></span>
+                                        </td>
+                                        <td>
+                                            <my-date-picker name="masterdate" [options]="myDatePickerOptions"
+                                                (dateChanged)="MasterDateChanged($event)" [selDate]="masterdate">
+                                            </my-date-picker>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="mode==='5'|| mode==='6'; else elseBlock">
+                                        <td> <span class="col-form-span-label "><b>BE No:</b></span>
+                                        </td>
+                                        <td> <input class="form-control width180" maxlength="20" [(ngModel)]="ship_billno">
+                                        </td>
+                                        <td> <span class="col-form-span-label "><b>BE Date :</b></span>
+                                        </td>
+                                        <td>
+                                            <my-date-picker name="shipbilldate" [options]="myDatePickerOptions"
+                                            (dateChanged)="shipbilldateChanged($event)" [selDate]="shipbilldate">
+                                        </my-date-picker>
+                                        </td>
+
+                                    </tr>
+                                    <ng-template #elseBlock>
+                                        <tr>
+                                            <td> <span class="col-form-span-label "><b>Ship BillNo:</b></span>
+                                            </td>
+                                            <td> <input class="form-control width180" maxlength="20"
+                                                    [(ngModel)]="ship_billno">
+                                            </td>
+                                            <td> <span class="col-form-span-label "><b>Ship BillNo Date :</b></span>
+                                            </td>
+                                            <td>
+                                                <my-date-picker name="shipbilldate" [options]="myDatePickerOptions"
+                                                    (dateChanged)="shipbilldateChanged($event)"
+                                                    [selDate]="shipbilldate">
+                                                </my-date-picker>
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+
+                                    <!-- <tr>
+                                <td> <span class="col-form-span-label "><b>Pay By Date :</b></span> </td>
+                                <td>
+                                    <my-date-picker name="paybydate" [options]="myDatePickerOptions" [selDate]="paybydate" [disabled]="mode=='1'||mode=='2'||mode=='5'||mode=='6'"></my-date-picker>
+                                </td>
+                                <td></td>
+                                <td></td>
+                            </tr> -->
+                                    <tr>
+                                        <td> <span class="col-form-span-label "><b>Client Cont. Executive :</b></span>
+                                        </td>
+                                        <td colspan="3">
+                                            <input class="form-control width200" [(ngModel)]="client_excutive">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label "><b>Narration</b></span> </td>
+                                        <td colspan="3">
+                                            <!-- (input)="Narrationarea()" -->
+                                            <textarea class="form-control" id="autoresizing" (change)="TextareaValueChange($event)"
+                                            placeholder="text" cols="50" rows="5" [innerHTML]="narration"></textarea>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane" id="two">
+                        <div class="row">
+                            <div class="col">
+                                <table class="table table-bordered table-sm-new">
+
+                                    <tr>
+                                        <td class="col-form-span-label" style="font-weight: bold;">Charges Code </td>
+                                        <td colspan="3">
+                                            <ng-select [items]="table8_charge" bindLabel="CHARGE_DESC"
+                                                (ngModelChange)="GetChargeDesc($event)" bindValue="CHARGE_CODE"
+                                                [(ngModel)]="charge" class="custom" placeholder="--Please Select--">
+                                            </ng-select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-form-span-label" style="font-weight: bold;">Account Name
+                                        </td>
+                                        <td colspan="3">
+                                            <ng-select [items]="table9_account" [disabled]='disableaccount' bindLabel="ACCTNAME"
+                                                bindValue="ACCTCODE" [(ngModel)]="account"  (ngModelChange)="GetAcctname($event)" class="custom"
+                                                placeholder="--Please Select--">
+                                            </ng-select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-form-span-label" style="font-weight: bold;">Description </td>
+                                        <td>
+                                            <input type="text" class="form-control " [(ngModel)]="desc1">
+                                        </td>
+                                        <td class="col-form-span-label" style="font-weight: bold;">Description1
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control " [(ngModel)]="desc2">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <table class="table table-bordered table-sm-new">
+                                                <tr>
+                                                    <td class="col-form-span-label" style="font-weight: bold;">Tax </td>
+                                                    <td class="col-form-span-label" style="font-weight: bold;">Qty </td>
+                                                    <td class="col-form-span-label" style="font-weight: bold;">Rate/Qty </td>
+                                                    <td class="col-form-span-label" style="font-weight: bold;">Amt In Cur </td>
+                                                    <td class="col-form-span-label" style="font-weight: bold;">Cur Type </td>
+                                                    <td class="col-form-span-label" style="font-weight: bold;">Ex. Rate </td>
+                                                    <td class="col-form-span-label" style="font-weight: bold;">Amt(INR) </td>
+                                                    <td class="col-form-span-label" style="font-weight: bold;">Amt Taxable(INR)</td>
+                                                   
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <select class="form-control width80" [(ngModel)]="tax" [disabled]="disabletax">
+                                                            <option value="">Please select</option>
+                                                            <option value="N">N</option>
+                                                            <option value="G">G</option>
+                                                        </select> 
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control width60" [(ngModel)]="qty" [OnlyNumber]="true">
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control width60" [(ngModel)]="rateperqty" [OnlyNumber]="true">
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control width60" value={{Curamount}} 
+                                                            [disabled]=true>
+                                                    </td>
+                                                    <td>
+                                                        <select class="form-control width80" [(ngModel)]="currencytype"  (ngModelChange)="getexchangerate($event)">
+                                                            <option value="">Please select</option>
+                                                            <option *ngFor="let d of table13_currencytype" value={{d.DATAVALUE}}>
+                                                                {{d.DATATEXTVALUE}}</option>
+            
+                                                        </select>
+                                                    </td>
+                                                    <td style=" display: flex;">
+                                                        <input type="text" class="form-control width80" [(ngModel)]="excrate" (ngModelChange)="Calcamount()" [disabled]='disableexrate' [OnlyNumber]="true"  >
+                                                        <span class="col-form-span-label" style="font-weight: bold;"> = INR</span>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control width100" value={{amount}} 
+                                                            [disabled]=true>
+                                                    </td>
+                                                    <td>
+                                                        <span *ngIf="tax==='G'; else elseBlock1">
+                                                            <input type="text" class="form-control width120"
+                                                                [(ngModel)]="taxamount_G" [disabled]=true>
+                                                        </span>
+                                                        <ng-template #elseBlock1>
+                                                            <input type="text" class="form-control width120"
+                                                                [(ngModel)]="taxamount_N" [disabled]=true>
+                                                        </ng-template>
+                                                    </td>
+                                                  
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <!-- <tr>
+                                        <td class="col-form-span-label" style="font-weight: bold;">Charges Code </td>
+                                        <td colspan="3">
+                                            <ng-select [items]="table8_charge" bindLabel="CHARGE_DESC"
+                                                (ngModelChange)="GetChargeDesc($event)" bindValue="CHARGE_CODE"
+                                                [(ngModel)]="charge" class="custom" placeholder="--Please Select--">
+                                            </ng-select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-form-span-label" style="font-weight: bold;">Account Name
+                                        </td>
+                                        <td colspan="3">
+                                            <ng-select [items]="table9_account" bindLabel="ACCTNAME"
+                                                bindValue="ACCTCODE" [(ngModel)]="account" class="custom"
+                                                placeholder="--Please Select--">
+                                            </ng-select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-form-span-label" style="font-weight: bold;">Description </td>
+                                        <td>
+                                            <input type="text" class="form-control " [(ngModel)]="desc1">
+                                        </td>
+                                        <td class="col-form-span-label" style="font-weight: bold;">Description1
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control " [(ngModel)]="desc2">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-form-span-label" style="font-weight: bold;">Tax </td>
+                                        <td>
+                                            <select class="form-control width180" [(ngModel)]="tax">
+                                                <option value="">Please select</option>
+                                                <option value="N">N</option>
+                                                <option value="G">G</option>
+                                            </select> </td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-form-span-label" style="font-weight: bold;">Qty </td>
+
+                                        <td>
+                                            <input type="text" class="form-control width180" [(ngModel)]="qty" [OnlyNumber]="true">
+                                        </td>
+                                        <td class="col-form-span-label" style="font-weight: bold;">Rate/Qty
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control width180" [(ngModel)]="rateperqty" [OnlyNumber]="true">
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td class="col-form-span-label" style="font-weight: bold;">Currency Type </td>
+
+                                        <td>
+                                            <select class="form-control width180" [(ngModel)]="currencytype">
+                                                <option value="">Please select</option>
+                                                <option *ngFor="let d of table13_currencytype" value={{d.DATAVALUE}}>
+                                                    {{d.DATATEXTVALUE}}</option>
+
+                                            </select>
+                                        </td>
+                                        <td class="col-form-span-label" style="font-weight: bold;">Exchange Rate
+                                        </td>
+                                        <td style=" display: flex;">
+                                            <input type="text" class="form-control width180" [(ngModel)]="excrate" [OnlyNumber]="true"  >
+                                            <span class="col-form-span-label" style="font-weight: bold;"> = INR</span>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td class="col-form-span-label" style="font-weight: bold;">Amount
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control width180" value={{amount}} 
+                                                [disabled]=true>
+                                        </td>
+                                        <td class="col-form-span-label" style="font-weight: bold;">Amount Taxable
+                                        </td>
+                                        <td>
+                                            <span *ngIf="tax==='G'; else elseBlock1">
+                                                <input type="text" class="form-control width180"
+                                                    [(ngModel)]="taxamount_G" [disabled]=true>
+                                            </span>
+                                            <ng-template #elseBlock1>
+                                                <input type="text" class="form-control width180"
+                                                    [(ngModel)]="taxamount_N" [disabled]=true>
+                                            </ng-template>
+                                        </td>
+                                    </tr> -->
+                                    <tr>
+                                        <td colspan="4" align="center">
+                                            <button class="btn btn-sm btn-success" type="submit" (click)="addcharges()">
+                                                <span class="col-form-span-label"><i
+                                                        class="fa fa-dot-circle-o"></i>{{chargetext}}</span></button>
+                                            <button class="btn btn-sm btn-danger" type="reset"> <span
+                                                    class="col-form-span-label" (click)="resetcharges();"><i
+                                                        class="fa fa-ban"></i> Reset</span></button>
+                                             <button class="btn btn-sm btn-danger" type="reset"> <span
+                                                    class="col-form-span-label" (click)="resetCurcharges();"><i
+                                                       class="fa fa-ban"></i> Reset Cur Charges</span></button>           
+                                        </td>
+                                     
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <table class="table table-responsive-sm table-bordered">
+                                                        <thead>
+                                                            <tr class="col-form-span-heading">
+                                                                <th  ></th>
+                                                                <th   align="center"><span  class="col-form-span-label"> Charge code</span></th>
+                                                                <th   align="center"><span  class="col-form-span-label"> Account Name</span> </th>
+                                                                <th   align="center"><span  class="col-form-span-label">  Charge Description</span></th>
+                                                                <th   align="center"> <span  class="col-form-span-label"> Tax</span> </th>
+                                                                <th   align="center"> <span  class="col-form-span-label"> Qty</span> </th>
+                                                                <th   align="center"> <span  class="col-form-span-label">Rate</span> </th>
+                                                                <th   align="center"> <span  class="col-form-span-label"> Currency</span> </th>
+                                                                <th   align="center"> <span  class="col-form-span-label">Ex.Rate</span> </th>
+                                                                <th   align="center"><span  class="col-form-span-label">Amount </span> </th>
+                                                                <th   align="center"><span  class="col-form-span-label">Taxable Amount </span> </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody *ngIf="chargetable.length > 0">
+                                                            <tr *ngFor="let data of chargetable">
+                                                                <td>
+                                                                    <i class="fa fa-pencil"
+                                                                        (click)="editcharge(data)"></i>
+                                                                    &nbsp;
+                                                                    <i class="fa fa-trash"
+                                                                        (click)="deletecharge(data)"></i>
+                                                                </td>
+                                                                <td><span  class="col-form-span-label">{{data.INV_CHRGCODE}}</span>  </td>
+                                                                <td><span class="col-form-span-label">{{data.ACCOUNT_NAME}}</span>   </td>
+                                                                <td><span  class="col-form-span-label">{{data.description1}}</span>  </td>
+                                                                <td><span  class="col-form-span-label">{{data.INV_TAXABLE}}</span>  </td>
+                                                                <td><span  class="col-form-span-label">{{data.INV_QTY}}</span>  </td>
+                                                                <td style="text-align: right;"  ><span  class="col-form-span-label">{{data.INV_RATE}}</span>   </td>
+                                                                <td><span  class="col-form-span-label">{{data.INV_CURRENCYNAME}}</span>  </td>
+                                                                <td style="text-align: right;"><span  class="col-form-span-label">{{data.INV_EXRATE}}</span>   </td>
+                                                                <!-- <td><span   class="col-form-span-label">{{data.INV_AMOUNT}}</span>  </td>
+                                                                <td><span   class="col-form-span-label">{{data.TAXABLEAMT}}</span>   </td> -->
+                                                                <td style="text-align: right;"><span   class="col-form-span-label">{{data.INV_INRAMT}}</span>  </td>
+                                                                <td style="text-align: right;"><span   class="col-form-span-label">{{data.TAXABLEAMTINR|number:'2.2-4'}}</span>   </td>
+                                                            </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane" id="three">
+                        <div class="row">
+                            <div class="col">
+                                <table class="table table-bordered table-sm-new">
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label "><b>Enclosure code</b><span
+                                                    class="col-form-span-error">*</span></span>
+                                        </td>
+                                        <td colspan="3">
+                                            <select class="form-control" [(ngModel)]="enclose_code">
+                                                <option value="">--Please select--</option>
+                                                <option *ngFor="let d of Table11_enclose" value={{d.enc_code}}>
+                                                    {{d.enclosure}}</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label "><b>Description </b><span
+                                                    class="col-form-span-error">*</span></span>
+                                        </td>
+                                        <td>
+                                            <input class="form-control width180" maxlength="20"
+                                                [(ngModel)]="enclose_desc">
+                                        </td>
+                                        <td>
+                                            <span class="col-form-span-label "><b>number</b><span
+                                                    class="col-form-span-error">*</span></span>
+                                        </td>
+                                        <td>
+                                            <input class="form-control width180" maxlength="20"
+                                                [(ngModel)]="enclose_number">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" align="center">
+                                            <button class="btn btn-sm btn-success" type="submit"
+                                                (click)="addenclosure()">
+                                                <span class="col-form-span-label"><i
+                                                        class="fa fa-dot-circle-o"></i>{{enclosuretext}}</span></button>
+                                            <button class="btn btn-sm btn-danger" type="reset"> <span
+                                                    class="col-form-span-label" (click)="resetenclosure();"><i
+                                                        class="fa fa-ban"></i> Reset</span></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <table class="table table-responsive-sm table-bordered">
+                                                        <thead>
+                                                            <tr class="col-form-span-heading">
+                                                                <th class="centerlabel"><span class="col-form-span-label"></span></th>
+                                                                <th align="center"><span  class="col-form-span-label">Enclosure code</span></th>
+                                                                <th align="center"><span  class="col-form-span-label">  Description</span></th>
+                                                                <th align="center"><span  class="col-form-span-label">Number </span></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody *ngIf="enclosuretable.length > 0">
+                                                            <tr *ngFor="let data of enclosuretable">
+                                                                <td>  <i class="fa fa-pencil"   (click)="editenclosue(data)"></i>
+                                                                    &nbsp;
+                                                                    <i class="fa fa-trash"  (click)="deleteenclosur(data)"></i> </td>
+                                                                <td><span  class="col-form-span-label">{{data.INV_ENCLCODE}}</span>   </td>
+                                                                <td><span  class="col-form-span-label">{{data.INV_DESC}}</span> </td>
+                                                                <td><span  class="col-form-span-label">{{data.INV_NUMBER}}</span>  </td>
+                                                            </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane" id="four">
+                        <div class="row">
+                            <div class="col">
+                                <table class="table table-bordered table-sm-new">
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label "><b>Dispatch code</b><span
+                                                    class="col-form-span-error">*</span></span>
+                                        </td>
+                                        <td colspan="3">
+                                            <select class="form-control" [(ngModel)]="despachcode">
+                                                <option value="">--Please select--</option>
+                                                <option *ngFor="let d of Table12_despach" value={{d.des_code}}>
+                                                    {{d.Despatch_desc}}</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label "><b>Description </b><span
+                                                    class="col-form-span-error">*</span></span>
+                                        </td>
+                                        <td>
+                                            <input class="form-control width180" maxlength="20"
+                                                [(ngModel)]="despach_desc">
+                                        </td>
+                                        <td>
+                                            <span class="col-form-span-label "><b>Number</b><span
+                                                    class="col-form-span-error">*</span></span>
+                                        </td>
+                                        <td>
+                                            <input class="form-control width180" maxlength="20"
+                                                [(ngModel)]="despach_no">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" align="center">
+                                            <button class="btn btn-sm btn-success" type="submit" (click)="despachadd()">
+                                                <span class="col-form-span-label"><i
+                                                        class="fa fa-dot-circle-o"></i>{{despatchtext}}</span></button>
+                                            <button class="btn btn-sm btn-danger" type="reset"> <span
+                                                    class="col-form-span-label" (click)="despachreset();"><i
+                                                        class="fa fa-ban"></i> Reset</span></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <table class="table table-responsive-sm table-bordered">
+                                                        <thead>
+                                                            <tr class="title-head formheading">
+                                                                <th  ></th>
+                                                                <th   align="center">Dispatch  code</th>
+                                                                <th   align="center">    Description</th>
+                                                                <th   align="center">Number  </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody *ngIf="despach_table.length >0">
+                                                            <tr *ngFor="let data of despach_table">
+                                                                <td>
+                                                                    <i class="fa fa-pencil"
+                                                                        (click)="despachedit(data)"></i>
+                                                                    &nbsp;
+                                                                    <i class="fa fa-trash"
+                                                                        (click)="despachdelete(data)"></i>
+                                                                </td>
+                                                                <td><span  class="col-form-span-label">{{data.INV_DESPCODE}}</span>   </td>
+                                                                <td><span class="col-form-span-label">{{data.INV_DESC}}</span>  </td>
+                                                                <td><span class="col-form-span-label">{{data.INV_NUMBER}}</span>   </td>
+
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div align="center" class="border p-1">
+                    <button class="btn btn-sm btn-success" type="submit" (click)="MainInvoice_submit()"> <span
+                            class="col-form-span-label"><i
+                                class="fa fa-dot-circle-o"></i>{{Mainaddtext}}</span></button>
+                    <button class="btn btn-sm btn-danger" type="submit" (click)="MainReset()"> <span
+                            class="col-form-span-label"><i class="fa fa-ban"></i>Reset</span></button>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-1 col-lg-1"> </div>
+    </div>
+</div>
+
+<div class="modal" [style.display]="showModal_ListJob ? 'block' : 'none'">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col" style="height:400px;overflow-y: auto;">
+                        <table class="table table-bordered table-sm-new bgwhite">
+                            <tr>
+                                <td colspan="6">
+                                    <input type="text" [(ngModel)]="term"
+                                        style="float: right;width: 200px;font-family: verdana;font-size:11px;padding: 1px;"
+                                        placeholder="Search by Job Number">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <thead style="text-align: center;">
+                                        <tr>
+                                            <th class="col-form-span-label"></th>
+                                            <th class="col-form-span-label">JOb No.</th>
+                                            <th class="col-form-span-label">SHIIPER NAME</th>
+                                            <th class="col-form-span-label">BR/JV NO</th>
+                                            <th class="col-form-span-label">BR/JV CLIENT</th>
+                                            <th class="col-form-span-label">AMOUNT</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- <tr *ngFor="let obj of ListJob;let i = index | filterBy: userFilter"> -->
+                                        <tr *ngFor="let obj of ListJob | filter: term ;let i = index">
+                                            <td class="col-form-span-label">
+                                                <input type="checkbox" [(ngModel)]="obj.Checked" [id]="i" [value]="i"
+                                                    (ngModelChange)="getCheckboxValues($event,obj.EXPTNO,obj.SHIPPER_CODE,i)">
+                                                &nbsp; </td>
+                                            <td class="col-form-span-label">{{obj.EXPTNO}}</td>
+                                            <td class="col-form-span-label">{{obj.SHIIPER_NAME}}</td>
+                                            <td class="col-form-span-label">{{obj.BRJV_NO}}</td>
+                                            <td class="col-form-span-label">{{obj.BRJV_CLIENT}}</td>
+                                            <td class="col-form-span-label">{{obj.AMOUNT}}</td>
+                                        </tr>
+                                    </tbody>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+                </div>
+                <div style="float: right;">
+                    <button class="btn btn-sm btn-success" type="submit" (click)="popup_listjob()"> <span
+                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Add</span></button>
+                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                            (click)="close()"><i class="fa fa-ban"></i>
+                            Close</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" [style.display]="showModal_Remark ? 'block' : 'none'">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content ">
+            <div class="modal-body text-center">
+                <p [innerHtml]="REMARK1"></p>
+                <button type="button" class="btn btn-success" (click)="remarks_popup_select('YES')">YES</button>
+                <button type="button" class="btn btn-danger" (click)="remarks_popup_select('NO')">NO</button>
+
+            </div>
+        </div>
+    </div>
+</div>

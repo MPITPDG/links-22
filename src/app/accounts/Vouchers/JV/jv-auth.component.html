@@ -1,0 +1,104 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+      <div class="col-sm-12">
+        <div class="card">
+          <div class="card-header formheading">
+            <strong>Authorise Journal Voucher Request List</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row no-gutters" >
+      <div class="col-md-1">
+        
+      </div>
+      <div   class="col-md-10" style="overflow-y: auto;height: 500px;">
+        <table  class="table table-bordered table-sm-new bgwhite table-hover" >
+          <thead>
+           
+            <tr class="col-form-span-heading" style="white-space:nowrap;">
+              <th *ngIf=" FLAG != 'VIEW'" class="col-form-span-label"><input type="checkbox"  [(ngModel)]='checkbox' (change)="checkAll($event)" /> &nbsp; </th>
+          
+              <th class="col-form-span-label">
+                REQ CODE
+              </th>
+              <th class="col-form-span-label" >
+                REQUESTED ON 
+              </th>
+              <th class="col-form-span-label" >
+                REQUESTED BY 
+              </th>
+              <th class="col-form-span-label" >
+                DEBIT 
+              </th>
+              <th class="col-form-span-label" >
+                CREDIT 
+              </th>
+              <th class="col-form-span-label" >
+                AUTHORISED BY 
+              </th>
+              <th class="col-form-span-label" >
+                AUTHORISED ON 
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bgwhite">
+            <tr
+              *ngFor="let obj of Unauthlist "  
+              >
+              <td *ngIf=" FLAG != 'VIEW'" class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.Checked"
+                  (ngModelChange)="getCheckboxValues($event,obj.REQCODE)"> &nbsp; </td>
+        
+               <td class="col-form-span-label link-label"  (click)="ViewJVData(obj.REQCODE)"><u> {{obj.REQCODE}}</u> </td> 
+              <!-- <td class="col-form-span-label link-label" (click)="srpinvoiceviewdata(obj.REQCODE,FLAG,authstatus)">{{obj.REQCODE}}</td> -->
+              <td class="col-form-span-label">{{obj.REQUESTEDON}}</td>
+              <td class="col-form-span-label">{{obj.REQUESTEDBY}}</td>
+              <td class="col-form-span-label" style="text-align: right;">{{obj.DEBIT|number:'2.2-4'}}</td>
+              <td class="col-form-span-label" style="text-align: right;">{{obj.CREDIT|number:'2.2-4'}}</td>
+              <td class="col-form-span-label" >{{obj.AUTHORISEDBY}}</td>
+              <td class="col-form-span-label" >{{obj.AUTHORISATIONDATE}}</td>
+            </tr>
+          </tbody>
+        
+          <tr >
+               <td *ngIf="(hidebtnrow =='U' || hidebtnrow == 'M')"  colspan="8" class="right-text pr-2">
+                <button class="btn btn-sm btn-success" type="submit" (click)="Verify()"> <span
+                  class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Verified</span></button>
+                  <button class="btn btn-sm btn-success" type="submit" (click)="rejectdata()"> <span
+                    class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Reject</span></button>
+                       <!-- <button class="btn btn-sm btn-success" *ngIf=" hidebtnrow =='U' " type="submit" (click)="Passdatatomanagement()"> <span
+                  class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Management</span></button> -->
+                 
+            </td>
+          </tr>
+        
+        </table>
+        <table class="table table-bordered table-sm-new bgwhite table-hover">
+          <tr>
+            <td colspan="10" class="right-text pr-2">
+         
+           <span class="col-form-span-label link-label" (click)="VerifiedDataList('V')" ><b><u>Verified</u></b></span>&nbsp;&nbsp;
+           <span class="col-form-span-label link-label" (click)="getdataforauth()" ><b><u>UnVerified</u></b></span>&nbsp;&nbsp;
+           <span class="col-form-span-label link-label" (click)="VerifiedDataList('R')" ><b><u>Rejected</u></b></span>&nbsp;&nbsp;
+           <!-- <span class="col-form-span-label link-label" (click)="VerifiedDataList('M')" ><b><u>Management</u></b></span>&nbsp;&nbsp; -->
+          
+         </td>
+       </tr>
+        </table> 
+        
+     
+      </div>
+      <div class="col-md-1">
+      </div>
+      <!-- <div class="col-md-1">
+       </div>
+       <div class="col-md-10" >
+        <strong>Total Records :  {{rowcount}}</strong>
+       </div>
+       <div class="col-md-1">
+      </div> -->
+    </div>           
+  </div>  
+   
+  
+ 

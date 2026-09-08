@@ -1,0 +1,358 @@
+﻿<table class="table table-bordered table-sm-new tablebg">
+	<tr class="trbg">
+		<td colspan="8">
+			<span class="col-form-span-label"><b>CONTAINER DETAILS</b></span>
+			<button class="btn btn-sm btn-warning" style="float: right;" (click)="back();"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to search</u></span></button>
+		</td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>Rotation No.</strong></span></td>
+		<td colspan="3"><span class="col-form-span-labe l">{{RotationNo}}</span></td>
+		<td class="width150"><span class="col-form-span-label"><strong>Voyage No. </strong></span></td>
+		<td colspan="3"><span class="col-form-span-label">{{VoyageNo}}</span></td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>Vessel Name </strong></span></td>
+		<td colspan="7"><span class="col-form-span-label">{{VesselName}}</span></td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>Last Carting Date </strong></span></td>
+		<td colspan="3"><span class="col-form-span-label">{{LastCartingDate}}</span></td>
+		<td class="width150"><span class="col-form-span-label"><strong>ETD</strong></span></td>
+		<td colspan="3"><span class="col-form-span-label">{{ETD}}</span></td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>Act. Sailing Date</strong></span></td>
+		<td colspan="3"><span class="col-form-span-label">{{ActSailingDate}}</span></td>
+		<td class="width150"><span class="col-form-span-label"><strong>Container No. </strong></span></td>
+		<td colspan="3"><span class="col-form-span-label">{{ContainerNo}}</span></td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>Tot. No. of Pkgs</strong></span></td>
+		<td colspan="3"><span class="col-form-span-label">{{NoOfPackage}}</span></td>
+		<td class="width150"><span class="col-form-span-label"><strong>Tot. Volume </strong></span></td>
+		<td colspan="3"><span class="col-form-span-label">{{TotalVolume}}</span></td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>Agent Name</strong></span></td>
+		<td colspan="7"><span class="col-form-span-label">{{AgentName}}</span></td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>Destination</strong></span></td>
+		<td colspan="7"><span class="col-form-span-label">{{Destination}}</span></td>
+	</tr>
+	<tr>
+		<td  class="width150"rowspan="4" ><span class="col-form-span-label"><strong>Pre-Carriage</strong></span></td>
+		<td><select class="form-control width100"  [(ngModel)]="precarby" [disabled]="pracarrieagedisable==true" >
+				<option value="TRAIN">TRAIN</option>
+				<option value="TRUCK">TRUCK</option>
+			</select></td> 
+			<td  class="width150"  ><span class="col-form-span-label"><strong>Place of Receipt :</strong></span></td>
+			<td  colspan="4"> 
+					<ng-select [items]="PlcaRecptlist"
+						   bindLabel="ICD_NAME"
+						   bindValue="PK_ID"
+						   placeholder="--Select--"
+						   [(ngModel)]="PlcRecpt"
+						   class="form-control width150"					   
+						   [disabled]="pracarrieagedisable==true"
+						   >
+				</ng-select>
+			</td>	
+		</tr>	 
+		<tr>
+			<td><span class="col-form-span-label"><strong>ETD @ POR :</strong> </span> </td>
+			<td  colspan="5" >				 
+			<div class="custom-control  custom-control-inline">
+				<my-date-picker name="date" [options]="myDatePickerOptions" [(ngModel)]="EtdPor" [disabled]="pracarrieagedisable==true"  ></my-date-picker>
+				<span class="col-form-span-label" >dd/mm/yyyy</span>
+				<select class="form-control width30"  [(ngModel)]="EtdporHr"  [disabled]="pracarrieagedisable==true">
+						<option value="TRAIN">00</option>
+						<option value="TRUCK">01</option>
+						<option value="TRAIN">02</option>
+						<option value="TRUCK">03</option>
+						<option value="TRAIN">04</option>
+						<option value="TRUCK">05</option>
+						<option value="TRAIN">06</option>
+						<option value="TRUCK">07</option>
+						<option value="TRAIN">08</option>
+						<option value="TRUCK">09</option>
+						<option value="TRAIN">10</option>
+						<option value="TRUCK">11</option>
+						<option value="TRAIN">12</option>
+						<option value="TRUCK">13</option>
+						<option value="TRAIN">14</option>
+						<option value="TRUCK">15</option>
+						<option value="TRAIN">16</option>
+						<option value="TRUCK">17</option>
+						<option value="TRAIN">18</option>
+						<option value="TRUCK">19</option>
+						<option value="TRAIN">20</option>
+						<option value="TRUCK">21</option>
+						<option value="TRUCK">22</option>
+						<option value="TRUCK">23</option>						 
+					</select>
+					<span class="col-form-span-label" >Hr</span>
+					<select class="form-control width30"  [(ngModel)]="EtdporMin" [disabled]="pracarrieagedisable==true" >
+						<option value="TRAIN">00</option>
+						<option value="TRUCK">15</option>
+						<option value="TRAIN">30</option>
+						<option value="TRUCK">45</option>
+						</select>
+						<span class="col-form-span-label" >Min</span>
+					</div>
+			</td>
+		</tr>
+		<tr>
+				<td><span class="col-form-span-label"><strong>ETA @ POL :</strong> </span> </td>
+				<td  colspan="5"> 
+				<div class="custom-control  custom-control-inline">
+				<my-date-picker name="date" [options]="myDatePickerOptions" [(ngModel)]="EtaPol" [disabled]="pracarrieagedisable==true"  ></my-date-picker>
+				<span class="col-form-span-label" >dd/mm/yyyy</span>
+				<select class="form-control width30"  [(ngModel)]="EtaPolHr" [disabled]="pracarrieagedisable==true" >
+						<option value="TRAIN">00</option>
+						<option value="TRUCK">01</option>
+						<option value="TRAIN">02</option>
+						<option value="TRUCK">03</option>
+						<option value="TRAIN">04</option>
+						<option value="TRUCK">05</option>
+						<option value="TRAIN">06</option>
+						<option value="TRUCK">07</option>
+						<option value="TRAIN">08</option>
+						<option value="TRUCK">09</option>
+						<option value="TRAIN">10</option>
+						<option value="TRUCK">11</option>
+						<option value="TRAIN">12</option>
+						<option value="TRUCK">13</option>
+						<option value="TRAIN">14</option>
+						<option value="TRUCK">15</option>
+						<option value="TRAIN">16</option>
+						<option value="TRUCK">17</option>
+						<option value="TRAIN">18</option>
+						<option value="TRUCK">19</option>
+						<option value="TRAIN">20</option>
+						<option value="TRUCK">21</option>
+						<option value="TRUCK">22</option>
+						<option value="TRUCK">23</option>						 
+					</select>
+					<span class="col-form-span-label" >Hr</span>
+					<select class="form-control width30"  [(ngModel)]="EtaPolMin" [disabled]="pracarrieagedisable==true" >
+						<option value="TRAIN">00</option>
+						<option value="TRUCK">15</option>
+						<option value="TRAIN">30</option>
+						<option value="TRUCK">45</option>
+					</select>
+						<span class="col-form-span-label" >Min</span>
+						</div>
+			</td>
+	</tr>
+
+	<tr *ngIf="MessageLoadNotDone !== ''">
+		<td colspan="8">
+			<span class="error-text">{{MessageLoadNotDone}}</span>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="5" style="white-space:nowrap;"><span class="col-form-span-label"><strong>CONTAINER LOADING AT ORIGIN CONFIRMATION DATE</strong></span></td>
+		<td colspan="3">
+			<span class="col-form-span-label" *ngIf="LabelLoadOriginDt !== ''">{{LabelLoadOriginDt}}</span>
+			<input type="checkbox" [checked]="CheckLoadOriginDt==true" [(ngModel)]="CheckLoadOriginDt" *ngIf="LabelLoadOriginDt==''&&MessageLoadOriginDtMsg==''">
+		</td>
+	</tr>
+	<tr *ngIf="MessageLoadOriginDtMsg !== ''">
+		<td colspan="8">
+			<span class="error-text">{{MessageLoadOriginDtMsg}}</span>
+		</td>
+	</tr>
+	<tr class="centerlabel">
+		<td colspan="8">
+			<span class="col-form-span-label"><input type="radio" name="TransType" [checked]="TransType=='Direct'" (change)="TransType='Direct'" /> Direct</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<span class="col-form-span-label"><input type="radio" name="TransType" [checked]="TransType=='Transhipment'" (change)="TransType='Transhipment'" /> Transhipment</span>
+		</td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>Trans. Port 1</strong></span></td>
+		<td colspan="7">
+			<ng-select [items]="CityList"
+					   bindLabel="CITY_NAME"
+					   bindValue="CITY_CODE"
+					   placeholder="--Select--"
+					   [(ngModel)]="TransPortOne"
+					   class="form-control width200"
+					   (change)="changePort(TransPortOne)"
+					   [disabled]="TransType=='Direct'"
+					   >
+			</ng-select>
+		</td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>Connecting Vessel 1</strong></span></td>
+		<td colspan="7">
+			<ng-select [items]="ConnVesselListOne"
+					   bindLabel="TEXTFIELD"
+					   bindValue="VALUEFIELD"
+					   placeholder="--Select--"
+					   [(ngModel)]="ConnVesselOne"
+					   class="form-control"
+					   (change)="callPortEtd(ConnVesselOne)"
+					   [disabled]="TransType=='Direct'"
+					   >
+			</ng-select>
+		</td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>ETD (at trans. port 1)</strong></span></td>
+		<td colspan="3">
+			<my-date-picker name="date" [options]="myDatePickerOptions" [(ngModel)]="EtdPort" [disabled]="disableEtdPort==true"></my-date-picker>
+		</td>
+		<td class="width150"><span class="col-form-span-label"><strong>ETA</strong></span></td>
+		<td colspan="3">
+			<my-date-picker name="date" [options]="myDatePickerOptions" [(ngModel)]="ETA"></my-date-picker>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="5" class="width150" style="background: #94cae0;"><span class="col-form-span-label"><strong>ATA (Actual Time of Arrival at trans. port 1)</strong></span></td>
+		<td colspan="2" style="background: #94cae0;">
+			<my-date-picker name="date" [options]="myDatePickerOptions" [(ngModel)]="ATAPort"></my-date-picker>
+		</td>
+	</tr>
+	<tr *ngIf="MessageConnLoadNotDone !== ''">
+		<td colspan="8">
+			<span class="error-text">{{MessageConnLoadNotDone}}</span>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="5" style="white-space:nowrap;"><span class="col-form-span-label"><strong>CONTAINER LOADING AT TRANSHIPMENT PORT1 CONFIRMATION DATE</strong></span></td>
+		<td colspan="3">
+			<span class="col-form-span-label" *ngIf="LabelLoadOrigin2Dt !==''">{{LabelLoadOrigin2Dt}}</span>
+			<input type="checkbox" [checked]="LoadOrigin2Dt==true" [(ngModel)]="LoadOrigin2Dt" *ngIf="LabelLoadOrigin2Dt==''&&MessageLoadOrigin2Dt==''" />
+			<!-- <input type="checkbox" [checked]="CheckLoadOriginDt==true" [(ngModel)]="CheckLoadOriginDt" *ngIf="LabelLoadOriginDt==''&&MessageLoadOriginDtMsg==''"> -->
+		</td>
+	</tr>
+	<tr *ngIf="MessageLoadOrigin2Dt !== ''">
+		<td colspan="8">
+			<span class="error-text">{{MessageLoadOrigin2Dt}}</span>
+		</td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>Trans. Port2</strong></span></td>
+		<td colspan="7">
+			<ng-select [items]="CityList"
+					   bindLabel="CITY_NAME"
+					   bindValue="CITY_CODE"
+					   placeholder="--Select--"
+					   [(ngModel)]="TransPortTwo"
+					   class="form-control width200"
+					   (change)="changePortTwo(TransPortTwo)"
+					   [disabled]="(TransType=='Direct'||ConnVesselOne==null)"
+					   >
+			</ng-select>
+		</td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>Connecting Vessel2</strong></span></td>
+		<td colspan="7">
+			<ng-select [items]="ConnVesselListTwo"
+					   bindLabel="TEXTFIELD"
+					   bindValue="VALUEFIELD"
+					   placeholder="--Select--"
+					   [(ngModel)]="ConnVesselTwo"
+					   class="form-control"
+					   (change)="changePortEtdTwo(ConnVesselTwo)"
+					   [disabled]="(TransType=='Direct'||ConnVesselOne==null)"
+					   >
+			</ng-select>
+		</td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>ETD (at trans. port2)</strong></span></td>
+		<td colspan="3">
+			<my-date-picker name="date" [options]="myDatePickerOptions" [(ngModel)]="EtdPortTwo" [disabled]="disableEtdPortTwo"></my-date-picker>
+		</td>
+		<td class="width150"><span class="col-form-span-label"><strong>ETA</strong></span></td>
+		<td colspan="3">
+			<my-date-picker name="date" [options]="myDatePickerOptions" [(ngModel)]="ETATwo" [disabled]="(TransType=='Direct'||ConnVesselOne==null)"></my-date-picker>
+		</td>
+	</tr>
+	<tr *ngIf="MessageConnLoadNotDone1 !== ''">
+		<td colspan="8">
+			<span class="error-text">{{MessageConnLoadNotDone1}}</span>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="5" style="white-space:nowrap;"><span class="col-form-span-label"><strong>CONTAINER LOADING AT TRANSHIPMENT PORT2 CONFIRMATION DATE</strong></span></td>
+		<td colspan="3">
+			<span class="col-form-span-label" *ngIf="LabelLoadOrigin3Dt!=''">{{LabelLoadOrigin3Dt}}</span>
+			<input type="checkbox" [checked]="LoadOrigin3Dt==true" [(ngModel)]="LoadOrigin3Dt"  >
+		 
+		</td>
+	</tr>
+	<tr *ngIf="MessageLoadOrigin3Dt !== ''">
+		<td colspan="8">
+			<span class="error-text">{{MessageLoadOrigin3Dt}}</span>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="4" rowspan="4" style="padding: 20px;">
+			<span class="col-form-span-label">
+				<input type="checkbox" [checked]="OnwardTrans==true" [(ngModel)]="OnwardTrans">&nbsp;OWNWARD TRANSPORTATION
+			</span>
+		</td>
+		<td class="width150"><span class="col-form-span-label"><strong>By</strong></span></td>
+		<td colspan="3">
+			<ng-select [items]="[{VALUEFIELD: 'BARGE', TEXTFIELD: 'BARGE'},{VALUEFIELD: 'TRUCK', TEXTFIELD: 'TRUCK'},{VALUEFIELD: 'TRAIN', TEXTFIELD: 'TRAIN'}]"
+					   bindLabel="TEXTFIELD"
+					   bindValue="VALUEFIELD"
+					   [selectOnTab]="true"
+					   placeholder="--Select--"
+					   [(ngModel)]="OnwardTransBy"
+					   class="form-control"
+					   [disabled]="OnwardTrans==false"
+					   >
+			</ng-select>
+		</td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>From</strong></span></td>
+		<td colspan="3">
+			<ng-select [items]="CityList"
+					   bindLabel="CITY_NAME"
+					   bindValue="CITY_CODE"
+					   placeholder="--Select--"
+					   [(ngModel)]="From"
+					   class="form-control"
+					   [disabled]="OnwardTrans==false"
+					   >
+			</ng-select>
+		</td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>To</strong></span></td>
+		<td colspan="3"><span class="col-form-span-label">{{LabelTo}}</span></td>
+	</tr>
+	<tr>
+		<td class="width150"><!--<span class="col-form-span-label"><strong>Cost</strong></span>--></td>
+		<td colspan="3">
+			<!--<ng-select [items]="[{VALUEFIELD: 'LINER', TEXTFIELD: 'BORNE BY SHPG LINE'},{VALUEFIELD: 'US', TEXTFIELD: 'BORNE BY US'}]"
+					   bindLabel="TEXTFIELD"
+					   bindValue="VALUEFIELD"
+					   placeholder="--Select--"
+					   [(ngModel)]="Cost"
+					   class="form-control"
+					   >
+			</ng-select>-->
+		</td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>ETA</strong></span></td>
+		<td colspan="7">
+			<my-date-picker name="date" [options]="myDatePickerOptions" [(ngModel)]="ETAThree" [disabled]="OnwardTrans==false"></my-date-picker>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="8" class="centerlabel">
+			<button type="button" class="btn btn-sm btn-success" name="updateButton" (click)="Update()" #updateButton><span class="col-form-span-label"><i class="fa fa-refresh"></i>&nbsp;Update</span></button>
+			<button type="button" class="btn btn-sm btn-danger" name="abortButton" (click)="Abort()" #abortButton><span class="col-form-span-label"><i class="fa fa-ban"></i>&nbsp;Abort</span></button>
+		</td>
+	</tr>
+</table>

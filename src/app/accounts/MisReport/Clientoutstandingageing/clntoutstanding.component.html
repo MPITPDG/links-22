@@ -1,0 +1,136 @@
+<div class="animated fadeIn" >  
+    <div class="row no-gutters" >
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                         <div class="col-sm-12">
+                            <strong>{{HeaderText}}</strong>
+                        </div> 
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+        <div class="col-sm-12 col-md-10 col-lg-10 ">
+            <table>
+                <tr>
+                  <td colspan="8">
+                    <div class="input-group input-group-rounded"  style="float: right;width: 300px;font-family: verdana;font-size:11px;padding: 1px;">
+                      <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fa fa-search"></i></span>
+                      </div>
+                      <input class="form-control" type="search" [(ngModel)]="searchString" autocomplete="off"
+                          placeholder="Search"  autofocus>
+                  </div>
+                  </td>
+                </tr>
+              </table>
+              <div class="row  xyscroll"  style="height: 500px;">
+                <table class="table table-hover table-bordered table-responsive-xl" >
+                    <thead>
+                    
+                        <tr class="title-head formheading table-primary">
+                            <th class="col-form-span-label" align="center"></th>
+                            <th style="width: 100px;" class="col-form-span-label" align="center">CLIENT NAME</th>
+                            <th style="width: 100px;"class="col-form-span-label" align="center">	DOC CITY</th>
+                            <th style="width: 100px;" class="col-form-span-label" align="center">O/S AS ON DATE</th>      
+                            <th style="width: 100px;" class="col-form-span-label" align="center">LESS THAN 30 DAYS</th>     
+                            <th style="width: 100px;" class="col-form-span-label" align="center">31-60  DAYS</th>     
+                            <th style="width: 100px;" class="col-form-span-label" align="center">61-90  DAYS</th>      
+                            <th  style="width: 100px;" class="col-form-span-label" align="center">91-120  DAYS </th>    
+                            <th style="width: 100px;" class="col-form-span-label" align="center">120-180  DAYS</th>    
+                            <th style="width: 100px;" class="col-form-span-label" align="center"> 181-365  Days </th>    
+                            <th style="width: 100px;"  class="col-form-span-label" align="center"> MORE THAN 1 Yr </th>  
+                            <th style="width: 100px;" class="col-form-span-label" align="center"> SUM OF ALL O/S INV </th> 
+                            <th style="width: 100px;" class="col-form-span-label" align="center" >UNADJUSTED RECEIPTS</th>
+                            <th style="width: 100px;" class="col-form-span-label" align="center" >ADVANCE</th>
+                            <th style="width: 100px;" class="col-form-span-label" align="center" >ADVANCE PAID ON BEHALF</th>
+                        </tr>
+                    </thead>
+                    <tbody *ngIf="cloutList.length > 0">
+                        <ng-container *ngFor="let data of cloutList | clntoutageingfilterpipe: searchString" >
+                        <tr (click)="data.expanded = !data.expanded">
+                            <td ><span  class="col-form-span-label " >{{ data.expanded ? '&ndash;' : '+'}} </span></td> 
+                            <td style="width: 250px;"><span  class="col-form-span-label " >{{data.ACCTNAME}}</span> </td> 
+                            <td style="width: 100px;" ><span class="col-form-span-label">{{data.DOCCITY}}</span>  </td>                             
+                            <td style="width: 90px;" ><span class="col-form-span-label">{{data.RECEIVABLE_AS_ON}}</span>  </td>
+                            <td style="width: 50px;" ><span class="col-form-span-label">{{data.DAYS_000_030}}</span>  </td>
+                            <td style="width: 50px;" ><span class="col-form-span-label">{{data.DAYS_031_060}}</span>  </td>
+                            <td style="width: 50px;" ><span class="col-form-span-label">{{data.DAYS_061_090}}</span>  </td>
+                            <td style="width: 50px;" ><span class="col-form-span-label">{{data.DAYS_091_120}}</span>  </td>
+                            <td style="width: 50px;" ><span class="col-form-span-label">{{data.DAYS_121_180}}</span>  </td>
+                            <td style="width: 50px;" ><span class="col-form-span-label">{{data.DAYS_181_365}}</span>  </td>
+                            <td style="width: 50px;" ><span class="col-form-span-label">{{data.DAYS_366_730}}</span>  </td>
+                            <td style="width: 50px;" ><span class="col-form-span-label">{{data.INVOICES_OUTSTANDING}}</span>  </td>
+                            <td  style="white-space: pre-wrap;width: 50px;"><span class="col-form-span-label">{{data.UNADJUSTED_RECEIPTS}}</span>  </td>
+                            <td style="width: 100px;" ><span class="col-form-span-label">{{data.ADVANCE}}</span>  </td>
+                            <td style="white-space: pre-wrap;width: 100px;" ><span class="col-form-span-label">{{data.ADVANCE_PAIDBYUS}}</span>  </td>
+                           
+                        </tr>
+                        <ng-container *ngIf="data.expanded">
+                            <tr class="title-head formheading table-primary">
+                                <th ></th>
+                                <th class="col-form-span-label" align="center">ASSIGNED ON:</th>
+                                <th class="col-form-span-label" align="center">FOLLOW UP ASSIGNED TO:</th>
+                                <th class="col-form-span-label" align="center">CLIENT STATUS:</th>
+                                <th class="col-form-span-label" align="center">INVOICE CITY:</th>      
+                              
+                            </tr>
+                        <tr class="title-head formheading table-primary" *ngFor="let details of findDetails(data)">
+                            <td>  </td>
+                             <td> <span class="col-form-span-label">{{details.ASSIGNED_ON}}</span>  </td>
+                            <td> <span class="col-form-span-label">{{details.FOLLOW_ASSIGNED_TO}}</span>  </td>
+                            <td> <span class="col-form-span-label">{{details.CLIENT_STATUS}}</span>  </td>
+                            <td> <span class="col-form-span-label">{{details.CITYNAME}}</span>  </td>
+                          </tr>
+                        </ng-container>
+                    </ng-container>
+                        <!-- <tr *ngIf ="CHECK==true" >
+                            <td  colspan="4">                                
+                                <table class="table table-bordered table-sm-new bgwhite" >
+                                    <tr *ngFor="let data of cloutList" >
+                                        <td class="col-form-span-label"  >ASSIGNED ON:</td>
+                                        <td>{{ASSIGNED_ON}}</td>
+                                        <td class="col-form-span-label" >FOLLOW UP ASSIGNED TO:</td>
+                                        <td>{{FOLLOW_ASSIGNED_TO}}</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr> -->
+                    </tbody>
+                    <!-- <tbody *ngIf="cloutList.length > 0">
+                        <tr *ngIf ="CHECK==true" >
+                            <td  colspan="4">                                
+                                <table class="table table-bordered table-sm-new bgwhite" >
+                                    <tr  >
+                                        <td class="col-form-span-label"  >ASSIGNED ON:</td>
+                                        <td>{{ASSIGNED_ON}}</td>
+                                        <td class="col-form-span-label" >FOLLOW UP ASSIGNED TO:</td>
+                                        <td>{{FOLLOW_ASSIGNED_TO}}</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody> -->
+                  
+                </table>
+            </div>       
+        </div>
+        <div class="col-md-12"> 
+        <div class="row  d-flex justify-content-center" >
+         
+                <button class="btn btn-sm btn-primary" type="submit"  (click)="ExportOutstandingData()" > <span
+                class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
+                Export To Excel </span></button>&nbsp;
+        </div>
+        </div>
+
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+     </div>  
+</div>

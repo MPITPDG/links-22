@@ -1,0 +1,869 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-2">
+        </div>
+        <div class="col-sm-8">
+            <div *ngIf="links == 'L'"></div>
+            <div *ngIf="links == 'M'">
+                <table class="table table-bordered table-sm-new bgwhite">
+                    <tbody>
+                        <tr *ngIf="viewData?.Table[0]?.EXPTCANCEL == 'Y'">
+                            <td colspan="4">
+                                <span class="col-form-span-label red">
+                                    <strong>CONSIGNMENT IS CANCELLED</strong>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr *ngIf="edocView == 1">
+                            <th class="col-form-span-heading centerlabel  link-label" colspan="4">
+                                <span (click)="openEdoc()">E-Document - View/Upload File</span>
+                            </th>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">EXPORT NO </span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPTNO}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Mode Of Shipment</span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_MODE}}</span>
+                            </td>
+                            <td class="width130 centerlabel" rowspan="14">
+                                <span class="col-form-span-label" *ngIf="viewData?.Table[0]?.CLEARANCE == 'S'">
+                                    <strong>SHIPMENT CLEARANCE BY SHIPPER'S AGENT</strong>
+                                </span>
+                                <span class="col-form-span-label" *ngIf="viewData?.Table[0]?.CLEARANCE != 'S'">
+                                    <strong>SHIPMENT CLEARANCE BY US</strong>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Exporter/Shipper </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXP_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Bill To </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.BILLTO_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Agent </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.AGENT_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Consignee </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.CON_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Sourcing Agent </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.SRCAGT_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Consignee Bank </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.BANK_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Buyer Name </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.BUYER_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Loading Port </span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_LDGPORT}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">Origin City : {{viewData?.Table[0]?.ORIGIN}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Port Of Discharge </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.PORT_OF_DISCHARGE}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">I / T </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.IT}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Destination City </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.DEST_CITY}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Destination Country </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.DEST_COUNTRY}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Doc Recd. Date </span>
+                            </td>
+                            <td colspan="2">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_DOCRECD}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">No. of Packages </span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_NOOFPKGS}}</span>
+                            </td>
+                            <td class="width150">
+                                <span class="col-form-span-label">No. of Pieces </span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_NOOFPCS}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Gross Weight </span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_GRWT}}</span>
+                            </td>
+                            <td class="width150">
+                                <span class="col-form-span-label">Net Weight </span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_NETWT}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Volume(CBM) </span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_VOLUME}}</span>
+                            </td>
+                            <td class="width150">
+                                <span class="col-form-span-label">CHBL Weight </span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_CHBLWT}}</span>
+                            </td>
+                        </tr>
+                        <tbody>
+                </table>
+                <table class="table table-bordered table-sm-new bgwhite">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <span class="col-form-span-label">
+                                    <strong>ORDER NO. DETAILS:</strong>
+                                </span>
+                            </td>
+                        </tr>
+                        <tbody>
+                </table>
+                <div class="row xscroll">
+                    <table class="table table-bordered table-sm-new bgwhite">
+                        <thead>
+                            <tr class="col-form-span-heading">
+                                <th class="centerlabel">
+                                    <span class="col-form-span-label">Order No.</span>
+                                </th>
+                                <th class="width100 centerlabel">
+                                    <span class="col-form-span-label">Reference No</span>
+                                </th>
+                                <th class="width100 centerlabel">
+                                    <span class="col-form-span-label">Pieces</span>
+                                </th>
+                                <th class="width100 centerlabel">
+                                    <span class="col-form-span-label">Type of Pieces</span>
+                                </th>
+                                <th class="width100 centerlabel">
+                                    <span class="col-form-span-label">Warehouse</span>
+                                </th>
+                                <th class="width100 centerlabel">
+                                    <span class="col-form-span-label">Item Description</span>
+                                </th>
+                                <th class="width100 centerlabel">
+                                    <span class="col-form-span-label">Pkgs</span>
+                                </th>
+                                <th class="width100 centerlabel">
+                                    <span class="col-form-span-label">Gr. Wt</span>
+                                </th>
+                                <th class="width100 centerlabel">
+                                    <span class="col-form-span-label">Net Wt</span>
+                                </th>
+                                <th class="width100 centerlabel">
+                                    <span class="col-form-span-label">Volume</span>
+                                </th>
+                                <th class="width100 centerlabel">
+                                    <span class="col-form-span-label">Chbl. Wt.</span>
+                                </th>
+                                <th class="width100 centerlabel">
+                                    <span class="col-form-span-label">LSD Date</span>
+                                </th>
+                                <th class="width100 centerlabel">
+                                    <span class="col-form-span-label">DRN Date</span>
+                                </th>
+                                <th class="width100 centerlabel">
+                                    <span class="col-form-span-label">FOB Value</span>
+                                </th>
+                                <th class="width100 centerlabel">
+                                    <span class="col-form-span-label">Currency </span>
+                                </th>
+                                <th class="width100 centerlabel">
+                                    <span class="col-form-span-label">Cnee Dept (Rayon)</span>
+                                </th>
+                                <th class="width100 centerlabel">
+                                    <span class="col-form-span-label">Container No</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let obj of viewData?.Table4">
+                                <td class="centerlabel">
+                                    <span class="col-form-span-label">{{obj.ORDERNO}}</span>
+                                </td>  
+                                <!-- <td class="centerlabel">
+                                    <span class="col-form-span-label">
+                                        <a href="javascript:void(0);" *ngIf="viewData?.Table[0]?.GRPID=='1'" (click)="openWindow(obj.ORDERNO, obj.STYLENO, obj.CONCODE)">{{obj.ORDERNO}}</a>
+                                        </span>
+                                </td> -->
+                                <td class="width100">
+                                    <span class="col-form-span-label">{{obj.STYLENO}}</span>
+                                </td>
+                                <td class="width100">
+                                    <span class="col-form-span-label">{{obj.PIECES}}</span>
+                                </td>
+                                <td class="width100">
+                                    <span class="col-form-span-label">{{obj.TYPEOFPCS}}</span>
+                                </td>
+                                <td class="width100">
+                                    <span class="col-form-span-label">{{obj.WAREHOUSE}}</span>
+                                </td>
+                                <td class="width100">
+                                    <span class="col-form-span-label">{{obj.ITEMDESC}}</span>
+                                </td>
+                                <td class="width100">
+                                    <span class="col-form-span-label">{{obj.PKGS}}</span>
+                                </td>
+                                <td class="width100">
+                                    <span class="col-form-span-label">{{obj.GRWT}}</span>
+                                </td>
+                                <td class="width100">
+                                    <span class="col-form-span-label">{{obj.VOLUME}}</span>
+                                </td>
+                                <td class="width100">
+                                    <span class="col-form-span-label">{{obj.NETWT}}</span>
+                                </td>
+                                <td class="width100">
+                                    <span class="col-form-span-label">{{obj.CHBLWT}}</span>
+                                </td>
+                                <td class="width100">
+                                    <span class="col-form-span-label">{{obj.LSD}}</span>
+                                </td>
+                                <td class="width100">
+                                    <span class="col-form-span-label">{{obj.DRNDATE}}</span>
+                                </td>
+                                <td class="width100">
+                                    <span class="col-form-span-label">{{obj.FOBVALUE}}</span>
+                                </td>
+                                <td class="width100">
+                                    <span class="col-form-span-label">{{obj.CURENCY}}</span>
+                                </td>
+                                <td class="width100">
+                                    <span class="col-form-span-label">{{obj.CNEEDEPT}}</span>
+                                </td>
+                                <td class="width100">
+                                    <span class="col-form-span-label">{{obj.CONTAINERNO}}</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <br />
+                <table class="table table-bordered table-sm-new bgwhite">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <span class="col-form-span-label">
+                                    <strong>PKG NO. DETAILS:</strong>
+                                </span>
+                            </td>
+                        </tr>
+                        <tbody>
+                </table>
+                <table class="table table-bordered table-sm-new bgwhite">
+                    <thead>
+                        <tr class="col-form-span-heading">
+                            <th class="width150 centerlabel">
+                                <span class="col-form-span-label">From.</span>
+                            </th>
+                            <th class="width150 centerlabel">
+                                <span class="col-form-span-label">To</span>
+                            </th>
+                            <th class="centerlabel">
+                                <span class="col-form-span-label">Alphabet</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let obj of viewData?.Table5">
+                            <td class="width150">
+                                <span class="col-form-span-label">{{obj.FROM}}</span>
+                            </td>
+                            <td class="width150">
+                                <span class="col-form-span-label">{{obj.TO}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.ALPHABET}}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br />
+                <table class="table table-bordered table-sm-new bgwhite" *ngIf="viewData?.Table[0]?.EXPT_MODE == 'SEA'">
+                    <tbody>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Container No </span>
+                            </td>
+                            <td colspan="3">
+                                <p class="col-form-span-label" *ngFor="let obj of containerData">
+                                    <span class="link-label" (click)="showClpView(obj.CONTAINERNO)">
+                                        <u>{{obj.CONTAINER}}</u>
+                                    </span>{{obj.CONTAINER_STATUS}}</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">B/L No. </span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.BL_NO}}</span>
+                            </td>
+                            <td class="width150">
+                                <span class="col-form-span-label">B/L Date </span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.BL_DATE}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">HBL No.</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.HBL_NO}}</span>
+                            </td>
+                            <td class="width150">
+                                <span class="col-form-span-label">HBL Date</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.HBL_DATE}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Surrendered Date </span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.FCRSDT}}</span>
+                            </td>
+                            <td class="width150">
+                                <span class="col-form-span-label"></span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Name of The Vessel </span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.VSL_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Rotation</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_VESSEL}}</span>
+                            </td>
+                            <td class="width150">
+                                <span class="col-form-span-label">Voyage Number </span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.VSL_VOYNO}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Shipping Line </span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.LINER_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Vessel Agent </span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.AGT_NAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">E.T.D. (SCHEDULED) </span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.ETD}}</span>
+                            </td>
+                        </tr>
+                        <tr *ngIf="viewData?.Table[0]?.SAILING == ''">
+                            <td colspan="4" class="bglightgreen red">
+                                <strong>
+                                    <span class="col-form-span-label">VESSEL DELAYED</span>
+                                </strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">SAILED ON (ACTUAL) </span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.SAILING}}</span>
+                            </td>
+                        </tr>
+                        <tr *ngIf="viewData?.Table[0]?.EXPT_MODE == 'SEA'">
+                            <td class="width150">
+                                <span class="col-form-span-label"></span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">Direct </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table table-bordered table-sm-new bgwhite" *ngIf="viewData?.Table[0]?.EXPT_MODE == 'SEA'">
+                    <tbody>
+                        <tr>
+                            <td colspan="4">
+                                <span class="col-form-span-label">
+                                    <strong>TRANSHIPMENT DETAILS - VESSEL #1</strong>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Name of The Port</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table2[0]?.TRANSPORT1}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Name of The Vessel</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table2[0]?.VSL_NAME1}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Voyage # of vessel</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table2[0]?.VSL_VOYNO1}}</span>
+                            </td>
+                            <td class="width150">
+                                <span class="col-form-span-label">ETD of vessel</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table2[0]?.ETD1}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">ETA</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table2[0]?.ETA1}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <span class="col-form-span-label">
+                                    <strong>TRANSHIPMENT DETAILS - VESSEL #2</strong>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Name of The Port</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table2[0]?.TRANSPORT2}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Name of The Vessel</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table2[0]?.VSL_NAME2}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Voyage # of vessel</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table2[0]?.VSL_VOYNO2}}</span>
+                            </td>
+                            <td class="width150">
+                                <span class="col-form-span-label">ETD of vessel</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table2[0]?.ETD2}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">ETA</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table2[0]?.ETA2}}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table table-bordered table-sm-new bgwhite" *ngIf="viewData?.Table[0]?.EXPT_MODE == 'SEA'">
+                    <tbody>
+                        <tr>
+                            <td colspan="4">
+                                <span class="col-form-span-label">
+                                    <strong>ONWARD TRANSPORTATION DETAILS</strong>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">By</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table2[0]?.ONWARDTRANSBY}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">From</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table2[0]?.ONWARDTRANSPORT}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">To</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table2[0]?.DESTPORT}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">ETA</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table2[0]?.ETA3}}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table table-bordered table-sm-new bgwhite">
+                    <tbody>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Airline Name</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.AIRLINENAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Planned Flight No.</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.PLANFLIGHTNO}}</span>
+                            </td>
+                            <td class="width150">
+                                <span class="col-form-span-label">Planned Flight Date</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.PLANFLIGHTDT}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Actual Flight No.</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.ACTUALFLIGHTNO}}</span>
+                            </td>
+                            <td class="width150">
+                                <span class="col-form-span-label">Actual Flight Date</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.ACTUALFLIGHTDT}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">MAWB No.</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.AEROBILLNO}}</span>
+                                <span class="col-form-span-label" *ngIf="viewData?.Table[0]?.AEROBILLNO != ''"> </span>
+                            </td>
+                            <td class="width150">
+                                <span class="col-form-span-label">MAWB Date</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.AEROBILLDT}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">House AWB No.</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.HOUSEBILLNO}}</span>
+                                <span class="col-form-span-label" *ngIf="viewData?.Table[0]?.HOUSEBILLNO != ''"> </span>
+                            </td>
+                            <td class="width150">
+                                <span class="col-form-span-label">House AWB Date.</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.HOUSEBILLDT}}</span>
+                            </td>
+                        </tr>
+                        <tr *ngIf="viewData?.Table[0]?.EXPT_MODE == 'AIR'">
+                            <td class="width150">
+                                <span class="col-form-span-label"></span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">Direct </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table table-bordered table-sm-new bgwhite">
+                    <tbody>
+                        <tr>
+                            <td colspan="4">
+                                <span class="col-form-span-label">
+                                    <strong>TRANSHIPMENT DETAILS</strong>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Transhipment Port1</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.TRANSPORT1_CITYNAME}} </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Flight No.</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.FLIGHTNO1}}</span>
+                            </td>
+                            <td class="width150">
+                                <span class="col-form-span-label">ETD</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.ETDPORT1}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">ETA</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.ETAPORT1}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Transhipment Port2</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.TRANSPORT2_CITYNAME}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Flight No.</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.FLIGHTNO2}}</span>
+                            </td>
+                            <td class="width150">
+                                <span class="col-form-span-label">ETD</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.ETDPORT2}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">ETA</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.ETAPORT2}}</span>
+                            </td>
+                        </tr>
+                        <tr *ngIf="viewData?.Table2[0]?.DIRECTVSL == 'YES'">
+                            <td class="width150">
+                                <span class="col-form-span-label">E.T.A</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.FCRSDT}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">D/douane No.</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.FCRSDT}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">D/douane Date</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.FCRSDT}}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table table-bordered table-sm-new bgwhite">
+                    <tbody>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Actual Arrival date </span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.ARRIVALDT}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">Delivery given date </span>
+                            </td>
+                            <td colspan="3">
+                                <table class="table table-bordered table-sm-new bgwhite">
+                                    <tbody>
+                                        <tr *ngFor="let obj of viewData?.Table3">
+                                            <td class="width150">
+                                                <span class="col-form-span-label">{{obj.ACTUALDT}}</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="width150">
+                                <span class="col-form-span-label">PSS</span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_PSS}}</span>
+                            </td>
+                        </tr>
+                        <tbody>
+                </table>
+                <table class="table table-bordered table-sm-new bgwhite">
+                    <tbody>
+                        <tr>
+                            <td class="width200 centerlabel">
+                                <span class="col-form-span-label link-label" (click)="show('I', null)">EXPORTER'S INVOICE DETAILS </span>
+                            </td>
+                            <td class="width200 centerlabel">
+                                <span class="col-form-span-label link-label" (click)="show('C', null)">CHRONOLOGY </span>
+                            </td>
+                            <td class="width200 centerlabel">
+                                <span class="col-form-span-label link-label" (click)="show('R', null)">REMARK </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <app-consignment-invoice-view [exptno]="ExptNo" *ngIf="links == 'I'"></app-consignment-invoice-view>
+            <app-consignment-chronology-view [exptno]="ExptNo" [deliveryData]="deliveryData" [loadTrans]="loadTrans" *ngIf="links == 'C'"></app-consignment-chronology-view>
+            <app-consignment-remark-view [exptno]="ExptNo" [remarkData]="remark" *ngIf="links == 'R'"></app-consignment-remark-view>
+            <app-consignment-clp-view [exptno]="ExptNo" [containerno]="containerno" [vessel]="vessel" *ngIf="links == 'CLP'"></app-consignment-clp-view>
+            <br />
+            <div *ngIf="links=='I'||links=='C'||links=='R'||links=='CLP'">
+                <button class="btn btn-sm btn-warning" (click)="links='M'">
+                    <i class="fa fa-arrow-circle-o-left"></i>&nbsp;back to main</button>
+            </div>
+        </div>
+        <div class="col-sm-2">
+        </div>
+    </div>
+</div>

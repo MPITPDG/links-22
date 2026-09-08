@@ -1,0 +1,103 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-body"> 
+				<div class="row">
+					<div class="col-md-3"></div>
+					<div class="col-md-6">
+                        <table class="table table-bordered table-sm-new">
+							<tbody style='height:30px'>
+								<tr >
+									<td class="col-form-span-heading  centerlabel "  colspan="4">
+										EP-Copy 
+									</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-form-span-heading"  colspan="4">
+										Report Type
+									</td>
+                                </tr>
+                                <tr>
+                                    <td>
+										<span class="col-form-span-label ">Mode</span>
+                                    </td>
+                                    <td>                                        
+                                            <span class="col-form-span-label">                                               
+                                                <input type="radio"   name="radiogroup"  (click)="mainCheck('1')" [checked]="checkWise == '1'"    >&nbsp; Sea 
+                                            </span>                                       
+                                    </td>   
+                                    <td colspan="2">
+                                       <span class="col-form-span-label" >
+                                        <input type="radio"   name="radiogroup"  (click)="mainCheck('2')" [checked]="checkWise == '2'"  />&nbsp; Air 
+                                    </span>
+                                    </td>
+                                </tr>                                
+                                <tr>
+                                    <td>
+										<span class="col-form-span-label ">Type</span>
+                                    </td>
+                                    <td colspan="3">
+                                        <select class="form-control width200"   [(ngModel)]="rpttype">
+											<option value="-1">Please select</option>
+											<option value="NOT_RECEIVED">Not Received</option>
+                                            <option value="RECEIVED_BUT_NOT_SENT_TO_THE_CLIENT">Received But Not Sent to the Client</option>
+                                            <option value="RECEIVED_AND_SENT_TO_THE_CLIENT">Received and Sent to the Client</option>
+										</select>
+                                         
+                                    </td>
+                                </tr>
+                                 
+                                <tr>
+                                    <td>
+										<span class="col-form-span-label ">City</span>
+                                    </td>
+                                    <td colspan="3">
+                                        <select class="form-control width180"   [(ngModel)]="city">
+											<option value="-1">Please select</option>
+											<option *ngFor="let d of listCity" value={{d.citycode}}>{{d.cityname}}</option>
+										</select>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+										<span class="col-form-span-label ">Exporter</span>
+                                    </td>
+                                    <td colspan="3">
+                                        <select class="form-control width250"   [(ngModel)]="exporter">
+											<option value="-1">Please select</option>
+											<option *ngFor="let d of listExporter" value={{d.exp_code}}>{{d.exp_name}}</option>
+										</select>
+                                        
+                                    </td>
+                                </tr>
+                                 
+                                <tr>
+                                    <td>
+										<span class="col-form-span-label ">From Date</span>
+                                    </td>
+                                    <td  >
+                                        <my-date-picker name="dtfrm" [options]="myDatePickerOptions" [(ngModel)]="dtfrmt" required></my-date-picker>
+                                    </td>
+                                    <td>
+										<span class="col-form-span-label ">To Date</span>
+                                    </td>
+                                    <td  >
+                                        <my-date-picker name="dtpto" [options]="myDatePickerOptions" [(ngModel)]="dtto" required></my-date-picker>
+                                    </td>
+
+                                </tr>
+                                 
+                                <td colspan="4" class="centerlabel" >
+                                    <button class="btn btn-sm btn-success" type="Print"    (click)="onexcelGeneration()"> <i class=" fa fa-download"></i> Export to Excel</button>
+                                    
+        
+                                </td>
+                            </tbody>
+                        </table>			
+                    </div>
+					
+                    </div>
+                    <div class="col-md-3"></div>
+                </div>
+            </div>

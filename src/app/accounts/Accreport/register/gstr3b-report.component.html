@@ -1,0 +1,636 @@
+<div class="br-page">
+
+  <!-- ========================================================= -->
+  <!-- SEARCH - stays on screen, results render below it         -->
+  <!-- ========================================================= -->
+
+  <div class="br-card search-card-clean">
+    <div class="clean-row-layout">
+
+      <div class="clean-field clean-title">
+        <span class="pl-title">{{ Header }}</span>
+        <span class="pl-meta" *ngIf="cmpnyname">{{ cmpnyname }}</span>
+      </div>
+
+      <div class="clean-field clean-date">
+        <label>From <span class="br-req">*</span></label>
+        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate">
+        </my-date-picker>
+      </div>
+
+      <div class="clean-field clean-date">
+        <label>To <span class="br-req">*</span></label>
+        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate">
+        </my-date-picker>
+      </div>
+
+      <div class="clean-actions">
+        <button class="br-btn br-btn--primary" type="button" (click)="Submit()">
+          <i class="fa fa-search"></i> Submit
+        </button>
+        <button class="br-btn br-btn--export" type="button" (click)="ExportToExcel()">
+          <i class="fa fa-file-excel-o"></i> Export To Excel
+        </button>
+        <button class="br-btn br-btn--filed" type="button" (click)="MarkAsFiled()">
+          <i class="fa fa-lock"></i> Mark as Filed
+        </button>
+        <button class="br-btn br-btn--danger" type="button" (click)="clear()">
+          <i class="fa fa-ban"></i> Clear
+        </button>
+      </div>
+
+    </div>
+
+    <div class="search-note" *ngIf="Searched">
+      Showing <b>{{ PeriodLabel }}</b>. Reverse-charge credit is availed in the month after the
+      liability month, so this report claims the previous month's RCM credit and defers the
+      current month's. Export To Excel always writes the full period, whatever is filtered on
+      screen.
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- RESULT                                                    -->
+  <!-- ========================================================= -->
+
+  <div *ngIf="Searched" class="br-result-view">
+
+    <!-- TABS -->
+    <div class="g3-tabs">
+      <button class="g3-tab" [class.active]="ActiveTab=='SUMMARY'" (click)="ActiveTab='SUMMARY'">
+        GSTR-3B Summary <span class="g3-tab-count">{{ Summary.length }}</span>
+      </button>
+      <button class="g3-tab" [class.active]="ActiveTab=='NET'" (click)="ActiveTab='NET'">
+        Net Position <span class="g3-tab-count">{{ NetPosition.length }}</span>
+      </button>
+      <button class="g3-tab" [class.active]="ActiveTab=='RCM'" (click)="ActiveTab='RCM'">
+        RCM ITC Deferred <span class="g3-tab-count">{{ RcmDeferred.length }}</span>
+      </button>
+      <button class="g3-tab" [class.active]="ActiveTab=='LEDGER'" (click)="ActiveTab='LEDGER'">
+        Ledger Detail <span class="g3-tab-count">{{ LedgerDetail.length }}</span>
+      </button>
+      <button class="g3-tab" [class.active]="ActiveTab=='FILED'"
+        (click)="ActiveTab='FILED'; LoadFilings()">
+        Filed Archive <span class="g3-tab-count">{{ Filings.length }}</span>
+      </button>
+      <button class="g3-tab g3-tab--warn" [class.active]="ActiveTab=='WARN'"
+        (click)="ActiveTab='WARN'">
+        <i class="fa fa-exclamation-triangle" *ngIf="Warnings.length > 0"></i>
+        Check Before Filing
+        <span class="g3-tab-count" [class.g3-tab-count--warn]="Warnings.length > 0">
+          {{ Warnings.length }}
+        </span>
+      </button>
+    </div>
+
+    <!-- ------------------------ SUMMARY ------------------------ -->
+    <div class="br-card br-table-card" *ngIf="ActiveTab=='SUMMARY'">
+      <div class="br-card-header">
+        <span class="br-card-title">
+          GSTR-3B Section Wise
+          <span class="br-hint">liability and set-off per branch</span>
+        </span>
+        <div class="g3-filter">
+          <span class="g3-search">
+            <i class="fa fa-search"></i>
+            <input class="g3-inp" type="text" placeholder="Filter rows..."
+              [(ngModel)]="Filters.SUMMARY.q" (ngModelChange)="refreshAll()" />
+          </span>
+          <ng-select class="g3-ngsel" [items]="Branches" [multiple]="true" [closeOnSelect]="false"
+            placeholder="All branches" [(ngModel)]="Filters.SUMMARY.branch"
+            (ngModelChange)="refreshAll()"></ng-select>
+          <button class="g3-clear" *ngIf="hasFilter('SUMMARY')" (click)="clearFilter('SUMMARY')">
+            <i class="fa fa-times"></i> Clear
+          </button>
+          <span class="br-record-chip">{{ ViewSummary.length }} / {{ Summary.length }}</span>
+        </div>
+      </div>
+
+      <div class="br-table-wrap">
+        <table class="br-table">
+          <thead>
+            <tr>
+              <th class="sortable" style="width:12%;" (click)="sortBy('SUMMARY','BRANCH')">
+                BRANCH <i [ngClass]="sortIcon('SUMMARY','BRANCH')"></i>
+              </th>
+              <th class="sortable" style="width:34%;" (click)="sortBy('SUMMARY','SECTION')">
+                SECTION <i [ngClass]="sortIcon('SUMMARY','SECTION')"></i>
+              </th>
+              <th class="num sortable" (click)="sortBy('SUMMARY','TAXABLE_VALUE')">
+                TAXABLE VALUE <i [ngClass]="sortIcon('SUMMARY','TAXABLE_VALUE')"></i>
+              </th>
+              <th class="num sortable" (click)="sortBy('SUMMARY','IGST')">
+                IGST <i [ngClass]="sortIcon('SUMMARY','IGST')"></i>
+              </th>
+              <th class="num sortable" (click)="sortBy('SUMMARY','CGST')">
+                CGST <i [ngClass]="sortIcon('SUMMARY','CGST')"></i>
+              </th>
+              <th class="num sortable" (click)="sortBy('SUMMARY','SGST')">
+                SGST <i [ngClass]="sortIcon('SUMMARY','SGST')"></i>
+              </th>
+              <th class="num sortable" (click)="sortBy('SUMMARY','TOTAL_TAX')">
+                TOTAL TAX <i [ngClass]="sortIcon('SUMMARY','TOTAL_TAX')"></i>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of ViewSummary; let i = index" [ngClass]="rowClass(r.SECTION)"
+              [class.g3-branch-start]="showBranch(i)">
+              <td class="g3-branch-name">{{ showBranch(i) ? r.BRANCH : '' }}</td>
+              <td>{{ r.SECTION }}</td>
+              <td class="num">{{ r.TAXABLE_VALUE | number:'1.2-2' }}</td>
+              <td class="num">{{ r.IGST | number:'1.2-2' }}</td>
+              <td class="num">{{ r.CGST | number:'1.2-2' }}</td>
+              <td class="num">{{ r.SGST | number:'1.2-2' }}</td>
+              <td class="num num-strong">{{ r.TOTAL_TAX | number:'1.2-2' }}</td>
+            </tr>
+            <tr *ngIf="ViewSummary.length == 0">
+              <td colspan="7" class="g3-empty">No rows match the filter.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="g3-legend">
+        <span><i class="g3-swatch" style="background:#FDEDE4;"></i>Liability</span>
+        <span><i class="g3-swatch" style="background:#E5F3E8;"></i>Set-off</span>
+        <span><i class="g3-swatch" style="background:#FEF7E0;"></i>Memo &ndash; reverse-charge credit
+          deferred to next month, not part of this month's set-off</span>
+      </div>
+    </div>
+
+    <!-- ------------------------ NET POSITION ------------------------ -->
+    <div class="br-card br-table-card" *ngIf="ActiveTab=='NET'">
+      <div class="br-card-header">
+        <span class="br-card-title">
+          Net Position
+          <span class="br-hint">liability less set-off</span>
+        </span>
+        <div class="g3-filter">
+          <span class="g3-search">
+            <i class="fa fa-search"></i>
+            <input class="g3-inp" type="text" placeholder="Filter rows..."
+              [(ngModel)]="Filters.NET.q" (ngModelChange)="refreshAll()" />
+          </span>
+          <ng-select class="g3-ngsel" [items]="Branches" [multiple]="true" [closeOnSelect]="false"
+            placeholder="All branches" [(ngModel)]="Filters.NET.branch"
+            (ngModelChange)="refreshAll()"></ng-select>
+          <button class="g3-clear" *ngIf="hasFilter('NET')" (click)="clearFilter('NET')">
+            <i class="fa fa-times"></i> Clear
+          </button>
+          <span class="br-record-chip">{{ ViewNet.length }} / {{ NetPosition.length }}</span>
+        </div>
+      </div>
+
+      <div class="br-table-wrap">
+        <table class="br-table">
+          <thead>
+            <tr>
+              <th class="sortable" rowspan="2" style="vertical-align:middle;"
+                (click)="sortBy('NET','BRANCH')">
+                BRANCH <i [ngClass]="sortIcon('NET','BRANCH')"></i>
+              </th>
+              <th class="grp-liab" colspan="4">LIABILITY</th>
+              <th class="grp-setoff" colspan="4">SET-OFF</th>
+              <th class="num sortable" rowspan="2" style="vertical-align:middle;"
+                (click)="sortBy('NET','NET_PAYABLE')">
+                NET PAYABLE <i [ngClass]="sortIcon('NET','NET_PAYABLE')"></i>
+              </th>
+            </tr>
+            <tr>
+              <th class="num sortable" (click)="sortBy('NET','LIAB_IGST')">IGST <i
+                  [ngClass]="sortIcon('NET','LIAB_IGST')"></i></th>
+              <th class="num sortable" (click)="sortBy('NET','LIAB_CGST')">CGST <i
+                  [ngClass]="sortIcon('NET','LIAB_CGST')"></i></th>
+              <th class="num sortable" (click)="sortBy('NET','LIAB_SGST')">SGST <i
+                  [ngClass]="sortIcon('NET','LIAB_SGST')"></i></th>
+              <th class="num sortable" (click)="sortBy('NET','LIAB_TOTAL')">TOTAL <i
+                  [ngClass]="sortIcon('NET','LIAB_TOTAL')"></i></th>
+              <th class="num sortable" (click)="sortBy('NET','SETOFF_IGST')">IGST <i
+                  [ngClass]="sortIcon('NET','SETOFF_IGST')"></i></th>
+              <th class="num sortable" (click)="sortBy('NET','SETOFF_CGST')">CGST <i
+                  [ngClass]="sortIcon('NET','SETOFF_CGST')"></i></th>
+              <th class="num sortable" (click)="sortBy('NET','SETOFF_SGST')">SGST <i
+                  [ngClass]="sortIcon('NET','SETOFF_SGST')"></i></th>
+              <th class="num sortable" (click)="sortBy('NET','SETOFF_TOTAL')">TOTAL <i
+                  [ngClass]="sortIcon('NET','SETOFF_TOTAL')"></i></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of ViewNet">
+              <td class="g3-branch-name">{{ r.BRANCH }}</td>
+              <td class="num">{{ r.LIAB_IGST | number:'1.2-2' }}</td>
+              <td class="num">{{ r.LIAB_CGST | number:'1.2-2' }}</td>
+              <td class="num">{{ r.LIAB_SGST | number:'1.2-2' }}</td>
+              <td class="num num-strong">{{ r.LIAB_TOTAL | number:'1.2-2' }}</td>
+              <td class="num">{{ r.SETOFF_IGST | number:'1.2-2' }}</td>
+              <td class="num">{{ r.SETOFF_CGST | number:'1.2-2' }}</td>
+              <td class="num">{{ r.SETOFF_SGST | number:'1.2-2' }}</td>
+              <td class="num num-strong">{{ r.SETOFF_TOTAL | number:'1.2-2' }}</td>
+              <td class="num num-strong" [ngClass]="r.NET_PAYABLE > 0 ? 'dr-amt' : 'cr-amt'">
+                {{ r.NET_PAYABLE | number:'1.2-2' }}
+              </td>
+            </tr>
+            <tr *ngIf="ViewNet.length == 0">
+              <td colspan="10" class="g3-empty">No rows match the filter.</td>
+            </tr>
+          </tbody>
+          <tfoot *ngIf="ViewNet.length > 0">
+            <tr>
+              <td>TOTAL</td>
+              <td class="num">{{ total('LIAB_IGST') | number:'1.2-2' }}</td>
+              <td class="num">{{ total('LIAB_CGST') | number:'1.2-2' }}</td>
+              <td class="num">{{ total('LIAB_SGST') | number:'1.2-2' }}</td>
+              <td class="num">{{ total('LIAB_TOTAL') | number:'1.2-2' }}</td>
+              <td class="num">{{ total('SETOFF_IGST') | number:'1.2-2' }}</td>
+              <td class="num">{{ total('SETOFF_CGST') | number:'1.2-2' }}</td>
+              <td class="num">{{ total('SETOFF_SGST') | number:'1.2-2' }}</td>
+              <td class="num">{{ total('SETOFF_TOTAL') | number:'1.2-2' }}</td>
+              <td class="num">{{ total('NET_PAYABLE') | number:'1.2-2' }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="g3-legend">
+        <span>A negative NET PAYABLE is excess input credit carried forward. Set-off here excludes
+          this period's reverse-charge credit and includes the previous month's. The TOTAL row
+          adds up only the rows currently shown.</span>
+      </div>
+    </div>
+
+    <!-- ------------------------ RCM DEFERRED ------------------------ -->
+    <div class="br-card br-table-card" *ngIf="ActiveTab=='RCM'">
+      <div class="br-card-header">
+        <span class="br-card-title">
+          Reverse-Charge ITC Deferred
+          <span class="br-hint">availed in the month after the liability month</span>
+        </span>
+        <div class="g3-filter">
+          <span class="g3-search">
+            <i class="fa fa-search"></i>
+            <input class="g3-inp" type="text" placeholder="Filter rows..."
+              [(ngModel)]="Filters.RCM.q" (ngModelChange)="refreshAll()" />
+          </span>
+          <ng-select class="g3-ngsel" [items]="Branches" [multiple]="true" [closeOnSelect]="false"
+            placeholder="All branches" [(ngModel)]="Filters.RCM.branch"
+            (ngModelChange)="refreshAll()"></ng-select>
+          <button class="g3-clear" *ngIf="hasFilter('RCM')" (click)="clearFilter('RCM')">
+            <i class="fa fa-times"></i> Clear
+          </button>
+          <span class="br-record-chip">{{ ViewRcm.length }} / {{ RcmDeferred.length }}</span>
+        </div>
+      </div>
+
+      <div class="br-table-wrap">
+        <table class="br-table">
+          <thead>
+            <tr>
+              <th class="sortable" (click)="sortBy('RCM','BRANCH')">BRANCH <i
+                  [ngClass]="sortIcon('RCM','BRANCH')"></i></th>
+              <th class="num sortable" (click)="sortBy('RCM','RCM_LIABILITY_PAID')">RCM LIABILITY
+                PAID <i [ngClass]="sortIcon('RCM','RCM_LIABILITY_PAID')"></i></th>
+              <th class="num sortable" (click)="sortBy('RCM','DEFER_IGST')">DEFER IGST <i
+                  [ngClass]="sortIcon('RCM','DEFER_IGST')"></i></th>
+              <th class="num sortable" (click)="sortBy('RCM','DEFER_CGST')">DEFER CGST <i
+                  [ngClass]="sortIcon('RCM','DEFER_CGST')"></i></th>
+              <th class="num sortable" (click)="sortBy('RCM','DEFER_SGST')">DEFER SGST <i
+                  [ngClass]="sortIcon('RCM','DEFER_SGST')"></i></th>
+              <th class="num sortable" (click)="sortBy('RCM','DEFER_TOTAL')">DEFER TOTAL <i
+                  [ngClass]="sortIcon('RCM','DEFER_TOTAL')"></i></th>
+              <th class="sortable" (click)="sortBy('RCM','AVAIL_IN_MONTH')">AVAIL IN <i
+                  [ngClass]="sortIcon('RCM','AVAIL_IN_MONTH')"></i></th>
+              <th class="num sortable" (click)="sortBy('RCM','BF_FROM_LAST_MONTH')">B/F FROM LAST
+                MONTH <i [ngClass]="sortIcon('RCM','BF_FROM_LAST_MONTH')"></i></th>
+              <th class="sortable" (click)="sortBy('RCM','BF_MONTH')">B/F MONTH <i
+                  [ngClass]="sortIcon('RCM','BF_MONTH')"></i></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of ViewRcm" class="g3-memo">
+              <td class="g3-branch-name">{{ r.BRANCH }}</td>
+              <td class="num">{{ r.RCM_LIABILITY_PAID | number:'1.2-2' }}</td>
+              <td class="num">{{ r.DEFER_IGST | number:'1.2-2' }}</td>
+              <td class="num">{{ r.DEFER_CGST | number:'1.2-2' }}</td>
+              <td class="num">{{ r.DEFER_SGST | number:'1.2-2' }}</td>
+              <td class="num num-strong">{{ r.DEFER_TOTAL | number:'1.2-2' }}</td>
+              <td><span class="g3-pill g3-pill--rcm">{{ r.AVAIL_IN_MONTH }}</span></td>
+              <td class="num">{{ r.BF_FROM_LAST_MONTH | number:'1.2-2' }}</td>
+              <td><span class="g3-pill g3-pill--rcm">{{ r.BF_MONTH }}</span></td>
+            </tr>
+            <tr *ngIf="ViewRcm.length == 0">
+              <td colspan="9" class="g3-empty">
+                {{ RcmDeferred.length == 0 ? 'No reverse-charge credit in this period.' : 'No rows
+                match the filter.' }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="g3-legend">
+        <span>The DEFER columns are excluded from Net Position and carry into next month's return.
+          B/F FROM LAST MONTH is what was brought in this month and is included in Net
+          Position.</span>
+      </div>
+    </div>
+
+    <!-- ------------------------ LEDGER DETAIL ------------------------ -->
+    <div class="br-card br-table-card" *ngIf="ActiveTab=='LEDGER'">
+      <div class="br-card-header">
+        <span class="br-card-title">
+          Ledger Detail
+          <span class="br-hint">the postings behind the summary</span>
+        </span>
+        <div class="g3-filter">
+          <span class="g3-search">
+            <i class="fa fa-search"></i>
+            <input class="g3-inp" type="text" placeholder="Filter ledger, code, nature..."
+              [(ngModel)]="Filters.LEDGER.q" (ngModelChange)="refreshAll()" />
+          </span>
+          <ng-select class="g3-ngsel" [items]="Branches" [multiple]="true" [closeOnSelect]="false"
+            placeholder="All branches" [(ngModel)]="Filters.LEDGER.branch"
+            (ngModelChange)="refreshAll()"></ng-select>
+          <button class="g3-clear" *ngIf="hasFilter('LEDGER')" (click)="clearFilter('LEDGER')">
+            <i class="fa fa-times"></i> Clear
+          </button>
+          <span class="br-record-chip">{{ ViewLedger.length }} / {{ LedgerDetail.length }}</span>
+        </div>
+      </div>
+
+      <div class="br-table-wrap">
+        <table class="br-table">
+          <thead>
+            <tr>
+              <th class="sortable" (click)="sortBy('LEDGER','BRANCH')">BRANCH <i
+                  [ngClass]="sortIcon('LEDGER','BRANCH')"></i></th>
+              <th class="sortable" (click)="sortBy('LEDGER','NATURE')">NATURE <i
+                  [ngClass]="sortIcon('LEDGER','NATURE')"></i></th>
+              <th class="sortable" (click)="sortBy('LEDGER','RCM')">RCM <i
+                  [ngClass]="sortIcon('LEDGER','RCM')"></i></th>
+              <th class="sortable" (click)="sortBy('LEDGER','ACCTCODE')">A/C CODE <i
+                  [ngClass]="sortIcon('LEDGER','ACCTCODE')"></i></th>
+              <th class="sortable" (click)="sortBy('LEDGER','LEDGER')">LEDGER <i
+                  [ngClass]="sortIcon('LEDGER','LEDGER')"></i></th>
+              <th class="num sortable" (click)="sortBy('LEDGER','AMOUNT')">AMOUNT <i
+                  [ngClass]="sortIcon('LEDGER','AMOUNT')"></i></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of ViewLedger">
+              <td class="g3-branch-name">{{ r.BRANCH }}</td>
+              <td>
+                <span class="g3-pill"
+                  [ngClass]="r.NATURE == 'LIABILITY' ? 'g3-pill--liab' : 'g3-pill--setoff'">
+                  {{ r.NATURE }}
+                </span>
+              </td>
+              <td>
+                <span class="g3-pill g3-pill--rcm" *ngIf="r.RCM == 'REVERSE CHARGE'">RCM</span>
+                <span *ngIf="r.RCM != 'REVERSE CHARGE'">&ndash;</span>
+              </td>
+              <td>{{ r.ACCTCODE }}</td>
+              <td>{{ r.LEDGER }}</td>
+              <td class="num num-strong">{{ r.AMOUNT | number:'1.2-2' }}</td>
+            </tr>
+            <tr *ngIf="ViewLedger.length == 0">
+              <td colspan="6" class="g3-empty">No rows match the filter.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ------------------------ CHECK BEFORE FILING ------------------------ -->
+    <div class="br-card br-table-card" *ngIf="ActiveTab=='WARN'">
+      <div class="br-card-header">
+        <span class="br-card-title">
+          Check Before Filing
+          <span class="br-hint">every row names the document - these change the other tabs</span>
+        </span>
+        <div class="g3-filter">
+          <span class="g3-search">
+            <i class="fa fa-search"></i>
+            <input class="g3-inp" type="text" placeholder="Filter entry no, party, issue..."
+              [(ngModel)]="Filters.WARN.q" (ngModelChange)="refreshAll()" />
+          </span>
+          <ng-select class="g3-ngsel g3-ngsel--sm" [items]="EntryTypes" [multiple]="true"
+            [closeOnSelect]="false" placeholder="All types" [(ngModel)]="Filters.WARN.etype"
+            (ngModelChange)="refreshAll()"></ng-select>
+          <ng-select class="g3-ngsel" [items]="Branches" [multiple]="true" [closeOnSelect]="false"
+            placeholder="All branches" [(ngModel)]="Filters.WARN.branch"
+            (ngModelChange)="refreshAll()"></ng-select>
+          <button class="g3-clear" *ngIf="hasFilter('WARN')" (click)="clearFilter('WARN')">
+            <i class="fa fa-times"></i> Clear
+          </button>
+          <span class="br-record-chip" [class.br-record-chip--warn]="ViewWarn.length > 0">
+            {{ ViewWarn.length }} / {{ Warnings.length }}
+          </span>
+        </div>
+      </div>
+
+      <div class="br-table-wrap">
+        <table class="br-table">
+          <thead>
+            <tr>
+              <th class="sortable" (click)="sortBy('WARN','ENTRY_TYPE')">TYPE <i
+                  [ngClass]="sortIcon('WARN','ENTRY_TYPE')"></i></th>
+              <th class="sortable" (click)="sortBy('WARN','ENTRY_NO')">ENTRY NO <i
+                  [ngClass]="sortIcon('WARN','ENTRY_NO')"></i></th>
+              <th class="sortable" (click)="sortBy('WARN','ENTRY_DATE')">DATE <i
+                  [ngClass]="sortIcon('WARN','ENTRY_DATE')"></i></th>
+              <th class="sortable" (click)="sortBy('WARN','BRANCH')">BRANCH <i
+                  [ngClass]="sortIcon('WARN','BRANCH')"></i></th>
+              <th class="sortable" (click)="sortBy('WARN','PARTY')">PARTY / LEDGER <i
+                  [ngClass]="sortIcon('WARN','PARTY')"></i></th>
+              <th class="sortable" (click)="sortBy('WARN','ISSUE')">ISSUE <i
+                  [ngClass]="sortIcon('WARN','ISSUE')"></i></th>
+              <th class="num sortable" (click)="sortBy('WARN','CGST')">CGST <i
+                  [ngClass]="sortIcon('WARN','CGST')"></i></th>
+              <th class="num sortable" (click)="sortBy('WARN','SGST')">SGST <i
+                  [ngClass]="sortIcon('WARN','SGST')"></i></th>
+              <th class="num sortable" (click)="sortBy('WARN','IGST')">IGST <i
+                  [ngClass]="sortIcon('WARN','IGST')"></i></th>
+              <th class="num sortable" (click)="sortBy('WARN','DIFF')">DIFF <i
+                  [ngClass]="sortIcon('WARN','DIFF')"></i></th>
+              <th>DETAIL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let w of ViewWarn">
+              <td><span class="g3-pill"
+                  [ngClass]="w.SEVERITY == 'HIGH' ? 'g3-pill--liab' : 'g3-pill--rcm'">{{ w.ENTRY_TYPE
+                  }}</span></td>
+              <td class="g3-branch-name">{{ w.ENTRY_NO }}</td>
+              <td>{{ w.ENTRY_DATE }}</td>
+              <td>{{ w.BRANCH }}</td>
+              <td>{{ w.PARTY }}</td>
+              <td [ngClass]="w.SEVERITY == 'HIGH' ? 'g3-warn-name' : ''">{{ w.ISSUE }}</td>
+              <td class="num">{{ w.CGST | number:'1.2-2' }}</td>
+              <td class="num">{{ w.SGST | number:'1.2-2' }}</td>
+              <td class="num">{{ w.IGST | number:'1.2-2' }}</td>
+              <td class="num num-strong" [ngClass]="w.DIFF != 0 ? 'dr-amt' : ''">
+                {{ w.DIFF | number:'1.2-2' }}</td>
+              <td class="g3-detail">{{ w.DETAIL }}</td>
+            </tr>
+            <tr *ngIf="ViewWarn.length == 0 && Warnings.length == 0">
+              <td colspan="11" class="g3-empty">
+                <i class="fa fa-check-circle" style="color:#059669;"></i>
+                Nothing to review for this period.
+              </td>
+            </tr>
+            <tr *ngIf="ViewWarn.length == 0 && Warnings.length > 0">
+              <td colspan="11" class="g3-empty">No rows match the filter.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="g3-legend" *ngIf="Warnings.length > 0">
+        <span>Purchase entry has no automatic GST calculation, so the ledger and amount are typed
+          by hand. Clear the HIGH rows before filing &ndash; the set-off figures inherit the
+          mistakes.</span>
+      </div>
+    </div>
+
+
+    <!-- ------------------------ FILED ARCHIVE ------------------------ -->
+    <div class="br-card br-table-card" *ngIf="ActiveTab=='FILED'">
+
+      <!-- list of filings -->
+      <div class="br-card-header">
+        <span class="br-card-title">
+          Filed Archive
+          <span class="br-hint">what was filed, kept as proof</span>
+        </span>
+        <div class="g3-filter">
+          <button class="g3-clear" *ngIf="OpenFiling" (click)="CloseFiling()">
+            <i class="fa fa-arrow-left"></i> Back to list
+          </button>
+          <span class="br-record-chip">{{ Filings.length }} FILING</span>
+        </div>
+      </div>
+
+      <div class="br-table-wrap" *ngIf="!OpenFiling">
+        <table class="br-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>PERIOD</th>
+              <th>FILED BY</th>
+              <th>FILED ON</th>
+              <th>STATUS</th>
+              <th class="num">LEDGER ROWS</th>
+              <th>REMARKS</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let f of Filings">
+              <td class="g3-branch-name">{{ f.FILING_ID }}</td>
+              <td>{{ f.PERIOD_FROM }} &ndash; {{ f.PERIOD_TO }}</td>
+              <td>{{ f.FILED_BY }}</td>
+              <td>{{ f.FILED_ON }}</td>
+              <td>
+                <span class="g3-pill"
+                  [ngClass]="f.STATUS == 'CURRENT' ? 'g3-pill--setoff' : 'g3-pill--rcm'">
+                  {{ f.STATUS }}</span>
+              </td>
+              <td class="num">{{ f.LEDGER_ROWS }}</td>
+              <td>{{ f.REMARKS }}</td>
+              <td>
+                <button class="br-btn br-btn--primary" (click)="ViewFiling(f)">
+                  <i class="fa fa-search"></i> Open
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="Filings.length == 0">
+              <td colspan="8" class="g3-empty">
+                Nothing filed yet. Search a period and use <b>Mark as Filed</b> to archive it.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- one filing: transaction-level statement, as filed vs as it stands now -->
+      <div class="br-table-wrap" *ngIf="OpenFiling">
+        <div class="g3-filedbar"
+          [ngClass]="OpenFiling.CHANGED_ROWS > 0 ? 'g3-filedbar--changed' : 'g3-filedbar--ok'">
+          <b>Filing #{{ OpenFiling.FILING_ID }}</b>
+          &nbsp;{{ OpenFiling.PERIOD_FROM }} &ndash; {{ OpenFiling.PERIOD_TO }}
+          &nbsp;|&nbsp; filed by {{ OpenFiling.FILED_BY }} on {{ OpenFiling.FILED_ON }}
+          &nbsp;|&nbsp; {{ OpenFiling.FILED_ROWS }} transactions archived
+          &nbsp;|&nbsp;
+          <span *ngIf="OpenFiling.CHANGED_ROWS > 0">
+            <i class="fa fa-exclamation-triangle"></i>
+            <b>{{ OpenFiling.CHANGED_ROWS }} changed since filing</b>
+            &nbsp;({{ OpenFiling.AMENDED_ROWS }} amended, {{ OpenFiling.ADDED_ROWS }} added,
+            {{ OpenFiling.DELETED_ROWS }} deleted)
+          </span>
+          <span *ngIf="OpenFiling.CHANGED_ROWS == 0">
+            <i class="fa fa-check-circle"></i> Live data still matches what was filed
+          </span>
+          <span style="margin-left:auto;">
+            <label class="g3-onlychg">
+              <input type="checkbox" [(ngModel)]="FilingOnlyChanged" /> differences only
+            </label>
+            <button class="br-btn br-btn--export" (click)="ExportFiling()">
+              <i class="fa fa-file-excel-o"></i> Download Statement
+            </button>
+          </span>
+        </div>
+
+        <table class="br-table">
+          <thead>
+            <tr>
+              <th>TYPE</th>
+              <th>ENTRY NO</th>
+              <th>DATE</th>
+              <th>BRANCH</th>
+              <th>LEDGER</th>
+              <th class="num">FILED DR</th>
+              <th class="num">FILED CR</th>
+              <th class="num">LIVE DR</th>
+              <th class="num">LIVE CR</th>
+              <th class="num">DIFFERENCE</th>
+              <th>STATUS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let l of FilingRows" [class.g3-changed]="l.STATUS != 'UNCHANGED'">
+              <td><span class="g3-pill"
+                  [ngClass]="l.NATURE == 'LIABILITY' ? 'g3-pill--liab' : 'g3-pill--setoff'">{{
+                  l.ENTRY_TYPE }}</span></td>
+              <td class="g3-branch-name">{{ l.ENTRY_NO }}</td>
+              <td>{{ l.ENTRY_DATE }}</td>
+              <td>{{ l.BRANCH }}</td>
+              <td>{{ l.LEDGER }}</td>
+              <td class="num">{{ l.FILED_DR | number:'1.2-2' }}</td>
+              <td class="num">{{ l.FILED_CR | number:'1.2-2' }}</td>
+              <td class="num">{{ l.LIVE_DR | number:'1.2-2' }}</td>
+              <td class="num">{{ l.LIVE_CR | number:'1.2-2' }}</td>
+              <td class="num num-strong" [ngClass]="l.DIFFERENCE != 0 ? 'dr-amt' : ''">
+                {{ l.DIFFERENCE | number:'1.2-2' }}</td>
+              <td [ngClass]="l.STATUS != 'UNCHANGED' ? 'g3-warn-name' : ''">{{ l.STATUS }}</td>
+            </tr>
+            <tr *ngIf="FilingRows.length == 0">
+              <td colspan="11" class="g3-empty">
+                <i class="fa fa-check-circle" style="color:#059669;"></i>
+                No differences &ndash; live data matches what was filed.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="g3-legend">
+        <span>The archive stores the full transaction-level GST ledger statement as the server
+          recomputed it at filing time. Download it to compare against a statement taken later.
+          Re-filing a period supersedes the earlier archive but never deletes it.</span>
+      </div>
+    </div>
+
+  </div>
+
+</div>

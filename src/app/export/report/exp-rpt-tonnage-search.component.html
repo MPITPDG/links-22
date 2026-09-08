@@ -1,0 +1,158 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-6">
+                        <table class="table table-bordered table-sm-new">
+                            <tbody style='height:30px'>
+                                <tr>
+                                    <td class="col-form-span-heading  centerlabel " colspan="4">
+                                        Tonnage
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="col-form-span-label ">Mode</span>
+                                    </td>
+                                    <td>
+                                        <span class="col-form-span-label">
+                                            <input type="radio" name="radiogroupM" (click)="ModeCheck('1')" [checked]="checkmode == '1'">&nbsp; Sea
+                                        </span>
+                                    </td>
+                                    <td colspan="2">
+                                        <span class="col-form-span-label">
+                                            <input type="radio" name="radiogroupM" (click)="ModeCheck('2')" [checked]="checkmode == '2'" />&nbsp; Air
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-form-span-heading" colspan="4">
+                                        <input type="radio" name="radiogroupD" (click)="mainchkDate('1')" [checked]="checkdate == '1'">&nbsp; Datewise
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="col-form-span-label ">From Date</span>
+                                    </td>
+                                    <td>
+                                        <my-date-picker name="dtfrm" [options]="myDatePickerOptions" [(ngModel)]="dtfrmt" required [disabled]=fddisable></my-date-picker>
+                                    </td>
+                                    <td>
+                                        <span class="col-form-span-label ">To Date</span>
+                                    </td>
+                                    <td>
+                                        <my-date-picker name="dtpto" [options]="myDatePickerOptions" [(ngModel)]="dtto" required [disabled]=fddisable></my-date-picker>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td class="col-form-span-heading" colspan="4">
+                                        <input type="radio" name="radiogroupD" (click)="mainchkDate('2')" [checked]="checkdate == '2'">&nbsp; Weekly
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <tr>
+                                        <td>
+                                            <span class="col-form-span-label ">Date</span>
+                                        </td>
+                                        <td colspan="3">
+                                            <my-date-picker name="dtfrm" [options]="myDatePickerOptions" [(ngModel)]="dtwkfrmt" required [disabled]=wkdisable></my-date-picker>
+                                        </td>
+                                    </tr>
+                                    <tr>
+
+                                        <td>
+                                            <span class="col-form-span-label">
+                                                <span class="col-form-span-label ">Origin</span>
+                                            </span>
+                                        </td>
+                                        <td colspan="3">
+                                            
+                                            <ng-select  class="form-control width250"
+                                                #select
+                                                [items]="listorigin"
+                                                [multiple]="true"                                                 
+                                                bindLabel="city_code"
+                                                bindValue="city_code"
+                                                [(ngModel)]="origin">
+                                        </ng-select>
+                                        
+                                        </td>
+                                    </tr>
+                                    <tr>
+
+                                        <td>
+                                            <span class="col-form-span-label">
+                                                <input type="radio" name="radiogroupS" (click)="mainSub('1')" [checked]="checkSub == '1'">&nbsp; Consignee
+                                            </span>
+                                        </td>
+                                        <td colspan="3">
+                                            <select class="form-control width250" [(ngModel)]="concode" [disabled]=condisable>
+                                                <option value="-1">Please select</option>
+                                                <option *ngFor="let d of listconcode" value={{d.con_code}}>{{d.con_name}}</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+
+                                        <td>
+                                            <span class="col-form-span-label">
+                                                <input type="radio" [disabled]=aldisableR name="radiogroupS" (click)="mainSub('2')" [checked]="checkSub == '2'">&nbsp; Airline
+                                            </span>
+                                        </td>
+                                        <td colspan="3">
+                                            <select class="form-control width250" [(ngModel)]="aline" [disabled]=aldisable>
+                                                <option value="-1">Please select</option>
+                                                <option *ngFor="let d of listAline" value={{d.AWB_PRIFIX}}>{{d.AIRLINE_NAME}}</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+
+                                        <td>
+                                            <span class="col-form-span-label">
+                                                <input type="radio" name="radiogroupS" (click)="mainSub('3')" [checked]="checkSub == '3'">&nbsp; Agent
+                                            </span>
+                                        </td>
+                                        <td colspan="3">
+                                            <select class="form-control width250" [(ngModel)]="SAgent" [disabled]=agtdisable>
+                                                <option value="-1">Please select</option>
+                                                <option *ngFor="let d of listAgent" value={{d.SUP_CODE}}>{{d.SUP_NAME}}</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+
+                                        <td>
+                                            <span class="col-form-span-label">
+                                                <span class="col-form-span-label ">Destination</span>
+                                            </span>
+                                        </td>
+                                        <td colspan="3">                                           
+                                            <ng-select  class="form-control width250"
+                                                #select
+                                                [items]="listdetport"
+                                                [multiple]="true"                                                 
+                                                bindLabel="city_name"
+                                                bindValue="city_code"
+                                                [(ngModel)]="dest">
+                                            </ng-select>                                    
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="centerlabel" >
+                                            <button class="btn btn-sm btn-success" type="Print"    (click)="onexcelGeneration()"> <i class=" fa fa-download"></i> Export to Excel</button>
+                                            
+                
+                                        </td>
+                                   </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+                <div class="col-md-3"></div>
+            </div>
+        </div>

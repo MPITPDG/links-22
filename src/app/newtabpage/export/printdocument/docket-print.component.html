@@ -1,0 +1,751 @@
+<div class="row" *ngIf="lengthData==0">
+    <div class="col-sm-12 centerlabel">
+        <img src="assets/img/loading.gif"/>
+    </div>
+</div>
+<table width="100%" border="1" cellspacing="3" cellpadding="3" height="514" style="background-color: white;border-collapse: separate;" *ngIf="lengthData==1">
+    <tr>
+        <td height="2">
+            <table width="98%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td>
+                        <div align="right">
+                            <font size="3" face="Arial">
+                                <font size="5">EXP - {{dataTable?.EXPTNO}}&nbsp;</font>
+                                <font size="4">&nbsp;</font>
+                            </font>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div align="center">
+                            <b>
+                                <font size="3" face="Verdana, Arial, Helvetica, sans-serif">
+                                    {{dataTable?.CMP_NAME}} </font>
+                            </b>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div align="center">
+                            <b>
+                                <font size="2" face="Verdana, Arial, Helvetica, sans-serif">{{dataTable?.CITY_NAME}}
+                                </font>
+                            </b>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div align="center" style="color:#FF0000;">
+                            <b>
+                                <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                                    {{(dataTable?.EXPTCANCEL==='Y')? 'CONSIGNMENT IS CANCELLED' : ''}}
+                                </font>
+                            </b>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td height="14">
+            <table width="98%" border="0" cellspacing="0" cellpadding="2">
+                <tr>
+                    <td height="2" colspan="3">
+                        <font size="5" face="Arial">{{dataTable?.SHIP_BILL}}</font>
+                    </td>
+                    <td width="32%" height="2">
+                        <table width="98%" border="0" cellspacing="0" cellpadding="0">
+                            <tr *ngIf="dataTable?.EXPT_MODE=='SEA'">
+                                <td align="center">
+                                    <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                                        <!-- <b>{{(dataTable?.SHIP_BILL=='yes')? dataTable?.SHIP_BILL + ' STUFFED' : 'DOCK STUFFED'}}</b> -->
+                                        <b>{{dataTable?.SHIPMENT_TYPE}}</b>
+                                    </font>
+                                </td>
+                            </tr>
+                            <tr *ngIf="dataTable?.EXPT_MODE=='SEA'">
+                                <td align="center">
+                                    <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                                        <b>{{dataTable?.LDG_PORT}}</b>
+                                    </font>
+                                </td>
+                            </tr>
+                            <tr *ngIf="dataTable?.EXPT_MODE=='AIR'">
+                                <td align="center">
+                                    <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                                        <b>{{'BY AIR'}}</b>
+                                    </font>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+               
+
+                <tr *ngIf="billto !=''">
+                    <td width="3%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2"></font>
+                        <font size="2">.</font>
+                    </td>
+                    <td width="14%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+                            <b>BILL TO :
+                            </b>
+                        </font>
+                    </td>
+                    <td colspan="2">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">{{billto}}</font>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td width="3%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">1</font>
+                        <font size="2">.</font>
+                    </td>
+                    <td width="14%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+                            <b>SHIPPER :
+                            </b>
+                        </font>
+                    </td>
+                    <td colspan="2">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">{{dataTable?.SHIPPER}}</font>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td height="2">
+            <table width="98%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td width="3%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">2</font>
+                        <font size="2">.</font>
+                    </td>
+                    <td width="19%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+                            <b>CONSIGNEE : </b>
+                        </font>
+                    </td>
+                    <td width="78%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+                            <b>{{dataTable2?.CONSIGNEE}}</b>
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="3%" valign="top">
+                        <font size="2">
+                        </font>
+                    </td>
+                    <td width="19%" valign="top">
+                    </td>
+                    <td width="78%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+                            <span [innerHtml]="dataTable2?.CONSIGNEEADD"></span>
+                        </font>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td height="2">
+            <table width="98%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td height="2" colspan="2">
+                        <table width="98%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td width="26%">
+                                    <font size="2" face="Verdana, Arial, Helvetica, sans-serif">INVOICE NO.&nbsp;
+                                    </font>
+                                </td>
+                                <td width="43%">
+                                    <font size="2" face="Verdana, Arial, Helvetica, sans-serif">{{dataTable?.INV_NO}}</font>
+                                </td>
+                                <td width="7%">
+                                    <font size="2" face="Verdana, Arial, Helvetica, sans-serif">DT.</font>
+                                </td>
+                                <td width="24%">
+                                    <font size="2" face="Verdana, Arial, Helvetica, sans-serif">{{dataTable?.INV_DATE}}</font>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td height="2" width="38%">
+                        <table width="98%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td width="26%">
+                                    <font size="2" face="Verdana, Arial, Helvetica, sans-serif">GRI NO.&nbsp;
+                                    </font>
+                                </td>
+                                <td width="37%">
+                                    <font size="2" face="Verdana, Arial, Helvetica, sans-serif">{{dataTable?.GRI_NO}}</font>
+                                </td>
+                                <td width="13%">
+                                    <font size="2" face="Verdana, Arial, Helvetica, sans-serif">DT.</font>
+                                </td>
+                                <td width="24%">
+                                    <font size="2" face="Verdana, Arial, Helvetica, sans-serif">{{dataTable?.GRI_DATE}}</font>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="15%" valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                            <b>CONTENTS:</b>
+                        </font>
+                    </td>
+                    <td colspan="2">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+                                <span [innerHtml]="dataTable?.ITEMDESC"></span>
+                                 
+                        </font>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td height="2">
+            <table width="98%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td width="2%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">3.</font>
+                    </td>
+                    <td width="20%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">ORDER NUMBER
+                        </font>
+                    </td>
+                    <td width="78%">
+                        <font size="2">
+
+                        </font>
+                        <table width="55%" border="0" cellspacing="1" cellpadding="1" align="center" height="19">
+                            <tr>
+                                <td width="38%">
+                                    <div align="left">
+                                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                                            <b>Order No.
+                                            </b>
+                                        </font>
+                                    </div>
+                                </td>
+                                <td width="39%">
+                                    <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                                        <b>Ref. No.
+                                        </b>
+                                    </font>
+                                </td>
+                                <td width="23%">
+                                    <div align="left">
+                                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                                            <b>Pieces</b>
+                                        </font>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- <tr> -->
+                            <tr *ngFor="let obj of dataTable1"> 
+                                <td align=left>
+                                    <font size="1" face="Verdana, Arial, Helvetica, sans-serif">{{obj.ORDERNO}}</font>
+                                </td>
+                                <td align=left>
+                                    <font size="1" face="Verdana, Arial, Helvetica, sans-serif">{{obj.STYLENO}}</font>
+                                </td>
+                                <td align=left>
+                                    <font size="1" face="Verdana, Arial, Helvetica, sans-serif">{{obj.PIECES}}</font>
+                                </td>
+                            </tr>
+                        </table>
+                        <font size="2">
+
+                        </font>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td height="2">
+            <table width="98%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td width="2%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">4.</font>
+                    </td>
+                    <td width="46%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">DOCUMENTS RECEIVED ON</font>
+                    </td>
+                    <td>
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">{{dataTable?.DOC_RECD}}</font>
+                    </td>
+                    <td>
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">APPROVED ON : {{dataTable?.DOC_APPROVAL}}</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="2%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">5.</font>
+                    </td>
+                    <td width="46%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">CARGO RECEIVED ON</font>
+                    </td>
+                    <td width="21%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">{{dataTable?.CARGORECD}}</font>
+                    </td>
+                    <td width="31%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">CARTED ON : {{dataTable?.CARTEDDT}}</font>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td height="2">
+            <table width="98%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td width="3%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">6.</font>
+                    </td>
+                    <td width="45%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">NUMBER OF PACKAGES</font>
+                    </td>
+                    <td width="68%">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">{{dataTable?.NO_OF_PKG + ' ' + dataTable?.TYPE_OF_PKG}}</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="3%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">7.</font>
+                    </td>
+                    <td width="45%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">NUMBER OF PIECES</font>
+                    </td>
+                    <td width="68%">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">{{dataTable?.NO_OF_PCS + ' ' + dataTable?.TYPE_OF_PCS}}
+                        </font>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td height="2">
+            <table width="98%" border="0" cellspacing="1" cellpadding="1">
+                <tr>
+                    <td width="2%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">8.</font>
+                    </td>
+                    <td width="46%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">TOTAL GROSS WEIGHT IN KGS</font>
+                    </td>
+                    <td  width="21%">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif"  >{{dataTable?.GRWT}} </font>
+                    </td>
+
+                     <td  width="31%">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif"   > NETT. WT.   {{ dataTable?.NET_WGT}}</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="3%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">9.</font>
+                    </td>
+                    <td width="45%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+                            {{(dataTable?.EXPT_MODE=='SEA')? 'TOTAL VOLUME IN CBM' : 'TOTAL VOLUME WEIGHT'}}
+                        </font>
+                    </td>
+                    <td width="68%" colspan="2">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">{{dataTable?.VOLUME}}</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="3%" valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">10.</font>
+                    </td>
+                    <td width="40%" valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">QUOTA DATES </font>
+                    </td>
+                    <td width="68%" colspan="2">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">{{ 'EXPIRY ' + dataTable?.EXPIRY_DATE}}</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="3%" valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">11.</font>
+                    </td>
+                    <td width="40%" valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">CLEARED THROUGH CUSTOMS ON</font>
+                    </td>
+                    <td width="68%" colspan="2">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                            {{dataTable?.CLEAREDTHROUGH}}
+                        </font>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr *ngIf="dataTable?.EXPT_MODE=='SEA'">
+        <td height="88">
+            <font size="2">
+
+            </font>
+            <table width="98%" border="0" cellspacing="1" cellpadding="1">
+                <tr>
+                    <td width="3%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">12.</font>
+                    </td>
+                    <td width="42%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">BILL OF LADING DATE</font>
+                    </td>
+                    <td width="53%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">{{dataTable?.EXPT_BLNO+' DT. '+dataTable?.EXPT_BLDT}}</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="3%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">13.</font>
+                    </td>
+                    <td width="45%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">VESSEL NAME</font>
+                    </td>
+                    <td width="68%">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">{{dataTable?.VESSEL_NAME}}</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="3%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">14.</font>
+                    </td>
+                    <td width="45%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">SHIPPING LINE</font>
+                    </td>
+                    <td width="68%">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">{{dataTable?.SHPGLINE}}</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="3%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2"></font>
+                    </td>
+                    <td width="45%" valign="top">
+                    </td>
+                    <td width="68%">
+                        {{dataTable?.AGT_NAME+' / '+dataTable?.CARTPLACE+' / '+dataTable?.EXPT_BLDT}}
+                    </td>
+                </tr>
+                <tr>
+                    <td width="3%" valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">15.</font>
+                    </td>
+                    <td width="40%" valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">PORT OF DESTINATION</font>
+                    </td>
+                    <td width="68%">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                            {{dataTable?.DESTINATION+' / '+dataTable?.DESTINATION_CITY+' / '+dataTable?.DESTINATION_COUNTRY}}
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="3%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">16.</font>
+                    </td>
+                    <td width="40%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">PORT OF TRANSHIPMENT</font>
+                    </td>
+                    <td width="68%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+                            {{(dataTable?.DIRECTVSL=='yes')? 'DIRECT' : dataTable?.TRANSPORT1_CITYNAME+ ' '+ dataTable?.TRANSPORT2_CITYNAME}}
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="3%" valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">17.</font>
+                    </td>
+                    <td width="40%" valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">ON CARRYING VESSEL NAME</font>
+                    </td>
+                    <td width="68%">
+                        <font size="2">
+                            {{''}}
+                        </font>
+                    </td>
+                </tr>
+            </table>
+            <font size="2">
+
+            </font>
+        </td>
+    </tr>
+    <tr *ngIf="dataTable?.EXPT_MODE=='AIR'">
+        <td height="88">
+            <font size="2">
+
+            </font>
+            <table width="98%" border="0" cellspacing="1" cellpadding="1">
+                <tr>
+                    <td width="3%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">12.</font>
+                    </td>
+                    <td width="42%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">MAWB/HAWB Nos.&amp; DATE</font>
+                    </td>
+                    <td width="53%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+                            {{dataTable?.AEROBILLNO+' '+dataTable?.AEROBILLDT+' '+dataTable?.HOUSEBILLNO}}
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="3%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">13.</font>
+                    </td>
+                    <td width="45%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">AIR LINE, FLIGHT NO. &amp; DATE</font>
+                    </td>
+                    <td width="68%">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                            {{dataTable?.AIRLINENAME+' '+dataTable?.FLIGHTNO+' '+dataTable?.FLIGHTDT}}
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="3%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">14.</font>
+                    </td>
+                    <td width="45%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">SHIPPING LINE</font>
+                    </td>
+                    <td width="68%">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">{{dataTable?.SHPGLINE}}</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="3%" valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">15.</font>
+                    </td>
+                    <td width="40%" valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">PORT OF DESTINATION</font>
+                    </td>
+                    <td width="68%">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                            {{dataTable?.DESTINATION+' / '+dataTable?.DESTINATION_CITY+' / '+dataTable?.DESTINATION_COUNTRY}}
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="3%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">16.</font>
+                    </td>
+                    <td width="40%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">PORT OF TRANSHIPMENT</font>
+                    </td>
+                    <td width="68%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+                            {{dataTable?.TRANSPORT1_CITYNAME+' '+dataTable?.TRANSPORT2_CITYNAME}}
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="3%" valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">17.</font>
+                    </td>
+                    <td width="40%" valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">CONNECTING FLIGHT NO.</font>
+                    </td>
+                    <td width="68%">
+                        <font size="2">
+                            {{dataTable?.FLIGHTNO1+' '+dataTable?.FLIGHTNO2}}
+                        </font>
+                    </td>
+                </tr>
+            </table>
+            <font size="2">
+
+            </font>
+        </td>
+    </tr>
+    <tr *ngIf="dataTable?.EXPT_MODE=='SEA'">
+        <td height="59">
+            <font size="2">
+
+            </font>
+            <table width="98%" border="0" cellspacing="1" cellpadding="1">
+                <tr>
+                    <td width="4%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">18.</font>
+                    </td>
+                    <td valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">FREIGHT</font>
+                    </td>
+                    <td width="49%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+                            {{(dataTable?.FRT=='PP')? 'PRE PAID' : 'COLLECT'}}
+                        </font>
+                    </td>
+                </tr>
+                <!-- <tr>
+                    <td width="4%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">18.</font>
+                    </td>
+                    <td valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">CONTAINER NUMBER</font>
+                    </td>
+                    <td valign="top" *ngIf = "dataTable3?.CONTAINERNO != undefined ">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                            {{dataTable3?.CONTAINERNO+ ' '+dataTable3?.CONTAINERSIZE+ ' '+dataTable3?.CONTAINERSIZE1+ ' '+dataTable3?.CONTAINERSTATUS}}
+                        </font>
+                    </td>
+                </tr> -->
+                <tr>
+                        <td width="4%" valign="top">
+                            <font face="Verdana, Arial, Helvetica, sans-serif" size="2">19.</font>
+                        </td>
+                        <td valign="top">
+                            <font face="Verdana, Arial, Helvetica, sans-serif" size="2">CONTAINER NUMBER</font>
+                        </td>
+                        <ng-container *ngIf="dataTable3?.CONTAINERNO != 'undefined' ;else container ">
+                        <td valign="top"  >
+                            <table>
+                                <tr  *ngFor="let obj of dataTable3">
+                                    <td>
+                                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                                                {{obj.CONTAINERNO+ ' '+obj.CONTAINERSIZE+ ' '+obj.CONTAINERSIZE1+ ' '+obj.CONTAINERSTATUS}}
+                                        </font>
+                                    </td>
+                                </tr>
+                            </table>
+                           
+                        </td>
+                    </ng-container>
+                    <ng-template #container>
+                        <td valign="top" >
+                            <font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;  </font>
+                        </td>
+                    </ng-template>
+                    </tr>
+                <tr>
+                    <td width="4%" valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">20.</font>
+                    </td>
+                    <td valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">ETD AT ORIGIN</font>
+                    </td>
+                    <td width="49%">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                            {{dataTable?.ETD}}
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="4%" valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">21.</font>
+                    </td>
+                    <td valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">ETA AT DESTINATION</font>
+                    </td>
+                    <td width="49%">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                            {{''}}
+                        </font>
+                    </td>
+                </tr>
+            </table>
+            <font size="2">
+
+            </font>
+        </td>
+    </tr>
+    <tr *ngIf="dataTable?.EXPT_MODE=='AIR'">
+        <td height="59">
+            <font size="2">
+            </font>
+            <table width="98%" border="0" cellspacing="1" cellpadding="1">
+                <tr>
+                    <td width="4%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">18.</font>
+                    </td>
+                    <td valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">FREIGHT</font>
+                    </td>
+                    <td width="49%">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+                            {{(dataTable?.FRT=='PP')? 'PRE PAID' : 'COLLECT'}}
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="4%" valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">19.</font>
+                    </td>
+                    <td valign="top">
+                        <font face="Verdana, Arial, Helvetica, sans-serif" size="2">SHIPPING BILL NUMBER</font>
+                    </td>
+                    <td valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                            {{dataTable?.EXPT_SHIPBILLNO+ ' - '+dataTable?.EXPT_SHIPBILLDT}}
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="4%" valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">20.</font>
+                    </td>
+                    <td valign="top">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">CC NUMBER </font>
+                    </td>
+                    <td width="49%">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                            {{dataTable?.EXPT_SHIPCCNO}}
+                        </font>
+                    </td>
+                </tr>
+            </table>
+            <font size="2">
+            </font>
+        </td>
+    </tr>
+    <tr>
+        <td height="56" valign="top">
+            <table width="98%" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td width="41%">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">OUR BILL NUMBER</font>
+                    </td>
+                    <td width="59%">&nbsp;</td>
+                </tr>
+            </table>
+            <br>
+        </td>
+    </tr>
+    <tr>
+        <td height="71" valign="top">
+            <table width="98%" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td width="18%">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">REMARK:</font>
+                    </td>
+                    <td width="82%">
+                        <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
+                            {{dataTable?.REMARKS_PORT}}
+                        </font>
+                    </td>
+                </tr>
+            </table>
+            <br>
+        </td>
+    </tr>
+</table>

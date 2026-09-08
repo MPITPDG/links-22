@@ -1,0 +1,209 @@
+<div class="br-page">
+
+  <!-- ========================================================= -->
+  <!-- SEARCH -->
+  <!-- ========================================================= -->
+
+  <div class="br-card search-card-clean" *ngIf="!Searched">
+    <div class="clean-row-layout">
+
+      <!-- BRANCH -->
+      <div class="clean-field clean-branch">
+        <label>Branch</label>
+        <select class="form-control" name="Branch" [(ngModel)]="Branch">
+          <option *ngFor="let b of BranchList" value="{{b.CITYCODE1}}">{{b.CITYNAME}}</option>
+        </select>
+      </div>
+
+      <!-- FROM DATE -->
+      <div class="clean-field clean-date">
+        <label>F.Y. Start Date <span class="br-req">*</span></label>
+        <my-date-picker
+          name="FromDate"
+          (dateChanged)="FromDateChanged($event)"
+          [options]="myDatePickerOptions"
+          [selDate]="FromDate">
+        </my-date-picker>
+      </div>
+
+      <!-- TO DATE -->
+      <div class="clean-field clean-date">
+        <label>F.Y. End Date <span class="br-req">*</span></label>
+        <my-date-picker
+          name="ToDate"
+          (dateChanged)="ToDateChanged($event)"
+          [options]="myDatePickerOptions"
+          [selDate]="ToDate">
+        </my-date-picker>
+      </div>
+
+      <!-- SUBMIT -->
+      <div class="clean-actions">
+        <button class="br-btn br-btn--primary" type="button" (click)="Submit()">
+          <i class="fa fa-search"></i> Run Audit
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- RESULT -->
+  <!-- ========================================================= -->
+
+  <div *ngIf="Searched" class="br-result-view">
+
+    <!-- TOP BAR -->
+
+    <div class="br-topbar">
+
+      <div class="br-topbar-title">
+        <span class="pl-title">{{ Header }}</span>
+        <span class="pl-meta" *ngIf="cmpnyname">{{ cmpnyname }}</span>
+      </div>
+
+      <div class="br-topbar-right">
+        <button class="br-back-btn" type="button" (click)="BackToSearch()">
+          <i class="fa fa-arrow-left"></i> Back To Search
+        </button>
+        <button class="br-btn br-btn--export" type="button" (click)="ExportStatement()">
+          <i class="fa fa-file-excel-o"></i> Export To Excel
+        </button>
+      </div>
+
+    </div>
+
+    <!-- SUMMARY STRIP -->
+
+    <div class="br-card recon-schedule">
+
+      <div class="recon-topline">
+
+        <div class="recon-title-group">
+          <span class="recon-schedule-title">Audit Summary</span>
+          <span class="recon-meta">{{ FromDate }} – {{ ToDate }}</span>
+          <span class="recon-meta">{{ BranchLabel }}</span>
+        </div>
+
+        <span
+          class="recon-check-badge"
+          [ngClass]="IsClean ? 'ok' : 'warn'">
+
+          <i class="fa" [ngClass]="IsClean ? 'fa-check-circle' : 'fa-exclamation-triangle'"></i>
+          {{ IsClean ? 'ALL CLEAR' : 'ISSUES FOUND' }}
+
+        </span>
+
+      </div>
+
+      <div class="recon-equation" *ngIf="!IsClean">
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">Check Types Flagged</span>
+          <span class="recon-seg-val">{{ Groups.length }}</span>
+        </div>
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">Total Flagged Entries</span>
+          <span class="recon-seg-val less">{{ TotalIssueRows }}</span>
+        </div>
+
+        <div class="recon-seg recon-seg--result">
+          <span class="recon-seg-label">Total Absolute Difference</span>
+          <span class="recon-seg-val result less">{{ TotalDiffAmt | number:'1.2-2' }}</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- CLEAN STATE -->
+
+    <div class="br-card" *ngIf="IsClean">
+      <div class="audit-clean">
+        <i class="fa fa-check-circle"></i>
+        <div class="audit-clean-title">No debit/credit differences found</div>
+        <div class="audit-clean-sub">Every voucher checked balanced for this period and branch selection.</div>
+      </div>
+    </div>
+
+    <!-- CHECKTYPE GROUPS (drill-down into vouchers) -->
+
+    <div class="br-card br-table-card" *ngIf="!IsClean">
+
+      <div class="br-card-header">
+        <div class="br-card-title">
+          <i class="fa fa-sitemap"></i>
+          Check Types
+          <span class="br-hint">click a check type to see the affected vouchers</span>
+        </div>
+        <span class="br-record-chip">{{ Groups.length }} Check Types</span>
+      </div>
+
+      <div class="br-table-wrap">
+        <table class="br-table">
+          <thead>
+            <tr>
+              <th>Check Type</th>
+              <th class="num">Entries</th>
+              <th class="num">Total Diff</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let g of Groups">
+
+              <tr class="pl-grp-row" (click)="Toggle(g.CHECKTYPE)">
+                <td>
+                  <i
+                    class="fa pl-chevron"
+                    [ngClass]="IsExpanded(g.CHECKTYPE) ? 'fa-minus-square-o' : 'fa-plus-square-o'">
+                  </i>
+                  <span class="pl-checktype-badge">{{ g.CHECKTYPE }}</span>
+                </td>
+                <td class="num">{{ g.ENTRIES }}</td>
+                <td class="num less">{{ g.TOTAL_DIFF | number:'1.2-2' }}</td>
+              </tr>
+
+              <tr *ngIf="IsExpanded(g.CHECKTYPE)" class="pl-ledger-row">
+                <td colspan="3">
+                  <div class="pl-ledger-wrap">
+                    <table class="br-table pl-ledger-table">
+                      <thead>
+                        <tr>
+                          <th>Type</th>
+                          <th>Voucher No</th>
+                          <th>Date</th>
+                          <th>Name</th>
+                          <th class="num">Debit</th>
+                          <th class="num">Credit</th>
+                          <th class="num">Diff</th>
+                          <th>Remark</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let d of GetDetails(g.CHECKTYPE)">
+                          <td class="mono">{{ d.VTYPE }}</td>
+                          <td class="mono">{{ d.VOUCHERNO }}</td>
+                          <td class="mono">{{ d.VDATE }}</td>
+                          <td>{{ d.NAME }}</td>
+                          <td class="num dr-amt">{{ d.DRAMT | number:'1.2-2' }}</td>
+                          <td class="num cr-amt">{{ d.CRAMT | number:'1.2-2' }}</td>
+                          <td class="num less">{{ d.DIFF | number:'1.2-2' }}</td>
+                          <td class="audit-remark">{{ d.REMARK }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

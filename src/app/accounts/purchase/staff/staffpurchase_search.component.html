@@ -1,0 +1,167 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>Staff Purchase Search</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" *ngIf="searchList==0">
+        <div class="col-sm-3">
+        </div>
+        <div class="col-sm-6">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr class="trbg">
+                    <td  colspan="2">
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="CODE" [(ngModel)]="Type" />&nbsp;Purchase No</span>
+                    </td>
+                    <td  >
+                        <input type="text" [(ngModel)]="PurchaseNo" class="form-control width150" [maxlength]="15" [OnlyNumber]="true" [disabled]="Type!='CODE'"
+                        />
+                    </td>
+                    <td>
+                        <button type="button" name="printButton" class="btn btn-sm btn-primary" (click)="search();" [disabled]="Type!='CODE'">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-print"></i> Print</span>
+                        </button>
+                    </td> 
+                </tr>
+                <tr class="trbg">
+                    <td colspan="2">
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="STAFF" [(ngModel)]="Type" />&nbsp;Staff</span>
+                    </td>
+                    <td colspan="2" >
+                         
+                                 <select class="form-control width200"  [(ngModel)]="Staff" [disabled]="Type!='STAFF'">
+                                    <option value="">Please select</option>
+                                    <option *ngFor="let d of Stafflist" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option> 
+                                </select>
+                            
+                       
+                    </td>
+                </tr>
+                <tr class="trbg">
+                    <td colspan="2" >
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="JOBNO" [(ngModel)]="Type" />&nbsp;Job No</span>
+                    </td>
+                    <td colspan="2" >
+                        <input type="text" [(ngModel)]="JobNo"   class="form-control" [maxlength]="15" class="form-control width150" [OnlyNumber]="true" [disabled]="Type!='JOBNO'"
+                        />
+                    </td>
+                   
+                </tr>
+                <tr class="trbg">
+                    <td colspan="2" >
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="AMOUNT" [(ngModel)]="Type" />&nbsp;Amount</span>
+                    </td>
+                    <td colspan="3"  >
+                        <input type="text" [(ngModel)]="Amount" [OnlyNumber]="true" class="form-control" [maxlength]="15" class="form-control width150" [disabled]="Type!='AMOUNT'"
+                        />
+                    </td>
+                   
+                </tr>
+                <tr class="trbg">
+                    <td   colspan="2">
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="DATE" [(ngModel)]="Type" />&nbsp; Date Wise</span>
+                    </td>
+                    <td>
+                        <div style="display: flex;">
+                            <span class="col-form-span-label">From</span>
+                            <my-date-picker name="PurchaseFromDate" [options]="myDatePickerOptions" [(ngModel)]="PurchaseFromDate" [disabled]="Type!='DATE'"></my-date-picker>
+                        </div>
+                        <td>
+                            <div style="display: flex;"> 
+                                <span class="col-form-span-label">To</span>
+                                <my-date-picker name="PurchaseToDate" [options]="myDatePickerOptions" [(ngModel)]="PurchaseToDate" [disabled]="Type!='DATE'"></my-date-picker>
+                            </div>
+                    </td>
+                   
+                </tr>
+                
+                <tr class="trbg">
+                    <td  colspan="2">
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="PRINTAV" [(ngModel)]="Type" />&nbsp; Print All Vouchers of a day</span>
+                    </td>
+                    <td colspan="2">
+                      
+                            <span class="col-form-span-label">Date</span>
+                            <my-date-picker name="Day" [options]="myDatePickerOptions" [(ngModel)]="PurchaseDay" [disabled]="Type!='PRINTAV'"></my-date-picker>
+                       
+                    </td>
+                </tr>
+                <tr class="trbg">
+                    <td  colspan="2">
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="DISPLAY" [(ngModel)]="Type" />&nbsp;Display</span>
+                    </td>
+                    <td colspan="2">
+                      
+                        <div class="leftlabel">
+                            <span class="col-form-span-label">
+                                <input type="radio" name="radioDisplay" value="0" [(ngModel)]="Display"  [disabled]="Type!='DISPLAY'"/>&nbsp;List</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <span class="col-form-span-label">
+                                <input type="radio" name="radioDisplay" value="1" [(ngModel)]="Display"  [disabled]="Type!='DISPLAY'"/>&nbsp;Details</span>
+                        </div>
+                    </td>
+                </tr>
+             
+                <tr class="trbg" >
+                    <td colspan="4" class="centerlabel">
+                        <button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="search();">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-search"></i> Search</span>
+                                      
+                        </button>
+                        <button class="btn btn-sm btn-danger" type="reset">
+                            <span class="col-form-span-label" (click)="ResetAll();"><i class="fa fa-ban"></i> Reset</span></button> 
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-3">
+        </div>
+    </div>
+    <div class="row" *ngIf="searchList >0">
+        <div class="col-sm-12 xyscroll" style="height:300px;">
+            <table class="table table-sm-new table-bordered bgwhite">
+                <thead>
+                    <tr class="title-head formheading">
+                        <th colspan="8">
+                            {{searchHeaderText}}
+                            <a href="javascript:void(0);" (click)="displayType='SEARCH';searchList=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
+                        </th>
+                    </tr>
+                    <tr class="title-head formheading">
+                        <th>Purchase Code</th>
+                        <th>Purchase Date</th>
+                        <th>Staff</th>
+                     
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let obj of searchList">
+                        <td>
+                            <span class="col-form-span-label anchor-link" (click)="redirectToEdit(obj.PUR_CODE)" style="cursor:pointer;">{{obj.PUR_CODE}}</span>
+                          
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.PUR_DATE}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.SUPPLIER}}</span>
+                        </td>
+                      
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

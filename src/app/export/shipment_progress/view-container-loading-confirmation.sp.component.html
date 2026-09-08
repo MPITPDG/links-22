@@ -1,0 +1,61 @@
+﻿<table class="table table-bordered table-sm-new">
+	<tr class="trbg centerlabel">
+		<td colspan="8">
+			<span class="col-form-span-label"><b>VESSEL DETAILS</b></span>
+			<button class="btn btn-sm btn-warning" style="float: right;" (click)="back();"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to search</u></span></button>
+		</td>
+	</tr>
+</table>
+<table class="table table-bordered table-sm-new">
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>Rotation No.</strong></span></td>
+		<td colspan="7"><span class="col-form-span-label">{{VesselDetail?.VSL_RTNO}}</span></td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>Vessel Name </strong></span></td>
+		<td colspan="7"><span class="col-form-span-label">{{VesselDetail?.VSL_NAME}}</span></td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>Voyage No. </strong></span></td>
+		<td colspan="7"><span class="col-form-span-label">{{VesselDetail?.VSL_VOYNO}}</span></td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>Last Carting Date </strong></span></td>
+		<td colspan="7"><span class="col-form-span-label">{{VesselDetail?.CARTING}}</span></td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>ETD </strong></span></td>
+		<td colspan="7"><span class="col-form-span-label">{{VesselDetail?.ETD}}</span></td>
+	</tr>
+	<tr>
+		<td class="width150"><span class="col-form-span-label"><strong>Actual Departure </strong></span></td>
+		<td colspan="7"><span class="col-form-span-label">{{VesselDetail?.SAILING}}</span></td>
+	</tr>
+</table>
+<div class="xyscroll" style="height:300px" *ngIf="ContainerList.length > 0">
+	<table class="table table-bordered table-sm-new">
+		<thead>
+			<tr class="col-form-span-heading" style="white-space:nowrap;">
+				<th class="centerlabel width20"></th>
+				<ng-container *ngFor=" let key of keys; let i = index;">
+					<th class="centerlabel" *ngIf="i!=0&&i!=1&&i!=2"><span class="col-form-span-label">{{key}}</span></th>
+				</ng-container>
+			</tr>
+		</thead>
+		<tbody class="bgwhite">
+			<tr *ngFor="let obj of ContainerList">
+				<td class="centerlabel width20"><i class="fa fa-edit" style="cursor: pointer;" (click)="edit(obj[keys[0]],obj[keys[1]],obj[keys[2]],obj[keys[3]])"></i></td>
+				<ng-container *ngFor=" let key of keys; let i = index;">
+					<td *ngIf="i!=0&&i!=1&&i!=2"><span class="col-form-span-label">{{obj[key]}}</span></td>
+				</ng-container>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<table class="table table-bordered table-sm-new" *ngIf="ErrorMessage !== ''">
+	<tr class="trbg centerlabel">
+		<td colspan="8">
+			<span class="error-text">{{ErrorMessage}}</span>
+		</td>
+	</tr>
+</table>

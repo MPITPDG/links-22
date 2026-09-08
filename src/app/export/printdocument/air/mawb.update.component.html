@@ -1,0 +1,152 @@
+﻿<table class="table table-bordered table-sm-new bgwhite">
+	<tr class="title-head trbg">
+		<td class="width150">
+			<span class="col-form-span-label">MAWB No.</span><span class="col-form-span-error">*</span>
+		</td>
+		<td colspan="2">
+			<span class="col-form-span-label">{{mawbno}}</span>
+		</td>
+		<td class="width150">
+			<span class="col-form-span-label">MAWB Date.</span><span class="col-form-span-error">*</span>
+		</td>
+		<td colspan="2">
+			<span class="col-form-span-label">{{mawbdate}}</span>
+		</td>
+	</tr>
+	<tr class="title-head trbg">
+		<td class="width150">
+			<span class="col-form-span-label">Freight Type</span><span class="col-form-span-error">*</span>
+		</td>
+		<td colspan="2">
+			<!-- <ng-select [items]="[{VALUEFIELD: 'PP', TEXTFIELD: 'PP'},{VALUEFIELD: 'CC', TEXTFIELD: 'CC'}]"
+					   bindLabel="TEXTFIELD"
+					   bindValue="VALUEFIELD"
+					   placeholder="--Select--"
+					   [(ngModel)]="FreightType"
+					   class="form-control width120"
+					   >
+			</ng-select> -->
+			<select class="form-control width120"   [(ngModel)]="FreightType">
+				<option value="-1">select</option>
+				<option value="CC">CC</option>
+				<option value="PP">PP</option>
+			</select>
+		</td>
+		<td class="width150">
+			<span class="col-form-span-label">Freight Currency</span><span class="col-form-span-error">*</span>
+		</td>
+		<td colspan="2">
+			<!-- <ng-select [items]="currencyList"
+					   bindLabel="CUR_NAME"
+					   bindValue="CUR_CODE"
+					   placeholder="--Select--"
+					   [(ngModel)]="Fcurrency"
+					   class="form-control width300"
+					   >
+			</ng-select> -->
+
+			<select class="form-control width120"   [(ngModel)]="Fcurrency">
+				<option value="-1">Please select</option>
+				<option *ngFor="let d of currencyList" value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+			
+			</select>
+			 
+		</td>
+	</tr>
+	<tr class="title-head trbg">
+		<td class="width150">
+			<span class="col-form-span-label">Freight Amount</span><span class="col-form-span-error">*</span>
+		</td>
+		<td colspan="5">
+			<input type="text" [(ngModel)]="FreightAmount" class="form-control width120" [OnlyNumber]="true" [maxlength]="11" />
+		</td>
+	</tr>
+	<tr class="title-head trbg">
+		<td class="width150">
+			<span class="col-form-span-label">Shipment Type</span><span class="col-form-span-error">*</span>
+		</td>
+		<td colspan="2">
+			<!-- <ng-select [items]="[{VALUEFIELD: '0', TEXTFIELD: 'Normal'},{VALUEFIELD: '1', TEXTFIELD: 'DDX'}]"
+					   bindLabel="TEXTFIELD"
+					   bindValue="VALUEFIELD"
+					   placeholder="--Select--"
+					   [(ngModel)]="ShipType"
+					   class="form-control width120"
+					   (change)="ddx_Onchange(ShipType)"
+					   >
+			</ng-select> -->
+			<select class="form-control width120"   [(ngModel)]="ShipType"  (change)="ddx_Onchange(ShipType)">
+				<option value="-1"> select</option>
+				<option value="0">Normal</option>
+				<option value="1">DDX</option>
+			</select>
+		</td>
+		<td class="width150">
+			<span class="col-form-span-label">Dest.Warehouse</span><span class="col-form-span-error">*</span>
+		</td>
+		<td colspan="2">
+			<!-- <ng-select [items]="destinationList"
+					   bindLabel="DDX_DESTINATION"
+					   bindValue="PK_ID"
+					   placeholder="--Select--"
+					   [(ngModel)]="ShipDest"
+					   class="form-control width300"
+					   [disabled]="ShipType == '0' || ShipType == null"
+					   >
+			</ng-select> -->
+			<select class="form-control width300"   [(ngModel)]="ShipDest" [disabled]="ShipType == '0' || ShipType == null">
+				<option value="0">Please select</option>
+				<option *ngFor="let d of destinationList" value={{d.PK_ID}}>{{d.DDX_DESTINATION}}</option>
+			
+			</select>
+		</td>
+	</tr>
+</table>
+<table class="table table-bordered table-sm-new bgwhite">
+	<thead>
+			<tr class="title-head formheading">
+				<th>EXPT NO</th>
+				<th>SHIPPER</th>
+				<th>CONSIGNEE</th>
+				<th>Pkgs</th>
+				<th>Grwt</th>
+				<th>Chrg.Wt</th>
+				<th>Pcs</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr *ngFor="let obj of mawbnoList">
+				<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
+				<td><span class="col-form-span-label">{{obj.SHIPPER}}</span></td>
+				<td><span class="col-form-span-label">{{obj.CONSIGNEE}}</span></td>
+				<td><span class="col-form-span-label">{{obj.PKGS}}</span></td>
+				<td><span class="col-form-span-label">{{obj.GRWT}}</span></td>
+				<td><span class="col-form-span-label">{{obj.CHBLWT}}</span></td>
+				<td><span class="col-form-span-label">{{obj.PCS}}</span></td>
+			</tr>
+			<tr class="trbg">
+				<td><span class="col-form-span-label"></span></td>
+				<td><span class="col-form-span-label"></span></td>
+				<td><span class="col-form-span-label"></span></td>
+				<td><span class="col-form-span-label"></span></td>
+				<td><input type="text" [(ngModel)]="totalGrwt" class="form-control width75" [OnlyNumber]="true"/></td>
+				<td><input type="text" [(ngModel)]="totalChblwt" class="form-control width75" [OnlyNumber]="true"/></td>
+				<td><span class="col-form-span-label"></span></td>
+			</tr>
+		</tbody>
+</table>
+<table class="table table-bordered table-sm-new bgwhite">
+</table>
+<table class="table table-bordered table-sm-new bgwhite">
+	<tr class="title-head trbg">
+		<td colspan="6" class="centerlabel">
+			<button type="button" name="submit" class="btn btn-sm btn-success" (click)="submit();">
+				<span class="col-form-span-label"><i class="fa fa-save"></i> Submit</span>
+			</button>
+			<button type="button" name="cancelButton" class="btn btn-sm btn-danger" (click)="cancel();">
+				<span class="col-form-span-label"><i class="fa fa-remove"></i> Cancel</span>
+			</button>
+		</td>
+	</tr>
+</table>
+	

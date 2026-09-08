@@ -1,0 +1,1022 @@
+/* 140px = this app's actual fixed shell chrome (55-65px header + 22px
+   footer + ~24px breadcrumb overlap, measured directly via
+   getBoundingClientRect on the live app — see the same fix on the
+   Cashbook Statement page). The previous -95px guess left ~45px too
+   little headroom, so this page's content pushed past the viewport and
+   forced the browser's own outer/window scrollbar. */
+:host {
+    display: block;
+    height: calc(100vh - 140px);
+    overflow: hidden;
+}
+
+/* PAGE */
+.br-page {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+   padding: 5px 10px !important;
+  gap: 5px !important;
+    box-sizing: border-box;
+}
+
+/* RESULT LAYOUT — fills viewport, no outer scroll */
+.br-result-view {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    gap: 4px !important;
+
+}
+
+/* TOP AREA */
+.br-filter-card,
+.br-summary-strip,
+.br-topbar,
+.br-action-bar {
+    flex-shrink: 0;
+}
+
+/* TABLE CARD */
+.br-table-card {
+    flex: 1;
+    min-height: 0;
+    /* overflow: hidden; */
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+}
+
+.br-table-wrap {
+    flex: 1;
+    min-height: 0;
+    /* overflow-y: auto;
+    overflow-x: auto; */
+      overflow:auto;
+    /* Always reserve the vertical scrollbar's width, even when it isn't
+       currently needed (e.g. a short Cleared-tab list) — otherwise the
+       table's visible column area shifts by the scrollbar's width only
+       when it happens to be present, breaking any fixed offset that tries
+       to align against it from outside this container. */
+    scrollbar-gutter: stable;
+    position:relative;
+}
+
+/* TABLE HEADER */
+.br-card-header {
+    flex-shrink: 0;
+}
+
+/* ============================= */
+/* TOP */
+/* ============================= */
+
+.br-search-header {
+  margin-bottom: 5px !important;
+}
+
+.br-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.br-subtitle {
+  margin-top: 4px;
+  color: #6B7280;
+  font-size: 13px;
+}
+
+/* ============================= */
+/* CARD */
+/* ============================= */
+
+.br-card {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+
+/* ============================= */
+/* FILTER */
+/* ============================= */
+
+.br-filter-card {
+  padding: 18px;
+  max-width: 1250px;
+}
+
+/* BANK DROPDOWN - Takes remaining space */
+.br-filter-row .br-field--wide {
+  flex-grow: 1 !important; 
+  min-width: 200px !important;
+}
+
+/* DATE PICKERS - Fixed size */
+.br-filter-row .date-field {
+  width: 150px !important;
+  flex-shrink: 0 !important;
+}
+
+/* BUTTONS - Stay on the same line, pushed to bottom */
+.br-filter-row .inline-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 10px !important;
+  margin-top: 0 !important;
+  padding-bottom: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+/* Make sure the input boxes inside the new row look correct */
+.br-filter-row .br-datepicker,
+.br-filter-row .br-ng-select {
+  width: 100% !important;
+}
+
+
+.br-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748B;
+  text-transform: uppercase;
+}
+
+.br-req {
+  color: #DC2626;
+}
+
+.br-search-input,
+.br-datepicker,
+.br-type-filter,
+.form-control {
+  border-radius: 10px !important;
+  border: 1px solid #D1D5DB !important;
+  min-height: 30px;
+  font-size: 13px;
+}
+
+.br-search-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* ============================= */
+/* BUTTONS */
+/* ============================= */
+
+.br-btn {
+  height: 25px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.br-btn--primary,
+.br-btn--submit {
+  background: #2563EB;
+  color: #fff;
+}
+
+.br-btn--primary:hover,
+.br-btn--submit:hover {
+  background: #1D4ED8;
+}
+
+.br-btn--ghost {
+  background: #fff;
+  border: 1px solid #D1D5DB;
+}
+
+.br-back-btn {
+  border: 1px solid #D1D5DB;
+  background: #fff;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.br-btn--export {
+  height: 30px;
+  background: #059669;
+  color: #fff;
+  font-size: 11px;
+}
+
+.br-btn--export:hover {
+  background: #047857;
+}
+
+/* ============================= */
+/* TOPBAR */
+/* ============================= */
+
+.br-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+/* ============================= */
+/* SUMMARY */
+/* ============================= */
+
+.br-summary-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+.br-summary-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #E5E7EB;
+  /* padding: 10px 12px; */
+   padding: 4px 8px;
+}
+
+.br-summary-card--highlight {
+  background: #EFF6FF;
+  border-color: #BFDBFE;
+}
+
+.br-summary-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748B;
+  text-transform: uppercase;
+}
+
+.br-summary-val {
+  margin-top: 1px;
+  font-size: 11px;
+  font-weight: 700;
+}1
+
+.br-summary-val .dr {
+  color: #DC2626;
+}
+
+.br-summary-val .cr {
+  color: #059669;
+}
+
+.br-summary-val .neutral {
+  color: #94A3B8;
+}
+
+.br-summary-sub {
+  margin-top: 4px;
+  font-size: 10px;
+  color: #64748B;
+}
+
+.stacked {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================= */
+/* VIEW TOGGLE (Uncleared / Cleared) */
+/* ============================= */
+
+.br-view-toggle {
+  display: flex;
+  align-items: flex-end;
+  flex-shrink: 0;
+  position: relative; /* anchor for .br-view-toggle-totals, positioned absolutely below */
+  min-height: 30px;
+}
+
+.br-view-toggle-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.toggle-btn {
+  border: 1px solid #D1D5DB;
+  background: #fff;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #374151;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toggle-btn.active {
+  background: #2563EB;
+  border-color: #2563EB;
+  color: #fff;
+}
+
+.toggle-btn .toggle-count {
+  background: rgba(0,0,0,0.08);
+  border-radius: 999px;
+  padding: 1px 6px;
+  font-size: 10px;
+}
+
+.toggle-btn.active .toggle-count {
+  background: rgba(255,255,255,0.25);
+}
+
+/* Active-tab Debit/Credit totals, pinned at a fixed offset (735px) from the
+   LEFT edge of .br-view-toggle — the same left edge the table below starts
+   from (Entry No+Date+Type+Party+Chq Type+Cheque No+Cheque Dt = 735px).
+   Anchoring from the left (not the right, via space-between) means this
+   never has to account for the table's vertical scrollbar, which only
+   ever affects the right side. */
+.br-view-toggle-totals {
+  position: absolute;
+  left: 735px;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+}
+
+.br-col-total {
+  width: 85px;
+  text-align: right;
+  padding-right: 12px;
+}
+
+.br-col-total-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: #6B7280;
+  text-transform: uppercase;
+}
+
+.br-col-total-val {
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.br-col-total-val.dr {
+  color: #DC2626;
+}
+
+.br-col-total-val.cr {
+  color: #059669;
+}
+
+.br-cleared-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: #059669;
+  white-space: nowrap;
+}
+
+/* ============================= */
+/* TABLE */
+/* ============================= */
+
+.br-card-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid #E5E7EB;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.br-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.br-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.br-record-chip {
+  background: #EEF2FF;
+  color: #4338CA;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* TABLE — fixed width equal to the exact sum of the declared column widths
+   below (110+70+60+270+75+75+75+85+85+130 = 1035px). Using width:100% here
+   with table-layout:fixed would make the browser proportionally stretch
+   every column to fill the container, drifting the real Debit/Credit
+   position away from the totals row above, which uses these same px values. */
+.br-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  table-layout: fixed;
+  margin-bottom: 0;
+}
+
+/* HEADER */
+.br-table thead th {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6B7280;
+  padding: 7px 8px;
+  border-bottom: 0.5px solid #E5E7EB;
+  text-align: left;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #F9FAFB;
+}
+
+/* BODY */
+.br-table tbody td {
+  padding: 6px 8px;
+  border-bottom: 0.5px solid #F3F4F6;
+  color: #111827;
+  vertical-align: middle;
+  font-size: 11px;
+  overflow: visible;
+}
+
+/* PARTY NAME */
+/* .br-party-name {
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.2;
+  max-width: 220px;
+  word-break: break-word;
+} */
+
+/* PARTY REF */
+/* .br-party-ref {
+  font-size: 9px;
+  color: #6B7280;
+  margin-top: 1px;
+  line-height: 1.2;
+} */
+
+/* MONO TEXT */
+.br-table .mono {
+  font-size: 10px;
+  color: #6B7280;
+}
+
+/* DATE PICKER COLUMN */
+.br-table td:last-child,
+.br-table th:last-child {
+  min-width: 130px;
+  width: 130px;
+}
+.br-table td,
+.br-table th{
+    vertical-align:middle;
+}
+/* DATE PICKER */
+.br-datepicker--inline {
+  min-width: 120px;
+  width: 120px;
+  font-size: 10px;
+}
+
+/* DATE PICKER INPUT */
+.br-datepicker--inline input {
+  height: 28px !important;
+  font-size: 10px !important;
+  padding: 2px 6px !important;
+}
+
+/* BADGES */
+.br-badge {
+  display: inline-flex;
+  padding: 1px 6px;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* DEBIT CREDIT */
+.dr-amt,
+.cr-amt {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* CHECKBOX COLUMN */
+/* .br-table td:first-child,
+.br-table th:first-child {
+  width: 50px;
+  text-align: center;
+} */
+
+/* ENTRY COLUMN */
+/* .br-table td:nth-child(2),
+.br-table th:nth-child(2) {
+  min-width: 90px;
+} */
+ /* 1. ENTRY NO COLUMN (Now the 1st column) */
+/* .br-table td:first-child,
+.br-table th:first-child {
+  min-width: 160px; 
+  width: 160px;
+  white-space: nowrap; 
+  text-align: left;
+} */
+
+/* 2. DATE COLUMN (Now the 2nd column) */
+/* .br-table td:nth-child(2),
+.br-table th:nth-child(2) {
+  min-width: 75px;
+  width: 75px;
+  white-space: nowrap;
+} */
+
+/* 3. TYPE COLUMN (Now the 3rd column) */
+/* .br-table td:nth-child(3),
+.br-table th:nth-child(3) {
+  min-width: 50px;
+  width: 50px;
+  text-align: center;
+} */
+
+/* 4. PARTY / REFERENCE COLUMN (Now the 4th column) */
+/* .br-table td:nth-child(4),
+.br-table th:nth-child(4) {
+  min-width: 300px;
+  width: 300px;
+  max-width: 300px;
+} */
+
+/* 10. CLEARANCE DATE (Still the last column, handled automatically) */
+/* .br-table td:last-child,
+.br-table th:last-child {
+  min-width: 130px;
+  width: 130px;
+} */
+/* Checkbox column removed — table is now 10 columns, no per-row selection */
+
+/* 1. ENTRY NO */
+.br-table th:nth-child(1), .br-table td:nth-child(1) {
+  width: 110px;
+}
+
+/* 2. DATE */
+.br-table th:nth-child(2), .br-table td:nth-child(2) {
+  width: 70px;
+  text-align: center;
+}
+
+/* 3. TYPE */
+.br-table th:nth-child(3), .br-table td:nth-child(3) {
+  width: 60px;
+  text-align: left;
+}
+
+/* 4. PARTY / REF */
+.br-table th:nth-child(4), .br-table td:nth-child(4) {
+  width: 270px;
+  white-space: normal; /* Let the name stack on multiple lines */
+}
+
+/* 5. CHQ TYPE */
+.br-table th:nth-child(5), .br-table td:nth-child(5) {
+  width: 75px;
+  text-align: center;
+}
+
+/* 6. CHEQUE NO */
+.br-table th:nth-child(6), .br-table td:nth-child(6) {
+  width: 75px;
+  text-align: center;
+}
+
+/* 7. CHEQUE DATE */
+.br-table th:nth-child(7), .br-table td:nth-child(7) {
+  width: 75px;
+  text-align: center;
+}
+
+/* 8. DEBIT */
+.br-table th:nth-child(8), .br-table td:nth-child(8) {
+  width: 85px;
+  text-align: right;
+  padding-right: 12px !important;
+}
+
+/* 9. CREDIT */
+.br-table th:nth-child(9), .br-table td:nth-child(9) {
+  width: 85px;
+  text-align: right;
+  padding-right: 12px !important;
+}
+
+/* 10. CLEARANCE DATE */
+.br-table th:nth-child(10), .br-table td:nth-child(10) {
+  width: 130px;
+  overflow: visible !important; /* Required so calendar pop-up escapes cell */
+}
+/* No responsive min-width override needed — .br-table is now a fixed
+   1035px, and .br-table-wrap's overflow:auto scrolls it horizontally
+   whenever the container is narrower than that. */
+
+/* ============================= */
+/* TEXT */
+/* ============================= */
+
+/* .br-party-name {
+  font-weight: 600;
+} */
+
+.br-party-ref {
+  /* margin-top: 3px;
+  font-size: 11px;
+  color: #64748B; */
+    font-size: 9px;
+  line-height: 10px;
+  max-height: 20px;
+  margin-top: 1px;
+}
+
+.mono {
+  font-family: monospace;
+  color: #64748B;
+}
+
+.dr-amt {
+  color: #DC2626;
+  font-weight: 700;
+}
+
+.cr-amt {
+  color: #059669;
+  font-weight: 700;
+}
+
+.muted {
+  color: #CBD5E1;
+}
+
+/* ============================= */
+/* ACTION BAR */
+/* ============================= */
+
+.br-action-bar {
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.95);
+  border-top: 1px solid #E5E7EB;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ✅ Push reset + submit to right side */
+.br-action-bar .br-btn--ghost {
+  margin-left: auto;  /* ← pushes everything after it to the right */
+}
+.br-diff-pill {
+  margin-right: auto;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.br-diff-pill.ok {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+.br-diff-pill.warn {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+/* ============================= */
+/* RESPONSIVE */
+/* ============================= */
+
+@media (max-width: 992px) {
+
+  .br-filter-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .br-summary-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .br-filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .br-summary-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .br-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .br-action-bar {
+    flex-wrap: wrap;
+  }
+
+}
+
+/* REMOVE OUTER BOX OF DATE PICKER */
+.br-datepicker--inline,
+.br-datepicker--inline .mydp,
+.br-datepicker--inline .mydp input,
+.br-datepicker--inline .selectiongroup {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* DATE PICKER INPUT */
+.br-datepicker--inline input {
+  height: 22px !important;
+  min-height: 22px !important;
+  padding: 0 4px !important;
+  font-size: 10px !important;
+  border: 1px solid #D1D5DB !important;
+  border-radius: 4px !important;
+  background: #fff !important;
+}
+
+/* REMOVE EXTRA CONTAINER SPACE */
+.br-datepicker--inline .mydp {
+  width: 110px !important;
+}
+
+/* REMOVE FORM CONTROL STYLE */
+.br-datepicker.form-control,
+.br-datepicker--inline.form-control {
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  height: auto !important;
+}
+
+/* CALENDAR BUTTON */
+.br-datepicker--inline .btnpicker {
+  height: 24px !important;
+  min-height: 24px !important;
+  border: 1px solid #D1D5DB !important;
+  border-left: none !important;
+  border-radius: 0 4px 4px 0 !important;
+  background: #F9FAFB !important;
+}
+
+/* CLEAR (✕) BUTTON — undo a wrongly-typed clearance date without a checkbox */
+.br-datepicker--inline .btnclear {
+  height: 24px !important;
+  min-height: 24px !important;
+  width: 18px !important;
+  min-width: 18px !important;
+  border: 1px solid #D1D5DB !important;
+  border-left: none !important;
+  border-right: none !important;
+  background: #FEF2F2 !important;
+  color: #DC2626 !important;
+}
+
+.br-datepicker--inline .btnclear:hover {
+  background: #FEE2E2 !important;
+}
+
+.br-datepicker--inline .btnclear span,
+.br-datepicker--inline .btnclear i {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  font-size: 11px !important;
+  line-height: 1 !important;
+  color: #DC2626 !important;
+}
+
+/* SMALLER TABLE ROW */
+.br-table tbody td {
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+  line-height: 1 !important;
+}
+.br-table th {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.br-party-name{
+    font-size:10px;
+    line-height:11px;
+    max-height:24px;
+    overflow:hidden;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    word-break:break-word;
+}
+
+/* SECOND LINE */
+.br-party-ref{
+    font-size:9px;
+    line-height:10px;
+    color:#6B7280;
+
+    max-height:24px;
+    overflow:hidden;
+
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+
+    word-break:break-word;
+}
+/* .br-table td:nth-child(5),
+.br-table th:nth-child(5){
+    width:220px;
+    max-width:220px;
+} */
+
+::ng-deep .br-datepicker--inline .selector {
+    background: #ffffff !important;
+    border: 1px solid #D1D5DB !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
+    z-index: 9999 !important;
+    position: absolute !important;
+}
+.search-card-clean {
+  padding: 12px 18px !important;
+  margin-bottom: 10px !important;
+}
+
+/* 1. The Flex Container (Forces one line) */
+/* =========================================
+   SEARCH ROW LAYOUT
+========================================= */
+
+.clean-row-layout{
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
+  flex-wrap:nowrap;
+  width:100%;
+}
+
+/* =========================================
+   COMMON FIELD
+========================================= */
+
+.clean-field{
+  display:flex;
+  flex-direction:column;
+}
+
+.clean-field label{
+  font-size:11px;
+  font-weight:600;
+  margin-bottom:4px;
+  white-space:nowrap;
+}
+
+/* =========================================
+   BANK FIELD
+========================================= */
+
+.clean-bank{
+  flex:1 1 auto;
+  min-width:250px;
+}
+
+/* =========================================
+   DATE FIELD
+========================================= */
+
+.clean-date{
+  flex:0 0 135px;
+  width:135px;
+  min-width:135px;
+}
+
+/* =========================================
+   ACTION BUTTONS
+========================================= */
+
+.clean-actions{
+  display:flex;
+  gap:8px;
+  align-items:flex-end;
+  margin-bottom:1px;
+  white-space:nowrap;
+}
+
+.clean-actions .br-btn{
+  height:32px !important;
+  padding:0 14px !important;
+  font-size:12px !important;
+}
+
+/* =========================================
+   NG-SELECT
+========================================= */
+
+.clean-bank ::ng-deep .ng-select-container{
+  height:32px !important;
+  min-height:32px !important;
+  border-radius:4px !important;
+  border:1px solid #ced4da !important;
+  box-shadow:none !important;
+}
+
+.clean-bank ::ng-deep .ng-value-container{
+  height:30px !important;
+  display:flex !important;
+  align-items:center !important;
+  padding-left:8px !important;
+  font-size:13px !important;
+}
+
+/* =========================================
+   DATE PICKER
+========================================= */
+
+::ng-deep .search-date-control .mydp{
+  width:135px !important;
+  min-width:135px !important;
+  display:block !important;
+}
+
+/* Main wrapper */
+::ng-deep .search-date-control .selectiongroup{
+  height:30px !important;
+  border:1px solid #ced4da !important;
+  border-radius:4px !important;
+  background:#fff !important;
+  overflow:visible !important;
+}
+
+/* Input */
+::ng-deep .search-date-control input{
+  height:30px !important;
+  line-height:30px !important;
+  border:none !important;
+  outline:none !important;
+  box-shadow:none !important;
+  font-size:12px !important;
+  padding-left:6px !important;
+  background:transparent !important;
+}
+
+/* Calendar + clear buttons */
+::ng-deep .search-date-control .btnpicker,
+::ng-deep .search-date-control .btnclear{
+  width:24px !important;
+  min-width:24px !important;
+  height:30px !important;
+  padding:0 !important;
+  border:none !important;
+  background:#f8fafc !important;
+}
+
+/* Force icon visibility */
+::ng-deep .search-date-control .btnpicker span,
+::ng-deep .search-date-control .btnclear span,
+::ng-deep .search-date-control .btnpicker i,
+::ng-deep .search-date-control .btnclear i{
+  display:inline-block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  font-size:13px !important;
+  line-height:1 !important;
+}
+

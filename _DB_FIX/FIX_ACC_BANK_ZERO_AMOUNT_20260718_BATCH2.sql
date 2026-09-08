@@ -1,0 +1,112 @@
+USE [LinksDB20]
+GO
+
+/*
+	Purpose : Audit correction - these 34 ENTRYNO records were recorded in the
+			  ERP as bank payments but the accounts team confirmed (during bank
+			  reconciliation) the transactions never actually happened at the
+			  bank. Zeroing the amount fields per accountant instruction:
+				ACC_BANK.ACTUALAMOUNT     -> 0
+				ACC_BANKDTLS.AMOUNT       -> 0
+				ACC_BANKDTLS.DEDUCTION    -> 0
+			  NARRATION is prefixed with a VOID marker so the reason survives
+			  in the record itself (schema has no ISVOID/status column today).
+	Backs up the current values into BACKUP_* tables before updating, so the
+	change can be reversed if needed (see rollback block at the bottom).
+*/
+
+DECLARE @EntryNos TABLE (ENTRYNO VARCHAR(15) PRIMARY KEY)
+INSERT INTO @EntryNos (ENTRYNO)
+VALUES
+('301102504012002'),
+('301102504012003'),
+('301102504012007'),
+('301102504012008'),
+('301102504012009'),
+('301102504012010'),
+('301102504012012'),
+('301102504012013'),
+('301102504012014'),
+('301102504012015'),
+('301102504012016'),
+('301102504012017'),
+('301102504012018'),
+('301102504012019'),
+('301102504012020'),
+('301102504012021'),
+('301102504012022'),
+('301102504012023'),
+('301102504012024'),
+('301102504012025'),
+('301102504012026'),
+('301102504012028'),
+('301102504012029'),
+('301102504012030'),
+('301102504012031'),
+('301102504012032'),
+('301102504012034'),
+('301102504012036'),
+('301102504012037'),
+('301102504012038'),
+('301102504012039'),
+('301102504012040'),
+('301102504012042'),
+('301102504012047')
+
+-- === Backup current values before touching anything ===
+IF OBJECT_ID('dbo.BACKUP_ACC_BANK_ZERO_20260718_B2') IS NOT NULL DROP TABLE dbo.BACKUP_ACC_BANK_ZERO_20260718_B2
+IF OBJECT_ID('dbo.BACKUP_ACC_BANKDTLS_ZERO_20260718_B2') IS NOT NULL DROP TABLE dbo.BACKUP_ACC_BANKDTLS_ZERO_20260718_B2
+
+SELECT	ID, ENTRYNO, ACTUALAMOUNT, NARRATION, GETDATE() AS BACKED_UP_ON
+INTO	dbo.BACKUP_ACC_BANK_ZERO_20260718_B2
+FROM	ACC_BANK
+WHERE	ENTRYNO IN (SELECT ENTRYNO FROM @EntryNos)
+
+SELECT	ID, ENTRYNO, AMOUNT, DEDUCTION, GETDATE() AS BACKED_UP_ON
+INTO	dbo.BACKUP_ACC_BANKDTLS_ZERO_20260718_B2
+FROM	ACC_BANKDTLS
+WHERE	ENTRYNO IN (SELECT ENTRYNO FROM @EntryNos)
+
+DECLARE @BankBackupCount INT, @DtlsBackupCount INT
+SELECT @BankBackupCount = COUNT(*) FROM dbo.BACKUP_ACC_BANK_ZERO_20260718_B2
+SELECT @DtlsBackupCount = COUNT(*) FROM dbo.BACKUP_ACC_BANKDTLS_ZERO_20260718_B2
+
+PRINT 'Backed up ' + CONVERT(VARCHAR, @BankBackupCount) + ' ACC_BANK row(s) and '
+	+ CONVERT(VARCHAR, @DtlsBackupCount) + ' ACC_BANKDTLS row(s).'
+
+-- === Apply the fix ===
+BEGIN TRANSACTION
+
+-- NARRATION is NVARCHAR(120) -- LEFT(...,120) guarantees the marker + original text never overflows
+UPDATE	ACC_BANK
+SET		ACTUALAMOUNT = 0,
+		NARRATION = LEFT('[VOID-BANK] ' + NARRATION, 120)
+WHERE	ENTRYNO IN (SELECT ENTRYNO FROM @EntryNos)
+
+PRINT CONVERT(VARCHAR, @@ROWCOUNT) + ' row(s) updated in ACC_BANK.'
+
+UPDATE	ACC_BANKDTLS
+SET		AMOUNT = 0,
+		DEDUCTION = 0
+WHERE	ENTRYNO IN (SELECT ENTRYNO FROM @EntryNos)
+
+PRINT CONVERT(VARCHAR, @@ROWCOUNT) + ' row(s) updated in ACC_BANKDTLS.'
+
+COMMIT TRANSACTION
+GO
+
+/*
+	=== ROLLBACK (run this block only, if the fix above needs to be reversed) ===
+
+	UPDATE b
+	SET    b.ACTUALAMOUNT = bak.ACTUALAMOUNT,
+		   b.NARRATION = bak.NARRATION
+	FROM   ACC_BANK b
+	JOIN   dbo.BACKUP_ACC_BANK_ZERO_20260718_B2 bak ON bak.ID = b.ID
+
+	UPDATE d
+	SET    d.AMOUNT = bak.AMOUNT,
+		   d.DEDUCTION = bak.DEDUCTION
+	FROM   ACC_BANKDTLS d
+	JOIN   dbo.BACKUP_ACC_BANKDTLS_ZERO_20260718_B2 bak ON bak.ID = d.ID
+*/

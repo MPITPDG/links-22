@@ -1,0 +1,1782 @@
+<div class="animated fadeIn">
+    <div class="row">
+
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>{{FormHeader}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-1">
+        </div>
+        <div class="col-sm-10">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr class="trbg">
+                    <td colspan="12">
+                        <span class="col-form-span-label">
+                            <b>IMPORT DETAILS &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Note:-
+                            </b>
+                            <span class="col-form-span-error">*</span> Mark fields are mandatory.)
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td  class="col-form-span-label" colspan="2"></td>
+                    <td  class="col-form-span-label bgyellow" colspan="10">
+                        <input type="checkbox" class="col-form-span-label"  name="ExWork" [(ngModel)]="EXWORKS" (ngModelChange)="onTypeChange('E')">
+                        EX-WORKS&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" class="col-form-span-label"  name="CustomClr" [(ngModel)]="CUSTOMCLR" (ngModelChange)="onTypeChange('C')">
+                        CUSTOMS CLEARANCE&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" class="col-form-span-label"  name="Freightfrd" [(ngModel)]="FREIGHTFRD" (ngModelChange)="onTypeChange('F')">
+                        FREIGHT FORWARDING  
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="width160">
+                        <span class="col-form-span-label">Importer
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td colspan="10">
+                        <ng-select [items]="ImporterList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="Importer"
+                            class="form-control" (ngModelChange)="BillTo=Importer">
+                        </ng-select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <span class="col-form-span-label">Bill To</span>
+                    </td>
+                    <td colspan="10">
+                        <ng-select [items]="BillToList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="BillTo"
+                            class="form-control">
+                        </ng-select>
+                    </td>
+                </tr>
+                  <tr>
+                    <td colspan="2">
+                        <span class="col-form-span-label">Business Associate</span>
+                        <span class="col-form-span-error">*</span>
+                    </td>
+                    <td colspan="10">
+                        <ng-select [items]="BusinessAssociateList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--"
+                            [(ngModel)]="BusinessAssociate" class="form-control">
+                        </ng-select>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr class="trheader">
+                    <td colspan="4">
+                        <span class="col-form-span-label">
+                            <b>SHIPMENT DETAILS</b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td   class="width160">
+                        <span class="col-form-span-label">Party Ref. No.</span>
+                    </td>
+                    <td colspan="2">
+                        <input type="text" [(ngModel)]="PartyRefNo" class="form-control" />
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan=5>
+                        <table class="table table-bordered table-sm-new bgwhite">
+                            <tr >
+                                <td colspan="12">
+                                    <span class="col-form-span-label">
+                                        <b>DATE OF RECEIPT OF DOCUMENT DETAILS</b>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <span class="col-form-span-label">Date of Receipt Of Documents</span>
+                                </td>
+                                <td colspan="8">
+                                    <span class="col-form-span-label">Remarks</span>
+                                </td>
+                                <td colspan="2">
+                                    <span class="col-form-span-label">&nbsp;</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <my-date-picker name="RODDate" [options]="myDatePickerOptions" [(ngModel)]="RODDate"></my-date-picker>
+                                </td>
+                                <td colspan="8">
+                                    <input type="text" [(ngModel)]="RODRemark" class="form-control" />
+                                </td>
+                                <td colspan="2">
+                                    <button class="btn btn-sm btn-success" (click)="fnAddEdit_DateOfROD_Dtls(0,'A', RODdtID, '', '')">
+                                        <span class="col-form-span-label">
+                                            <i class="fa fa-plus"></i>
+                                        </span>
+                                    </button>&nbsp;
+                                    <button class="btn btn-sm btn-danger" (click)="RODdtID=0;RODDate=null;RODRemark=''">
+                                        <span class="col-form-span-label">
+                                            <i class="fa fa-undo"></i>
+                                        </span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="table table-bordered table-sm-new bgwhite">
+                            <thead class="trbg">
+                                <th class="width50">
+                                    <span class="col-form-span-label"></span>
+                                </th>
+                                <th class="width220">
+                                    <span class="col-form-span-label">Date Of Receipt of Document</span>
+                                </th>
+                                <th colspan="10">
+                                    <span class="col-form-span-label">Remarks</span>
+                                </th>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let obj of dtDATEOFROD; let i =index;">
+                                    <td class="width50">
+                                        <i class="fa fa-pencil-square-o" (click)="fnAddEdit_DateOfROD_Dtls(i,'P', obj.pk_tblIndex, obj.DateOfRODdt, obj.DateOfRODremark)"></i>&nbsp;&nbsp;
+                                        <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_DateOfROD_Dtls(i,'D', obj.pk_tblIndex, obj.DateOfRODdt, obj.DateOfRODremark)"></i>
+                                    </td>
+                                    <td>
+                                        <span class="col-form-span-label">{{obj.DateOfRODdt}}</span>
+                                    </td>
+                                    <td colspan="10">
+                                        <span class="col-form-span-label">{{obj.DateOfRODremark}}</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Description of Goods
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td colspan="4">
+                        <input type="text" class="form-control" name="DescriptionGoods" [(ngModel)]="DescriptionGoods" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">No. of Packages
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="NoOfPackages1" [(ngModel)]="NoOfPackages1" [OnlyNumber]="true" />
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Type of Packages
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td colspan="2">
+                        <ng-select [items]="TypeOfPackage2List" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="TypeOfPackage2"
+                            class="form-control">
+                        </ng-select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width160">
+                        <span class="col-form-span-label">Gross Weight Kgs
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="GrossWeight" [(ngModel)]="GrossWeight" [OnlyNumber]="true" />
+                    </td>
+                    <td class="width160">
+                        <span class="col-form-span-label">Net Weight Kgs</span>
+                    </td>
+                    <td colspan="2">
+                        <input type="text" class="form-control" name="NetWeight" [(ngModel)]="NetWeight" [OnlyNumber]="true" />
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td width="150px">
+                        <span class="col-form-span-label">Container number</span>
+                    </td>
+                    <td colspan="2">
+                        <span class="col-form-span-label">Container Size \ Type</span>
+                    </td>
+                    <td width="130px">
+                        <span class="col-form-span-label">No Of Packages</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">&nbsp;</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="150px">
+                        <input type="text" class="form-control" [(ngModel)]="ContNo" [maxlength]="11" />
+                    </td>
+                    <td width="60px">
+                        <ng-select [items]="ContLengthList" bindLabel="length" bindValue="length" placeholder="--" [(ngModel)]="ContLength" class="form-control width60"
+                            (ngModelChange)="changeDrpContainerSize(ContType)">
+                        </ng-select>
+                    </td>
+                    <td width="300px">
+                        <ng-select [items]="ContTypeList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="ContType"
+                            class="form-control">
+                        </ng-select>
+                    </td>
+                    <td width="130px">
+                        <input type="text" class="form-control" [(ngModel)]="ContNoOfPackage" [maxlength]="14" [OnlyNumber]="true" />
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-success" (click)="fnAddEdit_Good_Dtls(0,'A', ContId, '', '', '', '')">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-plus"></i>
+                            </span>
+                        </button>&nbsp;
+                        <button class="btn btn-sm btn-danger" (click)="resetGood_Dtls()">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-undo"></i>
+                            </span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead class="trbg">
+                    <th class="width50">
+                        <span class="col-form-span-label"></span>
+                    </th>
+                    <th>
+                        <span class="col-form-span-label">Container No</span>
+                    </th>
+                    <th>
+                        <span class="col-form-span-label">Container Size \ Type</span>
+                    </th>
+                    <th>
+                        <span class="col-form-span-label">No Of Packages</span>
+                    </th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let obj of dtGOOD; let i =index;">
+                        <td class="width50">
+                            <i class="fa fa-pencil-square-o" (click)="fnAddEdit_Good_Dtls(i,'P', obj.pk_tblIndex, obj.ContainerNumber, obj.ContLength, obj.ContType, obj.NoOfPackages)"></i>&nbsp;&nbsp;
+                            <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_Good_Dtls(i,'D', obj.pk_tblIndex, obj.ContainerNumber,'','','')"></i>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.ContainerNumber}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.ContLength + ' ' + obj.ContainerSize}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.NoOfPackages}}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr class="trheader">
+                    <td colspan="12">
+                    <span class="col-form-span-label">
+                        <b>Vessel Details</b>
+                    </span>
+                        <!-- <div class="form-check form-check-inline"  style="display: flex;">
+                              <span class="col-form-span-label"><b>Direct Vessel</b></span>
+                              <input type="radio" name="DirectVessel" [(ngModel)]="DirectVessel" value="YES" (ngModelChange)="(VesselName==null)?TranshipmentVessel=null:TranshipmentVessel=VesselName;"
+                              /><b>Yes</b>&ngsp;&nbsp;
+                        <span class="col-form-span-label">
+                            <b>Vessel Details</b>
+                        </span>
+                        </div> -->
+                      
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <span class="col-form-span-label">Vessel Name
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td colspan="2">
+                        <!-- <ng-select [items]="VesselNameList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="VesselName"
+                            class="form-control" (ngModelChange)="changeVesselName()">
+                        </ng-select> -->
+                        <input type="text" class="form-control"   [(ngModel)]="VesselName"  />
+                        
+                    </td>
+                    <td colspan="2">
+                        <span class="col-form-span-label">Vessel VoyNo.
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td colspan="4">
+                        
+                        <input type="text" class="form-control"   [(ngModel)]="voyno"  />
+                        
+                    </td>
+
+
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <span class="col-form-span-label">Liner Agent</span>
+                    </td>
+                    <td colspan="2">
+                        <ng-select [items]="AgentList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="LinerAgent"
+                            class="form-control">
+                        </ng-select> 
+
+                        <!-- <input type="text" class="form-control"   [(ngModel)]="LinerAgent"  /> -->
+                    </td>
+                    <td colspan="2">
+                        <span class="col-form-span-label">IGM No/date</span>
+                    </td>
+                    <td colspan="2">
+                        <input type="text" class="form-control"   [(ngModel)]="IGMNo"  />
+                    </td>
+                    <td>
+                        <my-date-picker name="IGMdt" [options]="myDatePickerOptions" [(ngModel)]="IGMdt"></my-date-picker>
+                    </td>
+                   
+                </tr>
+              
+                <!---->
+                 
+                <!-- <tr class="trheader">
+                    <td colspan="12">
+                        <span class="col-form-span-label">
+                            <b>Transhipment</b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="width160">
+                        <span class="col-form-span-label">Transhipment Vessel</span>
+                    </td>
+                    <td colspan="10">
+                        <ng-select [items]="TranshipmentVesselList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--"
+                            [(ngModel)]="TranshipmentVessel" class="form-control" [disabled]="DirectVessel=='YES'" (ngModelChange)="changeTranVesselName()">
+                        </ng-select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="width160">
+                        <span class="col-form-span-label">Transhipment Port</span>
+                    </td>
+                    <td colspan="10">
+                        <ng-select [items]="TranshipmentPortList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="TranshipmentPort"
+                            class="form-control" [disabled]="DirectVessel=='YES'">
+                        </ng-select>
+                    </td>
+                </tr> -->
+                <tr>
+                    <td colspan="12">
+                        <span class="col-form-span-label">
+                            <b>Arrival Details </b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td  class="width160">
+                        <span class="col-form-span-label">POL </span>
+                    </td>
+                    <td colspan="2" >
+                        <!-- <input type="text" class="form-control"   [(ngModel)]="ArrivalPort"  /> -->
+                        <select class="form-control width150"  [(ngModel)]="ArrivalPort"  >
+                            <option value="">Please select</option>
+                            <option *ngFor="let d of Arrivalportlist" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+                        </select>
+                    </td>
+                    <td   class="width160">
+                        <span class="col-form-span-label">Arrival Port (POD) </span>
+                    </td>
+                    <td colspan="2" >
+                      <input type="text" class="form-control"   [(ngModel)]="ArrivalPortPOD"  /> 
+                        <!-- <select class="form-control width150"  [(ngModel)]="ArrivalPortPOD"  >
+                            <option value="">Please select</option>
+                            <option *ngFor="let d of ShipmentPortList" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+                        </select> -->
+                        <!-- <span class="col-form-span-label">{{ArrivalPort}}</span> -->
+                    </td>
+                    <td   class="width160">
+                        <span class="col-form-span-label">Terminal</span>
+                    </td>
+                    <td colspan="3"  >
+                        <input type="text" class="form-control"   [(ngModel)]="ShedNo"  />
+                        <!-- <span class="col-form-span-label">{{ShedNo}}</span> -->
+                    </td>
+                <tr>
+                   
+                   
+                </tr>
+                <tr>
+                    <td  class="width160">
+                        <span class="col-form-span-label">Expected Arrival Date</span>
+                    </td>
+                    <td colspan="2">
+                        <my-date-picker name="ExpectedArrDate" [options]="myDatePickerOptions" [(ngModel)]="ExpectedArrDate"></my-date-picker>
+                        <!-- <span class="col-form-span-label">{{ExpectedArrDate}}</span> -->
+                    </td>
+                    <td   class="width160">
+                        <span class="col-form-span-label">Actual Arrival Date</span>
+                    </td>
+                    <td colspan="2">
+                        <my-date-picker name="ActualArrDate" [options]="myDatePickerOptions" [(ngModel)]="ActualArrDate" (ngModelChange)="OnChangeArrivalDt(ActualArrDate)"></my-date-picker>
+                        <!-- <span class="col-form-span-label">{{ActualArrDate}}</span> -->
+                    </td>
+                    <td  class="width160">
+                        <span class="col-form-span-label">Last Free Date</span>
+                    </td>
+                    <td colspan="3">
+                        <!-- <my-date-picker name="LastDate" [options]="myDatePickerOptions" [(ngModel)]="LastDate"></my-date-picker> -->
+                        <input type="text" class="form-control"   [(ngModel)]="LastDate" [disabled]="true"  />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="12">
+                        <span class="col-form-span-label">
+                            <b>Arriving Details</b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td   class="width160">
+                        <span class="col-form-span-label">Arriving Date at ICD</span>
+                    </td>
+                    <td colspan="2">
+                        <span class="col-form-span-label" style="display: -webkit-flex">
+                            <my-date-picker name="ArrivingICD" [options]="myDatePickerOptions" [(ngModel)]="ArrivingICD"></my-date-picker>(Internal Container Depot)</span>
+                        
+                    </td>
+                    <td   class="width160">
+                        <span class="col-form-span-label">Final Destination Port</span>
+                    </td>
+                    <td colspan="2"  >
+                        <select class="form-control width150"  [(ngModel)]="Finaldest"  >
+                            <option value="">Please select</option>
+                            <option *ngFor="let d of ShipmentPortList" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+                        </select>
+                    </td>
+                    <td   class="width160">
+                        <span class="col-form-span-label">Arrival Date at Final Destination</span>
+                    </td>
+                    <td colspan="2">
+                        <my-date-picker name="dtfinaldest" [options]="myDatePickerOptions" [(ngModel)]="dtfinaldest"></my-date-picker>
+                        <!-- <span class="col-form-span-label">{{ActualArrDate}}</span> -->
+                    </td>
+                </tr>
+                <tr class="trheader">
+                    <td colspan="12">
+                        <span class="col-form-span-label">
+                            <b>PORT DETAILS</b>
+                        </span>
+                    </td>
+                </tr>
+                <!-- <tr>
+                    <td colspan="3" class="width160">
+                        <span class="col-form-span-label">Bank Ref. No.</span>
+                    </td>
+                    <td colspan="3">
+                        <input type="text" [(ngModel)]="BankRefNo" class="form-control" />
+                    </td>
+                   
+                </tr> -->
+               <!--  <tr>
+                    <td colspan="3" class="width160">
+                        <span class="col-form-span-label">G.L.Date</span>
+                    </td>
+                    <td colspan="3">
+                        <my-date-picker name="GLDate" [options]="myDatePickerOptions" [(ngModel)]="GLDate"></my-date-picker>
+                    </td> 
+                    <td></td>
+                    <td></td>
+                  
+                </tr>-->
+                <tr>
+                    <td colspan="2">
+                        <span class="col-form-span-label">Port of Shipment
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td colspan="4">
+                        <ng-select [items]="ShipmentPortList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="ShipmentPort"
+                            class="form-control">
+                        </ng-select>
+                    </td>
+                    <td colspan="2"></td>
+                    <td colspan="4"></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <span class="col-form-span-label">MBL No.</span>
+                    </td>
+                    <td colspan="4">
+                        <input type="text" class="form-control" name="MblNo" [(ngModel)]="MblNo" />
+                    </td>
+                    <td colspan="2">
+                        <span class="col-form-span-label">MBL Date</span>
+                    </td>
+                    <td colspan="4">
+                        <my-date-picker name="MblDate" [options]="myDatePickerOptions" [(ngModel)]="MblDate"></my-date-picker>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <span class="col-form-span-label">HBL No.</span>
+                    </td>
+                    <td colspan="4">
+                        <input type="text" class="form-control" name="HblNo" [(ngModel)]="HblNo" />
+                    </td>
+                    <td colspan="2">
+                        <span class="col-form-span-label">HBL Date</span>
+                    </td>
+                    <td colspan="4">
+                        <my-date-picker name="HblDate" [options]="myDatePickerOptions" [(ngModel)]="HblDate"></my-date-picker>
+                    </td>
+                </tr> 
+                <!-- <tr class="trbg">
+                    <td colspan="12">
+                        <span class="col-form-span-label">
+                            <b>
+                                <input type="checkbox" [(ngModel)]="DocumentCancel" />&nbsp;DOCUMENT CANCELLED</b>
+                        </span>
+                    </td>
+                </tr> -->
+            </table>
+
+          
+           
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr class="trheader">
+                    <td colspan="12">
+                        <span class="col-form-span-label">
+                            <b>DOCUMENT CALL FOR</b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <span class="col-form-span-label">Document Name</span>
+                    </td>
+                    <td colspan="8">
+                        <span class="col-form-span-label">Received On</span>
+                    </td>
+                    <td colspan="2">
+                        <span class="col-form-span-label">&nbsp;</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="text" [(ngModel)]="DocumentName" class="form-control" />
+                    </td>
+                    <td colspan="8">
+                        <my-date-picker name="DocumentRecOn" [options]="myDatePickerOptions" [(ngModel)]="DocumentRecOn"></my-date-picker>
+                    </td>
+                    <td colspan="2">
+                        <button class="btn btn-sm btn-success" (click)="fnAddEdit_DocCallForUs_Dtls(0,'A', DocCallForUsID, '', '')">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-plus"></i>
+                            </span>
+                        </button>&nbsp;
+                        <button class="btn btn-sm btn-danger" (click)="DocCallForUsID=0;DocumentRecOn=null;DocumentName=''">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-undo"></i>
+                            </span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead class="trbg">
+                    <th class="width50">
+                        <span class="col-form-span-label"></span>
+                    </th>
+                    <th colspan="9">
+                        <span class="col-form-span-label">Document Name</span>
+                    </th>
+                    <th class="width160">
+                        <span class="col-form-span-label">Recevied On</span>
+                    </th>
+                    <th class="width200">
+                        <span class="col-form-span-label">Acknowledged On</span>
+                    </th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let obj of dtCALLFORUS; let i =index;">
+                        <td class="width50">
+                            <i class="fa fa-pencil-square-o" (click)="fnAddEdit_DocCallForUs_Dtls(i,'P', obj.pk_tblIndex, obj.DocName, obj.ReceivedOn)"></i>&nbsp;&nbsp;
+                            <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_DocCallForUs_Dtls(i,'D', obj.pk_tblIndex, obj.DocName, '')"></i>
+                        </td>
+                        <td colspan="9">
+                            <span class="col-form-span-label">{{obj.DocName}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.ReceivedOn}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.AcknowledgedOn}}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr class="trheader">
+                    <td colspan="4">
+                        <span class="col-form-span-label">
+                            <b>DOCUMENT SUBMITTED TO CUSTOMS</b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Bill of Entry Type</span>
+                    </td>
+                    <td colspan="3">
+                        <ng-select [items]="BillOfEntryNoList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="BillOfEntry"
+                            class="form-control width120">
+                        </ng-select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Online Submission Date</span>
+                    </td>
+                    <td>
+                        <my-date-picker name="onlinesuubDt" [options]="myDatePickerOptions" [(ngModel)]="onlinesuubDt"></my-date-picker>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label"> Online Submission By</span>
+                    </td>
+                    <td>
+                        <select class="form-control width150"  [(ngModel)]="submissionBy"  >
+                            <option value="0">Please select</option>
+                            <option *ngFor="let d of userdtls" value={{d.CMPID}}>{{d.fullname}}</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Bill of Entry No.</span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="BillOfEntryNo" />
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Bill of Entry Date</span>
+                    </td>
+                    <td>
+                        <my-date-picker name="BillOfEntryDate" [options]="myDatePickerOptions" [(ngModel)]="BillOfEntryDate"></my-date-picker>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Remark</span>
+                    </td>
+                    <td colspan="3">
+                        <input type="text" class="form-control" [(ngModel)]="BillOfEntryRemark" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Assessment Date</span>
+                    </td>
+                    <td>
+                        <my-date-picker name="AssessmentDate" [options]="myDatePickerOptions" [(ngModel)]="AssessmentDate"></my-date-picker>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Remark</span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="AssessmentRemark" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Duty Amount</span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="dutyamt" [OnlyNumber]="true" />
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Stamp Duty Amount</span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="StampDutyAmt" [OnlyNumber]="true" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="4">
+                        <span class="col-form-span-label">
+                            <b>Other Document Submitted</b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Document Name</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Submitted On</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Remark</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">&nbsp;</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="CustomDocumentName" />
+                    </td>
+                    <td>
+                        <my-date-picker name="CustomSubmittedOn" [options]="myDatePickerOptions" [(ngModel)]="CustomSubmittedOn"></my-date-picker>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="CustomRemark" />
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-success" (click)="fnAddEdit_BOE_Dtls(0,'A', CustomId, '', '', '')">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-plus"></i>
+                            </span>
+                        </button>&nbsp;
+                        <button class="btn btn-sm btn-danger" (click)="resetBOE_Dtls()">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-undo"></i>
+                            </span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead class="trbg">
+                    <th class="width50">
+                        <span class="col-form-span-label"></span>
+                    </th>
+                    <th class="width200">
+                        <span class="col-form-span-label">Document Name</span>
+                    </th>
+                    <th class="width120">
+                        <span class="col-form-span-label">Submitted On</span>
+                    </th>
+                    <th>
+                        <span class="col-form-span-label">Remarks</span>
+                    </th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let obj of dtDOCSUB; let i =index;">
+                        <td class="width50">
+                            <i class="fa fa-pencil-square-o" (click)="fnAddEdit_BOE_Dtls(i,'P', obj.pk_tblIndex, obj.BOEno, obj.BOEdt, obj.BOEremark)"></i>&nbsp;&nbsp;
+                            <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_BOE_Dtls(i,'D', obj.pk_tblIndex, obj.BOEno,'','')"></i>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.BOEno}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.BOEdt}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.BOEremark}}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr class="trheader">
+                    <td colspan="5">
+                        <span class="col-form-span-label">
+                            <b>COMMERCIAL INVOICE DETAILS</b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Invoice No
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="InvoiceNo" [(ngModel)]="InvoiceNo" [maxlength]="30" />
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Date
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td>
+                        <my-date-picker name="InvoiceDate" [options]="myDatePickerOptions" [(ngModel)]="InvoiceDate"></my-date-picker>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-success" (click)="fnAddEdit_Invoice_Dtls(0,'A', InvoiceId, '', '')">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-plus"></i>
+                            </span>
+                        </button>&nbsp;
+                        <button class="btn btn-sm btn-danger" (click)="resetInvoice_Dtls()">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-undo"></i>
+                            </span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead class="trbg">
+                    <th class="width50">
+                        <span class="col-form-span-label"></span>
+                    </th>
+                    <th class="width200">
+                        <span class="col-form-span-label">Invoice No</span>
+                    </th>
+                    <th>
+                        <span class="col-form-span-label">Invoice Date</span>
+                    </th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let obj of dtINVOICE; let i =index;">
+                        <td class="width50">
+                            <i class="fa fa-pencil-square-o" (click)="fnAddEdit_Invoice_Dtls(i,'P', obj.pk_tblIndex, obj.Invoice_No, obj.Invoice_Date)"></i>&nbsp;&nbsp;
+                            <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_Invoice_Dtls(i,'D', obj.pk_tblIndex, obj.Invoice_No,'','')"></i>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.Invoice_No}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.Invoice_Date}}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td class="width120">
+                        <span class="col-form-span-label">Incoterm
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td colspan="2">
+                        <ng-select [items]="IncotermList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="Incoterm"
+                            class="form-control" (ngModelChange)="checkEnableIncoterm()">
+                        </ng-select>
+                    </td>
+                    <td class="width100" >
+                        <a href="javascript:void(0);" (click)="moreDetails();" style="color: #c37804;text-decoration: underline;">
+                            <span class="col-form-span-label">For Details..</span>
+                        </a>
+                    </td>
+                    <td class="width100" colspan="2">
+                        <a href="javascript:void(0);" (click)="moreDetails();" style="color: #c37804;text-decoration: underline;">
+                            <span class="col-form-span-label">Chart</span>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6">
+                        <div style="border: 1px #c2cfd6 solid;">
+                            <span class="col-form-span-label">{{BriefIncoterm}}</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td>
+                        &nbsp;
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Value</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Currency</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Exch. Rate 1 = INR</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Amount In INR</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Invoice Value
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" id="InvValue" name="InvValue" [(ngModel)]="InvValue" (blur)="amountValidationInvoice('InvValue', 'InvCurrency', 'InvExchRate')"
+                            [OnlyNumber]="true" [maxlength]="30" />
+                    </td>
+                    <td class="width220">
+                        <select id="InvCurrency" [(ngModel)]="InvCurrency" class="form-control" (change)="checkCurrency('InvCurrency','InvValue','InvExchRate')">
+                            <option value="null">--Select--</option>
+                            <option *ngFor="let c of InvoiceCurrencyList" value="{{c.DATAVALUEFIELD}}">{{c.DATATEXTFIELD}}</option>
+                        </select>
+                        <!-- <ng-select [items]="InvoiceCurrencyList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="InvCurrency"
+                            class="form-control" (change)="checkCurrency('InvCurrency','InvValue','InvExchRate')">
+                        </ng-select> -->
+                    </td>
+                    <td>
+                        <input type="text" id="InvExchRate" class="form-control" [(ngModel)]="InvExchRate" (blur)="amountValidationInvExchChange('InvExchRate', 'InvCurrency')"
+                            [OnlyNumber]="true" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="InvTotInr" [OnlyNumber]="true" [disabled]="true" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Freight Amount</span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" id="FrightAmount" name="FrightAmount" [(ngModel)]="FrightAmount" (blur)="amountValidationInvoice('FrightAmount', 'FrightCurrency', 'FrightExchRate')"
+                            [OnlyNumber]="true" [maxlength]="30" [disabled]="FrightEnable" />
+                    </td>
+                    <td class="width220">
+                        <select id="FrightCurrency" [(ngModel)]="FrightCurrency" [disabled]="FrightEnable" class="form-control" (change)="checkCurrency('FrightCurrency','FrightAmount','FrightExchRate')">
+                            <option value="null">--Select--</option>
+                            <option *ngFor="let c of FrightCurrencyList" value="{{c.DATAVALUEFIELD}}">{{c.DATATEXTFIELD}}</option>
+                        </select>
+                        <!-- <ng-select [items]="FrightCurrencyList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="FrightCurrency"
+                            class="form-control" [disabled]="FrightEnable" (change)="checkCurrency('FrightCurrency','FrightAmount','FrightExchRate')">
+                        </ng-select> -->
+                    </td>
+                    <td>
+                        <input type="text" id="FrightExchRate" name="FrightExchRate" class="form-control" [(ngModel)]="FrightExchRate" (blur)="amountValidationInvExchChange('FrightExchRate', 'FrightCurrency')"
+                            [OnlyNumber]="true" [disabled]="FrightEnable" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="FrightTotInr" [OnlyNumber]="true" [disabled]="true" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Insurance Amount</span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" id="InsuranceAmount" name="InsuranceAmount" [(ngModel)]="InsuranceAmount" (blur)="amountValidationInvoice('InsuranceAmount', 'InsuranceCurrency', 'InsuranceExchRate')"
+                            [OnlyNumber]="true" [maxlength]="30" [disabled]="InsurenceEnable" />
+                    </td>
+                    <td class="width220">
+                        <select id="InsuranceCurrency" [(ngModel)]="InsuranceCurrency" [disabled]="InsurenceEnable" class="form-control" (change)="checkCurrency('InsuranceCurrency','InsuranceAmount','InsuranceExchRate')">
+                            <option value="null">--Select--</option>
+                            <option *ngFor="let c of InsuranceCurrencyList" value="{{c.DATAVALUEFIELD}}">{{c.DATATEXTFIELD}}</option>
+                        </select>
+                        <!-- <ng-select [items]="InsuranceCurrencyList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--"
+                            [(ngModel)]="InsuranceCurrency" class="form-control" [disabled]="InsurenceEnable" (change)="checkCurrency('InsuranceCurrency','InsuranceAmount','InsuranceExchRate')">
+                        </ng-select> -->
+                    </td>
+                    <td>
+                        <input type="text" id="InsuranceExchRate" name="InsuranceExchRate" class="form-control" [(ngModel)]="InsuranceExchRate" (blur)="amountValidationInvExchChange('InsuranceExchRate', 'InsuranceCurrency')"
+                            [OnlyNumber]="true" [disabled]="InsurenceEnable" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="InsuranceTotInr" [OnlyNumber]="true" [disabled]="true" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Commission Amount </span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="CommissionAmount" id="CommissionAmount" [(ngModel)]="CommissionAmount" (blur)="amountValidationInvoice('CommissionAmount', 'CommissionCurrency', 'CommissionExchRate')"
+                            [OnlyNumber]="true" [maxlength]="30" />
+                    </td>
+                    <td class="width220">
+                        <select id="CommissionCurrency" [(ngModel)]="CommissionCurrency" class="form-control" (change)="checkCurrency('CommissionCurrency','CommissionAmount','CommissionExchRate')">
+                            <option value="null">--Select--</option>
+                            <option *ngFor="let c of CommissionCurrencyList" value="{{c.DATAVALUEFIELD}}">{{c.DATATEXTFIELD}}</option>
+                        </select>
+                        <!-- <ng-select [items]="CommissionCurrencyList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--"
+                            [(ngModel)]="CommissionCurrency" class="form-control" (change)="checkCurrency('CommissionCurrency','CommissionAmount','CommissionExchRate')">
+                        </ng-select> -->
+                    </td>
+                    <td>
+                        <input type="text" id="CommissionExchRate" name="CommissionExchRate" class="form-control" [(ngModel)]="CommissionExchRate" (blur)="amountValidationInvExchChange('CommissionExchRate', 'CommissionCurrency')"
+                            [OnlyNumber]="true" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="CommissionTotInr" [OnlyNumber]="true" [disabled]="true" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">&nbsp;</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">&nbsp;</span>
+                    </td>
+                    <td class="width220">
+                        <span class="col-form-span-label">&nbsp;</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">CIF Amount</span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="CifAmount" [OnlyNumber]="true" [disabled]="true" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">&nbsp;</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">&nbsp;</span>
+                    </td>
+                    <td class="width220">
+                        <span class="col-form-span-label">&nbsp;</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Assessable Value</span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="AccessableValue" [OnlyNumber]="true" [disabled]="true" />
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr class="trheader">
+                    <td colspan="6">
+                        <span class="col-form-span-label">
+                            <b>DUTY DETAILS</b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6">
+                        <span class="col-form-span-label">
+                            <input type="radio" name="DutyPaidBy" [(ngModel)]="DutyPaidBy" value="LNK"/><b>Paid By Links</b>&ngsp;&nbsp;
+                            <input type="radio" name="DutyPaidBy" [(ngModel)]="DutyPaidBy" value="O"/><b>Paid BY Client</b>&ngsp;&nbsp;
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Duty Paid</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Interest INR</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Paid On</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Cash No</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Remark</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="DutyPaid" [maxlength]="10" [OnlyNumber]="true" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="DutyIns" [maxlength]="10" [OnlyNumber]="true" />
+                    </td>
+                    <td>
+                        <my-date-picker name="DutyPaidOnDate" [options]="myDatePickerOptions" [maxlength]="30" [(ngModel)]="DutyPaidOnDate"></my-date-picker>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="DutyCashNo" [maxlength]="30" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="DutyRemark" />
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-success" (click)="fnAddEdit_Duty_Dtls(0,'A', DutyId, '', '', '', '', '')">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-plus"></i>
+                            </span>
+                        </button>&nbsp;
+                        <button class="btn btn-sm btn-danger" (click)="resetDuty_Dtls()">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-undo"></i>
+                            </span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead class="trbg">
+                    <th class="width50">
+                        <span class="col-form-span-label"></span>
+                    </th>
+                    <th class="width100">
+                        <span class="col-form-span-label">Duty Paid</span>
+                    </th>
+                    <th class="width100">
+                        <span class="col-form-span-label">Interest INR</span>
+                    </th>
+                    <th class="width100">
+                        <span class="col-form-span-label">Duty Paid On</span>
+                    </th>
+                    <th class="width100">
+                        <span class="col-form-span-label">Cash No</span>
+                    </th>
+                    <th>
+                        <span class="col-form-span-label">Duty Remarks</span>
+                    </th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let obj of dtDUTY; let i =index;">
+                        <td class="width50">
+                            <i class="fa fa-pencil-square-o" (click)="fnAddEdit_Duty_Dtls(i,'P', obj.pk_tblIndex, obj.DutyPaid, obj.DutyIns, obj.DutyPaidOn, obj.DutyCashNo, obj.DutyRemark)"></i>&nbsp;&nbsp;
+                            <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_Duty_Dtls(i,'D', obj.pk_tblIndex, obj.DutyPaid, obj.DutyIns,'','','')"></i>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.DutyPaid}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.DutyIns}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.DutyPaidOn}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.DutyCashNo}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.DutyRemark}}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr class="trheader">
+                    <td colspan="6">
+                        <span class="col-form-span-label">
+                            <b>ADVANCE DETAILS</b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6" style="text-align: -webkit-center;">
+                        <table class="table table-bordered table-sm-new bgwhite" style="width:500px">
+                            <tr>
+                                <td></td>
+                                <td class="trbg">
+                                    <span class="col-form-span-label">Advance Recieved</span>
+                                </td>
+                                <td class="trbg">
+                                    <span class="col-form-span-label">Advance Recieved On</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="col-form-span-label">Advance Duty</span>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" [(ngModel)]="AdvRecOne" [maxlength]="30" [OnlyNumber]="true" />
+                                </td>
+                                <td>
+                                    <my-date-picker name="AdvRecOneDate" [options]="myDatePickerOptions" [(ngModel)]="AdvRecOneDate"></my-date-picker>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="col-form-span-label">Advance Steamer Agent</span>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" [(ngModel)]="AdvRecTwo" [maxlength]="30" [OnlyNumber]="true" />
+                                </td>
+                                <td>
+                                    <my-date-picker name="AdvRecTwoDate" [options]="myDatePickerOptions" [(ngModel)]="AdvRecTwoDate"></my-date-picker>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="col-form-span-label">Advance CFS</span>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" [(ngModel)]="AdvRecThree" [maxlength]="30" [OnlyNumber]="true" />
+                                </td>
+                                <td>
+                                    <my-date-picker name="AdvRecThreeDate" [options]="myDatePickerOptions" [(ngModel)]="AdvRecThreeDate"></my-date-picker>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="col-form-span-label">Advance  Others</span>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" [(ngModel)]="AdvRecFour" [maxlength]="30" [OnlyNumber]="true" />
+                                </td>
+                                <td>
+                                    <my-date-picker name="AdvRecFourDate" [options]="myDatePickerOptions" [(ngModel)]="AdvRecFourDate"></my-date-picker>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr class="trheader">
+                    <td colspan="4">
+                        <span class="col-form-span-label">
+                            <b>OTHER DETAIL</b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Examination Date</span>
+                    </td>
+                    <td>
+                        <my-date-picker name="ExaminationDate" [options]="myDatePickerOptions" [(ngModel)]="ExaminationDate"></my-date-picker>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Remark</span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="ExaminationRemark" />
+                    </td>
+                </tr>
+               
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Custom Clerk</span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="CustomClerk" />
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Dock Clerk</span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="DockClerk" />
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr class="trheader">
+                    <td colspan="6">
+                        <span class="col-form-span-label">
+                            <b>STAEMER AGENT CHARGES</b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Type Of Charge</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Receipt No.</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Payment Date</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Amount</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Remark</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">&nbsp;</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width220">
+                        <ng-select [items]="SteTypeChargeList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="SteTypeCharge"
+                            class="form-control">
+                        </ng-select>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="SteRecNo" />
+                    </td>
+                    <td>
+                        <my-date-picker name="StePayDate" [options]="myDatePickerOptions" [(ngModel)]="StePayDate"></my-date-picker>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="SteAmount" [OnlyNumber]="true" [maxlength]="30" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="SteRemark" />
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-success" (click)="fnAddEdit_SteAgent_Dtls(0,'A', SteId, '', '','','','')">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-plus"></i>
+                            </span>
+                        </button>&nbsp;
+                        <button class="btn btn-sm btn-danger" (click)="resetSteAgent_Dtls()">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-undo"></i>
+                            </span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead class="trbg">
+                    <th class="width50">
+                        <span class="col-form-span-label"></span>
+                    </th>
+                    <th class="width200">
+                        <span class="col-form-span-label">Type Of Charge</span>
+                    </th>
+                    <th class="width150">
+                        <span class="col-form-span-label">Receipt Number</span>
+                    </th>
+                    <th class="width100">
+                        <span class="col-form-span-label">Paid Date</span>
+                    </th>
+                    <th class="width100">
+                        <span class="col-form-span-label">Amount</span>
+                    </th>
+                    <th>
+                        <span class="col-form-span-label">Remark</span>
+                    </th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let obj of dtSTEAGENT; let i =index;">
+                        <td class="width50">
+                            <i class="fa fa-pencil-square-o" (click)="fnAddEdit_SteAgent_Dtls(i,'P', obj.pk_tblIndex, obj.SteType, obj.SteRecNo, obj.StePaydt, obj.SteAmount, obj.SteRemark)"></i>&nbsp;&nbsp;
+                            <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_SteAgent_Dtls(i,'D', obj.pk_tblIndex, obj.SteType, obj.SteRecNo,'','','')"></i>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.SteTypeValue}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.SteRecNo}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.StePaydt}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.SteAmount}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.SteRemark}}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">D/OReceived on</span>
+                    </td>
+                    <td >
+                        <my-date-picker name="DOrecvdOn" [options]="myDatePickerOptions" [(ngModel)]="DOrecvdOn"></my-date-picker>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">D/O Validity Date</span>
+                    </td>
+                    <td>
+                        <!-- <input type="text" class="form-control" [(ngModel)]="validatedt" /> -->
+                        <my-date-picker name="validatedt" [options]="myDatePickerOptions" [(ngModel)]="validatedt"></my-date-picker>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Delivery Mode</span>
+                    </td>
+                     <td colspan="3">
+                        <span class="col-form-span-label">
+                            <input type="radio" name="deliverymode" [(ngModel)]="deliverymode" value="CFS"  /><b>CFS Delivery </b> &nbsp;&nbsp;&nbsp;
+                            <input type="radio" name="deliverymode" [(ngModel)]="deliverymode" value="DPD"  /><b>DPD (Direct Port Delivery)</b> 
+                        </span>
+                    </td>
+                </tr>
+                 
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr class="trheader">
+                    <td colspan="5">
+                        <span class="col-form-span-label">
+                            <b>PORT / CFS PAYMENT DETAIL</b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Receipt / Chappa No</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Paid Date</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Amount</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Remark</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">&nbsp;</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width220">
+                        <input type="text" class="form-control" [(ngModel)]="PortRecNo" />
+                    </td>
+                    <td class="width120">
+                        <my-date-picker name="PortPaidDate" [options]="myDatePickerOptions" [(ngModel)]="PortPaidDate"></my-date-picker>
+                    </td>
+                    <td class="width120">
+                        <input type="text" class="form-control" [(ngModel)]="PortAmount" [maxlength]="30" [OnlyNumber]="true" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="PortRemark" />
+                    </td>
+                    <td class="width60">
+                        <button class="btn btn-sm btn-success" (click)="fnAddEdit_Port_Dtls(0,'A', PortId, '', '','','')">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-plus"></i>
+                            </span>
+                        </button>&nbsp;
+                        <button class="btn btn-sm btn-danger" (click)="resetPort_Dtls()">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-undo"></i>
+                            </span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead class="trbg">
+                    <th class="width50">
+                        <span class="col-form-span-label"></span>
+                    </th>
+                    <th class="width150">
+                        <span class="col-form-span-label">Receipt Number</span>
+                    </th>
+                    <th class="width100">
+                        <span class="col-form-span-label">Paid Date</span>
+                    </th>
+                    <th class="width100">
+                        <span class="col-form-span-label">Amount</span>
+                    </th>
+                    <th>
+                        <span class="col-form-span-label">Remark</span>
+                    </th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let obj of dtPORTCFS; let i =index;">
+                        <td class="width50">
+                            <i class="fa fa-pencil-square-o" (click)="fnAddEdit_Port_Dtls(i,'P', obj.pk_tblIndex, obj.PortRecNo, obj.PortPaiddt, obj.PortAmount, obj.PortRemark)"></i>&nbsp;&nbsp;
+                            <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_Port_Dtls(i,'D', obj.pk_tblIndex, obj.PortRecNo, obj.PortPaiddt,'','')"></i>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.PortRecNo}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.PortPaiddt}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.PortAmount}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.PortRemark}}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- <table class="table table-bordered table-sm-new bgwhite">
+                <tr class="trheader">
+                    <td colspan="5">
+                        <span class="col-form-span-label">
+                            <b>OCTROI DETAIL</b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Receipt</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Paid Date</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Amount</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">Remark</span>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">&nbsp;</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width220">
+                        <input type="text" class="form-control" [(ngModel)]="OctRecNo" />
+                    </td>
+                    <td class="width120">
+                        <my-date-picker name="OctPaidDate" [options]="myDatePickerOptions" [(ngModel)]="OctPaidDate"></my-date-picker>
+                    </td>
+                    <td class="width120">
+                        <input type="text" class="form-control" [(ngModel)]="OctAmount" [maxlength]="30" [OnlyNumber]="true" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="OctRemark" />
+                    </td>
+                    <td class="width60">
+                        <button class="btn btn-sm btn-success" (click)="fnAddEdit_Octroi_Dtls(0,'A', OctId, '', '','','')">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-plus"></i>
+                            </span>
+                        </button>&nbsp;
+                        <button class="btn btn-sm btn-danger" (click)="resetOctroi_Dtls()">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-undo"></i>
+                            </span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead class="trbg">
+                    <th class="width50">
+                        <span class="col-form-span-label"></span>
+                    </th>
+                    <th class="width150">
+                        <span class="col-form-span-label">Receipt Number</span>
+                    </th>
+                    <th class="width100">
+                        <span class="col-form-span-label">Paid Date</span>
+                    </th>
+                    <th class="width100">
+                        <span class="col-form-span-label">Amount</span>
+                    </th>
+                    <th>
+                        <span class="col-form-span-label">Remark</span>
+                    </th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let obj of dtOCTROI; let i =index;">
+                        <td class="width50">
+                            <i class="fa fa-pencil-square-o" (click)="fnAddEdit_Octroi_Dtls(i,'P', obj.pk_tblIndex, obj.OctRecNo, obj.OctRecPaidDT, obj.OctAmount, obj.OctRemark)"></i>&nbsp;&nbsp;
+                            <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_Octroi_Dtls(i,'D', obj.pk_tblIndex, obj.OctRecNo, obj.OctRecPaidDT,'','')"></i>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.OctRecNo}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.OctRecPaidDT}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.OctAmount}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.OctRemark}}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table> -->
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr class="trheader">
+                    <td colspan="4">
+                        <span class="col-form-span-label">
+                            <b>DELIVERY DETAILS</b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width120">
+                        <span class="col-form-span-label">
+                            <input type="radio" name="rTruck" [(ngModel)]="rTruck" value="O" (ngModelChange)="TruckOur=null;Supplier=null;TruckNo='';TruckType='';RateAgreed=''"
+                            /> Our
+                        </span>
+                    </td>
+                    <td colspan="3">
+                        <ng-select [items]="TruckOurList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="TruckOur"
+                            class="form-control" [disabled]="rTruck!='O'">
+                        </ng-select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <span class="col-form-span-label">
+                            <input type="radio" name="rTruck" [(ngModel)]="rTruck" value="H" (ngModelChange)="TruckOur=null;RateAgreed=''" /> Hired By Links &nbsp;&nbsp;&nbsp;
+                            <input type="radio" name="rTruck" [(ngModel)]="rTruck" value="HI" (ngModelChange)="TruckOur=null;RateAgreed=''" /> Hired By Importer
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width120">
+                        <span class="col-form-span-label">
+                            Supplier
+                        </span>
+                    </td>
+                    <td colspan="3">
+                        <ng-select [items]="SupplierList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="Supplier"
+                            class="form-control" [disabled]="rTruck=='O'">
+                        </ng-select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width120">
+                        <span class="col-form-span-label">
+                            Truck No
+                        </span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="TruckNo" [disabled]="rTruck=='O'" />
+                    </td>
+                    <td class="width120">
+                        <span class="col-form-span-label">
+                            Truck Type
+                        </span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="TruckType" [disabled]="rTruck=='O'" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width120">
+                        <span class="col-form-span-label">
+                            Rate Agreed
+                        </span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="RateAgreed" [disabled]="rTruck=='O'||rTruck=='HI'" />
+                    </td>
+                    <td class="width120">
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="width120">
+                        <span class="col-form-span-label">
+                            Loading Date
+                        </span>
+                    </td>
+                    <td>
+                        <my-date-picker name="DeliveryDate" [options]="myDatePickerOptions" [(ngModel)]="DeliveryDate"></my-date-picker>
+                    </td>
+                    <td class="width120">
+                        <span class="col-form-span-label">
+                            Remark
+                        </span>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" [(ngModel)]="DeliveryRemark" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="width60 centerlabel">
+                        <button class="btn btn-sm btn-success" (click)="fnAddEdit_Delivery_Dtls(0,'A', DeliveryId, '', '', '', '', '', '', '', '')">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-plus"></i>
+                            </span>
+                        </button>&nbsp;
+                        <button class="btn btn-sm btn-danger" (click)="resetDelivery_Dtls();">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-undo"></i>
+                            </span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead class="trbg">
+                    <th class="width50">
+                        <span class="col-form-span-label"></span>
+                    </th>
+                    <th class="width150">
+                        <span class="col-form-span-label">Our/Hired</span>
+                    </th>
+                    <th class="width100">
+                        <span class="col-form-span-label">Truck/Supplier</span>
+                    </th>
+                    <th class="width100">
+                        <span class="col-form-span-label">Truck No</span>
+                    </th>
+                    <th>
+                        <span class="col-form-span-label">Truck Type</span>
+                    </th>
+                    <th>
+                        <span class="col-form-span-label">Rate Agreed</span>
+                    </th>
+                    <th>
+                        <span class="col-form-span-label">Date</span>
+                    </th>
+                    <th>
+                        <span class="col-form-span-label">Remarks</span>
+                    </th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let obj of dtDELIVERY; let i =index;">
+                        <td class="width50">
+                            <i class="fa fa-pencil-square-o" (click)="fnAddEdit_Delivery_Dtls(i,'P', obj.pk_tblIndex, obj.OH_truck, obj.trackValue, obj.truck, obj.TruckNo, obj.TruckType, obj.RateAgreed, obj.DelDate, obj.DelRemark)"></i>&nbsp;&nbsp;
+                            <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_Delivery_Dtls(i,'D', obj.pk_tblIndex, obj.OH_truck, obj.trackValue, obj.truck, obj.TruckNo, obj.TruckType, obj.RateAgreed, obj.DelDate, obj.DelRemark)"></i>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.OH_truck}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.truck}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.TruckNo}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.TruckType}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.RateAgreed}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.DelDate}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.DelRemark}}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">
+                            Remark
+                        </span>
+                    </td>
+                    <td colspan="2">
+                        <textarea class="form-control" [(ngModel)]="ImpRemark" rows="2"></textarea>
+                    </td>
+                    <td>
+                        <span class="col-form-span-label">
+                            &nbsp;
+                        </span>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tfoot style="background-color: #f0f3f5;">
+                    <tr>
+                        <td colspan="12" class="centerlabel">
+                            <button type="button" class="btn btn-sm btn-primary" (click)="submit()">
+                                <span class="col-form-span-label">
+                                    <i class="fa fa-dot-circle-o"></i> Submit</span>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-danger" (click)="abort()">
+                                <span class="col-form-span-label">
+                                    <i class="fa fa-ban"></i> Abort</span>
+                            </button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="col-sm-1">
+        </div>
+    </div>
+</div>

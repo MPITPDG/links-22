@@ -1,0 +1,199 @@
+﻿<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-body"> 
+				<div class="row">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">	
+						
+						<table class="table table-bordered table-sm-new">
+							<tbody style='height:30px'>
+								<tr>
+									<td class="col-form-span-heading"  colspan="4">
+										HOUSE B/L
+									</td>
+								</tr>							
+								<tr>
+									<td  >
+										<span class="col-form-span-label "><b>Job No</b><span class="col-form-span-error">*</span></span>
+									</td>
+									<td colspan="2">
+										<input [(ngModel)]="exJobno" type="text"  maxlength="15"  class="form-control width150">
+									</td>
+									
+									<td colspan="2" class="centerlabel" >
+										<button class="btn btn-sm btn-success" type="submit" id="btnSearch" name="btnSearch"    (click)="jobserch()"> <i class="fa fa-search"></i> Search</button>
+										<button *ngIf="exptdt.length>0" class="btn btn-sm btn-danger   " type="reset"     (click)="onpreview()"><i class="fa fa-print "></i> Preview</button>
+										<button *ngIf="exptdt.length>0" class="btn btn-sm btn-danger   " type="reset"     (click)="onprint()"><i class="fa fa-print "></i> Print</button>
+			
+									</td>
+								</tr>
+							</tbody>
+							<tbody *ngIf="exptdt.length>0">
+								<tr>
+									<td class="col-form-span-heading"  colspan="4">
+										LIST OF CONSIGNMENTS
+									</td>
+								</tr>
+								
+								<tr>
+									<td>
+										<span class="col-form-span-label "><b>Shipper</b></span>
+									</td>
+									<td colspan="3" >
+										<label class="col-form-span-label" >{{ shippername }}</label>	  
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<span class="col-form-span-label "><b>Vessel </b></span>
+									</td>
+									<td>
+										<label class="col-form-span-label" >{{ vesselname }}</label>	  
+									</td>						
+									
+									<td>
+										<span class="col-form-span-label "> <b>Voyage</b></span>
+									</td>
+									<td>
+										<label class="col-form-span-label" >{{ vslvoyage }}</label>	  
+									</td>							 
+								</tr>
+								<tr>
+									<td>
+										<span class="col-form-span-label "><b>Vessel Agent </b></span>
+									</td>
+									<td>
+										<label class="col-form-span-label" >{{ vslAgt }}</label>	 
+									</td>
+									<td>
+										<span class="col-form-span-label "><b>BL Type</b> </span> <span class="col-form-span-error">*</span>
+									</td>
+									<td>
+										<select class="form-control width150"   [(ngModel)]="bltype" [disabled]="switchhbl!= '0'" >
+											<option value="-1">Please select</option>
+											<option *ngFor="let d of listBltype" value={{d.HBLCODE}}>{{d.HBLNAME}}</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<span class="col-form-span-label "><b>Freight Type</b> </span><span class="col-form-span-error">*</span>
+									</td>
+									<td>
+										<select class="form-control width150"   [(ngModel)]="frttype">
+											<option value="-1">Please select</option>
+											<option value="CC">CC</option>
+											<option value="PP">PP</option>
+										</select>
+									</td>
+									<td>
+										<span class="col-form-span-label "><b>Freight Currency</b> </span>
+									</td>
+									<td>
+										<select class="form-control width150" [(ngModel)]="currency">
+											<option value="-1">Please select</option>
+											<option *ngFor="let d of listCurreny" value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<span class="col-form-span-label "><b>Freight Amoun</b>t </span>
+									</td>
+									<td  >
+										<input [(ngModel)]="frtAmt" type="text"  class="form-control width150">
+									</td>
+									<td>
+										<span class="col-form-span-label "> <b>House B/L Date</b></span><span class="col-form-span-error">*</span>
+									</td>
+									<td>
+										<my-date-picker name="dtbld" [options]="myDatePickerOptions" [(ngModel)]="bldate" required></my-date-picker>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<span class="col-form-span-label "><b>Delivery Apply To </b></span>
+									</td>
+									<td >
+										<select class="form-control width150"   [(ngModel)]="deliveryTo">
+											 
+											<option *ngFor="let d of listSupp" value={{d.SUP_CODE}}>{{d.SUPNAME}}</option>
+										</select>
+									</td> 
+									<td colspan="2"   ><input type="checkbox" [disabled]="bltype!= 'M' " [(ngModel)]="switchhbl" (change)="checkValue(switchhbl?'1':'')"  >
+										<span class="col-form-span-label "><b>switch HBL</b></span>
+									</td>
+								</tr>
+								<tr class="title-head trbg" *ngIf="ishablissue=='1'; else  otherhbl">
+								<!-- <tr> -->
+									<td   *ngIf="FCRNo==''"  class="col-form-span-heading"  colspan="4">
+										HOUSE B/L NO. WILL START WITH  {{pod}} 
+									</td>
+									 <td   *ngIf="FCRNo!=''"  class="col-form-span-heading"  colspan="4">
+										HOUSE B/L NO. " {{FCRNo}} "
+									</td>
+								</tr>
+								<ng-template #otherhbl> 
+										<td class="width150">
+												<span class="col-form-span-label"><b>HBL No.</b></span><span class="col-form-span-error">*</span>
+											</td>
+											<td >						 
+												 <input    type="text" [(ngModel)]="FCRNo" [disabled]="FCRNo != ''"  class="form-control width120"    />
+											</td>	
+								</ng-template>
+								<tr>
+									<td class="col-form-span-heading"  colspan="4">
+										FOLLOWING EXPORT NOS. FOUND WITH ABOVE SHIPPER, VESSEL AND VESSEL AGENT
+									</td>
+								</tr>
+								<tr>
+									<td colspan="4" *ngIf="exptdt.length>0">
+										
+										<table class="table table-hover">
+											<thead>
+												
+												<th class="col-form-span-label" >Select</th>
+												<th class="col-form-span-label">Jobno</th>
+												<th class="col-form-span-label">Consignee</th>
+												<th class="col-form-span-label">Pkgs</th>
+												<th class="col-form-span-label">grwt</th>
+												<th class="col-form-span-label">Pcs</th>
+											</thead>
+											<!-- (change)="addhobno($event,d.EXPTNO)" -->
+											<tbody>
+												<tr *ngFor="let d of exptdt"  >	
+													<td><input type="checkbox" [disabled]="FRMBL" [(ngModel)]="d.SELEJOB" > </td>
+													<td class="col-form-span-label">{{d.EXPTNO}}</td>
+													<td class="col-form-span-label">{{d.EXPT_CONSIGNEE}}</td>													 
+													<td class="col-form-span-label">{{d.EXPT_NOOFPKGS}}</td>													
+													<td class="col-form-span-label">{{d.EXPT_GRWT}}</td>
+													<td class="col-form-span-label">{{d.EXPT_NOOFPCS}}</td>													
+												</tr>
+											</tbody>
+										</table>									
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					
+					<!-- <pre>{{exptdt | json}}</pre> -->
+				</div>
+				<div class="col-md-2"></div>
+			</div>
+		</div>
+		
+		<div class="card-footer rightlabel "*ngIf="exptdt.length>0">
+			<button class="btn btn-sm btn-success" type="submit" id="btnswtAdd" style="BACKGROUND-COLOR: ORANGE;BORDER-COLOR: ORANGE;"  *ngIf ="viewswitch != '1'"   (click)="GenSwitchBL()" ><i class="fa fa-dot-circle-o" ></i> Gen. Switch BL</button>
+			<button class="btn btn-sm btn-success" type="submit" id="btnAgtAdd" name="btnAgtAdd"   (click)="AddFCR()" ><i class="fa fa-dot-circle-o" ></i> Submit</button>
+			<button class="btn btn-sm btn-danger" type="reset" id="btnAgtRest" name="btnAgtrest" (click)="ResetAll()"><i class="fa fa-ban"></i> Reset</button>
+			   
+		</div>
+		
+		  
+										
+
+	</div>
+	
+</div>

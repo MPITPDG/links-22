@@ -1,0 +1,152 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>PURCHASE REQUEST VIEW</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-2 col-lg-2">
+        </div>
+        <div class="col-sm-12 col-md-8 col-lg-8 ">
+            <table class="table table-bordered table-sm-new bgwhite" style=" width: 750px;margin: 0px auto;">
+
+                <tr class="bakgrdliteBlue">
+                    <td class="col-form-span-heading" colspan="4">
+                        <b> General Details</b>
+                    </td>
+                </tr>
+                <tr>
+
+                    <td><span class="col-form-span-label"><b>Purchase No</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                            <td><span class="col-form-span-label"><b> {{PurchaseNo}}</b> </span></td>
+                    <td><span class="col-form-span-label"><b>Purchase Date</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                            <td><span class="col-form-span-label"><b> {{PurchaseDate}}</b> </span></td>
+                    </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>Narration</b> </span></td>
+                    <td colspan="3"><span class="col-form-span-label"><b> {{Narration}}</b> </span></td>
+                </tr>
+                <tr class="bakgrdliteBlue">
+                    <td class="col-form-span-heading" colspan="4">
+                        <b>Supplier Details</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>Supplier Name</b> </span></td>
+                    <td colspan="3">
+                        <span class="col-form-span-label"><b> {{pursuppliername}}</b> </span>
+                        
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>Bill To Address</b> </span></td>
+                    <td><span class="col-form-span-label"><b> {{billaddress}}</b> </span></td>
+              
+                </tr>
+                <tr>
+
+                    <td><span class="col-form-span-label"><b>Inv No</b> </span></td>
+                            <td><span class="col-form-span-label"><b> {{InvNo}}</b> </span></td>
+                
+                    <td><span class="col-form-span-label"><b>Inv Date</b> </span></td>
+                            <td><span class="col-form-span-label"><b> {{InvDate}}</b> </span></td>
+                    </tr>
+                <tr>
+
+                    <td><span class="col-form-span-label"><b>Bill Received On</b> </span></td>
+                    <td><span class="col-form-span-label"><b> {{BillReceive}}</b> </span></td>
+                    <td><span class="col-form-span-label"><b>Due Date</b> </span></td>
+                     <td><span class="col-form-span-label"><b> {{DueDate}}</b> </span></td>
+                 </tr>
+                 <tr class="bakgrdliteBlue">
+                    <td class="col-form-span-heading " colspan="2">
+                        Supplier Invoice Passing Details
+                    </td>
+                    <td  colspan="2"
+                      class="col-form-span-label"> 
+                      <span class="col-form-span-label" ><b>IsPassed</b>  </span>  
+                      <input type="checkbox" disabled="disabled" [(ngModel)]="IsPassed">
+                  </td>
+                  </tr>
+                  <tr>
+                    <td><span class="col-form-span-label"><b>Passed By </b> </span></td>
+                    <td> <span class="col-form-span-label">{{passedbyperson}}</span> </td>
+                    <td><span class="col-form-span-label"><b>Passed Amount </b> </span></td>
+                    <td><span class="col-form-span-label">{{PassedAmount}}</span> </td>
+                  </tr>
+                  <tr>
+                      <td><span class="col-form-span-label"><b>Invoice Amount </b> </span></td>
+                      <td> <span class="col-form-span-label">{{InvoiceAmount}}</span> </td>
+                      <td><span class="col-form-span-label"><b>Voucher No. </b> </span></td>
+                      <td> <span class="col-form-span-label">{{VoucherNo}}</span> </td>
+                  </tr>
+                <tr class="bakgrdliteBlue" >
+                    <td class="col-form-span-heading" colspan="4">
+                        <b>Accounts Details</b>
+                    </td>
+                </tr>
+                   <tr>
+
+                    <td><span class="col-form-span-heading"><b> Net Total</b> </span></td>
+                    <td> <input [(ngModel)]="NetAmt"  type="text" class="form-control width150"
+                            maxlength="40"> </td>
+                    <td colspan="2"></td>
+                </tr>
+
+                <tr>
+                    <td><span class="col-form-span-label"><b> Amount</b> </span></td>
+                    <td> <span class="col-form-span-label">{{NetAmount}}</span> </td>
+                    <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
+                    <td> <span class="col-form-span-label">{{Netdeduction}}</span> </td>
+                                   </tr>
+                <tr>
+                    <td colspan="4">
+                        <div class="row xyscroll">
+                            <table class="table table-responsive-sm table-bordered" *ngIf="Accountlist.length>0">
+                                <thead>
+                                    <tr class="bakgrdliteBlue">
+                                      
+                                        <th class="col-form-span-label font-weight-bold headerwhite">Account Name</th>
+                                        <th class="col-form-span-label font-weight-bold headerwhite">Amount</th>
+                                        <th class="col-form-span-label font-weight-bold headerwhite">Deduction</th>
+                                        <th class="col-form-span-label font-weight-bold headerwhite">Pass Amt</th>
+                                        <th class="col-form-span-label font-weight-bold headerwhite">Item</th>
+                                        <th class="col-form-span-label font-weight-bold headerwhite">Job No</th>
+                                        <th class="col-form-span-label font-weight-bold headerwhite">Narration</th>
+                                    </tr>
+                                </thead>
+                                <tbody *ngIf="Accountlist.length>0">
+                                    <tr *ngFor="let obj of Accountlist">
+                                      
+                                        <td><span class="col-form-span-label" [innerHtml]="obj.ACCOUNT_NAME"> </span>
+                                        </td>
+                                        <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.DEDUCTION}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.SRPIPASSAMOUNT}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.ITEM}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
+                                        <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+              
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-2 col-lg-2">
+        </div>
+    </div>
+
+</div>

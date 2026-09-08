@@ -1,0 +1,524 @@
+
+
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>{{searchHeaderText}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters" *ngIf="displayType=='SEARCH'">
+        <div class="col-sm-3">
+        </div>
+        <div class="col-sm-6">
+            <table class="table table-sm-new bgwhite table-bordered">
+                <tr class="trbg">
+                    <td class="width130">
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="CODE" [(ngModel)]="Type" />&nbsp;<B>Entry No</B></span>
+                    </td>
+                    <td class="width130">
+                        <input type="text" [(ngModel)]="EntryNo" class="form-control width150" [maxlength]="15" [OnlyNumber]="true" [disabled]="Type!='CODE'"
+                        />
+                    </td>
+                    <td colspan="2">
+                        <button type="button" name="printButton" class="btn btn-sm btn-primary" (click)="printButton();" [disabled]="Type!='CODE'">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-print"></i> Print</span>
+                        </button>
+                    </td>
+                </tr>
+                 <tr class="trbg">
+                    <td >
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="CHEQUENO" [disabled]="PageType=='CR'" [(ngModel)]="Type" />&nbsp;<B>Cheque No</B></span>
+                    </td>
+                    <td colspan="3" >
+                        <input type="text" [(ngModel)]="ChequeNo"   class="form-control" [maxlength]="15" class="form-control width150" [OnlyNumber]="true" [disabled]="Type!='CHEQUENO'"
+                        />
+                    </td>
+                   
+                </tr>
+               <tr class="trbg" >
+                    <td  rowspan="2" >
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="CLIENT" [(ngModel)]="Type" />&nbsp;<B>Account</B></span>
+                    </td> 
+                    <td colspan="3">
+                        <div style="display: inline-flex;">
+                            <span class="col-form-span-label">Bank:</span> 
+                            <ng-select [items]="AccountList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
+                            [(ngModel)]="Account" class="custom" placeholder="--Select--" [disabled]="Type!='CLIENT'" style="width: 380px;">
+                        </ng-select> 
+                        </div>                        
+                    </td>
+                </tr>
+                    <tr class="trbg" >                     
+                    <td colspan="3">
+                        <div>
+                            <span class="col-form-span-label">From</span> &nbsp; &nbsp; &nbsp; &nbsp;
+                            <my-date-picker name="FromDate" [options]="myDatePickerOptions" (dateChanged)="frmActDateChanged($event)" [selDate]="ActFromDate" [disabled]="Type!='CLIENT'"></my-date-picker>
+                            &nbsp; &nbsp; &nbsp; &nbsp;
+                            <span class="col-form-span-label">To</span> &nbsp; &nbsp; &nbsp; &nbsp;
+                            <my-date-picker name="ToDate" [options]="myDatePickerOptions" (dateChanged)="toactDateChanged($event)" [selDate]="ActToDate" [disabled]="Type!='CLIENT'"></my-date-picker>
+                        </div>                       
+                    </td>                
+                </tr>
+                            <tr class="trbg" >
+                    <td  rowspan="2">                        
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" [disabled]="PageType=='CR'" value="OURBANK" [(ngModel)]="Type" />&nbsp;<B>Our Bank</B></span>
+                    </td>
+                    <td colspan="3">     
+                        <div style="display: inline-flex;">
+                            <span class="col-form-span-label">Bank:</span>                    
+                             <ng-select [items]="OurBankList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
+                                [(ngModel)]="OurBank" (change)="GetActName($event.ACCTCODENAME)" class="custom" placeholder="--Select--" [disabled]="Type!='OURBANK'" style="width: 380px;">
+                            </ng-select> 
+                        </div>           
+                    </td>
+                </tr>
+                <tr class="trbg" >                   
+                        <td colspan="3" >
+                            <div>
+                                <span class="col-form-span-label">From</span> &nbsp; &nbsp; &nbsp; &nbsp; 
+                                <my-date-picker name="FromDate" [options]="myDatePickerOptions" (dateChanged)="frmBankDateChanged($event)" [selDate]="BankFromDate" [disabled]="Type!='OURBANK'"></my-date-picker>
+                                &nbsp; &nbsp; &nbsp; &nbsp; 
+                                <span class="col-form-span-label">To</span>&nbsp; &nbsp; &nbsp; &nbsp; 
+                                <my-date-picker name="ToDate" [options]="myDatePickerOptions" (dateChanged)="toBankDateChanged($event)" [selDate]="BankToDate" [disabled]="Type!='OURBANK'"></my-date-picker>
+                            </div>                       
+                         </td>
+                </tr>
+                <tr class="trbg">
+                    <td  >  <span class="col-form-span-label">
+                            <input type="radio" name="check" value="JOBNO" [(ngModel)]="Type" />&nbsp;<B>Job No</B></span>
+                    </td>
+                    <td colspan="3" >
+                        <input type="text" [(ngModel)]="JobNo"   class="form-control" [maxlength]="15" class="form-control width150" [OnlyNumber]="true" [disabled]="Type!='JOBNO'" />
+                    </td>                   
+                </tr>
+                <tr class="trbg">
+                    <td > <span class="col-form-span-label">
+                            <input type="radio" name="check" value="AMOUNT" [(ngModel)]="Type" />&nbsp;<B>Amount</B></span>
+                    </td>
+                    <td  >
+                        <input type="text" [(ngModel)]="Amount" [OnlyNumber]="true"  [maxlength]="15" class="form-control width150" [disabled]="Type!='AMOUNT'"
+                        />
+                    </td>
+                    <td >
+                        <span class="col-form-span-label"><B>Transfer Voucher Type</B></span>
+                    </td>
+                    <td  >
+                        <select class="form-control width150"  [(ngModel)]="VoucherType"  [disabled]="Type!='AMOUNT'" >                                   
+                            <option value="0">-- Select Type --</option>	
+                            <option value="BP">Bank - Payment</option>	
+                            <option value="BR">Bank - Receipt</option>
+                            <option value="CP">Cash - Payment</option>
+                            <option value="CR">Cash - Receipt</option>
+                            <option value="CE">Cash - Expenses</option>
+                            <option value="All">All</option>
+                        </select> 
+                    </td>
+                   
+                </tr>
+         
+                <!-- <tr class="trbg">
+                    <td  >  <span class="col-form-span-label">
+                            <input type="radio" name="check" value="DATE" [(ngModel)]="Type" />&nbsp;<B>Date Wise</B> </span>
+                    </td>
+                    <td colspan="2">   <span class="col-form-span-label">From</span>
+                        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate" [disabled]="Type!='DATE'"></my-date-picker>
+                        </td>
+                    
+                        <td>
+                            <span class="col-form-span-label">To</span> 
+                                <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate" [disabled]="Type!='DATE'"></my-date-picker>
+                        </td> 
+                </tr>    -->
+                <tr class="trbg" >   
+                    <td >  <span class="col-form-span-label">
+                        <input type="radio" name="check" value="DATE" [(ngModel)]="Type" />&nbsp;<B>Date Wise</B> </span>
+                </td>                  
+                    <td colspan="3">
+                        <!-- <div>
+                            <span class="col-form-span-label">From</span> &nbsp; &nbsp; &nbsp; &nbsp;
+                            <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate" [disabled]="Type!='DATE'"></my-date-picker>
+                            &nbsp; &nbsp; &nbsp; &nbsp;
+                            <span class="col-form-span-label">To</span> &nbsp; &nbsp; &nbsp; &nbsp;
+                            <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate" [disabled]="Type!='DATE'"></my-date-picker>
+                        </div>     -->         
+                                 
+                          <div>
+                         <span class="col-form-span-label">From</span> &nbsp; &nbsp; &nbsp; &nbsp;
+                           <my-date-picker name="FromDate" (dateChanged)="frmDateChanged($event)" [options]="myDatePickerOptions" [selDate]="FromDate" [disabled]="Type!='DATE'"></my-date-picker>
+                             &nbsp; &nbsp; &nbsp; &nbsp;
+                           <span class="col-form-span-label">To</span> &nbsp; &nbsp; &nbsp; &nbsp;
+                             <my-date-picker name="ToDate" (dateChanged)="toDateChanged($event)" [options]="myDatePickerOptions" [selDate]="ToDate" [disabled]="Type!='DATE'"></my-date-picker>
+                             </div>      
+                    </td>                
+                </tr>             
+                <tr class="trbg">
+                    <td  colspan="2">
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="PRINTAV" [(ngModel)]="Type" />&nbsp; <B>Print Vouchers of a day</B></span>
+                    </td>
+                    <td   colspan="2">   
+                            <my-date-picker name="Day" [options]="myDatePickerOptions" [(ngModel)]="VoucherDay" [disabled]="Type!='PRINTAV'"></my-date-picker>
+                    </td>
+                </tr>
+                <tr class="trbg">
+                    <td class="width200" colspan="2" >
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="DISPLAY" [(ngModel)]="Type" />&nbsp;<B>Display</B></span>
+                    </td>
+                    <td colspan="2">
+                      
+                        <div class="leftlabel">
+                            <span class="col-form-span-label">
+                                <input type="radio" name="radioDisplay" value="0" [(ngModel)]="Display"  [disabled]="Type!='DISPLAY'"/>&nbsp;List</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <span class="col-form-span-label">
+                                <input type="radio" name="radioDisplay" value="1" [(ngModel)]="Display"  [disabled]="Type!='DISPLAY'"/>&nbsp;Details</span>
+                        </div>
+                    </td>
+                </tr>
+             
+                <tr class="trbg centerlabel">
+                    <td colspan="4">
+                        <button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="search();">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-search"></i> Search</span>
+                                      
+                        </button>
+                        <button class="btn btn-sm btn-danger" type="reset">
+                            <span class="col-form-span-label" (click)="ResetAll();"><i class="fa fa-ban"></i> Reset</span></button> 
+                    </td>
+                </tr> 
+            </table>
+        </div>
+        <div class="col-sm-3">
+        </div>
+    </div>
+    <div class="row no-gutters" *ngIf="displayType=='LIST'">
+        <div class="col-sm-1">
+        </div>
+        <div class="col-10 xyscroll" style="height:550px;" >
+            <table class="table table-sm-new table-bordered bgwhite">
+                <thead>
+                    <tr class="title-head formheading">
+                        <th colspan="9">
+                            {{searchHeaderText}}
+                            <a href="javascript:void(0);" (click)="displayType='SEARCH';searchList=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
+                        </th>
+                    </tr>
+                    <tr class="title-head formheading">
+                        <th *ngIf="Type=='PRINTAV'" class="centerlabel"><input type="checkbox" [(ngModel)]='checkbox'
+                            (change)="checkAll($event)" /> &nbsp; </th>
+                        <th>Entry No</th>
+                        <th>Entry Date</th>
+                        <th>Status</th>
+                        <th>Bank Name</th>
+                        <th>Cheque No</th>
+                        <th>Amount</th>
+                        <th>Payee Name</th>
+                        <th>Narration</th>
+                        <!-- <th>CompChqFlag</th> -->
+                     
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let obj of searchList">
+                        <td *ngIf="Type=='PRINTAV'"  class="centerlabel"> <input type="checkbox" [(ngModel)]="obj.Checked"
+                            (ngModelChange)="getCheckboxValues($event,obj.ENTRYNO)"> &nbsp; </td>
+                        <td>
+                            <span class="col-form-span-label anchor-link" (click)="redirectToEdit(obj.ENTRYNO)" style="cursor:hand;">{{obj.ENTRYNO}}</span>
+                            <!-- <span class="col-form-span-label">
+                                 <a href="javascript:void(0);" (click)="redirectToEdit(obj.pur_code)">{{obj.PUR_CODE}}</a> 
+                            </span> -->
+                        </td>
+                        <!-- <td>
+                            <span class="col-form-span-label">{{obj.ENTRYNO}}</span>
+                        </td> -->
+                        <td>
+                            <span class="col-form-span-label">{{obj.ENTRYDT}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.STATUS}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.OURBANK}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.CHEQUENO}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.AMOUNT}}</span>
+                        </td>
+
+                        <td>
+                            <span class="col-form-span-label">{{obj.PAYEENAME}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label"><p>{{obj.NARRATION}}</p></span>
+                        </td>
+                      
+                    </tr>
+                </tbody>
+                <tr *ngIf="Type=='PRINTAV'" >
+                    <td colspan="9" class="right-text pr-2">
+                        <button class="btn btn-sm btn-success" type="submit" (click)="Print_Multiple()"> <span
+                                class="col-form-span-label"><i class="fa fa-print"></i>&nbsp;Print</span></button>
+                    </td>
+                </tr>
+            </table>
+        
+        </div>
+        <div class="col-sm-1">
+        </div>
+    </div>
+   
+</div>
+<!-- <div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>Search</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" *ngIf="displayType=='SEARCH'">
+        <div class="col-sm-3">
+        </div>
+        <div class="col-sm-6">
+            <table class="table table-sm-new bgwhite">
+                <tr class="trbg">
+                    <td class="width150">
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="CODE" [(ngModel)]="Type" />&nbsp;Entry No</span>
+                    </td>
+                    <td class="width130">
+                        <input type="text" [(ngModel)]="EntryNo" class="form-control width150" [maxlength]="15" [OnlyNumber]="true" [disabled]="Type!='CODE'"
+                        />
+                    </td>
+                    <td>
+                        <button type="button" name="printButton" class="btn btn-sm btn-primary" (click)="Print();" [disabled]="Type!='CODE'">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-print"></i> Print</span>
+                        </button>
+                    </td>
+                </tr>
+                <tr class="trbg">
+                    <td  >
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="CHEQUENO" [(ngModel)]="Type" />&nbsp;Cheque No</span>
+                    </td>
+                    <td colspan="3" >
+                        <input type="text" [(ngModel)]="ChequeNo"   class="form-control" [maxlength]="15" class="form-control width150" [OnlyNumber]="true" [disabled]="Type!='CHEQUENO'"
+                        />
+                    </td>
+                   
+                </tr>
+                <tr class="trbg" >
+                    <td rowspan="2">
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="CLIENT" [(ngModel)]="Type" />&nbsp;Account</span>
+                    </td>
+                    <td colspan="4">
+                       
+                                 <select class="form-control width300"  [(ngModel)]="Account" [disabled]="Type!='CLIENT'">
+                                    <option value="">Please select</option>
+                                    <option *ngFor="let d of AccountList" value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option> 
+                                </select>
+                     
+                    </td>
+
+                </tr>
+               
+                     
+                <tr class="trbg" >  
+                           
+                    </td> 
+                        <td colspan="2">
+                        <span class="col-form-span-label">From</span>
+                        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="BankFromDate" [disabled]="Type!='OURBANK'"></my-date-picker>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span class="col-form-span-label">To</span>
+                        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="BankToDate" [disabled]="Type!='OURBANK'"></my-date-picker>
+                    </td>
+
+                </tr>
+                <tr class="trbg">
+                    <td  >
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="JOBNO" [(ngModel)]="Type" />&nbsp;Job No</span>
+                    </td>
+                    <td colspan="3" >
+                        <input type="text" [(ngModel)]="JobNo"   class="form-control" [maxlength]="15" class="form-control width150" [OnlyNumber]="true" [disabled]="Type!='JOBNO'"
+                        />
+                    </td>
+                   
+                </tr>
+             
+              
+              
+                <tr class="trbg">
+                    <td >
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="AMOUNT" [(ngModel)]="Type" />&nbsp;Amount</span>
+                    </td>
+                    <td colspan="3"  >
+                        <input type="text" [(ngModel)]="Amount" [OnlyNumber]="true"  [maxlength]="15" class="form-control width150" [disabled]="Type!='AMOUNT'"
+                        />
+                    </td>
+                   
+                </tr>
+                <tr class="trbg">
+                    <td >
+                        <span class="col-form-span-label">Status</span>
+                    </td>
+                    <td >
+                        <span class="col-form-span-label">Transfer Voucher Type</span>
+                    </td>
+                    <td colspan="3"  >
+                        <select class="form-control width150"  [(ngModel)]="VoucherType" >
+                                   
+                            <option value="0">-- Select Type --</option>	
+                            <option value="BP">Bank - Payment</option>	
+                            <option value="BR">Bank - Receipt</option>
+                            <option value="CP">Cash - Payment</option>
+                            <option value="CR">Cash - Receipt</option>
+                            <option value="CE">Cash - Expenses</option>
+                            <option value="All">All</option>	
+                           
+                            </select> 
+                    </td>
+                   
+                </tr>
+                <tr class="trbg">
+                    <td  class="width150">
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="DATE" [(ngModel)]="Type" />&nbsp; Date Wise</span>
+                    </td>
+                    <td colspan="2">
+                        <span class="col-form-span-label">From</span>
+                        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate" [disabled]="Type!='DATE'"></my-date-picker>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span class="col-form-span-label">To</span>
+                        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate" [disabled]="Type!='DATE'"></my-date-picker>
+                    </td>
+                
+                </tr>
+                
+                <tr class="trbg">
+                    <td  class="width150">
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="PRINTAV" [(ngModel)]="Type" />&nbsp; Print Vouchers of a day</span>
+                    </td>
+                    <td colspan="2">
+                      
+                            <span class="col-form-span-label">Date</span>
+                            <my-date-picker name="Day" [options]="myDatePickerOptions" [(ngModel)]="VoucherDay" [disabled]="Type!='PRINTAV'"></my-date-picker>
+                       
+                    </td>
+                </tr>
+                <tr class="trbg">
+                    <td  class="width150">
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="DISPLAY" [(ngModel)]="Type" />&nbsp;Display</span>
+                    </td>
+                    <td colspan="2">
+                      
+                        <div class="leftlabel">
+                            <span class="col-form-span-label">
+                                <input type="radio" name="radioDisplay" value="0" [(ngModel)]="Display"  [disabled]="Type!='DISPLAY'"/>&nbsp;List</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <span class="col-form-span-label">
+                                <input type="radio" name="radioDisplay" value="1" [(ngModel)]="Display"  [disabled]="Type!='DISPLAY'"/>&nbsp;Details</span>
+                        </div>
+                    </td>
+                </tr>
+             
+                <tr class="trbg centerlabel">
+                    <td colspan="3">
+                        <button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="search();">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-search"></i> Search</span>
+                                      
+                        </button>
+                        <button class="btn btn-sm btn-danger" type="reset">
+                            <span class="col-form-span-label" (click)="ResetAll();"><i class="fa fa-ban"></i> Reset</span></button> 
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-3">
+        </div>
+    </div>
+
+    <div class="row" *ngIf="displayType=='LIST'">
+        <div class="col-sm-12 xyscroll" style="height:300px;" >
+            <table class="table table-sm-new table-bordered bgwhite">
+                <thead>
+                    <tr class="title-head formheading">
+                        <th colspan="8">
+                            {{searchHeaderText}}
+                            <a href="javascript:void(0);" (click)="displayType='SEARCH';searchList=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
+                        </th>
+                    </tr>
+                    <tr class="title-head formheading">
+                        <th>Entry No</th>
+                        <th>Entry Date</th>
+                        <th>Status</th>
+                        <th>Bank Name</th>
+                        <th>Cheque No</th>
+                        <th>Amount</th>
+                        <th>Payee Name</th>
+                        <th>Narration</th>
+                        
+                     
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let obj of searchList">
+                        <td>
+                            <span class="col-form-span-label anchor-link" (click)="redirectToEdit(obj.ENTRYNO)" style="cursor:pointer;">{{obj.ENTRYNO}}</span>
+                            
+                        </td>
+                        
+                        <td>
+                            <span class="col-form-span-label">{{obj.ENTRYDT}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.STATUS}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.OURBANK}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.CHEQUENO}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.AMOUNT}}</span>
+                        </td>
+
+                        <td>
+                            <span class="col-form-span-label">{{obj.PAYEENAME}}</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{obj.NARRATION}}</span>
+                        </td>
+
+                       
+
+
+                      
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+   
+</div>  -->

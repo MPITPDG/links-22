@@ -1,0 +1,118 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>OUTSTANDING RECEIVABLE - ADVANCE FROM CLIENTS
+                    </strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters" *ngIf="displayType=='SEARCH'">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+                  <tr class="trbg">
+                    <td  >
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="JOBNO" [(ngModel)]="Type" />&nbsp;Job No</span>
+                    </td>
+                    <td colspan="3" >
+                        <input type="text" [(ngModel)]="JobNo"   class="form-control" [maxlength]="15" class="form-control width150" [OnlyNumber]="true" [disabled]="Type!='JOBNO'"
+                        />
+                    </td>
+                   
+                </tr>
+                <tr class="trbg" >
+                    <td >
+                        <span class="col-form-span-label">
+                            <input type="radio" name="check" value="CLIENT" [(ngModel)]="Type" />&nbsp;Account</span>
+                    </td>
+                    <td colspan="4">
+                       
+                                 <select class="form-control width300"  [(ngModel)]="Exporter" [disabled]="Type!='CLIENT'">
+                                    <option value="">Please select</option>
+                                    <option *ngFor="let d of ExporterList" value={{d.EXP_CODE}}>{{d.EXP_NAME_CITY}}</option> 
+                                </select>
+                   </td>
+                </tr>
+                <tr class="trbg">
+                    <td colspan="4">
+                        <span class="col-form-span-label">
+                            <input type="radio"  name="check" value="All" [(ngModel)]="Type" />&nbsp;All</span>
+                    </td>
+                </tr>
+                <tr class="trbg centerlabel">
+                    <td colspan="3">
+                        <button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="GetClientAdvanceData();">
+                            <span class="col-form-span-label">  <i class="fa fa-search"></i> Search</span>  </button>
+                        <button class="btn btn-sm btn-danger" type="reset">
+                            <span class="col-form-span-label" (click)="ResetAll();"><i class="fa fa-ban"></i> Reset</span></button> 
+                    </td>
+                </tr>
+            </table>
+          
+    </div>
+    <div class="col-sm-12 col-md-3 col-lg-3">
+    </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+        <div class="col-sm-12 col-md-10 col-lg-10">
+    <!-- <div  class="row xyscroll"  *ngIf="displayType=='LIST'"> -->
+        <div class="row  xyscroll" *ngIf="displayType=='LIST'">
+      
+            <table class="table table-bordered table-sm-new table-striped   " >
+
+                <thead>
+                    <tr class="title-head formheading">
+                        <th colspan="7" >
+                      <a href="javascript:void(0);" (click)="displayType='SEARCH';ClAdvList=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
+                        </th>
+                    </tr>
+                <tr class="title-head formheading ">
+                        <th>Client Name</th>
+                        <th>Job No</th>
+                        <th>Type</th>
+                        <th>Trans Code</th>
+                        <th>Trans Date </th>
+                        <th>Dr Amt</th>
+                        <th>Cr Amt</th>
+                    </tr>   
+               </thead>
+                <tbody>
+                    <tr *ngFor="let obj of ClAdvList">
+                        <td><span class="col-form-span-label " style="cursor:pointer;">{{obj.CLIENTNAME}}</span></td>
+                       <td><span class="col-form-span-label anchor-link" (click)="OpenJobPrint(obj.JOBNO)" >{{obj.JOBNO.replace("'", "")}}</span></td>
+                       <td> <span class="col-form-span-label">{{obj.TYPE}}</span></td>
+                       <td> <span *ngIf="obj.TYPE!=''" class="col-form-span-label anchor-link" (click)="OpenPrint(obj.TRANSCODE,obj.TYPE)">{{obj.TRANSCODE.replace("'", "")}}</span>
+                        <span *ngIf="obj.TYPE==''" class="col-form-span-label " ><b>{{obj.TRANSCODE.replace("'", "")}}</b></span> </td>
+                        <!-- <td> <span class="col-form-span-label">{{obj.TRANSDATE}}</span></td> -->
+                        <td>
+                            <span *ngIf="obj.TYPE!=''" class="col-form-span-label ">{{obj.TRANSDATE}}</span>
+                            <span *ngIf="obj.TYPE==''" class="col-form-span-label " ><b>{{obj.TRANSDATE}}</b></span>
+                        </td>
+                        <td><span class="col-form-span-label">{{obj.DRAMT|number:'2.2-4'}}</span></td>
+                        <!-- <td><span class="col-form-span-label">{{obj.CRAMT|number:'2.2-4'}}</span></td> -->
+                        <td>
+                            <span *ngIf="obj.TYPE!=''" class="col-form-span-label ">{{obj.CRAMT|number:'2.2-4'}}</span>
+                            <span *ngIf="obj.TYPE==''" class="col-form-span-label " ><b>{{obj.CRAMT|number:'2.2-4'}}</b></span>
+                        </td>
+                </tr>
+                </tbody>
+                <tr> <td colspan="7" class="centerlabel">
+                    <button class="btn btn-sm btn-primary" type="submit" (click)="ExportAdvfrmClnt()" > <span
+                    class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
+                    Export To Excel </span></button>&nbsp;
+                </td>
+        </tr>
+            </table>
+        </div>
+
+    </div>
+    <div class="col-sm-12 col-md-1 col-lg-1">
+    </div>        
+</div>

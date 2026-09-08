@@ -1,0 +1,87 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+      <div class="col-sm-12">
+        <div class="card">
+          <div class="card-header formheading">
+            <strong>{{subheader}}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row no-gutters">
+      <!-- <div class="col-md-1 col-lg-1 col-12">
+      </div> -->
+      <div class="col-md-12  col-lg-12 col-12" style="overflow-y: auto;height: 455px;">
+        <table class="table table-bordered table-sm-new bgwhite ">
+          <thead>
+            
+            <tr  style="white-space:nowrap;">
+              <th class="col-form-span-label"  style="  background-color: #004980; color: white;">  <input type="checkbox"  [(ngModel)]='checkbox' (change)="checkAll($event)" /> &nbsp;  </th>
+              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> Inv No </th>
+              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> Inv Date   </th>
+              <th class="col-form-span-label"  style="  background-color: #004980; color: white;" > Client </th>
+              <th class="col-form-span-label"  style="  background-color: #004980; color: white;" > Client GST No.  </th>
+              <th class="col-form-span-label"  style="  background-color: #004980; color: white;" > Supply Type </th>
+              <th class="col-form-span-label"  style="  background-color: #004980; color: white;" > Total Amount     </th>
+              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"  > Taxable Amt   </th>
+              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> Non Taxable Amt  </th>
+              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> IGST </th>
+              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> CGST  </th>
+              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> SGST  </th>
+            </tr>
+          </thead>
+          <tbody class="bgwhite">
+            <tr
+              *ngFor="let obj of EInvoiceListtbl "  
+              >
+              <td class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.Checked"
+                  (ngModelChange)="getCheckboxValues($event,obj.INV_NO)"> &nbsp; </td>
+              <td class="col-form-span-label">{{obj.INV_NO}}</td>
+              <td class="col-form-span-label" >{{obj.INV_DATE}}</td>
+              <td class="col-form-span-label">{{obj.CLIENT}}</td>
+              <td class="col-form-span-label">{{obj.EXP_GSTNO}}</td>
+              <td class="col-form-span-label">{{obj.SUPTYPE}}</td>
+              <td class="col-form-span-label" style="text-align: right;">{{obj.TOTALAMT|number:'2.2-4'}}</td>
+              <td class="col-form-span-label">{{obj.TAXABLEAMT}}</td>
+              <td class="col-form-span-label">{{obj.NONTAXABLEAMT}}</td>
+              <td class="col-form-span-label">{{obj.IGST}}</td>
+              <td class="col-form-span-label">{{obj.CGST}}</td>
+              <td class="col-form-span-label">{{obj.SGST}}</td>
+            </tr>
+          </tbody>
+          <!-- <tr>
+            <td colspan="12" class="right-text pr-2">
+              <button class="btn btn-sm btn-success" type="submit" (click)="GenerateEInvoice()"> <span
+                  class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Generate</span></button>
+           
+            </td>
+          </tr> -->
+          <!-- <tr>
+            <td colspan="8">
+              <div class="row justify-content-center no-gutters"
+                style="font-family:verdana;font-size: 11px;padding: 1px;">
+                <pagination-controls (pageChange)="PageActual=$event" autoHide="true"></pagination-controls>
+              </div>
+            </td>
+          </tr> -->
+        </table>
+  
+      </div>
+      <!-- <div class="col-md-1  col-lg-1 col-12">
+      </div> -->
+    
+    </div>
+    <div class="row no-gutters">
+      <!-- <div class="col-md-1 col-lg-1 col-12">
+      </div> -->
+      <div class="col-md-12  col-lg-12 col-12" style="display: flex;
+      justify-content: flex-end;
+      margin-left: auto;
+      margin-right: 0;">
+        <button class="btn btn-sm btn-success" type="submit" (click)="GenerateEInvoice()"> <span
+          class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Generate</span></button>
+      </div>
+      <!-- <div class="col-md-1 col-lg-1 col-12">
+      </div> -->
+    </div>
+  </div>

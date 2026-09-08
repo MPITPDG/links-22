@@ -1,0 +1,134 @@
+
+ <div class="animated fadeIn">
+     <div class="container">
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-6">
+            <table class="table table-bordered table-sm-new bgwhite" style="font-family:  Verdana;font-size: 12px;" *ngIf="Masterdetail_list.length==0">
+                <tbody style='height:30px'>
+                    <tr class="trbg">
+                        <td class="col-form-span-heading" colspan="5">
+                            MASTER DETAIL SEARCH
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-form-span-label width100">
+                            <input type="radio" name="exampleRadios" value='1' [(ngModel)]="exampleRadios1">&nbsp; Client 
+                        </td>
+                        <td class="col-form-span-label width240" colspan="4">
+                            <!-- <select class="form-control width240" [(ngModel)]="client" [disabled]="exampleRadios1 != '1'">
+                                <option value="">--Please Select Client--</option>
+                                <option *ngFor="let data of clientable" value={{data.DATAVALUE}}>{{data.DATATEXTVALUE}}
+                                </option>
+                            </select>   -->
+                            <ng-select [items]="clientable"
+                            bindLabel="DATATEXTVALUE"
+                            bindValue="DATAVALUE" 
+                            [(ngModel)]="client"
+                            class="custom"  
+                            placeholder="--Please Select--"
+                            [disabled]="exampleRadios1 != '1'" >
+                            
+                         </ng-select>
+                        </td>
+                    </tr>
+                    
+                 
+            <tr class="trbg" >
+                <td class="col-form-span-label width100">   
+                      
+                        <input   type="radio" name="exampleRadios" id="exampleRadios3"  [(ngModel)]="exampleRadios1"
+                            value="2" >
+                             Origin 
+                </td>
+                <td colspan="4">
+                            <select class="form-control width240" [(ngModel)]="origin" [disabled]="exampleRadios1 != '2'">
+                            <option value="">--Please Select --</option>
+                            <option *ngFor="let d of origintable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+                        </select>                  
+                                                       
+                </td>
+            </tr >
+                
+                    <tr class="trbg">
+                
+                        <td class="col-form-span-label width100">
+                  
+                    
+                          <input type="radio" name="exampleRadios" id="exampleRadios2" [(ngModel)]="exampleRadios1"
+                              value="3"  >  Date
+                        </td>
+                          
+                              <td>
+                                  <span class="col-form-span-label width150"><b>Start Date</b> </span>
+                                  <span class="col-form-span-error">*</span>
+                              </td>
+                              <td>
+                                  <my-date-picker name="StartDate" [options]="myDatePickerOptions" [(ngModel)]="Effective_from_date" [disabled]="exampleRadios1 != '3'">
+                                  </my-date-picker>
+                              </td>
+                              <td>
+                                  <span class="col-form-span-label width150"><b>End Date</b> </span>
+                                  <span class="col-form-span-error">*</span>
+                              </td>
+                              <td>
+                                  <my-date-picker name="EndDate" [options]="myDatePickerOptions" [(ngModel)]="Effective_to_date" [disabled]="exampleRadios1 != '3'">
+                                  </my-date-picker>
+                              </td>
+                          
+              </tr>
+              <tr>
+                <td colspan="5" class="centerlabel">
+                    <button class="btn btn-sm btn-success" type="submit" (click)="searchlist()"><span
+                            class="col-form-span-label"><i class="fa fa-search"></i> Search</span></button>
+                </td>
+            </tr>
+                </tbody>
+            </table>
+
+        </div>
+     
+    <div class="col-sm-3"></div>
+    <div *ngIf="Masterdetail_list.length >0" >  
+        <button class="btn btn-sm btn-warning" style="float: right;" (click)="displayType='SEARCH';Masterdetail_list=[]"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to search</u></span></button>
+    </div>  
+</div>
+ 
+    <!-- <div  *ngIf="Masterdetail_list.length>0"> -->
+        <main *ngIf="Masterdetail_list.length >0">   
+        <div class="container">
+                    <div class="row yscroll" style="max-height:300px">
+                    <table class="table table-hover table-bordered table-sm-new bgwhite">
+                        <thead>
+                            <tr class="col-form-span-heading" style="white-space:nowrap;">
+                                <!-- <th class="col-form-span-label">PKQUTID</th> -->
+                                <th class="col-form-span-label">Quotation No</th>
+                                <th class="col-form-span-label">Client</th>
+                                <th class="col-form-span-label">Origin</th>
+                                <th class="col-form-span-label">Shipment Mode </th>
+                                <th class="col-form-span-label">Shipment Type</th>
+                                <th class="col-form-span-label">Shipping Line</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bgwhite">
+                            <tr *ngFor="let obj of Masterdetail_list| paginate: config">
+                                <!-- <td><span class="col-form-span-label">{{obj.PKQUTID}}</span></td> -->
+                                <td><span class="col-form-span-label anchor-link" (click)="ListOnclick(obj.PKQUTID,obj.QUT_CODE)">{{obj.QUT_CODE}}</span></td>
+                                <td><span class="col-form-span-label " >{{obj.EXP_SNAME}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.CLIENT_ORIGIN}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.SHIP_MODE}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.SHIPMENTTYPE}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.SHIPPINGLINE}}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+        
+                </div>
+                           
+                <div class="row justify-content-center" style="font-family: sans-serif">
+                    <pagination-controls (pageChange)="pageChanged($event)"  autoHide="true"></pagination-controls>
+                </div>
+        </div>
+    </main> 
+</div>
+</div>

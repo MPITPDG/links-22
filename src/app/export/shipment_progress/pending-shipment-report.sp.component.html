@@ -1,0 +1,76 @@
+﻿<table class="table table-bordered table-sm-new">
+	<tr class="trbg">
+		<td colspan="8">
+			<span class="col-form-span-label"><strong>{{Header}}</strong></span>
+			<button class="btn btn-sm btn-warning" style="float: right;" (click)="back();"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back</u></span></button>
+		</td>
+	</tr>
+	<tr class="trbg">
+		<td colspan="8">
+			<span class="col-form-span-label"><strong>Old Vessel Details </strong></span>
+		</td>
+	</tr>
+	<tr class="trbg">
+		<td colspan="8">
+			<span class="col-form-span-label"><strong>{{OldVessel}}</strong></span>
+		</td>
+	</tr>
+	<tr class="trbg">
+		<td colspan="8">
+			<span class="col-form-span-label"><strong>New Vessel Details</strong></span>
+		</td>
+	</tr>
+	<tr class="trbg">
+		<td colspan="8">
+			<span class="col-form-span-label"><strong>{{NewVessel}}</strong></span>
+		</td>
+	</tr>
+</table>
+<div class="row yscroll" style="height:300px" *ngIf="ExportList.length > 0">
+	<table class="table table-bordered table-sm-new" style="white-space:nowrap;">
+	   <thead>
+			<tr class="col-form-span-heading">
+				<th><span class="col-form-span-label">EXPORT NO</span></th>
+				<th><span class="col-form-span-label">SHIPPER</span></th>
+				<th><span class="col-form-span-label">CONSIGNEE</span></th>
+				<th><span class="col-form-span-label">AGENT</span></th>
+				<th><span class="col-form-span-label">PKGS</span></th>
+				<th><span class="col-form-span-label">PCS</span></th>
+				<th><span class="col-form-span-label">ORDER NO</span></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr *ngFor="let obj of ExportList">
+				<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
+				<td><span class="col-form-span-label">{{obj.EXP_NAME}}</span></td>
+				<td><span class="col-form-span-label">{{obj.CON_NAME}}</span></td>
+				<td><span class="col-form-span-label">{{obj.AGT_SNAME}}</span></td>
+				<td><span class="col-form-span-label">{{obj.EXPT_NOOFPKGS}}</span></td>
+				<td><span class="col-form-span-label">{{obj.EXPT_NOOFPCS}}</span></td>
+				<td><span class="col-form-span-label">{{obj.ORDERNO}}</span></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<div class="row yscroll" style="height:300px" *ngIf="ContainerList.length > 0">
+	<table class="table table-bordered table-sm-new" style="white-space:nowrap;">
+	   <thead>
+			<tr class="col-form-span-heading">
+				<th><span class="col-form-span-label">Container No</span></th>
+				<th><span class="col-form-span-label">Export No</span></th>
+				<th><span class="col-form-span-label">Total No Of Pkgs</span></th>
+				<th><span class="col-form-span-label">Total CBM</span></th>
+			</tr>
+		</thead>
+		<tbody>
+			<ng-container *ngFor="let obj of ContainerList">
+				<tr>
+					<td *ngIf="obj.CONTAINERNO !== ''" [attr.rowspan]="obj.TOTAL_COUNT" style="vertical-align: middle;"><span class="col-form-span-label">{{obj.CONTAINERNO}}</span></td>
+					<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
+					<td><span class="col-form-span-label">{{obj.NOOFPKGS}}</span></td>
+					<td><span class="col-form-span-label">{{obj.CBM}}</span></td>
+				</tr>
+			</ng-container>
+		</tbody>
+	</table>
+</div>

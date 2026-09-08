@@ -1,0 +1,137 @@
+
+<table class="table table-bordered table-sm-new" style="width:100%" >
+    <!-- <tr class="title-head trbg">
+            <th colspan="2">
+                    <span class="col-form-span-label">
+                            CALCULATE CBM
+                    </span>
+            </th>
+    </tr> -->
+        <tr>
+            <td>
+                <table class="table table-bordered table-sm-new" style="width:100%" >
+                <tr>
+                <td>
+                <table class="table table-bordered table-sm-new" style="width:100%" >
+                <tr>
+                <td><span class="col-form-span-label">Gr.Wt</span></td>
+                <td>
+                   <input type="text" disabled [(ngModel)]="Grwt" class="form-control width50" />
+                </td>
+                <td><span class="col-form-span-label">No. Of Packages</span></td>
+                <td>
+                   <input type="text" disabled [(ngModel)]="NoOfPackages" class="form-control width50" />
+                </td>
+                </tr>
+                <tr>
+                <td ><span class="col-form-span-label">Unit Type</span> </td>
+                <td colspan="2">
+                   <select class="form-control width50"  [(ngModel)]="Unit"  >
+                    <option value="0">--Select--</option>
+                    <option value="1">Inch</option>
+                    <option value="2">Cm</option>
+                        </select>
+                </td>
+                </tr>
+
+                </table>
+                </td>
+                </tr>
+                <tr>
+                    <td>
+                    <table class="table table-bordered table-sm-new" style="width:100%" >
+                    <tr>
+                    <td><span class="col-form-span-label"> PACKAGES</span></td>
+                    <td><span class="col-form-span-label"> LENGTH</span></td>
+                    <td><span class="col-form-span-label"> WIDTH</span></td>
+                    <td><span class="col-form-span-label"> HEIGHT</span></td>
+                    <td><span class="col-form-span-label"> VOLUME</span></td>
+                </tr>
+            <tr>
+            <td> <input type="text" [(ngModel)]="Packages" class="form-control width50" /> </td>
+            <td> <input type="text" [(ngModel)]="Length" class="form-control width50" /> </td>
+            <td> <input type="text" [(ngModel)]="Width" class="form-control width50" /></td>
+            <td> <input type="text" [(ngModel)]="Height" (change)="fn_CalCBM();" class="form-control width80" />  </td>
+            <td> <input type="text" disabled [(ngModel)]="Volume" class="form-control width80" /> </td>
+            </tr>
+                    </table>
+                    </td>
+                </tr>
+          <tr>
+        <td colspan="5" align="center">
+         <button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="AddDimension();">
+         <span class="col-form-span-label"> <i class="fa fa-save"></i>{{text}}</span></button>&nbsp;
+         <button type="button" name="ResetButton" class="btn btn-sm btn-warning" (click)="fun_clear();" >
+         <span class="col-form-span-label"><i class="fa fa-undo"></i>&nbsp;Clear</span></button>&nbsp;
+        </td>
+         </tr>
+    <tr>
+    <td>
+    <table class="table table-bordered table-sm-new" style="width:100%">
+    <tr>
+    <td><span class="col-form-span-label">CBM</span></td>
+    <td>
+       <input type="text" disabled [(ngModel)]="TotCbm" class="form-control width80" />
+    </td>
+    <td><span class="col-form-span-label">Vol Wt.</span></td>
+    <td>
+       <input type="text" disabled [(ngModel)]="VolWt" class="form-control width80" />
+    </td>
+    </tr>
+    </table>
+    </td>
+    </tr>
+    <tr>
+    <td colspan="4">
+<!--
+        <tr>
+             -->
+                <div  style="width:100%"   >
+                    <table class="table table-responsive-sm table-bordered" style="width:100%"  *ngIf="Dimensionlist.length>0" >
+                        <thead>
+                            <tr class="bakgrdliteBlue">
+                                <th  class="col-form-span-label font-weight-bold headerwhite" ></th>
+                                <th class="col-form-span-label font-weight-bold headerwhite">Packages</th>
+                                <th  class="col-form-span-label font-weight-bold headerwhite">Length</th>
+                                <th  class="col-form-span-label font-weight-bold headerwhite">Width</th>
+                                <th  class="col-form-span-label font-weight-bold headerwhite">Height</th>
+                                <th  class="col-form-span-label font-weight-bold headerwhite">Volume</th>
+
+                            </tr>
+                        </thead>
+                         <tbody   >
+                            <tr *ngFor="let obj of Dimensionlist">
+                                <td class="centerlabel">
+                                    <i class="fa fa-pencil" (click)="EditDimension(obj.PK_ID)" ></i>
+                                    &nbsp;
+                                    <i class="fa fa-trash" (click)="DeleteDimension(obj.PK_ID,obj.MAINTBLID)"></i>
+                                </td>
+
+                                <td><span class="col-form-span-label">{{obj.DIMPKGS}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.DIMLENGTH}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.DIMWIDTH}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.DIMHEIGHT}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.DIMVOLUME}}</span></td>
+
+                                 </tr>
+                        </tbody>
+                    </table>
+               </div>
+
+        <!-- </tr> -->
+
+</td>
+</tr>
+
+<tr>
+<td colspan="5" align="center">
+<button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="Close();">
+<span class="col-form-span-label"><i class="fa fa-save"></i>Close</span></button>&nbsp;
+</td>
+</tr>
+     </table>
+
+    </td>
+    </tr>
+
+</table>

@@ -1,0 +1,67 @@
+﻿<div class="animated fadeIn">
+	<div class="row">
+		<div class="col-sm-2">
+		</div>
+		<div class="col-sm-8">
+			<table class="table table-bordered table-sm-new">
+				<tr class="trbg centerlabel">
+					<td colspan="8"><span class="col-form-span-label"><b>CONTAINER LOADING CONFIRMATION </b></span></td>
+				</tr>
+			</table>
+			<table class="table table-bordered table-sm-new" *ngIf="this.viewType == 'Search'">
+				<tr>
+					<td class="width100"><span class="col-form-span-label">Vessel Name<span class="col-form-span-error"> *</span></span></td>
+					<td colspan="3">
+						<input type="text" [(ngModel)]="VesselName" class="form-control"/>
+					</td>
+					<td class="width100"><span class="col-form-span-label">Voyage No<span class="col-form-span-error"> *</span></span></td>
+					<td colspan="3">
+						<input type="text" [(ngModel)]="VoyageNo" class="form-control"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="centerlabel" colspan="8">
+						<button type="button" class="btn btn-sm btn-info" name="searchButton" (click)="Search()" #searchButton><span class="col-form-span-label"><i class="fa fa-search"></i>&nbsp;Search</span></button>
+					</td>
+				</tr>
+			</table>
+			<div class="row yscroll" style="height:300px" *ngIf="this.viewType=='Search'&&searchList.length > 0">
+				<table class="table table-bordered table-sm-new">
+					<thead>
+						<tr class="col-form-span-heading" style="white-space:nowrap;">
+							<th class="centerlabel"><span class="col-form-span-label">Vessel Name</span></th>
+							<th class="centerlabel"><span class="col-form-span-label">Voyage No</span></th>
+							<th class="centerlabel"><span class="col-form-span-label">ETD</span></th>
+						</tr>
+					</thead>
+					<tbody class="bgwhite">
+						<tr *ngFor="let obj of searchList" (click)="rowSearchSendClick(obj.VSL_RTNO, obj.VSL_NAME, obj.VSL_VOYNO, obj.ETD);" style="cursor: pointer;">
+							<td><span class="col-form-span-label">{{obj.VSL_NAME}}</span></td>
+							<td><span class="col-form-span-label">{{obj.VSL_VOYNO}}</span></td>
+							<td><span class="col-form-span-label">{{obj.ETD}}</span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<table class="table table-bordered table-sm-new" *ngIf="this.viewType=='Search'&&searchList.length > 0">
+				<tr class="trbg">
+					<td colspan="8">
+						<span class="error-text">{{searchList.length + ' Rows Found.'}}</span>
+					</td>
+				</tr>
+			</table>
+			<app-shipment-progress-container-loading-view [DataSet]="ContainerDataSet" *ngIf="this.viewType=='View'" (backtosearch)="back($event)" (editdata)="editdata($event)"></app-shipment-progress-container-loading-view>
+			<app-shipment-progress-container-loading-update [DataSet]="UpdateDataSet" [EditData]="EditData" *ngIf="this.viewType=='Update'" (updatedata)="reportdata($event)" (backtosearch)="back($event)"></app-shipment-progress-container-loading-update>
+			<app-shipment-progress-container-loading-report [DataSet]="ReportDataSet" *ngIf="this.viewType=='Report'" (backtosearch)="back($event)"></app-shipment-progress-container-loading-report>
+			<table class="table table-bordered table-sm-new">
+				<tr class="trbg centerlabel" *ngIf="ErrorMessage !== ''">
+					<td colspan="8">
+						<span class="error-text">{{ErrorMessage}}</span>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-sm-2">
+		</div>
+	</div>
+</div>

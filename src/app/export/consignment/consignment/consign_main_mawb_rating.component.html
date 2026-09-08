@@ -1,0 +1,1210 @@
+﻿<table class="table table-bordered table-sm-new">
+   <tbody>
+	  <tr>
+		 <td class="width220" colspan="3"><span class="col-form-span-label"></span></td>
+		 <td class="width300" colspan="3"><span class="col-form-span-label"><strong><u>Existing</u></strong></span></td>
+		 <td class="width300" colspan="3"><span class="col-form-span-label"><strong><u>New</u></strong></span></td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Chargable Weight</strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label">{{Wgt}}</span></td>
+		 <td colspan="3"><input type="text" [(ngModel)]="UserWgt" class="form-control width100" (change)="changeUserWeight()"  /></td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Gross Weight</strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label">{{GrossWeight}}</span></td>
+		 <td colspan="3"><input type="text" [(ngModel)]="UserGrossWeight" class="form-control width100" (change)="changeUserWeight()"   /></td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"></span></td>
+		 <td colspan="6"><span class="col-form-span-label"><input type="checkbox" [(ngModel)]="isMinRate" [disabled]="true" />Print as MIN Rate Charges</span></td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Freight INR/Kg </strong></span></td>
+		 <td colspan="6">
+
+			<select class="form-control width100" [(ngModel)]="FreightRate"  (change)="changeFreight(FreightRate)" [disabled]="true">
+				<option value="">--Select--</option>
+				<option value="PP">Prepaid</option>
+				<option value="CC">Collect</option>
+		</select>
+		 </td>
+	  </tr>
+
+	  <tr class="col-form-span-heading">
+		 <td colspan="3"><span class="col-form-span-label"><strong>FREIGHT </strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label"><strong>TARIFF RATE </strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label"><strong>NET NET RATE </strong></span></td>
+	  </tr>
+	  <tr>
+		 <td colspan="2"><span class="col-form-span-label"><strong>Supplier </strong></span><span class="col-form-span-error">*</span></td>
+		 <!-- <td colspan="3"><span class="col-form-span-label"><strong></strong></span></td> -->
+		 <td colspan="6">
+
+			<select class="form-control " [(ngModel)]="SupplierNet">
+				<option value="">--select--</option>
+				 <option *ngFor="let d of netData" value={{d.DataValueField}}>{{d.DataTextField}}</option>
+			</select>
+		</td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Freight Chargeble As </strong></span></td>
+		 <td colspan="3">
+			<span class="col-form-span-label">
+				<input type="radio" name="TarFreightType" [checked]="TariffRate == 1" (click)="tarCheck(1)"/>All Inclusive&nbsp;
+				<input type="radio" name="TarFreightType" [checked]="TariffRate == 2" (click)="tarCheck(2)"/>Freight + Surcharge
+			</span>
+		</td>
+		<td colspan="3">
+			<span class="col-form-span-label">
+				<input type="radio"  name="NetFreightType" [checked]="NetRate == 1" (click)="netCheck(1)"/>All Inclusive&nbsp;
+				<input type="radio"  name="NetFreightType" [checked]="NetRate == 2" (click)="netCheck(2)"/>Freight + Surcharge
+			</span>
+		</td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong><u>DESCRIPTION</u></strong></span></td>
+		 <td colspan="3">
+			<span class="col-form-span-label" *ngIf="FreightRate == 'PP' || FreightRate == null"><strong><u>Payable On / Rate / Prepaid</u></strong></span>
+			<span class="col-form-span-label" *ngIf="FreightRate == 'CC'"><strong><u>Payable On / Rate / Collect</u></strong></span>
+		 </td>
+		 <td colspan="3">
+			<span class="col-form-span-label" *ngIf="FreightRate == 'PP' || FreightRate == null"><strong><u>Payable On / Rate / Prepaid</u></strong></span>
+			<span class="col-form-span-label" *ngIf="FreightRate == 'CC'"><strong><u>Payable On / Rate / Collect</u></strong></span>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(1) FREIGHT (BASIC) </strong></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="TarFreightPayOn" [disabled]="true">
+							<option value="null">--</option>
+							<option value="CW">CW</option>
+						</select>
+
+					</td>
+					<td class="width60"><input type="text" [(ngModel)]="TarFreightRate" class="form-control"(change)="selectionChange($event)" (change)="changeTariffRates('Freight');changeNetRates('Freight')"/></td>
+					<td class="width100"><input type="text" [(ngModel)]="TarFreight" class="form-control" [disabled]="UserWgt > 151" (change)="RatesChange($event)"/></td>
+					<td class="width60">
+
+
+						<select class="form-control width70" [(ngModel)]="TarFreightFrt" (change)="fnChangeFreight_PP_CC_TAR()"  >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="NetFreightPayOn" [disabled]="true">
+							<option value="null">--</option>
+							<option value="CW">CW</option>
+						</select>
+					</td>
+					<td class="width60"><input type="text" [(ngModel)]="NetFreightRate" class="form-control" (change)="changeNetRates('Freight')" /></td>
+					<td class="width100"><input type="text" [(ngModel)]="NetFreight" class="form-control"  [disabled]="UserWgt > 151"/></td>
+				    <!-- <td class="width60"><input type="text" [(ngModel)]="TarFreightRate"  class="form-control" (change)="changeTariffRates('Freight')" /></td>
+					<td class="width100"><input type="text" [(ngModel)]="TarFreight"  class="form-control" [disabled]="UserWgt > 151" /></td> -->
+					<td class="width60">
+
+						<select class="form-control width80" [(ngModel)]="NetFreightFrt" (change)="fnChangeFreight_PP_CC_NET()"  >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td class="col-form-span-heading" colspan="9"><span class="col-form-span-label"><strong>FREIGHT (SURCHARGE)</strong></span></td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(2) FSC </strong></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="TarFscPayOn" (change)="TarFscPayOnChange($event)" (change)="changePayOnTariff('Fsc')" [disabled]="TariffRate == 1">
+							<option value="null">--</option>
+							<option value="CW">CW</option>
+							<option value="GW">GW</option>
+						</select>
+					</td>
+					<td class="width60"><input type="text" [(ngModel)]="TarFscRate" class="form-control" [disabled]="TariffRate == 1" (change)="TariffRateChange($event)" (change)="changeTariffRates('Fsc');changeNetRates('Fsc')"/></td>
+					<td class="width100"><input type="text" [(ngModel)]="TarFsc" class="form-control"  [disabled]="TariffRate == 1"/></td>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="TarFscFrt" (change)="fnCalculate_Tar()" [disabled]="true" >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="NetFscPayOn" [disabled]="NetRate == 1" (change)="changePayOnNet('Fsc')">
+							<option value="null">--</option>
+							<option value="CW">CW</option>
+							<option value="GW">GW</option>
+						</select>
+					</td>
+					<td class="width60"><input type="text" [(ngModel)]="NetFscRate" [disabled]="NetRate == 1" (change)="changeNetRates('Fsc')" class="form-control" /></td>
+					<td class="width100"><input type="text" [(ngModel)]="NetFsc" class="form-control"  [disabled]="UserWgt > 151"/></td>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="NetFscFrt" (change)="fnCalculate_Net()" 	[disabled]="true"  >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(3) IRC </strong></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="TarIrcPayOn"  [disabled]="TariffRate == 1" (change)="TarIrcPayOnChange($event)" (change)="changePayOnTariff('Irc')">
+							<option value="null">--</option>
+							<option value="CW">CW</option>
+							<option value="GW">GW</option>
+						</select>
+					</td>
+					<td class="width60"><input type="text" [(ngModel)]="TarIrcRate" class="form-control"  [disabled]="TariffRate == 1" (change)="TarIrcChange($event)" (change)="changeTariffRates('Irc');changeNetRates('Irc')"/></td>
+					<td class="width100"><input type="text" [(ngModel)]="TarIrc" class="form-control" [disabled]="TariffRate == 1" /></td>
+					<td class="width60">
+
+						<select class="form-control width80" [(ngModel)]="TarIrcFrt" [disabled]="true" (change)="fnCalculate_Tar()"  >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="NetIrcPayOn" [disabled]="NetRate == 1" (change)="changePayOnNet('Irc')">
+							<option value="null">--</option>
+							<option value="CW">CW</option>
+							<option value="GW">GW</option>
+						</select>
+					</td>
+					<td class="width60"><input type="text" [(ngModel)]="NetIrcRate" [disabled]="NetRate == 1" (change)="changeNetRates('Irc')" class="form-control" /></td>
+					<td class="width100"><input type="text" [(ngModel)]="NetIrc" class="form-control" [disabled]="UserWgt > 151" /></td>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="NetIrcFrt"  [disabled]="true" (change)="fnCalculate_Net()" >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+
+					</td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(4) X-RAY </strong></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="TarXrayPayOn" (change)="XraypayChange($event)"	(change)="changePayOnTariff('Xray')">
+							<option value="null">--</option>
+							<option value="CW">CW</option>
+							<option value="GW">GW</option>
+						</select>
+					</td>
+					<td class="width60"><input type="text" [(ngModel)]="TarXrayRate" class="form-control" (change)="XrayChange($event)"  (change)="changeTariffRates('Xray');changeNetRates('Xray')"/></td>
+					<!-- <td class="width100"><input type="text" [(ngModel)]="TarXray" class="form-control" [disabled]="UserWgt > 151" /></td> -->
+					<td class="width100"><input type="text" [(ngModel)]="TarXray" class="form-control" (change)="fnCalculate_Tar()" /></td>
+					<td class="width60">
+
+						<select class="form-control width80" [(ngModel)]="TarXrayFrt"  [disabled]="true" 	(change)="fnCalculate_Tar()">
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+
+					</td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="NetXrayPayOn" [disabled]="NetRate == 2" (change)="changePayOnNet('Xray')">
+							<option value="null">--</option>
+							<option value="CW">CW</option>
+							<option value="GW">GW</option>
+						</select>
+					</td>
+					<td class="width60"><input type="text" [(ngModel)]="NetXrayRate" [disabled]="NetRate == 2" (change)="changeNetRates('Xray')" class="form-control" /></td>
+					<!-- <td class="width100"><input type="text" [(ngModel)]="NetXray" class="form-control" [disabled]="UserWgt > 151" /></td> -->
+					<td class="width100"><input type="text" [(ngModel)]="NetXray" class="form-control" (change)="fnCalculate_Net()" /></td>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="NetXrayFrt" [disabled]="true" (change)="fnCalculate_Net()">
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(5) MISC CHARGES </strong></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="TarMcPayOn" (change)="TarMcPayOnChange($event)" (change)="changePayOnTariff('Misc')">
+							<!-- <option value="null">--</option>
+							<option value="CW">CW</option> -->
+							<option value="null">--</option>
+							<option value="CW">CW</option>
+							<option value="GW">GW</option>
+						</select>
+					</td>
+					<!-- <td class="width60"><input type="text" [(ngModel)]="TarMcRate" class="form-control" [disabled]="UserWgt > 151" /></td>
+					<td class="width100"><input type="text" [(ngModel)]="TarMc" class="form-control" [disabled]="UserWgt > 151" /></td> -->
+					<td class="width60"><input type="text" [(ngModel)]="TarMcRate" class="form-control" (change)="TarMcRateChange($event)" (change)="changeTariffRates('Misc');changeNetRates('Misc')" /></td>
+					<td class="width100"><input type="text" [(ngModel)]="TarMc" class="form-control" (change)="fnCalculate_Tar()" /></td>
+					<td class="width60">
+
+						<select class="form-control width70" [disabled]="true" [(ngModel)]="TarMcFrt" (change)="fnCalculate_Tar()"  >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="NetMcPayOn" (change)="changePayOnNet('Misc')">
+							<!-- <option value="null">--</option>
+							<option value="CW">CW</option> -->
+							<option value="null">--</option>
+							<option value="CW">CW</option>
+							<option value="GW">GW</option>
+						</select>
+					</td>
+					<!-- <td class="width60"><input type="text" [(ngModel)]="NetMcRate" class="form-control" [disabled]="UserWgt > 151" /></td>
+					<td class="width100"><input type="text" [(ngModel)]="NetMc" class="form-control" [disabled]="UserWgt > 151" /></td> -->
+					<td class="width60"><input type="text" [(ngModel)]="NetMcRate" class="form-control" (change)="changeNetRates('Misc')" /></td>
+					<td class="width100"><input type="text" [(ngModel)]="NetMc" class="form-control" (change)="fnCalculate_Net()" /></td>
+					<td class="width60">
+
+
+					<select class="form-control width70" [(ngModel)]="NetMcFrt"  [disabled]="true" (change)="fnCalculate_Net()"  >
+						<option value="null">--</option>
+						<option value="PP">PP</option>
+						<option value="CC">CC</option>
+					</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(6) CTG </strong></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60">
+
+						<!-- <select class="form-control width70" [(ngModel)]="TarCtgPayOn" [disabled]="true"> -->
+							<select class="form-control width70" [(ngModel)]="TarCtgPayOn" (change)="TarCtgPayOnChange($event)" (change)="changePayOnTariff('CTG')" >
+							<!-- <option value="null">--</option>
+							<option value="GW">GW</option> -->
+							<option value="null">--</option>
+							<option value="CW">CW</option>
+							<option value="GW">GW</option>
+						</select>
+					</td>
+					<td class="width60"><input type="text" [(ngModel)]="TarCtgRate"  class="form-control" (change)="TarCtgRateChange($event)" (change)="changeTariffRates('CTG');changeNetRates('CTG')"/></td>
+					<td class="width100"><input type="text" [(ngModel)]="TarCtg" class="form-control" (change)="fnCalculate_Tar();" /></td>
+					<td class="width60">
+
+						<select class="form-control width70" [disabled]="true" [(ngModel)]="TarCtgFrt" (change)="fnCalculate_Tar()"  >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60">
+
+						<!-- <select class="form-control width70" [(ngModel)]="NetCtgPayOn" [disabled]="true"> -->
+							<select class="form-control width70" [(ngModel)]="NetCtgPayOn" (change)="changePayOnNet('CTG')">
+							<!-- <option value="null">--</option>
+							<option value="GW">GW</option> -->
+							<option value="null">--</option>
+							<option value="CW">CW</option>
+							<option value="GW">GW</option>
+						</select>
+					</td>
+					<!-- <td class="width60"><input type="text" [(ngModel)]="NetCtgRate" class="form-control" [disabled]="true" /></td>
+					<td class="width100"><input type="text" [(ngModel)]="NetCtg" class="form-control" [disabled]="UserWgt > 151" /></td> -->
+					<td class="width60"><input type="text" [(ngModel)]="NetCtgRate" class="form-control"  (change)="changeNetRates('CTG')"/></td>
+					<td class="width100"><input type="text" [(ngModel)]="NetCtg" class="form-control"   (change)="fnCalculate_Net()"/></td>
+					<td class="width60">
+
+						<select class="form-control width70" [disabled]="true" [(ngModel)]="NetCtgFrt" (change)="fnCalculate_Net()"  >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(7) THC </strong></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60">
+
+						<!-- <select class="form-control width70" [(ngModel)]="TarThcPayOn" [disabled]="true"> -->
+							<select class="form-control width70" [(ngModel)]="TarThcPayOn" (change)="TarThcPayOnChange($event)" (change)="changePayOnTariff('THC')">
+							<!-- <option value="null">--</option>
+							<option value="CW">CW</option> -->
+							<option value="null">--</option>
+							<option value="CW">CW</option>
+							<option value="GW">GW</option>
+
+						</select>
+					</td>
+					<!-- <td class="width60"><input type="text" [(ngModel)]="TarThcRate" class="form-control" [disabled]="true" /></td>
+					<td class="width100"><input type="text" [(ngModel)]="TarThc" class="form-control" [disabled]="true" /></td> -->
+					<td class="width60"><input type="text" [(ngModel)]="TarThcRate" class="form-control" (change)="TarThcRateChange($event)" (change)="changeTariffRates('THC');changeNetRates('THC')" /></td>
+					<td class="width100"><input type="text" [(ngModel)]="TarThc" class="form-control" (change)="fnCalculate_Tar();" /></td>
+					<td class="width60">
+
+						<select class="form-control width70" [disabled]="true" [(ngModel)]="TarThcFrt" (change)="fnCalculate_Tar()">
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+
+					</td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60">
+
+						<!-- <select class="form-control width70" [(ngModel)]="NetThcPayOn" [disabled]="true"> -->
+							<select class="form-control width70" [(ngModel)]="NetThcPayOn" (change)="changePayOnNet('THC')">
+							<!-- <option value="null">--</option>
+							<option value="GW">GW</option> -->
+							<option value="null">--</option>
+							<option value="CW">CW</option>
+							<option value="GW">GW</option>
+						</select>
+					</td>
+					<!-- <td class="width60"><input type="text" [(ngModel)]="NetThcRate" class="form-control" [disabled]="true" /></td>
+					<td class="width100"><input type="text" [(ngModel)]="NetThc" class="form-control" [disabled]="true" /></td> -->
+					<td class="width60"><input type="text" [(ngModel)]="NetThcRate" class="form-control"  (change)="changeNetRates('THC')"/></td>
+					<td class="width100"><input type="text" [(ngModel)]="NetThc" class="form-control" (change)="fnCalculate_Net()" /></td>
+					<td class="width60">
+
+						<select class="form-control width70" [disabled]="true" [(ngModel)]="NetThcFrt" 	(change)="fnCalculate_Net()">
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr *ngIf="CityCode != 'DAC'">
+		 <td colspan="3"><span class="col-form-span-label"><strong>(8) BUSINESS PROMOTION </strong></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="TarBPPayOn" (change)="TarBPPayOnChange($event)" (change)="changePayOnTariff('BP')" >
+							<option value="null">--</option>
+							<option value="CW">CW</option>
+							<option value="GW">GW</option>
+						</select>
+					</td>
+					<td class="width60"><input type="text" [(ngModel)]="TarBPRate" class="form-control" (change)="TarBPRateChange($event)"  (change)="changeTariffRates('BP');changeNetRates('BP')"/></td>
+					<td class="width100"><input type="text" [(ngModel)]="TarBP" class="form-control"  [disabled]="UserWgt > 151"/></td>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="TarBPFrt"(change)="fnCalculate_Tar()">
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="NetBPPayOn" (change)="changePayOnNet('BP')">
+							<option value="null">--</option>
+							<option value="CW">CW</option>
+							<option value="GW">GW</option>
+						</select>
+					</td>
+					<td class="width60"><input type="text" [(ngModel)]="NetBPRate" class="form-control"  (change)="changeNetRates('BP')" /></td>
+					<td class="width100"><input type="text" [(ngModel)]="NetBP" class="form-control" [disabled]="UserWgt > 151" /></td>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="NetBPFrt" (change)="fnCalculate_Net()">
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(9) AMS </strong></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60"></td>
+					<td class="width60"></td>
+					<td class="width100"><input type="text" [(ngModel)]="TarAms" class="form-control" (change)="TarAmsChange($event)" (change)="onChangeAms('TAR');onChangeAms('NET')"/></td>
+					<td class="width70">
+
+						<select class="form-control width70" [(ngModel)]="TarAmsFrt" (change)="TarAmsFrtChange($event)" (change)="fnCalculate_Tar()"  >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60"></td>
+					<td class="width60"></td>
+					<td class="width100"><input type="text" [(ngModel)]="NetAms" class="form-control" (change)="onChangeAms('NET')" /></td>
+					<td class="width70">
+
+						<select class="form-control width70" [(ngModel)]="NetAmsFrt" (change)="fnCalculate_Net()"  >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(10) MAWB </strong></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60"></td>
+					<td class="width60"></td>
+					<td class="width100"><input type="text" [(ngModel)]="HawbTar" (change)="fnCalculate_Tar()" class="form-control" [disabled]="UserWgt > 151" /></td>
+					<td class="width70">
+
+						<select class="form-control width70" [(ngModel)]="HawbTarFrt" (change)="fnCalculate_Tar()"  >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60"></td>
+					<td class="width60"></td>
+					<td class="width100"><input type="text" [(ngModel)]="HawbNet" class="form-control" [disabled]="UserWgt > 151" /></td>
+					<td class="width70">
+
+						<select class="form-control width70" [(ngModel)]="HawbNetFrt" (change)="fnCalculate_Net()"  >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(11) PCA </strong></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60"></td>
+					<td class="width60"></td>
+					<td class="width100"><input type="text" [(ngModel)]="PcaTar" (change)="fnCalculate_Tar()" class="form-control" /></td>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="PcaTarFrt" (change)="fnCalculate_Tar()"  >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60"></td>
+					<td class="width60"></td>
+					<td class="width100"><input type="text" [(ngModel)]="PcaNet" class="form-control" /></td>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="PcaNetFrt" (change)="fnCalculate_Net()"  >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+
+	  <tr>
+		<td colspan="3"><span class="col-form-span-label"><strong>(12) DEST.TRUCKING </strong></span></td>
+		<td colspan="3">
+			 <table class="table-sm-new bglightgray">
+			   <tr>
+				   <td class="width60">
+
+					   <select class="form-control width70" [(ngModel)]="TarTruckPayOn" (change)="TarTruckPayOnChange($event)" (change)="changePayOnTariff('DT')" >
+						   <option value="null">--</option>
+						   <option value="CW">CW</option>
+						   <option value="GW">GW</option>
+					   </select>
+				   </td>
+				   <td class="width60"><input type="text" [(ngModel)]="TarTruckRate" class="form-control" (change)="TarTruckRateChange($event)" (change)="changeTariffRates('DT');changeNetRates('DT')"/></td>
+				   <td class="width100"><input type="text" [(ngModel)]="TarTruck" class="form-control"  [disabled]="UserWgt > 151"/></td>
+				   <td class="width60">
+
+					   <select class="form-control width70" [(ngModel)]="TarTruckFrt"(change)="fnCalculate_Tar()">
+						   <option value="null">--</option>
+						   <option value="PP">PP</option>
+						   <option value="CC">CC</option>
+					   </select>
+				   </td>
+			   </tr>
+		   </table>
+		</td>
+		<td colspan="3">
+			 <table class="table-sm-new bglightgray">
+			   <tr>
+				   <td class="width60">
+
+					   <select class="form-control width70" [(ngModel)]="NetTruckPayOn" (change)="changePayOnNet('DT')">
+						   <option value="null">--</option>
+						   <option value="CW">CW</option>
+						   <option value="GW">GW</option>
+					   </select>
+				   </td>
+				   <td class="width60"><input type="text" [(ngModel)]="NetTruckRate" class="form-control"  (change)="changeNetRates('DT')" /></td>
+				   <td class="width100"><input type="text" [(ngModel)]="NetTruck" class="form-control" [disabled]="UserWgt > 151" /></td>
+				   <td class="width60">
+
+					   <select class="form-control width70" [(ngModel)]="NetTruckFrt" (change)="fnCalculate_Net()">
+						   <option value="null">--</option>
+						   <option value="PP">PP</option>
+						   <option value="CC">CC</option>
+					   </select>
+				   </td>
+			   </tr>
+		   </table>
+		</td>
+	 </tr>
+	 <tr class="formheading">
+		<td colspan="11"><strong><span class="col-form-span-label">(13)  AIRLINE CHARGES</span></strong></td>
+	 </tr>
+	 <tr>
+
+		<td colspan="11">
+			<table class="table table-sm-new bgwhite" width="100%">
+				<tr >
+					<td>
+						<select class="form-control width80" [(ngModel)]="CHARGETYPE" (change)="GetChrges(CHARGETYPE)" >
+						   <option value="null">--Select--</option>
+						   <option *ngFor="let d of ChrgTypelist" value={{d.DataValueField}}>{{d.DataTextField}}</option>
+				   </select>
+					</td>
+					<td>
+						<select class="form-control  width130" [(ngModel)]="CHARGENAME" >
+						<option value="null">--</option>
+						<option *ngFor="let d of AirLineCharges" value={{d.DataValueField}}>{{d.DataTextField}}</option>
+				  </select></td>
+
+					<td class="width60"></td>
+					<td class="width60"></td>
+					<td class="centerlabel">
+						<input type="text" class="width100" [(ngModel)]="RATE_TAR" (change)="changeNetRate(RATE_TAR)" class="form-control">
+					</td>
+					<td>
+						<select class="form-control width70" [(ngModel)]="RATE_TAR_FRT" (change)="changeNetFreight(RATE_TAR_FRT)" >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+					</select>
+					</td>
+					<td class="width60"></td>
+					<!-- <td class="width60"></td> -->
+					<td>
+						<input type="text" class="width100" [(ngModel)]="RATE_NET" disabled class="form-control">
+					</td>
+					<td>
+						<select class="form-control width70" [(ngModel)]="RATE_NET_FRT" >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+					</select>
+					</td>
+					<!-- <td class="right-text" >
+						<button type="button" class="btn btn-sm btn-warning" (click)="AddALCharges()">
+							<span class="col-form-span-label">
+								<i class="fa fa-plus"></i>&nbsp;{{txtchild}}</span>
+						</button>
+					</td> -->
+					<!-- <td class="centerlabel width20">
+						<button type="button" class="btn btn-sm btn-danger" (click)="removeRow(i)" *ngIf="dtAirLineCharges.length > 1">
+							<span class="col-form-span-label"><i class="fa fa-times"></i></span>
+						</button>
+					</td> -->
+
+				  </tr>
+				  <tr>
+					<td colspan="9" align="center" >
+						<button type="button" class="btn btn-sm btn-warning" (click)="AddMAWBALCharges()">
+							<span class="col-form-span-label">
+								<i class="fa fa-plus"></i>&nbsp;{{txtchild}}</span>
+						</button>
+						<button type="button" class="btn btn-sm btn-danger" (click)="ResetMAWBCharges()">
+							<span class="col-form-span-label">
+								<i class="fa fa-ban"></i>Reset</span>
+						</button>
+					</td>
+				  </tr>
+				<!-- <tr *ngFor="let obj of dtAirLineCharges; let i= index">
+					<td>
+						<select class="form-control width80" [(ngModel)]="obj.CHARGETYPE"  >
+						   <option value="">--Select--</option>
+						   <option *ngFor="let d of ChrgTypelist[i]" value={{d.DataValueField}}>{{d.DataTextField}}</option>
+				   </select>
+					</td>
+					<td>
+						<select class="form-control  width130" [(ngModel)]="obj.CHARGECODE" (change)="GetChrgType(obj.CHARGECODE,i)" >
+						<option value="null">--</option>
+						<option *ngFor="let d of AirLineCharges" value={{d.DataValueField}}>{{d.DataTextField}}</option>
+				  </select></td>
+
+					<td class="width60"></td>
+					<td class="width60"></td>
+					<td class="centerlabel">
+						<input type="text" class="width100" [(ngModel)]="obj.CHRGAMT1" (change)="changeAmt2(obj.CHRGAMT1,i)" class="form-control">
+					</td>
+					<td>
+						<select class="form-control width70" [(ngModel)]="obj.FREIGHT1" (change)="changeFreight2(obj.FREIGHT1,i,obj.CHRGAMT1)" >
+							<option value="">--Select--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+					</select>
+					</td>
+					<td class="width60"></td>
+					<td class="width60"></td>
+					<td>
+						<input type="text" class="width100" [(ngModel)]="obj.CHRGAMT2" disabled class="form-control">
+					</td>
+					<td>
+						<select class="form-control width70" [(ngModel)]="obj.FREIGHT2" >
+							<option value="">--Select--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+					</select>
+					</td>
+					<td class="centerlabel width20">
+						<button type="button" class="btn btn-sm btn-danger" (click)="removeRow(i)" *ngIf="dtAirLineCharges.length > 1">
+							<span class="col-form-span-label"><i class="fa fa-times"></i></span>
+						</button>
+					</td>
+
+				  </tr> -->
+
+				<tr>
+					<td colspan="11">
+						<table class="table table-bordered  table-sm-new bgwhite" *ngIf="Chargeslist.length>0" width="100%" >
+											<thead>
+												<tr class="formheading">
+													<th></th>
+													<th  class="col-form-span-label">DA/DC</th>
+													<th class="col-form-span-label">Charge</th>
+													<th  class="col-form-span-label">Tariff Rate </th>
+													<th  class="col-form-span-label">Tariff Rate Freight</th>
+													<th  class="col-form-span-label">Net Rate </th>
+													<th class="col-form-span-label">Net Rate Freight</th>
+
+												</tr>
+											</thead>
+											 <tbody   >
+												<tr *ngFor="let obj of Chargeslist">
+													<td class="centerlabel">
+														<i class="fa fa-pencil" (click)="Editchildrecd(obj.PK_ID)"  ></i>
+														&nbsp;
+														<i class="fa fa-trash" (click)="deletechildrecd(obj.PK_ID,obj.FK_CHRGDETAILSID)"></i>
+													</td>
+												   	<td><span class="col-form-span-label">{{obj.CHARGETYPE}}</span></td>
+													<td><span class="col-form-span-label">{{obj.CHRGNAME}}</span></td>
+													<td><span class="col-form-span-label">{{obj.RATE_TAR}}</span></td>
+													<td><span class="col-form-span-label">{{obj.RATE_TAR_FRT}}</span></td>
+													<td><span class="col-form-span-label">{{obj.RATE_NET}}</span></td>
+													<td><span class="col-form-span-label">{{obj.RATE_NET_FRT}}</span></td>
+													<td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
+												</tr>
+											</tbody>
+										</table>
+
+					</td>
+				</tr>
+			</table>
+		</td>
+	 </tr>
+	  <tr class="col-form-span-heading">
+		<td colspan="11"></td>
+	  </tr>
+	  <!-- <tr>
+		<td class="centerlabel" width="5%"></td>
+
+	  </tr> -->
+	  <tr class="col-form-span-heading">
+		 <td colspan="3"></td>
+		 <td colspan="3">
+			  <table class="table-sm-new">
+				<tr>
+					<td class="width120"><span class="col-form-span-label"><strong>PP Total</strong></span></td>
+					<td class="width120"><span class="col-form-span-label"><strong>CC Total</strong></span></td>
+					<td class="width60"></td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new">
+				<tr>
+					<td class="width120"><span class="col-form-span-label"><strong>PP Total</strong></span></td>
+					<td class="width120"><span class="col-form-span-label"><strong>CC Total</strong></span></td>
+					<td class="width60"></td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(14) DUE CARRIER [2+3+4+5+6+7+8+9]</strong></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width120"><input type="text" [(ngModel)]="DurCarrierTar" [disabled]="UserWgt > 151" class="form-control" [maxlength]="20"/></td>
+					<td class="width120"><input type="text" [(ngModel)]="DurCarrierTarCC" [disabled]="true" class="form-control"  [maxlength]="20"/></td>
+					<td class="width60"></td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width120"><input type="text" [(ngModel)]="DurCarrierNet" [disabled]="UserWgt > 151" class="form-control" [maxlength]="20"/></td>
+					<td class="width120"><input type="text" [(ngModel)]="DurCarrierNetCC" [disabled]="true" class="form-control" [maxlength]="20" /></td>
+					<td class="width60"></td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(15) DUE AGENT [10+11]</strong></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width120"><input type="text" [(ngModel)]="DueAgentTar" class="form-control" [disabled]="UserWgt > 151" [maxlength]="20" /></td>
+					<td class="width120"><input type="text" [(ngModel)]="DueAgentTarCC" class="form-control" [disabled]="true" [maxlength]="20" /></td>
+					<td class="width60"></td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width120"><input type="text" [(ngModel)]="DueAgentNet" class="form-control" [disabled]="UserWgt > 151" [maxlength]="20" /></td>
+					<td class="width120"><input type="text" [(ngModel)]="DueAgentNetCC" class="form-control" [disabled]="true" [maxlength]="20" /></td>
+					<td class="width60"></td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(16) TOTAL [1+12+14+15] </strong></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width120"><input type="text" [(ngModel)]="TotalTar" class="form-control" [disabled]="UserWgt > 151" [maxlength]="20" /></td>
+					<td class="width120"><input type="text" [(ngModel)]="TotalTarCC" class="form-control" [disabled]="true" [maxlength]="20" /></td>
+					<td class="width60"></td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width120"><input type="text" [(ngModel)]="TotalNet" class="form-control" [disabled]="UserWgt > 151" [maxlength]="20" /></td>
+					<td class="width120"><input type="text" [(ngModel)]="TotalNetCC" class="form-control" [disabled]="true" [maxlength]="20" /></td>
+					<td class="width60"></td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(17) OTHER CHARGES </strong></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width120"></td>
+					<td class="width120"><input type="text" [(ngModel)]="OtherTar" class="form-control"  [maxlength]="20"/></td>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="OtherTarFrt" >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width120"></td>
+					<td class="width120"><input type="text" [(ngModel)]="OtherNet" class="form-control" [maxlength]="20" /></td>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="OtherNetFrt" >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(18) Air Freight Commission </strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label"></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width120"></td>
+					<td class="width120"><input type="text" [(ngModel)]="AirFrtCommission" class="form-control" [maxlength]="20" /></td>
+					<td class="width60"></td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(19) Freight Rebate </strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label"></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width120"></td>
+					<td class="width120"><input type="text" [(ngModel)]="FrtRebate" class="form-control" [maxlength]="20" /></td>
+					<td class="width60"></td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr *ngIf="CityCode == 'DAC'">
+		 <td colspan="3"><span class="col-form-span-label"><strong>(20) Business Promotion</strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label"></span></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width120"></td>
+					<td class="width120"><input type="text" [(ngModel)]="BusinesPromo" class="form-control" [maxlength]="20" /></td>
+					<td class="width60"></td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(21) TDS </strong></span></td>
+		 <td colspan="3">
+
+			<select class="form-control " [(ngModel)]="DrpTDS">
+				<option value="">--</option>
+				 <option *ngFor="let d of tdsData" value={{d.DataValueField}}>{{d.DataTextField}}</option>
+			</select>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width120"></td>
+					<td class="width120"><input type="text" [(ngModel)]="TxtTDS" class="form-control" [maxlength]="20" /></td>
+					<td class="width60"></td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>(22) Service Tax </strong></span></td>
+		 <td colspan="3">
+
+			<select class="form-control " [(ngModel)]="DrpServiceTax">
+				<option value="">--</option>
+				 <option *ngFor="let d of serviceTax" value={{d.DataValueField}}>{{d.DataTextField}}</option>
+			</select>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width120"></td>
+					<td class="width120"><input type="text" [(ngModel)]="TxtServiceTax" class="form-control" [maxlength]="20" /></td>
+					<td class="width60"></td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>OTHER CHARGES </strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label"><strong>AMOUNT / CALCULATE WITH</strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label"><strong>AMOUNT / CALCULATE WITH</strong></span></td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><input type="text" [(ngModel)]="OtherChrg1" class="form-control" [maxlength]="10" (change)="onChangeOtherChargeName(1)"/></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60"><input type="text" [(ngModel)]="OtherAmt1_Tar" class="form-control" (change)="onChangeOther_Tar(1)"  /></td>
+					<td class="width80">
+						<span class="col-form-span-label">
+							<input type="radio" name="CalOneDcTar" [checked]="CalOneDcTar == 1" (click)="calOneTarCheck(1)"/>DueCarrier
+						</span>
+					</td>
+					<td class="width80">
+						<span class="col-form-span-label">
+							<input type="radio" name="CalOneDcTar" [checked]="CalOneDcTar == 2" (click)="calOneTarCheck(2)"/>DueAgent
+						</span>
+					</td>
+					<td class="width60">
+
+						<select class="form-control width70" [(ngModel)]="OtherAmt1TarFrt" >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+
+					</td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60"><input type="text" [(ngModel)]="OtherAmt1_Net" class="form-control" [maxlength]="10"  (change)="onChangeOther_Net(1)" /></td>
+					<td class="width80">
+						<span class="col-form-span-label">
+							<input type="radio" name="CalOneDcNet" [checked]="CalOneDcNet == 1" (click)="calOneNetCheck(1)"/>DueCarrier
+						</span>
+					</td>
+					<td class="width80">
+						<span class="col-form-span-label">
+							<input type="radio" name="CalOneDcNet" [checked]="CalOneDcNet == 2" (click)="calOneNetCheck(2)"/>DueAgent
+						</span>
+					</td>
+					<td class="width60">
+						<!-- <ng-select [items]="[{VALUEFIELD: 'PP', TEXTFIELD: 'PP'},{VALUEFIELD: 'CC', TEXTFIELD: 'CC'}]"
+									bindLabel="TEXTFIELD"
+									bindValue="VALUEFIELD"
+									[(ngModel)]="OtherAmt1NetFrt"
+									class="form-control"
+									>
+						</ng-select> -->
+						<select class="form-control width70" [(ngModel)]="OtherAmt1NetFrt" >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+
+					</td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><input type="text" [(ngModel)]="OtherChrg2" class="form-control" [maxlength]="10"  (change)="onChangeOtherChargeName(2)"/></td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60"><input type="text" [(ngModel)]="OtherAmt2_Tar" class="form-control" (change)="onChangeOther_Tar(2)"  [maxlength]="10"/></td>
+					<td class="width80">
+						<span class="col-form-span-label">
+							<input type="radio" name="CalTwoDcTar" [checked]="CalTwoDcTar == 1" (click)="calTwoTarCheck(1)"/>DueCarrier
+						</span>
+					</td>
+					<td class="width80">
+						<span class="col-form-span-label">
+							<input type="radio" name="CalTwoDcTar" [checked]="CalTwoDcTar == 2" (click)="calTwoTarCheck(2)"/>DueAgent
+						</span>
+					</td>
+					<td class="width60">
+						<!-- <ng-select [items]="[{VALUEFIELD: 'PP', TEXTFIELD: 'PP'},{VALUEFIELD: 'CC', TEXTFIELD: 'CC'}]"
+									bindLabel="TEXTFIELD"
+									bindValue="VALUEFIELD"
+									[(ngModel)]="OtherAmt2TarFrt"
+									class="form-control"
+									>
+						</ng-select> -->
+						<select class="form-control width70" [(ngModel)]="OtherAmt2TarFrt" >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+		 <td colspan="3">
+			  <table class="table-sm-new bglightgray">
+				<tr>
+					<td class="width60"><input type="text" [(ngModel)]="OtherAmt2_Net" class="form-control" [maxlength]="10" (change)="onChangeOther_Net(2)" /></td>
+					<td class="width80">
+						<span class="col-form-span-label">
+							<input type="radio" name="CalTwoDcNet" [checked]="CalTwoDcNet == 1" (click)="calTwoNetCheck(1)"/>DueCarrier
+						</span>
+					</td>
+					<td class="width80">
+						<span class="col-form-span-label">
+							<input type="radio" name="CalTwoDcNet" [checked]="CalTwoDcNet == 2" (click)="calTwoNetCheck(2)"/>DueAgent
+						</span>
+					</td>
+					<td class="width60">
+						<!-- <ng-select [items]="[{VALUEFIELD: 'PP', TEXTFIELD: 'PP'},{VALUEFIELD: 'CC', TEXTFIELD: 'CC'}]"
+									bindLabel="TEXTFIELD"
+									bindValue="VALUEFIELD"
+
+									[(ngModel)]="OtherAmt2NetFrt"
+									class="form-control"
+									>
+						</ng-select> -->
+						<select class="form-control width70" [(ngModel)]="OtherAmt2NetFrt" >
+							<option value="null">--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>REMARK </strong></span></td>
+		 <td colspan="6"><input type="text" [(ngModel)]="Remark" class="form-control" /></td>
+	  </tr>
+	  <tr class="col-form-span-heading">
+		 <td colspan="9"><span class="col-form-span-label"><strong>Freight on MAWB - Already Printed</strong></span></td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong><u>DESCRIPTION</u></strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label"><strong><u>PREPAID</u></strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label"><strong><u>COLLECT</u></strong></span></td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>FREIGHT</strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label">{{Ppchrg}}</span></td>
+		 <td colspan="3"><span class="col-form-span-label">{{Ccchrg}}</span></td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>DUE AGENT  </strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label">{{Pptotagt}}</span></td>
+		 <td colspan="3"><span class="col-form-span-label">{{Cctotagt}}</span></td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>DUE CARRIER  </strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label">{{Pptotcarr}}</span></td>
+		 <td colspan="3"><span class="col-form-span-label">{{Cctotcarr}}</span></td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong><u>TOTAL </u> </strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label"><strong><u>{{Pptot}}</u></strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label"><strong><u>{{Cctot}}</u></strong></span></td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>MISCELLANEOUS CHARGES </strong></span></td>
+		 <td colspan="6"><span class="col-form-span-label">{{Othchrg}}</span></td>
+	  </tr>
+	</tbody>
+</table>

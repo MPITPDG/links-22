@@ -1,0 +1,80 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>{{Header| uppercase}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 ">
+            <table class="table table-sm-new bgwhite table-bordered">
+                <tr class="trbg">
+                    <td class="width150">
+                        <span class="col-form-span-label">
+                         &nbsp;Employee Name</span>
+                    </td>
+                    <td colspan="4">                       
+                        <select class="form-control width300"  [(ngModel)]="Employee">
+                           <option value="">Please select</option>
+                           <option *ngFor="let d of Employyetable" value={{d.acctcode}}>{{d.acctname}}</option> 
+                       </select>           
+           </td>
+                </tr>
+                <tr class="trbg" >
+                    <td class="width150">
+                        <span class="col-form-span-label">
+                         &nbsp;Date</span>
+                    </td>
+                        <td colspan="4">
+                        <span class="col-form-span-label">From</span>
+                        <my-date-picker name="user_startdate" [options]="myDatePickerOptions" [(ngModel)]="user_startdate" ></my-date-picker>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span class="col-form-span-label">To</span>
+                        <my-date-picker name="user_enddate" [options]="myDatePickerOptions" [(ngModel)]="user_enddate" ></my-date-picker>
+                    </td>
+
+                </tr>
+                <tr class="trbg" >
+                    <td class="width150">
+                        <span class="col-form-span-label">
+                         &nbsp;Job Details</span>
+                    </td>
+                    <td colspan="4">
+                      
+                        <div class="leftlabel">
+                            <span class="col-form-span-label">
+                                <input type="radio" name="radioDisplay" value="0" [(ngModel)]="Display"  />&nbsp;With</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <span class="col-form-span-label">
+                                <input type="radio" name="radioDisplay" value="1" [(ngModel)]="Display" />&nbsp;Without</span>
+                        </div>
+                    </td>
+
+                </tr>
+                <tr class="trbg centerlabel">
+                    <td colspan="5">
+                        <button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="search();">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-search"></i> Search</span>
+                                      
+                        </button>
+                        <button class="btn btn-sm btn-danger" type="reset">
+                            <span class="col-form-span-label" (click)="ResetAll();"><i class="fa fa-ban"></i> Reset</span></button> 
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+    </div>
+
+</div>

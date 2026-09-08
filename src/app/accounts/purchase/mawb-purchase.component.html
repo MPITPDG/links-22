@@ -1,0 +1,620 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>MAWB</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-2 col-lg-2"> </div>
+        <div class="col-sm-12 col-md-8 col-lg-8">
+            <div class="tab" role="tabpanel">
+                <div >
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="data-step1" data-toggle="tab" href="#step1">MAWB </a>
+                        </li>
+                        <li class="nav-item" >
+                            <a class="nav-link disabled" id="data-step2"  data-toggle="tab" href="#step2"> PURCHASE </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="step1">
+                        <div class="row">
+                            <div class="col-12">
+                        <table class="table table-bordered table-sm-new bgwhite">
+
+                            <tr  >
+                                <td class="col-form-span-heading"  colspan="4">
+                                    <b> General Details</b>
+                                </td>
+                            </tr>
+                            <tr>
+                              
+                            </tr>
+                            <tr>
+            
+                                <td><span class="col-form-span-label"><b>Mawb No</b> </span><span
+                                        class="col-form-span-error">*</span></td>
+                                <td> <input [(ngModel)]="mawbno" type="text" class="form-control width150" (change)="fn_Validate_MawbNo(mawbno)" [maxlength]="30" 
+                                        > </td>
+                                <td><span class="col-form-span-label"><b>Purchase Date</b> </span><span
+                                            class="col-form-span-error">*</span></td>
+                                <td>
+                                        <my-date-picker name="purchasedate_step1" [options]="myDatePickerOptionsInv"
+                                            class="form-control width170" (dateChanged)="PurchaseDate_Step1Changed($event)"
+                                            [selDate]="purchasedate_step1"></my-date-picker>
+                                        </td>
+                            </tr>
+                            <tr  >
+                                <td class="col-form-span-heading"   colspan="4">
+                                    <b> Supplier Details</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="col-form-span-label"><b>Supplier Name</b> </span><span
+                                        class="col-form-span-error">*</span></td>
+                                <td colspan="3">
+                                    <!-- <select class="form-control width350"  [(ngModel)]="staff">
+                                        <option value="">Please select</option>
+                                        <option *ngFor="let d of Stafflist" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                                    </select> -->
+                                    <ng-select [items]="supplierlist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                                        [(ngModel)]="step1suppliername" (ngModelChange)="GetStep1SupplierName($event)" class="custom "
+                                        placeholder="--Select--">
+                                    </ng-select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="col-form-span-label"><b>Bill To Address</b> </span><span
+                                        class="col-form-span-error">*</span></td>
+                                <td colspan="3">
+                                    <select class="form-control" [(ngModel)]="billaddress_step1">
+                                        <option value="">Please select</option>
+                                        <option *ngFor="let d of billaddressfilter_step1" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-form-span-heading" colspan="4">
+                                             
+                                    <div style="display: flex;float: center;" >&nbsp;&nbsp;&nbsp;
+                                        <span class="col-form-span-label" style="color: crimson;"><b>{{chktdslbl_step1}}</b> </span>
+                                        <span class="col-form-span-label"> <input type="checkbox"   
+                                              [(ngModel)]="chkIsTDS_step1"  [disabled]='disablecheckbox'
+                                                /> </span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr >
+                                <td class="col-form-span-heading" colspan="4">
+                                    <b>Accounts Details</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="col-form-span-label"><b>Account Name</b> </span><span
+                                    class="col-form-span-error">*</span></td>
+                                <td colspan="3">
+                                    <ng-select [items]="AccountNameList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
+                                        (ngModelChange)="GetActName($event)" [(ngModel)]="AccountName_step1" class="custom "
+                                        placeholder="--Select--">
+                                    </ng-select>
+                                   
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="col-form-span-label"><b> Amount</b> </span><span
+                                        class="col-form-span-error">*</span>
+                                </td>
+                                <td> <input [(ngModel)]="AcctAmount_step1" OnlyNumber="true" type="text" [disabled]="disableamt" class="form-control width150"
+                                        maxlength="40"> </td>
+                                        <td><span class="col-form-span-label"><b> Deduction</b> </span><span
+                                            class="col-form-span-error">*</span>
+                                    </td>
+                                    <td> <input [(ngModel)]="Deduction_step1" OnlyNumber="true" type="text"  [disabled]="disablededuction" class="form-control width150"
+                                            maxlength="40"> </td>
+                            </tr>
+                           
+                            <tr>
+                                <td><span class="col-form-span-label"><b> TDS Applicable</b> </span><span
+                                        class="col-form-span-error">*</span>
+                                </td>
+                                <td style=" display: flex; ">
+                                    <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
+                                        <select class="form-control width150"  [(ngModel)]="TDSApplicable_step1"   >
+                                        <option value="">--Please select--</option>
+                                        <option value="Y">Y</option>
+                                        <option value="N">N</option>
+                                       </select>
+                
+                            </td>
+                                <td><span class="col-form-span-label"><b>GST Applicable</b> </span><span
+                                    class="col-form-span-error">*</span></td>
+                                <td style=" display: flex; ">
+                                    <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
+                                        <select class="form-control width150"  [(ngModel)]="GSTApplicable_step1"   >
+                                            <option  value="" >-- Please Select --</option>
+                                            <option value="1">Y</option>
+                                            <option value="0" >N</option>
+                                            <option value="2" >RCM</option>
+                                       </select>
+                                </td>
+            
+                            </tr>
+                         <tr>
+                                <td colspan="4" class="centerlabel">
+                                    <button class="btn btn-sm btn-success" type="submit" (click)="Addchildrcrdstep1()"> <span
+                                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>
+                                            {{txtchild}}</span></button>
+                                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                                            (click)="Resetchildrcrdstep1();"><i class="fa fa-ban"></i> Reset</span></button>
+                                </td>
+                            </tr>
+            
+                            <tr>
+            
+                                <td><span class="col-form-span-heading"><b> Net Total</b> </span></td>
+                                <td> <input [(ngModel)]="NetTotal_step1" disabled="disabled" type="text" class="form-control width150"
+                                        maxlength="40"> </td>
+                                <td colspan="2"></td>
+                            </tr>
+                                <tr>
+                                <td><span class="col-form-span-label"><b> Amount</b> </span></td>
+                                <td> <input [(ngModel)]="NetAmount_step1" OnlyNumber="true" disabled="disabled" type="text"
+                                        class="form-control width150" maxlength="40"> </td>
+                                <td colspan="2"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <div class="row xyscroll">
+                                        <div class="col-12">
+                                        <table class="table table-responsive-sm table-bordered">
+                                            <thead>
+                                                <tr class="bakgrdliteBlue">
+                                                    <th class="col-form-span-label"></th>
+                                                    <th class="col-form-span-label font-weight-bold headerwhite">Account Name</th>
+                                                    <th class="col-form-span-label font-weight-bold headerwhite">Amount</th>
+                                                    <th class="col-form-span-label font-weight-bold headerwhite">Deduction</th>
+                                                    <th class="col-form-span-label font-weight-bold headerwhite">Tds</th>
+                                                    <th class="col-form-span-label font-weight-bold headerwhite">Gst</th>
+                                                   
+                                                </tr>
+                                            </thead>
+                                            <tbody >
+                                                <tr *ngFor="let obj of Accountlist_step1">
+                                                    <td class="centerlabel">
+                                                        <i class="fa fa-pencil" (click)="Editchildrecdstep1(obj.ID)"></i>
+                                                        &nbsp;
+                                                       <i class="fa fa-trash" (click)="deletechildrecdstep1(obj.ID)"></i> 
+                                                    </td>
+                                                    <td><span class="col-form-span-label">{{obj.ACCOUNT_NAME}} </span></td>
+                                                    <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>                                    
+                                                    <td><span class="col-form-span-label">{{obj.DEDUCTION}}</span></td>
+                                                    <td><span class="col-form-span-label">{{obj.PUR_TDS}}</span></td>
+                                                    <td><span class="col-form-span-label">{{obj.GST}}</span></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="centerlabel">
+                                    <button class="btn btn-sm btn-success" type="submit"   [disabled]="buttonStatus" (click)="Add_Mainstep1()"> <span
+                                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> {{text}}</span></button>
+                                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                                            (click)="RestMain_step1();"><i class="fa fa-ban"></i> Reset</span></button>
+                                </td>
+                            </tr>
+                      
+                        </table>
+                        </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel " class="tab-pane" id="step2">
+                        <div class="row">
+                            <div class="col-12">
+                        <table class="table table-bordered table-sm-new bgwhite">
+
+                            <tr  >
+                                <td class="col-form-span-heading" colspan="4">
+                                    <b> General Details</b>
+                                </td>
+                            </tr>
+                            <tr>
+            
+                                <td><span class="col-form-span-label"><b>Purchase No</b> </span><span
+                                        class="col-form-span-error">*</span></td>
+                                <td> <input [(ngModel)]="PurchaseNo_step2" type="text" class="form-control width150" [maxlength]="30" 
+                                        [disabled]="true"> </td>
+                                <td><span class="col-form-span-label"><b>Purchase Date</b> </span><span
+                                        class="col-form-span-error">*</span></td>
+                                <td style="text-align:left ;">              
+                                    <my-date-picker name="purchasedate_step2" [options]="myDatePickerOptionsInv" [disabled]='disablepurchasedate_step2'
+                                        class="width170" (dateChanged)="PurchaseDate_Step2Changed($event)" [selDate]="purchasedate_step2" ></my-date-picker>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="col-form-span-label"><b>Narration</b> </span></td>
+                                <!-- <td colspan="3"> <input [(ngModel)]="Narration_step2" type="text" class="form-control"
+                                        [maxlength]="4000"> </td> -->
+                                        <td colspan="3">
+                                            <textarea class="form-control" id="autoresizing" (change)="TextareaValueChange($event)"
+                                             placeholder="text" cols="50" rows="3" [innerHTML]="Narration_step2"></textarea>
+                                               </td>
+                            </tr>
+                            <tr  >
+                                <td class="col-form-span-heading" colspan="4">
+                                    <b>Supplier Details</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="col-form-span-label"><b>Supplier Name</b> </span><span
+                                        class="col-form-span-error">*</span></td>
+                                <td colspan="3">                      
+                                    <ng-select [items]="supplierlist" disabled bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                                        [(ngModel)]="suppliername" (ngModelChange)="GetSupplierName($event)" class="custom"
+                                        placeholder="--Select--">
+                                    </ng-select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="col-form-span-label"><b>Bill To Address</b> </span><span
+                                        class="col-form-span-error">*</span></td>
+                                <td colspan="3">
+                                    <select class="form-control" disabled [(ngModel)]="billaddress">
+                                        <option value="">Please select</option>
+                                        <option *ngFor="let d of billaddressfilter" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+            
+                                <td><span class="col-form-span-label"><b>Inv No</b> </span><span
+                                        class="col-form-span-error">*</span></td>
+                                <td> <input [(ngModel)]="InvNo" type="text"  class="form-control width150"
+                                        maxlength="40"> </td>
+                                <td><span class="col-form-span-label"><b>Inv Date</b> </span><span
+                                        class="col-form-span-error">*</span></td>
+                                <td style="text-align: left;">
+                                    <my-date-picker name="InvDate" [options]="myDatePickerOptions" class=" width170"
+                                        [(ngModel)]="InvDate"></my-date-picker>
+                                </td>
+                            </tr>
+                            <tr>
+            
+                                <td><span class="col-form-span-label"><b>Bill Received On</b> </span><span
+                                        class="col-form-span-error">*</span></td>
+                                <td style="text-align: left;">
+                                    <my-date-picker name="BillReceive" [options]="myDatePickerOptions" class="width170"
+                                        [(ngModel)]="BillReceive"></my-date-picker>
+                                </td>
+                                <td><span class="col-form-span-label"><b>Due Date</b> </span><span
+                                        class="col-form-span-error">*</span></td>
+                                <td style="text-align: left;">
+                                    <my-date-picker name="DueDate" [options]="myDatePickerOptions" class="width170"
+                                        [(ngModel)]="DueDate"></my-date-picker>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-form-span-heading" colspan="4">
+                                             
+                                    <div style="display: flex;float: left;" >
+                                        <span class="col-form-span-label" style="color: crimson;"><b>{{chktdslbl_step2}}</b> </span>
+                                        <span class="col-form-span-label"> <input type="checkbox"   
+                                              [(ngModel)]="chkIsTDS_step2"  [disabled]='disablecheckbox'
+                                                /> </span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- <tr  class="trheader">
+                                <td class="col-form-span-label" colspan="2">
+                                    <b> Passing Details</b>
+                                </td>
+                                <td class="col-form-span-heading" colspan="2">
+            
+                                    <div style="display: flex;">
+                                        <span class="col-form-span-label"><b>Passed&nbsp;&nbsp;</b> </span>
+                                        <span class="col-form-span-label"> <input type="checkbox" [(ngModel)]="IsPassed"
+                                                (change)="changeEvent($event)" /> </span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="col-form-span-label"><b>Passed By</b> </span></td>
+                                <td>
+                                    <select class="form-control width150" [(ngModel)]="passedby" [disabled]='togglepassedby'>
+                                        <option value="">Please select</option>
+                                        <option *ngFor="let d of PassedBylist" value={{d.CMPID}}>{{d.CMP_USERNAME}}</option>
+                                    </select>
+                                </td>
+                                <td><span class="col-form-span-label"><b>Passed Amount</b> </span><span
+                                        class="col-form-span-error">*</span></td>
+                                <td> <input [(ngModel)]="PassedAmount" OnlyNumber="true" type="text" [disabled]='togglepamount'
+                                        class="form-control width150" maxlength="40"> </td>
+                            </tr>
+                            <tr>
+                                <td><span class="col-form-span-label"><b>Invoice Amount</b> </span><span
+                                        class="col-form-span-error">*</span></td>
+                                <td> <input [(ngModel)]="InvoiceAmount" OnlyNumber="true" type="text" [disabled]='toggleinvamount'
+                                        class="form-control width150" maxlength="40"> </td>
+                                <td><span class="col-form-span-label"><b>Voucher No</b> </span><span
+                                        class="col-form-span-error">*</span></td>
+                                <td> <input [(ngModel)]="VoucherNo" OnlyNumber="true" type="text" [disabled]='togglevno'
+                                        class="form-control width150" maxlength="40"> </td>
+            
+                            </tr> -->
+                            <tr >
+                                <td class="col-form-span-heading" colspan="4">
+                                    <b>Accounts Details</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="col-form-span-label"><b>Account Name</b> </span></td>
+                                <td colspan="3">                   
+                                    <ng-select [items]="AccountNameStep2List" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
+                                        (ngModelChange)="GetActName_Step2($event)" [(ngModel)]="AccountName_step2" class="custom"
+                                        placeholder="--Select--">
+                                    </ng-select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="col-form-span-label"><b>Item</b> </span></td>
+                                <td colspan="3">
+                                    <ng-select [items]="Itemslist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Item_step2"
+                                        class="custom" placeholder="--Select--">
+                                    </ng-select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="col-form-span-label"><b> TDS Applicable</b> </span><span
+                                        class="col-form-span-error">*</span>
+                                </td>
+                                <td style=" display: flex; ">
+                                    <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
+                                        <select class="form-control width150"  [(ngModel)]="TDSApplicable_step2"   >
+                                        <option value="">--Please select--</option>
+                                        <option value="Y">Y</option>
+                                        <option value="N">N</option>
+                                       </select>
+                
+                            </td>
+                                <td><span class="col-form-span-label"><b>GST Applicable</b> </span></td>
+                                <td style=" display: flex; ">
+                                    <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
+                                        <select class="form-control width150"  [(ngModel)]="GSTApplicable_step2"   >
+                                            <option  value="" >-- Please Select --</option>
+                                            <option value="1">Y</option>
+                                            <option value="0" >N</option>
+                                            <option value="2" >RCM</option>
+                                       </select>
+                                </td>
+            
+                            </tr>
+                            <tr>
+                                <td><span class="col-form-span-label"><b> Amount</b> </span><span
+                                        class="col-form-span-error">*</span>
+                                </td>
+                                <td> <input [(ngModel)]="Amount_step2" OnlyNumber="true" type="text" class="form-control width150"
+                                        maxlength="40"> </td>
+                                <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
+                                <td> <input [(ngModel)]="Deduction_step2" type="text" OnlyNumber="true" class="form-control width150"
+                                        maxlength="40"> </td>
+            
+                            </tr>
+                            <tr>
+                                <td><span class="col-form-span-label"><b> Job No</b> </span><span
+                                        class="col-form-span-error">*</span>
+                                </td>
+                                <td> <input [(ngModel)]="JobNo_step2" type="text" OnlyNumber="true" class="form-control width150"
+                                        maxlength="40"> </td>
+                                <td><span class="col-form-span-label"><b>Pass Amount</b> </span></td>
+                                <td> <input [(ngModel)]="actpassedamount_step2" type="text"  disabled="true"
+                                        class="form-control width150" maxlength="40">
+                                </td>
+            
+                            </tr>
+                            <tr>
+                                <td><span class="col-form-span-label"><b>Narration</b> </span></td>
+                                <td colspan="3">
+                                    <input [(ngModel)]="ActNarration_step2" type="text" [maxlength]="800" class="form-control">
+                                </td>
+                            </tr>
+            
+                            <tr>
+                                <td colspan="4" class="centerlabel">
+                                    <button class="btn btn-sm btn-success" type="submit" (click)="Addchildrcrdstep2()" [disabled]='disablechildaddbtn'> <span
+                                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>
+                                            {{txtchild}}</span></button>
+                                    <button class="btn btn-sm btn-danger" type="reset" [disabled]='disablechildresetbtn'> <span class="col-form-span-label"
+                                            (click)="Resetchildrcrdstep2();"><i class="fa fa-ban"></i> Reset</span></button>
+                                    <button class="btn btn-sm btn-success" type="submit"  [disabled]='disabletdsbtn'> <span class="col-form-span-label"
+                                            (click)=" !disabletdsbtn && OpenTdsModal();"><i class="fa fa-dot-circle-o"></i> Cal TDS</span></button>
+                                     <button class="btn btn-sm btn-danger" type="reset"  [disabled]='disableresetbtn'> <span class="col-form-span-label"
+                                            (click)="!disableresetbtn && ResetTDS()"><i class="fa fa-ban"></i> Reset TDS</span></button>        
+                                </td>
+                            </tr>
+                          
+                            <tr>
+            
+                                <td><span class="col-form-span-heading"><b> Net Total</b> </span></td>
+                                <td> <input [(ngModel)]="NetAmt_step2" disabled="disabled" type="text" class="form-control width150"
+                                        maxlength="40"> </td>
+                                <td colspan="2"></td>
+                            </tr>
+            
+                            <tr>
+                                <td><span class="col-form-span-label"><b> Amount</b> </span></td>
+                                <td> <input [(ngModel)]="NetAmount_step2" OnlyNumber="true" disabled="disabled" type="text"
+                                        class="form-control width150" maxlength="40"> </td>
+                                <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
+                                <td> <input [(ngModel)]="Netdeduction_step2" OnlyNumber="true" disabled="disabled" type="text"
+                                        class="form-control width150" maxlength="40"> </td>
+                            </tr>
+                             <tr>
+                                <td colspan="6">
+                                    <div class="row xyscroll" style="overflow-y: auto; width:670px">
+                                        <div class="col-12">
+                                        <table class="table table-responsive-sm table-bordered" *ngIf="Accountlist_step2.length>0" style="width:100%">
+                                            <thead>
+                                                <tr class="bakgrdliteBlue">
+                                                    <th class="col-form-span-label"></th>
+                                                    <th class="col-form-span-label font-weight-bold headerwhite">Account Name</th>
+                                                    <th class="col-form-span-label font-weight-bold headerwhite">Amount</th>
+                                                    <th class="col-form-span-label font-weight-bold headerwhite">Deduction</th>
+                                                    <th class="col-form-span-label font-weight-bold headerwhite">TDS</th>
+                                                    <th class="col-form-span-label font-weight-bold headerwhite">GST</th>
+                                                    <th class="col-form-span-label font-weight-bold headerwhite">Item</th>
+                                                    <th class="col-form-span-label font-weight-bold headerwhite">Job No</th>
+                                                    <th class="col-form-span-label font-weight-bold headerwhite">Narration</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody *ngIf="Accountlist_step2.length>0">
+                                                <tr *ngFor="let obj of Accountlist_step2">
+                                                    <td class="centerlabel">
+                                                        <i class="fa fa-pencil" (click)="Editchildrecdstep2(obj.ID)"></i>
+                                                        &nbsp;
+                                                        <i class="fa fa-trash" (click)="deletechildrecdstep2(obj.ID,obj.IS_NOT_EDIT_ABLE)"></i>
+                                                    </td>
+                                                    <td><span class="col-form-span-label" [innerHtml]="obj.ACCOUNT_NAME"> </span>
+                                                    </td>
+                                                    <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>
+                                                    <td><span class="col-form-span-label">{{obj.DEDUCTION}}</span></td>
+                                                    <td><span class="col-form-span-label">{{obj.PUR_TDS}}</span></td>
+                                                    <td><span class="col-form-span-label">{{obj.GST}}</span></td>
+                                                    <td><span class="col-form-span-label">{{obj.ITEM}}</span></td>
+                                                    <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
+                                                    <td><span *ngIf="obj.CLIENT=='G100741'" class="col-form-span-label" [innerHtml]="obj.NARRATION"></span>
+                                                        <span *ngIf="obj.CLIENT!='G100741'" class="col-form-span-label">{{obj.NARRATION}}</span></td> 
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    </div>
+                                </td>
+                            </tr> 
+                            <tr>
+                                <td colspan="4" class="centerlabel">
+                                    <button class="btn btn-sm btn-success" type="submit" (click)="supplier_validation()"> <span
+                                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> {{text}}</span></button>
+                                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                                            (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
+                                </td>
+                            </tr>
+                      
+            
+                        </table>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-2 col-lg-8"> </div>
+
+    </div>
+    </div>
+    <div class="modal" [style.display]="showModal_TDS ? 'block' : 'none' "  >
+        <div class="modal-dialog modal-lg" role="document" style="width: 700px;">
+            <div class="modal-content">
+                <div class="card-header formheading">
+                    <!-- <h5 class="modal-title">TDS Details</h5> -->
+                    <strong>TDS Details</strong>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col" style="height:400px;overflow-y: auto; ">
+                            <table class="table table-bordered table-sm-new bgwhite">
+                              
+                                <tr>
+                                    <td>
+                                        <thead style="text-align: center;">
+                                            <tr>
+                                                <th class="col-form-span-label"></th>
+                                                <th class="col-form-span-label">Acct Name.</th>
+                                                <th class="col-form-span-label">Section</th>
+                                                <th class="col-form-span-label">LDC Limit</th>
+                                                <th class="col-form-span-label">Utilized Amt</th>
+                                                <th class="col-form-span-label">LDC Rate %</th>
+                                                <th class="col-form-span-label">Base Rate %"</th>
+                                                <th class="col-form-span-label">PI Amt</th>
+                                                <th class="col-form-span-label">TDS Amount</th>
+                                                <th class="col-form-span-label">Remarks</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                               <tr *ngFor="let obj of TDSList ">
+                                                <td class="col-form-span-label">
+                                                    <input type="checkbox" [(ngModel)]="obj.Checked" [id]="i" [value]="i" [disabled]="obj.Disabled"
+                                                         (ngModelChange)="getCheckedTDSData($event,obj.TDSACCTID,obj.RATE,obj.TDSAMOUNT,obj.AMOUNT,obj.ITEMCODE,obj.NARRATION,obj.RATETYPE,obj.ACCTID,obj.OFFLAG)">
+                                                    &nbsp; 
+                                                </td>
+                                                <td class="col-form-span-label">{{obj.ACCTNAME}}</td>
+                                                <td class="col-form-span-label">{{obj.SECTIONNAME}}</td>
+                                                <td class="col-form-span-label">{{obj.TDS_LIMIT_AMT}}</td>
+                                                <td class="col-form-span-label">{{obj.UTIAMT}}</td>
+                                                <td class="col-form-span-label">{{obj.LDCRATE}}</td>
+                                                <td class="col-form-span-label">{{obj.RATE}}</td>
+                                                <td class="col-form-span-label">{{obj.AMOUNT}}</td>
+                                                <td class="col-form-span-label">{{obj.TDSAMOUNT}}</td>
+                                                <td class="col-form-span-label">{{obj.NARRATION}}</td>
+                                            </tr>
+                                          
+                             
+                            </tbody>
+                        </td>
+                    </tr>
+                            </table>
+                             <table class="table table-bordered table-sm-new bgwhite">
+                                <td colspan="9" align="center" style="width:100%">
+                                    <tr >
+                                        <td colspan="5"><span class="col-form-span-label">Total PI Amount :  </span>
+                                            <span class="col-form-span-label"><b>{{totpiamt}}</b> </span>
+                                        </td>
+                                        <td align="right" colspan="4"><span class="col-form-span-label">Selected PI Amount  :  </span>
+                                            <span class="col-form-span-label"><b>{{seltaxableamt}}</b> </span>
+                                        </td>
+                                        <td>
+                                            <thead style="text-align: center;">
+                                                <tr>
+                                                  <th class="col-form-span-label">Section</th>
+                                                  <th class="col-form-span-label">Total Tds Amount</th>
+                                                 </tr>
+                                            </thead> 
+                                            <tbody>
+                                                <tr *ngFor="let obj of TotalTDSList ">
+                                                 <td class="col-form-span-label"><b>{{obj.SECTIONNAME}}</b></td>
+                                                 <td class="col-form-span-label"><b>{{obj.TOTTDSAMOUNT}}</b></td>
+                                             </tr>
+                                             </tbody> 
+                                        </td>
+                                    </tr>
+                                   
+                                </td>
+                             </table>   
+                        </div>
+                    </div>
+                    <div class="card-header formheading" style="height:25px" >
+                        <button class="btn btn-sm btn-danger" style="float: right;" type="reset"> <span class="col-form-span-label"
+                            (click)="closeTdsModal()"><i class="fa fa-ban"></i>
+                            Close</span></button>
+                        <button class="btn btn-sm btn-success" style="float: right;" type="submit" (click)="AddtdsDetails()"> <span
+                                class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Add</span></button>
+                       
+                    </div>
+                 
+                </div>
+            </div>
+        </div>
+    </div>

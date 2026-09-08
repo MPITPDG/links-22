@@ -1,0 +1,142 @@
+﻿<div class="row">
+	<div class="col-sm-12">
+		<div class="card">
+			<div class="card-header formheading">
+			   <strong>Export - HAWB NO</strong>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-2">
+	</div>
+	<div class="col-sm-8">
+		<table class="table table-bordered table-sm-new bgwhite">
+			<tr class="title-head trbg" *ngIf="hawb_issue=='1'; else  otherhawbno">
+				<td class="width150">
+					<span class="col-form-span-label">HAWB No.</span><span class="col-form-span-error">*</span>
+				</td>
+				<td colspan="2" >
+					<span  class="col-form-span-label">{{hawbno}}</span>					
+				</td>				 
+				<td class="width150">
+					<span class="col-form-span-label">HAWB Date.</span><span class="col-form-span-error">*</span>
+				</td>
+				<td colspan="2">
+					<my-date-picker name="mawbdate" [options]="myDatePickerOptions" [(ngModel)]="hawbdate" [disabled]="hawbno != ''"></my-date-picker>
+				</td>
+			</tr>
+			<ng-template #otherhawbno> 
+				<tr class="title-head trbg">
+					<td class="width150">
+						<span class="col-form-span-label">HAWB No.</span><span class="col-form-span-error">*</span>
+					</td>
+					<td colspan="2" >						 
+						 <input    type="text" [(ngModel)]="hawbno" class="form-control width120" [OnlyNumber]="true" [maxlength]="15" />
+					</td>					 
+					<td class="width150">
+						<span class="col-form-span-label">HAWB Date.</span><span class="col-form-span-error">*</span>
+					</td>
+					<td colspan="2">
+						<my-date-picker name="mawbdate" [options]="myDatePickerOptions" [(ngModel)]="hawbdate" [disabled]="hawbno != ''"></my-date-picker>
+					</td>
+				</tr>
+			</ng-template>
+
+			<tr class="title-head trbg">
+				<td class="width150">
+					<span class="col-form-span-label">Freight Type</span><span class="col-form-span-error">*</span>
+				</td>
+				<td colspan="2">
+					<!-- <ng-select [items]="[{VALUEFIELD: 'PP', TEXTFIELD: 'PP'},{VALUEFIELD: 'CC', TEXTFIELD: 'CC'}]"
+							   bindLabel="TEXTFIELD"
+							   bindValue="VALUEFIELD"
+							   placeholder="--Select--"
+							   [(ngModel)]="FreightType"
+							   class="form-control width120"
+							   >
+					</ng-select> -->
+
+					<select class="form-control width120"   [(ngModel)]="FreightType">
+						<option value="-1">select</option>
+						<option value="CC">CC</option>
+						<option value="PP">PP</option>
+					</select>
+				</td>
+				<td class="width150">
+					<span class="col-form-span-label">Freight Currency</span><span class="col-form-span-error">*</span>
+				</td>
+				<td colspan="2">
+					<!-- <ng-select [items]="currencyList"
+							   bindLabel="CUR_NAME"
+							   bindValue="CUR_CODE"
+							   placeholder="--Select--"
+							   [(ngModel)]="Fcurrency"
+							   class="form-control width300"
+							   >
+					</ng-select> -->
+					<select class="form-control width120"   [(ngModel)]="Fcurrency">
+						<option value="0">Please select</option>
+						<option *ngFor="let d of currencyList" value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+					
+					</select>
+				</td>
+			</tr>
+			<tr class="title-head trbg">
+				<td class="width150">
+					<span class="col-form-span-label">Freight Amount</span><span class="col-form-span-error">*</span>
+				</td>
+				<td colspan="5">
+					<input type="text" [(ngModel)]="FreightAmount" class="form-control width120" [OnlyNumber]="true" [maxlength]="11" />
+				</td>
+			</tr>
+		</table>
+		<table class="table table-bordered table-sm-new bgwhite" *ngIf="hawbnoList.length > 0">
+			<thead>
+					<tr class="title-head formheading">
+						<th>EXPT NO</th>
+						<th>SHIPPER</th>
+						<th>CONSIGNEE</th>
+						<th>Pkgs</th>
+						<th>Pcs</th>
+						<th>Grwt</th>
+						<th>Chrg.Wt</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let obj of hawbnoList">
+						<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
+						<td><span class="col-form-span-label">{{obj.SHIPPER}}</span></td>
+						<td><span class="col-form-span-label">{{obj.CONSIGNEE}}</span></td>
+						<td><span class="col-form-span-label">{{obj.PKGS}}</span></td>
+						<td><span class="col-form-span-label">{{obj.PCS}}</span></td>
+						<td><span class="col-form-span-label">{{obj.GRWT}}</span></td>
+						<td><span class="col-form-span-label">{{obj.CHBLWT}}</span></td>
+					</tr>
+					<tr class="trbg">
+						<td><span class="col-form-span-label"></span></td>
+						<td><span class="col-form-span-label"></span></td>
+						<td><span class="col-form-span-label"></span></td>
+						<td><span class="col-form-span-label"></span></td>
+						<td><span class="col-form-span-label"></span></td>
+						<td><input type="text" [(ngModel)]="totalGrwt" class="form-control width75" [OnlyNumber]="true" [disabled]="true"/></td>
+						<td><input type="text" [(ngModel)]="totalChblwt" class="form-control width75" [OnlyNumber]="true" [disabled]="true"/></td>
+					</tr>
+				</tbody>
+		</table>
+		<table class="table table-bordered table-sm-new bgwhite" *ngIf="hawbnoList.length < 0">
+			<tr><td colspan="6" class="centerlabel"><span class="col-form-span-error">please wait data is loading.........</span></td></tr>
+		</table>
+		<table class="table table-bordered table-sm-new bgwhite">
+			<tr class="title-head trbg">
+				<td colspan="6" class="centerlabel">
+					<button type="button" name="submit" class="btn btn-sm btn-success" (click)="submit();">
+						<span class="col-form-span-label"><i class="fa fa-save"></i> Submit</span>
+					</button>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="col-sm-2">
+	</div>
+</div>

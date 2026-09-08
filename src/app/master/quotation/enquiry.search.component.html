@@ -1,0 +1,325 @@
+
+<div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+              <div class="card-header ">
+                    <div class="row no-gutters ">
+                  <div class="col-sm-4" *ngIf="displayType=='SEARCH'" >
+                            <strong>Enquiry Search</strong>
+                   </div>
+                   <div class="col-sm-4" *ngIf="displayType=='LIST'">
+                            <strong>Enquiry List</strong>
+                   </div>
+          
+                     <!-- <div class="col-sm-8" *ngIf="displayType=='LIST'">
+                            <button style="float: right; margin-left: 15px;"class="btn btn-sm btn-primary" type="submit" (click)="Exporttoxl()"> <span
+                                class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
+                                Export To Excel </span></button>
+                                <a style="float: right;text-decoration: underline;color: red;" href="javascript:void(0);" 
+                                (click)="displayType='SEARCH'; enquirylist=[]"
+                               >
+                                ← Back to Search
+                              </a>
+                           
+                        </div> -->
+                       <div class="col-sm-8 d-flex justify-content-end align-items-center" 
+     *ngIf="displayType=='LIST'" 
+     style="gap: 15px;">
+
+  <a style="text-decoration: underline; color: red;"
+     href="javascript:void(0);"
+     (click)="displayType='SEARCH'; enquirylist=[]">
+    ← Back to Search
+  </a>
+
+  <button class="btn btn-sm btn-primary" type="submit" (click)="Exporttoxl()">
+    <i class="fa fa-file-excel-o"></i> Export To Excel
+  </button>
+
+</div>
+ 
+       
+                 </div>
+              </div>
+            </div>
+        </div>
+    </div>
+<div class="row justify-content-center" *ngIf="displayType=='SEARCH'">
+  <div class="col-md-6">
+
+  <div class="search-card shadow rounded bg-white p-3">
+
+<div class="search-row d-flex align-items-center mb-3">
+  <input type="radio" 
+         name="filterType" 
+         value="1" 
+         [(ngModel)]="exampleRadios1" 
+         class="mr-2">
+
+  <label class="fw-semibold mb-0 mr-3">Sales Person</label>
+
+  <ng-select [items]="salespersontable"
+                            bindLabel="DATATEXTVALUE"
+                            bindValue="DATAVALUE"
+                            [(ngModel)]="salesperson"
+                            class="custom rounded-pill  liner-select"
+                            placeholder="--Please Select--"
+                            [disabled]="exampleRadios1 != '1'" >
+</ng-select>
+</div>
+
+      <!-- Radio: Origin -->
+   <div class="search-row d-flex align-items-center gap-3  mb-3">
+        <input type="radio" name="filterType" value="2" [(ngModel)]="exampleRadios1" class="mr-2"> 
+        <label class="fw-semibold mb-0 mr-3">Branch</label>
+
+        <ng-select
+        [items]="enqbranchtable"
+        bindLabel="CITYNAME"
+        bindValue="CITYCODE"
+        [(ngModel)]="enqbranch"
+        class="custom rounded-pill  short-select"
+        placeholder="--Please Select--"
+        [disabled]="exampleRadios1 != '2'">
+  </ng-select>
+
+      </div>
+
+      <!-- Radio: Date -->
+      <div class="search-row d-flex align-items-center gap-3  mb-3">
+        <div class="d-flex align-items-start mb-2">
+          <input type="radio" name="filterType" value="3" [(ngModel)]="exampleRadios1" class="mr-2">
+          <label class="fw-semibold">Date Range</label>
+        </div>
+
+        <div class="row">
+          <div class="col-6 p-0">
+            <label class="form-label medium">Start Date</label>
+            <my-date-picker
+              name="StartDate"
+              [options]="myDatePickerOptions"
+              [(ngModel)]="startdate"
+              [disabled]="exampleRadios1 != '3'">
+            </my-date-picker>
+          </div>
+
+          <div class="col-6">
+            <label class="form-label medium">End Date</label>
+            <my-date-picker
+              name="EndDate"
+              [options]="myDatePickerOptions"
+              [(ngModel)]="enddate"
+              [disabled]="exampleRadios1 != '3'">
+            </my-date-picker>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="text-center mt-3">
+        <button class="btn btn-success btn-sm mx-1" (click)="searchdata()">
+          <i class="fa fa-search"></i> Search
+        </button>
+        <button class="btn btn-danger btn-sm mx-1" (click)="Reset()">
+          <i class="fa fa-ban"></i> Reset
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+<div class="row justify-content-center" *ngIf="displayType=='LIST'">
+
+  <div class="col-md-12">
+
+    <div class="list-card shadow rounded bg-white p-3">
+
+      <!-- Header -->
+     
+
+      <!-- Table -->
+      <div class="table-responsive">
+        <table class="table table table-sm">
+          <thead class="col-form-span-heading py-1 bg-body-secondary text-start fw-semibold text-primary heading-box">
+            <tr>
+              <th>Enquiry No</th>
+              <th>Enquiry Dt</th>
+              <th>Sales Person</th>
+              <th>Agent Name</th>
+              <th>Branch</th>
+               <th>Status</th>
+                  <th>Created By</th>
+                     <th>Created On</th>
+              <!-- <th>Country</th> -->
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let obj of enquirylist | paginate: config">
+              <td>
+                <span class="anchor-link text-primary fw-semibold"
+                      (click)="ListOnclick(obj.ENQREFNO)">
+                  {{obj.DISPNO}}
+                </span>
+              </td>
+               <td>{{obj.ENQRECPTDT}}</td>
+              <td>{{obj.SALESPERSON}}</td>
+              <td>{{obj.AGENT_NAME}}</td>
+              <td>{{obj.BRANCHNM}}</td>
+               <td>{{obj.ENQSTATUS}}</td>
+                <td>{{obj.CREATEDBY}}</td>
+                 <td>{{obj.CREATEDDATE}}</td>
+              <!-- <td>{{obj.CITY_COUNTRY}}</td> -->
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+ 
+ <!-- <div class="animated fadeIn">
+      <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>Enquiry List</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+   <div class="row no-gutters" *ngIf="displayType=='SEARCH'">
+        <div class="col-sm-3">
+        </div>
+        <div class="col-sm-6">
+            <table class="table table-bordered table-sm-new bgwhite" style="font-family:  Verdana;font-size: 12px;" *ngIf="enquirylist.length==0">
+                <tbody>
+               
+                    <tr class="trbg">
+                        <td class="width200">
+                            
+                            <div class="d-flex align-items-center" style="gap: 8px;">
+                        <input type="radio" name="exampleRadios" value="1" [(ngModel)]="exampleRadios1">
+                        <label class="form-label mb-0 ms-1">Sales Person</label>
+  </div>
+                        </td>
+                        <td class="col-form-span-label width240" colspan="4">
+                        
+                            <ng-select [items]="salespersontable"
+                            bindLabel="DATATEXTVALUE"
+                            bindValue="DATAVALUE"
+                            [(ngModel)]="salesperson"
+                            class="custom"
+                            placeholder="--Please Select--"
+                            [disabled]="exampleRadios1 != '1'" >
+
+                         </ng-select>
+                        </td>
+                    </tr>
+                    <tr class="trbg">
+                        <td class=" width100">
+                            <div class="d-flex align-items-center" style="gap: 8px;">
+                            <input type="radio" name="exampleRadios" value='2' [(ngModel)]="exampleRadios1"><label for="enqType" class="form-label">Branch</label>
+                       </div>
+                        </td>
+                        <td class="col-form-span-label width240" colspan="4">
+                        
+                            <ng-select [items]="enqbranchtable"
+                            bindLabel="CITYNAME"
+                            bindValue="CITYCODE"
+                            [(ngModel)]="enqbranch"
+                            class="enq-ng-select"
+                            placeholder="--Branch--">
+                        </ng-select>
+                        </td>
+                    </tr>
+
+
+           
+                    <tr class="trbg">
+                        <td class=" width100">
+                              <div class="d-flex align-items-center" style="gap: 8px;">
+                          <input type="radio" name="exampleRadios" id="exampleRadios2" [(ngModel)]="exampleRadios1"
+                              value="3"  ><label for="enqType" class="form-label">Date</label>
+                              </div>
+                        </td>
+                              <td>
+                                  <span class="col-form-span-label width150"><b>Start Date</b> </span>
+                                  <span class="col-form-span-error">*</span>
+                              </td>
+                              <td>
+                                  <my-date-picker name="StartDate" [options]="myDatePickerOptions" [(ngModel)]="startdate" [disabled]="exampleRadios1 != '3'">
+                                  </my-date-picker>
+                        
+                              </td>
+                              <td>
+                                  <span class="col-form-span-label width150"><b>End Date</b> </span>
+                                  <span class="col-form-span-error">*</span>
+                              </td>
+                              <td>
+                                  <my-date-picker name="EndDate" [options]="myDatePickerOptions" [(ngModel)]="enddate" [disabled]="exampleRadios1 != '3'">
+                                  </my-date-picker>
+                       
+                              </td>
+
+              </tr>
+              <tr>
+                <td colspan="5" class="centerlabel">
+                    <button class="btn btn-sm btn-success" type="submit" (click)="searchdata()"><span
+                     class="col-form-span-label"><i class="fa fa-search"></i> Search</span></button>
+                     <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                                    (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
+                       
+                </td>
+            </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+     <div class="col-sm-3">
+        </div>
+    </div>
+ <div class="row no-gutters" *ngIf="displayType=='LIST'">
+        <div class="col-sm-1">
+        </div>
+         <div class="col-10 xyscroll" style="height:550px;" >
+              <table class="table  table-bordered table-sm-new bgwhite">
+                        <thead>
+                               <tr class="title-head formheading">
+                        <th colspan="6">
+                             <a href="javascript:void(0);" (click)="displayType='SEARCH';enquirylist=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
+                        </th>
+                    </tr>
+                            <tr class="col-form-span-heading" style="white-space:nowrap;">
+                              
+                                <th class="col-form-span-label">Enquiry No</th>
+                                <th class="col-form-span-label">SalesPerson</th>
+                                <th class="col-form-span-label">Agent Name</th>
+                                <th class="col-form-span-label">Branch</th>
+                               
+                            </tr>
+                        </thead>
+                        <tbody class="bgwhite">
+                            <tr *ngFor="let obj of enquirylist| paginate: config">
+                               
+                                <td><span class="col-form-span-label anchor-link" (click)="ListOnclick(obj.ENQREFNO)">{{obj.ENQREFNO}}</span></td>
+                                <td><span class="col-form-span-label " >{{obj.SALESPERSON}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.AGENT_NAME}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.BRANCH}}</span></td>
+                              
+                            </tr>
+                        </tbody>
+                    </table>
+         </div>
+         <div class="col-sm-1">
+        </div>
+    </div>
+
+
+</div> -->

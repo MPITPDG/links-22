@@ -1,0 +1,96 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>{{Header| uppercase}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">  </div>
+        <div class="col-sm-8">
+            <table class="table table-bordered table-sm-new bgwhite">               
+                <tr >
+                    <td class="col-form-span-heading   " colspan="4">
+                        SHIPPING LINER MASTER DETAILS
+                    </td>
+                </tr>
+                <tr>   
+                    <td><span class="col-form-span-label"><b>Short Name</b> </span><span class="col-form-span-error">*</span></td>         
+                    <td colspan="3">  <input [(ngModel)]="ShrtName" type="text"    class="form-control width180"   >   </td> 
+                    
+                   
+                </tr>                
+                <tr>
+                    <td><span class="col-form-span-label"><b>Name</b> </span><span class="col-form-span-error">*</span></td> 
+                    <td  colspan="3" >
+                        <table class="table table-bordered table-sm-new bgwhite">               
+                            <tr >
+                                <td   style=" display: flex; "  >                        
+                                    <select class="form-control width70"  [(ngModel)]="title"  >
+                                   
+                                    <option value="Mr.">Mr.</option>	
+                                    <option value="Ms">Ms</option>	
+                                    <option value="Mrs.">Mrs.</option>
+                                    <option value="Miss">Miss</option>
+                                    <option value="Dr.">Dr.</option>	
+                                    <option value="Messrs">Messrs</option>	
+                                    </select> 
+                                    <input [(ngModel)]="Name" type="text"    class="form-control "    >                      
+                                </td>
+                            </tr>
+                        </table>
+                    </td> 
+                </tr>                
+                <tr>   
+                        <td><span class="col-form-span-label"><b>Address 1</b> </span></td>         
+                        <td colspan="3">  <input [(ngModel)]="addrs21" type="text"    class="form-control "  maxlength="40"  >   </td> 
+                               
+                    </tr>
+                    <tr>   
+                        <td><span class="col-form-span-label"><b>Address 2</b> </span></td>         
+                        <td>  <input [(ngModel)]="addrs22" type="text"    class="form-control width250"   maxlength="40"  >   </td> 
+                        <td><span class="col-form-span-label"><b>Address 3</b> </span></td>         
+                        <td>  <input [(ngModel)]="addrs23" type="text"    class="form-control width180"   maxlength="40" > </td>         
+                    </tr>
+                    <tr>
+                       
+                        <td><span class="col-form-span-label"><b>Pincode</b> </span></td>         
+                        <td>  <input [(ngModel)]="Pincode2" type="text"    class="form-control width180"   > </td>  
+                        <td><span class="col-form-span-label"><b>Pincode Position</b> </span></td>        
+                        <td>
+                            <span class="col-form-span-label"><input type="radio"   [checked]="position2=='After'" (change)="position2='After'" /><b>After</b> </span> 
+                            <span class="col-form-span-label"><input type="radio"   [checked]="position2=='Before'" (change)="position2='Before'" /><b>Before</b> </span>
+                        </td>       
+                    </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>City</b> </span><span class="col-form-span-error">*</span></td>        
+                        <td>
+                            <select class="form-control width200"  [(ngModel)]="city2" (change)="Countryfilter($event.target.value)">
+                                <option value="">Please select</option>
+                                <option *ngFor="let d of Citylist" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+                            </select>
+                        </td>
+                           <td><span class="col-form-span-label"><b>Country</b> </span></td>         
+                        <td>  <input disabled [(ngModel)]="country2" type="text"    class="form-control width180"   > </td>  
+                    </tr>
+                    <tr>                         
+                        <td><span class="col-form-span-label"><b>Telephone No.</b> </span></td>         
+                        <td>  <input [(ngModel)]="teleno" type="text"    class="form-control width180"   > </td> 
+                        <td><span class="col-form-span-label"><b>Fax No</b> </span></td>         
+                        <td><input [(ngModel)]="nofax" type="text"    class="form-control width180"   > </td>   
+                    </tr>
+                     
+                    <tr>
+                        <td colspan="4"  class="centerlabel">                                
+                            <button class="btn btn-sm btn-success" type="submit" (click)="Add_Main()"> <span class="col-form-span-label"><i class="fa fa-plus" ></i> {{text}}</span></button>
+                            <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="RestMain();"><i class="fa fa-ban"></i> Reset</span></button>
+                        </td>
+                    </tr>
+            </table>
+        </div>
+        <div class="col-sm-2">  </div>
+    </div>
+</div>

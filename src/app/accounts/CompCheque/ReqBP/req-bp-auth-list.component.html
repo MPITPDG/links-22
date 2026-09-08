@@ -1,0 +1,162 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>COMPUTERISED CHEQUE PRINTING AUTHORIZATION</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-12 col-md-1 col-lg-1"> </div>
+        <div class="col-12 col-md-10 col-lg-10">
+            <table class="table table-bordered table-sm-new bgwhite">        
+                <thead>           
+                    <tr>
+                        <td colspan="10">
+                            <div class="input-group input-group-rounded"  style="float: right;width: 200px;font-family: verdana;font-size:11px;padding: 1px;">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="padding: 0px;"><i class="fa fa-search"></i></span>
+                                </div>
+                                <input class="form-control" type="search" [(ngModel)]="searchString" autocomplete="off"
+                                    placeholder="Search">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="col-form-span-heading" style="white-space:nowrap;">
+                        <th class="col-form-span-label">  <input type="checkbox" [(ngModel)]='checkbox' (change)="checkAll($event)" /> &nbsp;  </th>
+                        <th class="col-form-span-label" style="  background-color: #004980; color: white;" [class.active]="order === 'ENTRYNO'"
+                            (click)="setOrder('ENTRYNO')">
+                            EntryNo <span [hidden]="reverse">▼</span>
+                            <span [hidden]="!reverse">▲</span>
+                        </th>
+                        <th class="col-form-span-label" style="  background-color: #004980; color: white;" [class.active]="order === 'CREATEDBY'"
+                            (click)="setOrder('CREATEDBY')">
+                            CreatedBy <span [hidden]="reverse">▼</span>
+                            <span [hidden]="!reverse">▲</span>
+                        </th>
+                        <th class="col-form-span-label" style="  background-color: #004980; color: white;" [class.active]="order === 'ENTRYDT1'"
+                            (click)="setOrder('ENTRYDT1')">
+                            Entry Date <span [hidden]="reverse">▼</span>
+                            <span [hidden]="!reverse">▲</span>
+                        </th>
+                        <th class="col-form-span-label" style="  background-color: #004980; color: white;" [class.active]="order === 'CHEQUEDT1'"
+                            (click)="setOrder('CHEQUEDT1')">
+                            PayBY Date<span [hidden]="reverse">▼</span>
+                            <span [hidden]="!reverse">▲</span>
+                        </th>
+                        <th class="col-form-span-label" style="  background-color: #004980; color: white;" [class.active]="order === 'PAYEENAME'"
+                            (click)="setOrder('PAYEENAME')">
+                            Payee Name <span [hidden]="reverse">▼</span>
+                            <span [hidden]="!reverse">▲</span>
+                        </th>
+                        <th class="col-form-span-label" style="  background-color: #004980; color: white;" [class.active]="order === 'AMOUNT'"
+                            (click)="setOrder('AMOUNT')">
+                            Amount <span [hidden]="reverse">▼</span>
+                            <span [hidden]="!reverse">▲</span>
+                        </th>               
+                        <th class="col-form-span-label" style="  background-color: #004980; color: white;">
+                            AuthorisedBy
+                        </th>
+                        <th class="col-form-span-label" style="  background-color: #004980; color: white;">
+                            AuthorisationDate
+                        </th>
+                        <th class="col-form-span-label" style="  background-color: #004980; color: white;">
+                            TYPE
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bgwhite">
+                    <tr
+                        *ngFor="let obj of DataList | ReqBPFilter: searchString| orderBy: order:reverse:'case-insensitive'" >
+                        <td class="col-form-span-label"><input type="checkbox" [(ngModel)]="obj.Checked"   [disabled]="obj.CHKPRINTAUTHORITY=='1'" 
+                            (ngModelChange)="getCheckboxValues($event,obj.ENTRYNO,obj.CHKPRINTAUTHORITY,obj.AUTHORISATIONDATE)"> &nbsp;</td>
+                        <td class="col-form-span-label anchor-link"  (click)=reqviewdata(obj.ENTRYNO)>{{obj.ENTRYNO}}</td>
+                        <td class="col-form-span-label">{{obj.CREATEDBY}}</td>
+                        <td class="col-form-span-label">{{obj.ENTRYDT}}</td>
+                        <td class="col-form-span-label">{{obj.CHEQUEDT}}</td>
+                        <td class="col-form-span-label">{{obj.PAYEENAME}}</td>
+                        <td class="col-form-span-label" style="text-align: right;">{{obj.AMOUNT|number:'2.2-4'}}</td>                      
+                        <td class="col-form-span-label">{{obj.USERNAME}}</td>
+                        <td class="col-form-span-label">{{obj.AUTHORISATIONDATE}}</td>
+                        <td class="col-form-span-label">{{obj.TYPE}}</td>
+
+                    </tr>
+                </tbody>
+                <!-- <tr>
+                    <td colspan="10">
+                      <div class="row justify-content-center no-gutters"
+                        style="font-family:verdana;font-size: 11px;padding: 1px;">
+                        <pagination-controls (pageChange)="PageActual=$event" autoHide="true"></pagination-controls>
+                      </div>
+                    </td>
+                  </tr> -->
+                <tr>
+                    <td colspan="10" class="right-text pr-2">
+                        <span class="col-form-span-label  anchor-link" (click)="viewrjectlist()">ViewRejectedList</span>&nbsp;
+                        <button class="btn btn-sm btn-primary" type="submit" (click)="rejectdata()"> <span
+                                class="col-form-span-label"><i class="fa fa-ban"></i>Reject
+                                Request</span></button>&nbsp;
+                        <button class="btn btn-sm btn-primary" type="submit" (click)="assignauthdata()">
+                            <span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Assign
+                                Authorization</span></button>&nbsp;
+                        <button class="btn btn-sm btn-primary" type="submit" (click)="exp_exl()">
+                            <span class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
+                                Export to Excel</span></button>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+        <div class="col-12 col-md-1 col-lg-1"> </div>
+    </div>
+</div>
+
+<div class="modal" [style.display]="showModal_ListReject ? 'block' : 'none'">
+    <div class="modal-dialog modal-lg" role="document"  >
+        <div class="modal-content " >
+            <div class="modal-header formheading"> <strong>CHEQUE PRINTING REJECTED LIST</strong>  </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- <div class="col" style="height:400px;overflow-y: auto;" > -->
+                        <div class="col-12" style="height:400px;overflow-y: auto;" >
+                        <table class="table table-bordered table-sm-new bgwhite">                         
+                            <thead style="text-align: center;">
+                                <tr>
+                                    <th class="col-form-span-label">ENTRYNO</th>
+                                    <th class="col-form-span-label">ENTRYDT</th>
+                                    <th class="col-form-span-label">CREATEDBY</th>
+                                    <th class="col-form-span-label">AMOUNT</th>
+                                    <th class="col-form-span-label">PAYBYDATE</th>
+                                    <th class="col-form-span-label">PAYEENAME</th>
+                                    <th class="col-form-span-label">REJECTEDBY</th>
+                                    <th class="col-form-span-label">REJECTIONDATE</th>
+                                </tr>
+                            </thead>
+                            <tbody>                                      
+                                <tr *ngFor="let obj of rejectlist" (click)=reqviewdata(obj.ENTRYNO)>
+                                    <td class="col-form-span-label anchor-link">{{obj.ENTRYNO}}</td>              
+                                    <td class="col-form-span-label">{{obj.ENTRYDT}}</td>
+                                    <td class="col-form-span-label">{{obj.CREATEDBY}}</td>
+                                    <td class="col-form-span-label">{{obj.AMOUNT}}</td>
+                                    <td class="col-form-span-label">{{obj.PAYBYDATE}}</td>
+                                    <td class="col-form-span-label">{{obj.PAYEENAME}}</td>
+                                    <td class="col-form-span-label">{{obj.REJECTEDBY}}</td>
+                                    <td class="col-form-span-label">{{obj.REJECTIONDATE}}</td>
+                                </tr>
+                            </tbody>                           
+                        </table>
+                    </div>
+                </div>             
+            </div>
+            <div class="modal-footer" style="border:none">
+                <div style="float: right;">                   
+                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                            (click)="close()"><i class="fa fa-window-close"></i>
+                            Close</span></button>
+                </div>
+              </div>
+        </div>
+    </div>
+</div>

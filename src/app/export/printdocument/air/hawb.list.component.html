@@ -1,0 +1,74 @@
+﻿<div class="row">
+	<div class="col-sm-12">
+		<div class="card">
+			<div class="card-header formheading">
+			   <strong>Export - Master HAWB NO</strong>
+			</div>
+		</div>
+	</div>
+</div>
+<br />
+<div class="row">
+	<div class="col-sm-12">
+		<table class="table table-bordered table-striped table-sm-new bgwhite">
+			<thead>
+				<tr class="title-head formheading">
+					<th colspan="3">List of Export Jobs</th>
+					<th colspan="5" class="right-text">
+						<strong>Note: </strong>
+						<span class="col-form-span-label red">
+							<u>Shipper and Importer</u> should be same !
+						</span>
+						<span class="col-form-span-label bghighlightblue">
+							(To select another <u>shipper and importer</u> un-select previous <u>shipper and importer</u>.)
+						</span>
+					</th>
+				</tr>
+			</thead>
+		</table>
+		<div class="row y350heightscroll">
+			<table class="table table-bordered table-striped table-sm-new bgwhite">
+				<thead>
+					<tr class="title-head formheading">
+						<th>Select</th>
+						<th>EXPT NO</th>
+						<th>SHIPPER</th>
+						<th>CONSIGNEE/Importer</th>
+						<th>Pkgs</th>
+						<th>Pcs</th>
+						<th>Grwt</th>
+						<th>Chrg.Wt</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngIf="searchLength==0"><td colspan="8" class="centerlabel"><img src="assets/img/loading.gif" /></td></tr>
+					<tr *ngIf="searchLength==-1"><td colspan="8" class="centerlabel"><span class="col-form-span-label">No Record Found!</span></td></tr>
+					<tr *ngFor="let obj of searchList">
+						<td class="centerlabel">
+							<input type="checkbox" (checked)="obj.Select == true" [disabled]="obj.Disabled == true" (click)="validate(obj.EXPTNO, obj.SHIPPER, obj.CONSIGNEE)" />
+						</td>
+						<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
+						<td><span class="col-form-span-label">{{obj.SHIPPER}}</span></td>
+						<td><span class="col-form-span-label">{{obj.CONSIGNEE}}</span></td>
+						<td><span class="col-form-span-label">{{obj.PKGS}}</span></td>
+						<td><span class="col-form-span-label">{{obj.PCS}}</span></td>
+						<td><span class="col-form-span-label">{{obj.GRWT}}</span></td>
+						<td><span class="col-form-span-label">{{obj.CHBLWT}}</span></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="row">
+			<div class="col-sm-8">
+				<br />
+				<span class="col-form-span-error">{{error}}</span>
+			</div>
+			<div class="col-sm-4 right-text"> 
+				<br />
+				<button type="button" name="submit" class="btn btn-sm btn-primary" (click)="submit();">
+					<span class="col-form-span-label"><i class="fa fa-save"></i> Submit</span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

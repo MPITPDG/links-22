@@ -1,0 +1,198 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>{{PageName|uppercase}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td><span class="col-form-span-label"><b>{{inputname}}</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td> <input id="searchno" [(ngModel)]="searchno" type="text" class="form-control width150"
+                            maxlength="40"> </td>
+                    <td colspan="2" class="centerlabel">
+                        <button class="btn btn-sm btn-success" type="submit" (click)="Search()"> <span
+                                class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>
+                                Search</span></button>
+                        <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                                (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+    </div>
+    <div class="row no-gutters" *ngIf="detailsdata_serch">
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+        <div class="col-sm-12 col-md-10 col-lg-10 xyscroll" style="height: 470px;">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td>
+
+                        <table class="table table-bordered table-sm-new bgwhite">
+                            <thead>
+                                <tr class="title-head" style="background-color: #3aa2d3">
+                                    <th></th>
+                                    <th class="col-form-span-label">Container No.</th>
+                                    <th class="col-form-span-label"></th>
+                                    <th class="col-form-span-label">Expense</th>
+                                    <th class="col-form-span-label">Recovery </th>
+                                    <th class="col-form-span-label">Difference </th>
+                                    <th class="col-form-span-label">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr *ngFor="let data of cont_table1" style="font-weight: bold;">
+                                    <td data-toggle="collapse" data-target="#accordion_containerdetail"
+                                        (click)="setOrder_CONT()" class="clickable" style="width: 15px;"><span
+                                            [hidden]="reverse_CONT" id="icon_show">+</span>
+                                        <span [hidden]="!reverse_CONT" id="icon_show">-</span>
+                                    </td>
+
+                                    <td><span class="col-form-span-label">{{data.CTR_MAWBNO}}</span></td>
+                                    <td><span class="col-form-span-label">{{data.JOBNO}}</span></td>
+                                    <td><span class="col-form-span-label">{{data.DRAMT}}</span> </td>
+                                    <td><span class="col-form-span-label">{{data.CRAMT}}</span> </td>
+                                    <td><span class="col-form-span-label">{{data.GRANDVALUE_TOTAL}}</span></td>
+                                    <td><span class="col-form-span-label">{{data.GRANDVALUE}}</span> </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+
+
+                        <div style="padding-left: 15px;" id="accordion_containerdetail" class="collapse">
+                            <table class="table table-bordered table-sm-new bgwhite">
+                                <tr class="title-head">
+                                    <td style="width: 15px;" (click)="setOrder_Voucher()" data-toggle="collapse"
+                                        data-target="#accordion_summarydetail" class="clickable">
+                                        <span [hidden]="reverse_VOCHR" id="icon_show">+</span>
+                                        <span [hidden]="!reverse_VOCHR" id="icon_show">-</span>
+                                    </td>
+                                    <td class="col-form-span-label"> SUMMARY PROFIT {{'['+ searchno +']'}}</td>
+                                    <td></td>
+                                </tr>
+                            </table>
+
+                            <div style="padding-left: 15px;" id="accordion_summarydetail" class="collapse">
+                                <table class="table table-bordered table-sm-new bgwhite">
+                                    <thead>
+                                        <tr class="title-head" style="background-color: #89CFF0">
+                                            <th style="width: 15px;"></th>
+                                            <th class="col-form-span-label" colspan="2">Voucher No.</th>
+                                            <th class="col-form-span-label">Date</th>
+                                            <th class="col-form-span-label">Expense</th>
+                                            <th class="col-form-span-label">Recovery </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let data of vouchr_table3">
+                                            <td></td>
+                                            <td colspan="2"><span class="col-form-span-label"
+                                                     (click)="voucherprint(data.VOUCHER_NO,data.VOUCHERNO)" 
+                                                    [innerHtml]="data.VOUCHER_NO"></span>
+                                            </td>
+                                            <td><span class="col-form-span-label">{{data.TRAN_DATE}}</span> </td>
+                                            <td><span class="col-form-span-label">{{data.PAYMENT_EURO}}</span> </td>
+                                            <td><span class="col-form-span-label">{{data.RECOVERY_EURO}}</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <table class="table table-bordered table-sm-new bgwhite">
+                                <thead>
+                                    <tr class="title-head" style="background-color: #89CFF0">
+                                        <th></th>
+                                        <th class="col-form-span-label">Job No.</th>
+                                        <th class="col-form-span-label">Client</th>
+                                        <th class="col-form-span-label">Expense</th>
+                                        <th class="col-form-span-label">Recovery </th>
+                                        <th class="col-form-span-label">Difference </th>
+                                        <th class="col-form-span-label">Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <ng-container *ngFor="let data of job_table2">
+                                        <tr>
+                                            <td style="width: 15px;" (click)="setOrder_JOB(data.JOBNO)"
+                                                class="clickable">
+                                                <span [hidden]="reverse_JOB" id="icon_show">+</span>
+                                                <span [hidden]="!reverse_JOB" id="icon_show">-</span>
+                                            </td>
+                                            <td><span class="col-form-span-label anchor-link"
+                                                    (click)="jobprofitreport(data.JOBNO)">{{data.JOBNO}}</span></td>
+                                            <td><span class="col-form-span-label">{{data.CLIENT_NAME}}</span> </td>
+                                            <td><span class="col-form-span-label">{{data.DRAMT}}</span> </td>
+                                            <td><span class="col-form-span-label">{{data.CRAMT}}</span></td>
+                                            <td><span class="col-form-span-label">{{data.GRANDVALUE_TOTAL}}</span> </td>
+                                            <td><span class="col-form-span-label">{{data.GRANDVALUE}}</span> </td>
+                                        </tr>
+                                        <tr class="{{data?.isvisible ? 'd-none' : ''}}">
+                                            <td><span class="col-form-span-label"></span>
+
+                                            </td>
+                                            <td colspan="6">
+                                                <!-- <span class="col-form-span-label"> -->
+                                                    <table class="table table-bordered table-sm-new bgwhite">
+                                                        <thead>
+                                                            <tr class="title-head" style="background-color: #89CFF0">
+                                                                <th style="width: 15px;"></th>
+                                                                <th class="col-form-span-label" colspan="2">Voucher No.</th>
+                                                                <th class="col-form-span-label">Date</th>
+                                                                <th class="col-form-span-label">Expense</th>
+                                                                <th class="col-form-span-label">Recovery </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr *ngFor="let childdata of data.childdetail">
+                                                                <td></td>
+                                                                <td colspan="2">
+                                                                    <span class="col-form-span-label"
+                                                                        (click)="voucherprint(childdata.VOUCHER_NO,childdata.VOUCHERNO)"
+                                                                        [innerHtml]="childdata.VOUCHER_NO">
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <span class="col-form-span-label"
+                                                                        (click)="voucherprint(childdata.VOUCHER_NO)">{{childdata.TRAN_DATE}}
+                                                                    </span>
+                                                                </td>
+                                                                <td><span class="col-form-span-label">{{childdata.PAYMENT_EURO}}</span>
+                                                                </td>
+                                                                <td><span class="col-form-span-label">{{childdata.RECOVERY_EURO}}</span>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                <!-- </span> -->
+                                            </td>
+                                        </tr>
+
+                                    </ng-container>
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+    </div>
+</div>

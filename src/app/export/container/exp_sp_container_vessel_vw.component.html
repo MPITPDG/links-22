@@ -1,0 +1,396 @@
+﻿
+
+<div class="animated fadeIn">	
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="card">
+				<div class="card-body"> 
+					<div class="row">
+						<div class="col-md-2"></div>
+						<div class="col-md-8">	
+							<!-- <accordion>
+								<accordion-group heading="Static Header, initially expanded"
+								[isOpen]="status.isFirstOpen">
+								This content is straight in the template.
+								</accordion-group>
+							</accordion> -->
+							<table class="table table-bordered table-sm-new">
+								<tr>
+									<td class="col-form-span-heading"  colspan="2">
+											<span class="col-form-span-label"><b>Vessel Details</b></span>
+										
+										<button class="btn btn-sm btn-warning" style="float: right;" (click)="back();"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to search</u></span></button>
+									</td>
+								</tr>
+								<tr>
+									<td rowspan="3"> <span class="col-form-span-label ">Vessel Details</span></td>
+									<td ><span class="col-form-span-label" >{{ VSL_NAMERot }}</span></td>
+								</tr>
+								<tr>
+									
+									<td><span class="col-form-span-label" >{{VSL_VOYAGE_ETD  }}</span></td>
+								</tr>
+								<tr>
+									
+									<td><span class="col-form-span-label" >{{ PORT }}</span></td>
+								</tr>
+								<tr>
+									<td> <span class="col-form-span-label ">Last Carting Date</span></td>
+									<td><span class="col-form-span-label" >{{ vslLstCartdt }}</span></td>
+								</tr>
+								<!-- <tr>
+									<td> <span class="col-form-span-label ">ETD</span></td>
+									<td><span class="col-form-span-label" >{{ vslEtd }}</span></td>
+								</tr> -->
+								<tr>
+									<td> <span class="col-form-span-label ">Actual Departure</span></td>
+									<td><span class="col-form-span-label" >{{ vslActDepart }}</span></td>
+								</tr>
+								<tr>
+									<td    colspan="2" class="rightlabel">
+									<button class="btn btn-outline-warning active btn-md-2" type="button" (click)="AddContainer()">   Add Container</button>
+									</td>
+								</tr>
+								<tr>
+									<td class="col-form-span-heading"  colspan="2">
+										Container List
+									</td>
+								</tr>
+								<tr>									
+									<td colspan="2">
+										<table class="bakgrdliteBlue width100per" >
+											<thead  class="bakgrdskyBlue">	
+												<th></th>
+												<th class="col-form-span-label" >Verified</th>
+												<th class="col-form-span-label">Container Det</th>
+												<th class="col-form-span-label">Agent Name</th>
+												<th class="col-form-span-label">Shpg Line</th>  
+												<th class="col-form-span-label">Destination</th>
+												<th class="col-form-span-label">Pkgs</th>
+												<th class="col-form-span-label">Volume</th>
+												<th></th>
+											</thead>
+											<tbody>	
+												<ng-container *ngFor="let c of contList">
+													<tr>	 
+														<td >  <i [ngClass]="(c.CHECK==true) ? 'fa fa-minus-square-o': 'fa fa-plus-square-o'" (click)="getContJob(c.CONTAINERNO)"></i>  </td>
+														<td class="col-form-span-label font-weight-bold">{{c.VERIFIED}}</td>												 
+														<td class="col-form-span-label font-weight-bold " style="color: blue;"(click)="contineronclick(c.CONTAINERID,c.VERIFIED)" ><a>{{c.CONDET}} </a></td>	
+														<td class="col-form-span-label font-weight-bold">{{c.AGT_NAME}}</td>	
+														<td class="col-form-span-label font-weight-bold">{{c.SHPGLINE}}</td>	 
+														<td class="col-form-span-label font-weight-bold">{{c.DESTPORT}}</td>	
+														<td class="col-form-span-label font-weight-bold">{{c.NOOFPKGS}}</td>	
+														<td class="col-form-span-label font-weight-bold">{{c.CBM}}</td>	
+                                                        <td class="col-form-span-label font-weight-bold"> <i class="fa fa-download" (click)="ClpDownload(c.CONTAINERNO)"></i></td>	
+													</tr>
+													<tr *ngIf="c.CHECK==true">
+														<td colspan="9" >
+															<table class="bakgrdwhite width100per">
+																<tr>
+																	<td><span class="col-form-span-label ">Agent Seal No</span> </td>
+																	<td><span class="col-form-span-label ">{{c.AGTSEALNO}}</span>														</td>
+																	<td><span class="col-form-span-label ">Custom Seal No</span>																</td>
+																	<td colspan="2"><span class="col-form-span-label ">{{c.AGTSEALNO}}</span>																</td>
+																</tr>
+																<tr>
+																	<td><span class="col-form-span-label ">FREIGHT</span> </td>
+																	<td><span class="col-form-span-label ">{{c.FREIGHT}}</span>														</td>
+																	<td><span class="col-form-span-label ">Freight</span>																</td>
+																	<td colspan="2"><span class="col-form-span-label ">{{c.FREIGHT_CHARGE}}</span>		
+																	</tr>
+																	<tr>
+																		<td><span class="col-form-span-label ">BAF</span> </td>
+																		<td><span class="col-form-span-label ">{{c.BAF_CHARGE}}</span>														</td>
+																		<td><span class="col-form-span-label ">Other Charges</span>																</td>
+																		<td colspan="2"><span class="col-form-span-label ">{{c.OTHER_CHARGE}}</span>		
+																		</tr>
+																		<tr>
+																			<td><span class="col-form-span-label ">Remark</span> </td>
+																			<td colspan="4"><span class="col-form-span-label ">{{c.REMARK}}</span>	</td>
+																		</tr>
+																		<tr>
+																			<td><span class="col-form-span-label ">Origin Port</span></td> 
+																			<td><span class="col-form-span-label ">Currency</span> 															</td>
+																			<td><span class="col-form-span-label ">Value</span>	</td>
+																			<td><span class="col-form-span-label ">Currency</span> </td>
+																			<td ><span class="col-form-span-label ">Value</span> </td>
+																			
+																		</tr>
+																		<tr>
+																			<td><span class="col-form-span-label ">{{c.O_CUR1}}</span></td>
+																			<td><span class="col-form-span-label ">{{c.OCURRATE1}}</span></td>														
+																			<td><span class="col-form-span-label ">{{c.O_CUR2}}</span></td>
+																			<td><span class="col-form-span-label ">{{c.OCURRATE2}}</span></td>		
+																		</tr>
+																		
+																		<tr>
+																			<td><span class="col-form-span-label ">Dest. Port</span></td>
+																			<td><span class="col-form-span-label ">{{c.D_CUR1}}</span></td>
+																			<td><span class="col-form-span-label ">{{c.DCURRATE1}}</span></td>														
+																			<td><span class="col-form-span-label ">{{c.D_CUR2}}</span></td>
+																			<td><span class="col-form-span-label ">{{c.DCURRATE2}}</span></td>		
+																		</tr>
+																		
+																		
+																	</table>
+																</td>
+															</tr>
+															<tr *ngIf="c.CHECK==true">
+																<td colspan="9" >
+																	
+																	<table class="bakgrdwhite width100per">																
+																		<thead>	
+																			<th class="col-form-span-label" >Exptno</th>
+																			<th class="col-form-span-label">Shipper</th>
+																			<th class="col-form-span-label">Consignee</th>
+																			<th class="col-form-span-label">NoofPcs</th>
+																			<th class="col-form-span-label">NoofPkgs</th>
+																			<th class="col-form-span-label">Gr.Wt</th>
+																			<th class="col-form-span-label">Net.Wt</th>
+																			<th class="col-form-span-label">CBM</th>
+																			<th class="col-form-span-label">Orderno</th>
+																			<th class="col-form-span-label">CLP Seq.</th>
+																		</thead>	
+																		<tbody>
+																			<ng-container *ngFor="let obj of filtjoblist" >
+																				<tr>
+																					<td rowspan="3" class="col-form-span-label">{{obj.EXPTNO}}</td>
+																					<td class="col-form-span-label">{{obj.EXP_NAME}}</td>
+																					<td class="col-form-span-label">{{obj.CON_NAME}}</td>
+																					<td class="col-form-span-label">{{obj.NOOFPCS}}</td>
+																					<td class="col-form-span-label">{{obj.NOOFPKGS}}</td>
+																					<td class="col-form-span-label">{{obj.GRWT}}</td>
+																					<td class="col-form-span-label">{{obj.NETWT}}</td>
+																					<td class="col-form-span-label">{{obj.CBM}}</td>
+																					<td>
+																						<table class="table table-hover">
+																							<tr *ngFor="let o of orderList">
+																								<td  *ngIf ="obj.EXPTNO==o.EXPTNO_O"  class="col-form-span-label">{{o.ORDERNO}}															
+																									
+																								</td>
+																							</tr>													
+																						</table>
+																					</td>																		
+																					<td class="col-form-span-label">{{obj.CLP_SEQUENCE}}</td>															 
+																				</tr>
+																				<tr>
+																					<th class="col-form-span-label" >Description</th>													 	
+																					<td class="col-form-span-label"colspan="7"  >{{obj.DESCRIPTION}}</td>  
+																				</tr>
+																				<tr>
+																					<th class="col-form-span-label" >FCR No.</th>
+																					<td class="col-form-span-label">{{obj.FCR_NO}}</td>
+																					<th class="col-form-span-label" colspan="2" >FCR Date</th>
+																					<td class="col-form-span-label" colspan="5">{{obj.FCR_DATE}}</td>
+																				</tr>	
+																			</ng-container>															
+																		</tbody>															
+																	</table>
+																</td>
+															</tr>
+														</ng-container>
+													</tbody>
+												</table>									
+											</td>									
+										</tr>
+									</table>
+								</div>
+							</div>
+							<div class="col-sm-2"></div>					
+						</div>
+					</div>
+				</div>
+	</div>	
+</div>
+
+<!-- 	
+	<div class="card-body"> 
+	<div class="row">
+	
+	<div class="col-md-6"> 
+	
+	
+	
+	</div>
+	</div>
+	</div>
+	</div> 
+	</div>
+-->
+<!-- <div class="col-md-7">
+	<div class="card">
+	<div class="card-body"> 
+	<div class="row">
+	
+	<div class="col-md-6  ">
+	<table class="table table-bordered table-sm-new">
+	<tr>
+	<td class="col-form-span-heading"  colspan="2">
+	Container Details
+</td>									
+</tr>
+<tr>
+<td rowspan="4" style="width:150px;"> <span class="col-form-span-label ">Vessel Details</span></td>
+<td><span class="col-form-span-label" >{{VSL_NAMERot}}</span></td>
+</tr>
+<tr>									 
+<td><span class="col-form-span-label" >{{VSL_VOYAGE_ETD}}</span></td>
+</tr>
+<tr>									 
+<td><span class="col-form-span-label" >{{PORT}}</span></td>
+</tr>
+<tr>									 
+<td><span class="col-form-span-label" >{{ORIGINPORT}}</span></td>
+</tr>
+<tr>
+<td > <span class="col-form-span-label ">Vessel Agent</span></td>
+<td><span class="col-form-span-label" >{{AGT_NAME}}</span></td>
+</tr>
+<tr>
+<td > <span class="col-form-span-label ">Shpg Line</span></td>
+<td><span class="col-form-span-label" >{{SHPGLINE}}</span></td>
+</tr>
+<tr>
+<td > <span class="col-form-span-label ">Container No.</span></td>
+<td><span class="col-form-span-label" >{{CONTAINERNO}}</span></td>
+</tr>
+<tr>
+<td > <span class="col-form-span-label ">Container Size</span></td>
+<td><span class="col-form-span-label" >{{SIZE}}</span></td>
+</tr>
+<tr>
+<td > <span class="col-form-span-label ">Status of Container</span></td>
+<td><span class="col-form-span-label" >{{CONTAINERSTATUS}}</span></td>
+</tr>
+<tr>
+<td > <span class="col-form-span-label ">Destination Port</span></td>
+<td><span class="col-form-span-label" >{{DESTPORT}}</span></td>
+</tr>
+<tr>
+<td > <span class="col-form-span-label ">Steamer Agent Seal No</span></td>
+<td><span class="col-form-span-label" >{{DESTPORT}}</span></td>
+</tr>
+<tr>
+<td > <span class="col-form-span-label ">Stuffed at</span></td>
+<td><span class="col-form-span-label" >{{STUFFED_AT}}</span></td>
+</tr>
+<tr>
+<td > <span class="col-form-span-label ">Custom Seal No</span></td>
+<td><span class="col-form-span-label" >{{CUSTSEALNO}}</span></td>
+</tr>
+<tr>
+<td > <span class="col-form-span-label ">Freight</span></td>
+<td><span class="col-form-span-label" >{{FREIGHT}}</span></td>
+</tr>
+<tr>
+<td > <span class="col-form-span-label ">Freight</span></td>
+<td><span class="col-form-span-label" >{{FREIGHT_CHARGE}}</span></td>
+</tr>
+<tr>
+<td > <span class="col-form-span-label ">BAF</span></td>
+<td><span class="col-form-span-label" >{{BAF_CHARGE}}</span></td>
+</tr>
+<tr>
+<td > <span class="col-form-span-label ">Other Charges</span></td>
+<td><span class="col-form-span-label" >{{OTHER_CHARGE}}</span></td>
+</tr>
+<tr>
+<td > <span class="col-form-span-label ">Remark</span></td>
+<td><span class="col-form-span-label" >{{REMARK}}</span></td>
+</tr>
+<tr>
+<td colspan="2">
+<table class="table table-hover">
+<thead>												
+<th class="col-form-span-label" > </th>
+<th class="col-form-span-label">Currency</th>
+<th class="col-form-span-label">value</th>
+<th class="col-form-span-label">Currency</th>
+<th class="col-form-span-label">value</th>
+</thead>
+<tbody>
+<tr >
+<td class="col-form-span-label">ORIGIN PORT</td>
+<td><span class="col-form-span-label" >{{O_CUR1}}</span></td>
+<td><span class="col-form-span-label" >{{OCURRATE1 }}</span></td>
+<td><span class="col-form-span-label" >{{O_CUR2}}</span></td>
+<td><span class="col-form-span-label" >{{OCURRATE2}}</span></td>
+</tr>
+<tr >
+<td class="col-form-span-label">DEST. PORT</td>
+<td><span class="col-form-span-label" >{{D_CUR1}}</span></td>
+<td><span class="col-form-span-label" >{{DCURRATE1}}</span></td>
+<td><span class="col-form-span-label" >{{D_CUR2}}</span></td>
+<td><span class="col-form-span-label" >{{DCURRATE2}}</span></td>
+</tr>
+</tbody>
+</table>										
+</td>
+</tr>
+
+<tr>
+<td class="col-form-span-heading"  colspan="2">
+Consignment Details
+</td>									
+</tr>
+<tr>
+<td colspan="2">
+<table class="table table-hover">
+<thead>												
+<th class="col-form-span-label" >Exptno</th>
+<th class="col-form-span-label">Shipper</th>
+<th class="col-form-span-label">Consignee</th>
+<th class="col-form-span-label">NoofPcs</th>
+<th class="col-form-span-label">NoofPkgs</th>
+<th class="col-form-span-label">Gr.Wt</th>
+<th class="col-form-span-label">Net.Wt</th>
+<th class="col-form-span-label">CBM</th>
+<th class="col-form-span-label">Orderno</th>
+<th class="col-form-span-label">CLP Seq.</th>
+</thead>											 
+<tbody *ngFor="let d of exJoblist" >
+<tr  >	
+<td rowspan="3" class="col-form-span-label">{{d.EXPTNO}}</td>
+<td class="col-form-span-label">{{d.EXP_NAME}}</td>
+<td class="col-form-span-label">{{d.CON_NAME}}</td>
+<td class="col-form-span-label">{{d.NOOFPCS}}</td>
+<td class="col-form-span-label">{{d.NOOFPKGS}}</td>
+<td class="col-form-span-label">{{d.GRWT}}</td>
+<td class="col-form-span-label">{{d.NETWT}}</td>
+<td class="col-form-span-label">{{d.CBM}}</td>
+<td>
+<table class="table table-hover">
+<tr *ngFor="let o of orderList">
+<td  *ngIf ="EXPTNO==EXPTNO_O"  class="col-form-span-label">{{o.ORDERNO}}															
+
+</td>
+</tr>													
+</table>
+</td>
+
+<td class="col-form-span-label">{{d.CLP_SEQUENCE}}</td>															 
+</tr>
+<tr>
+<th class="col-form-span-label" >Description</th>													 	
+<td class="col-form-span-label"colspan="7"  >{{d.DESCRIPTION}}</td>  
+</tr>
+<tr>
+<th class="col-form-span-label" >FCR No.</th>
+<td class="col-form-span-label">{{d.FCR_NO}}</td>
+<th class="col-form-span-label" colspan="2" >FCR Date</th>
+<td class="col-form-span-label" colspan="5">{{d.FCR_DATE}}</td>
+</tr>
+</tbody>
+</table>
+</td>							
+
+</tr>
+</table>							
+<!--		</div>
+</div>
+</div>
+</div> 
+</div>		
+</div>				-->												
+
+<!--  </div> -->				

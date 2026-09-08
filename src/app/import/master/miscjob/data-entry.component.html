@@ -1,0 +1,88 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>{{Header}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+        </div>
+        <div class="col-sm-8">
+            <table class="table table-sm-new bgwhite">
+                <tr class="trbg">
+                    <td colspan="3">
+                        <span class="col-form-span-label"><b>Miscellaneous Job</b></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width90">
+                        <span class="col-form-span-label">Job No.</span>
+                    </td>
+                    <td colspan="2">
+                        <input type="text" [(ngModel)]="JobNo" [disabled]="true" class="form-control width120"
+                            [maxlength]="15" [OnlyNumber]="true" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Client Name
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td>
+                        <select class="form-control" [(ngModel)]="ClientName">
+                            <option value="0">-- Select --</option>
+                            <ng-template ngFor let-item [ngForOf]="ClientList">
+                                <option value="{{item.DATAVALUEFIELD}}">{{item.DATATEXTFIELD}}</option>
+                            </ng-template>
+                        </select>
+                    </td>
+                    <td class="width200">
+                        <span class="col-form-span-error" *ngIf="ErrorType=='1'">Please enter client name.</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">No. of PKgs
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td>
+                        <input type="text" [(ngModel)]="NoOfPkgs" class="form-control width120" [maxlength]="10"
+                            [OnlyNumber]="true" />
+                    </td>
+                    <td>
+                        <span class="col-form-span-error" *ngIf="ErrorType=='2'">Please enter no. of pkgs.</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Narration</span>
+                    </td>
+                    <td colspan="2">
+                        <textarea class="form-control" [(ngModel)]="Narration" rows="15"></textarea>
+                    </td>
+                </tr>
+                <tr class="trbg centerlabel">
+                    <td colspan="3">
+                        <button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="submit();">
+                            <span class="col-form-span-label">
+                                <i class="{{(Id=='0')? 'fa fa-save' : 'fa fa-refresh'}}"></i> {{ (Id=='0')? 'Save' :
+                                'Update'}}</span>
+                        </button>&nbsp;
+                        <button type="button" name="cancelButton" class="btn btn-sm btn-danger" (click)="cancel();">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-times-circle"></i> Cancel</span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-2">
+        </div>
+    </div>
+</div>

@@ -1,0 +1,181 @@
+﻿<div class="animated fadeIn">
+	<div class="row">
+		<div class="col-sm-2">
+		</div>
+		<div class="col-sm-8">
+			<table class="table table-bordered table-sm-new">
+				<tr class="trbg">
+					<td colspan="6"><span class="col-form-span-label"><b>RECEIPT OF CARGO (WITHOUT JOBNO) DETAILS</b></span></td>
+					<td colspan="2">
+						<span class="col-form-span-label" *ngIf="viewType=='Add'">
+							<u><a href="javascript:void(0);" (click)="viewType='Search'"><i class="fa fa-arrow-left"></i> Back To Search</a></u>
+						</span>
+					</td>
+				</tr>
+			</table>
+			<table class="table table-bordered table-sm-new" *ngIf="viewType=='Search'">
+				<tr>
+					<td class="width150"><span class="col-form-span-label">Shipper<span class="col-form-span-error"> *</span></span></td>
+					<td colspan="7">
+						<ng-select [items]="ShipperList"
+								   bindLabel="TEXTFIELD"
+								   bindValue="VALUEFIELD"
+								   placeholder="-- Select --"
+								   [(ngModel)]="Shipper"
+								   class="form-control"
+								   >
+						</ng-select>
+					</td>
+				</tr>
+				<tr>
+					<td class="width150"><span class="col-form-span-label">Consignee<span class="col-form-span-error"> *</span></span></td>
+					<td colspan="7">
+						<ng-select [items]="ConsigneeList"
+								   bindLabel="CON_NAME"
+								   bindValue="CON_CODE"
+								   placeholder="-- Select --"
+								   [(ngModel)]="Consignee"
+								   class="form-control"
+								   >
+						</ng-select>
+					</td>
+				</tr>
+				<tr class="trbg centerlabel">
+					<td colspan="8">
+						<button type="button" class="btn btn-sm btn-info" name="searchButton" (click)="Search()"  #searchButton><span class="col-form-span-label"><i class="fa fa-search"></i>&nbsp;Search</span></button>
+					</td>
+				</tr>
+			</table>
+			<table class="table table-bordered table-sm-new" *ngIf="viewType=='Add'">
+				<tr>
+					<td class="width150"><span class="col-form-span-label">Shipper</span></td>
+					<td colspan="7"></td>
+				</tr>
+				<tr>
+					<td class="width150"><span class="col-form-span-label">Consignee</span></td>
+					<td colspan="7"></td>
+				</tr>
+				<tr>
+					<td class="width150"><span class="col-form-span-label">Order No </span></td>
+					<td colspan="3"><input type="text" [(ngModel)]="OrderNo" class="form-control width100"/></td>
+					<td class="width150"><span class="col-form-span-label">Style No </span></td>
+					<td colspan="3"><input type="text" [(ngModel)]="StyleNo" class="form-control width100"/></td>
+				</tr>
+				<tr>
+					<td class="width150"><span class="col-form-span-label">Gross Weight </span></td>
+					<td colspan="3"><input type="text" [(ngModel)]="GrossWgt" class="form-control width100" OnlyNumber="true"/></td>
+					<td class="width150"><span class="col-form-span-label">Volume </span></td>
+					<td colspan="3"><input type="text" [(ngModel)]="Volume" class="form-control width100" OnlyNumber="true"/></td>
+				</tr>
+				<tr class="trbg">
+					<td colspan="8"><span class="col-form-span-label"><strong>PACKAGE DETAILS</strong></span></td>
+				</tr>
+				<tr>
+					<td class="width150"><span class="col-form-span-label">No Of Pkgs</span></td>
+					<td colspan="3"><span class="col-form-span-label">Recd Date</span></td>
+					<td class="width150"><span class="col-form-span-label">Recd Where</span></td>
+					<td colspan="3"><span class="col-form-span-label">Recd Locally</span></td>
+				</tr>
+				<tr>
+					<td class="width150"><input type="text" [(ngModel)]="NoOfPkgs" class="form-control width80" [maxlength]="20" /></td>
+					<td><my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="RecdDate"></my-date-picker></td>
+					<td>
+						<ng-select [items]="[{VALUE: '00'},{VALUE: '01'},{VALUE: '02'},{VALUE: '03'},{VALUE: '04'},{VALUE: '05'},{VALUE: '06'},{VALUE: '07'},{VALUE: '08'},{VALUE: '09'},{VALUE: '10'},{VALUE: '11'},{VALUE: '12'},{VALUE: '13'},{VALUE: '14'},{VALUE: '15'},{VALUE: '16'},{VALUE: '17'},{VALUE: '18'},{VALUE: '19'},{VALUE: '20'},{VALUE: '21'},{VALUE: '22'},{VALUE: '23'}]"
+								   bindLabel="VALUE"
+								   bindValue="VALUE"
+								   placeholder="--"
+								   [(ngModel)]="RecdTime"
+								   class="form-control width70"
+								   >
+						</ng-select>
+					</td>
+					<td>
+						<ng-select [items]="[{VALUE: '00'},{VALUE: '15'},{VALUE: '30'},{VALUE: '45'}]"
+								   bindLabel="VALUE"
+								   bindValue="VALUE"
+								   placeholder="--"
+								   [(ngModel)]="RecdMin"
+								   class="form-control width70"
+								   >
+						</ng-select>
+					</td>
+					<td><input type="text" [(ngModel)]="RecdWhere" class="form-control width150" [maxlength]="20" /></td>
+					<td><my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="RecdLocal"></my-date-picker></td>
+					<td>
+						<ng-select [items]="[{VALUE: '00'},{VALUE: '01'},{VALUE: '02'},{VALUE: '03'},{VALUE: '04'},{VALUE: '05'},{VALUE: '06'},{VALUE: '07'},{VALUE: '08'},{VALUE: '09'},{VALUE: '10'},{VALUE: '11'},{VALUE: '12'},{VALUE: '13'},{VALUE: '14'},{VALUE: '15'},{VALUE: '16'},{VALUE: '17'},{VALUE: '18'},{VALUE: '19'},{VALUE: '20'},{VALUE: '21'},{VALUE: '22'},{VALUE: '23'}]"
+								   bindLabel="VALUE"
+								   bindValue="VALUE"
+								   placeholder="--"
+								   [(ngModel)]="RecdLocalTime"
+								   class="form-control width70"
+								   >
+						</ng-select>
+					</td>
+					<td>
+						<ng-select [items]="[{VALUE: '00'},{VALUE: '15'},{VALUE: '30'},{VALUE: '45'}]"
+								   bindLabel="VALUE"
+								   bindValue="VALUE"
+								   placeholder="--"
+								   [(ngModel)]="RecdLocalMin"
+								   class="form-control width70"
+								   >
+						</ng-select>
+					</td>
+				</tr>
+				<tr class="trbg centerlabel">
+					<td colspan="8">
+						<button type="button" class="btn btn-sm btn-success" name="addButton" (click)="addUpdate()" *ngIf="Type == 'A'"  #addButton><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
+						<button type="button" class="btn btn-sm btn-info" name="updateButton" (click)="addUpdate()" *ngIf="Type == 'E'"  #updateButton><span class="col-form-span-label"><i class="fa fa-refresh"></i>&nbsp;Update</span></button>
+						<button type="button" class="btn btn-sm btn-secondary" (click)="reset()"><span class="col-form-span-label"><i class="fa fa-undo"></i>&nbsp;Reset</span></button>
+					</td>
+				</tr>
+			</table>
+			<div class="row yscroll" style="height:150px">
+				<table class="table table-bordered table-striped table-sm-new">
+					<thead>
+						<tr class="col-form-span-heading">
+							<th class="width75"></th>
+							<th class="centerlabel"><span class="col-form-span-label">No Of Pkgs</span></th>
+							<th class="centerlabel"><span class="col-form-span-label">Recd Date</span></th>
+							<th class="centerlabel"><span class="col-form-span-label">Recd Where</span></th>
+							<th class="centerlabel"><span class="col-form-span-label">Recd Locally</span></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let obj of cargoList">
+							<td class="width75">
+								<span class="col-form-span-label">
+									<i class="fa fa-pencil fa-1x" (click)="populate('E',obj.TBL_INDEXID,obj.CARGOID, obj.GUID, obj.EXPTNO, obj.NOOFPKGS, obj.RECDDATE, obj.RECDTIME, obj.RECDWHERE, obj.RECDLOCAL, obj.RECDLOCALTIME)"></i>&nbsp;&nbsp;
+									<i class="fa fa-trash fa-1x red" (click)="delete()"></i>
+								</span>
+							</td>
+							<td><span class="col-form-span-label">{{obj.NOOFPKGS}}</span></td>
+							<td><span class="col-form-span-label">{{obj.RECDDATE + ' ' + obj.RECDTIME}}</span></td>
+							<td><span class="col-form-span-label">{{obj.RECDWHERE}}</span></td>
+							<td><span class="col-form-span-label">{{obj.RECDLOCAL + ' ' + obj.RECDLOCALTIME}}</span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<table class="table table-bordered table-sm-new">
+				<tr class="trbg centerlabel" *ngIf="ErrorMessage != ''">
+					<td colspan="8">
+						<span class="col-form-span-error">{{ErrorMessage}}</span>
+					</td>
+				</tr>
+				<tr class="trbg right-text">
+					<td colspan="8">
+						<button type="button" name="submitButton" class="btn btn-sm btn-success" (click)="submit();" [disabled]="ErrorMessage != ''" #submitButton>
+							<span class="col-form-span-label"><app-font-changer [fontIndex]="'14'"></app-font-changer> Submit</span>
+						</button>
+						<button type="button" name="abortButton" class="btn btn-sm btn-danger" (click)="abort();">
+							<span class="col-form-span-label"><app-font-changer [fontIndex]="'7'"></app-font-changer> Abort</span>
+						</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-sm-2">
+		</div>
+	</div>
+</div>

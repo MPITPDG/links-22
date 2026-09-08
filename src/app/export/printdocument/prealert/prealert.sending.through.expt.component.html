@@ -1,0 +1,125 @@
+﻿<div class="row">
+	<div class="col-sm-12">
+		<div class="card">
+			<div class="card-header formheading centerlabel">
+			   <strong><u>CONSOLE AUTO PREALERT</u></strong>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row" *ngIf="setLoader==0">
+	<div class="col-sm-12 centerlabel">
+		<img src="assets/img/loading.gif" /><br />
+		<span class="col-form-span-label">Please wait until Pre-Alert send !</span>
+	</div>
+</div>
+<div class="row" *ngIf="setLoader==1">
+	<div class="col-sm-12 centerlabel">
+		<img src="assets/img/loading.gif" /><br />
+		<span class="col-form-span-label">Pre-Alert Send Successfully. Please wait for Details.........</span>
+	</div>
+</div>
+<div class="row" *ngIf="setLoader==2">
+	<div class="col-sm-12 centerlabel">
+		<span class="col-form-span-label">Timeout Error.........</span>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-12">
+		<div class="row y350heightscroll" *ngIf="consoleList.length > 0">
+			<table class="table table-bordered table-sm-new bgwhite">
+				<thead>
+					<tr class="title-head table-darkgreen-main">
+						<!-- <th>Sr no</th> -->
+						<th>ConsoleNo</th>
+						<th>ConsoleDate</th>
+						<th>SentFrom</th>
+						<th>Pkgs</th>
+						<th>Weight</th>
+						<th>Volume</th>
+						<th>CHBLWT</th>
+						<th>Agent_Name</th>
+					</tr>
+				</thead>
+				<tbody>
+					<ng-container *ngFor="let objCon of consoleList; let i=index">
+						<tr>
+							<!-- <td><span class="col-form-span-label"><strong>{{i + 1}})</strong></span></td> -->
+							<td><span class="col-form-span-label"><b>{{objCon.CONSOLENO}}</b></span></td>
+							<td><span class="col-form-span-label">{{objCon.CONSOLEDT}}</span></td>
+							<td><span class="col-form-span-label">{{objCon.SENTFROM}}</span></td>
+							<td><span class="col-form-span-label">{{objCon.NOOFPKGS}}</span></td>
+							<td><span class="col-form-span-label">{{objCon.WEIGHT}}</span></td>
+							<td><span class="col-form-span-label">{{objCon.VOLUME}}</span></td>
+							<td><span class="col-form-span-label">{{objCon.CHBLWT}}</span></td>
+							<td><span class="col-form-span-label">{{objCon.SUP_NAME}}</span></td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td colspan="8">
+								<table class="table table-bordered table-sm-new bgwhite">
+									<thead>
+										<tr class="title-head table-darkgreen-main">
+											<th>JobNo.</th>
+											<th>Hawbno</th>
+											<th>Hawbdt</th>
+											<th>Pkgs</th>
+											<th>Weight</th>
+											<th>Volume</th>
+											<th>Impoter</th>
+											<th>Expoter</th>
+											<th>Export_JobNo</th>
+										</tr>
+									</thead>
+									<tbody>
+										<ng-container *ngFor="let objJob of jobList">
+											<tr *ngIf="objJob.JOB_CONSOLENO == objCon.CONSOLENO">
+												<td><span class="col-form-span-label"><b>{{objJob.JOBNO}}</b></span></td>
+												<td><span class="col-form-span-label">{{objJob.HAWBNO}}</span></td>
+												<td><span class="col-form-span-label">{{objJob.HAWBDT}}</span></td>
+												<td><span class="col-form-span-label">{{objJob.NOOFPKGS}}</span></td>
+												<td><span class="col-form-span-label">{{objJob.WEIGHT}}</span></td>
+												<td><span class="col-form-span-label">{{objJob.VOLUME}}</span></td>
+												<td><span class="col-form-span-label">{{objJob.IMPOTER}}</span></td>
+												<td><span class="col-form-span-label">{{objJob.EXPOTER}}</span></td>
+												<td><span class="col-form-span-label">{{objJob.EXPTNO}}</span></td>
+											</tr>
+											<tr>
+												<td>&nbsp;</td>
+												<td colspan="8">
+													<table class="table table-bordered table-sm-new bgwhite">
+														<thead>
+															<tr class="title-head table-darkgreen-main">
+																<th>OrderNo</th>
+																<th>Pcs</th>
+															</tr>
+														</thead>
+														<tbody>
+															<ng-container *ngFor="let objOrder of orderList">
+																<tr *ngIf="objJob.JOB_CONSOLENO == objOrder.ORDER_CONSOLENO">
+																	<td><span class="col-form-span-label">{{objOrder.ORDERNO}}</span></td>
+																	<td><span class="col-form-span-label">{{objOrder.NOOFPCS}}</span></td>
+																</tr>
+															</ng-container>
+														</tbody>
+													</table>
+												</td>
+											</tr>
+										</ng-container>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+					</ng-container>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<div class="row" *ngIf="consoleList.length > 0">
+	<div class="col-sm-12 centerlabel">
+		<button (click)="exitClick()" class="btn btn-sm btn-danger">
+			Exit&nbsp;<i class="fa fa-share-square"></i>
+		</button>
+	</div>
+</div>

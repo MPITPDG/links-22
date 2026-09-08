@@ -1,0 +1,33 @@
+﻿<table class="table table-bordered table-sm-new tablebg">
+	<tr class="trbg">
+		<td colspan="8">
+			<span class="col-form-span-label"><b>Updated Details</b></span>
+		</td>
+	</tr>
+	<tr *ngIf="UpdatedList.length==0">
+		<td colspan="8">
+			<span class="col-form-span-label">There is No changes in Transhipment vessel and ETA.Other Details updated successfully!</span>
+		</td>
+	</tr>
+</table>
+<table class="table table-bordered table-sm-new" *ngIf="UpdatedList.length>0">
+	<thead>
+		<tr class="col-form-span-heading" style="white-space:nowrap;">
+			<th class="centerlabel"  *ngFor=" let key of keys; let i = index;"><span class="col-form-span-label">{{key}}</span></th>
+		</tr>
+	</thead>
+	<tbody class="bgwhite">
+		<tr *ngFor="let obj of UpdatedList"> 
+			<ng-container *ngFor=" let key of keys; let i = index;">
+				<td><span class="col-form-span-label">{{obj[key]}}</span></td>
+			</ng-container>
+		</tr>
+	</tbody>
+</table>
+<table class="table table-bordered table-sm-new">
+	<tr class="trbg">
+		<td colspan="8" class="right-text">
+			<button class="btn btn-sm btn-warning" style="float: right;" (click)="back();"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back</u></span></button>
+		</td>
+	</tr>
+</table>

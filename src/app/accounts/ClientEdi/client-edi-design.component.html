@@ -1,0 +1,124 @@
+<div class="container-fluid p-2">
+
+  <!-- Single Controls Row -->
+  <div class="controls-row mb-2">
+    <div class="d-flex align-items-center">
+      
+      <!-- Title -->
+      <h2 class="mb-0 fw-semibold me-3 title-text">
+        <i class="fa fa-file-text me-1 text-primary"></i>
+        Bajaj EDI Pending Billing List
+      </h2>
+      
+      <!-- Search Box -->
+      <div class="search-box me-2">
+        <i class="fa fa-search search-icon"></i>
+        <input 
+          class="form-control form-control-sm" 
+          type="search" 
+          [(ngModel)]="searchString" 
+          autocomplete="off"
+          placeholder="Search...">
+      </div>
+      
+      <!-- Action Buttons -->
+      <button 
+        class="btn btn-sm btn-success me-1" 
+        (click)="GenerateEdiInvoice()"
+        [disabled]="!hasSelectedItems()">
+        <i class="fa fa-file-excel-o me-1"></i>Generate Excel
+      </button>
+      <button 
+        class="btn btn-sm btn-primary" 
+        (click)="GenerateEditxtInvoice()"
+        [disabled]="!hasSelectedItems()">
+        <i class="fa fa-file-text-o me-1"></i>Generate Text
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div *ngIf="displayType=='LIST'">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-0">
+        
+        <!-- Loading State -->
+        <!-- <div *ngIf="isLoading" class="text-center p-4">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-2 text-muted small">Loading...</p>
+        </div> -->
+
+        <!-- Data Table -->
+        <div *ngIf="workOrders.length > 0" 
+             class="table-scroll-container">
+          <table class="table mb-0 modern-data-table">
+            <thead>
+              <tr>
+                <th class="sticky-check-col text-center">
+                  <input 
+                    type="checkbox" 
+                    class="form-check-input"
+                    [(ngModel)]="selectAll"
+                    (change)="onSelectAllChange()">
+                </th>
+                <th>Work Order No</th>
+                <th>WO Date</th>
+                <th>Client</th>
+                <th>Ship Bill No</th>
+                <th>Ship Bill Date</th>
+                <th>Sailing Date</th>
+                <th>Invoice No</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of workOrders | clientedifilterpipe: searchString"
+                  [class.row-disabled]="!(order.ISIRNDONE == 1 
+                  && order.ISBOL_SENT == 1 
+                  && order.ISAUTHODONE == 0) && order.BILLTYPEFLAG == 1">
+                
+                <td class="sticky-check-col text-center">
+                  <input 
+                    type="checkbox"
+                    class="form-check-input"
+                    [(ngModel)]="order.checked"
+                    (change)="onWOSelectChange()"
+                    [disabled]="!(order.ISIRNDONE == 1 
+                    && order.ISBOL_SENT == 1 
+                    && order.ISAUTHODONE !== 0 && order.BILLTYPEFLAG == 1)">
+                </td>
+                
+                <td [title]="order.WORKORDERNO">
+                  <span class="text-primary fw-semibold"><b>{{ order.WORKORDERNO }}</b></span>
+                </td>
+                <td [title]="order.WORKORDERDT">{{ order.WORKORDERDT }}</td>
+                <td [title]="order.CLIENT">{{ order.CLIENT }}</td>
+                <td [title]="order.SHIPBILLNO">{{ order.SHIPBILLNO }}</td>
+                <td [title]="order.SHIPBILLDT">{{ order.SHIPBILLDT }}</td>
+                <td [title]="order.SAILING">{{ order.SAILING }}</td>
+                <td class="invoice-cell">
+                  <div class="invoice-list">
+                    <ng-container *ngFor="let inv of order.INVOICENO?.split('<br>')">
+                      <span class="invoice-link" (click)="viewinvoice(inv)" [title]="inv">
+                        {{ inv }}
+                      </span>
+                    </ng-container>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- No Data State -->
+        <div *ngIf="!isLoading && (!workOrders || workOrders.length === 0)" 
+             class="text-center p-4">
+          <i class="fa fa-inbox fa-2x text-muted mb-2"></i>
+          <p class="text-muted mb-0 small">No work orders found.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,67 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>Vessel - SEARCH</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+        </div>
+        <div class="col-sm-6">
+            <table class="table table-sm-new bgwhite">
+                <tr>
+                    <td class="width90">
+                        <span class="col-form-span-label">Vessel Name:</span>
+                    </td>
+                    <td>
+                        <input type="text" [(ngModel)]="Input" class="form-control" />
+                    </td>
+                    <td class="width100">
+                        <button type="button" name="submitButton" class="btn btn-sm btn-info" (click)="search();">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-search"></i>&nbsp;Search</span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-3">
+        </div>
+    </div><br/>
+    <div class="row" *ngIf="List.length > 0">
+        <div class="col-sm-12">
+            <div class="yscroll" style="max-height: 300px">
+                <table class="table table-bordered table-sm-new bgwhite">
+                    <tr class="col-form-span-heading">
+                        <th><span class="col-form-span-label">ROTATION NO.</span></th>
+                        <th><span class="col-form-span-label">VESSEL NAME</span> </th>
+                        <th><span class="col-form-span-label">VOYAGE NO.</span></th>
+                        <th><span class="col-form-span-label">EXPECTED ARR. DT.</span> </th>
+                        <th><span class="col-form-span-label">ARRIVAL PORT</span></th>
+                        <th><span class="col-form-span-label">BERTH NO.</span> </th>
+                        <th><span class="col-form-span-label">ACTUAL ARR. DT.</span></th>
+                        <th><span class="col-form-span-label">USER</span> </th>
+                    </tr>
+                    <tr *ngFor="let obj of List" class="tr-hover">
+                        <td>
+                            <span class="col-form-span-label" (click)="goTo(obj.code)" style="cursor:pointer;text-decoration: underline;color: blue">
+                                {{obj["vsl_rotation"]}}
+                            </span>
+                        </td>
+                        <td><span class="col-form-span-label">{{obj["name"]}}</span> </td>
+                        <td><span class="col-form-span-label">{{obj["voyageno"]}}</span></td>
+                        <td><span class="col-form-span-label">{{obj["ExpectedDt"]}}</span> </td>
+                        <td><span class="col-form-span-label">{{obj["arrivalport"]}}</span></td>
+                        <td><span class="col-form-span-label">{{obj["berth"]}}</span> </td>
+                        <td><span class="col-form-span-label">{{obj["ActualDt"]}}</span></td>
+                        <td><span class="col-form-span-label">{{obj["Requested"]}}</span> </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

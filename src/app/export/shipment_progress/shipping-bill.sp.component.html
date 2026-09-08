@@ -1,0 +1,69 @@
+﻿<div class="animated fadeIn">
+	<div class="row">
+		<div class="col-sm-2">
+		</div>
+		<div class="col-sm-8">
+			<app-shipment-progress-common-view [ExptNo]="ExptNo"></app-shipment-progress-common-view>
+			<table class="table table-bordered table-sm-new">
+				<tr class="trbg">
+					<td colspan="4"><span class="col-form-span-label"><b>Shipping Bill Details</b></span></td>
+				</tr>
+				<tr style="background-color: #f1f1f1c7;">
+					<td class="width150"><span class="col-form-span-label">Custom date</span></td>
+					<td colspan="3">
+						<my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="CustomDate"></my-date-picker>
+					</td>
+				</tr>
+				<tr style="background-color: #f1f1f1c7;">
+					<td class="width150"><span class="col-form-span-label">Shipping Bill No.</span></td>
+					<td><input type="text" [(ngModel)]="ShipBillNo" class="form-control width150" [maxlength]="20" /></td>
+					<td class="width150"><span class="col-form-span-label">Shipping Bill date</span></td>
+					<td><my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="ShipBillDate"></my-date-picker></td>
+				</tr>
+				<tr class="trbg">
+					<td colspan="4"><span class="col-form-span-label"><b>Custom Details</b></span></td>
+				</tr>
+				<tr style="background-color: #f1f1f1c7;">
+					<td class="width150"><span class="col-form-span-label">Custom Examined on.</span></td>
+					<td><my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="ExaminDate"></my-date-picker></td>
+					<td class="width150"><span class="col-form-span-label">Objection</span></td>
+					<td><input type="checkbox" name="Objection" (checked)="Objection == 'Y'" (change)="changeObjection()" /></td>
+				</tr>
+				<tr style="background-color: #f1f1f1c7;">
+					<td class="width150"><span class="col-form-span-label">Remark</span></td>
+					<td colspan="3">
+						<textarea rows="2" class="form-control"  maxlength="240" [(ngModel)]="Remark" [disabled]="Objection != 'Y'"></textarea>
+					</td>
+				</tr>
+				<tr class="trbg centerlabel" *ngIf="CustomClearanceMsg != ''">
+					<td colspan="4">
+						<span class="col-form-span-error">{{CustomClearanceMsg}}</span>
+					</td>
+				</tr>
+				<tr style="background-color: #f1f1f1c7;">
+					<td class="width150"><span class="col-form-span-label">CC No.</span></td>
+					<td><input type="text" [(ngModel)]="CCNo" class="form-control width150" [maxlength]="20" [disabled]="IsCargoRecd == 'NO'"/></td>
+					<td class="width150"><span class="col-form-span-label">Custom Cleared On.</span></td>
+					<td><my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="CCDate"  [disabled]="IsCargoRecd == 'NO'"></my-date-picker></td>
+				</tr>
+				<tr class="trbg centerlabel">
+					<td colspan="4">
+						<button type="button" name="submitButton" class="btn btn-l btn-success" (click)="submit();" [disabled]="ErrorMessage != ''" #submitButton>
+							<span class="col-form-span-label"><app-font-changer [fontIndex]="'14'"></app-font-changer> Submit</span>
+						</button>
+						<button type="button" name="abortButton" class="btn btn-l btn-danger" (click)="search();">
+							<span class="col-form-span-label"><app-font-changer [fontIndex]="'7'"></app-font-changer> Abort</span>
+						</button>
+					</td>
+				</tr>
+				<tr class="trbg centerlabel" *ngIf="ErrorMessage != ''">
+					<td colspan="4">
+						<span class="col-form-span-error">{{ErrorMessage}}</span>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-sm-2">
+		</div>
+	</div>
+</div>

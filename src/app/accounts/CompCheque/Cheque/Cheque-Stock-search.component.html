@@ -1,0 +1,108 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>{{Header| uppercase}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters"  *ngIf="displayType=='SEARCH'">
+        <div class="col-sm-12 col-md-3 col-lg-3"> </div>
+        <div class="col-sm-12 col-md-6 col-lg-6">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td ><span class="col-form-span-label"><b>Our Bank</b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td >
+                        <select class="form-control"  [(ngModel)]="OurBank">
+                            <option value="">Please select</option>
+                            <option *ngFor="let d of OurBankList"  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">
+                        <button class="btn btn-sm btn-success" type="submit" (click)="searchchq()">
+                            <span class="col-form-span-label"><i
+                                    class="fa fa-dot-circle-o"></i>Search</span></button>
+                        <button class="btn btn-sm btn-danger" type="reset"> <span
+                                class="col-form-span-label" (click)="resetcheque();"><i
+                                    class="fa fa-ban"></i> Reset</span></button>
+                    </td>
+                </tr>            
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3"> </div>
+    </div>
+    <div class="row no-gutters"  *ngIf="displayType=='LIST'">
+        <div class="col-12 col-md-1 col-lg-1"> </div>
+        <div class="col-12 col-md-10 col-lg-10">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead>
+                    <tr class="title-head formheading">
+                        <th colspan="8">
+                            {{searchHeaderText}}
+                            <a href="javascript:void(0);" (click)="displayType='SEARCH';Searchdata_list=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td colspan="8">
+                            <div class="input-group input-group-rounded"  style="float: right;width: 200px;font-family: verdana;font-size:11px;padding: 1px;">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="padding: 0px;"><i class="fa fa-search"></i></span>
+                                </div>
+                                <input class="form-control" type="search" [(ngModel)]="searchString" autocomplete="off"
+                                    placeholder="Search">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="title-head formheading">      
+                        <th class="col-form-span-label" align="center">Cheque No</th>
+                        <th class="col-form-span-label" align="center">Bank Code</th>
+                        <th class="col-form-span-label" align="center">Request BP No</th>
+                        <th class="col-form-span-label" align="center">BP Entry No</th>
+                        <th class="col-form-span-label" align="center">Status</th>
+                        <th class="col-form-span-label" align="center">Reason</th>
+                        <th class="col-form-span-label" align="center">Printed BY</th>
+                        <th class="col-form-span-label" align="center">Printed On</th>
+                    </tr>
+                </thead>
+                <tbody *ngIf="Searchdata_list.length > 0">
+                    <tr *ngFor="let data of Searchdata_list | chqstockFilter: searchString|paginate: { itemsPerPage:25, currentPage: PageActual }">
+                       
+                        <td><span class="col-form-span-label">{{data.ChequeNo}}</span>
+                        </td>
+                        <td><span class="col-form-span-label">{{data.bank_code}}</span>
+                        </td>
+
+                        <td><span class="col-form-span-label">{{data.BP_Num}}</span>
+                        </td>
+                        <td><span class="col-form-span-label">{{data.BP_EntryNo}}</span>
+                        </td>
+                        <td><span class="col-form-span-label">{{data.Status}}</span>
+                        </td>
+                        <td><span class="col-form-span-label">{{data.Reason}}</span>
+                        </td>
+                        <td><span class="col-form-span-label">{{data.PrintedBY}}</span>
+                        </td>
+                        <td><span class="col-form-span-label">{{data.PrintedOn}}</span>
+                        </td>
+                       
+                    </tr>
+                </tbody>
+                <tr>
+                    <td colspan="8">
+                      <div class="row justify-content-center no-gutters"
+                        style="font-family:verdana;font-size: 11px;padding: 1px;">
+                        <pagination-controls (pageChange)="PageActual=$event" ></pagination-controls>
+                      </div>
+                    </td>
+                  </tr>
+            </table>
+        </div>
+        <div class="col-12 col-md-1 col-lg-1"> </div>
+
+    </div>
+    </div>

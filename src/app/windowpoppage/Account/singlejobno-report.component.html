@@ -1,0 +1,266 @@
+<div class="jp-page">
+
+    <!-- ============================ toolbar (screen only) ============================ -->
+    <div class="jp-toolbar jp-noprint">
+        <div class="jp-toolbar-title">
+            <i class="fa fa-file-text-o"></i>
+            Job Profit Statement
+            <span class="jp-jobno">Job {{ JobNo }}</span>
+        </div>
+        <div class="jp-toolbar-actions" *ngIf="Loaded && !NoData">
+            <button type="button" class="jp-btn" [class.jp-btn--on]="PendingOnly" (click)="PendingOnly = !PendingOnly"
+                    [title]="'Show only heads where billing or cost entry is still pending (' + pendingCount() + ')'">
+                <i class="fa" [ngClass]="PendingOnly ? 'fa-check-square-o' : 'fa-square-o'"></i>
+                Pending only <span class="jp-count" *ngIf="pendingCount()">{{ pendingCount() }}</span>
+            </button>
+            <button type="button" class="jp-btn" (click)="setAll(!allOpen())">
+                <i class="fa" [ngClass]="allOpen() ? 'fa-compress' : 'fa-expand'"></i>
+                {{ allOpen() ? 'Collapse all' : 'Expand all' }}
+            </button>
+            <button type="button" class="jp-btn jp-btn--primary" (click)="Print()">
+                <i class="fa fa-print"></i> Print
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================ states ============================ -->
+    <div class="jp-state" *ngIf="!Loaded">
+        <i class="fa fa-spinner fa-spin"></i> Loading job profit for {{ JobNo }} &hellip;
+    </div>
+    <div class="jp-state" *ngIf="Loaded && NoData">
+        <i class="fa fa-info-circle"></i>
+        No job profit data found for job <b>{{ JobNo }}</b>. The job may have no invoice or cost vouchers yet.
+    </div>
+
+    <ng-container *ngIf="Loaded && !NoData">
+
+        <!-- ============================ company ============================ -->
+        <div class="jp-company">
+            <div class="jp-company-name">{{ table0.HEADING_1 }}</div>
+            <div class="jp-company-addr">{{ table0.HEADING_2 }}</div>
+            <div class="jp-company-addr">{{ table0.HEADING_3 }}</div>
+        </div>
+        <div class="jp-print-title">Job Profit Statement &mdash; Job No {{ JobNo }}</div>
+
+        <!-- ============================ job header band ============================ -->
+        <div class="jp-band" [ngClass]="statusClass()">
+            <div class="jp-band-main">
+                <div class="jp-band-job">
+                    <div class="jp-lbl jp-lbl--light">Job No</div>
+                    <div class="jp-band-jobno">{{ JobNo }}</div>
+                </div>
+                <div class="jp-band-client">
+                    <div class="jp-lbl jp-lbl--light">Client</div>
+                    <div class="jp-band-clientname">
+                        {{ ClientName() }}
+                        <span class="jp-fromjob" *ngIf="ClientSource()">{{ ClientSource() }}</span>
+                    </div>
+                </div>
+                <div class="jp-status">
+                    <i class="fa" [ngClass]="Status === 'HEALTHY' ? 'fa-check-circle' : (Status === 'LOSS' ? 'fa-times-circle' : 'fa-exclamation-triangle')"></i>
+                    {{ statusLabel() }}
+                </div>
+            </div>
+            <!-- parties come off the JOB, so they are there before any bill is raised -->
+            <div class="jp-band-meta jp-band-meta--parties" *ngIf="ExporterName() || BillToName()">
+                <div class="jp-head-cell jp-head-cell--wide" *ngIf="ExporterName()">
+                    <div class="jp-lbl">{{ PartyLabel() }}</div>
+                    <div class="jp-val jp-val--strong">{{ ExporterName() }}</div>
+                </div>
+                <div class="jp-head-cell jp-head-cell--wide" *ngIf="BillToName()">
+                    <div class="jp-lbl">Bill to party</div>
+                    <div class="jp-val jp-val--strong">{{ BillToName() }}</div>
+                    <div class="jp-hint" *ngIf="!ShowBothParties() && ExporterName()">same as exporter</div>
+                </div>
+            </div>
+
+            <div class="jp-band-meta">
+                <div class="jp-head-cell">
+                    <div class="jp-lbl">Bill No</div>
+                    <div class="jp-val" *ngIf="IsBilled()">{{ table1.INV_NO }}</div>
+                    <div class="jp-val" *ngIf="!IsBilled()"><span class="jp-pill jp-pill--warn jp-pill--sm" style="margin-left:0">Not billed yet</span></div>
+                </div>
+                <div class="jp-head-cell"><div class="jp-lbl">Bill Date</div><div class="jp-val">{{ table1.INV_DATE || '-' }}</div></div>
+                <div class="jp-head-cell"><div class="jp-lbl">Packages</div><div class="jp-val">{{ fmtQty(table1.INV_PKGS) }}</div></div>
+                <div class="jp-head-cell"><div class="jp-lbl">Weight</div><div class="jp-val">{{ fmtQty(table1.INV_WT) }}</div></div>
+                <div class="jp-head-cell jp-head-cell--wide"><div class="jp-lbl">Vessel / Airline</div><div class="jp-val">{{ table1.INV_CARRIER || '-' }}</div></div>
+            </div>
+        </div>
+
+        <!-- ============================ insights ============================ -->
+        <div class="jp-insights" *ngIf="Insights.length">
+            <div class="jp-insight" *ngFor="let n of Insights" [ngClass]="'jp-insight--' + n.kind">
+                <i class="fa" [ngClass]="n.kind === 'ok' ? 'fa-check-circle' : (n.kind === 'bad' ? 'fa-times-circle' : (n.kind === 'warn' ? 'fa-exclamation-triangle' : 'fa-info-circle'))"></i>
+                <span>{{ n.text }}</span>
+            </div>
+        </div>
+
+        <!-- ============================ KPI strip ============================ -->
+        <div class="jp-kpis">
+            <div class="jp-kpi">
+                <div class="jp-kpi-top">
+                    <div class="jp-kpi-label">Income <span class="jp-hint">recovered</span></div>
+                    <span class="jp-kpi-ico jp-ico--green"><i class="fa fa-arrow-circle-down"></i></span>
+                </div>
+                <div class="jp-kpi-value">{{ Income | number:'1.2-2' }}</div>
+                <div class="jp-kpi-sub">{{ table3.length }} voucher lines &middot; {{ table2.length }} heads</div>
+            </div>
+            <div class="jp-kpi">
+                <div class="jp-kpi-top">
+                    <div class="jp-kpi-label">Expense <span class="jp-hint">paid</span></div>
+                    <span class="jp-kpi-ico jp-ico--amber"><i class="fa fa-arrow-circle-up"></i></span>
+                </div>
+                <div class="jp-kpi-value">{{ Expense | number:'1.2-2' }}</div>
+                <div class="jp-kpi-sub" *ngIf="Expense <= 0.01 && Income > 0.01"><span class="jp-pill jp-pill--loss jp-pill--sm" style="margin-left:0">No cost booked yet</span></div>
+                <div class="jp-kpi-sub" *ngIf="!(Expense <= 0.01 && Income > 0.01)">{{ expenseShare() | number:'1.0-0' }}% of income</div>
+            </div>
+            <div class="jp-kpi" [ngClass]="Profit >= 0 ? 'jp-kpi--pos' : 'jp-kpi--neg'">
+                <div class="jp-kpi-top">
+                    <div class="jp-kpi-label">Profit <span class="jp-hint">income &minus; expense</span></div>
+                    <span class="jp-kpi-ico" [ngClass]="Profit >= 0 ? 'jp-ico--green' : 'jp-ico--red'"><i class="fa fa-line-chart"></i></span>
+                </div>
+                <div class="jp-kpi-value">{{ Profit | number:'1.2-2' }}</div>
+                <div class="jp-kpi-sub">
+                    <span class="jp-pill jp-pill--sm" style="margin-left:0" [ngClass]="isLoss(table4.GRAND_REMARKS) ? 'jp-pill--loss' : 'jp-pill--gain'">
+                        {{ table4.GRAND_REMARKS || (Profit >= 0 ? 'Gain' : 'Loss') }}
+                    </span>
+                    <span class="jp-pill jp-pill--sm jp-pill--warn" *ngIf="Status === 'PROVISIONAL'">provisional</span>
+                </div>
+            </div>
+            <div class="jp-kpi" [ngClass]="Profit >= 0 ? 'jp-kpi--pos' : 'jp-kpi--neg'">
+                <div class="jp-kpi-top">
+                    <div class="jp-kpi-label">Margin % <span class="jp-hint">profit &divide; income</span></div>
+                    <span class="jp-kpi-ico" [ngClass]="Profit >= 0 ? 'jp-ico--green' : 'jp-ico--red'"><i class="fa fa-percent"></i></span>
+                </div>
+                <div class="jp-kpi-value">{{ MarginPct === null ? '-' : (MarginPct | number:'1.1-1') + ' %' }}</div>
+                <div class="jp-share" title="Share of income spent (amber) vs kept (green)">
+                    <span class="jp-share-exp" [style.width.%]="expenseShare()"></span>
+                </div>
+                <div class="jp-kpi-sub">spent {{ expenseShare() | number:'1.0-0' }}% &middot; kept {{ (100 - expenseShare()) | number:'1.0-0' }}%</div>
+            </div>
+        </div>
+
+        <!-- ============================ grouped statement ============================ -->
+        <div class="jp-card">
+            <div class="jp-card-title">Income &amp; expense by head
+                <span class="jp-card-sub">Click a head to fold it; click a voucher number to open that voucher.</span>
+            </div>
+            <div class="jp-table-wrap">
+                <table class="jp-table jp-table--stmt">
+                    <colgroup>
+                        <col class="jp-c-type"><col class="jp-c-vch"><col class="jp-c-date"><col class="jp-c-amt"><col class="jp-c-amt">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Voucher No</th>
+                            <th>Date</th>
+                            <th class="num" title="Expense booked on the job">Debit</th>
+                            <th class="num" title="Income billed on the job">Credit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngFor="let g of visibleHeads()">
+                            <tr class="jp-grp" [class.jp-grp--loss]="isLoss(g.REMARKS)" (click)="toggle(g.ACCTCODE)">
+                                <td colspan="3">
+                                    <i class="fa" [ngClass]="isOpen(g.ACCTCODE) ? 'fa-caret-down' : 'fa-caret-right'"></i>
+                                    <span class="jp-grp-code">{{ g.ACCTCODE }}</span>
+                                    <span class="jp-grp-name">{{ g.ACCTNAME }}</span>
+                                    <span class="jp-pill jp-pill--sm"
+                                          [ngClass]="isLoss(g.REMARKS) ? 'jp-pill--loss' : (isGain(g.REMARKS) ? 'jp-pill--gain' : 'jp-pill--flat')">
+                                        {{ g.REMARKS || ((groupDiff(g) | number:'1.2-2')) }}
+                                    </span>
+                                    <span class="jp-grp-count" *ngIf="!isOpen(g.ACCTCODE)">{{ linesFor(g.ACCTCODE).length }} voucher{{ linesFor(g.ACCTCODE).length === 1 ? '' : 's' }}</span>
+                                    <!-- entry status for the accounts team: what is done / pending on this head -->
+                                    <span class="jp-chk" [ngClass]="num(g.RECOVERYAMT) > 0.01 ? 'jp-chk--ok' : 'jp-chk--pend'"
+                                          [title]="num(g.RECOVERYAMT) > 0.01 ? 'Billed to client' : 'Billing pending on this head'">
+                                        <i class="fa" [ngClass]="num(g.RECOVERYAMT) > 0.01 ? 'fa-check' : 'fa-clock-o'"></i> Billed
+                                    </span>
+                                    <span class="jp-chk" [ngClass]="num(g.PAIDAMT) > 0.01 ? 'jp-chk--ok' : 'jp-chk--pend'"
+                                          [title]="num(g.PAIDAMT) > 0.01 ? 'Cost booked' : 'Cost entry pending on this head'">
+                                        <i class="fa" [ngClass]="num(g.PAIDAMT) > 0.01 ? 'fa-check' : 'fa-clock-o'"></i> Cost
+                                    </span>
+                                </td>
+                                <td class="num">{{ g.PAIDAMT | number:'1.2-2' }}</td>
+                                <td class="num">{{ g.RECOVERYAMT | number:'1.2-2' }}</td>
+                            </tr>
+
+                            <ng-container *ngIf="isOpen(g.ACCTCODE)">
+                                <tr class="jp-line" *ngFor="let l of linesFor(g.ACCTCODE)">
+                                    <td>
+                                        <span class="jp-pill jp-pill--vch" [ngClass]="vchClass(l.TTYPE)" [title]="vchName(l.TTYPE)">{{ l.TTYPE }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0)" class="jp-vch" (click)="invoiceprint(l.TCODE, l.TTYPE); $event.stopPropagation();"
+                                           [title]="'Open ' + vchName(l.TTYPE) + ' ' + l.TCODE">{{ l.TCODE }}</a>
+                                    </td>
+                                    <td>{{ l.TDATE }}</td>
+                                    <td class="num">{{ num(l.TDRAMT) ? (l.TDRAMT | number:'1.2-2') : '' }}</td>
+                                    <td class="num">{{ num(l.TCRAMT) ? (l.TCRAMT | number:'1.2-2') : '' }}</td>
+                                </tr>
+                                <tr class="jp-line jp-line--empty" *ngIf="linesFor(g.ACCTCODE).length === 0">
+                                    <td colspan="5">No vouchers under this head.</td>
+                                </tr>
+                            </ng-container>
+                        </ng-container>
+
+                        <tr *ngIf="table2.length === 0">
+                            <td colspan="5" class="jp-empty">No expense / income heads for this job.</td>
+                        </tr>
+                        <tr *ngIf="table2.length > 0 && visibleHeads().length === 0">
+                            <td colspan="5" class="jp-empty">Nothing pending - every head has both billing and cost booked.</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="jp-total">
+                            <td colspan="3">Grand total</td>
+                            <td class="num">{{ table4.GRAND_PAIDAMT | number:'1.2-2' }}</td>
+                            <td class="num">{{ table4.GRAND_RECOVERYAMT | number:'1.2-2' }}</td>
+                        </tr>
+                        <tr class="jp-result" [ngClass]="Profit >= 0 ? 'jp-result--pos' : 'jp-result--neg'">
+                            <td colspan="3">{{ table4.GRAND_REMARKS || (Profit >= 0 ? 'Gain' : 'Loss') }}</td>
+                            <td colspan="2" class="num">{{ table4.GRAND_DIFFAMT | number:'1.2-2' }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- ============================ company-wise summary ============================ -->
+        <div class="jp-card" *ngIf="table5.length > 0 || table6.length > 0">
+            <div class="jp-card-title">Company-wise summary</div>
+            <div class="jp-table-wrap">
+                <table class="jp-table jp-table--compact">
+                    <colgroup>
+                        <col style="width:18%"><col style="width:20%"><col style="width:20%"><col style="width:20%"><col style="width:22%">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th class="num">Paid</th>
+                            <th class="num">Recovered</th>
+                            <th class="num">Difference</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let c of table5.concat(table6)">
+                            <td><b>{{ c.ACCTCODE }}</b></td>
+                            <td class="num">{{ c.GRAND_PAIDAMT | number:'1.2-2' }}</td>
+                            <td class="num">{{ c.GRAND_RECOVERYAMT | number:'1.2-2' }}</td>
+                            <td class="num" [ngClass]="num(c.GRAND_DIFFAMT) >= 0 ? 'jp-pos' : 'jp-neg'">{{ c.GRAND_DIFFAMT | number:'1.2-2' }}</td>
+                            <td>
+                                <span class="jp-pill jp-pill--sm" [ngClass]="isLoss(c.GRAND_REMARKS) ? 'jp-pill--loss' : 'jp-pill--gain'">{{ c.GRAND_REMARKS }}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="jp-foot jp-noprint">
+            Figures are the accounts ledger as at the time of opening this page. Debit = expense booked on the job (PI / BP / CP / CE / JV);
+            Credit = income billed (II / SI / BI, less CN).
+        </div>
+    </ng-container>
+</div>

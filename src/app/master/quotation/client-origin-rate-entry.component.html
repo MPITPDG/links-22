@@ -1,0 +1,330 @@
+<div class="animated fadeIn">
+    <div class="card">
+        <div class="card-header formheading">
+            <strong>{{Header| uppercase}}</strong>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+          <div class="col-sm-2"> </div> 
+            <div class="col-sm-8">
+                <table class="table table-bordered table-sm-new bgwhite">
+                    <tr>
+                        <td class="col-form-span-heading" colspan="4">
+                            Master Details
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Quot No.</b> </span><span
+                                class="col-form-span-error">*</span></td>
+                        <td> <input type="text" class="form-control width180" [disabled]=true [(ngModel)]="quotno"> </td>
+                        <td><span class="col-form-span-label"><b>Quot Dt.</b> </span></td>
+                        <td  style="text-align: left;">
+                                <my-date-picker name="quotdate" [options]="myDatePickerOptions"
+                                (dateChanged)="onquotDateChanged($event)" [selDate]=quotdate></my-date-picker>
+
+                        </td>
+                    </tr>
+               
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Client</b> </span><span
+                                class="col-form-span-error">*</span></td>
+                        <td colspan="3">
+                            <!-- <select class="form-control  " [(ngModel)]="client">
+                                <option value="">--Please Select Client--</option>
+                                <option *ngFor="let data of clientable" value={{data.DATAVALUE}}>{{data.DATATEXTVALUE}}
+                                </option>
+                            </select> -->
+                            <ng-select [items]="clientable"
+                                bindLabel="DATATEXTVALUE"
+                                bindValue="DATAVALUE" 
+                                [(ngModel)]="client"
+                                class="custom"  
+                                placeholder="--Please Select--" >
+                             </ng-select>
+                        </td>
+                    </tr>
+                    <!-- <tr>
+                        <td colspan="4">
+                            <table class="table table-bordered table-sm-new bgwhite">
+                                <tr>
+                                    <td><span class="col-form-span-label"><b>Origin </b> </span><span
+                                        class="col-form-span-error">*</span>
+                                </td>
+                                <td>
+                                    <select class="form-control width120" [(ngModel)]="origin">
+                                        <option value="">--Please Select--</option>
+                                        <option *ngFor="let d of origintable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+                                    </select>
+                                </td>
+                                <td><span class="col-form-span-label"><b>Shipment Type </b> </span><span
+                                    class="col-form-span-error">*</span>
+                                </td>
+                            <td>
+                                <select class="form-control width120" [(ngModel)]="shiptype">
+                                    <option value="">--Please Select --</option>
+                                    <option *ngFor="let d of shipmentable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                                    </option>
+                                </select>
+                            </td>
+                            <td><span class="col-form-span-label"><b>Shipment Mode </b> </span><span
+                                class="col-form-span-error">*</span>
+                            </td>
+                        <td>
+                            <select class="form-control width120" [(ngModel)]="shipmode">
+                                <option value="">--Please Select --</option>
+                                <option *ngFor="let d of shpmodetable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                                </option>
+                            </select>
+                        </td>
+                                </tr>
+                            </table>
+
+                        </td>
+                    </tr> -->
+                     <tr>
+                        <td><span class="col-form-span-label"><b>Origin </b> </span><span
+                                class="col-form-span-error">*</span>
+                        </td>
+                        <td>
+                            <select class="form-control width120" [(ngModel)]="origin">
+                                <option value="">--Please Select--</option>
+                                <option *ngFor="let d of origintable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+                            </select>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td><span class="col-form-span-label"><b>Shipment Mode </b> </span><span
+                                class="col-form-span-error">*</span>
+                            </td>
+                        <td>
+                            <select class="form-control width120" [(ngModel)]="shipmode">
+                                <option value="">--Please Select --</option>
+                                <option *ngFor="let d of shpmodetable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                                </option>
+                            </select>
+                        </td>
+                        <td><span class="col-form-span-label"><b>Shipment Type </b> </span><span
+                            class="col-form-span-error">*</span>
+                        </td>
+                    <td>
+                        <select class="form-control width120" [(ngModel)]="shiptype">
+                            <option value="">--Please Select --</option>
+                            <option *ngFor="let d of shipmentable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                            </option>
+                        </select>
+                    </td>
+                    </tr> 
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Company </b> </span><span
+                                class="col-form-span-error">*</span>
+                        </td>
+                        <td colspan="3">
+                            <select class="form-control" [(ngModel)]="company">
+                                <option value="">--Please Select--</option>
+                                <option *ngFor="let d of compnytable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Shipping Line </b> </span><span
+                                class="col-form-span-error">*</span>
+                        </td>
+                        <td colspan="3">
+                            <select class="form-control" [(ngModel)]="liner">
+                                <option value="">--Please Select--</option>
+                                <option *ngFor="let d of linertable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <!-- <tr>
+                
+                    <td><span class="col-form-span-label"><b>Shipment Type </b> </span><span
+                            class="col-form-span-error">*</span>
+                        </td>
+                    <td>
+                        <select class="form-control width120" [(ngModel)]="shiptype">
+                            <option value="">--Please Select --</option>
+                            <option *ngFor="let d of shipmentable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                            </option>
+                        </select>
+                    </td>
+                    <td colspan="2"></td>
+                    </tr> -->
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Quotation Valid Upto </b> </span><span
+                                class="col-form-span-error">*</span>
+                        </td>
+                        <td>
+                            <my-date-picker name="Quotvaliddate" [options]="myDatePickerOptions"
+                                (dateChanged)="QuotValidDateChanged($event)" [selDate]="Quotvaliddate"></my-date-picker>
+                        </td>
+                        </tr>
+                    <tr>
+                        <td colspan="4" align="center" class="col-form-span-heading">
+                            <button class="btn btn-sm btn-success" type="submit" (click)="SearchLinerData()"> <span
+                                    class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Search</span></button>
+                        
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-form-span-heading" colspan="4">
+                            Port Details
+                        </td>
+                    </tr>
+                    <tr>
+                   <td ><span class="col-form-span-label"><b>Pol </b> </span><span
+                     class="col-form-span-error">*</span>
+                </td>
+                <td >
+                    <select class="form-control" [(ngModel)]="pol">
+                        <option value="">--Please Select--</option>
+                        <option *ngFor="let d of commoncities" value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
+                    </select>
+                     </td>
+                <td><span class="col-form-span-label"><b>Pod </b> </span><span
+                    class="col-form-span-error">*</span>
+            </td>
+            <td >
+                <select class="form-control" [(ngModel)]="pod">
+                    <option value="">--Please Select--</option>
+                    <option *ngFor="let d of commoncities" value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
+                </select>
+            </td>
+                    </tr>
+                    <tr>
+                        <td> <span class="col-form-span-label "><b>Narration</b></span> </td>
+                        <td colspan="3">
+                            <!-- (input)="Narrationarea()" -->
+                            <textarea class="form-control" id="autoresizing" (change)="TextareaValueChange($event)"
+                            placeholder="text" cols="50" rows="4" [innerHTML]="narration"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-form-span-heading" colspan="4">
+                            Charges Details
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Charge Type</b> </span><span
+                                class="col-form-span-error">*</span>
+                        </td>
+                        <td colspan="3">
+                            <select class="form-control width230" [(ngModel)]="chngetype">
+                                <option value="">--Please Select--</option>
+                                <option *ngFor="let d of chngetypetable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                                </option>
+                            </select>
+                        </td>
+                        
+                    </tr>
+                    <tr >
+                        <td><span class="col-form-span-label"><b>Account Code</b> </span><span
+                                class="col-form-span-error">*</span></td>
+                        <td colspan="3" >
+                            <!-- <select class="form-control  " [(ngModel)]="acccode">
+                                <option value=""> --Please Select Account Code-- </option>
+                                <option *ngFor="let d of accountable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+                            </select> -->
+                            <ng-select [items]="accountable"
+                                bindLabel="DATATEXTVALUE"
+                                bindValue="DATAVALUE" 
+                                [(ngModel)]="acccode"
+                                class="custom"
+                                placeholder="--Please Select--"  >
+                         </ng-select>
+                        </td>  
+                    </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Currency</b> </span><span
+                                class="col-form-span-error">*</span></td>
+                        <td >
+                            <select class="form-control width120" [(ngModel)]="currency">
+                                <option value="">--Please Select Currency--</option>
+                                <option *ngFor="let d of currencytable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                                </option>
+
+                            </select>
+                        </td>
+                        <td><span class="col-form-span-label"><b>Ex.Rate</b></span><span
+                            class="col-form-span-error">*</span> </td>
+                    <td> <input [(ngModel)]="exrate" OnlyNumber="true"  type="text" class="form-control width180" OnlyNumber="true" (blur)="onchangefindcomma(rate)" > </td>
+                    </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Rate</b></span><span
+                                class="col-form-span-error">*</span> </td>
+                        <td> <input [(ngModel)]="rate" OnlyNumber="true"  type="text" class="form-control width180" OnlyNumber="true" (blur)="onchangefindcomma(rate)" > </td>
+
+                        <td><span class="col-form-span-label"><b>Min.Rate </b></span></td>
+                        <td><input [(ngModel)]="minrate" type="text" class="form-control width180" OnlyNumber="true"   (blur)="onchangefindcomma(minrate)"></td>
+                    </tr>
+                    <tr>
+                        <td   ><span class="col-form-span-label"><b>Unit</b></span>
+                            <span class="col-form-span-error">*</span></td>
+                        <td colspan="3" >
+                            <select class="form-control width150" [(ngModel)]="unit">
+                                <option value="">--Please Select Unit--</option>
+                                <option *ngFor="let d of unitabel" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+                            </select>
+                        </td>
+
+                       
+                    </tr>
+
+
+                    <tr>
+                        <td colspan="4" class="centerlabel">
+                            <button class="btn btn-sm btn-success" type="submit" (click)="Addclientrate()"> <span
+                                    class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>{{txtchild}}</span></button>
+                            <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                                    (click)="ResetClientrate();"><i class="fa fa-ban"></i> Reset</span></button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="4">
+                            <div class="xyscroll">
+                                <table class="table table-responsive-sm table-bordered">
+                                    <thead>
+                                        <tr class="title-head formheading">
+                                            <th class="col-form-span-label"></th>
+                                            <th *ngIf="visible=='1'" class="col-form-span-label">Index</th>
+                                            <th class="col-form-span-label">Charge name</th>
+                                            <th class="col-form-span-label">Unit</th>
+                                            <th class="col-form-span-label">Currency</th>
+                                            <th class="col-form-span-label">Rate</th>
+                                            <th class="col-form-span-label">Min Rate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody *ngIf="chargesdetails.length>0">
+                                        <tr *ngFor="let obj of chargesdetails;index as i">
+                                            <td class="centerlabel">
+                                                <i class="fa fa-pencil" (click)="Editchildrecd(obj)"></i>
+                                            </td>
+                                            <td *ngIf="visible=='1'"><span class="col-form-span-label">{{i}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.chrg_desc}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.STR_TEXT}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.CUR_SNAME}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.RATE}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.MIN_RATE}}</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="centerlabel">
+                            <button class="btn btn-sm btn-success" type="submit" (click)="Add_Final()"> <span
+                                    class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>
+                                    Submit</span></button>
+                            <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                                    (click)="RestFinal();"><i class="fa fa-ban"></i> Reset</span></button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+             <div class="col-sm-2"> </div> 
+        </div>
+    </div> 
+</div>

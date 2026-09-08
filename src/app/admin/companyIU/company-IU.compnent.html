@@ -1,0 +1,313 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>{{Header| uppercase}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-2">  </div>
+        <div class="col-sm-8">
+            <table class="table table-bordered table-sm-new bgwhite">    
+                              
+                <tr >
+                    <td class="col-form-span-heading   " colspan="4">
+                        Company Details
+                    </td>
+                </tr>
+                   <tr>
+                    
+                    <td><span class="col-form-span-label"><b>Company Name</b> </span><span class="col-form-span-error">*</span></td>         
+                    <td colspan="3">  <input [(ngModel)]="CmpName" type="text"    class="form-control width300" maxlength="40" > </td> 
+                    </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Address1</b> </span><span class="col-form-span-error">*</span></td>         
+                    <td colspan="3">  <input [(ngModel)]="CmpAddr1" type="text"    class="form-control width300" maxlength="40"   >   </td> 
+                               
+                    </tr>
+                   
+                    <tr>                             
+                        <td><span class="col-form-span-label"><b>Address2 </b> </span><span class="col-form-span-error">*</span></td>         
+                        <td>  <input [(ngModel)]="CmpAddr2" type="text"    class="form-control width180"   > </td>  
+                        <td><span class="col-form-span-label"><b>Address3 </b> </span><span class="col-form-span-error">*</span></td>         
+                        <td>  <input [(ngModel)]="CmpAddr3" type="text"    class="form-control width180"   > </td>   
+                    </tr> 
+                    <tr>
+                        <td><span class="col-form-span-label"><b>City</b> </span><span class="col-form-span-error">*</span></td>        
+                        <td>
+                            <select class="form-control width150"  [(ngModel)]="city">
+                                <option value="">Please select</option>
+                                <option *ngFor="let d of Citylist" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+                            </select>
+                        </td> 
+                        
+                    </tr>
+                    <td colspan="4">
+                        <table class="table table-bordered table-sm-new bgwhite" >
+                            <tr>   
+                               
+                                    <td><span class="col-form-span-label"><b>Active City</b> </span><span class="col-form-span-error">*</span> </td>  
+                                    <td> 
+                                        <ng-select [items]="Branchlist"  class="form-control width350"
+                                        bindLabel="CITYNAME"
+                                        bindValue="CITYCODE" 
+                                        appendTo="body"
+                                        multiple="true"  [closeOnSelect]="false"
+                                        [selectableGroup]="true"
+                                        [(ngModel)]="branchcode"
+                                        (change)="onchnage(branchcode)"
+                                        >
+                                        
+                                        <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                            <input  type="checkbox" [(ngModel)]="item$.selected"  /> 
+                                            {{ item.CITYNAME}}
+                                         </ng-template>
+                                        </ng-select>
+                                    </td>     
+                            </tr>
+                        </table>
+                    </td>
+            
+                   <!--td  colspan="4">                                
+                    <table class="table table-bordered table-sm-new bgwhite" >
+                        <tr>   
+                           
+                                <td><span class="col-form-span-label"><b>Active City</b> </span> </td>  
+                                <td> 
+                                    <ng-select [items]="Branchlist"  class="form-control width350"
+                                    bindLabel="CITYNAME"
+                                    bindValue="CITYCODE" 
+                                    appendTo="body"
+                                    multiple="true"  [closeOnSelect]="false"
+                                    [selectableGroup]="true"
+                                    [(ngModel)]="branchcode"
+                                    (change)="onchnage(branchcode)">
+                                    <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+                                        <input  type="checkbox" [(ngModel)]="item$.selected"  /> 
+                                        {{ item.CITYNAME}}
+                                     </ng-template>
+                                    </ng-select>
+                                </td>     
+                        </tr>
+                    </table-->
+                         
+                               
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Custom Licence No.</b></span> </td>
+                        <td><input [(ngModel)]="CmpCustLicNo" type="text" class="form-control width180"></td>
+                    
+                        <td><span class="col-form-span-label"><b>IATA Code</b></span> </td>
+                        <td><input [(ngModel)]="CmpIATACode" type="text" class="form-control width180"></td>
+                    </tr>     
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Telephone No(General)</b></span> </td>
+                        <td><input [(ngModel)]="CmpTelNo" type="text" class="form-control width180"></td>
+                    
+                        <td><span class="col-form-span-label"><b>Fax No.(General)</b></span> </td>
+                        <td><input [(ngModel)]="CmpFaxNo" type="text" class="form-control width180"></td>
+                    </tr>  
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Email(General)</b></span> </td>
+                        <td><input [(ngModel)]="CmpEmail" type="text" class="form-control width180"  ></td>
+                    </tr> 
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Regd Service Tax No.</b></span> </td>
+                        <td><input [(ngModel)]="Cmpregsertax" type="text" class="form-control width180"></td>
+                    
+                        <td><span class="col-form-span-label"><b>Regd Tpt Tax No.</b></span> </td>
+                        <td><input [(ngModel)]="Cmpregtpttax" type="text" class="form-control width180"></td>
+                    </tr> 
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Regd Auxiliary  Service Tax No.</b></span> </td>
+                        <td><input [(ngModel)]="Cmpregauxsertax" type="text" class="form-control width180"></td>
+                    
+                        <td><span class="col-form-span-label"><b>Regd ESIC</b></span> </td>
+                        <td><input [(ngModel)]="Cmpregesic" type="text" class="form-control width180"></td>
+                    </tr> 
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Income Tax No.</b></span> </td>
+                        <td><input [(ngModel)]="Cmpincometax" type="text" class="form-control width180"></td>
+                    
+                        <td><span class="col-form-span-label"><b>Tan No.</b></span> </td>
+                        <td><input [(ngModel)]="Cmptanno" type="text" class="form-control width180"></td>
+                    </tr> 
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Regd Storage Service Tax</b></span> </td>
+                        <td><input [(ngModel)]="Cmpregstosertax" type="text" class="form-control width180"></td>
+                    
+                        <td><span class="col-form-span-label"><b>Regd Ch Service Tax</b></span> </td>
+                        <td><input [(ngModel)]="Cmpchsertax" type="text" class="form-control width180"></td>
+                    </tr> 
+                  
+                     <td class="col-form-span-heading" colspan="4">
+                        Address Details
+                    </td>
+                    <!-- <tr>                    
+                        <td colspan="4"   style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">Address Details</b></span></td>
+                    </tr> -->
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Branch Address1</b></span><span class="col-form-span-error">*</span> </td>
+                        <td>  <input [(ngModel)]="BrAddr1" type="text"    class="form-control width180" >   </td> 
+                      
+                           <td><span class="col-form-span-label"><b>Branch Address2</b></span><span class="col-form-span-error">*</span></td>
+                           <td><input [(ngModel)]="BrAddr2" type="text" class="form-control width180"></td>
+                       </tr>
+                       <tr>
+                           <td><span class="col-form-span-label"><b>Branch Address3</b></span><span class="col-form-span-error">*</span></td>
+                           <td><input [(ngModel)]="BrAddr3" type="text" class="form-control width180"></td>
+                      
+                           <td><span class="col-form-span-label"><b>City</b> </span><span class="col-form-span-error">*</span></td>        
+                           <td>
+                               <select class="form-control width150"  [(ngModel)]="city2">
+                                   <option value="">Please select</option>
+                                   <option *ngFor="let d of Citylist1" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+                               </select>
+                           </td> 
+                           
+                    </tr>
+                                                    
+                  
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Telephone No.(General)</b></span></td>
+                        <td><input [(ngModel)]="BrTelNo" type="text" class="form-control width180"></td>
+                   
+                        <td><span class="col-form-span-label"><b>Fax No.(General)</b></span></td>
+                        <td><input [(ngModel)]="BrFaxNo" type="text" class="form-control width180"></td>
+                    </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Email(General)</b></span></td>
+                        <td><input [(ngModel)]="BrEmail" type="text" class="form-control width180"   (change)="onChange($event.target.value)"></td>
+                        <td>
+                            <span class="col-form-span-label"><b>Company Image</b> </span>
+                           
+                        </td>         
+                    <td colspan="3">  
+                        <input #fileUpload type="file" name="CmpbrImage" accept=".png, .jpg, .jpeg" (change)="onFileChanged1($event)" class="form-control width180"> 
+                         <!-- <input #fileUpload type="file" class="col-form-span-label" (change)="fileChangeEvent($event)" placeholder="Upload file..." multiple accept=".pdf" /> -->
+                    </td> 
+                    </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Company Url</b></span> </td>
+                        <td><input [(ngModel)]="BrCmpurl" type="text" class="form-control width180"></td>
+                                          
+                    </tr> 
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Company Tax</b></span> </td>
+                        <td><input [(ngModel)]="BrCmpTax" type="text" class="form-control width180"></td>
+                    
+                        <td><span class="col-form-span-label"><b>GST No.</b></span> </td>
+                        <td><input [(ngModel)]="BrGSTNo" type="text" class="form-control width180"></td>
+                    </tr>   
+                    <tr>
+                        <td><span class="col-form-span-label"><b>ACSTMNT From</b></span> </td>
+                        <td><input [(ngModel)]="Bracstmntfrom" type="text" class="form-control width180"></td>
+                    
+                        <td><span class="col-form-span-label"><b>ACSTMNT FromEmail</b></span> </td>
+                        <td><input [(ngModel)]="Bracstmntfromemail" type="text" class="form-control width180"></td>
+                    </tr>   
+                    <tr>
+                             <td >
+                            <span class="col-form-span-label" ><b>IsHblissue</b>  </span>   
+                           </td>
+                           <td >
+                            <span class="col-form-span-label" > <input type="checkbox" [(ngModel)]="isHblissu" class="form-control width20"   /> </span>         
+                           </td>
+                           <td >
+                            <span class="col-form-span-label" ><b>Ishawblissw</b>  </span>    
+                           </td>
+                           <td >
+                            <span class="col-form-span-label" > <input type="checkbox" [(ngModel)]="ishawblissw"   class="form-control width20" /> </span>    
+                           </td>
+                        
+                           </tr>
+                           <tr>
+                            <td  >
+                                <span class="col-form-span-label" ><b>IsActive</b>  </span>   
+                            </td> 
+                            <td>
+                                <span class="col-form-span-label" > <input type="checkbox" [(ngModel)]="isactive"   class="form-control width20" /> </span>    
+                             </td> 
+                            
+                                <td >
+                                    <span class="col-form-span-label" ><b>IsMore</b>  </span>    
+                                </td>
+                                <td >
+                                    <span class="col-form-span-label" > <input type="checkbox" [(ngModel)]="ismore"   class="form-control width20" /> </span>    
+                                 </td>  
+                           </tr>
+                    
+                   
+                  
+                                          
+                    <tr>
+                        <td colspan="4"  class="centerlabel">                                
+                            <button class="btn btn-sm btn-success" type="submit" (click)="Addcildrcrd()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{txtchild}}</span></button>
+                            <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Resetcildrcrd();"><i class="fa fa-ban"></i> Reset</span></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <div class="row xyscroll" >
+                                <table class="table table-responsive-sm table-bordered"> 
+                                    <thead>
+                                        <tr class="title-head formheading">
+                                            <th  class="col-form-span-label" ></th>
+                                            <th class="col-form-span-label">Address</th>
+                                            <!--th  class="col-form-span-label">Address2</th>
+                                            <th  class="col-form-span-label">Address3</th>                                                     
+                                            <th  class="col-form-span-label">City</th-->    
+                                            <th  class="col-form-span-label">Phone</th>    
+                                            <th  class="col-form-span-label">Fax</th>    
+                                            <th  class="col-form-span-label">Email</th>    
+                                            <!--th  class="col-form-span-label">Company Image</th>  
+                                            <th  class="col-form-span-label">Company Url</th-->  
+                                            <th  class="col-form-span-label">Company Tax</th>  
+                                            <th class="col-form-span-label">Gst No</th> 
+                                            <!--th  class="col-form-span-label">ACSTMNT From</th> 
+                                            <th  class="col-form-span-label">ACSTMNT FromEmail</th--> 
+
+                                        </tr>
+                                    </thead>
+                                    <tbody   *ngIf="addrlist.length>0">
+                                        <tr *ngFor="let obj of addrlist">
+                                            <td class="centerlabel">
+                                                <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)" ></i>
+                                                &nbsp;
+                                                <i class="fa fa-trash" (click)="deletechildrecd(obj.ID)"></i>
+                                            </td>
+                                           <td><span class="col-form-span-label"  [innerHtml]="obj.BRANCHADDRESS"> </span></td>
+                                            <!--td><span class="col-form-span-label">{{obj.BRADDR1}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.BRADDR2}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.BRADDR3}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.CITYID}}</span></td-->
+                                            <td><span class="col-form-span-label">{{obj.BRPHONE}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.BRFAX}}</span></td>
+
+                                            <td><span class="col-form-span-label">{{obj.BREMAIL}}</span></td>
+                                            <!--td><span class="col-form-span-label">{{obj.BRCMPIMAGE}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.BRCMPURL}}</span></td-->
+                                            <td><span class="col-form-span-label">{{obj.BRTAX}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.BRGSTNO}}</span></td>
+                                            <!--td><span class="col-form-span-label">{{obj.BRCSTMNT}}</span></td>
+                                            <td><span class="col-form-span-label">{{obj.BRCSTMNTEMAIL}}</span></td-->
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr> 
+                    <tr>
+                        <td colspan="4"  class="centerlabel">                                
+                            <button class="btn btn-sm btn-success" type="submit" (click)="Add_Main()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{text}}</span></button>
+                            <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="RestMain();"><i class="fa fa-ban"></i> Reset</span></button>
+                        </td>
+                    </tr>
+            </table>
+        </div>
+        <div class="col-sm-2">  </div>
+    </div>
+</div>

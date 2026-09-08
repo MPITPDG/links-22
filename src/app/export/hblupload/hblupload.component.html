@@ -1,0 +1,119 @@
+<div class="animated fadeIn" >
+    <div class="row no-gutters"  >
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>{{Header}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters" >
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td class="col-form-span-heading" colspan="6"> <b>UPLOAD DETAILS</b> </td>
+                </tr>
+                <tr>
+                      <td style="width:120px;">
+                                <span class="col-form-span-label "><b>From Date</b> </span>
+                                <span class="col-form-span-error">*</span>
+                            </td>
+                            <td >
+                                <my-date-picker name="FromDate" [options]="myDatePickerOptions"   [(ngModel)]="fromdate" >
+                                </my-date-picker>
+                            </td>
+                            <td style="width:120px;">
+                                <span class="col-form-span-label "><b>To Date</b> </span>
+                                <span class="col-form-span-error">*</span>
+                            </td>
+                            <td>
+                                <my-date-picker name="ToDate" [options]="myDatePickerOptions"   [(ngModel)]="todate" >
+                                </my-date-picker>
+                            </td>
+                 </tr>
+                   <tr>
+                  
+                    <td colspan="4" style="text-align: center;">
+                        <button class="btn btn-sm btn-success" type="submit" (click)="downloadHBL()"><span
+                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Search</span></button>
+                            &nbsp;&nbsp;
+                        <button class="btn btn-sm btn-danger" type="submit" (click)="Reset()"> <span
+                            class="col-form-span-label"><i class="fa fa-ban"></i>Reset</span></button>
+                    </td>
+                </tr>
+                 <!-- <tr>
+                    <td>
+                        <span class="col-form-span-label"><b>Select File</b> </span>
+                        <span class="col-form-span-error">*</span>
+                    </td>
+                <td colspan="3">
+                    <input  type="file" #inputFile  accept=".csv,.xls,.xlsx,.doc,.docx,.ppt,.pptx,.txt,.pdf,.png" (change)="onFileChange($event)" class="form-control width180">
+                    
+                </td>
+
+                </tr> -->
+                <!-- <tr>
+                  
+                    <td>
+                        <button class="btn btn-sm btn-success" type="submit" (click)="onupload()"><span
+                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Upload</span></button>
+                            &nbsp;&nbsp;
+                        <button class="btn btn-sm btn-danger" type="submit" (click)="Reset()"> <span
+                            class="col-form-span-label"><i class="fa fa-ban"></i>Reset</span></button>
+                    </td>
+                </tr> -->
+           
+
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+    </div>
+    <div *ngIf="data_table.length > 0" class="row no-gutters">
+      
+        <div class="col-sm-12 col-md-12 col-lg-12 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead>
+                    <tr class="col-form-span-heading">
+                       
+                        <th   align="center"><span  class="col-form-span-label"> Mbl No</span></th>
+                        <th   align="center"><span  class="col-form-span-label"> Mbl Date</span> </th>
+                        <th   align="center"><span  class="col-form-span-label">  Hbl No.</span></th>
+                        <th   align="center"> <span  class="col-form-span-label"> Hbl Date</span> </th>
+                        <th   align="center"> <span  class="col-form-span-label"> Port Of Loading</span> </th>
+                        <th   align="center"> <span  class="col-form-span-label">Port of Discharge</span> </th>
+                        <th   align="center"> <span  class="col-form-span-label">Container Status</span> </th>
+                        <th   align="center"> <span  class="col-form-span-label">Consigner Name</span> </th>
+                        <th   align="center"> <span  class="col-form-span-label">Consignee</span> </th>
+                    </tr>
+                </thead>
+                <tbody *ngIf="data_table.length > 0">
+                    <tr *ngFor="let data of data_table">
+                      
+                        
+                        <td><span class="col-form-span-label">{{data.EXPT_BLNO}}</span>   </td>
+                        <td><span  class="col-form-span-label">{{data.EXPT_BLDT}}</span>  </td>
+                        <td><span  class="col-form-span-label">{{data.EXPT_HBLNO}}</span>  </td>
+                        <td><span  class="col-form-span-label">{{data.EXPT_HBLDT}}</span>  </td>
+                        <td><span  class="col-form-span-label">{{data.LOADINGPORT}}</span>  </td>
+                        <td><span  class="col-form-span-label">{{data.DISCHRGPORT}}</span>  </td>
+                        <td><span  class="col-form-span-label">{{ data.CONTSTATUS}}</span>  </td>
+                        <td><span  class="col-form-span-label">{{ data.CONSIGNORNAME}}</span>  </td>
+                        <td><span  class="col-form-span-label">{{ data.CONSIGNEENAME}}</span>  </td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+  
+    </div>
+</div>
+
+

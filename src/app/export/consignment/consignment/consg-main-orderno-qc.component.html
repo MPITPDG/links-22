@@ -1,0 +1,85 @@
+<table class="table table-bordered table-sm-new bgwhite">
+    <tr>
+        <td class="width120">
+            <span class="col-form-span-label">
+                <b>Export No.</b>
+            </span>
+        </td>
+        <td>
+            <span class="col-form-span-label">{{OrderNorQcList[0]?.EXPTNO}}</span>
+        </td>
+    </tr>
+    <tr>
+        <td class="width120">
+            <span class="col-form-span-label">
+                <b>Shipper Name</b>
+            </span>
+        </td>
+        <td>
+            <span class="col-form-span-label">{{OrderNorQcList[0]?.SHIPPER}}</span>
+        </td>
+    </tr>
+    <tr>
+        <td class="width120">
+            <span class="col-form-span-label">
+                <b>Consignee</b>
+            </span>
+        </td>
+        <td>
+            <span class="col-form-span-label">{{OrderNorQcList[0]?.CONSIGNEE}}</span>
+        </td>
+    </tr>
+</table>
+<table class="table table-bordered table-sm-new bgwhite">
+    <thead class="trbg">
+        <th>
+            <span class="col-form-span-label">Order No.</span>
+        </th>
+        <th>
+            <span class="col-form-span-label">Reference No.</span>
+        </th>
+        <th>
+            <span class="col-form-span-label">Is QC Checking</span>
+        </th>
+        <th>
+            <span class="col-form-span-label">Type</span>
+        </th>
+        <th>
+            <span class="col-form-span-label">Planned Date</span>
+        </th>
+        <th>
+            <span class="col-form-span-label">Actual Date</span>
+        </th>
+    </thead>
+    <tbody>
+        <tr *ngFor="let obj of OrderNorQcList">
+            <td>
+                <span class="col-form-span-label">
+                    <a href="javascript:void(0);" (click)="openWindow(obj.EXPTNO, obj.ORDERNO, obj.STYLENO, obj.CONCODE);">{{obj.ORDERNO}}</a>
+                </span>
+            </td>
+            <td>
+                <span class="col-form-span-label">{{obj.STYLENO}}</span>
+            </td>
+            <td>
+                <select [(ngModel)]="obj.IS_QCFLAG" (ngModelChange)="obj.QC_TYPE='0'" class="form-control">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </td>
+            <td>
+                <select [(ngModel)]="obj.QC_TYPE" class="form-control" [disabled]="obj.IS_QCFLAG==0">
+                    <option value="0">Select</option>
+                    <option value="CQPL">CQ Plateforme</option>
+                    <option value="CQUSI">CQ usine</option>
+                </select>
+            </td>
+            <td>
+                <my-date-picker name="PlannedDate" [options]="myDatePickerOptions" [(ngModel)]="obj.QC_PLANNEDDT" [disabled]="obj.IS_QCFLAG==0"></my-date-picker>
+            </td>
+            <td>
+                <my-date-picker name="ActualDate" [options]="myDatePickerOptions" [(ngModel)]="obj.QC_ACTUALDT" [disabled]="obj.IS_QCFLAG==0"></my-date-picker>
+            </td>
+        </tr>
+    </tbody>
+</table>

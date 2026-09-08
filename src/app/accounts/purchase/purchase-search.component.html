@@ -1,0 +1,176 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>PURCHASE SEARCH</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters" *ngIf="displayType=='SEARCH'">
+        <div class="col-sm-3"> </div>
+        <div class="col-sm-6">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td class="col-form-span-label width100"> 
+                            <input type="radio" name="check" value="purno" [(ngModel)]="Type" checked=true />&nbsp;Purchase No
+                    </td>
+                    <td class="width130">
+                        <input type="text" [(ngModel)]="PurchaseNo" class="form-control" [maxlength]="15" [OnlyNumber]="true" [disabled]="Type!='purno'" />
+                    </td>
+                    <td>
+                        <button type="button" name="printButton" class="btn btn-sm btn-primary" (click)="SupplierSinglePrint(PurchaseNo);" [disabled]="Type!='purno'">
+                            <span class="col-form-span-label">  <i class="fa fa-print"></i> Print</span>  </button>
+                    </td>
+                </tr>
+                <tr >
+                    <td class="col-form-span-label">
+                         <input type="radio" name="check" value="Supplier" [(ngModel)]="Type" />&nbsp;Supplier 
+                    </td>
+                    <td colspan="2">
+                        <tr>
+                            <td class="col-form-span-label">      Supplier   </td>
+                            <td>
+                                <ng-select [items]="SupplierList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"  placeholder="--Select--" [(ngModel)]="Supplier"      class="form-control width350" [disabled]="Type!='Supplier'">
+                                 </ng-select>     
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-form-span-label">  <span class="col-form-span-label">  Supp Inv No</span>  </td>
+                            <td>                               
+                               <input type="text" [(ngModel)]="SuppInvNo" class="width130" class="form-control" [maxlength]="15" [OnlyNumber]="true" [disabled]="Type!='Supplier'"/>
+                             </td>
+                        </tr>
+                        <tr>
+                            <td  class="col-form-span-label" colspan="2">  From 
+                                <my-date-picker name="SuppFromDt" [options]="myDatePickerOptions" [(ngModel)]="SuppFromDate" [disabled]="Type!='Supplier'"></my-date-picker>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <span class="col-form-span-label">To</span>
+                                <my-date-picker name="SupptoDt" [options]="myDatePickerOptions" [(ngModel)]="SuppToDate" [disabled]="Type!='Supplier'"></my-date-picker>
+                            </td>
+                        </tr>
+                       
+                    </td>
+                </tr>
+                <tr  >
+                    <td  class="col-form-span-label" >   <input type="radio" name="check" value="JobNo" [(ngModel)]="Type" />&nbsp;Job No    </td>
+                    <td>
+                        <input type="text" [(ngModel)]="JobNo"   class="form-control" [maxlength]="15" [OnlyNumber]="true" [disabled]="Type!='JobNo'" />
+                    </td>
+                   <td colspan="2"></td>
+                </tr>
+                <tr >
+                    <td  class="col-form-span-label"> <input type="radio" name="check" value="Amount" [(ngModel)]="Type" />&nbsp;Amount  </td>
+                    <td>
+                        <input type="text" [(ngModel)]="Amount" class="form-control" [maxlength]="15" [OnlyNumber]="true" [disabled]="Type!='Amount'"  />
+                    </td>
+                    <td colspan="2"></td>
+                </tr>
+                <tr >
+                    <td  class="col-form-span-label width150">
+                         <input type="radio" name="check" value="Date" [(ngModel)]="Type" />&nbsp; Date Wise 
+                    </td>
+                    <td colspan="2">
+                        <span class="col-form-span-label">From</span>
+                        <my-date-picker name="PurchaseFromDate" [options]="myDatePickerOptions" [(ngModel)]="PurchaseFromDate" [disabled]="Type!='Date'"></my-date-picker>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span class="col-form-span-label">To</span>
+                        <my-date-picker name="PurchaseToDate" [options]="myDatePickerOptions" [(ngModel)]="PurchaseToDate" [disabled]="Type!='Date'"></my-date-picker>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td  class="col-form-span-label width150" colspan="2"> <input type="radio" name="check" value="PRINTAV" [(ngModel)]="Type" />&nbsp; Print All Vouchers of a day
+                    </td>
+                    <td colspan="2">
+                            <span class="col-form-span-label">Date</span>
+                            <my-date-picker name="PurchaseofDay" [options]="myDatePickerOptions" [(ngModel)]="PurchaseofDay" [disabled]="Type!='PRINTAV'"></my-date-picker>
+                    </td>
+                </tr>
+                <tr>
+                    <td  class="col-form-span-label width150"> &nbsp;Display  </td>
+                    <td colspan="2"> 
+                        <div class="centerlabel">
+                            <span class="col-form-span-label">
+                                <input type="radio" name="radioDisplay" value="1" [(ngModel)]="Display"  [disabled]="Type!='DISPLAY'"/>&nbsp;List</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <span class="col-form-span-label">
+                                <input type="radio" name="radioDisplay" value="2" [(ngModel)]="Display"  [disabled]="Type!='DISPLAY'"/>&nbsp;Details</span>
+                        </div>
+                    </td>
+                </tr>
+             
+                <tr >
+                    <td colspan="3" align="center">
+                        <button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="search();">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-search"></i> Search</span>
+                        </button>
+                        <button class="btn btn-sm btn-danger" type="reset">
+                            <span class="col-form-span-label" (click)="ResetAll();"><i class="fa fa-ban"></i> Reset</span></button> 
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-3">
+        </div>
+    </div>
+    <div class="row no-gutters" *ngIf="displayType=='LIST'">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-8" style="height:500px;overflow-y:scroll;">
+            <table class="table table-sm-new table-bordered bgwhite">
+                <thead>
+                    <tr class="title-head formheading">
+                        <th colspan="8">
+                            <a href="javascript:void(0);" (click)="displayType='SEARCH';searchList=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
+                        </th>
+                    </tr>
+                    <tr class="title-head formheading">
+                        <th class="centerlabel"><input type="checkbox"  [(ngModel)]='checkbox' (change)="checkAll($event)" /> &nbsp; </th>
+                        <th>Purchase Code</th>
+                        <th>Purchase Date</th>
+                        <th *ngIf="STATUS=='RPI' || STATUS=='PI'">Supplier</th>
+                        <th *ngIf="STATUS=='SRPI'">Staff</th>
+                        <th>Supp Inv No</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let obj of searchList">
+                        <td class="centerlabel"> <input type="checkbox" [(ngModel)]="obj.Checked"
+                            (ngModelChange)="getCheckboxValues($event,obj.pur_code)"> &nbsp; </td>
+                        <td>
+                            <span *ngIf="STATUS=='PI'"class="col-form-span-label anchor-link" (click)="redirectToEdit(obj.pur_code)" style="cursor:pointer;">{{obj.pur_code}}</span>          
+                            <span *ngIf="STATUS=='RPI' || STATUS=='SRPI'" class="col-form-span-label anchor-link" (click)="redirectToEdit(obj.PUR_CODE)" style="cursor:pointer;">{{obj.PUR_CODE}}</span>                                
+                        </td>
+                        <td>
+                            <span *ngIf="STATUS=='RPI' || STATUS=='SRPI'"class="col-form-span-label">{{obj.PUR_DATE}}</span>
+                            <span *ngIf="STATUS=='PI'"class="col-form-span-label">{{obj.pur_date}}</span>
+                        </td>
+                        <td>
+                            <span *ngIf="STATUS=='RPI' || Status=='SRPI'"class="col-form-span-label">{{obj.SUPPLIER}}</span>
+                            <span *ngIf="STATUS=='PI'" class="col-form-span-label">{{obj.supplier}}</span>
+                        </td>
+                        <td>
+                            <span *ngIf="STATUS=='RPI' || Status=='SRPI'"class="col-form-span-label">{{obj.PUR_INVNO}}</span>
+                            <span *ngIf="STATUS=='PI'" class="col-form-span-label">{{obj.pur_invno}}</span>
+                        </td>
+                        <td>
+                            <span *ngIf="STATUS=='RPI' || Status=='SRPI'"class="col-form-span-label">{{obj.TOTALAMT}}</span>
+                            <span *ngIf="STATUS=='PI'" class="col-form-span-label">{{obj.totalamt}}</span>
+                        </td>
+                      
+                    </tr>
+                </tbody>
+                <tr>
+                    <td colspan="8" class="right-text pr-2">
+                      <button class="btn btn-sm btn-success" type="submit" (click)="PrintSupplier()"> <span
+                          class="col-form-span-label"><i class="fa fa-print"></i>&nbsp;Print</span></button>                 
+                    </td>
+                  </tr>
+            </table>
+         </div>
+        <div class="col-sm-2"></div>
+
+    </div>
+</div>

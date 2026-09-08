@@ -1,0 +1,288 @@
+﻿<div class="animated fadeIn">
+	<div class="row">
+		<div class="col-sm-2">
+		</div>
+		<div class="col-sm-8">
+			<table class="table table-bordered table-sm-new">
+				<tr class="trbg centerlabel">
+					<td colspan="8"><span class="col-form-span-label"><b>PENDING SHIPMENTS OF THE PURTICULAR VESSEL</b></span></td>
+				</tr>
+			</table>
+			<table class="table table-bordered table-sm-new" *ngIf="this.viewType == 'Search'">
+				<tr>
+					<td class="width100"><span class="col-form-span-label">Vessel Name<span class="col-form-span-error"> *</span></span></td>
+					<td colspan="3">
+						<input type="text" [(ngModel)]="VesselName" class="form-control"/>
+					</td>
+					<td class="width100"><span class="col-form-span-label">Voyage No<span class="col-form-span-error"> *</span></span></td>
+					<td colspan="3">
+						<input type="text" [(ngModel)]="VoyageNo" class="form-control"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="centerlabel" colspan="8">
+						<button type="button" class="btn btn-sm btn-info" name="searchButton" (click)="Search()" #searchButton><span class="col-form-span-label"><i class="fa fa-search"></i>&nbsp;Search</span></button>
+					</td>
+				</tr>
+			</table>
+			<div class="row yscroll" style="height:300px" *ngIf="this.viewType == 'Search'&&searchList.length > 0">
+				<table class="table table-bordered table-sm-new">
+					<thead>
+						<tr class="col-form-span-heading" style="white-space:nowrap;">
+							<th class="centerlabel"><span class="col-form-span-label">Vessel Name</span></th>
+							<th class="centerlabel"><span class="col-form-span-label">Voyage No</span></th>
+							<th class="centerlabel"><span class="col-form-span-label">ETD</span></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let obj of searchList" (click)="rowSearchSendClick(obj.VSL_RTNO, obj.VSL_NAME, obj.VSL_VOYNO, obj.ETD);" style="cursor: pointer;">
+							<td><span class="col-form-span-label">{{obj.VSL_NAME}}</span></td>
+							<td><span class="col-form-span-label">{{obj.VSL_VOYNO}}</span></td>
+							<td><span class="col-form-span-label">{{obj.ETD}}</span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<table class="table table-bordered table-sm-new" *ngIf="this.viewType == 'Search'&&searchList.length > 0">
+				<tr class="trbg">
+					<td colspan="8">
+						<span class="error-text">{{searchList.length + ' Rows Found.'}}</span>
+					</td>
+				</tr>
+			</table>
+			<table class="table table-bordered table-sm-new" *ngIf="this.viewType == 'View'">
+				<tr class="trbg">
+					<td colspan="8">
+						<span class="col-form-span-label"><strong>{{VesselLabel}}</strong></span>
+						<button class="btn btn-sm btn-warning" style="float: right;" (click)="viewType='Search';NewVessel=null;NewAgent=null"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to Search</u></span></button>
+					</td>
+				</tr>
+				<tr class="trbg">
+					<td colspan="8">
+						<tabset>
+							<tab style="padding: 0;">
+								<ng-template tabHeading><span class="title-head"><u>#Export No</u></span></ng-template>
+								<div class="row yscroll" style="height:300px">
+									<table class="table table-bordered table-sm-new" style="white-space:nowrap;">
+									   <thead>
+											<tr class="col-form-span-heading">
+												<th><input type="checkbox" name="all" [checked]="SelectAll" (click)="checkSelectAll()"/></th>
+												<th><span class="col-form-span-label">EXPORT NO</span></th>
+												<th><span class="col-form-span-label">SHIPPER</span></th>
+												<th><span class="col-form-span-label">CONSIGNEE</span></th>
+												<th><span class="col-form-span-label">AGENT</span></th>
+												<th><span class="col-form-span-label">PKGS</span></th>
+												<th><span class="col-form-span-label">PCS</span></th>
+												<th><span class="col-form-span-label">ORDER NO</span></th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr *ngFor="let obj of ExportNoList">
+												<td><input type="checkbox" name="all" style="cursor: pointer;" [checked]="obj.Check==true" [(ngModel)]="obj.Check" /></td>
+												<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
+												<td><span class="col-form-span-label">{{obj.EXP_NAME}}</span></td>
+												<td><span class="col-form-span-label">{{obj.CON_NAME}}</span></td>
+												<td><span class="col-form-span-label">{{obj.AGT_SNAME}}</span></td>
+												<td><span class="col-form-span-label">{{obj.EXPT_NOOFPKGS}}</span></td>
+												<td><span class="col-form-span-label">{{obj.EXPT_NOOFPCS}}</span></td>
+												<td><span class="col-form-span-label">{{obj.ORDERNO}}</span></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<div class="row">
+									<table class="table table-bordered table-sm-new">
+									   <tbody>
+											<tr>
+												<td class="width150">
+													<span class="col-form-span-label"><strong>New Vessel</strong><span class="col-form-span-error"> *</span></span>
+												</td>
+												<td colspan="7">
+													<ng-select [items]="NewVesselList"
+															   bindLabel="TEXTFIELD"
+															   bindValue="VALUEFIELD"
+															   placeholder="--Select--"
+															   [(ngModel)]="NewVessel"
+															   class="form-control"
+															   (change)="changeNewVessel(NewVessel)"
+															   >
+													</ng-select>
+												</td>
+											</tr>
+											<tr>
+												<td class="width150">
+													<span class="col-form-span-label"><strong>Agent Name</strong><span class="col-form-span-error"> *</span></span>
+												</td>
+												<td colspan="7">
+													<ng-select [items]="NewAgentList"
+															   bindLabel="AGT_NAME"
+															   bindValue="VSL_AGENT"
+															   placeholder="--Select--"
+															   [(ngModel)]="NewAgent"
+															   class="form-control"
+															   >
+													</ng-select>
+												</td>
+											</tr>
+											<tr class="trbg centerlabel">
+												<td colspan="8">
+													<button type="button" name="submitButton" class="btn btn-sm btn-success" (click)="submit();" [disabled]="ExportNoList.length==0" #submitButton>
+														<span class="col-form-span-label"><i class="fa fa-check-square-o"></i>&nbsp;Transfer the selected shipments to another vessel</span>
+													</button>
+												</td>
+											</tr>
+											<tr class="trbg centerlabel">
+												<td colspan="8">
+													<span class="error-text" *ngIf="ExportNoList.length==0">THERE ARE NO PENDING SHIPMENTS IN THIS VESSEL</span>
+													<span class="error-text" *ngIf="ExportNoList.length>0">{{ExportNoList.length + ' PENDING SHIPMENTS IN THIS VESSEL'}}</span>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</tab>
+							<tab style="padding: 0;"  *ngIf="ContainerNoList.length>0">
+								<ng-template tabHeading><span class="title-head"><u>#Container No</u></span></ng-template>
+								<table class="table table-bordered table-sm-new">
+								   <tr>
+									  <td class="col-form-span-heading" colspan="8">
+										 CONTAINER LOADING CONFIRMATION IS NOT DONE FOR THE FOLLOWING CONTAINERS
+									  </td>
+								   </tr>
+								</table>
+								<div class="row yscroll" style="height:300px">
+									<table class="table table-bordered table-sm-new" style="white-space:nowrap;">
+									   <thead>
+											<tr class="col-form-span-heading">
+												<th><span class="col-form-span-label">CONTAINER NO</span></th>
+												<th><span class="col-form-span-label">SIZE</span></th>
+												<th><span class="col-form-span-label">STATUS</span></th>
+												<th><span class="col-form-span-label">AGENT</span></th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr *ngFor="let obj of ContainerNoList">
+												<td><span class="col-form-span-label" style="cursor: pointer;color: #0000ff;" (click)="rowContainerSendClick(obj.EXPT_VESSEL,obj.CONTAINERNO,obj.AGT_NAME,obj.CONTAINERSTATUS)"><u>{{obj.CONTAINERNO}}</u></span></td>
+												<td><span class="col-form-span-label">{{obj.SIZE}}</span></td>
+												<td><span class="col-form-span-label">{{obj.CONTAINERSTATUS}}</span></td>
+												<td><span class="col-form-span-label">{{obj.AGT_NAME}}</span></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<table class="table table-bordered table-sm-new" *ngIf="ContainerNoList.length>0">
+									<tr class="trbg centerlabel">
+										<td colspan="8">
+											<span class="error-text">CLICK ON CONTAINER NO. TO TRANSFER THE PARTICULAR CONTAINER TO ANOTHER VESSEL</span>
+										</td>
+								   </tr>
+								</table>
+							</tab>
+						</tabset>
+					</td>
+				</tr>
+			</table>
+			<table class="table table-bordered table-sm-new">
+				<tr class="trbg centerlabel" *ngIf="ErrorMessage !== ''">
+					<td colspan="8">
+						<span class="error-text">{{ErrorMessage}}</span>
+					</td>
+				</tr>
+			</table>
+			<table class="table table-bordered table-sm-new" *ngIf="viewType=='ContainerDetail'">
+				<tr class="trbg">
+					<td colspan="8">
+						<span class="col-form-span-label"><b>TRANSFER CONTAINER TO ANOTHER VESSEL </b></span>
+						<button class="btn btn-sm btn-warning" style="float: right;" (click)="viewType='View'"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to Container List</u></span></button>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="8"><span class="col-form-span-label"><b style="font-size: 10px;">{{ContainerHeader}}</b></span></td>
+				</tr>
+				<tr class="trbg">
+					<td colspan="8"><span class="col-form-span-label"><b>Consignment Details</b></span></td>
+				</tr>
+			</table>
+			<div class="row yscroll" style="height:200px;background: #fff;" *ngIf="viewType=='ContainerDetail'">
+				<table class="table table-bordered table-sm-new" style="white-space:nowrap;">
+				   <thead>
+						<tr class="col-form-span-heading">
+							<th><span class="col-form-span-label">Container No</span></th>
+							<th><span class="col-form-span-label">Export No</span></th>
+							<th><span class="col-form-span-label">Total No Of Pkgs</span></th>
+							<th><span class="col-form-span-label">Total CBM</span></th>
+						</tr>
+					</thead>
+					<tbody>
+						<ng-container *ngFor="let obj of ContainerDetailsList">
+							<tr>
+								<td *ngIf="obj.CONTAINERNO !== ''" [attr.rowspan]="obj.TOTAL_COUNT" style="vertical-align: middle;"><span class="col-form-span-label">{{obj.CONTAINERNO}}</span></td>
+								<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
+								<td><span class="col-form-span-label">{{obj.NOOFPKGS}}</span></td>
+								<td><span class="col-form-span-label">{{obj.CBM}}</span></td>
+							</tr>
+						</ng-container>
+					</tbody>
+				</table>
+			</div>
+			<table class="table table-bordered table-sm-new" *ngIf="viewType=='ContainerDetail'">
+				<tr>
+					<td class="width150">
+						<span class="col-form-span-label"><strong>New Vessel Name</strong><span class="col-form-span-error"> *</span></span>
+					</td>
+					<td colspan="7">
+						<ng-select [items]="ContainerVesselList"
+								   bindLabel="TEXTFIELD"
+								   bindValue="VALUEFIELD"
+								   placeholder="--Select--"
+								   [(ngModel)]="ContainerVessel"
+								   class="form-control"
+								   (change)="changeContainerNewVessel(ContainerVessel)"
+								   >
+						</ng-select>
+					</td>
+				</tr>
+				<tr>
+					<td class="width150">
+						<span class="col-form-span-label"><strong>Vessel Agent</strong><span class="col-form-span-error"> *</span></span>
+					</td>
+					<td colspan="7">
+						<ng-select [items]="ContainerAgentList"
+								   bindLabel="AGT_NAME"
+								   bindValue="VSL_AGENT"
+								   placeholder="--Select--"
+								   [(ngModel)]="ContainerAgent"
+								   class="form-control"
+								   >
+						</ng-select>
+					</td>
+				</tr>
+				<tr>
+					<td class="width150">
+						<span class="col-form-span-label"><strong>SHPG Line</strong></span>
+					</td>
+					<td colspan="7">
+						<ng-select [items]="ContainerLinerList"
+								   bindLabel="LINER_NAME"
+								   bindValue="LINER_CODE"
+								   placeholder="--Select--"
+								   [(ngModel)]="ContainerLiner"
+								   class="form-control"
+								   >
+						</ng-select>
+					</td>
+				</tr>
+				<tr class="trbg centerlabel">
+					<td colspan="8">
+						<button type="button" name="submitContainerButton" class="btn btn-sm btn-success" (click)="submitContainer();" #submitContainerButton>
+							<span class="col-form-span-label"><i class="fa fa-check-square-o"></i>&nbsp;Click here to transfer all containers</span>
+						</button>
+					</td>
+				</tr>
+			</table>
+			<app-shipment-progress-pending-shipment-report [DataSet]="DataSet" [ReportType]="ReportType" [OldVessel]="VesselLabel" (result)="back($event)" *ngIf="this.viewType == 'Report'"></app-shipment-progress-pending-shipment-report>
+		</div>
+		<div class="col-sm-2">
+		</div>
+	</div>
+</div>

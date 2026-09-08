@@ -1,0 +1,172 @@
+<div class="animated fadeIn">
+    <div class="container">
+        <div class="row" *ngIf="Searchdata_list.length==0">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-6">
+                <table class="table table-bordered table-sm-new bgwhite" style="font-family:  Verdana;font-size: 12px;">
+                    <tbody style='height:30px'>
+                        <tr>
+                            <td class="col-form-span-heading" colspan="5">
+                               Credit Note Search
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="col-form-span-label width100">
+                                <input type="radio" name="exampleRadios" value='CreditNo' [(ngModel)]="exampleRadios1">&nbsp;  CreditNote No
+                            </td>
+                            <td class="col-form-span-label width240" colspan="3">
+                                <div style="display:flex;">
+                                    <input type="text" class="form-control width180" [maxlength]="15" [OnlyNumber]="true" [(ngModel)]="crtno" [disabled]="exampleRadios1 != 'CreditNo'">
+                                    <button class="btn btn-sm btn-success" type="submit" (click)="CreditNotePrint(crtno)"><span  class="col-form-span-label"><i class="fa fa-print"></i>Print</span></button>
+                                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"  (click)="CreditView(crtno);"><i class="fa fa-search"></i>View</span></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">
+                                <table>
+                                    <tr>
+                                        <td class="col-form-span-label width100">
+                                            <input type="radio" name="exampleRadios" value='Client'  [(ngModel)]="exampleRadios1"> Client Name
+                                        </td>
+                                        <td class="col-form-span-label width500" colspan="4">
+                                            <!-- <select class="form-control " [(ngModel)]="client"  [disabled]="exampleRadios1 != 'Client'">
+                                                <option value="">--Please Select Client--</option>
+                                                <option *ngFor="let data of clientable" value={{data.EXP_CODE}}>  {{data.EXP_NAME_CITY}}
+                                                </option>
+                                            </select> -->
+                                            <ng-select [items]="clientable"
+                                            [searchFn]="customSearchFn"
+                                            class="custom"
+                                            bindLabel="EXP_NAME_CITY"
+                                            bindValue="EXP_CODE"
+                                            [(ngModel)]="client" class="custom"
+                                            placeholder="--Please Select Client --"
+                                           [disabled]="exampleRadios1 != 'Client'">
+                                   </ng-select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <span class="col-form-span-label width150"><b>Start Date</b> </span>
+                                            <span class="col-form-span-error">*</span>
+                                        </td>
+                                        <td>
+                                            <my-date-picker name="StartDate" [options]="myDatePickerOptions"  [(ngModel)]="client_startdate" [disabled]="exampleRadios1 != 'Client'">
+                                            </my-date-picker>
+                                        </td>
+                                        <td>
+                                            <span class="col-form-span-label width150"><b>End Date</b> </span>
+                                            <span class="col-form-span-error">*</span>
+                                        </td>
+                                        <td>
+                                            <my-date-picker name="EndDate" [options]="myDatePickerOptions"   [(ngModel)]="client_enddate" [disabled]="exampleRadios1 != 'Client'">
+                                            </my-date-picker>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-form-span-label width100">
+                                <input type="radio" name="exampleRadios" value='JobNo' [(ngModel)]="exampleRadios1">&nbsp;   Job No
+                            </td>
+                            <td class="col-form-span-label width240" colspan="4">
+                                <input type="text" class="form-control width180" [maxlength]="15" [OnlyNumber]="true" [(ngModel)]="jobno" [disabled]="exampleRadios1 != 'JobNo'">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-form-span-label width100">
+                                <input type="radio" name="exampleRadios" value='Amount' [(ngModel)]="exampleRadios1">&nbsp;  Amount
+                            </td>
+                            <td class="col-form-span-label width240" colspan="4">
+                                <input type="text" class="form-control width180" [(ngModel)]="amount" [disabled]="exampleRadios1 != 'Amount'">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-form-span-label width100">
+                                <input type="radio" name="exampleRadios" id="exampleRadios2" value="Date"  [(ngModel)]="exampleRadios1"> Date Wise
+                            </td>
+
+                            <td>
+                                <span class="col-form-span-label width150"><b>Start Date</b> </span>
+                                <span class="col-form-span-error">*</span>
+                            </td>
+                            <td>
+                                <my-date-picker name="StartDate" [options]="myDatePickerOptions"  [(ngModel)]="datewise_startdate" [disabled]="exampleRadios1 != 'Date'">
+                                </my-date-picker>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label width150"><b>End Date</b> </span>
+                                <span class="col-form-span-error">*</span>
+                            </td>
+                            <td>
+                                <my-date-picker name="EndDate" [options]="myDatePickerOptions"  [(ngModel)]="datewise_enddate" [disabled]="exampleRadios1 != 'Date'">
+                                </my-date-picker>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="col-form-span-label width100">
+                                <input type="radio" name="exampleRadios" value="6"   [(ngModel)]="exampleRadios1"> Print All CreditNote of That Day
+                            </td>
+                            <td colspan="2">
+                                <my-date-picker name="StartDate" [options]="myDatePickerOptions"   [(ngModel)]="printallcredit_date" [disabled]="exampleRadios1 != '6'">
+                                </my-date-picker>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td colspan="5" class="centerlabel">
+                                <button class="btn btn-sm btn-success" type="submit" (click)="searchlist()"><span  class="col-form-span-label"><i class="fa fa-search"></i> Search</span></button>
+                                <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"  (click)="reset();"><i class="fa fa-ban"></i> Reset</span></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-3"></div>
+        </div>
+        <div *ngIf="Searchdata_list.length >1" >
+            <button class="btn btn-sm btn-warning" style="float: right;" (click)="Searchdata_list=[]"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to search</u></span></button>
+       </div>
+        <main *ngIf="Searchdata_list.length >1">
+            <div id="content">
+                <div class="table-wrapper">
+                    <table class="table table-bordered table-sm-new bgwhite" >
+                        <thead class="title-head formheading">
+                            <tr>
+                                <th *ngIf="exampleRadios1=='6'" class="centerlabel"><input type="checkbox"  [(ngModel)]='checkbox' (change)="checkAll($event)" /> &nbsp; </th>
+                                <th   align="center">CRT. NO.</th>
+                                <th   align="center">CRT. DATE</th>
+                                <th   align="center">BILL TO</th>
+                                <th   align="center">JOB NO.</th>
+                                <th   align="center">BILL TYPE</th>
+
+                            </tr>
+                        </thead>
+                        <tbody *ngIf="Searchdata_list.length > 0">
+                            <tr *ngFor="let data of Searchdata_list">
+                                <td *ngIf="exampleRadios1=='6'" class="centerlabel"> <input type="checkbox" [(ngModel)]="data.Checked" (ngModelChange)="getCheckboxValues($event,data.crt_no)"> &nbsp; </td>
+                                <td><span  class="col-form-span-label anchor-link" (click)="ListOnclick(data.crt_no)">{{data.crt_no}}</span> </td>
+                                <td><span  class="col-form-span-label">{{data.crt_date}}</span>  </td>
+                                <td><span  class="col-form-span-label">{{data.exp_name}}</span>  </td>
+                                <td><span  class="col-form-span-label">{{data.crt_jobno}}</span> </td>
+                                <td><span  class="col-form-span-label">{{data.crt_billtype}}</span> </td>
+
+
+                            </tr>
+                        </tbody>
+                        <tr>
+                            <td *ngIf="exampleRadios1=='6'" colspan="8" class="right-text pr-2">
+                            <button class="btn btn-sm btn-success" type="submit" (click)="PrintCreditNote()"> <span  class="col-form-span-label"><i class="fa fa-print"></i>&nbsp;Print</span></button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+

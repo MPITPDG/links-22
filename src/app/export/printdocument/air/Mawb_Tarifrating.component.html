@@ -1,0 +1,20 @@
+<div bsModal #MAWBModelpopup="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header formheading">
+          <span class="modal-title pull-left">
+              <strong>{{title}}</strong>
+          </span>
+        </div>
+        <div class="modal-body modal-fix-body">
+                <app-MAWB_tariffRate [exptno]="exptno" [type]="'MawbTarif'" [hidden]="(type == 'MawbTarif')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #MawbRate></app-MAWB_tariffRate>
+          </div>
+        <div class="modal-footer">
+          <div class="pull-left">
+            <button class='btn btn-primary' (click)="updateData()" name="updateButton" *ngIf="type != 'VIEW'" #updateButton><app-font-changer [fontIndex]="'4'"></app-font-changer> Update</button>
+            <button class="btn btn-danger" (click)="hide()"><i class="fa fa-ban" aria-hidden="true"></i> Abort</button>
+          </div>
+        </div>
+      </div>
+     </div>
+  </div>

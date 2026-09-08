@@ -1,0 +1,197 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header formheading">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <strong>STAFF PURCHASE</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-2 ">
+    </div>
+    <div class="col-sm-8 ">
+          
+         <table class="table table-bordered table-sm-new bgwhite">
+
+            <tr class="trheader">
+                <td class="col-form-span-label"  colspan="4">
+                    <b> GENERAL DETAILS </b>
+                </td>
+            </tr>
+            <tr>
+                <td><span  class="col-form-span-label"><b>Purchase No</b> </span><span class="col-form-span-error">*</span></td>
+                <td >  <input [(ngModel)]="PurchaseNo" type="text"   disabled="disabled" class="form-control width150" maxlength="40" > </td>
+                <td ><span class="col-form-span-label"><b>Purchase Date</b> </span><span class="col-form-span-error">*</span>  </td>
+                <td>
+                    <my-date-picker name="PurchaseDate" [options]="myDatePickerOptions" class="form-control" [selDate]="PurchaseDate"></my-date-picker>
+                </td>
+
+                </tr>
+             <tr>
+                <td><span class="col-form-span-label"><b>Narration</b> </span></td>
+                <td colspan="3">  <input [(ngModel)]="Narration" type="text"  class="form-control"  > </td>
+             </tr>
+             <tr class="trheader">
+                <td class="col-form-span-label"  colspan="4">
+                    <b>STAFF DETAILS</b>
+                </td>
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b>Staff Name</b> </span><span class="col-form-span-error">*</span></td>
+                <td colspan="3">
+                   
+                    <ng-select [items]="Stafflist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="staff"
+                        class="custom " placeholder="--Select--">
+                    </ng-select>
+                </td>
+            </tr>
+            <tr class="trheader">
+                <td class="col-form-span-label"  colspan="2">
+                   <b> PASSING DETAILS</b>
+                </td>
+                <td class="col-form-span-label"  colspan="2">
+                    <span class="col-form-span-label" ><b>Passed</b>  </span> &nbsp;&nbsp;
+                    <span  > <input type="checkbox" [(ngModel)]="IsPassed"  (change)="changeEvent($event)"  /> </span>
+                </td>
+
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b>Passed By</b> </span></td>
+                <td >
+                    <select class="form-control width150"  [(ngModel)]="passedby" [disabled]='togglepassedby' >
+                        <option value="">Please select</option>
+                        <option *ngFor="let d of PassedBylist"  value={{d.CMPID}}>{{d.CMP_USERNAME}}</option>
+                    </select>
+                </td>
+                <td><span class="col-form-span-label"><b>Passed Amount</b> </span><span class="col-form-span-error">*</span></td>
+                <td >  <input [(ngModel)]="PassedAmount" type="text" [OnlyNumber]="true" [disabled]='togglepamount'   class="form-control width150" maxlength="40" > </td>
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b>Invoice Amount</b> </span><span class="col-form-span-error">*</span></td>
+                <td >  <input [(ngModel)]="InvoiceAmount" type="text" [OnlyNumber]="true" [disabled]='toggleinvamount' class="form-control width150" maxlength="40" > </td>
+                <td><span class="col-form-span-label"><b>Voucher No</b> </span><span class="col-form-span-error">*</span></td>
+                <td >  <input [(ngModel)]="VoucherNo"   type="text" [disabled]='togglevno'  class="form-control width150" maxlength="40" > </td>
+
+            </tr>
+            <tr class="trheader">
+                <td class="col-form-span-label"  colspan="4">
+                   <b> ACCOUNTS DETAILS</b>
+                </td>
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b>Account Name</b> </span><span class="col-form-span-error">*</span></td>
+                <td colspan="3">
+                    
+                    <ng-select [items]="AccountNameList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
+                    [(ngModel)]="AccountName" (change)="GetActName($event.ACCTCODENAME)" class="custom " placeholder="--Select--">
+                </ng-select>
+
+                </td>
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b>Item</b> </span><span class="col-form-span-error">*</span></td>
+                <td colspan="3">
+                 
+                    <ng-select [items]="ItemList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Item"
+                    class="custom " placeholder="--Select--">
+                </ng-select>
+                </td>
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b> Amount</b> </span><span class="col-form-span-error">*</span></td>
+                <td >  <input [(ngModel)]="Amount" [OnlyNumber]="true" type="text"    class="form-control width150" maxlength="40" > </td>
+                <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
+                <td >  <input [(ngModel)]="Deduction" [OnlyNumber]="true" type="text"    class="form-control width150" maxlength="40" > </td>
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b> Job No</b> </span><span class="col-form-span-error">*</span></td>
+                <td >  <input [(ngModel)]="JobNo" type="text"  [OnlyNumber]="true"  class="form-control width150" maxlength="40" > </td>
+                <td><span class="col-form-span-label"><b>Pass Amount</b> </span></td>
+                <td >  <input [(ngModel)]="actpassedamount" [OnlyNumber]="true" type="text"    class="form-control width150" maxlength="40" > </td>
+            </tr>
+            <tr>
+                <td><span class="col-form-span-label"><b>Narration</b> </span></td>
+                <td colspan="3">
+                    <input [(ngModel)]="ActNarration" type="text"    class="form-control width500" maxlength="40" >
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="4"  class="centerlabel">
+                    <button class="btn btn-sm btn-success" type="submit" (click)="Addchildrcrd()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{txtchild}}</span></button>
+                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Resetchildrcrd();"><i class="fa fa-ban"></i> Reset</span></button>
+                </td>
+            </tr>
+            <tr>
+
+            </tr>
+            <tr >
+
+                <td><span class="col-form-span-heading"><b> Net Total</b> </span></td>
+                <td colspan="3">  <input [(ngModel)]="NetAmt" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
+        </tr>
+
+        <tr>
+            <td><span class="col-form-span-label"><b> Amount</b> </span></td>
+            <td >  <input [(ngModel)]="NetAmount" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
+            <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
+            <td >  <input [(ngModel)]="Netdeduction" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
+        </tr>
+      
+       
+    </table>
+     <table class="table table-bordered table-sm-new bgwhite"  *ngIf="Accountlist.length>0">
+        <tr>
+            <td colspan="4" >
+                <div class="row xyscroll" style="width:625px;" >
+                    <table class="table table-responsive-sm table-bordered" > 
+                        <thead>
+                            <tr class="title-head formheading">
+                                <th  class="col-form-span-label" ></th>
+                                <th class="col-form-span-label">Account Name</th>
+                                <th  class="col-form-span-label">Amount</th>    
+                                <th  class="col-form-span-label">Deduction</th>    
+                                <th  class="col-form-span-label">Pass Amt</th>    
+                                <th  class="col-form-span-label">Item</th>  
+                                <th class="col-form-span-label">Job No</th> 
+                                <th class="col-form-span-label">Narration</th> 
+                            </tr>
+                        </thead>
+                        <tbody  >
+                            <tr *ngFor="let obj of Accountlist">
+                                <td class="centerlabel">
+                                    <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)" ></i>
+                                    &nbsp;
+                                    <i class="fa fa-trash" (click)="deletechildrecd(obj.ID,obj.ACC_PURCHASEDTLS_ID)"></i>
+                                </td>
+                               <td><span class="col-form-span-label"  [innerHtml]="obj.ACCOUNT_NAME"> </span></td>
+                               <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.DEDUCTION}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.SRPIPASSAMOUNT}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.ITEM}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </td>
+        </tr> 
+        <tr>
+            <td colspan="4"  class="centerlabel">
+                <button class="btn btn-sm btn-success" type="submit" (click)="Add_Main()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{text}}</span></button>
+                <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+
+    <div class="col-sm-2">
+    </div>
+</div>

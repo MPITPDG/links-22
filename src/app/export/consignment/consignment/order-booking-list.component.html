@@ -1,0 +1,61 @@
+﻿<div class="animated fadeIn">
+	<div class="row">
+		<div class="col-sm-3">
+		</div>
+		<div class="col-sm-6">
+			<table class="table table-bordered table-sm-new">
+				<thead class="trbg">
+					<tr>
+						<th colspan="2" class="centerlabel"><span class="col-form-span-label">LIST OF ORDERS</span></th>
+					</tr>
+				</thead>
+				<tbody class="bgwhite">
+					<tr>
+						<td class="width150"><span class="col-form-span-label"><b>EXPORTER/SHIPPER</b></span></td>
+						<td><span class="col-form-span-label">{{ExporterName}}</span></td>
+					</tr>
+					<tr>
+						<td class="width150"><span class="col-form-span-label"><b>CONSIGNEE</b></span></td>
+						<td><span class="col-form-span-label">{{ConsigneeName}}</span></td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="table table-bordered table-sm-new">
+				<thead class="trbg">
+					<tr>
+						<th></th>
+						<th><span class="col-form-span-label">ORDER NO</span></th>
+						<th><span class="col-form-span-label">STYLE NO</span></th>
+						<th><span class="col-form-span-label">PIECES</span></th>
+						<th><span class="col-form-span-label">TYPE OF PIECES</span></th>
+					</tr>
+				</thead>
+				<tbody class="bgwhite">
+					<tr *ngIf="OrderList.length==0"><td colspan="5" class="centerlabel"><img src="assets/img/loading.gif" /></td></tr>
+					<tr *ngFor="let obj of OrderList">
+						<td class="centerlabel"><input type="checkbox" [(ngModel)]="obj.Check" (click)="setPieces(obj.ID, obj.Check)"/></td>
+						<td><span class="col-form-span-label">{{obj.ORDERNO}}</span></td>
+						<td><span class="col-form-span-label">{{obj.STYLENO}}</span></td>
+						<td>
+							<span class="col-form-span-label">
+								<input type="textbox" [(ngModel)]="obj.PCS" class="form-control width100" (keyup)="checkPieces(obj.ID, obj.PCS)" [OnlyNumber]="true" [disabled]="obj.Check==false"/>
+							</span>
+						</td>
+						<td><span class="col-form-span-label">{{obj.TYPEOFPCS}}</span></td>
+					</tr>
+				</tbody>
+				<tfoot class="trbg">
+					<tr>
+						<th colspan="5" class="centerlabel">
+							<button type="button" class="btn btn-sm btn-primary" (click)="submit()" #submitButton>
+								<span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Submit</span>
+							</button>
+						</th>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+		<div class="col-sm-3">
+		</div>
+	</div>
+</div>

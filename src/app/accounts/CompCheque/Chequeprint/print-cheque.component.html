@@ -1,0 +1,168 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>{{Header| uppercase}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-12 col-md-1 col-lg-1"> </div>
+        <div class="col-sm-12 col-md-10 col-lg-10">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td><span class="col-form-span-label"><b>Bank</b> </span><span
+                        class="col-form-span-error">*</span></td>
+                <td>
+                    <select class="form-control width350"  [(ngModel)]="BankName" (ngModelChange)="cheserchprint()">
+                        <option value="">Please select</option>
+                        <option *ngFor="let d of BankList"  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+                    </select>
+                </td>.
+                <td colspan="2" align="center">
+                    <button class="btn btn-sm btn-primary" type="submit" (click)="addchequestock()">
+                        <span class="col-form-span-label"><i
+                                class="fa fa-dot-circle-o"></i>View Available Cheque No</span></button>
+                </td>
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>Starting Cheque No</b> </span><span
+                        class="col-form-span-error">*</span></td>
+                <td colspan="3">
+                    <div style="display: inline-flex;">
+                    <input [(ngModel)]="start_chqno" type="text"  class="form-control width180" maxlength="40" >
+                    <button class="btn btn-sm btn-primary" type="submit" (click)="cheqavailable()">
+                        <span class="col-form-span-label"><i
+                                class="fa fa-dot-circle-o"></i>Cheque Status</span></button>&nbsp;&nbsp;
+                                <span class="col-form-span-label font-weight-bold">{{chkstatus}}</span>
+                            </div>  </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-12 col-md-1 col-lg-1"> </div>
+    </div>
+
+    <div class="row no-gutters">
+        <div class="col-12 col-md-1 col-lg-1"> </div>
+        <div class="col-sm-12 col-md-10 col-lg-10">
+            <div  style="height: 380px;overflow-y:auto;overflow-x: hidden;width: 100%;">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead >
+                    <tr  class="col-form-span-heading">
+                        <td class="col-form-span-label"></td >
+                        <td class="col-form-span-label font-weight-bold ">Status</td >
+                        <td class="col-form-span-label font-weight-bold ">Entry No</td                              >
+                        <td  class="col-form-span-label font-weight-bold ">Cheque No</td >
+                        <td  class="col-form-span-label font-weight-bold ">Cheque Type</td >
+                        <td  class="col-form-span-label font-weight-bold ">Payee Name</td >
+                        <td  class="col-form-span-label font-weight-bold ">Pay Date</td >
+                        <td  class="col-form-span-label font-weight-bold "> Amount</td >
+                        <td  class="col-form-span-label font-weight-bold ">Requested By</td >
+                        <td  class="col-form-span-label font-weight-bold ">Requested On</td >
+                        <td  class="col-form-span-label font-weight-bold ">Bank Ref No</td >
+                    </tr>
+                </thead>
+                <tbody *ngIf="searvhptintlist.length>0" >
+                    <tr *ngFor="let obj of searvhptintlist |paginate: { itemsPerPage:20, currentPage: PageActual }">
+                        <td class="col-form-span-label"><input type="checkbox" [(ngModel)]="obj.Checked"   [disabled]="obj.PRINTSTATUS=='Not Authorised'"
+                            (ngModelChange)="getCheckboxValues($event,obj.ENTRYNO,obj.CHEQUETYPE,obj.AMOUNT,obj.BANKREFNO)"> &nbsp;</td>
+                        <td><span class="col-form-span-label">{{obj.PRINTSTATUS}} </span>
+                        </td>
+                        <td><span class="col-form-span-label"  (click)="OpenView(obj.ENTRYNO)">{{obj.ENTRYNO}}</span></td>
+                        <td   > <span class="col-form-span-label"  *ngIf="obj.Checked != true">{{obj.CHEQUENO}}</span>
+                            <span [ngClass]="{'class1':CHEQUENO=='Not Available.', 'class2':CHEQUENO!='Not Available.'}" *ngIf="obj.Checked==true && flag=='1'">{{CHEQUENO}}</span>
+                        </td>
+                        <td><span class="col-form-span-label">{{obj.CHEQUETYPE}}</span></td>
+                        <td><span class="col-form-span-label">{{obj.PAYEENAME}}</span></td>
+                        <td><span class="col-form-span-label">{{obj.CHEQUEDT}}</span></td>
+                        <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>
+                        <td><span class="col-form-span-label">{{obj.RequestedBy}}</span></td>
+                        <td><span class="col-form-span-label">{{obj.ENTRYDT}}</span></td>
+                        <!-- <td><span class="col-form-span-label">{{obj.BANKREFNO}}</span></td> -->
+                        <td class="col-form-span-label"> <input [(ngModel)]="obj.BANKREFNO"  (change)="getbankrefno(obj.ENTRYNO,obj.BANKREFNO)" [disabled]="obj.PRINTSTATUS=='Not Authorised'" *ngIf="obj.CHEQUETYPE!=''" type="text" maxlenght="40" autofocus class="form-control width150">
+                            <span [ngClass]="{'class1':StartCheck=='Not Available.', 'class2':StartCheck!='Not Available.'}"  *ngIf="obj.Checked==true && (obj.CHEQUETYPE=='CHQ' || obj.CHEQUETYPE=='')">{{BankRefNo}}</span></td>
+                    </tr>
+
+                </tbody>
+                <!-- <tr>
+                    <td colspan="9">
+                      <div class="row justify-content-center no-gutters"
+                        style="font-family:verdana;font-size: 11px;padding: 1px;">
+                        <pagination-controls (pageChange)="PageActual=$event" autoHide="true"></pagination-controls>
+                      </div>
+                    </td>
+                  </tr>  -->
+            </table>
+
+            </div>
+        </div>
+        <div class="col-12 col-md-1 col-lg-1"> </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-12 col-md-1 col-lg-1"> </div>
+        <div class="col-sm-12 col-md-10 col-lg-10">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td colspan="9">
+                      <div class="row justify-content-center no-gutters"
+                        style="font-family:verdana;font-size: 11px;padding: 1px;">
+                        <pagination-controls (pageChange)="PageActual=$event" autoHide="true"></pagination-controls>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td  colspan="4"  >
+                        <button class="btn btn-sm btn-primary" style="float: right;" type="submit" (click)="payordergenrte()">
+                            <span class="col-form-span-label"><i
+                                    class="fa fa-dot-circle-o"></i>Assign Cheque No to Entry No</span></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-12 col-md-1 col-lg-1"> </div>
+    </div>
+</div>
+
+
+<div class="modal" [style.display]="showModal_ChequenoList ? 'block' : 'none'">
+    <div class="modal-dialog modal-sm" role="document"  >
+        <div class="modal-content " >
+            <div class="modal-header formheading">
+                        <strong>CHEQUE STOCK LIST</strong>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                        <div class="col-12"  >
+                        <table class="table table-bordered table-sm-new bgwhite">
+                                    <thead style="text-align: center;">
+                                        <tr>
+                                            <th class="col-form-span-heading">Cheque No</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody >
+                                        <tr *ngFor="let obj of cheque_nolist | paginate: { itemsPerPage: 10, currentPage: p2, id: 'second' }">
+                                            <td class="col-form-span-label ">{{obj.CHEQUENO}}</td>
+                                        </tr>
+                                    </tbody>
+
+                        </table>
+                       <span class="row justify-content-center no-gutters"
+                       style="font-family:verdana;font-size: 11px;padding: 1px;">
+                        <pagination-controls (pageChange)="p2 = $event" id="second" autoHide="true"></pagination-controls>
+
+                       </span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border:none">
+                <div style="float: right;">
+                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                            (click)="close1()"><i class="fa fa-ban"></i>
+                            Close</span></button>
+                </div>
+              </div>
+        </div>
+    </div>
+</div>

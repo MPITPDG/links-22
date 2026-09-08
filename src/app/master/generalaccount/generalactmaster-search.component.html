@@ -1,0 +1,270 @@
+<div class="animated fadeIn">
+	<div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+        </div>
+        <div class="col-sm-6"  *ngIf="accountlist.length==0">
+
+            <table class="table table-bordered table-sm-new bgwhite">
+				<tr>
+					<td colspan="4">
+						<table class="table table-bordered table-sm-new bgwhite">
+					<tr>
+						<td class="width150">
+							<span class="col-form-span-label">
+								<input type="radio" name="check" value="NAME" [(ngModel)]="Type"  (change)="handleChangeacc(1)"/>&nbsp;Account Name</span>
+						</td>
+						<td class="width130">
+							<input type="text" [(ngModel)]="AccountName " class="form-control" [disabled]="Type!='NAME'"
+							/>
+							<div class="centerlabel">
+								<span class="col-form-span-label">
+									<input type="radio" name="radioAccountName" value="B" [(ngModel)]="AccountNameType"  [disabled]="Type!='NAME'"/>&nbsp;Begin with</span>&nbsp;&nbsp;&nbsp;&nbsp;
+								<span class="col-form-span-label">
+									<input type="radio" name="radioAccountName" value="A" [(ngModel)]="AccountNameType"  [disabled]="Type!='NAME'"/>&nbsp;Any Where IN</span>
+							</div>
+						</td>
+						</tr>
+						<tr height="10">
+
+						</tr>
+					<tr >
+						<td>
+							<span class="col-form-span-label">
+								<input type="radio" name="check" value="UnderGroupwise" [(ngModel)]="Type" (change)="handleChangeacc(2)" />&nbsp;Undergroup</span>
+						</td>
+						<td colspan="2">
+							<ng-select [items]="UndergroupList" bindLabel="Name" bindValue="Code"  [(ngModel)]="Undergroup"
+								class="form-control" [disabled]="Type!='UnderGroupwise'">
+							</ng-select>
+
+						</td>
+					</tr>
+					<tr height="10">
+
+					</tr>
+					<tr >
+						<td>
+							<span class="col-form-span-label">
+								<input type="radio" name="check" value="Typewise" [(ngModel)]="Type" (change)="handleChangeacc(3)" />&nbsp;Affecting Area</span>
+						</td>
+						<td>
+						<table class="table-clear">
+							<tr>
+								<td>
+									<input type="checkbox"  [(ngModel)]="IsInvoiceAccount"  [disabled]="Type!='Typewise'"  />
+									<span class="col-form-span-label" ><b>Inv Account</b>  </span>
+
+								</td>
+								 <td width="10px"></td>
+								<td>
+									<input type="checkbox"  [(ngModel)]="IsBank"  [disabled]="Type!='Typewise'"    />
+									<span class="col-form-span-label" ><b>Bank</b>  </span>
+
+								</td>
+								<td width="10px"></td>
+								<td>
+									<input type="checkbox"  [(ngModel)]="IsJobreport"  [disabled]="Type!='Typewise'"    />
+									<span class="col-form-span-label" ><b>Job Report</b>  </span>
+
+								</td>
+								<td width="10px"></td>
+								<td>
+									<input type="checkbox"  [(ngModel)]="IsEmployee"  [disabled]="Type!='Typewise'"     />
+									<span class="col-form-span-label" ><b>Is Employee</b>  </span>
+
+								</td>
+							</tr>
+						 </table>
+						 <table class="table-clear">
+							<tr>
+								<td>
+									<input type="checkbox"    [(ngModel)]="IsInvregreport" [disabled]="Type!='Typewise'" />
+									<span class="col-form-span-label" ><b>Inv Reg Report</b>  </span>
+
+								 </td>
+								 <td width="10px"></td>
+								 <td>
+									<input type="checkbox"    [(ngModel)]="IsExpenselock"  [disabled]="Type!='Typewise'"/>
+									<span class="col-form-span-label" ><b>ExpenseLock</b>  </span>
+
+								 </td>
+								 <td width="10px"></td>
+								 <td>
+									<input type="checkbox"    [(ngModel)]="IsPurchaseshow" [disabled]="Type!='Typewise'" />
+									<span class="col-form-span-label" ><b>PurchaseShow</b>  </span>
+
+								 </td>
+							</tr>
+
+						 </table>
+						 </td>
+					</tr>
+					<tr height="10">
+
+					</tr>
+					<tr >
+						<td>
+							<span class="col-form-span-label">
+								<input type="radio" name="check" value="Citywise" [(ngModel)]="Type" (change)="handleChangeacc(4)"/>&nbsp;City</span>
+						</td>
+						<td>
+						<table class="table-clear" >
+							<tr>
+
+								<td>
+									<input type="checkbox"    [(ngModel)]="IsMUM"  [disabled]="Type!='Citywise'"   />
+									<span class="col-form-span-label" ><b>MUM</b>  </span>
+
+								</td>
+								<td width="10px"></td>
+								<!-- <td>
+									<input type="checkbox"    [(ngModel)]="IsDEL" [disabled]="Type!='Citywise'" />
+									<span class="col-form-span-label" ><b>DEL</b>  </span>
+
+								</td>
+								<td width="10px"></td>
+								<td>
+									<input type="checkbox"    [(ngModel)]="IsMAA" [disabled]="Type!='Citywise'" />
+									<span class="col-form-span-label" ><b>MAA</b>  </span>
+
+								</td>
+								<td width="10px"></td>
+								<td>
+									<input type="checkbox"    [(ngModel)]="IsAMD" [disabled]="Type!='Citywise'" />
+									<span class="col-form-span-label" ><b>AMD</b>  </span>
+
+								</td> -->
+
+
+							</tr>
+							<!-- <tr>
+                                <td>
+                                    <input type="checkbox"    [(ngModel)]="IsBLR" />
+                                    <span class="col-form-span-label" ><b>BLR</b>  </span>
+
+                                </td>
+                                <td width="10px"></td>
+                                <td>
+                                    <input type="checkbox"    [(ngModel)]="IsTRN" />
+                                    <span class="col-form-span-label" ><b>TRN</b>  </span>
+
+                                </td>
+                                <td width="10px"></td>
+                                <td>
+                                    <input type="checkbox"    [(ngModel)]="IsTRU" />
+                                    <span class="col-form-span-label" ><b>TRU</b>  </span>
+
+                                </td>
+                                <td width="10px"></td>
+                                <td>
+                                    <input type="checkbox"    [(ngModel)]="IsCOC" />
+                                    <span class="col-form-span-label" ><b>COC</b>  </span>
+
+                                </td>
+                            </tr> -->
+							</table>
+							<!--table class="table-clear" >
+								<tr>
+
+								<td>
+
+									<span class="col-form-span-label" ><b>BLR</b>  </span>
+								<input type="checkbox"    [(ngModel)]="IsBLR" [disabled]="Type!='Citywise'" />
+								</td>
+								<td>
+									<span class="col-form-span-label" ><b>AMD</b>  </span>
+									<input type="checkbox"    [(ngModel)]="IsAMD" [disabled]="Type!='Citywise'" />
+								</td>
+
+								<td>
+									<span class="col-form-span-label" ><b>LIL</b>  </span>
+									<input type="checkbox"    [(ngModel)]="IsDAC" [disabled]="Type!='Citywise'"  />
+								</td>
+							</tr>
+						</table-->
+					</td>
+						</tr>
+						<tr height="10">
+
+						</tr>
+						<tr >
+							<td>
+								<span class="col-form-span-label">
+									<input type="radio" name="check" value="Companywise" [(ngModel)]="Type" (change)="handleChangeacc(5)" />&nbsp;Company</span>
+							</td>
+							<td>
+								<ng-select [items]="Companylist"  class="form-control width350"
+								bindLabel="CMPNAME"
+								bindValue="CMPCODE"
+								appendTo="body"
+								multiple="true"  [closeOnSelect]="false"
+								[selectableGroup]="true"
+								[(ngModel)]="Companycode" [disabled]="Type!='Companywise'"
+								(change)="onchnage(companycode)">
+								<ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+									<input  type="checkbox" [(ngModel)]="item$.selected"   />
+									{{ item.CMPNAME}}
+								 </ng-template>
+								</ng-select>
+							</td>
+							</tr>
+							<tr>
+								<td colspan="4" class="centerlabel" >
+									<button class="btn btn-sm btn-success" type="submit"   (click)="search()"><span class="col-form-span-label"><i class="fa fa-search"></i> Search</span></button>
+								</td>
+							</tr>
+			</table>
+			</td>
+			</tr>
+            </table>
+		</div>
+    </div>
+
+        <div class="col-sm-3">
+		</div>
+
+
+
+	<!--div class="row" *ngIf="displayType=='LIST'"-->
+
+		<div class="col-sm-12 xyscroll" *ngIf="accountlist.length>0">
+
+			<table class="table table-hover" >
+				<thead>
+					<td class="col-form-span-heading"  colspan="5">
+						<span class="col-form-span-label"><b>GENERAL ACCOUNT DETAILS</b></span>
+
+					<button class="btn btn-sm btn-warning" style="float: right;" (click)="accountlist=[]"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to search</u></span></button>
+				</td>
+					<tr class="col-form-span-heading" style="white-space:nowrap;">
+						<!--th class="col-form-span-label">ACCOUNT CODE</th-->
+						<th class="col-form-span-label">ACCOUNT</th>
+						<th class="col-form-span-label">UNDER GROUP</th>
+						<th class="col-form-span-label">CITY</th>
+						<th class="col-form-span-label">AFFECTING AREA</th>
+						<th class="col-form-span-label">COMPANY</th>
+
+
+					</tr>
+				 </thead>
+				<tbody class="bgwhite">
+					<tr *ngFor="let obj of accountlist | paginate: config">
+						<td><span class="col-form-span-label anchor-link" (click)="ListOnclick(obj.ID)" style="cursor:pointer;" >{{obj.Account}}</span></td>
+						<!--td class="col-form-span-label">{{obj.Account}}</td-->
+						<td class="col-form-span-label">{{obj.UnderGroup}}</td>
+						<td class="col-form-span-label">{{obj.CITY}}</td>
+						 <td class="col-form-span-label">{{obj.Type}}</td>
+						 <td class="col-form-span-label">{{obj.Active_comp}}</td>
+
+					</tr>
+				</tbody>
+			</table>
+			<pagination-controls (pageChange)="pageChanged($event)"></pagination-controls>
+		</div>

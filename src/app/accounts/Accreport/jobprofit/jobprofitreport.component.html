@@ -1,0 +1,172 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>{{PageName|uppercase}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr >
+                    <td colspan="2" style="text-align: left;"><input type="radio"  name="searchtype" value='singlejob'
+                        [(ngModel)]="searchtype">&nbsp;<span class="col-form-span-label"><b>Single Job No.</b> </span></td>
+                    <td colspan="4">
+                        <!-- <div style="display: inline-flex;"><span class="col-form-span-label">Job Number &nbsp;</span> </div> -->
+
+                            <input [(ngModel)]="single_jobno"   [disabled]="searchtype != 'singlejob' " type="text" class="form-control width150" maxlength="40">
+                        
+                    </td>
+                </tr>
+                <tr >
+                    <td colspan="2" style="text-align: left;"><input type="radio"  name="searchtype" value='MJOB'
+                        [(ngModel)]="searchtype">&nbsp;<span class="col-form-span-label"><b>Multiple Jobs.</b> </span></td>
+                    <td colspan="4" style="text-align: left;">
+                        <div style="display: inline-flex;">
+                            <span class="col-form-span-label">From &nbsp;</span>
+
+                            <input [(ngModel)]="multi_fromjobno" type="text" class="form-control width150"   [disabled]="searchtype != 'MJOB' "
+                                maxlength="40">
+                                &nbsp;
+                            <span class="col-form-span-label">To  &nbsp;</span>
+
+                            <input [(ngModel)]="multi_tojobno" type="text" class="form-control width150"   [disabled]="searchtype != 'MJOB' " maxlength="40">
+                        </div>
+                    </td>
+
+                </tr>
+                <tr >
+                    <td colspan="2" style="text-align: left;" ><input type="radio"  name="searchtype" value='DATE'
+                        [(ngModel)]="searchtype">&nbsp;<span class="col-form-span-label"><b>Date Wise</b> </span></td>
+                    <td colspan="4 " style="text-align: left;">
+                        <div style="display: inline-flex;" class="col-form-span-label">
+                            <input type="radio"  name="modetype_radio" value='SEA_exp'
+                                [(ngModel)]="modetype" [disabled]="searchtype != 'DATE'" (click)="clearDateControls()" >&nbsp;<b>Sea Export </b>
+                                &nbsp;<input type="radio"name="modetype_radio" value='AIR_exp'
+                                [(ngModel)]="modetype" [disabled]="searchtype != 'DATE'" (click)="clearDateControls()">&nbsp;<b>Air  Export</b>
+                                &nbsp;<input type="radio"name="modetype_radio" value='SEA_imp'
+                                [(ngModel)]="modetype" [disabled]="searchtype != 'DATE'" (click)="clearDateControls()" >&nbsp;<b>Sea Import </b>
+                                &nbsp;<input type="radio"name="modetype_radio" value='AIR_imp'
+                                [(ngModel)]="modetype" [disabled]="searchtype != 'DATE'" (click)="clearDateControls()" >&nbsp;<b>Air Import </b>
+                                &nbsp;<input type="radio"  name="modetype_radio" value='ALL'
+                                [(ngModel)]="modetype" [disabled]="searchtype != 'DATE'" (click)="clearDateControls()" >&nbsp;<b>All</b>
+                        </div><br>
+                        <div class="col-form-span-label" style="padding-left: 15px;">
+                            <span  *ngIf="modetype=='SEA_exp'"> <input type="radio"  name="mode_subtyperadio" value='DOC'
+                                [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>DocRecDate </b><br>
+                                <input type="radio"  name="mode_subtyperadio" value='SALING'
+                                [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>Sailing Date </b><br>
+                                <input type="radio"  name="mode_subtyperadio" value='INV'
+                                [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>Invoice Date</b>
+                            </span>
+                            <span  *ngIf="modetype=='AIR_exp'"> <input type="radio"  name="mode_subtyperadio" value='DOC'
+                                [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>DocRecDate </b><br>
+                                <input type="radio"  name="mode_subtyperadio" value='FLIGHT'
+                                [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>Flight Date </b>  <br>
+                                <input type="radio"  name="mode_subtyperadio" value='INV'
+                                [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>Invoice Date</b>                           
+                            </span>
+                            <span  *ngIf="modetype=='SEA_imp'"> <input type="radio"  name="mode_subtyperadio" value='DOCI'
+                                [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>DocRecDate </b><br>
+                                <input type="radio"  name="mode_subtyperadio" value='BL'
+                                [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>BL  Date </b><br>
+                                <input type="radio"  name="mode_subtyperadio" value='INV'
+                                [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>Invoice Date</b>
+                            </span>
+                            <span  *ngIf="modetype=='AIR_imp'"> <input type="radio"  name="mode_subtyperadio" value='DOCI'
+                                [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>DocRecDate </b><br>
+                                <input type="radio"  name="mode_subtyperadio" value='BL'
+                                [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>BL  Date </b><br>
+                                <input type="radio"  name="mode_subtyperadio" value='INV'
+                                [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>Invoice Date</b>
+                            </span>
+                            <span  *ngIf="modetype=='ALL'"> 
+                                <input type="radio"  name="mode_subtyperadio" value='INV'
+                                [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>Invoice Date</b>
+                            </span>
+                        </div>
+                        <div style="display: inline-flex;">
+                            <span class="col-form-span-label">From &nbsp;</span>
+                            <my-date-picker name="FromDate" [options]="myDatePickerOptions" 
+                                [(ngModel)]="from_datewise" [disabled]="searchtype != 'DATE'"></my-date-picker> &nbsp;
+                            <span class="col-form-span-label">To &nbsp;</span>
+
+                            <my-date-picker name="to_datewise" [options]="myDatePickerOptions"
+                                [(ngModel)]="to_datewise" [disabled]="searchtype != 'DATE'"></my-date-picker>
+                        </div>
+                  
+                    </td>
+                </tr>
+                <tr  >
+                    <td colspan="2" style="text-align: left;" ><input type="radio"  name="searchtype" value='acctwise'
+                        [(ngModel)]="searchtype">&nbsp;<span class="col-form-span-label"><b>Account Wise</b> </span></td>
+                    <td colspan="4" style="text-align: left;">
+                        <div style="display: inline-flex;"  class="col-form-span-label width500">
+                             <span>Account:</span>&nbsp;
+                             <ng-select [items]="AccountTableList " bindLabel="ACCTNAME" bindValue="ACCTCODENAME" [(ngModel)]="accountcode" class="custom " 
+                                    placeholder="--Please Select Client--" [disabled]="searchtype != 'acctwise'" style="width: 400px;">
+                             </ng-select>
+
+                             <!-- <select class="form-control width300" [(ngModel)]="accountcode" [disabled]="searchtype != 'acctwise'">
+                             <option value="">--Please Select Client--</option>
+                             <option *ngFor="let data of AccountTableList" value={{data.ACCTCODENAME}}> {{data.ACCTNAME}} </option>
+                         </select> -->
+                        </div>
+                        <br>
+         
+                        <div style="display: inline-flex;" class="col-form-span-label">
+                            <span >Branch:</span>&nbsp;
+                            <input type="radio" name="branchradio" value='ALL'
+                                [(ngModel)]="branch" [disabled]="searchtype != 'acctwise'">&nbsp;<b>All Branch </b>
+                                &nbsp;<input type="radio" value='MUM'  name="branchradio"
+                                [(ngModel)]="branch" [disabled]="searchtype != 'acctwise'">&nbsp;<b>{{cityname}}</b>
+                        </div><br>
+                        <div style="display: inline-flex;"  class="col-form-span-label">
+                            <span >Payment Date:</span>&nbsp;
+                            <input type="radio"  value='INVOICE'  name="paydateradio"
+                                [(ngModel)]="paydate" [disabled]="searchtype != 'acctwise'">&nbsp;<b>Invoice Date</b>
+                                &nbsp; <input type="radio"  value='PAYMENT'  name="paydateradio"
+                                [(ngModel)]="paydate" [disabled]="searchtype != 'acctwise'">&nbsp;<b>Payment Date</b>
+                        </div>  <br>
+                        <div style="display: inline-flex;">
+                            <span class="col-form-span-label">From &nbsp;</span>
+                            <my-date-picker name="FromDate" [options]="myDatePickerOptions"
+                                [(ngModel)]="fromdt_acct" [disabled]="searchtype != 'acctwise'"></my-date-picker>&nbsp;
+                            <span class="col-form-span-label">To &nbsp;</span> 
+
+                            <my-date-picker name="ToDate" [options]="myDatePickerOptions" 
+                                [(ngModel)]="todt_acct" [disabled]="searchtype != 'acctwise'"></my-date-picker>
+                        </div>
+                      
+                    </td>
+                </tr>
+                <tr  >
+                    <td colspan="6" class="centerlabel">
+                        <span *ngIf="searchtype=='singlejob'; else elseBlock1">
+                            <button class="btn btn-sm btn-primary" type="submit" (click)="print()">
+                                <span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Print</span>
+                               </button> 
+                        </span>
+                        <ng-template #elseBlock1>
+                            <button class="btn btn-sm btn-primary" type="submit" (click)="expt_excl()">
+                                <span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Export To Excel</span>
+       
+                               </button> 
+                        </ng-template>                    
+                <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                        (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
+                    </td>
+                    </tr>
+            </table>
+        </div>
+    </div>
+</div>

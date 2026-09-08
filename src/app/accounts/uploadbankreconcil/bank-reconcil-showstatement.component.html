@@ -1,0 +1,399 @@
+<div class="br-page">
+
+  <!-- ========================================================= -->
+  <!-- SEARCH SCREEN -->
+  <!-- ========================================================= -->
+
+  <div *ngIf="!showResult">
+    <div class="br-card search-card-clean">
+      <div class="clean-row-layout">
+
+        <!-- BANK ACCOUNT -->
+        <div class="clean-field clean-bank">
+          <label>Bank Account <span class="br-req">*</span></label>
+          <ng-select
+            [items]="BankList"
+            bindLabel="acctname"
+            bindValue="acctcodename"
+            [(ngModel)]="Bank"
+            [appendTo]="'body'"
+            placeholder="Select Bank Account">
+          </ng-select>
+        </div>
+
+        <!-- FROM DATE -->
+        <div class="clean-field clean-date">
+          <label>From Date <span class="br-req">*</span></label>
+          <my-date-picker
+            name="FromDate"
+            (dateChanged)="FromDateChanged($event)"
+            [options]="myDatePickerOptions"
+            [selDate]="FromDate"
+            class="search-date-control">
+          </my-date-picker>
+        </div>
+
+        <!-- TO DATE -->
+        <div class="clean-field clean-date">
+          <label>As On Date <span class="br-req">*</span></label>
+          <my-date-picker
+            name="ToDate"
+            (dateChanged)="ToDateChanged($event)"
+            [options]="myDatePickerOptions"
+            [selDate]="ToDate"
+            class="search-date-control">
+          </my-date-picker>
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="clean-actions">
+          <button class="br-btn br-btn--primary" type="button" (click)="SearchData()">
+            <i class="fa fa-search"></i> Show Statement
+          </button>
+          <button class="br-btn br-btn--ghost" type="button" (click)="Reset()">
+            <i class="fa fa-refresh"></i> Reset
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- RESULT SCREEN -->
+  <!-- ========================================================= -->
+
+  <div *ngIf="showResult" class="br-result-view">
+
+    <!-- TOP BAR -->
+
+    <div class="br-topbar">
+
+      <button
+        class="br-back-btn"
+        type="button"
+        (click)="BackToSearch()">
+
+        <i class="fa fa-arrow-left"></i>
+        Back To Search
+
+      </button>
+
+      <div class="br-topbar-right">
+
+        <span class="br-record-chip">
+          {{ bankreconcilList.length }} Records
+        </span>
+
+      </div>
+
+    </div>
+
+    <!-- SUMMARY -->
+
+    <div class="br-summary-strip">
+
+      <!-- OPENING -->
+
+      <div class="br-summary-card">
+
+        <div class="br-summary-label">
+          Opening Balance
+        </div>
+
+        <div class="br-summary-val">
+
+          <span class="dr" *ngIf="OpBalDr">
+            {{ OpBalDr }}
+          </span>
+
+          <span class="cr" *ngIf="OpBalCr">
+            {{ OpBalCr }}
+          </span>
+
+          <span class="neutral" *ngIf="!OpBalDr && !OpBalCr">
+            —
+          </span>
+
+        </div>
+
+        <div class="br-summary-sub">
+          Dr / Cr
+        </div>
+
+      </div>
+
+      <!-- BOOK BAL -->
+
+      <div class="br-summary-card">
+
+        <div class="br-summary-label">
+          Company Book Balance
+        </div>
+
+        <div class="br-summary-val">
+
+          <span class="dr" *ngIf="BalanceDr">
+            {{ BalanceDr }}
+          </span>
+
+          <span class="cr" *ngIf="BalanceCr">
+            {{ BalanceCr }}
+          </span>
+
+        </div>
+
+      </div>
+
+      <!-- UNRECONCILED -->
+
+      <div class="br-summary-card">
+
+        <div class="br-summary-label">
+          Unreconciled Amount
+        </div>
+
+        <div class="br-summary-val stacked">
+
+          <span class="dr" *ngIf="DrNotRef">
+            {{ DrNotRef }}
+          </span>
+
+          <span class="cr" *ngIf="CrNotRef">
+            {{ CrNotRef }}
+          </span>
+
+        </div>
+
+      </div>
+
+      <!-- TARGET -->
+
+      <div class="br-summary-card br-summary-card--highlight">
+
+        <div class="br-summary-label">
+          Target Bank Balance
+        </div>
+
+        <div class="br-summary-val">
+
+          <span class="dr" *ngIf="DrRef">
+            {{ DrRef }}
+          </span>
+
+          <span class="cr" *ngIf="CrRef">
+            {{ CrRef }}
+          </span>
+
+          <span class="neutral" *ngIf="!DrRef && !CrRef">
+            Pending
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TABLE CARD -->
+
+    <div class="br-card br-table-card">
+
+      <!-- TABLE -->
+
+      <div class="br-table-wrap">
+
+        <table class="br-table">
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Entry No
+              </th>
+
+              <th>
+                Date
+              </th>
+
+              <th>
+                Type
+              </th>
+
+              <th>
+                Party / Reference
+              </th>
+
+              <th>
+                Chq Type
+              </th>
+
+              <th>
+                Cheque No
+              </th>
+
+              <th>
+                Cheque Dt
+              </th>
+
+              <th class="num">
+                Debit
+              </th>
+
+              <th class="num">
+                Credit
+              </th>
+
+              <th>
+                Clearance Status
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            <tr
+              *ngFor="let data of bankreconcilList"
+              [class.br-row--receipt]="data.STATUS === 'BR'"
+              [class.br-row--payment]="data.STATUS === 'BP'">
+
+              <!-- ENTRY -->
+
+              <td class="mono">
+                {{ data.ENTRYNO }}
+              </td>
+
+              <!-- DATE -->
+
+              <td class="mono">
+                {{ data.ENTRYDT }}
+              </td>
+
+              <!-- TYPE -->
+
+              <td>
+
+                <span
+                  class="br-badge"
+                  [ngClass]="data.STATUS === 'BR'
+                  ? 'br-badge--br'
+                  : 'br-badge--bp'">
+
+                  {{ data.STATUS }}
+
+                </span>
+
+              </td>
+
+              <!-- PARTY -->
+
+              <td>
+
+                <div
+                 class="br-party-name"
+                  [innerHTML]="data.PARTYNAME">
+                </div>
+
+                <div
+                  class="br-party-ref"
+                  *ngIf="data.CHEQUENO">
+
+                  {{ data.CHEQUETYPE }}
+                  |
+                  {{ data.CHEQUENO }}
+
+                </div>
+
+              </td>
+
+              <!-- CHQ TYPE -->
+
+              <td class="mono">
+                {{ data.CHEQUETYPE || '—' }}
+              </td>
+
+              <!-- CHQ NO -->
+
+              <td class="mono">
+                {{ data.CHEQUENO || '—' }}
+              </td>
+
+              <!-- CHQ DATE -->
+
+              <td class="mono">
+                {{ data.CHEQUEDT || '—' }}
+              </td>
+
+              <!-- DR -->
+
+              <td class="num dr-amt">
+
+                <span *ngIf="data.DRAMT">
+                  {{ data.DRAMT | number:'1.2-2' }}
+                </span>
+
+                <span
+                  *ngIf="!data.DRAMT"
+                  class="muted">
+                  —
+                </span>
+
+              </td>
+
+              <!-- CR -->
+
+              <td class="num cr-amt">
+
+                <span *ngIf="data.CRAMT">
+                  {{ data.CRAMT | number:'1.2-2' }}
+                </span>
+
+                <span
+                  *ngIf="!data.CRAMT"
+                  class="muted">
+                  —
+                </span>
+
+              </td>
+
+              <!-- CLEARANCE STATUS (read-only) -->
+
+              <td>
+
+                <span
+                  *ngIf="data.CLEARANCEDATE"
+                  class="br-cleared">
+                  <i class="fa fa-check-circle"></i>
+                  {{ data.CLEARANCEDATE }}
+                </span>
+
+                <span
+                  *ngIf="!data.CLEARANCEDATE"
+                  class="br-uncleared">
+                  Not Cleared
+                </span>
+
+              </td>
+
+            </tr>
+
+            <tr *ngIf="bankreconcilList.length === 0">
+              <td colspan="10" class="text-center text-muted">
+                No entries found for this period
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

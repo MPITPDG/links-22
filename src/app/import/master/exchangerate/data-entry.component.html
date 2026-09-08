@@ -1,0 +1,106 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>{{Header}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+        </div>
+        <div class="col-sm-6">
+            <table class="table table-sm-new bgwhite">
+                <tr class="trbg">
+                    <td colspan="2">
+                        <span class="col-form-span-label"><b>ADD CURRENCY EXCHANGE RATE</b></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width150">
+                        <span class="col-form-span-label">Currency Type
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td>
+                        <select class="form-control" [(ngModel)]="CurrencyType">
+                            <option value="0">-- Select --</option>
+                            <ng-template ngFor let-item [ngForOf]="CurrencyList">
+                                <option value="{{item.DATAVALUEFIELD}}">{{item.DATATEXTFIELD}}</option>
+                            </ng-template>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Branch Name</span>
+                    </td>
+                    <td>
+                        <div class="yscroll" style="height: 150px;width:100%">
+                            <table class="table table-bordered table-sm-new">
+                                <tbody>
+                                    <ng-template ngFor let-item [ngForOf]="BranchList">
+                                        <tr>
+                                            <td class="width50 centerlabel">
+                                                <input type="checkbox" [(ngModel)]="item.checked" [disabled]="Id!=0" class="col-form-span-label" />
+                                            </td>
+                                            <td>
+                                                <span class="col-form-span-label">
+                                                    {{item.DATATEXTFIELD}}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">From Date
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td>
+                        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate"></my-date-picker>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">To Date</span>
+                    </td>
+                    <td>
+                        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate"></my-date-picker>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="col-form-span-label">Exchange Rate</span>
+                    </td>
+                    <td>
+                        <input type="text" [(ngModel)]="ExchangeRate" class="form-control" [maxlength]="50"
+                            [OnlyNumber]="true" />
+                    </td>
+                </tr>
+                <tr class="trbg centerlabel">
+                    <td colspan="3">
+                        <button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="submit();">
+                            <span class="col-form-span-label">
+                                <i class="{{(Id=='0')? 'fa fa-save' : 'fa fa-refresh'}}"></i> {{ (Id=='0')? 'Save' :
+                                'Update'}}</span>
+                        </button>&nbsp;
+                        <button type="button" name="cancelButton" class="btn btn-sm btn-danger" (click)="cancel();">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-times-circle"></i> Cancel</span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-3">
+        </div>
+    </div>
+</div>

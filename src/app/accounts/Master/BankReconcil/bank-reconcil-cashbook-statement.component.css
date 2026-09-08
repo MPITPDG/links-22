@@ -1,0 +1,491 @@
+:host {
+  display: block;
+}
+
+.br-page {
+  display: flex;
+  flex-direction: column;
+  padding: 5px 10px !important;
+  gap: 8px !important;
+  box-sizing: border-box;
+}
+
+/* Capped once here (not per-table) so flexbox can divide whatever's left
+   between the two scrollable table cards below. The offset (140px) is
+   measured from this app's actual shell chrome — 55-65px fixed header +
+   22px fixed footer + ~24px breadcrumb overlap (the breadcrumb is
+   position:fixed with no padding-top compensation) — not a guessed vh
+   fraction, since header/footer are fixed pixel heights, not viewport-
+   relative, so a vh-based cap drifts out of sync with them.
+   MUST be `height`, not `max-height`: with only max-height, the browser
+   sizes this flex container off its children's natural content size
+   rather than a definite box, so two flex:1 children with very different
+   row counts (e.g. 95 vs 8) don't split evenly — the bigger one keeps
+   its natural size and the smaller one gets starved down near 0.
+   A definite `height` gives flex-grow a real box to distribute against,
+   so both table cards split the space evenly regardless of row count. */
+.br-result-view {
+  display: flex;
+  flex-direction: column;
+  gap: 8px !important;
+  height: calc(100vh - 140px);
+  max-height: calc(100vh - 140px);
+  overflow: hidden;
+}
+
+.recon-schedule,
+.br-action-bar {
+  flex-shrink: 0;
+}
+
+.br-back-btn {
+  border: 1px solid #D1D5DB;
+  background: #fff;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-right: auto;
+}
+
+/* ============================= */
+/* CARD */
+/* ============================= */
+
+.br-card {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+
+.br-req {
+  color: #DC2626;
+}
+
+.form-control {
+  border-radius: 10px !important;
+  border: 1px solid #D1D5DB !important;
+  min-height: 30px;
+  font-size: 13px;
+}
+
+/* ============================= */
+/* BUTTONS */
+/* ============================= */
+
+.br-btn {
+  height: 25px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.br-btn--primary {
+  background: #2563EB;
+  color: #fff;
+}
+
+.br-btn--primary:hover {
+  background: #1D4ED8;
+}
+
+.br-btn--ghost {
+  background: #fff;
+  border: 1px solid #D1D5DB;
+}
+
+.br-btn--export {
+  height: 30px;
+  background: #059669;
+  color: #fff;
+  font-size: 11px;
+}
+
+.br-btn--export:hover {
+  background: #047857;
+}
+
+/* ============================= */
+/* RECONCILIATION SCHEDULE (equation strip) */
+/* ============================= */
+
+.recon-schedule {
+  padding: 8px 14px;
+}
+
+.recon-topline {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.recon-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.recon-schedule-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.recon-meta {
+  font-size: 11px;
+  color: #6B7280;
+  white-space: nowrap;
+}
+
+.recon-check-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.recon-check-badge.ok {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+.recon-check-badge.warn {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.recon-equation {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.recon-seg {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+.recon-seg-label {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.recon-seg-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.recon-seg-val.add {
+  color: #059669;
+}
+
+.recon-seg-val.less {
+  color: #DC2626;
+}
+
+.recon-op {
+  font-size: 14px;
+  font-weight: 700;
+  color: #9CA3AF;
+  flex-shrink: 0;
+}
+
+.recon-seg--result {
+  padding-left: 10px;
+  border-left: 2px solid #E5E7EB;
+}
+
+.recon-seg--result .recon-seg-val {
+  font-size: 15px;
+}
+
+/* ============================= */
+/* TABLE CARD */
+/* ============================= */
+
+.br-table-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.br-card-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid #E5E7EB;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.br-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.br-record-chip {
+  background: #EEF2FF;
+  color: #4338CA;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.br-table-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+}
+
+.br-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  table-layout: fixed;
+  margin-bottom: 0;
+}
+
+.br-table thead th {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6B7280;
+  padding: 7px 8px;
+  border-bottom: 0.5px solid #E5E7EB;
+  text-align: left;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #F9FAFB;
+}
+
+.br-table thead th.num,
+.br-table td.num {
+  text-align: right;
+  padding-right: 14px !important;
+}
+
+.br-table tbody td {
+  padding: 6px 8px;
+  border-bottom: 0.5px solid #F3F4F6;
+  color: #111827;
+  vertical-align: middle;
+  font-size: 11px;
+}
+
+.mono {
+  font-family: monospace;
+  color: #64748B;
+}
+
+.anchor-link {
+  color: #2563EB;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.anchor-link:hover {
+  text-decoration: underline;
+}
+
+.dr-amt {
+  color: #DC2626;
+  font-weight: 700;
+}
+
+.cr-amt {
+  color: #059669;
+  font-weight: 700;
+}
+
+.br-badge {
+  display: inline-flex;
+  padding: 1px 6px;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.br-badge--br {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+.br-badge--bp {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+/* ============================= */
+/* ACTION BAR */
+/* ============================= */
+
+.br-action-bar {
+  display: flex;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+/* ============================= */
+/* SEARCH SCREEN */
+/* ============================= */
+
+.search-card-clean {
+  padding: 12px 18px !important;
+}
+
+.clean-row-layout {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.clean-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.clean-field label {
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  white-space: nowrap;
+}
+
+.clean-bank {
+  flex: 1 1 auto;
+  min-width: 220px;
+}
+
+.clean-date {
+  flex: 0 0 135px;
+  width: 135px;
+  min-width: 135px;
+}
+
+.clean-balance {
+  flex: 0 0 150px;
+  width: 150px;
+  min-width: 150px;
+}
+
+.clean-balance input {
+  height: 32px;
+  font-size: 13px;
+}
+
+.clean-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  margin-bottom: 1px;
+  white-space: nowrap;
+}
+
+.clean-actions .br-btn {
+  height: 32px !important;
+  padding: 0 14px !important;
+  font-size: 12px !important;
+}
+
+.clean-bank ::ng-deep .ng-select-container {
+  height: 32px !important;
+  min-height: 32px !important;
+  border-radius: 4px !important;
+  border: 1px solid #ced4da !important;
+  box-shadow: none !important;
+}
+
+.clean-bank ::ng-deep .ng-value-container {
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding-left: 8px !important;
+  font-size: 13px !important;
+}
+
+::ng-deep .search-date-control .mydp {
+  width: 135px !important;
+  min-width: 135px !important;
+  display: block !important;
+}
+
+::ng-deep .search-date-control .selectiongroup {
+  height: 30px !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 4px !important;
+  background: #fff !important;
+  overflow: visible !important;
+}
+
+::ng-deep .search-date-control input {
+  height: 30px !important;
+  line-height: 30px !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  font-size: 12px !important;
+  padding-left: 6px !important;
+  background: transparent !important;
+}
+
+::ng-deep .search-date-control .btnpicker,
+::ng-deep .search-date-control .btnclear {
+  width: 24px !important;
+  min-width: 24px !important;
+  height: 30px !important;
+  padding: 0 !important;
+  border: none !important;
+  background: #f8fafc !important;
+}
+
+::ng-deep .search-date-control .btnpicker span,
+::ng-deep .search-date-control .btnclear span,
+::ng-deep .search-date-control .btnpicker i,
+::ng-deep .search-date-control .btnclear i {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+}

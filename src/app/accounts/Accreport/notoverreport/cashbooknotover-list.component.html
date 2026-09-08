@@ -1,0 +1,51 @@
+<div class="animated fadeIn" >  
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+        <div class="col-sm-12 col-md-10 col-lg-10 ">
+
+           
+            <div class="row  xyscroll"  style="height: 550px;">
+                <table class="table table-bordered table-sm-new table-striped  " >
+                    <thead>
+                        <tr class="title-head formheading table-primary">
+                        
+                            <th class="col-form-span-label" align="center">Entry No</th>
+                            <th class="col-form-span-label" align="center">	Entry Date</th>
+                            <th class="col-form-span-label" align="center">Cheque No</th>      
+                            <th class="col-form-span-label" align="center">Cheque Date</th>     
+                            <th class="col-form-span-label" align="center">Bank</th>     
+                            <th class="col-form-span-label" align="center">Account Name</th>      
+                            <th class="col-form-span-label" align="center">Amount </th>                        
+                        </tr>
+                    </thead>
+                    <tbody *ngIf="NotOverList.length > 0">
+                        <tr *ngFor="let data of NotOverList">
+                            <td ><span  class="col-form-span-label anchor-link" (click)="OpenPrint(data.entryno,data.status)" >{{data.entryno}}</span> </td> 
+                            <td  ><span class="col-form-span-label">{{data.entrydt}}</span>  </td>                             
+                            <td  ><span class="col-form-span-label">{{data.chequeno}}</span>  </td>
+                            <td  ><span class="col-form-span-label">{{data.chequedt}}</span>  </td>
+                            <td  ><span class="col-form-span-label">{{data.bank}}</span>  </td>
+                            <td  ><span class="col-form-span-label">{{data.acctname}}</span>  </td>
+                            <td  ><span class="col-form-span-label">{{data.actualamount}}</span>  </td>
+                        </tr>
+                    </tbody>
+                    <!-- <tr> <td colspan="7" class="centerlabel">
+                       &nbsp;
+                    </td>
+            </tr> -->
+                </table>
+            </div>
+            <div align="right">
+                <button class="btn btn-sm btn-primary" type="submit" (click)="ExportNotOver()" > <span
+                    class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
+                    Export To Excel </span></button>
+            </div>
+             
+        </div>
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+        
+                      
+    </div>  
+</div>

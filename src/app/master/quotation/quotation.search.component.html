@@ -1,0 +1,314 @@
+<!-- 
+ <div class="animated fadeIn">
+      <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>{{SearchTitle}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+   <div class="row no-gutters" *ngIf="displayType=='SEARCH'">
+        <div class="col-sm-3">
+        </div>
+        <div class="col-sm-6">
+            <table class="table table-bordered table-sm-new bgwhite" style="font-family:  Verdana;font-size: 12px;" *ngIf="quotationlist.length==0">
+                <tbody>
+               
+                    <tr class="trbg">
+                        <td class="col-form-span-label width100">
+                            <input type="radio" name="exampleRadios" value='1' [(ngModel)]="exampleRadios1">&nbsp; Client
+                        </td>
+                        <td class="col-form-span-label width240" colspan="4">
+                        
+                            <ng-select [items]="clientable"
+                            bindLabel="DATATEXTVALUE"
+                            bindValue="DATAVALUE"
+                            [(ngModel)]="client"
+                            class="custom"
+                            placeholder="--Please Select--"
+                            [disabled]="exampleRadios1 != '1'" >
+
+                         </ng-select>
+                        </td>
+                    </tr>
+
+
+            <tr class="trbg" >
+                <td class="col-form-span-label width100">
+                        <input   type="radio" name="exampleRadios" id="exampleRadios3"  [(ngModel)]="exampleRadios1"
+                            value="2" >
+                             Origin
+                </td>
+                <td colspan="4">
+                            <select class="form-control width240" [(ngModel)]="origin" [disabled]="exampleRadios1 != '2'">
+                            <option value="">--Please Select --</option>
+                            <option *ngFor="let d of origintable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+                        </select>
+
+                </td>
+            </tr >
+
+                    <tr class="trbg">
+
+                        <td class="col-form-span-label width100">
+
+
+                          <input type="radio" name="exampleRadios" id="exampleRadios2" [(ngModel)]="exampleRadios1"
+                              value="3"  >  Date
+                        </td>
+
+                              <td>
+                                  <span class="col-form-span-label width150"><b>Start Date</b> </span>
+                                  <span class="col-form-span-error">*</span>
+                              </td>
+                              <td>
+                                  <my-date-picker name="StartDate" [options]="myDatePickerOptions" [(ngModel)]="startdate" [disabled]="exampleRadios1 != '3'">
+                                  </my-date-picker>
+                      
+                              </td>
+                              <td>
+                                  <span class="col-form-span-label width150"><b>End Date</b> </span>
+                                  <span class="col-form-span-error">*</span>
+                              </td>
+                              <td>
+                                  <my-date-picker name="EndDate" [options]="myDatePickerOptions" [(ngModel)]="enddate" [disabled]="exampleRadios1 != '3'">
+                                  </my-date-picker>
+                                
+                              </td>
+
+              </tr>
+              <tr>
+                <td colspan="5" class="centerlabel">
+                    <button class="btn btn-sm btn-success" type="submit" (click)="searchlist()"><span
+                     class="col-form-span-label"><i class="fa fa-search"></i> Search</span></button>
+                     <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
+                                    (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
+                       
+                </td>
+            </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+     <div class="col-sm-3">
+        </div>
+    </div>
+ <div class="row no-gutters" *ngIf="displayType=='LIST'">
+        <div class="col-sm-1">
+        </div>
+         <div class="col-10 xyscroll" style="height:550px;" >
+              <table class="table  table-bordered table-sm-new bgwhite">
+                        <thead>
+                               <tr class="title-head formheading">
+                        <th colspan="6">
+                             <a href="javascript:void(0);" (click)="displayType='SEARCH';quotationlist=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
+                        </th>
+                    </tr>
+                            <tr class="col-form-span-heading" style="white-space:nowrap;">
+                             
+                                <th class="col-form-span-label">Quotation No</th>
+                                <th class="col-form-span-label">Client</th>
+                                <th class="col-form-span-label">Origin</th>
+                                <th class="col-form-span-label">Shipment Mode </th>
+                                <th class="col-form-span-label">Shipment Type</th>
+                                <th class="col-form-span-label">Shipping/AirLine</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bgwhite">
+                            <tr *ngFor="let obj of quotationlist| paginate: config">
+                              
+                                <td><span class="col-form-span-label anchor-link" (click)="ListOnclick(obj.PK_QUOTID,obj.QUOT_CODE,obj.SHIP_MODE)">{{obj.QUOT_CODE}}</span></td>
+                                <td><span class="col-form-span-label " >{{obj.EXP_SNAME}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.CLIENT_ORIGIN}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.SHIP_MODE}}</span></td>
+                                <td><span class="col-form-span-label">{{obj.SHIP_TYPE}}</span></td>
+                                <td *ngIf="obj.SHIP_MODE=='SEA'" class="col-form-span-label"> {{obj.SHIPPINGLINE }} </td>
+                                <td *ngIf="obj.SHIP_MODE=='AIR'" class="col-form-span-label"> {{obj.AIRLINENAME }} </td>
+                            </tr>
+                        </tbody>
+                    </table>
+         </div>
+         <div class="col-sm-1">
+        </div>
+    </div>
+
+
+</div> -->
+<div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header ">
+                    <strong *ngIf="displayType=='SEARCH'">Quotation Search</strong>
+                    <strong *ngIf="displayType=='LIST'">Quotation List</strong>
+                      <div style="float: right;">
+        <a href="javascript:void(0);" 
+           (click)="displayType='SEARCH'; quotationlist=[]"
+           class="text-danger fw-semibold back-link">
+          ← Back to Search
+        </a>
+        </div>
+                </div>
+                  
+            </div>
+        </div>
+    </div>
+<div class="row justify-content-center" *ngIf="displayType=='SEARCH'">
+  <div class="col-md-6">
+
+    <div class="search-card shadow rounded bg-white p-3">
+
+      <!-- <h6 class="text-center text-white p-2 rounded header-title">
+        {{SearchTitle}}
+      </h6> -->
+
+      <!-- Radio: Client -->
+<div class="search-row d-flex align-items-center mb-3">
+  <input type="radio" 
+         name="filterType" 
+         value="1" 
+         [(ngModel)]="exampleRadios1" 
+         class="mr-2">
+
+  <label class="fw-semibold mb-0 mr-3">Client</label>
+
+  <ng-select
+    [items]="clientable"
+    bindLabel="DATATEXTVALUE"
+    bindValue="DATAVALUE"
+    [(ngModel)]="client"
+    class="custom rounded-pill  liner-select"
+    placeholder="--Please Select--"
+    [disabled]="exampleRadios1 != '1'">
+  </ng-select>
+</div>
+      <!-- Radio: Mode -->
+   <div class="search-row d-flex align-items-center mb-3">
+        <input type="radio" name="filterType" value="2" [(ngModel)]="exampleRadios1" class="mr-2"> 
+        <label class="fw-semibold mb-0 mr-3">Mode</label>
+
+
+        <ng-select
+    [items]="shpmodetable"
+    bindLabel="DATATEXTVALUE"
+    bindValue="DATAVALUE"
+    [(ngModel)]="shipmode"
+    class="custom rounded-pill  short-select"
+    placeholder="--Please Select--"
+    [disabled]="exampleRadios1 != '2'">
+  </ng-select>
+
+      </div>
+      <!-- Radio: Origin -->
+   <div class="search-row d-flex align-items-center mb-3">
+        <input type="radio" name="filterType" value="3" [(ngModel)]="exampleRadios1" class="mr-2"> 
+        <label class="fw-semibold mb-0 mr-3">Origin</label>
+
+
+        <ng-select
+    [items]="origintable"
+    bindLabel="DATATEXTVALUE"
+    bindValue="DATAVALUE"
+    [(ngModel)]="origin"
+    class="custom rounded-pill  short-select"
+    placeholder="--Please Select--"
+    [disabled]="exampleRadios1 != '3'">
+  </ng-select>
+
+      </div>
+
+      <!-- Radio: Date -->
+      <div class="search-row d-flex align-items-center mb-3">
+        <div class="d-flex align-items-start mb-2">
+          <input type="radio" name="filterType" value="4" [(ngModel)]="exampleRadios1" class="mr-2">
+          <label class="fw-semibold">Date Range</label>
+        </div>
+
+        <div class="row">
+          <div class="col-6 p-0">
+            <label class="form-label medium">Start Date</label>
+            <my-date-picker
+              name="StartDate"
+              [options]="myDatePickerOptions"
+              [(ngModel)]="startdate"
+              [disabled]="exampleRadios1 != '4'">
+            </my-date-picker>
+          </div>
+
+          <div class="col-6">
+            <label class="form-label medium">End Date</label>
+            <my-date-picker
+              name="EndDate"
+              [options]="myDatePickerOptions"
+              [(ngModel)]="enddate"
+              [disabled]="exampleRadios1 != '4'">
+            </my-date-picker>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="text-center mt-3">
+        <button class="btn btn-success btn-sm me-2" (click)="searchlist()">
+          <i class="fa fa-search"></i> Search
+        </button>
+        <button class="btn btn-danger btn-sm" (click)="Reset()">
+          <i class="fa fa-ban"></i> Reset
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+<div class="row justify-content-center" *ngIf="displayType=='LIST'">
+
+  <div class="col-md-12">
+
+    <div class="list-card shadow rounded bg-white p-3">
+
+      <!-- Table -->
+      <div class="table-responsive">
+        <table class="table modern-table custom-table">
+          <thead>
+            <tr>
+              <th>Quotation No</th>
+              <th>Client</th>
+              <th>Origin</th>
+              <th>Shipment Mode</th>
+              <th>Shipment Type</th>
+              <th>Shipping / Airline</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let obj of quotationlist | paginate: config">
+              <td>
+                <span class="anchor-link text-primary fw-semibold"
+                      (click)="ListOnclick(obj.PK_QUOTID,obj.QUOT_CODE,obj.SHIP_MODE)">
+                  {{obj.QUOT_CODE}}
+                </span>
+              </td>
+
+              <td>{{obj.EXP_SNAME}}</td>
+              <td>{{obj.CLIENT_ORIGIN}}</td>
+              <td>{{obj.SHIP_MODE}}</td>
+              <td>{{obj.SHIP_TYPE}}</td>
+
+              <td>
+                <span *ngIf="obj.SHIP_MODE=='SEA'">{{obj.SHIPPINGLINE}}</span>
+                <span *ngIf="obj.SHIP_MODE=='AIR'">{{obj.AIRLINENAME}}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+

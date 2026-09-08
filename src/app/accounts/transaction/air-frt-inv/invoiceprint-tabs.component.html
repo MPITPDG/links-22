@@ -1,0 +1,708 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>{{Header|titlecase}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>{{SubHeader|titlecase}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-12 col-md-1 col-lg-1"> </div>
+        <div class="col-12 col-md-10 col-lg-10">
+            <div class="tab" role="tabpanel">
+                <div class="bor">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="zero-tab" data-toggle="tab" href="#zero" (click)="headerdata('View Invoice Details')">Frt. Invoice</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="one-tab" data-toggle="tab" href="#one" (click)="headerdata('View CreditNote Details')">Profit Sharing</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="two-tab" data-toggle="tab" href="#two" (click)="headerdata('View Console Purchase Details')">Console Purchase</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tab-content" style="height:500px;overflow-y:auto">
+                    <div role="tabpanel" class="tab-pane active" id="zero">
+                        <div class="row">
+                            <div class="col-12">
+                                <table class="table table-bordered table-sm-new bgwhite">
+
+                                    <tr>
+                                        <td class="col-form-span-heading" colspan="4">
+                                            <b>Invoice Details</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label"><b>Invoice No.</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detailtable.INV_NO}}</span></td>
+                                        <td> <span class="col-form-span-label"><b>Invoice Date</b> </span> </td>
+                                        <td>
+                                            <my-date-picker name="inv_date" [options]="myDatePickerOptions"
+                                                [selDate]="detailtable.INV_DATE"></my-date-picker>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-form-span-heading" colspan="4">
+                                            <b>Job Details</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <table class="table table-responsive-sm table-bordered">
+                                                <thead>
+                                                    <tr class="bakgrdliteBlue">
+                                                        <th
+                                                            class="col-form-span-label centerlabel font-weight-bold headerwhite">
+                                                            JOB NO</th>
+                                                        <th
+                                                            class="col-form-span-label centerlabel font-weight-bold headerwhite">
+                                                            PKGS</th>
+                                                        <th
+                                                            class="col-form-span-label centerlabel font-weight-bold headerwhite">
+                                                            GRWT</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody *ngIf="jobdetailtable.length>0">
+                                                        <tr *ngFor="let obj of jobdetailtable">                                                         
+                                                            <td><span class="col-form-span-label">{{obj.INV_JOBNO}}</span></td>
+                                                            <td><span class="col-form-span-label">{{obj.INV_PKGS}}</span></td>
+                                                            <td><span class="col-form-span-label">{{obj.INV_GRWT}}</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-form-span-heading" colspan="4">
+                                            <b>Main Details</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label"><b>Client Name</b> </span> </td>
+                                        <td colspan="3"> <span class="col-form-span-label">{{detailtable.CLIENTNAME}}</span> </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label"><b>Shipper Name</b> </span> </td>
+                                        <td colspan="3"> <span class="col-form-span-label">{{detailtable.SHIPPERNAME}}</span> </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label"><b>Bill Type</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detailtable.INV_BILLTYPE}}</span> </td>
+                                        <td> <span class="col-form-span-label"><b>Packages</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detailtable.INV_PKGS}}</span> </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label"><b>Type of PKGS</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detailtable.INV_TYPEOFPKG}}</span> </td>
+                                        <td> <span class="col-form-span-label"><b>No of PCS</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detailtable.INV_NOOFPCS}}</span> </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label"><b>Type of PCS</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detailtable.INV_TYPEOFPCS}}</span> </td>
+                                        <td> <span class="col-form-span-label"><b>Ref. No</b> </span></td>
+                                        <td> <span class="col-form-span-label">{{detailtable.INV_CLIENTREF}}</span> </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label"><b>Weight</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detailtable.INV_WT}}</span> </td>
+                                        <td> <span class="col-form-span-label"><b>Volume</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detailtable.INV_VOL}}</span> </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label"><b>HAWB NO</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detailtable.INV_HAWBNO}}</span> </td>
+                                        <td> <span class="col-form-span-label"><b>HAWB DT</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detailtable.INV_HAWBDT}}</span> </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label"><b>Carrier</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detailtable.INV_CARRIER}}</span> </td>
+                                        <td> <span class="col-form-span-label"><b>Goods</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detailtable.INV_GOODS}}</span> </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label"><b>Payable Date</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detailtable.PAYBLEBYDT}}</span> </td>
+                                        <td> <span class="col-form-span-label"><b>Total Amount</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detailtable.TOTALAMT}}</span> </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-form-span-heading" colspan="4">
+                                            <b>Currency Details</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+
+                                        <td>
+                                            <span class="col-form-span-label"><b>EURO</b> </span>
+                                        </td>
+                                        <td colspan="3">
+                                            <div style="display: inline-flex;">
+                                        <td> <span class="col-form-span-label">{{detailtable.INV_CUR}}</span> </td>
+                                        <td> <span class="col-form-span-label"><b>&nbsp;= INDIAN RUPEES &nbsp;</b>
+                                            </span></td>
+                                        <td> <span class="col-form-span-label">{{detailtable.INV_CURRATE}}</span> </td>
+                            </div>
+                            </td>
+
+                            </tr>
+                            <tr>
+
+                                <td>
+                                    <span class="col-form-span-label"><b>Narration</b> </span>
+                                </td>
+                                <td colspan="3">
+                                    <span class="col-form-span-label" [innerHtml]="detailtable.NARRATION"></span>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td class="col-form-span-heading" colspan="4">
+                                    <b>Account Details</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <table class="table table-responsive-sm table-bordered">
+                                        <thead>
+                                            <tr class="bakgrdliteBlue">
+                                                <th class="col-form-span-label centerlabel headerwhite"><b>Account
+                                                        Code</b></th>
+                                                <th class="col-form-span-label centerlabel  headerwhite"><b>Account
+                                                        Name</b></th>
+                                                <th class="col-form-span-label centerlabel headerwhite"><b>Charges
+                                                        Description</b></th>
+                                                <th class="col-form-span-label centerlabel headerwhite"><b>Invoice
+                                                        Taxable</b></th>
+                                                <th class="col-form-span-label centerlabel headerwhite"><b>INR
+                                                        Amount</b></th>
+                                                <th class="col-form-span-label centerlabel headerwhite"><b>EURO
+                                                        Amount</b></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody *ngIf="accountdetailtable.length>0">
+                                                        <tr *ngFor="let obj of accountdetailtable">                                                         
+                                                            <td><span class="col-form-span-label">{{obj.INV_ACCOUNT}}</span></td>
+                                                            <td><span class="col-form-span-label">{{obj.ACCTNAME}}</span></td>
+                                                            <td><span class="col-form-span-label">{{obj.CHRG_DESC}}</span></td>
+                                                            <td><span class="col-form-span-label">{{obj.INV_TAXABLE}}</span></td>
+                                                            <td><span class="col-form-span-label">{{obj.INV_INRAMT}}</span></td>
+                                                            <td><span class="col-form-span-label">{{obj.INV_AMOUNT}}</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-form-span-heading" colspan="4">
+                                    <b>Enclosure Details</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <table class="table table-responsive-sm table-bordered">
+                                        <thead>
+                                            <tr class="bakgrdliteBlue">
+                                                <th class="col-form-span-label centerlabel headerwhite"><b>Enclosure
+                                                        Code</b></th>
+                                                <th class="col-form-span-label centerlabel  headerwhite">
+                                                    <b>Description</b>
+                                                </th>
+                                                <th class="col-form-span-label centerlabel headerwhite"><b>Number </b>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody *ngIf="enclosuredetailtable.length>0">
+                                                        <tr *ngFor="let obj of enclosuredetailtable">                                                         
+                                                            <td><span class="col-form-span-label">{{obj.INV_ENCLCODE}}</span></td>
+                                                            <td><span class="col-form-span-label">{{obj.INV_DESC}}</span></td>
+                                                            <td><span class="col-form-span-label">{{obj.INV_NUMBER}}</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-form-span-heading" colspan="4">
+                                    <b>Despatch Details</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <table class="table table-responsive-sm table-bordered">
+                                        <thead>
+                                            <tr class="bakgrdliteBlue">
+                                                <th class="col-form-span-label centerlabel headerwhite"><b>Despatch
+                                                        Code</b></th>
+                                                <th class="col-form-span-label centerlabel  headerwhite">
+                                                    <b>Description</b>
+                                                </th>
+                                                <th class="col-form-span-label centerlabel headerwhite"><b>Number </b>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody *ngIf="despatchdetailtable.length>0">
+                                                        <tr *ngFor="let obj of despatchdetailtable">                                                         
+                                                            <td><span class="col-form-span-label">{{obj.INV_DESPCODE}}</span></td>
+                                                            <td><span class="col-form-span-label">{{obj.INV_DESC}}</span></td>
+                                                            <td><span class="col-form-span-label">{{obj.INV_NUMBER}}</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="one">
+                    <div class="row">
+                        <div class="col-12">
+                            <table class="table table-bordered table-sm-new bgwhite">
+
+                                <tr>
+                                    <td class="col-form-span-heading" colspan="4">
+                                        <b>Credit Note Details</b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td> <span class="col-form-span-label"><b>CreditNote No.</b> </span> </td>
+                                    <td> <span class="col-form-span-label">{{detailtable_CN.CRT_NO}}</span></td>
+                                    <td> <span class="col-form-span-label"><b>CreditNote Date</b> </span> </td>
+                                    <td>
+                                        <my-date-picker name="crt_date" [options]="myDatePickerOptions"
+                                        [selDate]="detailtable_CN.CRT_DATE"></my-date-picker>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-form-span-heading" colspan="4">
+                                        <b>Job Details</b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <table class="table table-responsive-sm table-bordered">
+                                            <thead>
+                                                <tr class="bakgrdliteBlue">
+                                                    <th
+                                                        class="col-form-span-label centerlabel font-weight-bold headerwhite">
+                                                        JOB NO</th>
+                                                    <th
+                                                        class="col-form-span-label centerlabel font-weight-bold headerwhite">
+                                                        PKGS</th>
+                                                    <th
+                                                        class="col-form-span-label centerlabel font-weight-bold headerwhite">
+                                                        GRWT</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody *ngIf="jobdetailtable_CN.length>0">
+                                                    <tr *ngFor="let obj of jobdetailtable_CN">                                                         
+                                                        <td><span class="col-form-span-label">{{obj.CRT_JOBNO}}</span></td>
+                                                        <td><span class="col-form-span-label">{{obj.CRT_PKGS}}</span></td>
+                                                        <td><span class="col-form-span-label">{{obj.CRT_GRWT}}</span></td>
+                                                    </tr>
+                                                </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-form-span-heading" colspan="4">
+                                        <b>Main Details</b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td> <span class="col-form-span-label"><b>Client Name</b> </span> </td>
+                                    <td colspan="3"> <span class="col-form-span-label">{{detailtable_CN.CRT_CLIENTNAME}}</span> </td>
+                                </tr>
+                                <tr>
+                                    <td> <span class="col-form-span-label"><b>Shipper Name</b> </span> </td>
+                                    <td colspan="3"> <span class="col-form-span-label">{{detailtable_CN.CRT_SHIPPERNAME}}</span> </td>
+                                </tr>
+                                <tr>
+                                    <td> <span class="col-form-span-label"><b>Bill Type</b> </span> </td>
+                                    <td> <span class="col-form-span-label">{{detailtable_CN.CRT_BILLTYPE}}</span> </td>
+                                    <td> <span class="col-form-span-label"><b>Packages</b> </span> </td>
+                                    <td> <span class="col-form-span-label">{{detailtable_CN.CRT_PKGS}}</span> </td>
+                                </tr>
+                                <tr>
+                                    <td> <span class="col-form-span-label"><b>Type of PKGS</b> </span> </td>
+                                    <td> <span class="col-form-span-label">{{detailtable_CN.CRT_TYPEOFPKG}}</span> </td>
+                                    <td> <span class="col-form-span-label"><b>No of PCS</b> </span> </td>
+                                    <td> <span class="col-form-span-label">{{detailtable_CN.CRT_NOOFPCS}}</span> </td>
+                                </tr>
+                                <tr>
+                                    <td> <span class="col-form-span-label"><b>Type of PCS</b> </span> </td>
+                                    <td> <span class="col-form-span-label">{{detailtable_CN.CRT_TYPEOFPCS}}</span> </td>
+                                    <td> <span class="col-form-span-label"><b>Ref. No</b> </span></td>
+                                    <td> <span class="col-form-span-label">{{detailtable_CN.CRT_CLIENTREF}}</span> </td>
+                                </tr>
+                                <tr>
+                                    <td> <span class="col-form-span-label"><b>Weight</b> </span> </td>
+                                    <td> <span class="col-form-span-label">{{detailtable_CN.CRT_WT}}</span> </td>
+                                    <td> <span class="col-form-span-label"><b>Volume</b> </span> </td>
+                                    <td> <span class="col-form-span-label">{{detailtable_CN.CRT_VOL}}</span> </td>
+                                </tr>
+                                <tr>
+                                    <td> <span class="col-form-span-label"><b>HAWB NO</b> </span> </td>
+                                    <td> <span class="col-form-span-label">{{detailtable_CN.CRT_HAWBNO}}</span> </td>
+                                    <td> <span class="col-form-span-label"><b>HAWB DT</b> </span> </td>
+                                    <td> <span class="col-form-span-label">{{detailtable_CN.CRT_HAWBDT}}</span> </td>
+                                </tr>
+                                <tr>
+                                    <td> <span class="col-form-span-label"><b>Carrier</b> </span> </td>
+                                    <td> <span class="col-form-span-label">{{detailtable_CN.CRT_CARRIER}}</span> </td>
+                                    <td> <span class="col-form-span-label"><b>Goods</b> </span> </td>
+                                    <td> <span class="col-form-span-label">{{detailtable_CN.CRT_GOODS}}</span> </td>
+                                </tr>
+                                <tr>
+                                    <td> <span class="col-form-span-label"><b>Total Amount</b> </span> </td>
+                                    <td> <span class="col-form-span-label">{{amountable_CN.TOTINRAMT}}</span> </td>
+                                    <td> <span class="col-form-span-label"><b>Balance Amount</b> </span> </td>
+                                    <td> <span class="col-form-span-label"></span> </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-form-span-heading" colspan="4">
+                                        <b>Currency Details</b>
+                                    </td>
+                                </tr>
+                                <tr>
+
+                                    <td>
+                                        <span class="col-form-span-label"><b>EURO</b> </span>
+                                    </td>
+                                    <td colspan="3">
+                                        <div style="display: inline-flex;">
+                                    <td> <span class="col-form-span-label">{{detailtable_CN.CRT_CUR}}</span> </td>
+                                    <td> <span class="col-form-span-label"><b>&nbsp;= INDIAN RUPEES &nbsp;</b> </span>
+                                    </td>
+                                    <td> <span class="col-form-span-label">{{detailtable_CN.CRT_CURRATE}}</span> </td>
+                        </div>
+                        </td>
+
+                        </tr>
+                        <tr>
+
+                            <td>
+                                <span class="col-form-span-label"><b>Narration</b> </span>
+                            </td>
+                            <td colspan="3">
+                                <span class="col-form-span-label" [innerHtml]="detailtable_CN.NARRATION"></span>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td class="col-form-span-heading" colspan="4">
+                                <b>Account Details</b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <table class="table table-responsive-sm table-bordered">
+                                    <thead>
+                                        <tr class="bakgrdliteBlue">
+                                            <th class="col-form-span-label centerlabel headerwhite"><b>Account
+                                                    Code</b></th>
+                                            <th class="col-form-span-label centerlabel  headerwhite"><b>Account
+                                                    Name</b></th>
+                                            <th class="col-form-span-label centerlabel headerwhite"><b>Charges
+                                                    Description</b></th>
+                                            <th class="col-form-span-label centerlabel headerwhite"><b>Invoice
+                                                    Taxable</b></th>
+                                            <th class="col-form-span-label centerlabel headerwhite"><b>INR
+                                                    Amount</b></th>
+                                            <th class="col-form-span-label centerlabel headerwhite"><b>EURO
+                                                    Amount</b></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody *ngIf="accountdetailtable_CN.length>0">
+                                                    <tr *ngFor="let obj of accountdetailtable_CN">                                                         
+                                                        <td><span class="col-form-span-label">{{obj.CRT_ACCOUNT}}</span></td>
+                                                        <td><span class="col-form-span-label">{{obj.ACCTNAME}}</span></td>
+                                                        <td><span class="col-form-span-label">{{obj.CHRG_DESC}}</span></td>
+                                                        <td><span class="col-form-span-label"></span></td>
+                                                        <td><span class="col-form-span-label">{{obj.CRT_INRAMT}}</span></td>
+                                                        <td><span class="col-form-span-label">{{obj.CRT_AMOUNT}}</span></td>
+                                                    </tr>
+                                                </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-form-span-heading" colspan="4">
+                                <b>Enclosure Details</b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <table class="table table-responsive-sm table-bordered">
+                                    <thead>
+                                        <tr class="bakgrdliteBlue">
+                                            <th class="col-form-span-label centerlabel headerwhite"><b>Enclosure
+                                                    Code</b></th>
+                                            <th class="col-form-span-label centerlabel  headerwhite">
+                                                <b>Description</b>
+                                            </th>
+                                            <th class="col-form-span-label centerlabel headerwhite"><b>Number </b>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <!-- <tbody *ngIf="Accountlist.length>0">
+                                                    <tr *ngFor="let obj of Accountlist">                                                         
+                                                        <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>
+                                                        <td><span class="col-form-span-label">{{obj.DEDUCTION}}</span></td>
+                                                        <td><span class="col-form-span-label">{{obj.SRPIPASSAMOUNT}}</span></td>
+                                                    </tr>
+                                                </tbody> -->
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-form-span-heading" colspan="4">
+                                <b>Despatch Details</b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <table class="table table-responsive-sm table-bordered">
+                                    <thead>
+                                        <tr class="bakgrdliteBlue">
+                                            <th class="col-form-span-label centerlabel headerwhite"><b>Despatch
+                                                    Code</b></th>
+                                            <th class="col-form-span-label centerlabel  headerwhite">
+                                                <b>Description</b>
+                                            </th>
+                                            <th class="col-form-span-label centerlabel headerwhite"><b>Number </b>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <!-- <tbody *ngIf="Accountlist.length>0">
+                                                    <tr *ngFor="let obj of Accountlist">                                                         
+                                                        <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>
+                                                        <td><span class="col-form-span-label">{{obj.DEDUCTION}}</span></td>
+                                                        <td><span class="col-form-span-label">{{obj.SRPIPASSAMOUNT}}</span></td>
+                                                    </tr>
+                                                </tbody> -->
+                                </table>
+                            </td>
+                        </tr>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+
+            <div role="tabpanel" class="tab-pane" id="two">
+                <div class="row">
+                    <div class="col-12">                 
+                    <div class="accordion md-accordion" id="accordionEx" role="tablist" >
+                        <div class="card">
+                          <div class="card-header" role="tab" id="headingOne1">
+                            <a class="collapsed" data-toggle="collapse"  href="#collapseOne1" aria-expanded="false"
+                              aria-controls="collapseOne1">
+                              <p class="mb-0">
+                                    <i class="fa fa-plus rotate-icon "></i>&nbsp;&nbsp;Purchase Details Against MP India AirFreight Invoice
+                              </p>
+                            </a>
+                          </div>
+                          <div id="collapseOne1" class="collapse show" role="tabpanel" aria-labelledby="headingOne1"
+                            >
+                            <div class="card-body">
+                                <table class="table table-bordered table-sm-new bgwhite">
+                                    <tr>
+                                        <td> <span class="col-form-span-label"><b>Entry No.</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detail_pur1.ENTRYNO}}</span></td>
+                                        <td> <span class="col-form-span-label"><b>Entry Date</b> </span> </td>
+                                        <td>
+                                            <my-date-picker name="inv_date" [options]="myDatePickerOptions"
+                                            [selDate]="detail_pur1.ENTRYDT"></my-date-picker>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-form-span-heading" colspan="4">
+                                            <b>Main Details</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label"><b>Shipper</b> </span> </td>
+                                        <td colspan="3"> <span class="col-form-span-label">{{detail_pur1.SUPPLIER_NAME}}</span> </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label"><b>Bill No</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detail_pur1.BILLNO}}</span> </td>
+                                        <td> <span class="col-form-span-label"><b>To Be Paid On</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detail_pur1.PAIDDT}}</span> </td>
+                                    </tr>
+        
+                                    <tr>
+                                        <td class="col-form-span-heading" colspan="4">
+                                            <b>Account Details</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <table class="table table-responsive-sm table-bordered">
+                                                <thead>
+                                                    <tr class="bakgrdliteBlue">
+                                                        <th class="col-form-span-label centerlabel headerwhite"><b>Account
+                                                                Code</b></th>
+                                                        <th class="col-form-span-label centerlabel  headerwhite"><b>Account
+                                                                Name</b></th>
+                                                        <th class="col-form-span-label centerlabel headerwhite"><b>MAWB NO </b>
+                                                        </th>
+                                                        <th class="col-form-span-label centerlabel headerwhite"><b>JOB No </b>
+                                                        </th>
+                                                        <th class="col-form-span-label centerlabel headerwhite"><b>Payable Euro
+                                                            </b></th>
+                                                        <th class="col-form-span-label centerlabel headerwhite"><b>Short
+                                                                Narration </b></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody *ngIf="account_pur1.length>0">
+                                                    <tr *ngFor="let obj of account_pur1">                                                         
+                                                        <td><span class="col-form-span-label">{{obj.ACCOUNT}}</span></td>
+                                                        <td><span class="col-form-span-label">{{obj.ACC_NAME}}</span></td>
+                                                        <td><span class="col-form-span-label">{{obj.MAWBMBL}}</span></td>
+                                                        <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
+                                                        <td><span class="col-form-span-label">{{obj.DEDUCTIONEURO}}</span></td>
+                                                        <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+        
+                                        <td>
+                                            <span class="col-form-span-label"><b>Payable EURO</b> </span>
+                                        </td>
+                                        <td colspan="3"> <span class="col-form-span-label">{{payable_euro}}</span> </td>
+        
+                            </tr>
+                            </table>                            </div>
+                          </div>
+                        </div>
+                        <div class="card">
+                          <div class="card-header" role="tab" id="headingTwo2">
+                            <a class="collapsed" data-toggle="collapse" href="#collapseTwo2" aria-expanded="false"
+                              aria-controls="collapseTwo2">
+                              <p class="mb-0">
+                                    <i class="fa fa-plus rotate-icon "></i>&nbsp;&nbsp;Purchase Details Against MP India Share Of Profit Creditnote Details
+                              </p>
+                            </a>
+                          </div>
+                          <div id="collapseTwo2" class="collapse" role="tabpanel" aria-labelledby="headingTwo2" >
+                            <div class="card-body">
+                                <table class="table table-bordered table-sm-new bgwhite">
+                                    <tr>
+                                        <td> <span class="col-form-span-label"><b>Entry No.</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detail_pur2.ENTRYNO}}</span></td>
+                                        <td> <span class="col-form-span-label"><b>Entry Date</b> </span> </td>
+                                        <td>
+                                            <my-date-picker name="inv_date" [options]="myDatePickerOptions"
+                                            [selDate]="detail_pur2.ENTRYDT"></my-date-picker>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-form-span-heading" colspan="4">
+                                            <b>Main Details</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label"><b>Shipper</b> </span> </td>
+                                        <td colspan="3"> <span class="col-form-span-label">{{detail_pur2.SUPPLIER_NAME}}</span> </td>
+                                    </tr>
+                                    <tr>
+                                        <td> <span class="col-form-span-label"><b>Bill No</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detail_pur2.BILLNO}}</span> </td>
+                                        <td> <span class="col-form-span-label"><b>To Be Paid On</b> </span> </td>
+                                        <td> <span class="col-form-span-label">{{detail_pur2.PAIDDT}}</span> </td>
+                                    </tr>
+        
+                                    <tr>
+                                        <td class="col-form-span-heading" colspan="4">
+                                            <b>Account Details</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <table class="table table-responsive-sm table-bordered">
+                                                <thead>
+                                                    <tr class="bakgrdliteBlue">
+                                                        <th class="col-form-span-label centerlabel headerwhite"><b>Account
+                                                                Code</b></th>
+                                                        <th class="col-form-span-label centerlabel  headerwhite"><b>Account
+                                                                Name</b></th>
+                                                        <th class="col-form-span-label centerlabel headerwhite"><b>MAWB NO </b>
+                                                        </th>
+                                                        <th class="col-form-span-label centerlabel headerwhite"><b>JOB No </b>
+                                                        </th>
+                                                        <th class="col-form-span-label centerlabel headerwhite"><b>Deduction Euro
+                                                            </b></th>
+                                                        <th class="col-form-span-label centerlabel headerwhite"><b>Short
+                                                                Narration </b></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody *ngIf="account_pur2.length>0">
+                                                            <tr *ngFor="let obj of account_pur2">                                                         
+                                                                <td><span class="col-form-span-label">{{obj.ACCOUNT}}</span></td>
+                                                                <td><span class="col-form-span-label">{{obj.ACC_NAME}}</span></td>
+                                                                <td><span class="col-form-span-label">{{obj.MAWBMBL}}</span></td>
+                                                                <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
+                                                                <td><span class="col-form-span-label">{{obj.DEDUCTIONEURO}}</span></td>
+                                                                <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
+                                                            </tr>
+                                                        </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+        
+                                        <td>
+                                            <span class="col-form-span-label"><b>Receivable EURO</b> </span>
+                                        </td>
+                                        <td colspan="3"> <span class="col-form-span-label">{{receive_euro}}</span> </td>
+        
+                            </tr>
+                            </table>                              
+                            </div>
+                          </div>
+                      
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div></div>
+    <div align="center" class="border p-1">
+        <button class="btn btn-sm btn-success" type="submit" (click)="abort()"> <span class="col-form-span-label"><i
+                    class="fa fa-dot-circle-o"></i>Abort</span></button>
+        <button class="btn btn-sm btn-danger" type="submit" (click)="generate()"> <span class="col-form-span-label"><i
+                    class="fa fa-dot-circle-o"></i>Generate</span></button>
+    </div>
+
+</div>
+<div class="col-12 col-md-1 col-lg-1"> </div>
+</div>
+</div>

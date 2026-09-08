@@ -1,0 +1,245 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters"  >
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>{{Header}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div  class="row no-gutters">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+               <tr>
+                <td class="col-form-span-heading" colspan="6"> <b>{{PageType}}</b> </td>
+                </tr>
+           <tr class="trbg">
+             <td rowspan="3">
+                <span class="col-form-span-label"><b>Title</b> </span>
+             </td>  
+            <td colspan="2">
+            <div class="leftlabel">
+                <span class="col-form-span-label">
+                <input type="radio" name="radioDisplay" value="EXPORTNO" (change)="lblchange($event)" [(ngModel)]="rdbtype" />&nbsp;Export No </span>&nbsp;&nbsp;&nbsp;&nbsp;
+           </div>
+            </td>
+            <td colspan="2">
+                <div class="leftlabel">
+                <span class="col-form-span-label">
+                <input type="radio" name="radioDisplay" value="FCR_NO" (change)="lblchange($event)" [(ngModel)]="rdbtype" />&nbsp;FCR No</span>
+                 </div>
+            </td>
+         </tr>
+          <tr class="trbg">
+            <td colspan="2" >
+                <div class="leftlabel">
+                    <span class="col-form-span-label">
+                     <input type="radio" name="radioDisplay" value="HAWB_NO" (change)="lblchange($event)" [(ngModel)]="rdbtype" />&nbsp;HAWB No</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                  </div>
+                      </td>
+                      <td colspan="2" >
+                        <div class="leftlabel">
+                    <span class="col-form-span-label">
+                   <input type="radio" name="radioDisplay" value="MAWB_NO" (change)="lblchange($event)" [(ngModel)]="rdbtype"  />&nbsp;MAWB No</span>
+                         </div>
+                  </td>         
+          </tr> 
+          <tr class="trbg">
+            <td colspan="4" >
+                <div class="leftlabel">
+                    <span class="col-form-span-label">
+                     <input type="radio" name="radioDisplay" value="containerno" (change)="lblchange($event)" [(ngModel)]="rdbtype" />&nbsp;CONTAINER No</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                  </div>
+                      </td>
+                 
+          </tr>
+          <tr class="trbg">
+              <td>
+                <span class="col-form-span-label"><b>{{lblexportNo}}</b> </span>
+              </td>
+            <td colspan="4" >
+                <div class="leftlabel">
+                    <span class="col-form-span-label">
+                         <input [(ngModel)]="ExportNo"  type="text"  class="form-control width150" maxlength="40" > 
+                    </span>
+                </div>
+            </td>
+            </tr>
+                    <tr>
+                    <td colspan="6" class="centerlabel">
+                        <button class="btn btn-sm btn-primary" type="submit" (click)="SearchData()" > <span
+                             class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i>
+                              Search </span></button>&nbsp;
+                             <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+         </div>
+         <br>
+         <br>
+         <div  class="row no-gutters" *ngIf="rdbtype=='containerno' && ContainerDataList.length>0">
+            <div class="col-sm-12 col-md-3 col-lg-3">
+            </div>
+           
+        <div class="col-sm-12 col-md-6 col-lg-6 " >
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead>
+                    <tr class="title-head formheading table-primary">
+                           <th class="col-form-span-label" align="center">Container No</th>
+                           <th class="col-form-span-label" align="center">Vessel Det</th>
+                           <th class="col-form-span-label" align="center">Verified</th>
+                           <th class="col-form-span-label" align="center">Load Confirmation</th>
+                                        
+                       </tr>
+                   </thead>
+                   <tbody>
+                    <tr *ngFor="let data of ContainerDataList">
+                      <td class="col-form-span-label">{{data.CONTAINERNO}}</td>
+                      <td class="col-form-span-label">{{data.expt_vessel}}</td>
+                      <td class="col-form-span-label" style="color: red;">{{data.verified}}</td>
+                      <td class="col-form-span-label" style="color: red;">{{data.loaddt}}</td>
+                    </tr>
+                  </tbody>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+    </div>
+    <div  class="row no-gutters" *ngIf="rdbtype!='containerno' && OtherDataList.length>0">
+        <div class="col-sm-12 col-md-2 col-lg-2">
+        </div>
+       
+    <div class="col-sm-12 col-md-8 col-lg-8" >
+
+        <table class="table table-bordered table-sm-new bgwhite">
+            <thead>
+                <tr class="title-head formheading table-primary">
+                       <th class="col-form-span-label" align="center">Mawb No</th>
+                       <th class="col-form-span-label" align="center">Destination</th>
+                       <th class="col-form-span-label" align="center">Pkgs</th>
+                       <th class="col-form-span-label" align="center">Grwt</th>
+                       <th class="col-form-span-label" align="center">Chbl Wt</th>
+                       <th class="col-form-span-label" align="center">Planned Flight Det</th>
+                       <th class="col-form-span-label" align="center">Actual Flight Det</th>
+                       <th class="col-form-span-label" align="center">ETA</th>
+                   </tr>
+               </thead>
+               <tbody>
+                <tr *ngFor="let data of OtherDataList">
+                  <td class="col-form-span-label">{{data.MAWBNO}}</td>
+                  <td class="col-form-span-label">{{data.MAWBDEST}}</td>
+                  <td class="col-form-span-label">{{data.P_PKGS}}</td>
+                  <td class="col-form-span-label">{{data.P_GRWT}}</td>
+                  <td class="col-form-span-label">{{data.P_CHBLWT}}</td>
+                  <td class="col-form-span-label">{{data.FLIGHTDTLS}}</td>
+                  <td class="col-form-span-label">{{data.ACTFLIGHTDTLS}}</td>
+                  <td class="col-form-span-label">{{data.ETAPORT1}}</td>
+                </tr>
+              </tbody>
+        </table>
+    </div>
+    <div class="col-sm-12 col-md-2 col-lg-2">
+    </div>
+</div>
+<div class="row no-gutters" *ngIf="rdbtype=='containerno' && ContainerData.length>1">
+         <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+        <div class="col-sm-12 col-md-10 col-lg-10 "  >
+            <div class="row xyscroll"  style="height: 250px;">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead>
+                    <tr class="title-head formheading table-primary">
+                           <th class="col-form-span-label" align="center">Expt No</th>
+                           <th class="col-form-span-label" align="center">Invoice no</th>
+                           <th class="col-form-span-label" align="center">Shipper</th>
+                           <th class="col-form-span-label" align="center">Consignee</th>
+                           <th class="col-form-span-label" align="center">Gr Wt</th>
+                           <th class="col-form-span-label" align="center">Net Wt</th>
+                           <th class="col-form-span-label" align="center">CBM</th>
+                           <th class="col-form-span-label" align="center">PCS</th> 
+                           <th class="col-form-span-label" align="center">PKGs</th>      
+                           <th class="col-form-span-label" align="center">FCR No</th>      
+                           <th class="col-form-span-label" align="center">FCR Dt</th>      
+                           <th class="col-form-span-label" align="center">Order No</th>      
+                           <th class="col-form-span-label" align="center">CLPSEQUENCE</th>               
+                       </tr>
+                   </thead>
+                   <tbody>
+                    <tr *ngFor="let data of ContainerData">
+                      <td class="col-form-span-label anchor-link"  (click)="ViewConsignment(data.EXPTNO)">{{data.EXPTNO}}</td>
+                      <td class="col-form-span-label">{{data.INVNO}}</td>
+                      <td class="col-form-span-label">{{data.SHIPPER}}</td>
+                      <td class="col-form-span-label">{{data.CONSIGNEE}}</td>
+                      <td class="col-form-span-label">{{data.GRWT}}</td>
+                      <td class="col-form-span-label">{{data.NETWT}}</td>
+                      <td class="col-form-span-label">{{data.CBM}}</td>
+                      <td class="col-form-span-label">{{data.PCS}}</td>
+                      <td class="col-form-span-label">{{data.NOOFPKGS}}</td>
+                      <td class="col-form-span-label">{{data.FCR_NO}}</td>
+                      <td class="col-form-span-label">{{data.FCR_DATE}}</td>
+                      <td class="col-form-span-label">
+                        <p    style="white-space: pre-wrap;width: 200px; " >{{data.ORDERNO}}</p>  </td>
+                      <td class="col-form-span-label">{{data.CLPSEQUENCE}}</td>
+                    </tr>
+                  </tbody>
+            </table>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+    </div>
+    <div class="row no-gutters" *ngIf="rdbtype!='containerno' && ContainerData.length>1">
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+        <div class="col-sm-12 col-md-10 col-lg-10 "  >
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead>
+                    <tr class="title-head formheading table-primary">
+                           <th class="col-form-span-label" align="center">expt No</th>
+                           <th class="col-form-span-label" align="center">Invoice no</th>
+                           <th class="col-form-span-label" align="center">Shipper</th>
+                           <th class="col-form-span-label" align="center">Consignee</th>
+                           <th class="col-form-span-label" align="center">Gr Wt</th>
+                           <th class="col-form-span-label" align="center">Volume</th>
+                           <th class="col-form-span-label" align="center">Vol. wt</th>
+                           <th class="col-form-span-label" align="center">Chbl Wt</th> 
+                           <th class="col-form-span-label" align="center">Pkgs</th>      
+                           <th class="col-form-span-label" align="center">Hawb No</th>      
+                           <th class="col-form-span-label" align="center">Hawb Dt</th>      
+                           <th class="col-form-span-label" align="center">Order No.</th>      
+                           <th class="col-form-span-label" align="center">Freight</th>               
+                       </tr>
+                   </thead>
+                   <tbody>
+                    <tr *ngFor="let data of ContainerData">
+                      <td class="col-form-span-label anchor-link"  (click)="ViewConsignment(data.EXPTNO)">{{data.EXPTNO}}</td>
+                      <td class="col-form-span-label">{{data.INVNO}}</td>
+                      <td class="col-form-span-label">{{data.SHIPPER}}</td>
+                      <td class="col-form-span-label">{{data.CONSIGNEE}}</td>
+                      <td class="col-form-span-label">{{data.GRWT}}</td>
+                      <td class="col-form-span-label">{{data.VOLUME}}</td>
+                      <td class="col-form-span-label">{{data.VOLWT}}</td>
+                      <td class="col-form-span-label">{{data.CHBLWT}}</td>
+                      <td class="col-form-span-label">{{data.PKGS}}</td>
+                      <td class="col-form-span-label">{{data.HAWBNO}}</td>
+                      <td class="col-form-span-label">{{data.HAWBDT}}</td>
+                      <td class="col-form-span-label">{{data.ORDER_NO}}</td>
+                      <td class="col-form-span-label">{{data.FREIGHT}}</td>
+                    </tr>
+                  </tbody>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+    </div>
+</div>

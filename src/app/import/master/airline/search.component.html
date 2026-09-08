@@ -1,0 +1,57 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>Airline - SEARCH</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+        </div>
+        <div class="col-sm-6">
+            <table class="table table-sm-new bgwhite">
+                <tr>
+                    <td class="width90">
+                        <span class="col-form-span-label">Airline Name:
+                            <span class="col-form-span-error">*</span>
+                        </span>
+                    </td>
+                    <td>
+                        <input type="text" [(ngModel)]="Input" class="form-control" />
+                    </td>
+                    <td class="width100">
+                        <button type="button" name="submitButton" class="btn btn-sm btn-info" (click)="search();">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-search"></i>&nbsp;Search</span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-3">
+        </div>
+    </div><br/>
+    <div class="row" *ngIf="List.length > 0">
+        <div class="col-sm-2">
+        </div>
+        <div class="col-sm-8">
+            <div class="yscroll" style="max-height: 250px">
+                <table class="table table-bordered table-sm-new bgwhite">
+                    <tr class="col-form-span-heading">
+                        <th class="width100"><span class="col-form-span-label">Airline Code</span></th>
+                        <th><span class="col-form-span-label">Airline Name</span> </th>
+                    </tr>
+                    <tr *ngFor="let obj of List" class="tr-hover" (click)="goTo(obj.pk_ArilineId)" style="cursor:pointer;">
+                        <td class="width150"><span class="col-form-span-label">{{obj["Airline Code"]}}</span></td>
+                        <td><span class="col-form-span-label">{{obj["Airline Name"]}}</span> </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="col-sm-2">
+        </div>
+    </div>
+</div>

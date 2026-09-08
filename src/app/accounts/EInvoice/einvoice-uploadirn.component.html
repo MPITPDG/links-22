@@ -1,0 +1,108 @@
+<div class="animated fadeIn" >
+    <div class="row no-gutters"  >
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>{{Header}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters" >
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr>
+                    <td class="col-form-span-heading" colspan="6"> <b>UPLOAD DETAILS</b> </td>
+                </tr>
+                <tr>
+                    <td class="width130">
+                        <span  class="col-form-span-label"><b>Trans Type</b> </span><span
+                        class="col-form-span-error">*</span>
+                    </td>
+                    <td colspan="3" >
+                        <div >
+                            <span class="col-form-span-label">
+                             <input type="radio" name="radioDisplay" value="INV" (change)="lblchange($event)" [(ngModel)]="rdbtype" />&nbsp;Invoice</span>&nbsp;&nbsp;&nbsp;&nbsp;
+
+                             <span class="col-form-span-label">
+                                <input type="radio" name="radioDisplay" value="CN" (change)="lblchange($event)" [(ngModel)]="rdbtype"  />&nbsp;Credit Note</span>
+                          </div>
+
+                                <!-- <div >
+                            <span class="col-form-span-label">
+                           <input type="radio" name="radioDisplay" value="CN" (change)="lblchange($event)" [(ngModel)]="rdbtype"  />&nbsp;Credit Note</span>
+                                 </div> -->
+                          </td>
+                 </tr>
+                 <tr>
+                    <td>
+                        <span class="col-form-span-label"><b>Select File</b> </span>
+                        <span class="col-form-span-error">*</span>
+                    </td>
+                <td colspan="3">
+                    <input  type="file" #inputFile  accept=".csv,.xls,.xlsx,.doc,.docx,.ppt,.pptx,.txt,.pdf,.png" (change)="onFileChange($event)" class="form-control width180">
+                     <!-- <input #fileUpload type="file" class="col-form-span-label" (change)="fileChangeEvent($event)" placeholder="Upload file..." multiple accept=".pdf" /> -->
+                     <!-- <input type="text" #Caption ngModel name="Caption" id="Caption"> -->
+                </td>
+
+                </tr>
+                <tr>
+                    <td>
+                      
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-success" type="submit" (click)="onupload()"><span
+                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Upload</span></button>
+                            &nbsp;&nbsp;
+                        <button class="btn btn-sm btn-danger" type="submit" (click)="Reset()"> <span
+                            class="col-form-span-label"><i class="fa fa-ban"></i>Reset</span></button>
+                    </td>
+                </tr>
+
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-12 col-lg-12 ">
+        <table class="table table-bordered table-sm-new bgwhite">
+            <thead>
+                <tr class="col-form-span-heading">
+                   
+                    <th   align="center"><span  class="col-form-span-label"> INV NO</span></th>
+                    <th   align="center"><span  class="col-form-span-label"> INV DATE</span> </th>
+                    <th   align="center"><span  class="col-form-span-label">  SUPPLY TYPE</span></th>
+                    <th   align="center"> <span  class="col-form-span-label"> CLIENT</span> </th>
+                    <th   align="center"> <span  class="col-form-span-label"> IRN NO</span> </th>
+                    <th   align="center"> <span  class="col-form-span-label">ACK NO</span> </th>
+                    <th   align="center"> <span  class="col-form-span-label">ACK DT</span> </th>
+                    <th   align="center"> <span  class="col-form-span-label">JSON CREATED BY</span> </th>
+                    <th   align="center"> <span  class="col-form-span-label">RESPONSE UPDATED BY</span> </th>
+                </tr>
+            </thead>
+            <tbody *ngIf="data_table.length > 0">
+                <tr *ngFor="let data of data_table">
+                  
+                    <td><span  class="col-form-span-label">{{data.INVNO}}</span>  </td>
+                    <td><span class="col-form-span-label">{{data.INVDATE}}</span>   </td>
+                    <td><span  class="col-form-span-label">{{data.SUPTYPE}}</span>  </td>
+                    <td><span  class="col-form-span-label">{{data.CLIENTNAME}}</span>  </td>
+                    <td><span  class="col-form-span-label">{{data.IRNNO}}</span>  </td>
+                    <td><span  class="col-form-span-label">{{data.ACKNO}}</span>  </td>
+                    <td><span  class="col-form-span-label">{{data.ACKDATE}}</span>  </td>
+                    <td><span  class="col-form-span-label">{{ data['JSON CREATED BY']}}</span>  </td>
+                    <td><span  class="col-form-span-label">{{ data['RESPONSE UPDATED BY']}}</span>  </td>
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+

@@ -1,0 +1,119 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>EXPORT - {{Header}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
+        </div>
+        <div class="col-sm-6">
+            <table class="table table-sm-new bgwhite" *ngIf="viewType==='MISC'">
+                <tr class="trbg">
+                    <td colspan="3">
+                        <span class="col-form-span-label">
+                            <b>{{Header | titlecase}}</b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width80">
+                        <span class="col-form-span-label">
+                            <b>Job No.
+                                <span class="col-form-span-error">*</span>
+                            </b>
+                        </span>
+                    </td>
+                    <td>
+                        <input type="text" [(ngModel)]="SearchJobNo" [maxlength]="15" class="form-control width120" />
+                    </td>
+                    <td>
+                        <span class="col-form-span-error">{{ErrorMessage}}</span>
+                    </td>
+                </tr>
+                <tr class="trbg centerlabel">
+                    <td colspan="3">
+                        <button type="button" name="searchButton" class="btn btn-sm btn-warning" (click)="search();" [hidden]="IsDisabled" #searchButton>
+                            <span class="col-form-span-label">
+                                <i class="fa fa-search"></i>&nbsp;Search</span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-sm-new bgwhite" *ngIf="viewType==='WHS' || viewType==='Add'">
+                <tr class="trbg">
+                    <td colspan="2">
+                        <span class="col-form-span-label">
+                            <b>{{Header | titlecase}}</b>
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width120">
+                        <span class="col-form-span-label">
+                            <b>Job No.
+                            </b>
+                        </span>
+                    </td>
+                    <td>
+                        <input type="text" [(ngModel)]="JobNo" [maxlength]="15" [disabled]="true" class="form-control width120" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width120">
+                        <span class="col-form-span-label">
+                            <b>Client Name
+                                <span class="col-form-span-error">*</span>
+                            </b>
+                        </span>
+                    </td>
+                    <td>
+                        <ng-select [items]="ClientNameList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" placeholder="--Select--" [(ngModel)]="ClientName"
+                            class="form-control">
+                        </ng-select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width120">
+                        <span class="col-form-span-label">
+                            <b>No. of PKgs
+                            </b>
+                        </span>
+                    </td>
+                    <td>
+                        <input type="text" [(ngModel)]="NoOfPackages" [maxlength]="15" [OnlyNumber]="true" class="form-control width120" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="width120">
+                        <span class="col-form-span-label">
+                            <b>Narration
+                            </b>
+                        </span>
+                    </td>
+                    <td>
+                        <textarea [(ngModel)]="Narration" class="form-control" rows="3"></textarea>
+                    </td>
+                </tr>
+                <tr class="trbg centerlabel">
+                    <td colspan="2">
+                        <button type="button" name="searchButton" class="btn btn-sm btn-primary" (click)="submit();" #submitButton>
+                            <span class="col-form-span-label">
+                                <i class="fa fa-send-o"></i>&nbsp;Submit</span>
+                        </button>
+                        <button type="button" name="searchButton" class="btn btn-sm btn-danger" (click)="reset();">
+                            <span class="col-form-span-label">
+                                <i class="fa fa-undo"></i>&nbsp;Reset</span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-3">
+        </div>
+    </div>
+</div>

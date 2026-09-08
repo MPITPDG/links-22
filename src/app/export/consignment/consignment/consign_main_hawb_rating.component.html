@@ -1,0 +1,1239 @@
+﻿<table class="table table-bordered table-sm-new bglightmaroon">
+   <tbody>
+	  <tr *ngIf="ErrorMessage != null || ErrorMessage != ''"><td colspan="10"><span class="col-form-span-label red"><b><small>{{ErrorMessage}}</small></b></span></td></tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>HAWB Print Type </strong></span></td>
+		 <td colspan="7">
+			<span class="col-form-span-label">
+				<input type="radio" name="Type" id="rdbRateAgreed" [checked]="Type == 1" (click)="checkType(1)"/>as Agreed&nbsp;
+				<input type="radio" name="Type" id="rdbRated" [checked]="Type == 2" (click)="checkType(2)"/>Rated
+			</span>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Transport Mode</strong></span></td>
+		 <td colspan="7">
+			<!-- <ng-select [items]="[{VALUEFIELD: '1', TEXTFIELD: 'DIFF AIR'},{VALUEFIELD: '0', TEXTFIELD: 'AIR'}]"
+					   bindLabel="TEXTFIELD"
+					   bindValue="VALUEFIELD"
+					   placeholder="--Select Transportation--"
+					   [(ngModel)]="TransportMode"
+					   class="form-control width160"
+					   >
+			</ng-select> -->
+			<select class="form-control width160" [(ngModel)]="TransportMode">
+				<option value="null">--Select Transportation--</option>
+				<option value="0">AIR</option>
+				<option value="1">DIFF AIR</option>
+				<option value="2">SEA/AIR</option>
+			</select>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"></span></td>
+		 <td colspan="3"><span class="col-form-span-label"><strong><u>Existing</u></strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label"><strong><u>New</u></strong></span></td>
+		 <td>&nbsp;</td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Chargable Weight</strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label">{{Wgt}}</span></td>
+		 <td colspan="3"><input type="text" [(ngModel)]="UserWgt" class="form-control width100" (keyup)="fn_ChangeUserWeight()" [OnlyAmount]="UserWgt" /></td>
+		 <td>&nbsp;</td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Gross Weight</strong></span></td>
+		 <td colspan="3"><span class="col-form-span-label">{{GrossWeight}}</span></td>
+		 <td colspan="3"><input type="text" [(ngModel)]="UserGrossWeight" class="form-control width100" (keyup)="fn_ChangeUserWeight()" [OnlyAmount]="UserGrossWeight" /></td>
+		 <td>&nbsp;</td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Freight INR/Kg </strong></span></td>
+		 <td colspan="7">
+			<!-- <ng-select [items]="[{VALUEFIELD: 'PP', TEXTFIELD: 'Prepaid'},{VALUEFIELD: 'CC', TEXTFIELD: 'Collect'},{VALUEFIELD: 'PC', TEXTFIELD: 'Prepaid + Collect'}]"
+					   bindLabel="TEXTFIELD"
+					   bindValue="VALUEFIELD"
+					   placeholder="--Select--"
+					   [(ngModel)]="FreightRate"
+					   class="form-control width120"
+					   (change)="changeFreight(FreightRate)"
+					   >
+			</ng-select> -->
+			<select class="form-control width120" [(ngModel)]="FreightRate" (change)="changeFreight(FreightRate)">
+				<option value="">--Select--</option>
+				<option value="PP">Prepaid</option>
+				<option value="CC">Collect</option>
+				<option value="PC">Prepaid + Collect</option>
+			</select>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Prepaid</strong></span></td>
+		 <td colspan="7">
+			<span class="display-inline">
+				<!-- <ng-select [items]="[{VALUEFIELD: '10'},{VALUEFIELD: '15'},{VALUEFIELD: '20'},{VALUEFIELD: '25'},{VALUEFIELD: '30'},{VALUEFIELD: '35'},{VALUEFIELD: '40'},{VALUEFIELD: '45'},{VALUEFIELD: '50'},{VALUEFIELD: '55'},{VALUEFIELD: '60'},{VALUEFIELD: '65'},{VALUEFIELD: '70'},{VALUEFIELD: '75'},{VALUEFIELD: '80'},{VALUEFIELD: '85'},{VALUEFIELD: '90'}]"
+						   bindLabel="VALUEFIELD"
+						   bindValue="VALUEFIELD"
+						   placeholder="--"
+						   [(ngModel)]="PrepaidPercent"
+						   class="form-control width75"
+						   (change)="changePrepaidPercentage(PrepaidPercent)"
+						   [disabled]="FreightRate != 'PC'"
+						   >
+				</ng-select> -->
+
+				<select class="form-control width75" [(ngModel)]="PrepaidPercent"    (change)="changePrepaidPercentage(PrepaidPercent)">
+					<option value="">--</option>
+					<option value="10">10</option>
+					<option value="15">15</option>
+					<option value="20">20</option>
+					<option value="25">25</option>
+					<option value="30">30</option>
+					<option value="35">35</option>
+					<option value="40">40</option>
+					<option value="45">45</option>
+					<option value="50">50</option>
+					<option value="55">55</option>
+					<option value="60">60</option>
+					<option value="65">65</option>
+					<option value="70">70</option>
+					<option value="75">75</option>
+					<option value="80">80</option>
+					<option value="85">85</option>
+					<option value="90">90</option>
+
+				</select>
+				<span class="col-form-span-label"><strong>%</strong></span>
+			</span>
+		 </td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Collect</strong></span></td>
+		 <td colspan="7">
+			<span class="display-inline">
+				<input type="text" [(ngModel)]="CollectPer" class="form-control width75" [OnlyAmount]="CollectPer" [disabled]="true" />
+				<span class="col-form-span-label"><strong>%</strong></span>
+			</span>
+		</td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Business Procurment Expence</strong></span></td>
+		 <td colspan="7"><input type="text" [(ngModel)]="Procument" class="form-control width75" [OnlyAmount]="Procument" /></td>
+	  </tr>
+	  <tr>
+		 <td colspan="3"><span class="col-form-span-label"><strong>Freight Chargeble As </strong></span></td>
+		 <td colspan="7">
+			<span class="col-form-span-label">
+				<input type="radio" name="FreightType" [checked]="FreightChargeble == 1" (click)="changeFreightChargebleAs(1)"/>All Inclusive&nbsp;
+				<input type="radio" name="FreightType" [checked]="FreightChargeble == 2" (click)="changeFreightChargebleAs(2)"/>Freight + Surcharge
+			</span>
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><span class="col-form-span-label"><strong>Rate Agreed by</strong></span></td>
+		<td colspan="2"><input type="text" [(ngModel)]="RateAgreedby" class="form-control width100"/></td>
+		<td colspan="3"><span class="col-form-span-label"><strong>Rate Agreed On</strong></span></td>
+		<td colspan="2"><my-date-picker name="RateAgreedOn" [options]="myDatePickerOptions" [(ngModel)]="RateAgreedOn"></my-date-picker></td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><span class="col-form-span-label"><strong>Exch. Rate</strong></span></td>
+		<td colspan="2"><input type="text" [(ngModel)]="TxtExchRate" class="form-control width100" (keyup)="fn_ChangeUserWeight()" [OnlyAmount]="TxtExchRate"/></td>
+		<td colspan="3">
+			<span class="display-inline">
+				<!-- <ng-select [items]="rateList"
+							bindLabel="CUR_CODE"
+							bindValue="CUR_CODE"
+
+							[(ngModel)]="DrpExchRate"
+							class="form-control width120"
+							(change)="checkExchRateCurDrp(DrpExchRate)"
+							>
+				</ng-select> -->
+				<select class="form-control  width120" [(ngModel)]="DrpExchRate" (change)="checkExchRateCurDrp(DrpExchRate)">
+					<option value="null">--select--</option>
+					<option *ngFor="let d of rateList" value={{d.CUR_CODE}}>{{d.CUR_CODE}}</option>
+			  </select>
+				<span class="col-form-span-label"><strong>=</strong></span>
+			</span>
+		</td>
+		<td colspan="2">
+			<span class="display-inline">
+				<input type="text" [(ngModel)]="InrRate" class="form-control width120" (keyup)="fn_ChangeUserWeight()" [OnlyAmount]="InrRate"/>
+				<span class="col-form-span-label"><strong>[INR]</strong></span>
+			</span>
+		</td>
+	  </tr>
+	  <tr>
+		 <td class="col-form-span-heading" colspan="10"><span class="col-form-span-label"><strong>Fright (Selling Rate) </strong></span></td>
+	  </tr>
+	</tbody>
+</table>
+<table class="table table-bordered table-sm-new bglightmaroon">
+   <tbody>
+	  <tr>
+		<td colspan="3" class="centerlabel"><span class="col-form-span-label"><strong><u>DESCRIPTION</u></strong></span></td>
+		<td colspan="2" class="centerlabel"></td>
+		<td colspan="2" class="centerlabel"><span class="col-form-span-label"><strong><u>PREPAID</u></strong></span></td>
+		<td class="centerlabel"><span class="col-form-span-label"><strong><u>PREPAID [INR]</u></strong></span></td>
+		<td colspan="2" class="centerlabel"><span class="col-form-span-label"><strong><u>COLLECT</u></strong></span></td>
+		<td class="centerlabel"><span class="col-form-span-label"><strong><u>COLLECT [INR]</u></strong></span></td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">{{FrtSell}}</span></strong></td>
+		<td>
+			<!-- <ng-select [items]="[{VALUEFIELD: 'CW', TEXTFIELD: 'CW'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--"
+						[(ngModel)]="RateFreightPayOn"
+						class="form-control width80"
+
+						>
+			</ng-select> -->
+			<select class="form-control width50" [(ngModel)]="RateFreightPayOn">
+				<option value="null">--</option>
+				<option value="CW">CW</option>
+		   </select>
+			<!-- (change)="checkExchRateCurDrp(RateFreightPayOn)" -->
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="RateFreight" class="form-control width50" [maxlength]="9" (keyup)="fn_ChangeRate_Basic()" [OnlyAmount]="RateFreight"/>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="Ppchrg_Selling" class="form-control width70" [maxlength]="20" [disabled]="true"/>
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+
+						[(ngModel)]="PPchrg_SellingCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(1, 'PP', PPchrg_SellingCur)"
+						[disabled]="FreightRate == 'CC'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="PPchrg_SellingCur" (change)="fnChkExchangeRate(1, 'PP', PPchrg_SellingCur)" [disabled]="FreightRate == 'CC'">
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="Ppchrg_SellingInr" class="form-control width80" [maxlength]="20" [OnlyAmount]="Ppchrg_SellingInr" [disabled]="true" />
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="Ccchrg_Selling" class="form-control width70" [maxlength]="20"  />
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="Ccchrg_SellingCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(1, 'CC', Ccchrg_SellingCur)"
+						[disabled]="FreightRate == 'PP'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="Ccchrg_SellingCur" (change)="fnChkExchangeRate(1, 'CC', Ccchrg_SellingCur)" [disabled]="FreightRate == 'PP'">
+				<option value="">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="Ccchrg_SellingInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		 <td class="col-form-span-heading" colspan="11"><span class="col-form-span-label"><strong>FREIGHT (SURCHARGE)</strong></span></td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">(2) FSC</span></strong></td>
+		<td>
+			<!-- <ng-select [items]="[{VALUEFIELD: 'CW', TEXTFIELD: 'CW'},{VALUEFIELD: 'GW', TEXTFIELD: 'GW'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--"
+						[(ngModel)]="RateFscPayOn"
+						class="form-control width80"
+						(change)="fn_ChangePayableOn('FSC')"
+						[disabled]="FreightChargeble == 1"
+						>
+			</ng-select> -->
+			<select class="form-control width50" [(ngModel)]="RateFscPayOn" [disabled]="FreightChargeble == 1" (change)="fn_ChangePayableOn('FSC')">
+				<option value="null">--</option>
+				<option value="CW">CW</option>
+				<option value="GW">GW</option>
+			</select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="RateFsc" class="form-control width50" [maxlength]="20" [OnlyAmount]="RateFsc" [disabled]="FreightChargeble == 1" (keyup)="fn_ChangeRate_Surcharge('FSC')"/>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="PpFsc_Selling" class="form-control width70" [maxlength]="20"  />
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="PpFsc_SellingCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(2, 'PP', PpFsc_SellingCur)"
+						[disabled]="(FreightRate == 'CC' || FreightChargeble == 1)"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="PpFsc_SellingCur"  (change)="fnChkExchangeRate(2, 'PP', PpFsc_SellingCur)" [disabled]="(FreightRate == 'CC' || FreightChargeble == 1)">
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="PpFsc_SellingInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="CcFsc_Selling" class="form-control width70" [maxlength]="20"  [disabled]="FreightChargeble == 1" />
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="CcFsc_SellingCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(2, 'CC', CcFsc_SellingCur)"
+						[disabled]="(FreightChargeble == 1 || FreightRate == 'PP')"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="CcFsc_SellingCur"   (change)="fnChkExchangeRate(2, 'CC', CcFsc_SellingCur)"  [disabled]="(FreightChargeble == 1 || FreightRate == 'PP')">
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="CcFsc_SellingInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">(3) IRC </span></strong></td>
+		<td>
+			<!-- <ng-select [items]="[{VALUEFIELD: 'CW', TEXTFIELD: 'CW'},{VALUEFIELD: 'GW', TEXTFIELD: 'GW'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--"
+						[(ngModel)]="RateIrcPayOn"
+						class="form-control width80"
+						(change)="fn_ChangePayableOn('IRC')"
+						[disabled]="FreightChargeble == 1"
+						>
+			</ng-select> -->
+			<select class="form-control width50" [(ngModel)]="RateIrcPayOn" [disabled]="FreightChargeble == 1" (change)="fn_ChangePayableOn('IRC')">
+				<option value="null">--</option>
+				<option value="CW">CW</option>
+				<option value="GW">GW</option>
+			</select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="RateIrc" class="form-control width50" [maxlength]="20" [OnlyAmount]="RateIrc" [disabled]="FreightChargeble == 1"  (keyup)="fn_ChangeRate_Surcharge('IRC')"/>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="PpIrc_Selling" class="form-control width70" [maxlength]="20"  />
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="PpIrc_SellingCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(3, 'PP', PpIrc_SellingCur)"
+						[disabled]="(FreightRate == 'CC' || FreightChargeble == 1)"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="PpIrc_SellingCur"  (change)="fnChkExchangeRate(3, 'PP', PpIrc_SellingCur)" 	[disabled]="(FreightRate == 'CC' || FreightChargeble == 1)">
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="PpIrc_SellingInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="CcIrc_Selling" class="form-control width70" [maxlength]="20" [OnlyAmount]="CcIrc_Selling" [disabled]="FreightChargeble == 1" />
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="CcIrc_SellingCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(3, 'CC', CcIrc_SellingCur)"
+						[disabled]="(FreightChargeble == 1 || FreightRate == 'PP')"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="CcIrc_SellingCur"  (change)="fnChkExchangeRate(3, 'CC', CcIrc_SellingCur)"	 [disabled]="(FreightChargeble == 1 || FreightRate == 'PP')">
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="CcIrc_SellingInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">(4) X-RAY</span></strong></td>
+		<td>
+			<!-- <ng-select [items]="[{VALUEFIELD: 'CW', TEXTFIELD: 'CW'},{VALUEFIELD: 'GW', TEXTFIELD: 'GW'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--"
+						[(ngModel)]="RateXrayPayOn"
+						class="form-control width80"
+						(change)="fn_ChangePayableOn('XRAY')"
+						[disabled]="FreightChargeble == 1"
+						>
+			</ng-select> -->
+			<select class="form-control width50" [(ngModel)]="RateXrayPayOn"  (change)="fn_ChangePayableOn('XRAY')">
+				<option value="null">--</option>
+				<option value="CW">CW</option>
+				<option value="GW">GW</option>
+			</select>
+
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="RateXray" class="form-control width50" [maxlength]="20"  [OnlyAmount]="RateXray" (keyup)="fn_ChangeRate_Surcharge('XRAY')"/>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="PpXray_Selling" class="form-control width70" [maxlength]="20"/>
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="PpXray_SellingCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(4, 'PP', PpXray_SellingCur)"
+						[disabled]="(FreightRate == 'CC' || FreightChargeble == 1)"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="PpXray_SellingCur"  (change)="fnChkExchangeRate(4, 'PP', PpXray_SellingCur)">
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="PpXray_SellingInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="CcXray_Selling" class="form-control width70" [maxlength]="20" 	/>
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="CcXray_SellingCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(4, 'CC', CcXray_SellingCur)"
+						[disabled]="(FreightChargeble == 1 || FreightRate == 'PP')"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="CcXray_SellingCur"  (change)="fnChkExchangeRate(4, 'CC', CcXray_SellingCur)" >
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="CcXray_SellingInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">(5) MISCELLANEOUS CHARGES</span></strong></td>
+		<td>
+			<!-- <ng-select [items]="[{VALUEFIELD: 'CW', TEXTFIELD: 'CW'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--"
+						[(ngModel)]="McPayOn"
+						class="form-control width80"
+						(change)="checkExchRateCurDrp(McPayOn)"
+						>
+			</ng-select> -->
+			<select class="form-control width50" [(ngModel)]="McPayOn"   (change)="checkExchRateCurDrp('McPayOn')">
+				<option value="null">--</option>
+				<option value="CW">CW</option>
+				<option value="GW">GW</option>
+			</select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="McRate" class="form-control width50" [maxlength]="20" [OnlyAmount]="McRate" (keyup)="fn_ChangeRate_MC_CTG('MC')"/>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="McRatePP" class="form-control width70" [maxlength]="20"  />
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="McCurPP"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(5, 'PP', McCurPP)"
+						[disabled]="FreightRate == 'CC'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="McCurPP"  (change)="fnChkExchangeRate(5, 'PP', McCurPP)" [disabled]="FreightRate == 'CC'">
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="McRatePPInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<!-- <input type="text" [(ngModel)]="McRateCC" class="form-control width70" [maxlength]="20" [disabled]="true" /> -->
+			<input type="text" [(ngModel)]="McRateCC" class="form-control width70" [maxlength]="20"  />
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="McCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(5, 'CC', McCur)"
+						[disabled]="FreightRate == 'PP'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="McCur"   (change)="fnChkExchangeRate(5, 'CC', McCur)" [disabled]="FreightRate == 'PP'">
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="McCCInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	   <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">(5.1) FOB</span></strong></td>
+		<td>
+			<!-- <ng-select [items]="[{VALUEFIELD: 'CW', TEXTFIELD: 'CW'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--"
+						[(ngModel)]="fobPayOn"
+						class="form-control width80"
+						(change)="checkExchRateCurDrp(fobPayOn)"
+						>
+			</ng-select> -->
+			<select class="form-control width50" [(ngModel)]="fobPayOn"   (change)="checkExchRateCurDrp(fobPayOn)">
+				<!-- <option value="null">--</option>
+				<option value="CW">CW</option> -->
+				<option value="null">--</option>
+				<option value="CW">CW</option>
+				<option value="GW">GW</option>
+			</select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="fobRate" class="form-control width50" [maxlength]="20" [OnlyAmount]="McRate" (keyup)="fn_ChangeRate_MC_CTG('FOB')"/>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="fobRatePP" class="form-control width70" [maxlength]="20" />
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="fobCurPP"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(18, 'PP', fobCurPP)"
+						[disabled]="FreightRate == 'CC'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="fobCurPP"  (change)="fnChkExchangeRate(18, 'PP', fobCurPP)" [disabled]="FreightRate == 'CC'">
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="fobRatePPInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<!-- <input type="text" [(ngModel)]="fobRateCC" class="form-control width70" [maxlength]="20" [disabled]="true" /> -->
+			<input type="text" [(ngModel)]="fobRateCC" class="form-control width70" [maxlength]="20"  />
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="fobCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(18, 'CC', fobCur)"
+						[disabled]="FreightRate == 'PP'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="fobCur"  (change)="fnChkExchangeRate(18, 'CC', fobCur)"  	[disabled]="FreightRate == 'PP'">
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="fobCCInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">(6) CTG</span></strong></td>
+		<td>
+			<!-- <ng-select [items]="[{VALUEFIELD: 'GW', TEXTFIELD: 'GW'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--"
+						[(ngModel)]="CtgPayOn"
+						class="form-control width80"
+						(change)="checkExchRateCurDrp(CtgPayOn)"
+						>
+			</ng-select> -->
+			<select class="form-control width50" [(ngModel)]="CtgPayOn"   (change)="checkExchRateCurDrp('CtgPayOn')">
+				<!-- <option value="null">--</option>
+				<option value="GW">GW</option> -->
+				<option value="null">--</option>
+				<option value="CW">CW</option>
+				<option value="GW">GW</option>
+			</select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="CtgRate" class="form-control width50" [maxlength]="20"  (keyup)="fn_ChangeRate_MC_CTG('CTG')" [OnlyAmount]="CtgRate"/>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="CtgRatePP" class="form-control width70" [maxlength]="20"  />
+		</td>
+		<td>
+			<!-- <ng-select [items]="[{VALUEFIELD: 'INR', TEXTFIELD: 'INR'},{VALUEFIELD: 'USD', TEXTFIELD: 'USD'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--"
+						[(ngModel)]="CtgCurPP"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(6, 'PP', CtgCurPP)"
+						[disabled]="FreightRate == 'CC'"
+						>
+			</ng-select> -->
+			<select class="form-control width80" [(ngModel)]="CtgCurPP" 	(change)="fnChkExchangeRate(6, 'PP', CtgCurPP)" [disabled]="FreightRate == 'CC'">
+				<option value="null">--</option>
+				<option value="INR">INR</option>
+				<option value="USD">USD</option>
+		</select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="CtgRatePPInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<!-- <input type="text" [(ngModel)]="CtgRateCC" class="form-control width70" [maxlength]="20" [disabled]="true" /> -->
+			<input type="text" [(ngModel)]="CtgRateCC" class="form-control width70" [maxlength]="20"  />
+		</td>
+		<td>
+			<!-- <ng-select [items]="[{VALUEFIELD: 'INR', TEXTFIELD: 'INR'},{VALUEFIELD: 'USD', TEXTFIELD: 'USD'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--"
+						[(ngModel)]="CtgCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(6, 'CC', CtgCur)"
+						[disabled]="FreightRate == 'PP'"
+						>
+			</ng-select> -->
+
+			<select class="form-control width80" [(ngModel)]="CtgCur" 	(change)="fnChkExchangeRate(6, 'CC', CtgCur)" [disabled]="FreightRate == 'PP'">
+				<option value="null">--</option>
+				<option value="INR">INR</option>
+				<option value="USD">USD</option>
+			</select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="CtgCCInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">(7) THC</span></strong></td>
+		<td>
+			<!-- <ng-select [items]="[{VALUEFIELD: 'CW', TEXTFIELD: 'CW'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--"
+						[(ngModel)]="ThcPayOn"
+						class="form-control width80"
+						(change)="checkExchRateCurDrp(ThcPayOn)"
+						>
+			</ng-select> -->
+			<select class="form-control width50" [(ngModel)]="ThcPayOn"   	(change)="checkExchRateCurDrp(ThcPayOn)">
+				<!-- <option value="null">--</option>
+				<option value="CW">CW</option> -->
+				<option value="null">--</option>
+				<option value="CW">CW</option>
+				<option value="GW">GW</option>
+			</select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="ThcRate" class="form-control width50" [maxlength]="20" (keyup)="fn_ChangeRate_MC_CTG('THC')" [OnlyAmount]="ThcRate"  />
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="ThcRatePP" class="form-control width70" [maxlength]="20"  />
+		</td>
+		<td>
+			<!-- <ng-select [items]="[{VALUEFIELD: 'INR', TEXTFIELD: 'INR'},{VALUEFIELD: 'USD', TEXTFIELD: 'USD'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--"
+						[(ngModel)]="ThcCurPP"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(7, 'PP', ThcCurPP)"
+						[disabled]="FreightRate == 'CC'"
+						>
+			</ng-select> -->
+
+			<select class="form-control width80" [(ngModel)]="ThcCurPP" 	(change)="fnChkExchangeRate(7, 'PP', ThcCurPP)" 	[disabled]="FreightRate == 'CC'">
+				<option value="null">--</option>
+				<option value="INR">INR</option>
+				<option value="USD">USD</option>
+			</select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="ThcRatePPInr" class="form-control width80" [maxlength]="20"  />
+		</td>
+		<td>
+			<!-- <input type="text" [(ngModel)]="ThcRateCC" class="form-control width70" [maxlength]="20" [OnlyAmount]="ThcRateCC" [disabled]="true" /> -->
+			<input type="text" [(ngModel)]="ThcRateCC" class="form-control width70" [maxlength]="20" [OnlyAmount]="ThcRateCC"  />
+		</td>
+		<td>
+			<!-- <ng-select [items]="[{VALUEFIELD: 'INR', TEXTFIELD: 'INR'},{VALUEFIELD: 'USD', TEXTFIELD: 'USD'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--"
+						[(ngModel)]="ThcCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(7, 'CC', ThcCur)"
+						[disabled]="FreightRate == 'PP'"
+						>
+			</ng-select> -->
+
+			<select class="form-control width80" [(ngModel)]="ThcCur" 	(change)="fnChkExchangeRate(7, 'CC', ThcCur)" [disabled]="FreightRate == 'PP'">
+				<option value="null">--</option>
+				<option value="INR">INR</option>
+				<option value="USD">USD</option>
+			</select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="ThcCCInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">(8) DELIVERY DESTI. CHRG</span></strong></td>
+		<td>
+			<!-- <ng-select [items]="[{VALUEFIELD: 'CW', TEXTFIELD: 'CW'},{VALUEFIELD: 'GW', TEXTFIELD: 'GW'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--"
+						[(ngModel)]="DdcPayOn"
+						class="form-control width80"
+						(change)="checkExchRateCurDrp(DdcPayOn)"
+						>
+			</ng-select> -->
+			<select class="form-control width50" [(ngModel)]="DdcPayOn"   	(change)="checkExchRateCurDrp(DdcPayOn)">
+				<option value="null">--</option>
+				<option value="CW">CW</option>
+				<option value="GW">GW</option>
+			</select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="DdcRate" class="form-control width50" [maxlength]="20" (keyup)="fn_ChangeRate_MC_CTG('DDC')" [OnlyAmount]="DdcRate" [disabled]="CityCode == 'DAC'" />
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="DdcRatePP" class="form-control width70" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<!-- <ng-select [items]="[{VALUEFIELD: 'INR', TEXTFIELD: 'INR'},{VALUEFIELD: 'USD', TEXTFIELD: 'USD'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--"
+						[(ngModel)]="DdcCurPP"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(8, 'PP', DdcCurPP)"
+						[disabled]="FreightRate == 'CC'"
+						>
+			</ng-select> -->
+
+			<select class="form-control width80" [(ngModel)]="DdcCurPP" (change)="fnChkExchangeRate(8, 'PP', DdcCurPP)" 	[disabled]="FreightRate == 'CC'">
+				<option value="null">--</option>
+				<option value="INR">INR</option>
+				<option value="USD">USD</option>
+			</select>
+
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="DdcRatePPInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="DdcRateCC" class="form-control width70" [maxlength]="20" [OnlyAmount]="DdcRateCC"  />
+		</td>
+		<td>
+			<!-- <ng-select [items]="[{VALUEFIELD: 'INR', TEXTFIELD: 'INR'},{VALUEFIELD: 'USD', TEXTFIELD: 'USD'}]"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						placeholder="--"
+						[(ngModel)]="DdcCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(8, 'CC', DdcCur)"
+						[disabled]="FreightRate == 'PP'"
+						>
+			</ng-select> -->
+			<select class="form-control width80" [(ngModel)]="DdcCur" 	(change)="fnChkExchangeRate(8, 'CC', DdcCur)"  [disabled]="FreightRate == 'PP'">
+				<option value="null">--</option>
+				<option value="INR">INR</option>
+				<option value="USD">USD</option>
+			</select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="DdcCCInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">(9) DC </span></strong></td>
+		<td>
+
+		</td>
+		<td>
+
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="DcRatePP" class="form-control width70" [maxlength]="20" [disabled]="FreightRate == 'CC'" (keyup)="fn_ChangeRate_Basic()" [OnlyAmount]="DcRatePP"/>
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+
+						[(ngModel)]="DcCurPP"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(9, 'PP', DcCurPP)"
+						[disabled]="FreightRate == 'CC'"
+						>
+			</ng-select> -->
+			<select class="form-control width80"   [(ngModel)]="DcCurPP" (change)="fnChkExchangeRate(9, 'PP', DcCurPP)" 	[disabled]="FreightRate == 'CC'">
+				<option value="null">--</option>
+				 <option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+			</select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="DcRatePPInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="DcRateCC" class="form-control width70" [maxlength]="20" [disabled]="FreightRate == 'PP'" (keyup)="fn_ChangeRate_Basic()" [OnlyAmount]="DcRateCC"/>
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="DcCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(9, 'CC', DcCur)"
+						[disabled]="FreightRate == 'PP'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="DcCur"  (change)="fnChkExchangeRate(9, 'CC', DcCur)" [disabled]="FreightRate == 'PP'">
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="DcCCInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">(10) SCR</span></strong></td>
+		<td>
+
+		</td>
+		<td>
+
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="ScrRatePP" class="form-control width70" [maxlength]="20" [disabled]="FreightRate == 'CC'" (keyup)="fn_ChangeRate_Basic()" [OnlyAmount]="ScrRatePP"/>
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="ScrCurPP"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(10, 'PP', ScrCurPP)"
+						[disabled]="FreightRate == 'CC'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="ScrCurPP"  (change)="fnChkExchangeRate(10, 'PP', ScrCurPP)" [disabled]="FreightRate == 'CC'">
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="ScrRatePPInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="ScrRateCC" class="form-control width70" [maxlength]="20" [disabled]="FreightRate == 'PP'" (keyup)="fn_ChangeRate_Basic()" [OnlyAmount]="ScrRateCC"/>
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="ScrCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(10, 'CC', ScrCur)"
+						[disabled]="FreightRate == 'PP'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="ScrCur"   (change)="fnChkExchangeRate(10, 'CC', ScrCur)"  [disabled]="FreightRate == 'PP'">
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="ScrCCInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">(11) MYC</span></strong></td>
+		<td>
+
+		</td>
+		<td>
+
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="MycRatePP" class="form-control width70" [maxlength]="20" [disabled]="FreightRate == 'CC'" (keyup)="fn_ChangeRate_Basic()" [OnlyAmount]="MycRatePP"/>
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="MycCurPP"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(11, 'PP', MycCurPP)"
+						[disabled]="FreightRate == 'CC'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="MycCurPP"   (change)="fnChkExchangeRate(11, 'PP', MycCurPP)"  [disabled]="FreightRate == 'CC'">
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="MycRatePPInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="MycRateCC" class="form-control width70" [maxlength]="20" [disabled]="FreightRate == 'PP'" (keyup)="fn_ChangeRate_Basic()" [OnlyAmount]="MycRateCC"/>
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="MycCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(11, 'CC', MycCur)"
+						[disabled]="FreightRate == 'PP'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="MycCur"  (change)="fnChkExchangeRate(11, 'CC', MycCur)"  [disabled]="FreightRate == 'PP'">
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="MycCCInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3">
+			<strong><span class="col-form-span-label">(12) DUE CARRIER</span></strong>
+			<small>[2+3+4+5+6+7+8+9+10+11]</small>
+		</td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><input type="text" [(ngModel)]="Pptotcarr_Selling" class="form-control width80" [maxlength]="20" [disabled]="true" /></td>
+		<td></td>
+		<td></td>
+		<td><input type="text" [(ngModel)]="Cctotcarr_SellingInr" class="form-control width80" [maxlength]="20" [disabled]="true" /></td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">(13) HAWB</span></strong></td>
+		<td></td>
+		<td></td>
+		<td>
+			<input type="text" [(ngModel)]="HawbRatePP" class="form-control width70" [maxlength]="20" [disabled]="FreightRate == 'CC'" (keyup)="fn_ChangeRate_Basic()" [OnlyAmount]="HawbRatePP" />
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+
+						[(ngModel)]="HawbCurPP"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(13, 'PP', HawbCurPP)"
+						[disabled]="FreightRate == 'CC'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="HawbCurPP" (change)="fnChkExchangeRate(13, 'PP', HawbCurPP)" [disabled]="FreightRate == 'CC'"  >
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="HawbRatePPInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="HawbRateCC" class="form-control width70" [maxlength]="20" [disabled]="FreightRate == 'PP'" (keyup)="fn_ChangeRate_Basic()" [OnlyAmount]="HawbRateCC"/>
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="HawbCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(13, 'CC', HawbCur)"
+						[disabled]="FreightRate == 'PP'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="HawbCur"  (change)="fnChkExchangeRate(13, 'CC', HawbCur)"  [disabled]="FreightRate == 'PP'"  >
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="HawbCCInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">(14) PCA</span></strong></td>
+		<td></td>
+		<td></td>
+		<td>
+			<input type="text" [(ngModel)]="PcaRatePP" class="form-control width70" [maxlength]="20" [disabled]="FreightRate == 'CC'" (keyup)="fn_ChangeRate_Basic()" [OnlyAmount]="PcaRatePP"/>
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="PcaCurPP"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(14, 'PP', PcaCurPP)"
+						[disabled]="FreightRate == 'CC'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="PcaCurPP"   (change)="fnChkExchangeRate(14, 'PP', PcaCurPP)"  [disabled]="FreightRate == 'CC'"  >
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="PcaRatePPInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="PcaRateCC" class="form-control width70" [maxlength]="20" [disabled]="FreightRate == 'PP'" (keyup)="fn_ChangeRate_Basic()" [OnlyAmount]="PcaRateCC"/>
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="PcaCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(14, 'CC', PcaCur)"
+						[disabled]="FreightRate == 'PP'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="PcaCur"   	(change)="fnChkExchangeRate(14, 'CC', PcaCur)"   	[disabled]="FreightRate == 'PP'"  >
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="PcaCCInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">(15) DUE AGENT</span></strong><span class="col-form-span-label">[13+14]</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td>
+			<input type="text" [(ngModel)]="Pptotagt_Selling" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+		<td></td>
+		<td></td>
+		<td>
+			<input type="text" [(ngModel)]="Cctotagt_SellingInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">(16) TOTAL</span></strong><span class="col-form-span-label">[1+12+15]</span></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td>
+			<input type="text" [(ngModel)]="Pptot_Selling" class="form-control width80" [maxlength]="20" [disabled]="true"/>
+		</td>
+		<td></td>
+		<td></td>
+		<td>
+			<input type="text" [(ngModel)]="Cctot_Selling" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">(17) OTHER CHARGES</span></strong></td>
+		<td></td>
+		<td></td>
+		<td>
+			<input type="text" [(ngModel)]="OtherRatePP" class="form-control width70" [maxlength]="20" [disabled]="FreightRate == 'CC'" (keyup)="fn_ChangeRate_Basic()" [OnlyAmount]="OtherRatePP"/>
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="OtherRateCurPP"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(17, 'PP', OtherRateCurPP)"
+						[disabled]="FreightRate == 'CC'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="OtherRateCurPP"  (change)="fnChkExchangeRate(17, 'PP', OtherRateCurPP)" [disabled]="FreightRate == 'CC'" >
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="OtherRatePPInr" class="form-control width80" [maxlength]="20" [disabled]="true"/>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="OtherRateCC" class="form-control width70" [maxlength]="20" [disabled]="FreightRate == 'PP'" (keyup)="fn_ChangeRate_Basic()" [OnlyAmount]="OtherRateCC"/>
+		</td>
+		<td>
+			<!-- <ng-select [items]="currencyList"
+						bindLabel="TEXTFIELD"
+						bindValue="VALUEFIELD"
+						[(ngModel)]="OtherRateCur"
+						class="form-control width80"
+						(change)="fnChkExchangeRate(17, 'CC', OtherRateCur)"
+						[disabled]="FreightRate == 'PP'"
+						>
+			</ng-select> -->
+			<select class="form-control  width80" [(ngModel)]="OtherRateCur"   (change)="fnChkExchangeRate(17, 'CC', OtherRateCur)" [disabled]="FreightRate == 'PP'" >
+				<option value="null">--</option>
+				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+		  </select>
+		</td>
+		<td>
+			<input type="text" [(ngModel)]="OtherRateInr" class="form-control width80" [maxlength]="20" [disabled]="true" />
+		</td>
+	  </tr>
+	  <tr class="formheading">
+		<td colspan="11"><strong><span class="col-form-span-label">(18)  AIRLINE CHARGES</span></strong></td>
+	 </tr>
+	 <tr>
+
+		<td colspan="11">
+			<table class="table table-sm-new bgwhite" width="100%">
+				<tr >
+					<td>
+						<select class="form-control width80" [(ngModel)]="CHARGETYPE" (change)="GetChrges(CHARGETYPE)" >
+						   <option value="null">--Select--</option>
+						   <option *ngFor="let d of ChrgTypelist" value={{d.DataValueField}}>{{d.DataTextField}}</option>
+				   </select>
+					</td>
+					<td>
+						<select class="form-control  width130" [(ngModel)]="CHARGENAME" >
+						<option value="null">--</option>
+						<option *ngFor="let d of AirLineCharges" value={{d.DataValueField}}>{{d.DataTextField}}</option>
+				  </select></td>
+
+					<td class="width60"></td>
+					<td class="width60"></td>
+					<td class="centerlabel">
+						<input type="text" class="width100" [(ngModel)]="RATE_TAR" (change)="changeNetRate(RATE_TAR)" class="form-control">
+					</td>
+					<td>
+						<select class="form-control width70" [(ngModel)]="RATE_TAR_FRT" (change)="changeNetFreight(RATE_TAR_FRT)" >
+							<option value="">--Select--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+					</select>
+					</td>
+					<td class="width60"></td>
+					<!-- <td class="width60"></td> -->
+					<td>
+						<input type="text" class="width100" [(ngModel)]="RATE_NET" disabled class="form-control">
+					</td>
+					<td>
+						<select class="form-control width70" disabled [(ngModel)]="RATE_NET_FRT" >
+							<option value="">--Select--</option>
+							<option value="PP">PP</option>
+							<option value="CC">CC</option>
+					</select>
+					</td>
+					<!-- <td class="right-text" >
+						<button type="button" class="btn btn-sm btn-warning" (click)="AddHAWBALCharges()">
+							<span class="col-form-span-label">
+								<i class="fa fa-plus"></i>&nbsp;{{txtchild}}</span>
+						</button>
+					</td> -->
+				  </tr>
+				  <tr>
+					<td colspan="9" align="center" >
+						<button type="button" class="btn btn-sm btn-warning" (click)="AddHAWBALCharges()">
+							<span class="col-form-span-label">
+								<i class="fa fa-plus"></i>&nbsp;{{txtchild}}</span>
+						</button>
+						<button type="button" class="btn btn-sm btn-danger" (click)="ResetHAWBCharges()">
+							<span class="col-form-span-label">
+								<i class="fa fa-ban"></i>Reset</span>
+						</button>
+					</td>
+				  </tr>
+				<tr>
+					<td colspan="11">
+						<table class="table table-bordered  table-sm-new bgwhite" *ngIf="Chargeslist.length>0" width="100%" >
+											<thead>
+												<tr class="formheading">
+													<th></th>
+													<th  class="col-form-span-label">DA/DC</th>
+													<th class="col-form-span-label"> Charge</th>
+													<th  class="col-form-span-label">Tariff Rate</th>
+													<th  class="col-form-span-label">Tariff Rate Freight</th>
+													<th  class="col-form-span-label">Net Rate </th>
+													<th class="col-form-span-label">Net Rate Freight</th>
+
+												</tr>
+											</thead>
+											 <tbody   >
+												<tr *ngFor="let obj of Chargeslist">
+													<td class="centerlabel">
+														<i class="fa fa-pencil" (click)="Editchildrecd(obj.PK_ID)"  ></i>
+														&nbsp;
+														<i class="fa fa-trash" (click)="deletechildrecd(obj.PK_ID,obj.FK_CHRGDETAILSID)" ></i>
+													</td>
+													   <td><span class="col-form-span-label">{{obj.CHARGETYPE}}</span></td>
+													<td><span class="col-form-span-label">{{obj.CHRGNAME}}</span></td>
+													<td><span class="col-form-span-label">{{obj.RATE_TAR}}</span></td>
+													<td><span class="col-form-span-label">{{obj.RATE_TAR_FRT}}</span></td>
+													<td><span class="col-form-span-label">{{obj.RATE_NET}}</span></td>
+													<td><span class="col-form-span-label">{{obj.RATE_NET_FRT}}</span></td>
+													<td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
+												</tr>
+											</tbody>
+										</table>
+
+					</td>
+				</tr>
+			</table>
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="3"><strong><span class="col-form-span-label">REMARK</span></strong></td>
+		<td colspan="8"><input type="text" [(ngModel)]="Remark" class="form-control" /></td>
+	  </tr>
+	</tbody>
+</table>

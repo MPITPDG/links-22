@@ -1,0 +1,1512 @@
+<div class="fd-page" [ngClass]="{ 'fd-dark': DarkMode }">
+
+    <!-- ============================== HEADER ============================== -->
+    <div class="fd-header">
+        <div class="fd-title-wrap">
+            <div class="fd-title-row">
+                <h1 class="fd-title">Finance Dashboard <span class="fd-company">{{ cmpnyname }}</span></h1>
+                <span class="fd-badge" *ngIf="Searched">{{ BranchLabel }}</span>
+            </div>
+        </div>
+
+        <div class="fd-header-actions">
+            <div class="fd-tabs" *ngIf="Searched">
+                <button type="button" class="fd-tab" [class.active]="Tab === 'OVERVIEW'"
+                        (click)="SetTab('OVERVIEW')">Overview</button>
+                <button type="button" class="fd-tab" [class.active]="Tab === 'RECEIVABLES'"
+                        (click)="SetTab('RECEIVABLES')">Receivables</button>
+                <button type="button" class="fd-tab" [class.active]="Tab === 'MARGIN'"
+                        (click)="SetTab('MARGIN')">Margin</button>
+                <button type="button" class="fd-tab" [class.active]="Tab === 'UNBILLED'"
+                        (click)="SetTab('UNBILLED')">Unbilled</button>
+                <button type="button" class="fd-tab" [class.active]="Tab === 'AUDIT'"
+                        (click)="SetTab('PAYABLES')">Payables</button>
+                <button type="button" class="fd-tab" [class.active]="Tab === 'AUDIT'"
+                        (click)="SetTab('AUDIT')">Audit</button>
+            </div>
+            <button type="button" class="fd-icon-btn" (click)="LegendOpen = true" title="Legend - what the badges, colours and abbreviations mean">
+                <i class="fa fa-question-circle-o"></i>
+            </button>
+            <button type="button" class="fd-icon-btn" (click)="DarkMode = !DarkMode"
+                    [title]="DarkMode ? 'Light mode' : 'Dark mode'">
+                <i class="fa" [ngClass]="DarkMode ? 'fa-moon-o' : 'fa-sun-o'"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================ FILTER BAR ============================ -->
+    <!-- one inline strip, like the Management Dashboard: controls left, actions right -->
+    <div class="fd-filterbar">
+        <div class="fd-filter-row">
+            <div class="fd-field fd-field--date" title="From Date">
+                <i class="fa fa-calendar-o fd-field-ico"></i>
+                <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)"
+                                [options]="myDatePickerOptions" [selDate]="FromDate"
+                                placeholder="From"></my-date-picker>
+            </div>
+            <div class="fd-field fd-field--date" title="To Date">
+                <i class="fa fa-calendar-o fd-field-ico"></i>
+                <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)"
+                                [options]="myDatePickerOptions" [selDate]="ToDate"
+                                placeholder="To"></my-date-picker>
+            </div>
+
+            <div class="fd-field fd-field--branch" title="Branch">
+                <select class="form-control" [(ngModel)]="Branch">
+                    <option *ngFor="let b of BranchList" value="{{ b.CITYCODE1 }}">{{ b.CITYNAME }}</option>
+                </select>
+            </div>
+
+            <div class="fd-field fd-field--client" title="Client">
+                <ng-select [items]="ClientList" bindLabel="NAME" bindValue="CODE" [(ngModel)]="ClientCode"
+                    [searchable]="true" [clearable]="true" [virtualScroll]="true"
+                    placeholder="All Clients" notFoundText="No client found" class="custom fd-select">
+                    <ng-template ng-option-tmp let-item="item">
+                        {{ item.NAME }} <small style="opacity:.6">({{ item.CODE }})</small>
+                    </ng-template>
+                </ng-select>
+            </div>
+
+            <div class="fd-field fd-field--topn" title="Top N clients in charts and lists">
+                <select class="form-control" [(ngModel)]="TopN">
+                    <option [ngValue]="10">Top 10</option>
+                    <option [ngValue]="20">Top 20</option>
+                    <option [ngValue]="50">Top 50</option>
+                </select>
+            </div>
+
+            <div class="fd-filter-actions">
+                <button type="button" class="fd-btn fd-btn--primary" (click)="Submit()">
+                    <i class="fa fa-filter"></i> Apply Filters
+                </button>
+                <button type="button" class="fd-btn fd-btn--danger" (click)="Reset()">
+                    <i class="fa fa-times"></i> Reset
+                </button>
+                <button type="button" class="fd-btn fd-btn--outline" (click)="ExportExposure()" [disabled]="!Searched">
+                    <i class="fa fa-download"></i> Export
+                </button>
+                <button type="button" class="fd-btn fd-btn--outline fd-btn--icon" *ngIf="Searched" (click)="SyncNow()"
+                        title="Bypass the 2-hour cache and pull fresh figures for everyone">
+                    <i class="fa fa-refresh"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="fd-asof" *ngIf="Searched && CacheInfo">
+            <i class="fa" [ngClass]="num(CacheInfo.IS_CACHED) === 1 ? 'fa-database' : 'fa-bolt'"></i>
+            Data as of {{ CacheInfo.CACHED_AT }}
+            <b *ngIf="num(CacheInfo.IS_CACHED) === 1">&middot; {{ cacheAge() }}</b>
+            <b *ngIf="num(CacheInfo.IS_CACHED) === 0">&middot; live</b>
+        </div>
+    </div>
+
+    <div class="fd-note" *ngIf="!Searched">
+        Outstanding, ageing and exposure are shown <b>as on the To Date</b>.
+        Billing mix, recovery days, margin and unbilled cover the <b>selected period</b>.
+        Choose a period and press <b>Apply Filters</b>.
+    </div>
+
+    <!-- ============================== RESULTS ============================== -->
+    <div class="fd-body" *ngIf="Searched">
+
+        <div class="fd-chip" *ngIf="ClientCode" style="margin-bottom:12px;">
+            Client: {{ ClientLabel() }}
+            <a href="javascript:void(0)" (click)="ClearClient()">&times;</a>
+        </div>
+
+        <!-- ======================= OVERVIEW ======================= -->
+        <div *ngIf="Tab === 'OVERVIEW'">
+
+            <div class="fd-grid fd-grid--main">
+                <!-- ---- KPI cards ---- -->
+                <div class="fd-grid fd-grid--3" style="margin-bottom:0;">
+                    <div class="fd-card fd-kpi">
+                        <div class="fd-kpi-top">
+                            <div class="fd-kpi-label">Total Exposure <i class="fd-info"
+                                 title="Net outstanding plus cost booked on jobs not yet invoiced, as on the To Date">i</i></div>
+                            <button type="button" class="fd-kpi-icon fd-kpi-icon--btn fd-ico--blue" (click)="OpenExplain('EXPOSURE')" title="How is this calculated?"><i class="fa fa-briefcase"></i></button>
+                        </div>
+                        <div class="fd-kpi-value">{{ fmtShort(Kpi.TOTAL_EXPOSURE) }}<span class="fd-kpi-unit">INR</span></div>
+                        <div class="fd-kpi-tip">Total money tied up with customers &mdash; what they owe us, plus work we have done but not yet billed.</div>
+                        <div class="fd-kpi-sub">
+                            <div class="fd-kpi-row"><span>Outstanding</span><b>{{ fmtShort(Kpi.TOTAL_OUTSTANDING) }}</b></div>
+                            <div class="fd-kpi-row"><span>Unbilled</span><b>{{ fmtShort(Kpi.UNBILLED_VALUE) }}</b></div>
+                        </div>
+                    </div>
+
+                    <div class="fd-card fd-kpi">
+                        <div class="fd-kpi-top">
+                            <div class="fd-kpi-label">Outstanding <i class="fd-info"
+                                 title="Bills pending less credits never applied to a bill">i</i></div>
+                            <button type="button" class="fd-kpi-icon fd-kpi-icon--btn fd-ico--red" (click)="OpenExplain('OUTSTANDING')" title="How is this calculated?"><i class="fa fa-exclamation-circle"></i></button>
+                        </div>
+                        <div class="fd-kpi-value">{{ fmtShort(Kpi.TOTAL_OUTSTANDING) }}<span class="fd-kpi-unit">net</span></div>
+                        <div class="fd-kpi-tip">What customers still owe us today, after deducting payments received but not yet matched to a bill.</div>
+                        <div class="fd-kpi-sub">
+                            <div class="fd-kpi-row"><span>Bills pending</span><b>{{ fmtShort(Kpi.GROSS_PENDING) }}</b></div>
+                            <div class="fd-kpi-row"><span>Unapplied credit</span><b>{{ fmtShort(Kpi.UNADJUSTED_CREDITS) }}</b></div>
+                            <div class="fd-kpi-row"><span>Overdue</span><b class="fd-neg">{{ fmtShort(Kpi.OVERDUE_AMT) }}</b></div>
+                        </div>
+                    </div>
+
+                    <div class="fd-card fd-kpi">
+                        <div class="fd-kpi-top">
+                            <div class="fd-kpi-label">Recovery <i class="fd-info"
+                                 title="Value-weighted days from invoice to last receipt, against the agreed credit period">i</i></div>
+                            <button type="button" class="fd-kpi-icon fd-kpi-icon--btn fd-ico--green" (click)="OpenExplain('RECOVERY')" title="How is this calculated?"><i class="fa fa-clock-o"></i></button>
+                        </div>
+                        <div class="fd-kpi-value">{{ Kpi.AVG_COLLECTION_DAYS | number:'1.0-1' }}<span class="fd-kpi-unit">days</span></div>
+                        <div class="fd-kpi-tip">How long customers actually take to pay us. If this is bigger than the credit period, they are paying late.</div>
+                        <div class="fd-kpi-sub">
+                            <div class="fd-kpi-row"><span>Credit period</span><b>{{ Kpi.AVG_CREDIT_PERIOD | number:'1.0-1' }} days</b></div>
+                            <div class="fd-kpi-row">
+                                <span>Recovery gap</span>
+                                <b [ngClass]="num(Kpi.RECOVERY_GAP) > 0 ? 'fd-up' : 'fd-down'">
+                                    {{ deltaArrow(Kpi.RECOVERY_GAP) }} {{ Kpi.RECOVERY_GAP | number:'1.1-1' }}d
+                                </b>
+                            </div>
+                            <!-- range: fastest / slowest settled bill in the period (needs proc with FASTEST_/SLOWEST_ columns) -->
+                            <div class="fd-kpi-row fd-kpi-row--range" *ngIf="Kpi.FASTEST_DAYS !== undefined && Kpi.FASTEST_DAYS !== null"
+                                 [title]="'Inv ' + Kpi.FASTEST_INV + ' - ' + Kpi.FASTEST_CLIENT">
+                                <span>Fastest</span><b class="fd-pos">{{ Kpi.FASTEST_DAYS | number }} days</b>
+                            </div>
+                            <div class="fd-kpi-row fd-kpi-row--range" *ngIf="Kpi.SLOWEST_DAYS !== undefined && Kpi.SLOWEST_DAYS !== null"
+                                 [title]="'Inv ' + Kpi.SLOWEST_INV + ' - ' + Kpi.SLOWEST_CLIENT">
+                                <span>Slowest</span><b class="fd-neg">{{ Kpi.SLOWEST_DAYS | number }} days</b>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fd-card fd-kpi">
+                        <div class="fd-kpi-top">
+                            <div class="fd-kpi-label">Billed in Period <i class="fd-info"
+                                 title="Invoice value raised between the From and To dates">i</i></div>
+                            <button type="button" class="fd-kpi-icon fd-kpi-icon--btn fd-ico--purple" (click)="OpenExplain('BILLED')" title="How is this calculated?"><i class="fa fa-file-text-o"></i></button>
+                        </div>
+                        <div class="fd-kpi-value">{{ fmtShort(Kpi.BILLED_PERIOD) }}<span class="fd-kpi-unit">INR</span></div>
+                        <div class="fd-kpi-tip">The value of invoices we raised to customers in the selected period.</div>
+                        <div class="fd-kpi-sub">
+                            <div class="fd-kpi-row"><span>Invoices</span><b>{{ Kpi.INVOICE_COUNT | number }}</b></div>
+                            <div class="fd-kpi-row"><span>GST</span><b>{{ fmtShort(Kpi.GST_AMT) }}</b></div>
+                        </div>
+                    </div>
+
+                    <div class="fd-card fd-kpi">
+                        <div class="fd-kpi-top">
+                            <div class="fd-kpi-label">Unbilled <i class="fd-info"
+                                 title="Cost already booked against jobs with no invoice. A cost figure, not revenue.">i</i></div>
+                            <button type="button" class="fd-kpi-icon fd-kpi-icon--btn fd-ico--amber" (click)="OpenExplain('UNBILLED')" title="How is this calculated?"><i class="fa fa-cube"></i></button>
+                        </div>
+                        <div class="fd-kpi-value">{{ fmtShort(Kpi.UNBILLED_VALUE) }}<span class="fd-kpi-unit">cost</span></div>
+                        <div class="fd-kpi-tip">Jobs we have spent money on but not yet invoiced. Every rupee here is our money until the bill goes out.</div>
+                        <div class="fd-kpi-sub">
+                            <div class="fd-kpi-row"><span>Open jobs</span><b>{{ Kpi.UNBILLED_JOBS | number }}</b></div>
+                            <div class="fd-kpi-row"><span>Basis</span><b>cost incurred</b></div>
+                        </div>
+                    </div>
+
+                    <div class="fd-card fd-kpi">
+                        <div class="fd-kpi-top">
+                            <div class="fd-kpi-label">Margin <i class="fd-info"
+                                 title="Job-wise income less expense. Duty billed to clients sits outside job income, so clearance work can read negative.">i</i></div>
+                            <button type="button" class="fd-kpi-icon fd-kpi-icon--btn fd-ico--green" (click)="OpenExplain('MARGIN')" title="How is this calculated?"><i class="fa fa-line-chart"></i></button>
+                        </div>
+                        <div class="fd-kpi-value" [ngClass]="num(Kpi.MARGIN_PCT) >= 0 ? 'fd-pos' : 'fd-neg'">
+                            {{ Kpi.MARGIN_PCT | number:'1.1-1' }}<span class="fd-kpi-unit">%</span>
+                        </div>
+                        <div class="fd-kpi-tip">Out of every &#8377;100 we billed on jobs, this is what stayed with us after paying job costs.</div>
+                        <div class="fd-kpi-sub">
+                            <div class="fd-kpi-row"><span>Income</span><b>{{ fmtShort(Kpi.REVENUE_PERIOD) }}</b></div>
+                            <div class="fd-kpi-row"><span>Expense</span><b>{{ fmtShort(Kpi.COST_PERIOD) }}</b></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ---- Quick snapshot ---- -->
+                <div class="fd-card">
+                    <div class="fd-card-head">
+                        <span class="fd-card-title">Quick Snapshot <i class="fd-info" title="Portfolio health at a glance">i</i></span>
+                    </div>
+
+                    <div class="fd-snap-grid">
+                        <div class="fd-snap">
+                            <div class="fd-snap-label">Overdue <i class="fd-info" title="Share of net outstanding past its due date">i</i></div>
+                            <div class="fd-snap-val">
+                                <span class="fd-snap-num">{{ pctOf(Kpi.OVERDUE_AMT, Kpi.TOTAL_OUTSTANDING) | number:'1.0-0' }}%</span>
+                                <span class="fd-snap-note">{{ fmtShort(Kpi.OVERDUE_AMT) }}</span>
+                            </div>
+                            <div class="fd-meter"><span class="bad" [style.width.%]="pctOf(Kpi.OVERDUE_AMT, Kpi.TOTAL_OUTSTANDING)"></span></div>
+                        </div>
+
+                        <div class="fd-snap">
+                            <div class="fd-snap-label">At Risk <i class="fd-info" title="Clients flagged RED">i</i></div>
+                            <div class="fd-snap-val">
+                                <span class="fd-snap-num">{{ Kpi.RED_CLIENTS }}</span>
+                                <span class="fd-snap-note">of {{ Kpi.CLIENT_COUNT }}</span>
+                            </div>
+                            <div class="fd-meter"><span class="bad" [style.width.%]="pctOf(Kpi.RED_CLIENTS, Kpi.CLIENT_COUNT)"></span></div>
+                        </div>
+
+                        <div class="fd-snap">
+                            <div class="fd-snap-label">Taxable Mix <i class="fd-info" title="Taxable share of billing, INR and foreign combined">i</i></div>
+                            <div class="fd-snap-val">
+                                <span class="fd-snap-num">{{ taxablePct() | number:'1.0-0' }}%</span>
+                                <span class="fd-snap-note">GST {{ fmtShort(Kpi.GST_AMT) }}</span>
+                            </div>
+                            <div class="fd-meter"><span [style.width.%]="taxablePct()"></span></div>
+                        </div>
+
+                        <div class="fd-snap">
+                            <div class="fd-snap-label">No Terms <i class="fd-info" title="Clients with no agreed credit period on file">i</i></div>
+                            <div class="fd-snap-val">
+                                <span class="fd-snap-num">{{ Kpi.NOTERMS_CLIENTS }}</span>
+                                <span class="fd-snap-note">clients</span>
+                            </div>
+                            <div class="fd-meter"><span class="warn" [style.width.%]="pctOf(Kpi.NOTERMS_CLIENTS, Kpi.CLIENT_COUNT)"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="fd-card-head" style="margin-top:18px;">
+                        <span class="fd-card-title">Top Exposure <i class="fd-info" title="Largest client exposures. Click a client for detail.">i</i></span>
+                    </div>
+                    <div class="fd-rank">
+                        <div class="fd-rank-item fd-row-click" *ngFor="let r of Exposure.slice(0, 7); let i = index" (click)="OpenDrill(r)">
+                            <span class="fd-dot" [style.background]="rankColor(i)"></span>
+                            <span class="fd-rank-name">{{ r.CLIENTNAME }}</span>
+                            <span class="fd-rank-val">{{ fmtShort(r.TOTAL_EXPOSURE) }}</span>
+                            <span class="fd-rank-pct">{{ pctOf(r.TOTAL_EXPOSURE, Kpi.TOTAL_EXPOSURE) | number:'1.0-0' }}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---- charts ---- -->
+            <!-- ---- cash funnel + billing coverage ---- -->
+            <div class="fd-section-title"><i class="fa fa-filter"></i> Cash Flow Funnel</div>
+            <div class="fd-card-sub">
+                Where money gets stuck: work done &rarr; billed &rarr; collected, for the selected period.
+                A big drop between two bars shows which team has the bottleneck.
+            </div>
+
+            <div class="fd-grid fd-grid--2">
+                <div class="fd-card">
+                    <div class="fd-funnel">
+                        <ng-container *ngFor="let f of Funnel; let i = index">
+                            <div class="fd-funnel-stage" [style.width.%]="funnelWidth(f)"
+                                 [ngClass]="'fd-funnel-s' + f.STAGE_NO">
+                                <div class="fd-funnel-head">
+                                    <span class="fd-funnel-name">{{ f.STAGE }}</span>
+                                    <span class="fd-funnel-jobs">{{ f.JOBS | number }} jobs</span>
+                                </div>
+                                <div class="fd-funnel-val">{{ fmtShort(f.VALUE_INR) }}
+                                    <small>{{ f.VALUE_LABEL }}</small>
+                                </div>
+                            </div>
+                            <div class="fd-funnel-drop" *ngIf="i > 0 && f.PCT_OF_PREV !== null">
+                                {{ f.PCT_OF_PREV | number:'1.0-1' }}% of previous stage
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="fd-kpi-tip" style="margin-top:12px;">
+                        Stage 1 shows cost booked on jobs (an unbilled job has no revenue figure yet).
+                        Stage 3 cash can include collections against invoices raised before this period.
+                    </div>
+                </div>
+
+                <div class="fd-card" *ngIf="Coverage">
+                    <div class="fd-card-head">
+                        <span class="fd-card-title">Billing Speed <i class="fd-info"
+                              title="How quickly finished jobs turn into invoices">i</i></span>
+                    </div>
+                    <div class="fd-kpi-tip" style="margin:-6px 0 12px;">
+                        Of {{ Coverage.TOTAL_JOBS | number }} shipment jobs in this period,
+                        {{ Coverage.BILLED_JOBS | number }} are invoiced
+                        ({{ Coverage.COVERAGE_PCT | number:'1.1-1' }}%) taking on average
+                        {{ Coverage.AVG_LAG_DAYS | number:'1.0-1' }} days from job to first invoice.
+                    </div>
+                    <div class="fd-rank">
+                        <div class="fd-rank-item">
+                            <span class="fd-dot" style="background:#00bb7f"></span>
+                            <span class="fd-rank-name">Billed within 7 days</span>
+                            <span class="fd-rank-val">{{ Coverage.LAG_0_7 | number }}</span>
+                        </div>
+                        <div class="fd-rank-item">
+                            <span class="fd-dot" style="background:#00bb7f"></span>
+                            <span class="fd-rank-name">8 - 15 days</span>
+                            <span class="fd-rank-val">{{ Coverage.LAG_8_15 | number }}</span>
+                        </div>
+                        <div class="fd-rank-item">
+                            <span class="fd-dot" style="background:#f99c00"></span>
+                            <span class="fd-rank-name">16 - 30 days</span>
+                            <span class="fd-rank-val">{{ Coverage.LAG_16_30 | number }}</span>
+                        </div>
+                        <div class="fd-rank-item">
+                            <span class="fd-dot" style="background:#f99c00"></span>
+                            <span class="fd-rank-name">31 - 60 days</span>
+                            <span class="fd-rank-val">{{ Coverage.LAG_31_60 | number }}</span>
+                        </div>
+                        <div class="fd-rank-item">
+                            <span class="fd-dot" style="background:#e40014"></span>
+                            <span class="fd-rank-name">Over 60 days</span>
+                            <span class="fd-rank-val">{{ Coverage.LAG_60P | number }}</span>
+                        </div>
+                        <div class="fd-rank-item" *ngIf="num(Coverage.UNBILLED_JOBS) > 0">
+                            <span class="fd-dot" style="background:#737373"></span>
+                            <span class="fd-rank-name">Still unbilled
+                                <small style="color:var(--fd-muted-fg)"> &middot; oldest {{ Coverage.OLDEST_UNBILLED_DAYS }} days</small>
+                            </span>
+                            <span class="fd-rank-val">{{ Coverage.UNBILLED_JOBS | number }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fd-section-title"><i class="fa fa-bar-chart"></i> Collection &amp; Revenue Insights</div>
+            <div class="fd-card-sub">Credit terms versus what clients actually pay, and how billing splits by tax status</div>
+
+            <div class="fd-grid fd-grid--2">
+                <div class="fd-card">
+                    <div class="fd-card-head">
+                        <span class="fd-card-title">Credit Period vs Actual Recovery <i class="fd-info"
+                              title="Value-weighted actual collection days against the agreed credit period, top clients by billing">i</i></span>
+                    </div>
+                    <div class="fd-legend">
+                        <span class="fd-legend-item"><span class="fd-dot" style="background:#93b4ff"></span> Credit period</span>
+                        <span class="fd-legend-item"><span class="fd-dot" style="background:#1447e6"></span> Actual recovery</span>
+                    </div>
+                    <div class="fd-chart">
+                        <canvas baseChart [datasets]="recoveryData" [labels]="recoveryLabels"
+                                [options]="barOptions" [colors]="recoveryColors"
+                                [legend]="false" chartType="bar"></canvas>
+                    </div>
+                </div>
+
+                <div class="fd-card">
+                    <div class="fd-card-head">
+                        <span class="fd-card-title">Revenue Composition <i class="fd-info"
+                              title="Taxable and non-taxable billing, INR and foreign, normalised to INR">i</i></span>
+                    </div>
+                    <div class="fd-chart">
+                        <canvas baseChart [data]="mixData" [labels]="mixLabels"
+                                [options]="donutOptions" [colors]="mixColors"
+                                [legend]="true" chartType="doughnut"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fd-grid fd-grid--2">
+                <div class="fd-card">
+                    <div class="fd-card-head">
+                        <span class="fd-card-title">Receivable Ageing <i class="fd-info"
+                              title="Net of unapplied credit, allocated oldest bucket first">i</i></span>
+                    </div>
+                    <div class="fd-chart">
+                        <canvas baseChart [datasets]="ageingData" [labels]="ageingLabels"
+                                [options]="hbarOptions" [colors]="ageingColors"
+                                [legend]="false" chartType="horizontalBar"></canvas>
+                    </div>
+                </div>
+
+                <div class="fd-card">
+                    <div class="fd-card-head">
+                        <span class="fd-card-title">Unbilled Ageing <i class="fd-info"
+                              title="Open jobs by age, valued at cost already booked">i</i></span>
+                    </div>
+                    <div class="fd-rank">
+                        <div class="fd-rank-item" *ngFor="let u of UnbilledAge">
+                            <span class="fd-dot" [style.background]="bucketColor(u.SORTORDER)"></span>
+                            <span class="fd-rank-name">
+                                {{ u.AGE_BUCKET }}
+                                <small style="color:var(--fd-muted-fg);font-weight:400;">
+                                    &middot; {{ u.JOBS }} jobs, {{ u.JOBS_WITH_COST }} costed
+                                </small>
+                            </span>
+                            <span class="fd-rank-val">{{ u.COST_VALUE | number:'1.0-0' }}</span>
+                        </div>
+                        <div class="fd-empty" *ngIf="UnbilledAge.length === 0">No open jobs in this period.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================= RECEIVABLES ======================= -->
+        <div *ngIf="Tab === 'RECEIVABLES'">
+            <div class="fd-card" style="margin-bottom:14px;">
+                <div class="fd-card-head">
+                    <span class="fd-card-title">Client Exposure &amp; Risk</span>
+                    <span class="fd-card-sub" style="margin:0;">Suggested limit is derived from billing history &mdash; not an approved credit limit</span>
+                </div>
+                <div class="fd-table-scroll">
+                    <table class="fd-table">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th class="num">Credit Days</th>
+                                <th class="num">Suggested Limit</th>
+                                <th class="num">Bills Pending</th>
+                                <th class="num">Unapplied Credit</th>
+                                <th class="num">Outstanding</th>
+                                <th class="num">Overdue</th>
+                                <th class="num">Unbilled</th>
+                                <th class="num">Total Exposure</th>
+                                <th class="num">Utilisation</th>
+                                <th class="num">Recovery Gap</th>
+                                <th>Risk</th>
+                                <th>Remind</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let r of Exposure" (click)="OpenDrill(r)" class="fd-row-click">
+                                <td>
+                                    {{ r.CLIENTNAME }}
+                                    <span class="fd-flag" *ngIf="r.CLIENT_FLAG">{{ r.CLIENT_FLAG }}</span>
+                                </td>
+                                <td class="num">{{ r.CREDIT_PERIOD }}</td>
+                                <td class="num">{{ r.SUGGESTED_LIMIT | number:'1.0-0' }}</td>
+                                <td class="num">{{ r.GROSS_PENDING | number:'1.0-0' }}</td>
+                                <td class="num fd-pos">{{ r.UNADJUSTED | number:'1.0-0' }}</td>
+                                <td class="num">{{ r.OUTSTANDING | number:'1.0-0' }}</td>
+                                <td class="num fd-neg">{{ r.OVERDUE | number:'1.0-0' }}</td>
+                                <td class="num">{{ r.UNBILLED | number:'1.0-0' }}</td>
+                                <td class="num"><b>{{ r.TOTAL_EXPOSURE | number:'1.0-0' }}</b></td>
+                                <td class="num">
+                                    <div class="fd-util">
+                                        <div class="fd-util-num">{{ r.UTILISATION_PCT === null ? '-' : (r.UTILISATION_PCT | number:'1.0-0') + '%' }}</div>
+                                        <div class="fd-meter" style="margin-top:4px;">
+                                            <span [ngClass]="meterClass(r.RISK_STATUS)" [style.width.%]="utilWidth(r.UTILISATION_PCT)"></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="num" [ngClass]="num(r.RECOVERY_GAP) > 0 ? 'fd-neg' : 'fd-pos'">
+                                    {{ r.RECOVERY_GAP === null ? '-' : (r.RECOVERY_GAP | number:'1.0-0') }}
+                                </td>
+                                <td><span class="fd-pill" [ngClass]="pillClass(r.RISK_STATUS)">{{ r.RISK_STATUS }}</span></td>
+                                <td>
+                                    <button type="button" class="fd-icon-btn fd-remind" *ngIf="num(r.OVERDUE) > 0.01"
+                                            title="Compose a payment reminder for this client"
+                                            (click)="OpenReminder(r, $event)">
+                                        <i class="fa fa-envelope-o"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr *ngIf="Exposure.length === 0"><td colspan="12" class="fd-empty">No records.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="fd-card">
+                <div class="fd-card-head"><span class="fd-card-title">Receivable Ageing by Client</span></div>
+                <div class="fd-table-scroll">
+                    <table class="fd-table">
+                        <thead>
+                            <tr>
+                                <th>Client</th><th class="num">Receivable</th>
+                                <th class="num">0-30</th><th class="num">31-60</th><th class="num">61-90</th>
+                                <th class="num">91-120</th><th class="num">121-180</th><th class="num">181-365</th>
+                                <th class="num">366-730</th><th class="num">731-1095</th><th class="num">1095+</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let a of Ageing">
+                                <td>{{ a.CLIENTNAME }}</td>
+                                <td class="num"><b>{{ a.RECEIVABLE | number:'1.0-0' }}</b></td>
+                                <td class="num">{{ a.DAYS_000_030 | number:'1.0-0' }}</td>
+                                <td class="num">{{ a.DAYS_031_060 | number:'1.0-0' }}</td>
+                                <td class="num">{{ a.DAYS_061_090 | number:'1.0-0' }}</td>
+                                <td class="num">{{ a.DAYS_091_120 | number:'1.0-0' }}</td>
+                                <td class="num">{{ a.DAYS_121_180 | number:'1.0-0' }}</td>
+                                <td class="num fd-neg">{{ a.DAYS_181_365 | number:'1.0-0' }}</td>
+                                <td class="num fd-neg">{{ a.DAYS_366_730 | number:'1.0-0' }}</td>
+                                <td class="num fd-neg">{{ a.DAYS_731_1095 | number:'1.0-0' }}</td>
+                                <td class="num fd-neg">{{ a.DAYS_1096_9999 | number:'1.0-0' }}</td>
+                            </tr>
+                            <tr *ngIf="Ageing.length === 0"><td colspan="11" class="fd-empty">No records.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================= MARGIN ======================= -->
+        <div *ngIf="Tab === 'MARGIN'">
+            <div class="fd-card">
+                <div class="fd-card-head">
+                    <span class="fd-card-title">Margin by Service Type</span>
+                </div>
+                <div class="fd-card-sub">
+                    What each client earned or lost us, by type of work.
+                    <b>Click a row to see every job behind the number</b> (same figures as the Job Profit report);
+                    the <i class="fa fa-external-link"></i> icon opens a job's full voucher-level statement.
+                    Note: customs duty is billed to the client but sits outside job income, so clearance work can read
+                    negative &mdash; the duty columns show by how much. A job costed but not yet fully invoiced also reads negative.
+                    <a href="javascript:void(0)" (click)="LegendOpen = true"><i class="fa fa-question-circle-o"></i> What do INFERRED / JOB and the service codes mean?</a>
+                </div>
+                <div class="fd-table-scroll fd-table-scroll--tall">
+                    <table class="fd-table">
+                        <thead>
+                            <tr>
+                                <th class="fd-sortable" (click)="SortMargin('CLIENTNAME')">Client {{ sortArrow('CLIENTNAME') }}</th>
+                                <th class="fd-sortable" (click)="SortMargin('SERVICE_TYPE')">Service Type {{ sortArrow('SERVICE_TYPE') }}</th>
+                                <th class="fd-sortable" (click)="SortMargin('LAST_BILLED_YMD')" title="Latest invoice date among this row's jobs">Last Billed {{ sortArrow('LAST_BILLED_YMD') }}</th>
+                                <th class="num fd-sortable" (click)="SortMargin('JOBS')">Jobs {{ sortArrow('JOBS') }}</th>
+                                <th class="num fd-sortable" (click)="SortMargin('REVENUE')">Income {{ sortArrow('REVENUE') }}</th>
+                                <th class="num fd-sortable" (click)="SortMargin('COST')">Expense {{ sortArrow('COST') }}</th>
+                                <th class="num fd-sortable" (click)="SortMargin('MARGIN')">Margin {{ sortArrow('MARGIN') }}</th>
+                                <th class="num fd-sortable" (click)="SortMargin('MARGIN_PCT')">Margin % {{ sortArrow('MARGIN_PCT') }}</th>
+                                <th class="num fd-sortable" (click)="SortMargin('DUTY_PAID')">Duty Paid {{ sortArrow('DUTY_PAID') }}</th>
+                                <th class="num fd-sortable" (click)="SortMargin('DUTY_RECO')">Duty Recovered {{ sortArrow('DUTY_RECO') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container *ngFor="let m of MarginSorted()">
+                                <tr class="fd-row-click" (click)="ToggleMargin(m.CLIENTCODE + '|' + m.SERVICE_TYPE)">
+                                    <td>
+                                        <i class="fa" [ngClass]="MarginOpen[m.CLIENTCODE + '|' + m.SERVICE_TYPE] ? 'fa-caret-down' : 'fa-caret-right'"
+                                           style="width:14px;color:var(--fd-muted-fg);"></i>
+                                        {{ m.CLIENTNAME }}
+                                    </td>
+                                    <td>
+                                        <span class="fd-pill fd-pill--svc" [title]="m.SERVICE_TYPE">{{ svcLabel(m.SERVICE_TYPE) }}</span>
+                                        <span class="fd-pill fd-pill--amber" *ngIf="num(m.INFERRED_JOBS) > 0"
+                                              title="Service type derived from invoice charge heads (Agency / Origin THC), not recorded on the shipment. ~96% accurate on sea export.">
+                                            INFERRED {{ m.INFERRED_JOBS }}/{{ m.JOBS }}
+                                        </span>
+                                    </td>
+                                    <td class="fd-lastbilled">{{ m.LAST_BILLED || '-' }}</td>
+                                    <td class="num">{{ m.JOBS }}</td>
+                                    <td class="num">{{ m.REVENUE | number:'1.0-0' }}</td>
+                                    <td class="num">{{ m.COST | number:'1.0-0' }}</td>
+                                    <td class="num" [ngClass]="num(m.MARGIN) >= 0 ? 'fd-pos' : 'fd-neg'">{{ m.MARGIN | number:'1.0-0' }}</td>
+                                    <td class="num" [ngClass]="num(m.MARGIN_PCT) >= 0 ? 'fd-pos' : 'fd-neg'">
+                                        {{ m.MARGIN_PCT === null ? '-' : (m.MARGIN_PCT | number:'1.1-1') + '%' }}
+                                    </td>
+                                    <td class="num">{{ m.DUTY_PAID | number:'1.0-0' }}</td>
+                                    <td class="num">{{ m.DUTY_RECO | number:'1.0-0' }}</td>
+                                </tr>
+                                <!-- job-wise P&L for this client + service type, same grain as the Job Profit report.
+                                     Rendered as rows of the SAME table so every figure sits under the master header:
+                                     Job (Client col) | Mode / date / status (Service Type col) | - | Income | Expense | Profit (Margin col) | Profit % | link -->
+                                <ng-container *ngIf="MarginOpen[m.CLIENTCODE + '|' + m.SERVICE_TYPE]">
+                                    <tr class="fd-subhead">
+                                        <td>Job No</td>
+                                        <td>Mode &middot; Job Date &middot; Status</td>
+                                        <td>Last Billed</td>
+                                        <td></td>
+                                        <td class="num">Income</td>
+                                        <td class="num">Expense</td>
+                                        <td class="num">Profit</td>
+                                        <td class="num">Profit %</td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                    <tr *ngFor="let j of JobsFor(m.CLIENTCODE, m.SERVICE_TYPE)" class="fd-subline">
+                                        <td>
+                                            <span class="fd-subindent"><a href="javascript:void(0)" class="fd-joblink" (click)="OpenJobDrawer(j.JOBNO); $event.stopPropagation();"
+                                               title="Open the Job Profit statement here">{{ j.JOBNO }}</a></span>
+                                            <a href="javascript:void(0)" (click)="OpenJobPopup(j.JOBNO); $event.stopPropagation();"
+                                               title="Open the Job Profit statement in its own window" style="margin:0 6px 0 4px;">
+                                                <i class="fa fa-external-link"></i>
+                                            </a>
+                                            <span class="fd-pill fd-pill--amber" *ngIf="j.SERVICE_SRC === 'INFERRED'"
+                                                  title="Service type derived from invoice charge heads, not recorded on the shipment">INFERRED</span>
+                                            <span class="fd-pill fd-pill--green" *ngIf="j.SERVICE_SRC === 'MASTER'"
+                                                  title="Service type as ticked on the import job (Ex-works / Custom Clearance / Freight Forwarding)">JOB</span>
+                                        </td>
+                                        <td>
+                                            {{ j.MODE_ }} &middot; {{ j.JOB_DATE }}
+                                            <span class="fd-pill" [ngClass]="j.IS_BILLED ? 'fd-pill--green' : 'fd-pill--amber'">
+                                                {{ j.IS_BILLED ? 'BILLED' : 'OPEN' }}
+                                            </span>
+                                            <span class="fd-pill fd-pill--amber" *ngIf="j.IS_BILLED && num(j.EXPENSE) <= 0.01"
+                                                  title="Billed, but no purchase / payment / JV cost is booked on this job yet - profit is provisional">COST PENDING</span>
+                                        </td>
+                                        <td class="fd-lastbilled">{{ j.LAST_BILLED || '-' }}</td>
+                                        <td></td>
+                                        <td class="num">{{ j.INCOME | number:'1.0-0' }}</td>
+                                        <td class="num">{{ j.EXPENSE | number:'1.0-0' }}</td>
+                                        <td class="num" [ngClass]="num(j.PROFIT) >= 0 ? 'fd-pos' : 'fd-neg'">{{ j.PROFIT | number:'1.0-0' }}</td>
+                                        <td class="num" [ngClass]="num(j.PROFIT_PCT) >= 0 ? 'fd-pos' : 'fd-neg'">
+                                            {{ j.PROFIT_PCT === null ? '-' : (j.PROFIT_PCT | number:'1.1-1') + '%' }}
+                                        </td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                    <tr *ngIf="JobsFor(m.CLIENTCODE, m.SERVICE_TYPE).length === 0" class="fd-subline">
+                                        <td colspan="10" class="fd-empty" style="padding:10px;">No job rows for this service type.</td>
+                                    </tr>
+                                </ng-container>
+                            </ng-container>
+                            <tr *ngIf="Margin.length === 0"><td colspan="10" class="fd-empty">No records.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================= UNBILLED ======================= -->
+        <div *ngIf="Tab === 'UNBILLED'">
+            <div class="fd-card">
+                <div class="fd-card-head"><span class="fd-card-title">Unbilled Jobs</span></div>
+                <div class="fd-card-sub">
+                    Every row is a finished or running job that nobody has invoiced yet &mdash; money waiting to be billed.
+                    <b>Click a row to see exactly which purchase, payment or JV put cost on the job</b>;
+                    the <i class="fa fa-external-link"></i> icon opens the full Job Profit statement.
+                    Value shown is cost already spent, not the invoice amount it will fetch.
+                </div>
+                <div class="fd-table-scroll fd-table-scroll--tall">
+                    <table class="fd-table">
+                        <thead>
+                            <tr>
+                                <th class="fd-sortable" (click)="SortUnbilled('JOBNO')">Job No {{ usortArrow('JOBNO') }}</th>
+                                <th class="fd-sortable" (click)="SortUnbilled('MODE_')">Mode {{ usortArrow('MODE_') }}</th>
+                                <th class="fd-sortable" (click)="SortUnbilled('CLIENTNAME')">Client {{ usortArrow('CLIENTNAME') }}</th>
+                                <th class="fd-sortable" (click)="SortUnbilled('JOB_DATE')">Job Date {{ usortArrow('JOB_DATE') }}</th>
+                                <th class="num fd-sortable" (click)="SortUnbilled('AGE_DAYS')">Age (days) {{ usortArrow('AGE_DAYS') }}</th>
+                                <th class="num fd-sortable" (click)="SortUnbilled('PURCHASE_EXP')">Purchase {{ usortArrow('PURCHASE_EXP') }}</th>
+                                <th class="num fd-sortable" (click)="SortUnbilled('BANKCASH_EXP')">Bank / Cash {{ usortArrow('BANKCASH_EXP') }}</th>
+                                <th class="num fd-sortable" (click)="SortUnbilled('JV_EXP')">JV {{ usortArrow('JV_EXP') }}</th>
+                                <th class="num fd-sortable" (click)="SortUnbilled('TOTAL_COST')">Total Cost {{ usortArrow('TOTAL_COST') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container *ngFor="let j of UnbilledSorted()">
+                                <tr class="fd-row-click" (click)="ToggleUnbilled(j.JOBNO)">
+                                    <td>
+                                        <i class="fa" [ngClass]="UnbilledOpen[j.JOBNO] ? 'fa-caret-down' : 'fa-caret-right'"
+                                           style="width:14px;color:var(--fd-muted-fg);"></i>
+                                        <a href="javascript:void(0)" class="fd-joblink" (click)="OpenJobDrawer(j.JOBNO); $event.stopPropagation();"
+                                           title="Open the Job Profit statement here">{{ j.JOBNO }}</a>
+                                        <a href="javascript:void(0)" (click)="OpenJobPopup(j.JOBNO); $event.stopPropagation();"
+                                           title="Open the Job Profit statement in its own window" style="margin-left:6px;">
+                                            <i class="fa fa-external-link"></i>
+                                        </a>
+                                    </td>
+                                    <td>{{ j.MODE_ }}</td>
+                                    <td>{{ j.CLIENTNAME }}</td>
+                                    <td>{{ j.JOB_DATE }}</td>
+                                    <td class="num">{{ j.AGE_DAYS }}</td>
+                                    <td class="num">{{ j.PURCHASE_EXP | number:'1.0-0' }}</td>
+                                    <td class="num">{{ j.BANKCASH_EXP | number:'1.0-0' }}</td>
+                                    <td class="num">{{ j.JV_EXP | number:'1.0-0' }}</td>
+                                    <td class="num"><b>{{ j.TOTAL_COST | number:'1.0-0' }}</b></td>
+                                </tr>
+                                <!-- voucher-level lines: which purchase / payment / JV put cost on this job.
+                                     Rows of the SAME table, column-synced with the master header: the amount sits
+                                     under the Purchase / Bank-Cash / JV column it belongs to. -->
+                                <ng-container *ngIf="UnbilledOpen[j.JOBNO]">
+                                    <tr class="fd-subhead">
+                                        <td>Source &middot; Voucher No</td>
+                                        <td></td>
+                                        <td>Expense Head</td>
+                                        <td>Date</td>
+                                        <td></td>
+                                        <td class="num">Purchase</td>
+                                        <td class="num">Bank / Cash</td>
+                                        <td class="num">JV</td>
+                                        <td class="num">Amount</td>
+                                    </tr>
+                                    <tr *ngFor="let l of LinesFor(j.JOBNO)" class="fd-subline">
+                                        <td><span class="fd-subindent"><span class="fd-pill fd-pill--svc" [title]="vchName(l.VCH_TYPE || l.SOURCE_)">{{ l.VCH_TYPE || l.SOURCE_ }}</span> {{ l.REFNO }}</span></td>
+                                        <td></td>
+                                        <td>{{ l.ACCTNAME }}</td>
+                                        <td>{{ l.REF_DATE }}</td>
+                                        <td></td>
+                                        <td class="num">{{ l.SOURCE_ === 'PURCHASE'  ? (l.AMOUNT | number:'1.2-2') : '' }}</td>
+                                        <td class="num">{{ l.SOURCE_ === 'BANK/CASH' ? (l.AMOUNT | number:'1.2-2') : '' }}</td>
+                                        <td class="num">{{ l.SOURCE_ === 'JV'        ? (l.AMOUNT | number:'1.2-2') : '' }}</td>
+                                        <td class="num">{{ l.AMOUNT | number:'1.2-2' }}</td>
+                                    </tr>
+                                    <tr *ngIf="LinesFor(j.JOBNO).length === 0" class="fd-subline">
+                                        <td colspan="9" class="fd-empty" style="padding:10px;">No expense vouchers found for this job.</td>
+                                    </tr>
+                                </ng-container>
+                            </ng-container>
+                            <tr *ngIf="UnbilledJobs.length === 0"><td colspan="9" class="fd-empty">No unbilled jobs.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================= AUDIT ======================= -->
+        <div *ngIf="Tab === 'AUDIT'">
+            <div class="fd-card">
+                <div class="fd-card-head">
+                    <span class="fd-card-title">Data Quality Audit</span>
+                    <span style="display:flex;gap:10px;align-items:center;">
+                        <label class="fd-hint" style="cursor:pointer;">
+                            <input type="checkbox" [(ngModel)]="ShowPassing"> show passing checks
+                        </label>
+                        <button type="button" class="fd-btn fd-btn--outline" (click)="LoadAudit()">
+                            <i class="fa fa-refresh"></i> Re-run
+                        </button>
+                        <button type="button" class="fd-btn fd-btn--outline" (click)="ExportAudit()">
+                            <i class="fa fa-download"></i> Export
+                        </button>
+                    </span>
+                </div>
+                <div class="fd-card-sub">
+                    Live checks (never cached) on the data feeding this dashboard. Fix the HIGH items first &mdash;
+                    they silently distort the overdue and ageing figures everyone else reads.
+                </div>
+
+                <div class="fd-empty" *ngIf="AuditLoading">Running checks&hellip;</div>
+                <div class="fd-empty" *ngIf="AuditLoaded && VisibleChecks().length === 0">All checks passing.</div>
+
+                <div class="fd-audit-card" *ngFor="let c of VisibleChecks()">
+                    <div class="fd-audit-head fd-row-click" (click)="ToggleAudit(c.CHECK_CODE)">
+                        <i class="fa" [ngClass]="AuditOpen[c.CHECK_CODE] ? 'fa-caret-down' : 'fa-caret-right'"
+                           style="width:14px;color:var(--fd-muted-fg);"></i>
+                        <span class="fd-pill" [ngClass]="sevClass(c.SEVERITY)">{{ c.SEVERITY }}</span>
+                        <span class="fd-audit-name">{{ c.CHECK_NAME }}</span>
+                        <span class="fd-audit-nums">
+                            <b>{{ c.ITEMS | number }}</b> items
+                            <ng-container *ngIf="num(c.ACTIONABLE_VALUE) > 0.01">
+                                &middot; <b class="fd-neg">{{ fmtShort(c.ACTIONABLE_VALUE) }}</b> actionable
+                            </ng-container>
+                            <ng-container *ngIf="num(c.BY_DESIGN_VALUE) > 0.01">
+                                &middot; <span class="fd-hint">{{ fmtShort(c.BY_DESIGN_VALUE) }} by design</span>
+                            </ng-container>
+                        </span>
+                    </div>
+                    <div class="fd-audit-note">{{ c.NOTE }}</div>
+
+                    <div *ngIf="AuditOpen[c.CHECK_CODE] && AuditRows(c.CHECK_CODE).length > 0" class="fd-table-scroll" style="margin-top:8px;">
+                        <table class="fd-table fd-subtable">
+                            <thead>
+                                <tr><th>Code</th><th>Name</th><th>Reference</th><th>Date</th>
+                                    <th class="num">Value</th><th>Detail</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let d of AuditRows(c.CHECK_CODE)">
+                                    <td>{{ d.ENTITY_CODE }}</td>
+                                    <td>{{ d.ENTITY_NAME }}</td>
+                                    <td>{{ d.REF_NO }}</td>
+                                    <td>{{ d.REF_DATE }}</td>
+                                    <td class="num">{{ d.VALUE_INR | number:'1.2-2' }}</td>
+                                    <td style="white-space:normal;max-width:380px;">
+                                        <span class="fd-pill fd-pill--grey" *ngIf="d.BY_DESIGN">BY DESIGN</span>
+                                        {{ d.DETAIL }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== LEGEND / HELP ==================== -->
+    <div class="fd-backdrop" *ngIf="LegendOpen" (click)="LegendOpen = false"></div>
+    <div class="fd-reminder fd-helppanel" *ngIf="LegendOpen">
+        <div class="fd-drawer-head">
+            <div>
+                <div class="fd-card-title"><i class="fa fa-question-circle-o"></i> Legend &mdash; badges, colours &amp; abbreviations</div>
+                <div class="fd-card-sub" style="margin:2px 0 0;">What each mark on this dashboard means, and where it comes from</div>
+            </div>
+            <button type="button" class="fd-icon-btn" (click)="LegendOpen = false">&times;</button>
+        </div>
+        <div class="fd-reminder-body fd-helppanel-body">
+
+            <div class="fd-lg-h">Service type (Margin tab)</div>
+            <table class="fd-lg-table">
+                <tr><td><span class="fd-pill fd-pill--svc">Freight Forwarding (FFD)</span></td><td>Freight / transport leg only.</td></tr>
+                <tr><td><span class="fd-pill fd-pill--svc">Custom Clearance (CCLR)</span></td><td>Customs clearance leg only.</td></tr>
+                <tr><td><span class="fd-pill fd-pill--svc">Exwork (EX)</span></td><td>Ex-works / door-to-door &mdash; both legs included.</td></tr>
+                <tr><td><span class="fd-pill fd-pill--svc">FFD + CCLR</span></td><td>Both freight forwarding and clearance done on the job.</td></tr>
+                <tr><td><span class="fd-pill fd-pill--svc">Misc / Other</span></td><td>Non-shipment (misc) jobs &mdash; billed value but no job-wise P&amp;L source.</td></tr>
+                <tr><td><span class="fd-pill fd-pill--svc">Unclassified</span></td><td>No service information anywhere &mdash; shown as its own row rather than guessed.</td></tr>
+            </table>
+
+            <div class="fd-lg-h">Where the service type came from</div>
+            <table class="fd-lg-table">
+                <tr><td><span class="fd-pill fd-pill--green">JOB</span></td>
+                    <td>Ticked on the import job itself (Ex-works / Custom Clearance / Freight Forwarding) &mdash; recorded by the operator, most reliable.</td></tr>
+                <tr><td><em class="fd-lg-muted">no badge</em></td>
+                    <td>From the shipment-summary flags (FFD / CCLR / EXW / FFDCLR) &mdash; the same source the Management Dashboard uses.</td></tr>
+                <tr><td><span class="fd-pill fd-pill--amber">INFERRED</span></td>
+                    <td>Nothing recorded (mainly sea exports since Apr-2024, when the flag writer stopped). Worked out from the job's own invoice:
+                        Agency Charges head &rarr; clearance, Origin THC head &rarr; forwarding, both &rarr; FFD + CCLR. Validated at ~96% accuracy on 11,451 flagged sea-export jobs.
+                        Applied to sea export only. <b>The money is not affected &mdash; only the bucket is inferred.</b> On a client row, <span class="fd-pill fd-pill--amber">INFERRED 21/31</span> = 21 of 31 jobs inferred.</td></tr>
+            </table>
+
+            <div class="fd-lg-h">Client risk (Receivables tab)</div>
+            <table class="fd-lg-table">
+                <tr><td><span class="fd-pill fd-pill--red">RED</span></td><td>Act now: risk score &ge; 60, or over half the balance is older than a year, or the client is marked DEFAULT / COURT CASE in the master.</td></tr>
+                <tr><td><span class="fd-pill fd-pill--amber">AMBER</span></td><td>Watch: risk score 30&ndash;59, or half the balance is older than 180 days.</td></tr>
+                <tr><td><span class="fd-pill fd-pill--green">GREEN</span></td><td>Fine: within the suggested limit, paying roughly on time, little old balance.</td></tr>
+                <tr><td><span class="fd-pill fd-pill--muted">NO-TERMS</span></td><td>No credit period on file for this client &mdash; measured against a 30-day default, so "late" is an assumption. Never shown GREEN.</td></tr>
+                <tr><td><span class="fd-pill fd-pill--muted">SETTLED</span></td><td>Nothing outstanding and nothing unbilled.</td></tr>
+            </table>
+            <div class="fd-lg-sub">How the risk score is built (0&ndash;100, higher = worse)</div>
+            <table class="fd-lg-table fd-lg-table--score">
+                <thead>
+                    <tr><th>Component</th><th>What is measured</th><th>Cap</th><th>Weight</th><th>Example</th></tr>
+                </thead>
+                <tr><td><b>Utilisation</b></td><td>Exposure (outstanding + unbilled) as % of the suggested limit</td><td>200 %</td><td class="num">40 %</td><td>160 % used &rarr; 160 &divide; 200 &times; 40 = <b>32</b></td></tr>
+                <tr><td><b>Paying late</b></td><td>Days paid after the credit period (recovery gap)</td><td>90 days</td><td class="num">30 %</td><td>30 days late &rarr; 30 &divide; 90 &times; 30 = <b>10</b></td></tr>
+                <tr><td><b>Old balance</b></td><td>Share of outstanding older than 180 days</td><td>100 %</td><td class="num">30 %</td><td>20 % old &rarr; 20 &divide; 100 &times; 30 = <b>6</b></td></tr>
+                <tr class="fd-lg-total"><td><b>Risk score</b></td><td colspan="3">sum of the three</td><td><b>32 + 10 + 6 = 48 &rarr; AMBER</b></td></tr>
+            </table>
+            <table class="fd-lg-table fd-lg-table--score" style="margin-top:6px;">
+                <thead><tr><th>Score / condition</th><th>Status</th></tr></thead>
+                <tr><td>&ge; 60, <i>or</i> &gt; 50 % of balance older than 1 year, <i>or</i> client master = DEFAULT / COURT CASE</td><td><span class="fd-pill fd-pill--red">RED</span></td></tr>
+                <tr><td>30 &ndash; 59, <i>or</i> &ge; 50 % of balance older than 180 days</td><td><span class="fd-pill fd-pill--amber">AMBER</span></td></tr>
+                <tr><td>below 30</td><td><span class="fd-pill fd-pill--green">GREEN</span></td></tr>
+                <tr><td>no credit period on file (checked before AMBER / GREEN)</td><td><span class="fd-pill fd-pill--muted">NO-TERMS</span></td></tr>
+                <tr><td>nothing outstanding and nothing unbilled</td><td><span class="fd-pill fd-pill--muted">SETTLED</span></td></tr>
+            </table>
+            <div class="fd-lg-sub" style="margin-top:10px;">Suggested limit (there is no approved credit-limit field in the system)</div>
+            <table class="fd-lg-table fd-lg-table--score">
+                <thead><tr><th>Step</th><th>Formula</th><th>Example</th></tr></thead>
+                <tr><td>1. Daily billing</td><td>last 90 days' billing &divide; 90</td><td>45,00,000 &divide; 90 = 50,000 / day</td></tr>
+                <tr><td>2. Credit exposure</td><td>&times; credit period (days)</td><td>&times; 30 = 15,00,000</td></tr>
+                <tr><td>3. Headroom</td><td>&times; 1.5</td><td>= <b>22,50,000 suggested limit</b></td></tr>
+                <tr class="fd-lg-total"><td>Utilisation</td><td>exposure &divide; suggested limit &times; 100</td><td>36,00,000 &divide; 22,50,000 = <b>160 %</b></td></tr>
+            </table>
+
+            <div class="fd-lg-h">Client flags</div>
+            <table class="fd-lg-table">
+                <tr><td><span class="fd-pill fd-pill--red">WATCH</span></td><td>Client master status is DEFAULT / COURT MATTER / COURT CASE.</td></tr>
+                <tr><td><span class="fd-pill fd-pill--muted">PREPAID</span></td><td>Pays before the invoice is raised (negative recovery days) &mdash; excluded from the portfolio recovery average.</td></tr>
+            </table>
+
+            <div class="fd-lg-h">Job status (Margin &amp; Unbilled drill-downs)</div>
+            <table class="fd-lg-table">
+                <tr><td><span class="fd-pill fd-pill--green">BILLED</span></td><td>At least one invoice names this job.</td></tr>
+                <tr><td><span class="fd-pill fd-pill--amber">OPEN</span></td><td>No invoice yet &mdash; the job is unbilled.</td></tr>
+                <tr><td><span class="fd-pill fd-pill--amber">COST PENDING</span></td><td>Billed, but no purchase / payment / JV cost booked yet &mdash; its profit is provisional and will fall.</td></tr>
+            </table>
+
+            <div class="fd-lg-h">Job Profit statement status</div>
+            <table class="fd-lg-table">
+                <tr><td><span class="fd-pill fd-pill--amber">Provisional &ndash; costs pending</span></td><td>Income billed, no expense booked: the margin is not final.</td></tr>
+                <tr><td><span class="fd-pill fd-pill--amber">Unbilled &ndash; costs booked</span></td><td>Expense booked, nothing invoiced yet.</td></tr>
+                <tr><td><span class="fd-pill fd-pill--green">Profitable</span></td><td>Income exceeds expense (a &ge; 90% margin is flagged to double-check costs).</td></tr>
+                <tr><td><span class="fd-pill fd-pill--red">Loss</span></td><td>Expense exceeds income.</td></tr>
+                <tr><td><span class="fd-pill fd-pill--green">&#10003; Billed</span> / <span class="fd-pill fd-pill--amber">&#9719; Cost</span></td>
+                    <td>Per head: green = that entry exists, amber = still pending on this head.</td></tr>
+            </table>
+
+            <div class="fd-lg-h">Voucher types</div>
+            <table class="fd-lg-table fd-lg-table--2col">
+                <tr><td><b>II</b> Invoice</td><td><b>SI</b> Storage Invoice</td></tr>
+                <tr><td><b>BI</b> Brokerage Invoice</td><td><b>CN</b> Credit Note</td></tr>
+                <tr><td><b>PI</b> Purchase Invoice</td><td><b>JV</b> Journal Voucher</td></tr>
+                <tr><td><b>BP</b> Bank Payment</td><td><b>BR</b> Bank Receipt</td></tr>
+                <tr><td><b>CP</b> Cash Payment</td><td><b>CR</b> Cash Receipt</td></tr>
+                <tr><td><b>CE</b> Cash Expense</td><td></td></tr>
+            </table>
+
+            <div class="fd-lg-h">Other terms</div>
+            <table class="fd-lg-table">
+                <tr><td><b>Unapplied credit</b></td><td>Money received from a client that was never matched to a bill (GR / OA / AO receipts). Deducted per client to get the net outstanding.</td></tr>
+                <tr><td><b>Recovery gap</b></td><td>Actual days to get paid minus the agreed credit period. Positive = paying late.</td></tr>
+                <tr><td><b>Unbilled (cost)</b></td><td>Cost already spent on jobs with no invoice &mdash; a floor, not the bill value.</td></tr>
+                <tr><td><b>Data as of &middot; live / cached</b></td><td>Results are cached for 2 hours; <i class="fa fa-refresh"></i> Sync now pulls fresh figures for everyone.</td></tr>
+            </table>
+            <div class="fd-lg-note">Click the coloured icon on any KPI card for the exact arithmetic behind that figure.</div>
+        </div>
+    </div>
+
+    <!-- ==================== HOW IS THIS CALCULATED? ==================== -->
+    <div class="fd-backdrop" *ngIf="ExplainKey" (click)="CloseExplain()"></div>
+    <div class="fd-reminder fd-explain" *ngIf="ExplainKey && explain() as ex">
+        <div class="fd-drawer-head">
+            <div>
+                <div class="fd-card-title"><i class="fa fa-calculator"></i> How is "{{ ex.title }}" calculated?</div>
+                <div class="fd-card-sub" style="margin:2px 0 0;">Using the figures on the card right now</div>
+            </div>
+            <button type="button" class="fd-icon-btn" (click)="CloseExplain()">&times;</button>
+        </div>
+        <div class="fd-reminder-body">
+            <div class="fd-ex-what">{{ ex.what }}</div>
+
+            <div class="fd-ex-h">The arithmetic</div>
+            <table class="fd-ex-table">
+                <tr *ngFor="let st of ex.steps">
+                    <td class="fd-ex-op">{{ st.op }}</td>
+                    <td class="fd-ex-lbl">{{ st.label }}</td>
+                    <td class="fd-ex-val">{{ st.value }}</td>
+                </tr>
+                <tr class="fd-ex-result">
+                    <td class="fd-ex-op">=</td>
+                    <td class="fd-ex-lbl">{{ ex.result.label }}</td>
+                    <td class="fd-ex-val">{{ ex.result.value }} <span class="fd-ex-short" *ngIf="ex.result.short">({{ ex.result.short }})</span></td>
+                </tr>
+                <tr *ngFor="let x of ex.extra" class="fd-ex-extra">
+                    <td class="fd-ex-op"></td>
+                    <td class="fd-ex-lbl">{{ x.label }}</td>
+                    <td class="fd-ex-val">{{ x.value }}</td>
+                </tr>
+            </table>
+
+            <div class="fd-ex-h">Where the numbers come from</div>
+            <div class="fd-ex-src">{{ ex.source }}</div>
+
+            <div class="fd-ex-h" *ngIf="ex.notes?.length">Good to know</div>
+            <ul class="fd-ex-notes">
+                <li *ngFor="let nt of ex.notes">{{ nt }}</li>
+            </ul>
+        </div>
+    </div>
+
+        <!-- ======================= PAYABLES ======================= -->
+        <div *ngIf="Tab === 'PAYABLES'">
+
+            <!-- under test: these figures have not been reconciled with Accounts yet -->
+            <div class="fd-testbar">
+                <i class="fa fa-flask"></i>
+                <span>
+                    <b>Under test.</b> These payable figures have not yet been reconciled with Accounts.
+                    Please check a few suppliers against the Bank Payment screen's own bill list and tell us
+                    where they differ. Bill-wise ageing counts a bill as paid when a payment voucher names it.
+                </span>
+            </div>
+
+            <div class="fd-payctl">
+                <label>History
+                    <select class="form-control" [(ngModel)]="PayLookback" (ngModelChange)="ReloadPayables()"
+                            title="How far back to load purchase bills. Longer = slower.">
+                        <option value="6">6 months</option>
+                        <option value="12">12 months</option>
+                        <option value="24">24 months</option>
+                        <option value="0">Everything</option>
+                    </select>
+                </label>
+                <label class="fd-check" title="Also compute receivables so the forecast can show money in vs money out. Slower.">
+                    <input type="checkbox" [(ngModel)]="PayInflow" (ngModelChange)="ReloadPayables()"> Include money-in
+                </label>
+                <span class="fd-asof" *ngIf="PayCacheInfo">
+                    <i class="fa" [ngClass]="num(PayCacheInfo.IS_CACHED) === 1 ? 'fa-database' : 'fa-bolt'"></i>
+                    Data as of {{ PayCacheInfo.CACHED_AT }}
+                </span>
+                <button type="button" class="fd-btn fd-btn--outline" (click)="SyncPayables()" title="Pull fresh figures now">
+                    <i class="fa fa-refresh"></i> Sync now
+                </button>
+            </div>
+
+            <div class="fd-note" *ngIf="PayLoading">Loading payables &hellip;</div>
+
+            <ng-container *ngIf="PayKpi">
+                <!-- ---- KPI cards ---- -->
+                <div class="fd-grid fd-grid--3" style="margin-bottom:12px;">
+                    <div class="fd-card fd-kpi">
+                        <div class="fd-kpi-top">
+                            <div class="fd-kpi-label">Total Payable <i class="fd-info"
+                                 title="Bills not yet knocked off, less money paid to the supplier that names no bill. Per supplier, floored at zero.">i</i></div>
+                            <button type="button" class="fd-kpi-icon fd-kpi-icon--btn fd-ico--red" (click)="OpenExplain('PAY_TOTAL')" title="How is this calculated?"><i class="fa fa-credit-card"></i></button>
+                        </div>
+                        <div class="fd-kpi-value">{{ fmtShort(PayKpi.TOTAL_PAYABLE) }}<span class="fd-kpi-unit">net</span></div>
+                        <div class="fd-kpi-tip">What we still owe suppliers as on the To Date.</div>
+                        <div class="fd-kpi-sub">
+                            <div class="fd-kpi-row"><span>Bills pending</span><b>{{ fmtShort(PayKpi.GROSS_PENDING) }}</b></div>
+                            <div class="fd-kpi-row"><span>Paid, no bill named</span><b>{{ fmtShort(PayKpi.ADVANCE_PAID) }}</b></div>
+                            <div class="fd-kpi-row"><span>Open bills</span><b>{{ PayKpi.OPEN_BILLS | number }}</b></div>
+                        </div>
+                    </div>
+
+                    <div class="fd-card fd-kpi">
+                        <div class="fd-kpi-top">
+                            <div class="fd-kpi-label">Overdue <i class="fd-info"
+                                 title="Past the due date on the bill, or bill date + 30 days where no usable due date was keyed.">i</i></div>
+                            <button type="button" class="fd-kpi-icon fd-kpi-icon--btn fd-ico--amber" (click)="OpenExplain('PAY_OVERDUE')" title="How is this calculated?"><i class="fa fa-exclamation-circle"></i></button>
+                        </div>
+                        <div class="fd-kpi-value fd-neg">{{ fmtShort(PayKpi.OVERDUE_AMT) }}</div>
+                        <div class="fd-meter" style="margin-top:8px;">
+                            <span class="bad" [style.width.%]="payOverduePct()"></span>
+                        </div>
+                        <div class="fd-kpi-sub">
+                            <div class="fd-kpi-row"><span>Share of payable</span><b>{{ payOverduePct() | number:'1.0-0' }}%</b></div>
+                            <div class="fd-kpi-row"><span>Oldest open bill</span><b>{{ PayKpi.OLDEST_BILL_DAYS | number }} days</b></div>
+                        </div>
+                    </div>
+
+                    <div class="fd-card fd-kpi">
+                        <div class="fd-kpi-top">
+                            <div class="fd-kpi-label">Falling due <i class="fd-info"
+                                 title="Not yet overdue. Each figure is cumulative from today.">i</i></div>
+                            <button type="button" class="fd-kpi-icon fd-kpi-icon--btn fd-ico--blue" (click)="OpenExplain('PAY_DUE')" title="How is this calculated?"><i class="fa fa-calendar"></i></button>
+                        </div>
+                        <div class="fd-kpi-value">{{ fmtShort(PayKpi.DUE_7) }}<span class="fd-kpi-unit">7 days</span></div>
+                        <div class="fd-kpi-sub">
+                            <div class="fd-kpi-row"><span>Within 15 days</span><b>{{ fmtShort(PayKpi.DUE_15) }}</b></div>
+                            <div class="fd-kpi-row"><span>Within 30 days</span><b>{{ fmtShort(PayKpi.DUE_30) }}</b></div>
+                        </div>
+                    </div>
+
+                    <div class="fd-card fd-kpi">
+                        <div class="fd-kpi-top">
+                            <div class="fd-kpi-label">DPO <i class="fd-info"
+                                 title="Days we actually take to pay, value-weighted, on bills raised in the period that were settled.">i</i></div>
+                            <button type="button" class="fd-kpi-icon fd-kpi-icon--btn fd-ico--green" (click)="OpenExplain('PAY_DPO')" title="How is this calculated?"><i class="fa fa-clock-o"></i></button>
+                        </div>
+                        <div class="fd-kpi-value">{{ PayKpi.DPO_DAYS === null ? '-' : (PayKpi.DPO_DAYS | number:'1.0-1') }}<span class="fd-kpi-unit">days</span></div>
+                        <div class="fd-kpi-tip">How long we take to pay suppliers. Compare with Recovery on the Overview tab.</div>
+                        <div class="fd-kpi-sub">
+                            <div class="fd-kpi-row"><span>Fastest</span><b class="fd-pos">{{ PayKpi.FASTEST_PAID_DAYS | number }} days</b></div>
+                            <div class="fd-kpi-row"><span>Slowest</span><b class="fd-neg">{{ PayKpi.SLOWEST_PAID_DAYS | number }} days</b></div>
+                        </div>
+                    </div>
+
+                    <div class="fd-card fd-kpi">
+                        <div class="fd-kpi-top">
+                            <div class="fd-kpi-label">Purchased in period <i class="fd-info"
+                                 title="Net of the TDS and round-off the bill itself deducts.">i</i></div>
+                            <button type="button" class="fd-kpi-icon fd-kpi-icon--btn fd-ico--purple" (click)="OpenExplain('PAY_PURCHASED')" title="How is this calculated?"><i class="fa fa-file-text-o"></i></button>
+                        </div>
+                        <div class="fd-kpi-value">{{ fmtShort(PayKpi.PURCHASED_PERIOD) }}<span class="fd-kpi-unit">net</span></div>
+                        <div class="fd-kpi-sub">
+                            <div class="fd-kpi-row"><span>Gross billed</span><b>{{ fmtShort(PayKpi.GROSS_BILLED_PERIOD) }}</b></div>
+                            <div class="fd-kpi-row"><span>TDS deducted</span><b>{{ fmtShort(PayKpi.TDS_DEDUCTED_PERIOD) }}</b></div>
+                            <div class="fd-kpi-row"><span>Bills</span><b>{{ PayKpi.BILLS_IN_PERIOD | number }}</b></div>
+                        </div>
+                    </div>
+
+                    <div class="fd-card fd-kpi">
+                        <div class="fd-kpi-top">
+                            <div class="fd-kpi-label">Paid in period <i class="fd-info"
+                                 title="Payments that named a bill. Job cost paid with no purchase bill behind it is shown separately.">i</i></div>
+                            <button type="button" class="fd-kpi-icon fd-kpi-icon--btn fd-ico--green" (click)="OpenExplain('PAY_PAID')" title="How is this calculated?"><i class="fa fa-check-circle"></i></button>
+                        </div>
+                        <div class="fd-kpi-value">{{ fmtShort(PayKpi.PAID_PERIOD) }}</div>
+                        <div class="fd-kpi-sub">
+                            <div class="fd-kpi-row"><span>Direct job cost</span><b>{{ fmtShort(PayKpi.JOBCOST_PAID_PERIOD) }}</b></div>
+                            <div class="fd-kpi-row"><span>Suppliers</span><b>{{ PayKpi.SUPPLIER_COUNT | number }}</b></div>
+                            <div class="fd-kpi-row"><span>History from</span><b>{{ PayKpi.HISTORY_FROM }}</b></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ---- honesty strip ---- -->
+                <div class="fd-note" style="margin-left:0;margin-right:0;">
+                    <b>{{ PayKpi.PCT_WITH_DUEDATE | number:'1.0-0' }}%</b> of bills carry a usable due date;
+                    the rest are aged on bill date + 30 days, so their overdue status is an assumption.
+                    <span *ngIf="num(PayKpi.DUEDATE_IGNORED) > 0">
+                        <b>{{ PayKpi.DUEDATE_IGNORED }}</b> due dates were rejected as not credible.
+                    </span>
+                    <span *ngIf="num(PayKpi.DUPLICATE_BILL_CODES) > 0">
+                        <b>{{ PayKpi.DUPLICATE_BILL_CODES }}</b> duplicate purchase codes were collapsed.
+                    </span>
+                    <span *ngIf="num(PayKpi.OPEN_BILLS) > num(PayKpi.BILL_LIST_CAP)">
+                        The bill list below shows the {{ PayKpi.BILL_LIST_CAP | number }} most overdue of
+                        {{ PayKpi.OPEN_BILLS | number }}.
+                    </span>
+                </div>
+
+                <!-- ---- ageing + forecast ---- -->
+                <div class="fd-grid fd-grid--2">
+                    <div class="fd-card">
+                        <div class="fd-card-head"><span class="fd-card-title">Payable Ageing</span></div>
+                        <div class="fd-card-sub">How old the unpaid bills are. Gross of money paid without naming a bill.</div>
+                        <div class="fd-agebar" *ngFor="let a of PayAge">
+                            <span class="fd-agebar-lbl">{{ a.BUCKET }}</span>
+                            <span class="fd-agebar-track">
+                                <span class="fd-agebar-fill" [class.fd-agebar-fill--old]="a.SORTORDER >= 4"
+                                      [style.width.%]="payAgeWidth(a)"></span>
+                            </span>
+                            <span class="fd-agebar-val">{{ fmtShort(a.AMOUNT) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="fd-card">
+                        <div class="fd-card-head"><span class="fd-card-title">Cash Forecast</span></div>
+                        <div class="fd-card-sub">
+                            What must go out, and (with money-in switched on) what should come in.
+                        </div>
+                        <div class="fd-table-scroll">
+                            <table class="fd-table">
+                                <thead>
+                                    <tr><th>When</th><th class="num">Money in</th><th class="num">Money out</th><th class="num">Gap</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let f of PayFlow">
+                                        <td>{{ f.BUCKET }}</td>
+                                        <td class="num">{{ num(f.INFLOW_INCLUDED) === 1 ? (f.INFLOW | number:'1.0-0') : '-' }}</td>
+                                        <td class="num">{{ f.OUTFLOW | number:'1.0-0' }}</td>
+                                        <td class="num" [ngClass]="num(f.NET_GAP) >= 0 ? 'fd-pos' : 'fd-neg'">
+                                            {{ num(f.INFLOW_INCLUDED) === 1 ? (f.NET_GAP | number:'1.0-0') : '-' }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="fd-kpi-tip" *ngIf="PayFlow.length && num(PayFlow[0].INFLOW_INCLUDED) !== 1">
+                            Money-in is not computed. Tick <b>Include money-in</b> above to add receivables.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ---- view switch ---- -->
+                <div class="fd-payctl" style="margin-top:4px;">
+                    <button type="button" class="fd-btn" [class.fd-btn--primary]="PayView === 'SUPPLIER'"
+                            (click)="PayView = 'SUPPLIER'">By supplier</button>
+                    <button type="button" class="fd-btn" [class.fd-btn--primary]="PayView === 'BILLS'"
+                            (click)="PayView = 'BILLS'">Bills to pay</button>
+                    <button type="button" class="fd-btn" [class.fd-btn--primary]="PayView === 'DQ'"
+                            (click)="PayView = 'DQ'">
+                        Data to fix <span class="fd-count" *ngIf="PayDqSum.length">{{ PayDqSum.length }}</span>
+                    </button>
+                </div>
+
+                <!-- ---- by supplier ---- -->
+                <div class="fd-card" *ngIf="PayView === 'SUPPLIER'">
+                    <div class="fd-card-head"><span class="fd-card-title">Supplier Exposure</span></div>
+                    <div class="fd-card-sub">Biggest payable first. Paid-no-bill is money given to the supplier that names no bill.</div>
+                    <div class="fd-table-scroll fd-table-scroll--tall">
+                        <table class="fd-table">
+                            <thead>
+                                <tr>
+                                    <th>Supplier</th>
+                                    <th class="num">Bills Pending</th><th class="num">Paid, No Bill</th>
+                                    <th class="num">Payable</th><th class="num">Overdue</th>
+                                    <th class="num">Open</th><th class="num">Oldest</th>
+                                    <th class="num">Due 7</th><th class="num">Due 30</th>
+                                    <th class="num">Purchased</th><th class="num">Paid</th>
+                                    <th class="num">DPO</th><th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let s of PaySupp">
+                                    <td>{{ s.SUPNAME }}</td>
+                                    <td class="num">{{ s.GROSS_PENDING | number:'1.0-0' }}</td>
+                                    <td class="num">{{ s.ADVANCE_PAID | number:'1.0-0' }}</td>
+                                    <td class="num"><b>{{ s.PAYABLE | number:'1.0-0' }}</b></td>
+                                    <td class="num fd-neg">{{ s.OVERDUE | number:'1.0-0' }}</td>
+                                    <td class="num">{{ s.BILLS_OPEN | number }}</td>
+                                    <td class="num">{{ s.OLDEST_DAYS | number }}d</td>
+                                    <td class="num">{{ s.DUE_7 | number:'1.0-0' }}</td>
+                                    <td class="num">{{ s.DUE_30 | number:'1.0-0' }}</td>
+                                    <td class="num">{{ s.PURCHASED_PERIOD | number:'1.0-0' }}</td>
+                                    <td class="num">{{ s.PAID_PERIOD | number:'1.0-0' }}</td>
+                                    <td class="num">{{ s.DPO_DAYS === null ? '-' : (s.DPO_DAYS | number:'1.0-0') }}</td>
+                                    <td><span class="fd-pill" [ngClass]="payStatusClass(s.PAY_STATUS)">{{ s.PAY_STATUS }}</span></td>
+                                </tr>
+                                <tr *ngIf="PaySupp.length === 0"><td colspan="13" class="fd-empty">No records.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ---- bills to pay ---- -->
+                <div class="fd-card" *ngIf="PayView === 'BILLS'">
+                    <div class="fd-card-head">
+                        <span class="fd-card-title">Bills to Pay</span>
+                        <label class="fd-check">
+                            <input type="checkbox" [(ngModel)]="PayOverdueOnly"> Overdue only
+                        </label>
+                    </div>
+                    <div class="fd-card-sub">
+                        Most overdue first. Gross is the bill, TDS is what the bill itself deducts,
+                        Net Payable is what the supplier is actually owed.
+                    </div>
+                    <div class="fd-table-scroll fd-table-scroll--tall">
+                        <table class="fd-table">
+                            <thead>
+                                <tr>
+                                    <th>Bill No</th><th>Supplier Inv</th><th>Supplier</th>
+                                    <th>Bill Date</th><th>Due Date</th>
+                                    <th class="num">Age</th><th class="num">Overdue</th>
+                                    <th class="num">Gross</th><th class="num">TDS</th>
+                                    <th class="num">Net Payable</th><th class="num">Paid</th><th class="num">Pending</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let b of PayBillRows()">
+                                    <td>{{ b.PUR_CODE }}</td>
+                                    <td>{{ b.PUR_INVNO }}</td>
+                                    <td>{{ b.SUPNAME }}</td>
+                                    <td>{{ b.BILL_DATE }}</td>
+                                    <td>
+                                        {{ b.DUE_DATE }}
+                                        <span class="fd-pill fd-pill--muted" *ngIf="num(b.HAS_TERMS) === 0"
+                                              title="No usable due date on the bill - assumed 30 days">assumed</span>
+                                    </td>
+                                    <td class="num">{{ b.AGE_DAYS | number }}d</td>
+                                    <td class="num" [ngClass]="num(b.OVERDUE_DAYS) > 0 ? 'fd-neg' : ''">
+                                        {{ num(b.OVERDUE_DAYS) > 0 ? (b.OVERDUE_DAYS | number) + 'd' : '-' }}
+                                    </td>
+                                    <td class="num">{{ b.GROSS_AMOUNT | number:'1.0-0' }}</td>
+                                    <td class="num">{{ b.TDS_DEDUCTED | number:'1.0-0' }}</td>
+                                    <td class="num">{{ b.NET_PAYABLE | number:'1.0-0' }}</td>
+                                    <td class="num">{{ b.PAID_AMOUNT | number:'1.0-0' }}</td>
+                                    <td class="num"><b>{{ b.PENDING | number:'1.0-0' }}</b></td>
+                                </tr>
+                                <tr *ngIf="PayBillRows().length === 0"><td colspan="12" class="fd-empty">No bills.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ---- data to fix ---- -->
+                <div class="fd-card" *ngIf="PayView === 'DQ'">
+                    <div class="fd-card-head"><span class="fd-card-title">Data to Fix</span></div>
+                    <div class="fd-card-sub">
+                        Problems found in <b>this period</b> while building the report. Click a row for the bills to correct.
+                        Nothing here is hidden from the figures above &mdash; it explains them.
+                    </div>
+                    <div class="fd-table-scroll fd-table-scroll--tall">
+                        <table class="fd-table">
+                            <thead>
+                                <tr><th>Issue</th><th>Severity</th><th class="num">Rows</th><th class="num">Value</th><th>What it means</th></tr>
+                            </thead>
+                            <tbody>
+                                <ng-container *ngFor="let d of PayDqSum">
+                                    <tr class="fd-row-click" (click)="TogglePayDq(d.ISSUE_CODE)">
+                                        <td>
+                                            <i class="fa" [ngClass]="PayDqOpen[d.ISSUE_CODE] ? 'fa-caret-down' : 'fa-caret-right'"
+                                               style="width:14px;color:var(--fd-muted-fg);"></i>
+                                            {{ d.ISSUE_TITLE }}
+                                        </td>
+                                        <td><span class="fd-pill" [ngClass]="dqClass(d.SEVERITY)">{{ dqLabel(d.SEVERITY) }}</span></td>
+                                        <td class="num">{{ d.ROWS_LISTED | number }}</td>
+                                        <td class="num">{{ d.VALUE_ | number:'1.0-0' }}</td>
+                                        <td style="white-space:normal;">{{ d.WHAT_IT_MEANS }}</td>
+                                    </tr>
+                                    <ng-container *ngIf="PayDqOpen[d.ISSUE_CODE]">
+                                        <tr class="fd-subhead">
+                                            <td>Bill No</td><td>Supplier</td><td class="num">Bill Date</td>
+                                            <td class="num">Amount</td><td>Detail</td>
+                                        </tr>
+                                        <tr class="fd-subline" *ngFor="let r of PayDqFor(d.ISSUE_CODE)">
+                                            <td><span class="fd-subindent">{{ r.PUR_CODE }}</span></td>
+                                            <td>{{ r.SUPNAME || r.SUPPLIER }}</td>
+                                            <td class="num">{{ r.BILL_DATE }}</td>
+                                            <td class="num">{{ r.AMOUNT | number:'1.0-0' }}</td>
+                                            <td style="white-space:normal;">{{ r.WHAT_TO_DO }}</td>
+                                        </tr>
+                                    </ng-container>
+                                </ng-container>
+                                <tr *ngIf="PayDqSum.length === 0">
+                                    <td colspan="5" class="fd-empty">Nothing to fix in this period.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ---- pay speed + unlinked ---- -->
+                <div class="fd-grid fd-grid--2">
+                    <div class="fd-card">
+                        <div class="fd-card-head"><span class="fd-card-title">How Fast We Pay</span></div>
+                        <div class="fd-card-sub">Top suppliers by purchase value. Useful when negotiating terms.</div>
+                        <div class="fd-table-scroll">
+                            <table class="fd-table">
+                                <thead>
+                                    <tr><th>Supplier</th><th class="num">Purchased</th><th class="num">Avg Days</th>
+                                        <th class="num">Fastest</th><th class="num">Slowest</th><th class="num">Bills</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let d of PaySpeed">
+                                        <td>{{ d.SUPNAME }}</td>
+                                        <td class="num">{{ d.PURCHASED_PERIOD | number:'1.0-0' }}</td>
+                                        <td class="num">{{ d.PAY_DAYS_WTD === null ? '-' : (d.PAY_DAYS_WTD | number:'1.0-0') }}</td>
+                                        <td class="num fd-pos">{{ d.FASTEST_DAYS | number }}</td>
+                                        <td class="num fd-neg">{{ d.SLOWEST_DAYS | number }}</td>
+                                        <td class="num">{{ d.BILLS | number }}</td>
+                                    </tr>
+                                    <tr *ngIf="PaySpeed.length === 0"><td colspan="6" class="fd-empty">No settled bills in this period.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="fd-card" *ngIf="PayUnlinked">
+                        <div class="fd-card-head"><span class="fd-card-title">Cost Not Linked to a Job</span></div>
+                        <div class="fd-card-sub">
+                            Purchase lines in the period that carry no job number. This cost can never reach a job P&amp;L,
+                            so the margin on those jobs is overstated by whatever share belongs to them.
+                        </div>
+                        <div class="fd-kpi-value fd-neg" style="margin-top:6px;">
+                            {{ fmtShort(PayUnlinked.UNLINKED_VALUE) }}<span class="fd-kpi-unit">{{ PayUnlinked.UNLINKED_PCT | number:'1.0-0' }}% of cost</span>
+                        </div>
+                        <div class="fd-kpi-sub">
+                            <div class="fd-kpi-row"><span>Linked to a job</span><b>{{ fmtShort(PayUnlinked.LINKED_VALUE) }}</b></div>
+                            <div class="fd-kpi-row"><span>Unlinked lines</span><b>{{ PayUnlinked.UNLINKED_LINES | number }}</b></div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+
+    <!-- ========================= JOB PROFIT DRAWER ========================= -->
+    <div class="fd-backdrop" *ngIf="JobDrawerNo" (click)="CloseJobDrawer()"></div>
+    <div class="fd-drawer fd-drawer--job" *ngIf="JobDrawerNo">
+        <div class="fd-drawer-head">
+            <div>
+                <div class="fd-card-title">Job Profit Statement</div>
+                <div class="fd-card-sub" style="margin:2px 0 0;">Job {{ JobDrawerNo }} &middot; Esc or &times; to close</div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;">
+                <button type="button" class="fd-btn fd-btn--outline" (click)="OpenJobPopup(JobDrawerNo)" title="Open in its own window (for printing / second screen)">
+                    <i class="fa fa-external-link"></i> Open in window
+                </button>
+                <button type="button" class="fd-icon-btn" (click)="CloseJobDrawer()">&times;</button>
+            </div>
+        </div>
+        <iframe class="fd-drawer-frame" [src]="JobDrawerUrl" title="Job Profit Statement"></iframe>
+    </div>
+
+    <!-- ========================= PAYMENT REMINDER ========================= -->
+    <div class="fd-backdrop" *ngIf="ReminderOpen" (click)="CloseReminder()"></div>
+    <div class="fd-reminder" *ngIf="ReminderOpen">
+        <div class="fd-drawer-head">
+            <div>
+                <div class="fd-card-title">Payment Reminder</div>
+                <div class="fd-card-sub" style="margin:2px 0 0;">
+                    {{ ReminderClient?.CLIENTNAME }} ({{ ReminderClient?.CLIENTCODE }})
+                </div>
+            </div>
+            <button type="button" class="fd-icon-btn" (click)="CloseReminder()">&times;</button>
+        </div>
+        <div class="fd-reminder-body">
+            <div class="fd-field" style="margin-bottom:10px;">
+                <label>Subject</label>
+                <input class="fd-input" type="text" [(ngModel)]="ReminderSubject">
+            </div>
+            <div class="fd-field">
+                <label>Message <span class="fd-hint">(review and edit before sending)</span></label>
+                <textarea class="fd-input fd-reminder-text" #remArea [(ngModel)]="ReminderText"></textarea>
+            </div>
+            <div class="fd-kpi-tip" *ngIf="ReminderTooLong()" style="color:var(--fd-danger);">
+                This message is too long for a mail-client link (Outlook truncates around 2,000 characters).
+                Use <b>Copy</b> and paste it into a new email instead.
+            </div>
+            <div class="fd-btn-row">
+                <button type="button" class="fd-btn fd-btn--outline" (click)="CopyReminder(remArea)">
+                    <i class="fa fa-clipboard"></i> Copy to clipboard
+                </button>
+                <button type="button" class="fd-btn fd-btn--primary" (click)="SendReminderMail()"
+                        [disabled]="ReminderTooLong()"
+                        title="Opens your own email program with this text pre-filled; nothing is sent until you press Send there">
+                    <i class="fa fa-envelope-o"></i> Open in mail client
+                </button>
+            </div>
+            <div class="fd-kpi-tip">
+                The email opens in your own mail program with no recipient filled in &mdash; add the client's
+                address there. Nothing is sent from the ERP itself.
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================= CLIENT DRILL-DOWN ========================= -->
+    <div class="fd-backdrop" *ngIf="DrillClient" (click)="CloseDrill()"></div>
+    <div class="fd-drawer" *ngIf="DrillClient">
+        <div class="fd-drawer-head">
+            <div>
+                <div class="fd-card-title">{{ DrillClient.CLIENTNAME }}</div>
+                <div class="fd-card-sub" style="margin:2px 0 0;">{{ DrillClient.CLIENTCODE }}</div>
+            </div>
+            <button type="button" class="fd-icon-btn" (click)="CloseDrill()">&times;</button>
+        </div>
+
+        <div class="fd-drawer-body">
+            <div class="fd-grid" style="grid-template-columns:repeat(2,1fr);">
+                <div class="fd-card fd-kpi">
+                    <div class="fd-kpi-top">
+                        <div class="fd-kpi-label">Total Exposure</div>
+                        <span class="fd-kpi-icon fd-ico--blue"><i class="fa fa-briefcase"></i></span>
+                    </div>
+                    <div class="fd-kpi-value">{{ fmtShort(DrillClient.TOTAL_EXPOSURE) }}</div>
+                    <div class="fd-kpi-sub">
+                        <div class="fd-kpi-row"><span>Outstanding</span><b>{{ DrillClient.OUTSTANDING | number:'1.0-0' }}</b></div>
+                        <div class="fd-kpi-row"><span>Unbilled</span><b>{{ DrillClient.UNBILLED | number:'1.0-0' }}</b></div>
+                    </div>
+                </div>
+
+                <div class="fd-card fd-kpi">
+                    <div class="fd-kpi-top">
+                        <div class="fd-kpi-label">Risk</div>
+                        <span class="fd-kpi-icon" [ngClass]="iconClass(DrillClient.RISK_STATUS)"><i class="fa fa-shield"></i></span>
+                    </div>
+                    <div class="fd-kpi-value" style="font-size:24px;">
+                        <span class="fd-pill" [ngClass]="pillClass(DrillClient.RISK_STATUS)">{{ DrillClient.RISK_STATUS }}</span>
+                    </div>
+                    <div class="fd-kpi-sub">
+                        <div class="fd-kpi-row"><span>Score</span><b>{{ DrillClient.RISK_SCORE | number:'1.0-0' }} / 100</b></div>
+                        <div class="fd-kpi-row"><span>Over 180 days</span><b class="fd-neg">{{ DrillClient.PCT_OVER_180 | number:'1.0-0' }}%</b></div>
+                        <div class="fd-kpi-row">
+                            <span>Terms vs actual</span>
+                            <b>{{ DrillClient.CREDIT_PERIOD }} &rarr;
+                               {{ DrillClient.AVG_COLLECTION_DAYS === null ? '-' : (DrillClient.AVG_COLLECTION_DAYS | number:'1.0-0') }} d</b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fd-card" *ngIf="DrillAgeing">
+                <div class="fd-card-head"><span class="fd-card-title">Ageing</span></div>
+                <div class="fd-table-scroll">
+                    <table class="fd-table">
+                        <thead>
+                            <tr><th class="num">0-30</th><th class="num">31-60</th><th class="num">61-90</th>
+                                <th class="num">91-120</th><th class="num">121-180</th><th class="num">181-365</th>
+                                <th class="num">366-730</th><th class="num">731-1095</th><th class="num">1095+</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="num">{{ DrillAgeing.DAYS_000_030 | number:'1.0-0' }}</td>
+                                <td class="num">{{ DrillAgeing.DAYS_031_060 | number:'1.0-0' }}</td>
+                                <td class="num">{{ DrillAgeing.DAYS_061_090 | number:'1.0-0' }}</td>
+                                <td class="num">{{ DrillAgeing.DAYS_091_120 | number:'1.0-0' }}</td>
+                                <td class="num">{{ DrillAgeing.DAYS_121_180 | number:'1.0-0' }}</td>
+                                <td class="num fd-neg">{{ DrillAgeing.DAYS_181_365 | number:'1.0-0' }}</td>
+                                <td class="num fd-neg">{{ DrillAgeing.DAYS_366_730 | number:'1.0-0' }}</td>
+                                <td class="num fd-neg">{{ DrillAgeing.DAYS_731_1095 | number:'1.0-0' }}</td>
+                                <td class="num fd-neg">{{ DrillAgeing.DAYS_1096_9999 | number:'1.0-0' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="fd-card" *ngIf="DrillMargin.length > 0">
+                <div class="fd-card-head"><span class="fd-card-title">Margin by Service Type</span></div>
+                <div class="fd-table-scroll">
+                    <table class="fd-table">
+                        <thead>
+                            <tr><th>Service Type</th><th class="num">Jobs</th><th class="num">Income</th>
+                                <th class="num">Expense</th><th class="num">Margin</th><th class="num">Margin %</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let m of DrillMargin">
+                                <td><span class="fd-pill fd-pill--svc" [title]="m.SERVICE_TYPE">{{ svcLabel(m.SERVICE_TYPE) }}</span></td>
+                                <td class="num">{{ m.JOBS }}</td>
+                                <td class="num">{{ m.REVENUE | number:'1.0-0' }}</td>
+                                <td class="num">{{ m.COST | number:'1.0-0' }}</td>
+                                <td class="num" [ngClass]="num(m.MARGIN) >= 0 ? 'fd-pos' : 'fd-neg'">{{ m.MARGIN | number:'1.0-0' }}</td>
+                                <td class="num" [ngClass]="num(m.MARGIN_PCT) >= 0 ? 'fd-pos' : 'fd-neg'">
+                                    {{ m.MARGIN_PCT === null ? '-' : (m.MARGIN_PCT | number:'1.1-1') + '%' }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="fd-card" *ngIf="DrillJobs.length > 0">
+                <div class="fd-card-head"><span class="fd-card-title">Unbilled Jobs</span></div>
+                <div class="fd-table-scroll">
+                    <table class="fd-table">
+                        <thead>
+                            <tr><th>Job No</th><th>Mode</th><th>Job Date</th><th class="num">Age</th><th class="num">Cost</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let j of DrillJobs">
+                                <td>{{ j.JOBNO }}</td><td>{{ j.MODE_ }}</td><td>{{ j.JOB_DATE }}</td>
+                                <td class="num">{{ j.AGE_DAYS }}</td>
+                                <td class="num">{{ j.TOTAL_COST | number:'1.0-0' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="fd-btn-row">
+                <button type="button" class="fd-btn fd-btn--primary" (click)="LoadClient(DrillClient.CLIENTCODE)">
+                    Reload dashboard for this client
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

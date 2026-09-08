@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>26AS TDS Reconciliation Guide</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --ink: #1c2733;
+  --ink-soft: #51606f;
+  --ink-faint: #8494a3;
+  --ground: #fbfaf7;
+  --card: #ffffff;
+  --line: #e3e0d8;
+  --accent: #14557b;
+  --accent-soft: #e8f0f5;
+  --good: #1a7a4a;
+  --good-bg: #e3f2ea;
+  --warn: #a05a12;
+  --warn-bg: #f8ecdd;
+  --bad: #b3352c;
+  --bad-bg: #f9e7e5;
+  --map: #7a6a12;
+  --map-bg: #f5f0d6;
+  --mono-bg: #f1efe9;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #e7ecf1; --ink-soft: #a8b6c2; --ink-faint: #75828e;
+    --ground: #14191f; --card: #1c232b; --line: #303a44;
+    --accent: #6db3d8; --accent-soft: #1e3240;
+    --good: #58bd8a; --good-bg: #1c3328;
+    --warn: #dfa15c; --warn-bg: #3a2c1a;
+    --bad: #e58a82; --bad-bg: #3d2321;
+    --map: #cfc06a; --map-bg: #34301a;
+    --mono-bg: #232b34;
+  }
+}
+:root[data-theme="dark"] {
+  --ink: #e7ecf1; --ink-soft: #a8b6c2; --ink-faint: #75828e;
+  --ground: #14191f; --card: #1c232b; --line: #303a44;
+  --accent: #6db3d8; --accent-soft: #1e3240;
+  --good: #58bd8a; --good-bg: #1c3328;
+  --warn: #dfa15c; --warn-bg: #3a2c1a;
+  --bad: #e58a82; --bad-bg: #3d2321;
+  --map: #cfc06a; --map-bg: #34301a;
+  --mono-bg: #232b34;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  font-size: 15.5px;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0 20px 80px;
+}
+.wrap { max-width: 860px; margin: 0 auto; }
+header { padding: 56px 0 8px; border-bottom: 3px solid var(--accent); margin-bottom: 8px; }
+.eyebrow {
+  font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--accent); font-weight: 600; margin-bottom: 10px;
+}
+h1 {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 40px; font-weight: 700; margin: 0 0 10px; line-height: 1.15;
+  text-wrap: balance;
+}
+.lede { color: var(--ink-soft); font-size: 17px; max-width: 62ch; margin: 0 0 28px; }
+h2 {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 25px; font-weight: 700; margin: 48px 0 14px;
+  text-wrap: balance;
+}
+h3 { font-size: 16.5px; font-weight: 600; margin: 26px 0 8px; }
+p { max-width: 68ch; margin: 0 0 14px; }
+code, .mono {
+  font-family: 'IBM Plex Mono', Consolas, monospace;
+  font-size: .88em; background: var(--mono-bg);
+  padding: 1px 6px; border-radius: 4px;
+}
+.card {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 10px; padding: 18px 22px; margin: 18px 0;
+}
+.steps { counter-reset: step; list-style: none; padding: 0; margin: 18px 0; display: flex; flex-direction: column; gap: 12px; }
+.steps li {
+  counter-increment: step;
+  background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  padding: 14px 18px 14px 58px; position: relative;
+}
+.steps li::before {
+  content: counter(step);
+  position: absolute; left: 16px; top: 14px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent); color: var(--ground);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600; font-size: 14px;
+}
+.steps b { display: block; margin-bottom: 2px; }
+.steps p { margin: 0; color: var(--ink-soft); font-size: 14.5px; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+.table-wrap { overflow-x: auto; margin: 16px 0; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+th {
+  font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-faint); font-weight: 600; background: var(--mono-bg);
+}
+td:first-child { white-space: nowrap; font-weight: 600; }
+.badge {
+  display: inline-block; border-radius: 5px; padding: 1px 9px;
+  font-size: 11px; font-weight: 700; letter-spacing: .05em;
+}
+.badge.tan  { background: var(--good-bg); color: var(--good); }
+.badge.name { background: var(--accent-soft); color: var(--accent); }
+.badge.man  { background: var(--map-bg); color: var(--map); }
+.pos { color: var(--warn); font-weight: 600; font-variant-numeric: tabular-nums; }
+.neg { color: var(--bad); font-weight: 600; font-variant-numeric: tabular-nums; }
+.zero { color: var(--good); font-weight: 600; font-variant-numeric: tabular-nums; }
+.callout {
+  border-left: 4px solid var(--accent); background: var(--accent-soft);
+  border-radius: 0 10px 10px 0; padding: 14px 18px; margin: 18px 0;
+}
+.callout.warn { border-left-color: var(--warn); background: var(--warn-bg); }
+.callout p { margin: 0; font-size: 14.5px; }
+.callout p + p { margin-top: 8px; }
+.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+footer { margin-top: 56px; color: var(--ink-faint); font-size: 13px; border-top: 1px solid var(--line); padding-top: 14px; }
+ul { padding-left: 22px; max-width: 68ch; }
+li { margin-bottom: 6px; }
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Accounts &middot; Finance user guide</div>
+  <h1>26AS TDS Reconciliation</h1>
+</header>
+<p class="lede">This screen compares the TDS your customers have deposited against your PAN
+(as reported in the Income-tax Form&nbsp;26AS) with what you actually billed them in the ERP —
+customer by customer — so you can claim the full TDS credit in the income-tax return and chase
+what's missing.</p>
+
+<h2>Where to find it</h2>
+<p><b>Accounts&nbsp;&rarr;&nbsp;Master&nbsp;&rarr;&nbsp;26AS TDS Reconcil.</b>
+The same screen handles upload and the report. When you open it, the last uploaded statement
+loads automatically — you only upload again when a fresh 26AS is downloaded.</p>
+
+<h2>How to use it — step by step</h2>
+<ol class="steps">
+  <li><b>Download Form 26AS from the income-tax portal</b>
+    <p>Log in to the e-filing portal &rarr; e-File &rarr; Income Tax Returns &rarr; View Form 26AS (TRACES).
+    Choose the financial year and download as <b>Text</b> — the file looks like
+    <code>AAACM3908L-2026-200230242.txt</code>. Upload it as-is; an Excel (.xlsx) copy of the
+    same statement also works.</p></li>
+  <li><b>Upload the file</b>
+    <p>Click <b>Upload New Statement</b>, pick the file, then <b>Upload &amp; Reconcile</b>.
+    The system reads PART-I (TDS deducted by customers), matches each deductor to your client
+    master, and opens the report. Re-uploading the same year's statement simply replaces the
+    old one — nothing is duplicated.</p></li>
+  <li><b>Map the unmatched customers (one-time)</b>
+    <p>Open the <b>Unmatched</b> tab. Where the customer's 26AS name differs from your ledger
+    name, pick the right client from the dropdown and press <b>Save</b>. The mapping is
+    remembered by TAN, so next year's upload matches automatically.</p></li>
+  <li><b>Review the differences</b>
+    <p>Work down the <b>Difference</b> column (see reading guide below). Click the number in the
+    <b>Txns</b> column to see the customer's individual 26AS entries side by side with your
+    invoices for the year.</p></li>
+  <li><b>Export for working papers</b>
+    <p><b>Export</b> downloads the current view (whichever tab is open) as an Excel file with
+    totals — ready to hand to the auditor or attach to the ITR working file.</p></li>
+</ol>
+
+<h2>Reading the list</h2>
+<div class="table-wrap"><table>
+  <tr><th>Column</th><th>What it shows</th></tr>
+  <tr><td>Deductor (as per 26AS)</td><td>The customer's name exactly as their accountant filed it in the TDS return. It may differ from your ledger name — that's what the mapping fixes.</td></tr>
+  <tr><td>TAN</td><td>The customer's Tax Deduction Account Number — the permanent key the system uses to remember your mappings.</td></tr>
+  <tr><td>Matched Client</td><td>The client in <em>your</em> ledger this deductor was matched to. Unmatched rows show a dropdown instead.</td></tr>
+  <tr><td>Match</td><td><span class="badge tan">TAN</span> matched from a saved mapping &nbsp;&middot;&nbsp; <span class="badge name">NAME</span> matched automatically by company name &nbsp;&middot;&nbsp; <span class="badge man">MANUAL</span> you mapped it this session.</td></tr>
+  <tr><td>Amount Credited</td><td>Total the customer reported paying / crediting you during the FY (per 26AS).</td></tr>
+  <tr><td>TDS Deposited</td><td>Tax they deducted and deposited against your PAN — this is the credit you can claim in the return.</td></tr>
+  <tr><td>FY Invoiced</td><td>Total you invoiced that client in the same financial year, from the ERP.</td></tr>
+  <tr><td>Difference</td><td>FY Invoiced minus 26AS Amount Credited. <span class="zero">0.00</span> = perfectly matched.</td></tr>
+  <tr><td>Txns</td><td>Number of 26AS entries — click it for the transaction-level drill-down.</td></tr>
+</table></div>
+
+<h2>What the Difference column means</h2>
+<div class="table-wrap"><table>
+  <tr><th>Reading</th><th>Typical cause</th><th>What to do</th></tr>
+  <tr><td><span class="zero">0.00</span></td>
+      <td>Customer booked exactly what you billed. (e.g. AMI Pigments — 1,66,003 both sides.)</td>
+      <td>Nothing — credit is claimable as-is.</td></tr>
+  <tr><td><span class="pos">Positive</span> (amber)</td>
+      <td>You invoiced more than they reported. Usually <b>timing</b>: your March bills booked by them in April (next FY), or they deduct TDS only on your service charges, not on reimbursements/duty.</td>
+      <td>Drill down and compare dates. A March invoice appearing in next year's 26AS is normal; only chase the customer if TDS itself looks short.</td></tr>
+  <tr><td><span class="neg">Negative</span> (red)</td>
+      <td>They reported more than you invoiced this FY. Usually last year's bills booked by them this year, or an advance.</td>
+      <td>Verify the income is really yours before treating the credit as claimable. Prior-year invoices carrying this year's TDS may need Form&nbsp;71 (see below).</td></tr>
+  <tr><td>Blank (—)</td>
+      <td>Row not mapped to a client yet, so there is nothing to compare.</td>
+      <td>Map it from the dropdown and Save.</td></tr>
+</table></div>
+
+<div class="callout">
+  <p><b>Timing differences are normal, not errors.</b> 26AS follows the <em>customer's</em>
+  booking date, your ERP follows <em>your</em> invoice date. A bill raised on 31&nbsp;March and
+  booked by the customer on 5&nbsp;April will always show as a difference in both years — it
+  offsets across the two statements.</p>
+</div>
+
+<div class="callout warn">
+  <p><b>TDS in this year's 26AS for income you billed last year?</b> Credit can still be
+  recovered by filing <b>Form&nbsp;71</b> on the e-filing portal (allowed up to two years from
+  the end of the FY in which the TDS was deducted — for FY&nbsp;2025-26 deductions, until
+  31&nbsp;March&nbsp;2028). Flag such rows for your CA.</p>
+  <p><b>A deductor in 26AS you don't recognise at all?</b> Don't claim that credit blindly —
+  it may be someone reporting against the wrong PAN. Confirm the income is yours first;
+  otherwise the deductor must file a correction on TRACES.</p>
+</div>
+
+<h2>The drill-down (click the Txns number)</h2>
+<p>The left panel lists every 26AS entry for that customer — section (194C etc.),
+transaction date, booking status, amount and TDS. The right panel lists your invoices to that
+client for the year. Use it to tick entries off against invoices and to spot exactly which
+bills the customer has or hasn't booked.</p>
+<p>In the <b>Status</b> column of 26AS entries, <code>F</code> (Final) means the deductor's
+payment is matched with the bank and the credit is secure. <code>U</code> (Unmatched) or
+<code>P</code> (Provisional) entries should be re-checked in a later 26AS download before
+relying on them.</p>
+
+<h2>The three totals at the top</h2>
+<ul>
+  <li><b>26AS Amount Credited</b> — everything customers reported paying you in the FY.</li>
+  <li><b>26AS TDS Deposited</b> — the total TDS credit available against your PAN. This is the
+  figure to reconcile with the TDS receivable in your books and claim in the ITR.</li>
+  <li><b>FY Invoiced (matched clients)</b> — your billing to the matched customers. It grows as
+  you map more rows, so map everything before comparing grand totals.</li>
+</ul>
+
+<h2>Month-end / year-end routine</h2>
+<ol class="steps">
+  <li><b>Download a fresh 26AS quarterly</b><p>Deductors file quarterly, and entries keep arriving for up to two months after each quarter ends. The year is only complete around end-May of the next FY.</p></li>
+  <li><b>Upload, then clear the Unmatched tab to zero</b><p>Every saved mapping is remembered — this gets faster each quarter.</p></li>
+  <li><b>Investigate red (negative) rows first</b><p>They affect what credit you may claim. Amber rows are mostly timing and usually explain themselves in the drill-down.</p></li>
+  <li><b>Export and file the reconciliation</b><p>Keep the export with the TDS receivable schedule for the auditor and the return.</p></li>
+</ol>
+
+<footer>26AS TDS Reconciliation &middot; Links / Manilal ERP &middot; Accounts module &middot; Prepared Aug 2026</footer>
+</div>
+
+</html>

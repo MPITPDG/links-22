@@ -1,0 +1,63 @@
+﻿<div class="animated fadeIn">
+	<div class="row">					
+		<div class="col-md-2">
+		</div>
+		<div class="col-md-8">
+			<table class="table table-bordered table-sm-new">
+				<tbody style='height:30px'>
+					<tr>
+						<td class="col-form-span-heading" colspan="2"  >
+							VESSEL SEARCH
+						</td>
+					</tr>
+					<tr class="bgwhite">
+						<td>
+							<span class="col-form-span-label ">Vessel Name</span>
+						</td>
+						<td>
+							<input [(ngModel)]="vslSname" type="text" id="txtvessel" name="txtvessel" class="form-control width150">
+						</td>
+					</tr>
+					<tr class="bgwhite">
+						<td>
+							<span class="col-form-span-label">Voyage No</span>
+						</td>
+						<td >
+							<input type="text" [(ngModel)]="vslSvoyno" id="txtvoyno" name="txtvoyno" class="form-control width150 " >
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2" class="centerlabel" >
+							<button class="btn btn-sm btn-success" type="submit" id="btnAgtAdd" name="btnAgtAdd"  (click)="serchList()"><span class="col-form-span-label"><i class="fa fa-search"></i> Search</span></button>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2" *ngIf="Searchlist.length>0">
+							<div  class="row yscroll" style="max-height:300px">
+								<table class="table table-hover">
+									<thead>
+										<tr class="col-form-span-heading" style="white-space:nowrap;">
+											<th class="col-form-span-label">Rotation</th>
+											<th class="col-form-span-label">Vessel</th>
+											<th class="col-form-span-label">Voyage No</th>
+										</tr>
+									 </thead>
+									<tbody class="bgwhite">
+										<tr *ngFor="let prtAgt of Searchlist">
+											<td><span class="col-form-span-label anchor-link" (click)="ListOnclick(prtAgt.VSL_RTNO)" style="cursor:pointer;">{{prtAgt.VSL_RTNO}}</span></td>
+											<td class="col-form-span-label">{{prtAgt.VSL_NAME}}</td>
+											<td class="col-form-span-label">{{prtAgt.VSL_VOYNO}}</td>                                             
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			 
+		</div>
+		<div class="col-md-2">
+		</div>
+	</div>
+</div>

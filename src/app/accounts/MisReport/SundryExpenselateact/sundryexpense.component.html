@@ -1,0 +1,128 @@
+<div class="animated fadeIn" >  
+    <div class="row no-gutters"  >
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>{{Header}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters" *ngIf="displayType=='SEARCH'">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+
+                <tr>
+                    <td class="col-form-span-heading" colspan="6"> <b>{{PageType}}</b> </td>
+           </tr>
+                 <tr>
+                    <td colspan="4"><span class="col-form-span-label"><b>Expenses Voucher Date (CE ,CP)</b> </span><span class="col-form-span-error">*</span></td>
+                 </tr>   
+                 <tr>
+                    <td><span class="col-form-span-label"><b>From</b> </span><span class="col-form-span-error">*</span></td>
+                    <td>
+                    <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)"  [options]="myDatePickerOptions"
+                        class="form-control"  [selDate]="FromDate"  ></my-date-picker>
+                </td>
+                    <td><span class="col-form-span-label"><b>To </b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td><my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)"  [options]="myDatePickerOptions"
+                            class="form-control"  [selDate]="ToDate"   ></my-date-picker>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="col-form-span-label"><b>No. Of Days Delay</b> </span><span
+                        class="col-form-span-error">*</span></td>
+                
+                    <td >  <input [(ngModel)]="DelayDays" type="text"  [OnlyNumber]="true"  class="form-control width150" maxlength="3" > </td>
+              
+                    <td><span class="col-form-span-label"><b>(Range 30 To 240) </b> </span></td>
+                 
+                </tr>
+                <tr>
+                    <td >
+                        <span  class="col-form-span-label"><b>Department </b> </span><span
+                        class="col-form-span-error">*</span>
+                    </td>
+                            <td colspan="3" >
+                                <select class="form-control width150"  [(ngModel)]="Department" (change)="GetDepartmentName($event)" >
+                                    <option value="0">All</option>
+                                    <option *ngFor="let d of Departmentlist"  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                
+                                </select>
+                            </td>
+                </tr>
+                <tr> <td colspan="6" class="centerlabel">
+                    <button class="btn btn-sm btn-primary" type="submit" (click)="GenerateData()" > <span
+                    class="col-form-span-label"><i class="fa fa-gg"></i>
+                    Generate </span></button>&nbsp;
+                </td>
+        </tr>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+    </div>
+    <div class="row no-gutters"   *ngIf="displayType=='LIST'">
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+        <div class="col-sm-12 col-md-10 col-lg-10 ">
+           <div class="row  xyscroll"  style="height: 500px;">
+                <table class="table table-bordered table-sm-new table-striped table-hover" >
+                
+
+                    <thead>
+                        <tr align="right" class="title-head formheading">
+                            <td colspan="7" >
+                          <a href="javascript:void(0);" (click)="displayType='SEARCH';SundryexpenseList=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
+                            </td>
+                        </tr>
+                        <tr class="title-head formheading table-primary">
+                            <th class="col-form-span-label" align="center">JOB NO</th>
+                            <th class="col-form-span-label" align="center">	CLIENT</th>
+                            <th class="col-form-span-label" align="center"></th>   
+                            <th class="col-form-span-label" align="center">VOUCHER NO.</th>   
+                            <th class="col-form-span-label" align="center">VOUCHER DATE</th>   
+                            <th class="col-form-span-label" align="center">ACCOUNT</th>   
+                            <th class="col-form-span-label" align="center">AMOUNT</th>   
+                        </tr>
+                    </thead>
+                    <tbody *ngIf="SundryexpenseList.length > 0">
+                        <tr *ngFor="let data of SundryexpenseList">
+                            <td style="width: 130px;"><span [ngClass]="{'col-form-span-label': data.JOBNO1  === 'GRAND TOTAL', 'col-form-span-label anchor-link': data.JOBNO1 != 'GRAND TOTAL'}"
+                                
+                                                class="col-form-span-label"><b>{{data.JOBNO1}}</b></span></td>  
+                          <!-- <td style="width: 30px;"><span   *ngIf="data.JOBNO1!='GRAND TOTAL'"class="col-form-span-label anchor-link" (click)="PrintJob(data.JOBNO1)" >{{data.JOBNO1}}</span> </td>  -->
+                            <td style="width: 130px;" ><span class="col-form-span-label">{{data.CLIENTNAME}}</span>  </td>                             
+                            <td  style="width: 90px;" ><span class="col-form-span-label">{{data.TRASNTYPE}}</span>  </td>
+                            <td  style="width:130px; " class="col-form-span-label">
+                                <p    style="white-space: pre-wrap;width: 130px; "  class="col-form-span-label anchor-link " (click)="Openprint(data.TRANSCODE,data.TRASNTYPE)" > {{data.TRANSCODE}}</p>
+                            </td> 
+                           <td  style="width:100px; " class="col-form-span-label">
+                            <p  style="white-space: pre-wrap;width: 100px; " >{{data.ENTRYDT}}</p>
+                           </td>
+                            <td  style="width: 200px;" ><span class="col-form-span-label">{{data.ACCTNAME}}</span>  </td>
+                            <td   style="width: 100px;"><span class="col-form-span-label">{{data.AMOUNT}}</span>  </td>
+                        </tr>
+                        <tr> <td colspan="7" class="centerlabel">
+                            <button class="btn btn-sm btn-primary" type="submit" (click)="ExportData()" > <span
+                            class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
+                            Export To Excel </span></button>&nbsp;
+                        </td>
+                </tr>
+                    </tbody>
+                </table>
+            </div>
+         </div>
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+                    
+    </div> 
+</div>
+

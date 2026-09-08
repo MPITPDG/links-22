@@ -1,0 +1,409 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <strong>Export - Booking Order No Details</strong>
+                        </div>
+                        <div class="col-sm-8" [ngStyle]="{ 'color': 'blue', 'font-weight':'bold', 'font-size': '11px'}">
+                            <marquee behavior="scroll" direction="left" height="20px" scrollamount="2" onmouseout="this.start()" onmouseover="this.stop()">Please Update Actual Approval date And Actual Approval By in Booking .</marquee>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <!-- Search Part Start hete -->
+        <div class="col-sm-2">
+        </div>
+        <div class="col-sm-8">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead>
+                    <th class="col-form-span-heading" colspan="5">ORDER NO DETAILS</th>
+                </thead>
+                <tbody>
+                    <tr class="title-head trbg">
+                        <td class="width150">
+                            <span class="col-form-span-label">EDI GROUP</span>
+                            <span class="col-form-span-error">*</span>
+                        </td>
+                        <td colspan="4">
+                            <ng-select [items]="EdiGroupList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" placeholder="--Select--" [(ngModel)]="EdiGroup"
+                                class="form-control width200" [disabled]="addList.length>0">
+                            </ng-select>
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg">
+                        <td class="width150">
+                            <span class="col-form-span-label">Order No</span>
+                            <span class="col-form-span-error">*</span>
+                        </td>
+                        <td>
+                            <input type="text" [(ngModel)]="OrderNo" class="form-control width120" [disabled]="addList.length>0" />
+                        </td>
+                        <td class="width150">
+                            <span class="col-form-span-label">Reference No.</span>
+                            <span class="col-form-span-error">*</span>
+                        </td>
+                        <td>
+                            <input type="text" [(ngModel)]="ReferenceNo" class="form-control width120" [disabled]="addList.length>0" />
+                        </td>
+                        <td>
+                            <button type="button" name="search" class="btn btn-sm btn-info" (click)="search();" title="Search" #searchButton>
+                                <span class="col-form-span-label">
+                                    <i class="fa fa-search"></i>&nbsp;Search</span>
+                            </button>
+                            <button type="button" name="search" class="btn btn-sm btn-danger" (click)="resetSearch();" title="Reset" #resetSearchButton>
+                                    <span class="col-form-span-label">
+                                        <i class="fa fa-undo"></i>&nbsp;Reset</span>
+                                </button>
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg" *ngIf="ErrorMessage!=''">
+                        <td colspan="5">
+                            <span class="error-text">{{ErrorMessage}}</span>
+                        </td>
+                    </tr>
+            </table>
+            <table class="table table-bordered table-sm-new bgwhite" #addArea>
+                <tbody>
+                    <tr class="col-form-span-heading" *ngIf="isVisibleRebooking=='edit'">
+                        <td class="centerlabel" colspan="4">
+                            <span class="col-form-span-label">
+                                <label class="checkbox-inline">
+                                    <u>RE-BOOKING</u>
+                                    <input type="checkbox" [(ngModel)]="Rebooking" (ngModelChange)="checkboxRebooking()" [disabled]="DisabledRebooking" />
+                                </label>
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg">
+                        <td class="width180">
+                            <span class="col-form-span-label">Booking Date</span>
+                            <span class="col-form-span-error">*</span>
+                        </td>
+                        <td colspan="3">
+                            <input type="text" [(ngModel)]="BookingDate" class="form-control width120" />
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg">
+                        <td class="width180">
+                            <span class="col-form-span-label">Pieces</span>
+                            <span class="col-form-span-error">*</span>
+                        </td>
+                        <td>
+                            <input type="text" [(ngModel)]="Pieces" [OnlyNumber]="true" class="form-control width120" />
+                        </td>
+                        <td class="width180">
+                            <span class="col-form-span-label">Types of Pieces</span>
+                            <span class="col-form-span-error">*</span>
+                        </td>
+                        <td>
+                            <ng-select [items]="[{ VALUEFIELD:'PIECES'},{ VALUEFIELD:'SETS'},{ VALUEFIELD:'DOZENS'},{ VALUEFIELD:'PAIRS'},{ VALUEFIELD:'BOXES'},{ VALUEFIELD:'NOS'},{ VALUEFIELD:'UNIT'},{ VALUEFIELD:'LOTS'},{ VALUEFIELD:'MTR'},{ VALUEFIELD:'PACK'},{ VALUEFIELD:'KGS'},{ VALUEFIELD:'KGS/MTRS'},{ VALUEFIELD:'PCS/PAIR'},{ VALUEFIELD:'SQ.MTRS'},{ VALUEFIELD:'PCS/SETS'},{ VALUEFIELD:'EA'},{ VALUEFIELD:'PCS/PAIR/KGS'},{ VALUEFIELD:'AMPOULES'},{ VALUEFIELD:'MT'},{ VALUEFIELD:'MATS'}]"
+                                bindLabel="VALUEFIELD" bindValue="VALUEFIELD" placeholder="--Select--" [(ngModel)]="TypesOfPieces"
+                                class="form-control width200">
+                            </ng-select>
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg">
+                        <td class="width180">
+                            <span class="col-form-span-label">Pkgs</span>
+                        </td>
+                        <td>
+                            <input type="text" [(ngModel)]="Package" [OnlyNumber]="true" class="form-control width120" />
+                        </td>
+                        <td class="width180">
+                            <span class="col-form-span-label">Volume</span>
+                        </td>
+                        <td>
+                            <input type="text" [(ngModel)]="Volume" [OnlyNumber]="true" class="form-control width120" />
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg">
+                        <td class="width180">
+                            <span class="col-form-span-label">Gross weight</span>
+                        </td>
+                        <td>
+                            <input type="text" [(ngModel)]="Grossweight" [OnlyNumber]="true" class="form-control width120" />
+                        </td>
+                        <td class="width180">
+                            <span class="col-form-span-label">Net Weight</span>
+                        </td>
+                        <td>
+                            <input type="text" [(ngModel)]="NetWeight" [OnlyNumber]="true" class="form-control width120" />
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg">
+                        <td class="width180">
+                            <span class="col-form-span-label">Item Description</span>
+                        </td>
+                        <td colspan="3">
+                            <input type="text" [(ngModel)]="ItemDescription" class="form-control" />
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg">
+                        <td class="width180">
+                            <span class="col-form-span-label">Exporter/Shipper</span>
+                            <span class="col-form-span-error">*</span>
+                        </td>
+                        <td colspan="3">
+                            <ng-select [items]="ExporterList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" placeholder="--Select--" [(ngModel)]="Exporter"
+                                class="form-control">
+                            </ng-select>
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg">
+                        <td class="width180">
+                            <span class="col-form-span-label">Consignee</span>
+                            <span class="col-form-span-error">*</span>
+                        </td>
+                        <td colspan="3">
+                            <ng-select [items]="ConsigneeList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" placeholder="--Select--" [(ngModel)]="Consignee"
+                                class="form-control">
+                            </ng-select>
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg">
+                        <td class="width180">
+                            <span class="col-form-span-label">Mode</span>
+                        </td>
+                        <td colspan="3">
+                            <ng-select [items]="[{VALUEFIELD: 'SEA'},{ VALUEFIELD: 'AIR'},{ VALUEFIELD: 'DIF.AIR'},{ VALUEFIELD: 'SEA/AIR'}]" bindLabel="VALUEFIELD" bindValue="VALUEFIELD" placeholder="--Select--"
+                                [(ngModel)]="Mode" class="form-control width100">
+                            </ng-select>
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg">
+                        <td class="width180">
+                            <span class="col-form-span-label">Docs Expected </span>
+                        </td>
+                        <td>
+                            <my-date-picker name="DocsExpected" [options]="myDatePickerOptions" [(ngModel)]="DocsExpected"></my-date-picker>
+                        </td>
+                        <td class="width180">
+                            <span class="col-form-span-label">Cargo Expected</span>
+                        </td>
+                        <td>
+                            <my-date-picker name="CargoExpected" [options]="myDatePickerOptions" [(ngModel)]="CargoExpected"></my-date-picker>
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg">
+                        <td class="width180">
+                            <span class="col-form-span-label">Approval Expected Dt</span>
+                            <span class="col-form-span-error">*</span>
+                        </td>
+                        <td>
+                            <my-date-picker name="ApprovalExpectedDate" [options]="myDatePickerOptions" [(ngModel)]="ApprovalExpectedDate"></my-date-picker>
+                        </td>
+                        <td class="width180">
+                            <span class="col-form-span-label">Actual Approval Date</span>
+                        </td>
+                        <td>
+                            <my-date-picker name="ActualApprovalDate" [options]="myDatePickerOptions" [(ngModel)]="ActualApprovalDate"></my-date-picker>
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg">
+                        <td class="width180">
+                            <span class="col-form-span-label">Actual Approval By</span>
+                        </td>
+                        <td>
+                            <input type="text" [(ngModel)]="ActualApprovalBy" class="form-control width120" />
+                        </td>
+                        <td class="width180">
+                            <span class="col-form-span-label">ETD</span>
+                            <span class="col-form-span-error">*</span>
+                        </td>
+                        <td>
+                            <my-date-picker name="ETD" [options]="myDatePickerOptions" [(ngModel)]="ETD"></my-date-picker>
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg">
+                        <td class="width180">
+                            <span class="col-form-span-label" [hidden]="EdiGroup===1">Sup.Contact Date</span>
+                            <span class="col-form-span-error" [hidden]="EdiGroup===1">*</span>
+                        </td>
+                        <td>
+                            <my-date-picker name="ETD" [options]="myDatePickerOptions" [(ngModel)]="SupContactDate" [hidden]="EdiGroup==1"></my-date-picker>
+                        </td>
+                        <td class="width180">
+                            <span class="col-form-span-label">Ref/Assorti</span>
+                        </td>
+                        <td>
+                            <span class="col-form-span-label">{{RefAssorti}}</span>
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg" [hidden]="EdiGroup==1">
+                        <td class="width180">
+                            <span class="col-form-span-label">Shipment Confirmation</span>
+                        </td>
+                        <td>
+                            <ng-select [items]="[{VALUEFIELD: '0', TEXTFIELD: 'Yes'},{ VALUEFIELD: '1', TEXTFIELD: 'No'}]" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                                placeholder="" [(ngModel)]="ShipmentConfirmation" class="form-control width50">
+                            </ng-select>
+                        </td>
+                        <td class="width180">
+                            <span class="col-form-span-label" [hidden]="ShipmentConfirmation=='0'" >New Shipment Date</span>
+                        </td>
+                        <td>
+                            <my-date-picker name="NewShipmentDate" [options]="myDatePickerOptions" [(ngModel)]="NewShipmentDate" [hidden]="ShipmentConfirmation=='0'"></my-date-picker>
+                        </td>
+                    </tr>
+                    <tr class="col-form-span-heading">
+                        <td class="centerlabel" colspan="4">
+                            <span class="col-form-span-label">
+                                <label class="checkbox-inline">
+                                    <u>TRANSSHIPMENT</u>
+                                    <input type="checkbox" [(ngModel)]="Transhipment" />
+                                </label>
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg" [hidden]="!Transhipment">
+                        <td class="width180">
+                            <span class="col-form-span-label">ETA At Transhipment Port </span>
+                            <span class="col-form-span-error">*</span>
+                        </td>
+                        <td>
+                            <my-date-picker name="ApprovalExpectedDate" [options]="myDatePickerOptions" [(ngModel)]="ETATranshipmentDate"></my-date-picker>
+                        </td>
+                        <td class="width180">
+                            <span class="col-form-span-label">ETD At Transhipment Port</span>
+                            <span class="col-form-span-error">*</span>
+                        </td>
+                        <td>
+                            <my-date-picker name="ActualApprovalDate" [options]="myDatePickerOptions" [(ngModel)]="ETDTranshipmentDate"></my-date-picker>
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg">
+                        <td class="width180">
+                            <span class="col-form-span-label">ETA</span>
+                            <span class="col-form-span-error">*</span>
+                        </td>
+                        <td colspan="3">
+                            <my-date-picker name="ETA" [options]="myDatePickerOptions" [(ngModel)]="ETA"></my-date-picker>
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg">
+                        <td colspan="4" class="centerlabel">
+                            <button type="button" name="search" class="btn btn-sm btn-success" (click)="add();" #addButton>
+                                <span class="col-form-span-label">
+                                    <i class="fa fa-plus"></i>&nbsp;Add</span>
+                            </button>
+                            <button type="button" name="search" class="btn btn-sm btn-success" (click)="update();" #updateButton>
+                                <span class="col-form-span-label">
+                                    <i class="fa fa-refresh"></i>&nbsp;Update</span>
+                            </button>
+                            <button type="button" name="search" class="btn btn-sm btn-danger" (click)="reset();" #resetButton>
+                                <span class="col-form-span-label">
+                                    <i class="fa fa-undo"></i>&nbsp;Reset</span>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="title-head trbg" *ngIf="ErrorMessage!=''">
+                        <td colspan="3">
+                            <span class="col-form-span-error">{{ErrorMessage}}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="row xyscroll" [ngStyle]="{'height': '120px'}" #listArea>
+                <table class="table table-bordered table-striped table-sm-new bgwhite" *ngIf="addList.length > 0">
+                    <thead>
+                        <tr class="title-head formheading">
+                            <th></th>
+                            <th></th>
+                            <th>Order No.</th>
+                            <th>Ref. No</th>
+                            <th>JobNo</th>
+                            <th>Shipper</th>
+                            <th>Consignee</th>
+                            <th>Pieces</th>
+                            <th>Pcs Type</th>
+                            <th>Pkgs</th>
+                            <th>Booking On</th>
+                            <th>DocsRecvdE</th>
+                            <th>CargoRecvdE</th>
+                            <th>ETD</th>
+                            <th>ETA</th>
+                            <th>Appr Extd</th>
+                            <th>App. Dt</th>
+                            <th>App. By</th>
+                            <th *ngIf="EdiGroup===2">Sup.Cont dt.</th>
+                            <th *ngIf="EdiGroup===3">Ref/Assorti</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let obj of addList">
+                            <td class="centerlabel width20">
+                                <i class="fa fa-edit" title="Edit" (click)="editPopulateData(obj.ID)"></i>
+                            </td>
+                            <td class="centerlabel width20">
+                                <i class="fa fa-arrow-down" title="{{'Download documents For Order No. '+obj.ORDERNO+' and Style No. '+obj.STYLENO+' Uploaded by Shipper'}}"></i>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.ORDERNO}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.STYLENO}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.EXPTNO}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.EXPORTER}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.CONNAME}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.PIECES}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.TYPEOFPCS}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.PKGS}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.BOOKINGDT}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.DOCSEXPECT}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.CARGOEXPECT}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.ETDEXPECT}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.ETAEXPECT}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.APPROVALDT}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.ACTLAPPROVAL}}</span>
+                            </td>
+                            <td>
+                                <span class="col-form-span-label">{{obj.ACTLAPPROVALBY}}</span>
+                            </td>
+                            <td *ngIf="EdiGroup===2">
+                                <span class="col-form-span-label">{{obj.SUP_CONTACT_DT}}</span>
+                            </td>
+                            <td *ngIf="EdiGroup===3">
+                                <span class="col-form-span-label">{{obj.REF_ASSORTI}}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-sm-2">
+        </div>
+    </div>
+    <!-- Search Part End hete -->
+</div>

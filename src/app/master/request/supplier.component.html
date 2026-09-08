@@ -1,0 +1,502 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>{{Header| uppercase}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">  </div>
+        <div class="col-sm-8">
+            <table class="table table-bordered table-sm-new bgwhite">               
+                <tr >
+                    <td class="col-form-span-heading   " colspan="4">
+                        Supplier Details
+                    </td>
+                </tr>
+                <tr>   
+                    <td><span class="col-form-span-label"><b>Short Name</b> </span><span class="col-form-span-error">*</span></td>         
+                    <td>  <input [(ngModel)]="ShrtName" type="text"    class="form-control width180"   >   </td> 
+                    <td><span class="col-form-span-label"><b>EORI #</b> </span></td>         
+                    <td> <input [(ngModel)]="EORIno" type="text"    class="form-control width180"   > </td> 
+
+                       
+                </tr>
+                 
+                <tr>
+                    <td><span class="col-form-span-label"><b>Name</b> </span><span class="col-form-span-error">*</span></td> 
+                    <td  colspan="3" >
+                        <table class="table table-bordered table-sm-new bgwhite">               
+                            <tr >
+                                <td   style=" display: flex; "  >                        
+                                    <select class="form-control width70"  [(ngModel)]="title"  >
+                                     <option value="Mr.">Mr.</option>	
+                                    <option value="Ms">Ms</option>	
+                                    <option value="Mrs.">Mrs.</option>
+                                    <option value="Miss">Miss</option>
+                                    <option value="Dr.">Dr.</option>	
+                                    <option value="Messrs">Messrs</option>	
+                                    </select> 
+                                    <input [(ngModel)]="Name" type="text"    class="form-control "    >                      
+                                </td>
+                            </tr>
+                        </table>
+                    </td> 
+                </tr >   
+                 <tr>
+                   
+                    <td><span class="col-form-span-label"><b>PAN No.</b> </span></td>         
+                    <td>  <input [(ngModel)]="panno" type="text"    class="form-control width180" maxlength="20" > </td>    
+                    <td><span class="col-form-span-label"><b> SERVICE TAX No.</b> </span></td>         
+                    <td>  <input [(ngModel)]="servtaxno" type="text"    class="form-control width180"   >   </td>   
+                </tr>
+                <tr>
+                        <td><span class="col-form-span-label"><b>TAN No.</b> </span></td>         
+                        <td colspan="3">  <input [(ngModel)]="tanno" type="text"    class="form-control width180" (change)="Tanchange()"  >   </td>           
+                </tr>
+                
+                <tr class="trheader">
+                    <td colspan="4"><span class="col-form-span-label"><b>CORRESPONDENCE ADDRESS</b> </span> </td>
+                </tr>
+                <tr>   
+                        <td><span class="col-form-span-label"><b>Address 1</b> </span></td>         
+                        <td colspan="3">  <input [(ngModel)]="addrs21" type="text"    class="form-control width300"  maxlength="40"  >   </td> 
+                               
+                    </tr>
+                    <tr>   
+                        <td><span class="col-form-span-label"><b>Address 2</b> </span></td>         
+                        <td>  <input [(ngModel)]="addrs22" type="text"    class="form-control width250"   maxlength="40"  >   </td> 
+                        <td><span class="col-form-span-label"><b>Address 3</b> </span></td>         
+                        <td>  <input [(ngModel)]="addrs23" type="text"    class="form-control width180"   maxlength="40" > </td>         
+                    </tr>
+                    <tr>
+                       <td><span class="col-form-span-label"><b>Pincode Position</b> </span></td>        
+                        <td>
+                            <span class="col-form-span-label"><input type="radio"   [checked]="position2=='After'" (change)="position2='After'" /><b>After</b> </span> 
+                            <span class="col-form-span-label"><input type="radio"   [checked]="position2=='Before'" (change)="position2='Before'" /><b>Before</b> </span>
+                        </td>
+                        <td><span class="col-form-span-label"><b>Pincode</b> </span></td>         
+                        <td>  <input [(ngModel)]="Pincode2" type="text"    class="form-control width180"   > </td>         
+                    </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>City</b> </span><span class="col-form-span-error">*</span></td>        
+                        <td>
+                            <select class="form-control width150"  [(ngModel)]="city2" (change)="Countryfilter($event.target.value,'INV')">
+                                <option value="">Please select</option>
+                                <option *ngFor="let d of Citylist" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+                            </select>
+                        </td>
+                        <td><span class="col-form-span-label"><b>State</b> </span></td>         
+                        <td>  <input [(ngModel)]="state" type="text"    class="form-control width180"   > </td>     
+                    </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Country</b> </span><span class="col-form-span-error">*</span></td>         
+                        <td>  <input [(ngModel)]="country2" type="text"    class="form-control width180"   > </td>     
+                        <td><span class="col-form-span-label"><b>Telephone No.</b> </span></td>         
+                        <td>  <input [(ngModel)]="teleno" type="text"    class="form-control width180"   > </td>       
+                    </tr>
+
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Fax No</b> </span></td>         
+                        <td>  <input [(ngModel)]="nofax" type="text"    class="form-control width180"   > </td>     
+                        <td> </td>         
+                        <td>   </td>       
+                    </tr>
+                    <tr>
+                        <td class="col-form-span-heading   " colspan="4">
+                                <span class="col-form-span-label"><input type="checkbox"   [(ngModel)]="IS_gst_reg" (change)="checkValue(IS_gst_reg?'gst':'')"  /><b>GST DETAILS</b> </span>    
+                        </td>
+                    </tr>
+                    
+                        <tr>   
+                            <td><span class="col-form-span-label"><b>GST No.</b> </span><span class="col-form-span-error">*</span></td>         
+                            <td>  <input [(ngModel)]="GstNo" type="text"    class="form-control width180"   >   </td> 
+                            <td><span class="col-form-span-label"><b>ARN No</b> </span></td>         
+                            <td>  <input [(ngModel)]="ARNNo" type="text"    class="form-control width180"   > </td>         
+                        </tr>
+                        <tr>
+                           <td><span class="col-form-span-label"><b>Contact Person</b> </span></td>        
+                            <td  style=" display: flex; " >
+                                <select class="form-control width50"  [(ngModel)]="title1"  >
+                                    <option value="Mr.">Mr.</option>	
+                                    <option value="Ms">Ms.</option>	
+                                    <option value="Mrs.">Mrs.</option>
+                                    <option value="Miss">Miss.</option>
+                                    <option value="Dr.">Dr.</option>
+                                </select>
+                                <input [(ngModel)]="person" type="text"    class="form-control width180"   > 
+                            </td>
+                            <td><span class="col-form-span-label"><b>Telephone No.</b> </span></td>         
+                            <td>  <input [(ngModel)]="telephone" type="text"    class="form-control width180"   > </td>         
+                        </tr>
+                        <tr>                             
+                            <td><span class="col-form-span-label"><b>Mobile No.</b> </span></td>         
+                            <td>  <input [(ngModel)]="mobile" type="text"    class="form-control width180"   > </td>  
+                            <td><span class="col-form-span-label"><b>E-Mail</b> </span></td>         
+                            <td>  <input   type="email"    class="form-control width180"   placeholder="Email"  [(ngModel)]="email" (change)="onChange(email)" > 
+                            </td>   
+                        </tr>
+                        <tr>
+                            <td colspan="4"  class="centerlabel">                                
+                                <button class="btn btn-sm btn-success" type="submit" (click)="Addcildrcrd()"> <span class="col-form-span-label"><i class="fa fa-plus" ></i> {{txtchild}}</span></button>
+                                <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Resetcildrcrd();"><i class="fa fa-ban"></i> Reset</span></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <div class="row xyscroll" *ngIf="gstlist.length > 0">
+                                    <table class="table table-responsive-sm table-bordered"> 
+                                        <thead>
+                                            <tr class="col-form-span-heading">
+                                                <th class="width50 centerlabel"><span class="col-form-span-label"></span></th>
+                                                <th class="width100 centerlabel"><span class="col-form-span-label">Invoicing Address</span></th>
+                                                <th class="width100 centerlabel"><span class="col-form-span-label">GST No.</span></th>
+                                                <th class="width100 centerlabel"><span class="col-form-span-label">GST ARN No.</span></th>                                                     
+                                            </tr>
+                                        </thead>
+                                        <tbody   *ngIf="gstlist.length>0">
+                                            <tr *ngFor="let obj of gstlist">
+                                                <td class="centerlabel">
+                                                    <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)" ></i>
+                                                    &nbsp;
+                                                    <i class="fa fa-trash" (click)="deletedtlrecd(obj.ID,obj.ISPI)"></i>
+                                                </td>
+                                                <td><span class="col-form-span-label"  [innerHtml]="obj.PURADDRESS1"> </span></td>
+                                                <td><span class="col-form-span-label">{{obj.GST_NO}}</span></td>
+                                                <td><span class="col-form-span-label">{{obj.GST_ARNNO}}</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr> 
+                        <!-- TDS  -->
+                        <tr>
+                            <td class="col-form-span-heading   " colspan="4">
+                                    <span class="col-form-span-label"><input type="checkbox"   [(ngModel)]="IS_TDSApp" (change)="checkValue(IS_TDSApp?'TDS':'')"  /><b>TDS DETAILS</b> </span>    
+                            </td>
+                        </tr>
+                        
+                            <tr *ngIf="(queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ') 
+                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ')">   
+                                <td><span class="col-form-span-label"><b>Section</b> </span><span class="col-form-span-error">*</span></td>         
+                                <td>  <select class="form-control width150"  [(ngModel)]="sections" >
+                                    <option value="">Please select</option>
+                                    <option *ngFor="let d of Sectionlist" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+                                </select>  </td> 
+                                <!-- <td><span class="col-form-span-label"><b>Base % Rate</b> </span></td>         
+                                <td>  <input [(ngModel)]="secRate" type="text"    class="form-control width50" OnlyNumber="true"  > </td>          -->
+                            </tr>
+                            <tr *ngIf="(queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ')
+                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ')">
+                               <td><span class="col-form-span-label"><b>From Date</b> </span></td>        
+                                <td> 
+                                    <my-date-picker name="frmdt" [options]="myDatePickerOptions" [(ngModel)]="frmdt" required></my-date-picker>
+                                </td>
+                                <td><span class="col-form-span-label"><b>To Date</b> </span></td>         
+                                <td>   
+                                    <my-date-picker name="todt" [options]="myDatePickerOptions" [(ngModel)]="todt" required></my-date-picker>
+                                </td>         
+                            </tr>
+                            <tr *ngIf="(queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ')
+                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ') ">   
+                                <td><span class="col-form-span-label"><b>TDS Type</b> </span></td>         
+                                <td>    <select class="form-control width150"  [(ngModel)]="tdstype"  (change)="EnableLDSRate($event.target.value)"   >
+                                    <option value="">Please Select</option>	
+                                    <option value="BRC">Base Rate</option>	
+                                    <option value="LDC">Low Deduction Certificate</option>	
+                                    <option value="EDC">Exemption</option>
+                                    
+                                </select></td> 
+                                <td><span class="col-form-span-label"><b>Base % Rate</b> </span></td>         
+                                <td>  <input [(ngModel)]="secRate" type="text"    class="form-control width50" OnlyNumber="true"  > </td>                           
+                             
+                            </tr>
+                            <tr *ngIf="(queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ')
+                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ')"> 
+                                <td><span class="col-form-span-label"><b>LDC % Rate</b> </span></td>         
+                                <td>  <input [(ngModel)]="ldcRate" type="text" [disabled]='disableldcrate'   class="form-control width50" OnlyNumber="true"  > </td>         
+                                <td><span class="col-form-span-label"><b>Amount Limit</b> </span></td>         
+                                <td>  <input [(ngModel)]="tdsLimit" type="text" OnlyNumber="true"   class="form-control width100"  [disabled]='disablelimitamt' > </td>  
+                               
+                            </tr>
+                            <tr *ngIf="(queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ')
+                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ')"> 
+                            <td><span class="col-form-span-label"><b>Company</b> </span></td>    
+                            <td>
+                                <select class="form-control width250"  [(ngModel)]="Company"  [disabled]='disablecompany' >
+                                    <option value="">Please select</option>
+                                    <option *ngFor="let d of CompanyList" value={{d.CMP_CODE}}>{{d.CMP_NAME}}</option>
+                                </select> 
+                               </td>
+                                <td><span class="col-form-span-label"><b>Certificate No.</b> </span></td>         
+                                <td>  <input [(ngModel)]="LdccertNo" type="text" OnlyNumber="true"   class="form-control width100"  [disabled]='disablecertno' > </td>  
+                               
+                            </tr>
+                                                        <!-- <tr>                             
+                                <td><span class="col-form-span-label"><b>TDS Type</b> </span></td>         
+                                <td>    <select class="form-control width150"  [(ngModel)]="tdstype"  >
+                                    <option value="">Please Select</option>	
+                                    <option value="BRC">Base Rate</option>	
+                                    <option value="LDC">Low Deduction Certificate</option>	
+                                    <option value="EDC">Exemption</option>
+                                    
+                                </select></td>  
+                            </tr> -->
+                            <tr *ngIf="(queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ')
+                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ')">
+                                <td colspan="4"  class="centerlabel">                                
+                                    <button class="btn btn-sm btn-success" type="submit" (click)="AddTDScildrcrd()"> <span class="col-form-span-label"><i class="fa fa-plus" ></i> {{txtchildTDS}}</span></button>
+                                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="ResetTDScildrcrd();"><i class="fa fa-ban"></i> Reset</span></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <div class="row xyscroll" style="overflow-y: auto; width:715px" *ngIf="TdsList.length > 0">
+
+                                        
+                                        <table class="table table-responsive-sm table-bordered"> 
+                                            <thead>
+                                                <tr class="col-form-span-heading">
+                                                    <th class="width50 centerlabel"><span class="col-form-span-label"></span></th>
+                                                    <th class="width100 centerlabel"><span class="col-form-span-label">SECTIONS</span></th>
+                                                    <th class="width100 centerlabel"><span class="col-form-span-label">RATE</span></th>
+                                                    <th class="width100 centerlabel"><span class="col-form-span-label">FROM DT</span></th>   
+                                                    <th class="width100 centerlabel"><span class="col-form-span-label">TO DT</span></th>     
+                                                    <th class="width100 centerlabel"><span class="col-form-span-label">LIMIT</span></th>        
+                                                    <th class="width100 centerlabel"><span class="col-form-span-label">TDS TYPE</span></th>   
+                                                    <th class="width100 centerlabel"><span class="col-form-span-label">LDC RATE</span></th>   
+                                                    <th class="width100 centerlabel"><span class="col-form-span-label">LDC CERTNO</span></th>  
+                                                    <th class="width100 centerlabel"><span class="col-form-span-label">COMPANY</span></th>                                                                                                        
+                                                </tr>
+                                            </thead>
+                                            <tbody   *ngIf="TdsList.length>0">
+                                                <tr *ngFor="let obj of TdsList">
+                                                    <td class="centerlabel">
+                                                        <i class="fa fa-pencil" (click)="EDIT_Tds(obj.PKID)" ></i>
+                                                        <!-- &nbsp;
+                                                        <i class="fa fa-trash" (click)="deletechildrecd(obj.PKID)"></i> -->
+                                                    </td>
+                                                    <td><span class="col-form-span-label" >   {{obj.SECTIONS_NME}} </span></td>
+                                                    <td><span class="col-form-span-label">{{obj.PER_RATE}}</span></td>
+                                                    <td><span class="col-form-span-label">{{obj.FRMDT}}</span></td>
+                                                    <td><span class="col-form-span-label">{{obj.TODT}}</span></td>
+                                                    <td><span class="col-form-span-label">{{obj.TDS_LIMIT_AMT}}</span></td>
+                                                    <td><span class="col-form-span-label">{{obj.TDS_TYPE }}</span></td>
+                                                    <td><span class="col-form-span-label">{{obj.LDCRATE }}</span></td>
+                                                    <td><span class="col-form-span-label">{{obj.LDCCERTNO }}</span></td>
+                                                    <td><span class="col-form-span-label">{{obj.CMP_NAME }}</span></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr> 
+
+                        <!-- END TDS  -->
+                        <tr>                    
+                            <td colspan="4"  (click)="getcollapse(CHECKC1,'contact1')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">CONTACT 1 DETAILS</b></span></td>
+                        </tr>
+                        <tr *ngIf ="CHECKC1==true">                        
+                            <td   colspan="4">                                
+                                <table class="table table-bordered table-sm-new bgwhite" >
+                                <tr>  
+                                    <td><span class="col-form-span-label"><b>Name</b> </span></td>         
+                                    <td  style=" display: flex; " > <select class="form-control width50"  [(ngModel)]="Ctitle1"  >
+                                            <option value="Mr.">Mr.</option>	
+                                            <option value="Ms">Ms.</option>	
+                                            <option value="Mrs.">Mrs.</option>
+                                            <option value="Miss">Miss.</option>
+                                            <option value="Dr.">Dr.</option>
+                                        </select>  
+                                        <input [(ngModel)]="Cname1" type="text" class="form-control width180"   > </td> 
+                                    <td><span class="col-form-span-label"><b>Designation</b> </span></td>         
+                                    <td>  <input [(ngModel)]="CDesignation1" type="text"    class="form-control width180"   > </td>    
+                                </tr>  
+                                <tr>  
+                                    <td><span class="col-form-span-label"><b>Telephone No. (Direct)</b> </span></td>         
+                                    <td>  <input [(ngModel)]="Ctelphone1" type="text"    class="form-control width180"   > </td> 
+                                    <td><span class="col-form-span-label"><b>FAX (Direct)</b> </span></td>         
+                                    <td>  <input [(ngModel)]="Cfaxno1" type="text"    class="form-control width180"   > </td>    
+                                </tr> 
+                                <tr>  
+                                    <td><span class="col-form-span-label"><b>Mobile No.</b> </span></td>         
+                                    <td>  <input [(ngModel)]="Cmobileno1" type="text"    class="form-control width180"   > </td> 
+                                    <td><span class="col-form-span-label"><b>E-Mail</b> </span></td>         
+                                    <td>  <input [(ngModel)]="Cemail1" type="text"    class="form-control width180"  (change)="onChange(Cemail1)"  > </td>    
+                                </tr> 
+                                </table>
+                            </td>
+                        </tr>
+                       
+                        <tr>                    
+                            <td colspan="4"  (click)="getcollapse(CHECKC2,'contact2')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">CONTACT 2 DETAILS</b></span></td>
+                        </tr>
+                        <tr *ngIf ="CHECKC2==true">                        
+                            <td   colspan="4">                                
+                                <table class="table table-bordered table-sm-new bgwhite" >
+                                    <tr>  
+                                        <td><span class="col-form-span-label"><b>Name</b> </span></td>         
+                                        <td  style=" display: flex; " > <select class="form-control width50"  [(ngModel)]="Ctitle2"  >
+                                            <option value="Mr.">Mr.</option>	
+                                            <option value="Ms">Ms.</option>	
+                                            <option value="Mrs.">Mrs.</option>
+                                            <option value="Miss">Miss.</option>
+                                            <option value="Dr.">Dr.</option>
+                                            </select>  
+                                            <input [(ngModel)]="Cname2" type="text"    class="form-control width180"   > </td> 
+                                        <td><span class="col-form-span-label"><b>Designation</b> </span></td>         
+                                        <td>  <input [(ngModel)]="CDesignation2" type="text"    class="form-control width180"   > </td>    
+                                    </tr>  
+                                    <tr>  
+                                        <td><span class="col-form-span-label"><b>Telephone No. (Direct)</b> </span></td>         
+                                        <td>  <input [(ngModel)]="Ctelphone2" type="text"    class="form-control width180"   > </td> 
+                                        <td><span class="col-form-span-label"><b>FAX (Direct)</b> </span></td>         
+                                        <td>  <input [(ngModel)]="Cfaxno2" type="text"    class="form-control width180"   > </td>    
+                                    </tr> 
+                                    <tr>  
+                                        <td><span class="col-form-span-label"><b>Mobile No.</b> </span></td>         
+                                        <td>  <input [(ngModel)]="Cmobileno2" type="text"    class="form-control width180"   > </td> 
+                                        <td><span class="col-form-span-label"><b>E-Mail</b> </span></td>         
+                                        <td>  <input [(ngModel)]="Cemail2" type="text"    class="form-control width180"   (change)="onChange(Cemail2)"  > </td>    
+                                    </tr>     
+                                </table>
+                            </td>
+                        </tr> 
+                    <tr>                    
+                        <td colspan="4"  (click)="getcollapse(CHECKC3,'contact3')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">CONTACT 3 DETAILS</b></span></td>
+                    </tr>
+                    <tr *ngIf ="CHECKC3==true">                        
+                        <td   colspan="4">                                
+                            <table class="table table-bordered table-sm-new bgwhite" >
+                                <tr>  
+                                    <td><span class="col-form-span-label"><b>Name</b> </span></td>         
+                                    <td  style=" display: flex; " > <select class="form-control width50"  [(ngModel)]="Ctitle3"  >
+                                        <option value="Mr.">Mr.</option>	
+                                        <option value="Ms">Ms.</option>	
+                                        <option value="Mrs.">Mrs.</option>
+                                        <option value="Miss">Miss.</option>
+                                        <option value="Dr.">Dr.</option>
+                                        </select>  
+                                        <input [(ngModel)]="Cname3" type="text"    class="form-control width180"   > </td> 
+                                    <td><span class="col-form-span-label"><b>Designation</b> </span></td>         
+                                    <td>  <input [(ngModel)]="CDesignation3" type="text"    class="form-control width180"   > </td>    
+                                </tr>  
+                                <tr>  
+                                    <td><span class="col-form-span-label"><b>Telephone No. (Direct)</b> </span></td>         
+                                    <td>  <input [(ngModel)]="Ctelphone3" type="text"    class="form-control width180"   > </td> 
+                                    <td><span class="col-form-span-label"><b>FAX (Direct)</b> </span></td>         
+                                    <td>  <input [(ngModel)]="Cfaxno3" type="text"    class="form-control width180"   > </td>    
+                                </tr> 
+                                <tr>  
+                                    <td><span class="col-form-span-label"><b>Mobile No.</b> </span></td>         
+                                    <td>  <input [(ngModel)]="Cmobileno3" type="text"    class="form-control width180"   > </td> 
+                                    <td><span class="col-form-span-label"><b>E-Mail</b> </span></td>         
+                                    <td>  <input [(ngModel)]="Cemail3" type="text"    class="form-control width180"  (change)="onChange(Cemail3)"  > </td>    
+                                </tr> 
+                            </table>
+                        </td>
+                    </tr>
+            
+                      
+                    <tr>                    
+                        <td colspan="4"  (click)="getcollapse(CHECKC4,'contact4')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">CONTACT 4 DETAILS</b></span></td>
+                    </tr>
+                    <tr *ngIf ="CHECKC4==true">                        
+                        <td   colspan="4">                                
+                            <table class="table table-bordered table-sm-new bgwhite" >
+                                <tr>  
+                                    <td><span class="col-form-span-label"><b>Name</b> </span></td>         
+                                    <td  style=" display: flex; " > <select class="form-control width50"  [(ngModel)]="Ctitle4"  >
+                                        <option value="Mr.">Mr.</option>	
+                                        <option value="Ms">Ms.</option>	
+                                        <option value="Mrs.">Mrs.</option>
+                                        <option value="Miss">Miss.</option>
+                                        <option value="Dr.">Dr.</option>
+                                        </select>  
+                                        <input [(ngModel)]="Cname4" type="text"    class="form-control width180"   > </td> 
+                                    <td><span class="col-form-span-label"><b>Designation</b> </span></td>         
+                                    <td>  <input [(ngModel)]="CDesignation4" type="text"    class="form-control width180"   > </td>    
+                                </tr>  
+                                <tr>  
+                                    <td><span class="col-form-span-label"><b>Telephone No. (Direct)</b> </span></td>         
+                                    <td>  <input [(ngModel)]="Ctelphone4" type="text"    class="form-control width180"   > </td> 
+                                    <td><span class="col-form-span-label"><b>FAX (Direct)</b> </span></td>         
+                                    <td>  <input [(ngModel)]="Cfaxno4" type="text"    class="form-control width180"   > </td>    
+                                </tr> 
+                                <tr>  
+                                    <td><span class="col-form-span-label"><b>Mobile No.</b> </span></td>         
+                                    <td>  <input [(ngModel)]="Cmobileno4" type="text"    class="form-control width180"   > </td> 
+                                    <td><span class="col-form-span-label"><b>E-Mail</b> </span></td>         
+                                    <td>  <input [(ngModel)]="Cemail4" type="text"    class="form-control width180"  (change)="onChange(Cemail4)"   > </td>    
+                                </tr> 
+                            </table>
+                        </td>
+                    </tr>
+                    <tr class="trheader">
+                        <td  colspan="4"><span class="col-form-span-label"><b>SHIPMENT DETAILS</b> </span> </td>
+                    </tr> 
+                    <tr>
+                        <td colspan="4">
+                            <div>
+                                <span class="col-form-span-label">  <input type="checkbox" 
+                                (change)="Airline = $event.target.checked ? 'Y': ''"  name="Airline"
+                                  [(ngModel)]="Airline">&nbsp;Air Line &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
+                                <!-- <span class="col-form-span-label"> <input type="checkbox"  [checked]="Airline=='Y'"  (change)= "Airline='Y'" />&nbsp;Air Line &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span> -->
+                                <span class="col-form-span-label"> <input type="checkbox"  [checked]="AirlineAgent=='Y'" (change)="AirlineAgent='Y'"/>&nbsp;Air Line Agent &nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="col-form-span-label"> <input type="checkbox"  [checked]="shipAgent=='Y'"(change)="shipAgent='Y'" />&nbsp;shipping Line / Agent &nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="col-form-span-label"> <input type="checkbox"  [checked]="warehousse=='Y'"(change)="warehousse='Y'" />&nbsp;Warehouse Provider &nbsp;&nbsp;&nbsp;&nbsp;</span><br> <br>
+                                <span class="col-form-span-label"> <input type="checkbox"  [checked]="Tranporter=='Y'" (change)="Tranporter='Y'"/>&nbsp;Transporter &nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="col-form-span-label"> <input type="checkbox"  [checked]="BusAssociate=='Y'" (change)="BusAssociate='Y'" />&nbsp;Business Associates	&nbsp;&nbsp;&nbsp;&nbsp; </span>
+                                <span class="col-form-span-label"> <input type="checkbox"  [checked]="Franwarehouse=='Y'"(change)="Franwarehouse='Y'" />&nbsp;France Warehouse &nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="col-form-span-label"> <input type="checkbox"  [checked]="other=='Y'" (change)="other='Y'" />&nbsp;Others  &nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="col-form-span-label"><b>Air Line Code</b> </span></td>         
+                                    <td>  <input [(ngModel)]="Airlinecode" type="text"  maxlength="3"   class="form-control width180"> </td> 
+                                    <td><span class="col-form-span-label"><b>City Code forBA</b> </span></td>         
+                                    <td>  <input [(ngModel)]="CitycodeA" type="text"    class="form-control width180"> </td>    
+                    </tr>
+                    <tr class="trheader">
+                        <td  colspan="4"><span class="col-form-span-label"><b>BRANCH LIST</b> </span> </td>
+                    </tr>
+                               
+                    <tr>
+                        <td colspan="4">
+                            <div class="row xyscroll" >
+                                    <table class="table table-responsive-sm table-bordered"> 
+                                        <thead>
+                                            <tr class="col-form-span-heading">
+                                                
+                                                <th class="width100 centerlabel" colspan="3"><span class="col-form-span-label">City</span></th>
+                                                <th class="width100 centerlabel"></th>                                                       
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr *ngFor="let obj of citybranchlict; let i = index">                                                        
+                                                    <td colspan="3"><span class="col-form-span-label">{{obj.CITYNAME}}</span></td>
+                                                    <td><span class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.CLIENTLOC" (change)="chkonchange(obj.CITYCODE,obj.CLIENTLOC)"/> </span></td>
+                                                    
+                                                </tr>
+                                        </tbody>
+
+                                    </table>
+                            </div>
+                        </td>
+                    </tr> 
+                    <tr>
+                        <td colspan="4"  class="centerlabel">                                
+                            <button class="btn btn-sm btn-success" type="submit" (click)="Add_Main()"> <span class="col-form-span-label"><i class="fa fa-plus" ></i> {{text}}</span></button>
+                            <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="RestMain();"><i class="fa fa-ban"></i> Reset</span></button>
+                        </td>
+                    </tr>
+            </table>
+        </div>
+        <div class="col-sm-2">  </div>
+    </div>
+</div>

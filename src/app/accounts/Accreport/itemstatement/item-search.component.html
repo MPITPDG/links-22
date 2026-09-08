@@ -1,0 +1,244 @@
+<div class="animated fadeIn" >  
+    <div class="row no-gutters" *ngIf="displayType=='SEARCH'" >
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <div class="row no-gutters">
+                        <div class="col-sm-12">
+                            <strong>{{Header}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters" *ngIf="displayType=='SEARCH'">
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6 ">
+            <table class="table table-bordered table-sm-new bgwhite">
+
+                <tr>
+                    <td class="col-form-span-heading" colspan="6"> <b>{{PageName}}</b> </td>
+           </tr>
+                <tr>
+                    <td ><span class="col-form-span-label"><b>Item</b> </span><span 
+                        class="col-form-span-error">*</span>
+                       
+                    </td>
+
+                            <td colspan="3" >
+                                 <!-- <ng-select *ngIf="  PageType=='Item'" class="form-control"  [(ngModel)]="Item" (change)="GetItemName($event)">
+                                    <option value="">Please select</option>
+                                    <option *ngFor="let d of ItemList"  value={{d.ITEMCODE}}>{{d.ITEMACTNAME}}</option>
+                                </ng-select>
+                                <ng-select *ngIf="  PageType=='Account'" class="form-control"  [(ngModel)]="Item" (change)="GetItemName($event)">
+                                    <option value="">Please select</option>
+                                    <option *ngFor="let d of ItemList"  value={{d.ITEMACCTCODE}}>{{d.ITEMACCTNAME}}</option>
+                                </ng-select> -->
+                                <ng-select   [items]="ItemList" bindLabel="ITEMACTNAME"
+                                bindValue="ITEMCODE"   [(ngModel)]="Item" (ngModelChange)="GetItemName($event)"
+                                class="custom" placeholder="--Please Select--">
+                             </ng-select>
+                             
+                            </td>
+                </tr>
+                <tr>
+
+                    <td><span class="col-form-span-label"><b>From</b> </span><span
+                        class="col-form-span-error">*</span></td>
+                <td>
+                    <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)"  [options]="myDatePickerOptions"
+                        class="form-control"  [selDate]="FromDate"    ></my-date-picker>
+                </td>
+                    <td><span class="col-form-span-label"><b>To </b> </span><span
+                            class="col-form-span-error">*</span></td>
+                    <td>
+                        <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)"  [options]="myDatePickerOptionsInv"
+                            class="form-control"  [selDate]="ToDate"   ></my-date-picker>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td colspan="6" class="centerlabel">
+                        <button class="btn btn-sm btn-primary" type="submit" (click)="Showdata()" > <span
+                                class="col-form-span-label"><i class="fa fa-search"></i>
+                                Search </span></button>&nbsp;
+
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+        </div>
+
+
+    </div>
+    <div class="row no-gutters"  *ngIf="displayType=='LIST'">
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+         <div class="col-sm-12 col-md-10 col-lg-10 ">
+            <table class="table table-bordered table-sm-new bgwhite" >
+                <tr class="title-head formheading">
+                    <th  >
+                  <a href="javascript:void(0);" (click)="displayType='SEARCH';SearchItemdata_list=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
+                    </th>
+                </tr>
+                <tr >
+                    <th style="text-align: center;" >
+                        <strong>{{searchHeaderText}}</strong>
+                    </th>
+               </tr>
+               <tr >
+                <th style="text-align: center;" >
+                    <strong>{{SubHeader}}</strong>
+                </th>
+           </tr>
+              </table>
+          
+             <table class="table table-bordered table-sm-new bgwhite">
+				 <tr>
+                <td align="right">
+  <table  class="table table-bordered table-sm-new bgwhite" style="width:300px">     
+               
+                <tr>
+                  <td class="col-form-span-label" align="right">Current Total:</td>
+                  <td class="col-form-span-label" align="right">{{currTotalDr}}</td>
+                  <td class="col-form-span-label" align="right">{{currTotalcr}}</td>
+                </tr>
+                <tr>
+                  <td  class="col-form-span-label" align="right">Closing:</td>
+                  <td  class="col-form-span-label" align="right">{{CLDrBal}} </td>
+                  <td  class="col-form-span-label" align="right">{{CLCrBal}} </td>
+                </tr>
+                 <tr>
+                    <td class="col-form-span-label anchor-link" (click)="AdvanceViewData()" align="right">Advance:</td>
+                    <td class="col-form-span-label" align="right">{{AdvCrAmt}}</td>
+                    <td  class="col-form-span-label" align="right">{{AdvDrAmt}}</td>
+                 </tr>
+          </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-sm-12 col-md-1 col-lg-1">
+    </div>
+    </div>
+    <div class="row no-gutters"  *ngIf="displayType=='LIST'">
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+        <div class="col-sm-12 col-md-10 col-lg-10 ">
+
+           
+            <div class="row  xyscroll"  style="height: 320px;">
+                <table class="table table-bordered table-sm-new table-striped" >
+                    <thead>
+					 <tr class="title-head formheading table-primary">
+                            <th class="col-form-span-label" align="center"></th>
+                            <th class="col-form-span-label" align="center">Number</th>
+                            <th class="col-form-span-label" align="center">Date</th>
+                            <th class="col-form-span-label" align="center">Particulars</th>
+                            <th class="col-form-span-label" align="center">	Debit</th>
+                            <th class="col-form-span-label" align="center">Credit</th>                          
+                        </tr>
+                    </thead>
+					 <tbody *ngIf="SearchItemdata_list.length > 0">
+                        <tr *ngFor="let data of SearchItemdata_list">
+                            <td  style="width: 30px;"><span  class="col-form-span-label" >{{data.TRANSTYPE}}</span> </td> 
+                             <td  style="width: 130px;"><span   class="col-form-span-label anchor-link " (click)="Openprint(data.TRANSCODE,data.TRANSTYPE)" >{{data.TRANSCODE}}</span> </td> 
+                             <td  style="width: 90px;"><span  class="col-form-span-label">{{data.TRANSDATE}}</span> </td>
+                             <td  style="width:200px; " class="col-form-span-label">
+                                  <p    style="white-space: pre-wrap;width: 450px; " > {{data.NARR}}{{data.EXP_SNAME}}{{data.SUP_SNAME}} {{data.ACCTNAME}}</p>
+                                
+                             </td> 
+                            <td  style="width: 100px;"><span class="col-form-span-label">{{data.DRAMT}}</span>  </td>                             
+                            <td  style="width: 100px;"><span class="col-form-span-label">{{data.CRAMT}}</span>  </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+             
+        </div>
+        <div class="col-sm-12 col-md-1 col-lg-1">
+        </div>
+     
+    </div>  
+  
+</div>
+<div class="modal" [style.display]="showModal_Advance ? 'block' : 'none'">
+    <div class="modal-dialog modal-lg" role="document"  >
+        <div class="modal-content " style="height:400px; width:800px;overflow-x: auto;">
+            <div class="modal-header">
+                <!-- <h6 class="modal-title">ADVANCE DETAILS</h6> -->
+            </div>
+            <div class="modal-body">
+
+                <table class="table table-sm-new table-responsive-sm" >
+
+                    <tr>
+                        <td colspan="6" class="centerlabel">
+                            <strong>{{advheader}}</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" class="centerlabel">
+                            <!-- <strong> {{ClientName}}</strong> -->
+                        </td>
+                    </tr>
+                </table>
+                <div class="row">
+                    <!-- <div class="col" style="height:400px;overflow-y: auto;" > -->
+
+                        <div class="col" >
+                            <table align="right" class="table  table-sm-new bgwhite" style="width:150px">
+                                <tr>
+                                    <td align="right">
+                                    <span class="col-form-span-label">Advance Total:</span>
+                                    </td>
+                                    <td>
+                                    <span  class="col-form-span-label">{{AdvTotal}}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="table table-bordered table-sm-new bgwhite ">
+                                <thead>
+                                  <tr class="col-form-span-heading ">
+
+                                    <th class="col-form-span-label"></th>
+                                    <th class="col-form-span-label">Number</th>
+                                    <th class="col-form-span-label">Date</th>
+                                    <th class="col-form-span-label">Particulars</th>
+                                    <th class="col-form-span-label">Amount</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr *ngFor="let data of AdvanceTable">
+                                    <td class="col-form-span-label">{{data.transtype}}</td>
+                                    <td class="col-form-span-label">{{data.Transcode}}</td>
+                                    <td class="col-form-span-label">{{data.Transdate}}</td>
+                                    <td class="col-form-span-label">{{data.exp_sname}},{{data.sup_sname}},{{data.acctname}}</td>
+                                    <td class="col-form-span-label">{{data.cramt|number:'2.2-4'}}</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                             <!-- KC <div style="float: center;"> -->
+                                <table class="table table-bordered table-sm-new bgwhite ">
+                                    <tr>
+                                        <td colspan="4" align="center">
+                                            <button class="btn btn-sm btn-success" type="submit" (click)="Print()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Print</span></button>
+                                            <button class="btn btn-sm btn-success" type="submit" (click)="expt_exlwithadv()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> ExportToExcel</span></button>
+                                            <button class="btn btn-sm btn-danger" (click)="close()"><span class="col-form-span-label"><i class="fa fa-ban"
+                                              aria-hidden="true"></i> Close</span></button>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                            <!-- </div> -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,151 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header formheading">
+                <strong>ORDER SIZE DETAILS</strong>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-4">
+    </div>
+    <div class="col-sm-4">
+        <table class="table table-bordered table-sm-new bgwhite">
+            <tr class="trbg">
+                <td colspan="4" style="text-align:center;">
+                    <span class="col-form-span-label">
+                        <b>Genaral Details</b>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="width120">
+                    <span class="col-form-span-label">
+                        <b>Expt No</b>
+                    </span>
+                </td>
+                <td colspan="3">
+                    <span class="col-form-span-label">{{OrderSizeList[0]?.EXPTNO}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="width120">
+                    <span class="col-form-span-label">
+                        <b>Consignee Name</b>
+                    </span>
+                </td>
+                <td colspan="4">
+                    <span class="col-form-span-label">{{OrderSizeList[0]?.CONSIGNEE}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="width120">
+                    <span class="col-form-span-label">
+                        <b>Order No</b>
+                    </span>
+                </td>
+                <td>
+                    <span class="col-form-span-label">{{OrderSizeList[0]?.ORDERNO}}</span>
+                </td>
+                <td class="width120">
+                    <span class="col-form-span-label">
+                        <b>Style No</b>
+                    </span>
+                </td>
+                <td>
+                    <span class="col-form-span-label">{{OrderSizeList[0]?.STYLENO}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="width120">
+                    <span class="col-form-span-label">Total Pcs</span>
+                </td>
+                <td>
+                    <span class="col-form-span-label">{{OrderSizeList[0]?.TOT_PCS}}</span>
+                </td>
+                <td class="width120">
+                    <span class="col-form-span-label">Total Pkgs</span>
+                </td>
+                <td>
+                    <span class="col-form-span-label">{{OrderSizeList[0]?.TOT_PKGS }}</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="width120">
+                    <span class="col-form-span-label">Total Gr. Wt.</span>
+                </td>
+                <td>
+                    <span class="col-form-span-label">{{OrderSizeList[0]?.TOT_GRWT}}</span>
+                </td>
+                <td class="width120">
+                    <span class="col-form-span-label">Total Net Wt.</span>
+                </td>
+                <td>
+                    <span class="col-form-span-label">{{OrderSizeList[0]?.TOT_NETWT}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="width120">
+                    <span class="col-form-span-label">Total Volume</span>
+                </td>
+                <td colspan="3">
+                    <span class="col-form-span-label">{{OrderSizeList[0]?.TOT_VOL}}</span>
+                </td>
+            </tr>
+            <tr class="trbg">
+                <td colspan="4">
+                    <span class="col-form-span-label">
+                        <b>Size Details</b>
+                    </span>
+                </td>
+            </tr>
+        </table>
+        <table class="table table-bordered table-sm-new bgwhite">
+            <thead>
+                <tr class="title-head formheading">
+                    <th class="width100" style="text-align:right">Size</th>
+                    <th>Pcs</th>
+                    <th>Pkgs</th>
+                    <th>Gr Wt.</th>
+                    <th>Net Wt.</th>
+                    <th>Volume</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let obj of OrderSizeList">
+                    <td class="width100" style="text-align:right">
+                        <span class="col-form-span-label"><b>{{obj.CODE_SIZE}}=></b></span>
+                    </td>
+                    <td>
+                        <input type="text" [(ngModel)]="obj.PCS" [maxlength]="15" class="form-control" />
+                    </td>
+                    <td>
+                        <input type="text" [(ngModel)]="obj.PKGS" [maxlength]="15" class="form-control" />
+                    </td>
+                    <td>
+                        <input type="text" [(ngModel)]="obj.GRWT" [maxlength]="15" class="form-control" />
+                    </td>
+                    <td>
+                        <input type="text" [(ngModel)]="obj.NETWT" [maxlength]="15" class="form-control" />
+                    </td>
+                    <td>
+                        <input type="text" [(ngModel)]="obj.VOL" [maxlength]="15" class="form-control" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="table table-bordered table-sm-new bgwhite">
+            <tr class="trbg centerlabel">
+                <td colspan="4">
+                    <button type="button" name="searchButton" class="btn btn-sm btn-primary" (click)="submit();" #submitButton>
+                        <span class="col-form-span-label">
+                            <i class="fa fa-send-o"></i>&nbsp;Submit</span>
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-sm-4">
+    </div>
+</div>

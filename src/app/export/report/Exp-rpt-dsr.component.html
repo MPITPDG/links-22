@@ -1,0 +1,119 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-body"> 
+				<div class="row">
+					<div class="col-md-3"></div>
+					<div class="col-md-6">
+                        <table class="table table-bordered table-sm-new">
+							<tbody style='height:30px'>
+								<tr >
+									<td class="col-form-span-heading  centerlabel "  colspan="3">
+										DSR Report
+									</td>
+                                </tr>
+                               
+                                <tr>
+                                     
+                                    <td>                                        
+                                        <span class="col-form-span-label">                                               
+                                            <input type="radio"   name="radiogroup"  (click)="mainCheck('1')" [checked]="checkWise == '1'"    >&nbsp; Consignee Name
+                                        </span>                                       
+                                    </td>   
+                                    <td colspan="2">
+                                        <!-- <select class="form-control width180"   [(ngModel)]="concode" [disabled]=condisable >
+											<option value="-1">Please select</option>
+											<option *ngFor="let d of listconcode" value={{d.CON_CODE}}>{{d.CON_NAME}}</option>
+										</select> -->
+                                           <ng-select   [items]="listconcode" bindLabel="CON_NAME"  [disabled]=condisable
+                                                bindValue="CON_CODE"  [(ngModel)]="concode"  
+                                                class="custom" placeholder="Please Select"> 
+                                         </ng-select>
+                                    </td>
+                                 
+                                </tr>  
+                                <tr>
+                                     
+                                    <td>                                        
+                                        <span class="col-form-span-label">                                               
+                                            <input type="radio"   name="radiogroup"  (click)="mainCheck('2')" [checked]="checkWise == '2'"    >&nbsp; Sourcing  Agent 
+                                        </span>                                       
+                                    </td>   
+                                    <td colspan="2">
+                                        <select class="form-control width180"   [(ngModel)]="SAgent"[disabled]=agtdisable >
+											<option value="-1">Please select</option>
+											<option  *ngFor="let d of listSAgent" value={{d.EXP_CODE}}>{{d.EXP_NAME}}</option>
+										</select>
+                                    </td>
+                                </tr>  
+                                <tr>
+                                    <td>                                        
+                                        <span class="col-form-span-label">                                               
+                                            <input type="radio"   name="radiogroup"  (click)="mainCheck('3')" [checked]="checkWise == '3'"    >&nbsp; Shipper
+                                        </span>                                       
+                                    </td>   
+                                    <td colspan="2">
+                                        <select class="form-control width300"   [(ngModel)]="Shipper"[disabled]=shpdisable >
+											<option value="-1">ALL</option>
+											<option  *ngFor="let d of listShipper" value={{d.SHIPPER_CODE}}>{{d.SHIPPER_NAME}}</option>
+										</select>
+                                        <!-- <select class="form-control width180"   [(ngModel)]="Shipper"[disabled]=    >
+											<option value="-1">Please select</option>
+											<option  *ngFor="let d of listShipper" value={{d.SHIPPER_CODE}}>{{d.SHIPPER_NAME}}</option>
+										</select> -->
+                                    </td>
+                                </tr>  
+                                <tr>
+                                    <td>
+										<span class="col-form-span-label ">Shipmet From(Origin)</span>
+                                    </td>
+                                    <td colspan="2">
+                                        <select class="form-control width200"   [(ngModel)]="city">
+											<option value="-1">Please select</option>
+											<option value="All">All</option>
+                                            <option value="Del">Delhi</option>
+                                            <option value="MAA">Chennai</option>
+                                            <option value="MUM">Mumbai</option>
+										</select>
+                                         
+                                    </td>
+                                </tr>                                 
+                                <tr>
+                                    <td>
+										<span class="col-form-span-label ">Mode</span>
+                                    </td>
+                                    <td colspan="2">
+                                        <select class="form-control width200"   [(ngModel)]="Mode">
+											<option value="-1">Please select</option>
+											<option value="1">Air</option>
+                                            <option value="0">Sea</option>
+                                            <option value="2">Sea/Air</option> 
+										</select>
+                                         
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+										<span class="col-form-span-label ">From Date</span>
+                                    </td>
+                                    <td colspan="2"  >
+                                        <my-date-picker name="dtfrm" [options]="myDatePickerOptions" [(ngModel)]="dtfrmt" required></my-date-picker>
+                                    </td>
+                                     
+
+                                </tr>
+                                 <tr>
+                                <td colspan="3" class="centerlabel" >
+                                    <button class="btn btn-sm btn-success" type="Print"    (click)="onexcelGeneration()"> <i class=" fa fa-download"></i> Export to Excel</button>
+                                    
+        
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>			
+                    </div>
+					
+                    </div>
+                    <div class="col-md-3"></div>
+                </div>
+            </div>

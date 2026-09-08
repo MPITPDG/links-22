@@ -1,0 +1,43 @@
+﻿<br />
+<!-- <div class="row y350heightscroll" *ngIf="searchList.length > 0"> commented to remove height -->
+
+	<div  *ngIf="searchList.length > 0">
+	<table class="table table-bordered table-striped table-sm-new bgwhite">
+		<thead>
+			<tr class="title-head formheading">
+				<th>Select</th>
+				<th>EXPT NO</th>
+				<th>SHIPPER</th>
+				<th>CONSIGNEE</th>
+				<th>Pkgs</th>
+				<th>Grwt</th>
+				<th>Chrg.Wt</th>
+				<th>Pcs</th>
+				<th>Shipment Mode</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr *ngFor="let obj of searchList">
+				<td class="centerlabel">
+					<input type="checkbox" (checked)="obj.SELECT == true" [disabled]="obj.Disabled == true"   (click)="validate(obj.MODEOFSHIP,obj.EXPTNO)" />
+				</td>
+				<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
+				<td><span class="col-form-span-label">{{obj.SHIPPER}}</span></td>
+				<td><span class="col-form-span-label">{{obj.CONSIGNEE}}</span></td>
+				<td><span class="col-form-span-label">{{obj.PKGS}}</span></td>
+				<td><span class="col-form-span-label">{{obj.GRWT}}</span></td>
+				<td><span class="col-form-span-label">{{obj.CHBLWT}}</span></td>
+				<td><span class="col-form-span-label">{{obj.PCS}}</span></td>
+				<td><span class="col-form-span-label">{{obj.MODEOFSHIP}}</span></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<div class="row">
+	<div class="col-sm-12 right-text">
+		<br />
+		<button type="button" name="submit" class="btn btn-sm btn-primary" (click)="submit();" >
+			<span class="col-form-span-label"><i class="fa fa-check-square-o"></i> Submit</span>
+		</button>
+	</div>
+</div>

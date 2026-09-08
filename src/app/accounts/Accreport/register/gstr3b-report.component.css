@@ -1,0 +1,385 @@
+/* GSTR-3B specific styling. The search-card shell, buttons and date-picker overrides come
+   from register-search.shared.css, which is listed first in this component's styleUrls. */
+
+/* the page owns the viewport height so the result area can flex into what the search card
+   leaves behind and the table scrolls inside its own card */
+.br-page {
+  height: calc(100vh - 140px);
+  overflow: hidden;
+}
+
+.br-result-view {
+  display: flex;
+  flex-direction: column;
+  gap: 8px !important;
+  flex: 1;
+  min-height: 0;
+}
+
+.g3-tabs {
+  flex-shrink: 0;
+}
+
+/* ============================= */
+/* TABLE                         */
+/* ============================= */
+
+.br-table-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.br-card-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid #E5E7EB;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.br-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.br-hint { font-size: 11px; font-weight: 400; color: #9CA3AF; }
+
+.br-record-chip {
+  background: #EEF2FF;
+  color: #4338CA;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.br-table-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+}
+
+/* ============================= */
+/* FILTER STRIP                  */
+/* ============================= */
+
+.g3-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.g3-filter .g3-search {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.g3-filter .g3-search .fa {
+  position: absolute;
+  left: 9px;
+  color: #9CA3AF;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+.g3-filter input.g3-inp {
+  height: 28px;
+  width: 190px;
+  padding: 0 8px 0 26px;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  font-size: 12px;
+  outline: none;
+}
+
+.g3-filter input.g3-inp:focus,
+.g3-filter select.g3-sel:focus {
+  border-color: #2563EB;
+}
+
+.g3-filter select.g3-sel {
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  font-size: 12px;
+  background: #fff;
+  outline: none;
+}
+
+/* multiselect branch / entry-type pickers. ng-select renders its own chrome, so the sizing
+   is pushed through ::ng-deep to line the control up with the search box next to it. */
+.g3-filter .g3-ngsel {
+  min-width: 210px;
+  max-width: 320px;
+  font-size: 12px;
+}
+
+.g3-filter .g3-ngsel--sm {
+  min-width: 130px;
+  max-width: 200px;
+}
+
+::ng-deep .g3-filter .g3-ngsel .ng-select-container {
+  min-height: 28px !important;
+  border-radius: 8px !important;
+  border: 1px solid #D1D5DB !important;
+  font-size: 12px;
+}
+
+::ng-deep .g3-filter .g3-ngsel .ng-value {
+  background: #EEF2FF !important;
+  color: #4338CA !important;
+  border-radius: 6px !important;
+  font-size: 11px;
+}
+
+::ng-deep .g3-filter .g3-ngsel .ng-placeholder { color: #9CA3AF !important; }
+
+/* DETAIL can be long - keep it readable without stretching the table */
+.br-table td.g3-detail {
+  max-width: 420px;
+  white-space: normal;
+  word-break: break-word;
+  color: #4B5563;
+}
+
+.g3-filter .g3-clear {
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid #D1D5DB;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #B91C1C;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.g3-filter .g3-clear:hover { background: #FEF2F2; }
+
+/* ============================= */
+/* SORTABLE HEADERS              */
+/* ============================= */
+
+.br-table thead th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.br-table thead th.sortable:hover { background: #EEF2FF; color: #111827; }
+
+.g3-sort-idle { color: #D1D5DB; margin-left: 5px; font-size: 10px; }
+.g3-sort-on   { color: #2563EB; margin-left: 5px; font-size: 10px; }
+
+.br-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-bottom: 0;
+}
+
+.br-table thead th {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6B7280;
+  padding: 8px 10px;
+  border-bottom: 1px solid #E5E7EB;
+  text-align: left;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #F9FAFB;
+}
+
+.br-table thead th.grp-liab   { background: #FDEDE4; color: #9A3412; text-align: center; }
+.br-table thead th.grp-setoff { background: #E5F3E8; color: #166534; text-align: center; }
+
+.br-table th.num,
+.br-table td.num {
+  text-align: right;
+  padding-right: 14px !important;
+}
+
+.br-table tbody td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #F3F4F6;
+  color: #111827;
+  vertical-align: middle;
+  font-size: 12px;
+}
+
+.br-table tfoot td {
+  padding: 8px 10px;
+  font-weight: 700;
+  color: #1E3A8A;
+  background: #EEF2FF;
+  border-top: 1px solid #E5E7EB;
+  position: sticky;
+  bottom: 0;
+  z-index: 15;
+}
+
+.num-strong { font-weight: 700; }
+.dr-amt { color: #DC2626; }
+.cr-amt { color: #059669; }
+
+/* ============================= */
+/* GSTR-3B SPECIFIC              */
+/* ============================= */
+
+/* branch block separator on the summary grid */
+.g3-branch-start td { border-top: 2px solid #CBD5E1; }
+.g3-branch-name { font-weight: 700; white-space: nowrap; }
+
+/* row tinting by nature - matches the exported workbook */
+.g3-liab   { background: #FDEDE4; }
+.g3-setoff { background: #E5F3E8; }
+.g3-memo   { background: #FEF7E0; font-style: italic; color: #7C5E10; }
+
+.g3-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.g3-pill--liab   { background: #FDEDE4; color: #9A3412; }
+.g3-pill--setoff { background: #E5F3E8; color: #166534; }
+.g3-pill--rcm    { background: #FEF3C7; color: #92400E; }
+
+/* tabs */
+.g3-tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid #E5E7EB;
+  padding: 0 2px;
+}
+
+.g3-tab {
+  border: none;
+  background: transparent;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6B7280;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  border-radius: 8px 8px 0 0;
+}
+
+.g3-tab:hover { background: #F9FAFB; color: #111827; }
+
+.g3-tab.active {
+  color: #2563EB;
+  border-bottom-color: #2563EB;
+  background: #fff;
+}
+
+.g3-tab-count {
+  margin-left: 6px;
+  background: #EEF2FF;
+  color: #4338CA;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+}
+
+/* the warnings tab is set apart from the four data tabs, and turns red when the period
+   actually has something to review */
+.g3-tab--warn {
+  border-left: 1px solid #E5E7EB;
+  margin-left: 6px;
+}
+
+.g3-tab--warn .fa {
+  color: #D97706;
+  margin-right: 5px;
+}
+
+.g3-tab-count--warn {
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+
+.br-record-chip--warn {
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+
+.g3-warn-name { color: #B91C1C; font-weight: 700; }
+
+.g3-legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 6px 14px;
+  font-size: 11px;
+  color: #6B7280;
+  border-top: 1px solid #F3F4F6;
+  flex-shrink: 0;
+}
+
+.g3-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 5px;
+  vertical-align: -2px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* ============================= */
+/* FILED ARCHIVE                 */
+/* ============================= */
+
+.g3-filedbar {
+  padding: 8px 14px;
+  font-size: 12px;
+  border-radius: 10px;
+  margin: 8px 10px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.g3-filedbar--ok      { background: #E5F3E8; color: #166534; }
+.g3-filedbar--changed { background: #FEE2E2; color: #B91C1C; }
+.g3-filedbar .fa      { margin-right: 5px; }
+
+/* a row that no longer matches what was filed */
+.g3-changed { background: #FEE2E2; }
+
+.g3-onlychg {
+  font-size: 11px;
+  font-weight: 600;
+  margin: 0 10px 0 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.g3-onlychg input { margin-right: 5px; vertical-align: -1px; }
+
+.g3-empty {
+  padding: 40px 0;
+  text-align: center;
+  color: #6B7280;
+  font-size: 13px;
+}
