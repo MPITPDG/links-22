@@ -136,7 +136,8 @@
                                 </th>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let obj of dtDATEOFROD; let i =index;">
+                                @for (obj of dtDATEOFROD; track obj; let i = $index) {
+<tr>
                                     <td class="width50">
                                         <i class="fa fa-pencil-square-o" (click)="fnAddEdit_DateOfROD_Dtls(i,'P', obj.pk_tblIndex, obj.DateOfRODdt, obj.DateOfRODremark)"></i>&nbsp;&nbsp;
                                         <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_DateOfROD_Dtls(i,'D', obj.pk_tblIndex, obj.DateOfRODdt, obj.DateOfRODremark)"></i>
@@ -148,6 +149,7 @@
                                         <span class="col-form-span-label">{{obj.DateOfRODremark}}</span>
                                     </td>
                                 </tr>
+}
                             </tbody>
                         </table>
                     </td>
@@ -377,7 +379,9 @@
                 <td colspan="3" >
                     <select class="form-control width150"  [(ngModel)]="Finaldest"  >
                         <option value="">Please select</option>
-                        <option *ngFor="let d of ShipmentPortList" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+                        @for (d of ShipmentPortList; track d) {
+<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+}
                     </select>
                 </td>
                 <td  colspan="3" class="width160">
@@ -482,7 +486,8 @@
                     </th>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let obj of dtCALLFORUS; let i =index;">
+                    @for (obj of dtCALLFORUS; track obj; let i = $index) {
+<tr>
                         <td class="width50">
                             <i class="fa fa-pencil-square-o" (click)="fnAddEdit_DocCallForUs_Dtls(i,'P', obj.pk_tblIndex, obj.DocName, obj.ReceivedOn)"></i>&nbsp;&nbsp;
                             <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_DocCallForUs_Dtls(i,'D', obj.pk_tblIndex, obj.DocName, '')"></i>
@@ -497,6 +502,7 @@
                             <span class="col-form-span-label">{{obj.AcknowledgedOn}}</span>
                         </td>
                     </tr>
+}
                 </tbody>
             </table>
            
@@ -531,7 +537,9 @@
                     <td>
                         <select class="form-control width150"  [(ngModel)]="submissionBy"  >
                             <option value="0">Please select</option>
-                            <option *ngFor="let d of userdtls" value={{d.CMPID}}>{{d.fullname}}</option>
+                            @for (d of userdtls; track d) {
+<option value={{d.CMPID}}>{{d.fullname}}</option>
+}
                         </select>
                     </td>
                 </tr>
@@ -647,7 +655,8 @@
                     </th>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let obj of dtDOCSUB; let i =index;">
+                    @for (obj of dtDOCSUB; track obj; let i = $index) {
+<tr>
                         <td class="width50">
                             <i class="fa fa-pencil-square-o" (click)="fnAddEdit_BOE_Dtls(i,'P', obj.pk_tblIndex, obj.BOEno, obj.BOEdt, obj.BOEremark)"></i>&nbsp;&nbsp;
                             <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_BOE_Dtls(i,'D', obj.pk_tblIndex, obj.BOEno,'','')"></i>
@@ -662,6 +671,7 @@
                             <span class="col-form-span-label">{{obj.BOEremark}}</span>
                         </td>
                     </tr>
+}
                 </tbody>
             </table>
             <table class="table table-bordered table-sm-new bgwhite">
@@ -716,7 +726,8 @@
                     </th>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let obj of dtINVOICE; let i =index;">
+                    @for (obj of dtINVOICE; track obj; let i = $index) {
+<tr>
                         <td class="width50">
                             <i class="fa fa-pencil-square-o" (click)="fnAddEdit_Invoice_Dtls(i,'P', obj.pk_tblIndex, obj.Invoice_No, obj.Invoice_Date)"></i>&nbsp;&nbsp;
                             <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_Invoice_Dtls(i,'D', obj.pk_tblIndex, obj.Invoice_No,'','')"></i>
@@ -728,6 +739,7 @@
                             <span class="col-form-span-label">{{obj.Invoice_Date}}</span>
                         </td>
                     </tr>
+}
                 </tbody>
             </table>
             <table class="table table-bordered table-sm-new bgwhite">
@@ -792,7 +804,9 @@
                     <td class="width220">
                         <select id="InvCurrency" [(ngModel)]="InvCurrency" class="form-control" (change)="checkCurrency('InvCurrency','InvValue','InvExchRate')">
                             <option value="null">--Select--</option>
-                            <option *ngFor="let c of InvoiceCurrencyList" value="{{c.DATAVALUEFIELD}}">{{c.DATATEXTFIELD}}</option>
+                            @for (c of InvoiceCurrencyList; track c) {
+<option value="{{c.DATAVALUEFIELD}}">{{c.DATATEXTFIELD}}</option>
+}
                         </select>
                         <!-- <ng-select [items]="InvoiceCurrencyList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="InvCurrency"
                             class="form-control" (change)="checkCurrency('InvCurrency','InvValue','InvExchRate')">
@@ -817,7 +831,9 @@
                     <td class="width220">
                         <select id="FrightCurrency" [(ngModel)]="FrightCurrency" [disabled]="FrightEnable" class="form-control" (change)="checkCurrency('FrightCurrency','FrightAmount','FrightExchRate')">
                             <option value="null">--Select--</option>
-                            <option *ngFor="let c of FrightCurrencyList" value="{{c.DATAVALUEFIELD}}">{{c.DATATEXTFIELD}}</option>
+                            @for (c of FrightCurrencyList; track c) {
+<option value="{{c.DATAVALUEFIELD}}">{{c.DATATEXTFIELD}}</option>
+}
                         </select>
                         <!-- <ng-select [items]="FrightCurrencyList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="FrightCurrency"
                             class="form-control" [disabled]="FrightEnable" (change)="checkCurrency('FrightCurrency','FrightAmount','FrightExchRate')">
@@ -842,7 +858,9 @@
                     <td class="width220">
                         <select id="InsuranceCurrency" [(ngModel)]="InsuranceCurrency" [disabled]="InsurenceEnable" class="form-control" (change)="checkCurrency('InsuranceCurrency','InsuranceAmount','InsuranceExchRate')">
                             <option value="null">--Select--</option>
-                            <option *ngFor="let c of InsuranceCurrencyList" value="{{c.DATAVALUEFIELD}}">{{c.DATATEXTFIELD}}</option>
+                            @for (c of InsuranceCurrencyList; track c) {
+<option value="{{c.DATAVALUEFIELD}}">{{c.DATATEXTFIELD}}</option>
+}
                         </select>
                         <!-- <ng-select [items]="InsuranceCurrencyList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--"
                             [(ngModel)]="InsuranceCurrency" class="form-control" [disabled]="InsurenceEnable" (change)="checkCurrency('InsuranceCurrency','InsuranceAmount','InsuranceExchRate')">
@@ -867,7 +885,9 @@
                     <td class="width220">
                         <select id="CommissionCurrency" [(ngModel)]="CommissionCurrency" class="form-control" (change)="checkCurrency('CommissionCurrency','CommissionAmount','CommissionExchRate')">
                             <option value="null">--Select--</option>
-                            <option *ngFor="let c of CommissionCurrencyList" value="{{c.DATAVALUEFIELD}}">{{c.DATATEXTFIELD}}</option>
+                            @for (c of CommissionCurrencyList; track c) {
+<option value="{{c.DATAVALUEFIELD}}">{{c.DATATEXTFIELD}}</option>
+}
                         </select>
                         <!-- <ng-select [items]="CommissionCurrencyList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--"
                             [(ngModel)]="CommissionCurrency" class="form-control" (change)="checkCurrency('CommissionCurrency','CommissionAmount','CommissionExchRate')">
@@ -1005,7 +1025,8 @@
                     </th>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let obj of dtDUTY; let i =index;">
+                    @for (obj of dtDUTY; track obj; let i = $index) {
+<tr>
                         <td class="width50">
                             <i class="fa fa-pencil-square-o" (click)="fnAddEdit_Duty_Dtls(i,'P', obj.pk_tblIndex, obj.DutyPaid, obj.DutyIns, obj.DutyPaidOn, obj.DutyCashNo, obj.DutyRemark)"></i>&nbsp;&nbsp;
                             <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_Duty_Dtls(i,'D', obj.pk_tblIndex, obj.DutyPaid, obj.DutyIns,'','','')"></i>
@@ -1026,6 +1047,7 @@
                             <span class="col-form-span-label">{{obj.DutyRemark}}</span>
                         </td>
                     </tr>
+}
                 </tbody>
             </table>
             <table class="table table-bordered table-sm-new bgwhite">
@@ -1216,7 +1238,8 @@
                     </th>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let obj of dtSTEAGENT; let i =index;">
+                    @for (obj of dtSTEAGENT; track obj; let i = $index) {
+<tr>
                         <td class="width50">
                             <i class="fa fa-pencil-square-o" (click)="fnAddEdit_SteAgent_Dtls(i,'P', obj.pk_tblIndex, obj.SteType, obj.SteRecNo, obj.StePaydt, obj.SteAmount, obj.SteRemark)"></i>&nbsp;&nbsp;
                             <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_SteAgent_Dtls(i,'D', obj.pk_tblIndex, obj.SteType, obj.SteRecNo,'','','')"></i>
@@ -1237,6 +1260,7 @@
                             <span class="col-form-span-label">{{obj.SteRemark}}</span>
                         </td>
                     </tr>
+}
                 </tbody>
             </table>
             <table class="table table-bordered table-sm-new bgwhite">
@@ -1339,7 +1363,8 @@
                     </th>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let obj of dtPORTCFS; let i =index;">
+                    @for (obj of dtPORTCFS; track obj; let i = $index) {
+<tr>
                         <td class="width50">
                             <i class="fa fa-pencil-square-o" (click)="fnAddEdit_Port_Dtls(i,'P', obj.pk_tblIndex, obj.PortRecNo, obj.PortPaiddt, obj.PortAmount, obj.PortRemark)"></i>&nbsp;&nbsp;
                             <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_Port_Dtls(i,'D', obj.pk_tblIndex, obj.PortRecNo, obj.PortPaiddt,'','')"></i>
@@ -1357,6 +1382,7 @@
                             <span class="col-form-span-label">{{obj.PortRemark}}</span>
                         </td>
                     </tr>
+}
                 </tbody>
             </table>
             <!-- <table class="table table-bordered table-sm-new bgwhite">
@@ -1583,7 +1609,8 @@
                     </th>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let obj of dtDELIVERY; let i =index;">
+                    @for (obj of dtDELIVERY; track obj; let i = $index) {
+<tr>
                         <td class="width50">
                             <i class="fa fa-pencil-square-o" (click)="fnAddEdit_Delivery_Dtls(i,'P', obj.pk_tblIndex, obj.OH_truck, obj.trackValue, obj.truck, obj.TruckNo, obj.TruckType, obj.RateAgreed, obj.DelDate, obj.DelRemark)"></i>&nbsp;&nbsp;
                             <i class="fa fa-trash-o" style="color: red" (click)="fnAddEdit_Delivery_Dtls(i,'D', obj.pk_tblIndex, obj.OH_truck, obj.trackValue, obj.truck, obj.TruckNo, obj.TruckType, obj.RateAgreed, obj.DelDate, obj.DelRemark)"></i>
@@ -1610,6 +1637,7 @@
                             <span class="col-form-span-label">{{obj.DelRemark}}</span>
                         </td>
                     </tr>
+}
                 </tbody>
             </table>
             <table class="table table-bordered table-sm-new bgwhite">

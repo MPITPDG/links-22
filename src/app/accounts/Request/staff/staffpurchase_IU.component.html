@@ -65,7 +65,9 @@
                 <td >
                     <select class="form-control width150"  [(ngModel)]="passedby" [disabled]='togglepassedby' >
                         <option value="">Please select</option>
-                        <option *ngFor="let d of PassedBylist"  value={{d.CMPID}}>{{d.CMP_USERNAME}}</option>
+                        @for (d of PassedBylist; track d) {
+<option  value={{d.CMPID}}>{{d.CMP_USERNAME}}</option>
+}
                     </select>
                 </td>
                 <td><span class="col-form-span-label"><b>Passed Amount</b> </span><span class="col-form-span-error">*</span></td>
@@ -145,7 +147,8 @@
       
        
     </table>
-     <table class="table table-bordered table-sm-new bgwhite"  *ngIf="Accountlist.length>0">
+     @if (Accountlist.length>0) {
+<table class="table table-bordered table-sm-new bgwhite" >
         <tr>
             <td colspan="4" >
                 <div class="row xyscroll" style="width:625px;" >
@@ -163,7 +166,8 @@
                             </tr>
                         </thead>
                         <tbody  >
-                            <tr *ngFor="let obj of Accountlist">
+                            @for (obj of Accountlist; track obj) {
+<tr>
                                 <td class="centerlabel">
                                     <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)" ></i>
                                     &nbsp;
@@ -177,6 +181,7 @@
                                 <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
                                 <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
                             </tr>
+}
                         </tbody>
                     </table>
                 </div>
@@ -189,6 +194,7 @@
             </td>
         </tr>
     </table>
+}
 </div>
 
 

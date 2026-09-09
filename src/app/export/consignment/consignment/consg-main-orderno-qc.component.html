@@ -52,7 +52,8 @@
         </th>
     </thead>
     <tbody>
-        <tr *ngFor="let obj of OrderNorQcList">
+        @for (obj of OrderNorQcList; track obj) {
+<tr>
             <td>
                 <span class="col-form-span-label">
                     <a href="javascript:void(0);" (click)="openWindow(obj.EXPTNO, obj.ORDERNO, obj.STYLENO, obj.CONCODE);">{{obj.ORDERNO}}</a>
@@ -81,5 +82,6 @@
                 <my-date-picker name="ActualDate" [options]="myDatePickerOptions" [(ngModel)]="obj.QC_ACTUALDT" [disabled]="obj.IS_QCFLAG==0"></my-date-picker>
             </td>
         </tr>
+}
     </tbody>
 </table>

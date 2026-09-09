@@ -87,7 +87,8 @@
          </div>
          <br>
          <br>
-         <div  class="row no-gutters" *ngIf="rdbtype=='containerno' && ContainerDataList.length>0">
+         @if (rdbtype=='containerno' && ContainerDataList.length>0) {
+<div  class="row no-gutters">
             <div class="col-sm-12 col-md-3 col-lg-3">
             </div>
            
@@ -103,19 +104,23 @@
                        </tr>
                    </thead>
                    <tbody>
-                    <tr *ngFor="let data of ContainerDataList">
+                    @for (data of ContainerDataList; track data) {
+<tr>
                       <td class="col-form-span-label">{{data.CONTAINERNO}}</td>
                       <td class="col-form-span-label">{{data.expt_vessel}}</td>
                       <td class="col-form-span-label" style="color: red;">{{data.verified}}</td>
                       <td class="col-form-span-label" style="color: red;">{{data.loaddt}}</td>
                     </tr>
+}
                   </tbody>
             </table>
         </div>
         <div class="col-sm-12 col-md-3 col-lg-3">
         </div>
     </div>
-    <div  class="row no-gutters" *ngIf="rdbtype!='containerno' && OtherDataList.length>0">
+}
+    @if (rdbtype!='containerno' && OtherDataList.length>0) {
+<div  class="row no-gutters">
         <div class="col-sm-12 col-md-2 col-lg-2">
         </div>
        
@@ -135,7 +140,8 @@
                    </tr>
                </thead>
                <tbody>
-                <tr *ngFor="let data of OtherDataList">
+                @for (data of OtherDataList; track data) {
+<tr>
                   <td class="col-form-span-label">{{data.MAWBNO}}</td>
                   <td class="col-form-span-label">{{data.MAWBDEST}}</td>
                   <td class="col-form-span-label">{{data.P_PKGS}}</td>
@@ -145,13 +151,16 @@
                   <td class="col-form-span-label">{{data.ACTFLIGHTDTLS}}</td>
                   <td class="col-form-span-label">{{data.ETAPORT1}}</td>
                 </tr>
+}
               </tbody>
         </table>
     </div>
     <div class="col-sm-12 col-md-2 col-lg-2">
     </div>
 </div>
-<div class="row no-gutters" *ngIf="rdbtype=='containerno' && ContainerData.length>1">
+}
+@if (rdbtype=='containerno' && ContainerData.length>1) {
+<div class="row no-gutters">
          <div class="col-sm-12 col-md-1 col-lg-1">
         </div>
         <div class="col-sm-12 col-md-10 col-lg-10 "  >
@@ -175,7 +184,8 @@
                        </tr>
                    </thead>
                    <tbody>
-                    <tr *ngFor="let data of ContainerData">
+                    @for (data of ContainerData; track data) {
+<tr>
                       <td class="col-form-span-label anchor-link"  (click)="ViewConsignment(data.EXPTNO)">{{data.EXPTNO}}</td>
                       <td class="col-form-span-label">{{data.INVNO}}</td>
                       <td class="col-form-span-label">{{data.SHIPPER}}</td>
@@ -191,6 +201,7 @@
                         <p    style="white-space: pre-wrap;width: 200px; " >{{data.ORDERNO}}</p>  </td>
                       <td class="col-form-span-label">{{data.CLPSEQUENCE}}</td>
                     </tr>
+}
                   </tbody>
             </table>
             </div>
@@ -198,7 +209,9 @@
         <div class="col-sm-12 col-md-1 col-lg-1">
         </div>
     </div>
-    <div class="row no-gutters" *ngIf="rdbtype!='containerno' && ContainerData.length>1">
+}
+    @if (rdbtype!='containerno' && ContainerData.length>1) {
+<div class="row no-gutters">
         <div class="col-sm-12 col-md-1 col-lg-1">
         </div>
         <div class="col-sm-12 col-md-10 col-lg-10 "  >
@@ -221,7 +234,8 @@
                        </tr>
                    </thead>
                    <tbody>
-                    <tr *ngFor="let data of ContainerData">
+                    @for (data of ContainerData; track data) {
+<tr>
                       <td class="col-form-span-label anchor-link"  (click)="ViewConsignment(data.EXPTNO)">{{data.EXPTNO}}</td>
                       <td class="col-form-span-label">{{data.INVNO}}</td>
                       <td class="col-form-span-label">{{data.SHIPPER}}</td>
@@ -236,10 +250,12 @@
                       <td class="col-form-span-label">{{data.ORDER_NO}}</td>
                       <td class="col-form-span-label">{{data.FREIGHT}}</td>
                     </tr>
+}
                   </tbody>
             </table>
         </div>
         <div class="col-sm-12 col-md-1 col-lg-1">
         </div>
     </div>
+}
 </div>

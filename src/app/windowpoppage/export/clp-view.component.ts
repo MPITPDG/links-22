@@ -31,14 +31,20 @@ import { LoaderService } from '../../shared/service/loader.service';
 								  <tr>
 									 <td colspan="4"><span class="col-form-span-label"><strong>Container Loading at Origin Conformation Date :</strong> {{setData?.LOADDT}}</span></td>
 								  </tr>
-								  <tr *ngIf="setData?.IS_VSLDELAY == 'Y'">
+								  @if (setData?.IS_VSLDELAY == 'Y') {
+<tr>
 									 <td colspan="4"><span class="col-form-span-label red">VESSEL DELAYED</span></td>
 								  </tr>
+}
 								  <tr>
 									 <td class="width150"></td>
 									 <td colspan="3">
-                                        <span class="col-form-span-label" *ngIf="setData?.DIRECTVSL == 'YES'"><strong>Direct Vessel</strong></span>
-                                        <span class="col-form-span-label" *ngIf="setData?.DIRECTVSL != 'YES'"><strong>Transhipment Vessel</strong></span>
+                                        @if (setData?.DIRECTVSL == 'YES') {
+<span class="col-form-span-label"><strong>Direct Vessel</strong></span>
+}
+                                        @if (setData?.DIRECTVSL != 'YES') {
+<span class="col-form-span-label"><strong>Transhipment Vessel</strong></span>
+}
                                     </td>
 								  </tr>
 								  <tr>
@@ -110,18 +116,26 @@ import { LoaderService } from '../../shared/service/loader.service';
 									 <td class="width150"><span class="col-form-span-label"><strong>Destination Port</strong></span></td>
 									 <td colspan="3"><span class="col-form-span-label">{{setData?.DESTPORT}}</span></td>
 								  </tr>
-								  <tr *ngIf="destPortData.length > 0">
+								  @if (destPortData.length > 0) {
+<tr>
 									 <td class="width150"></td>
-									 <td colspan="3"><span class="col-form-span-label" *ngFor="let obj of destPortData">{{obj.DESTPORT1}}</span></td>
+									 <td colspan="3">@for (obj of destPortData; track obj) {
+<span class="col-form-span-label">{{obj.DESTPORT1}}</span>
+}</td>
 								  </tr>
+}
 								  <tr>
 									 <td class="width150"><span class="col-form-span-label"><strong>Steamer Agent Seal no.</strong></span></td>
 									 <td colspan="3"><span class="col-form-span-label">{{setData?.AGTSEALNO}}</span></td>
 								  </tr>
 								  <tr>
 									 <td class="width150">
-                                        <span class="col-form-span-label" *ngIf="setData?.HSTUFFED != 'YES'"><strong>Stuffed At</strong></span>
-                                        <span class="col-form-span-label" *ngIf="setData?.HSTUFFED == 'YES'"><strong>H. Stuffed At</strong></span>
+                                        @if (setData?.HSTUFFED != 'YES') {
+<span class="col-form-span-label"><strong>Stuffed At</strong></span>
+}
+                                        @if (setData?.HSTUFFED == 'YES') {
+<span class="col-form-span-label"><strong>H. Stuffed At</strong></span>
+}
                                      </td>
 									 <td colspan="3"><span class="col-form-span-label">{{setData?.STUFF_WHERE}}</span></td>
 								  </tr>
@@ -185,7 +199,8 @@ import { LoaderService } from '../../shared/service/loader.service';
 									<tbody>
 								</table>
                               </div>
-                                <table class="table table-bordered table-sm-new" *ngIf="detailsData.length > 0">
+                                @if (detailsData.length > 0) {
+<table class="table table-bordered table-sm-new">
 								    <thead>
 								        <tr>
 									        <td class="width150 col-form-span-heading centerlabel" colspan="10">Consignment Details.</td>
@@ -204,7 +219,8 @@ import { LoaderService } from '../../shared/service/loader.service';
 									    </tr>
 								    </thead>
 							        <tbody>
-                                        <ng-container *ngFor="let obj of detailsData">
+                                        @for (obj of detailsData; track obj) {
+
 								            <tr [ngClass]="(obj.IS_SAME_JOB=='Y')?'bghighlightblue':'default'">
 									            <td rowspan="3"><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
 											    <td><span class="col-form-span-label">{{obj.EXPORTER}}</span></td>
@@ -227,23 +243,35 @@ import { LoaderService } from '../../shared/service/loader.service';
 											    <td><span class="col-form-span-label"><strong>FCR Date.</strong></span></td>
 											    <td colspan="8"><span class="col-form-span-label">{{obj.FCR_DATE}}</span></td>
 								            </tr>
-                                        </ng-container>
+                                        
+}
                                     <tbody>
 							    </table>
+}
                                 <table class="table table-bordered table-striped table-sm-new">
 							       <tbody>
 								      <tr>
 									     <td class="col-form-span-label centerlabel red" colspan="4">
-                                            <strong *ngIf="setData?.VERIFIED == 'Y'">VERIFIED</strong>
-                                            <strong *ngIf="setData?.VERIFIED != 'Y'">NOT VERIFIED</strong>
+                                            @if (setData?.VERIFIED == 'Y') {
+<strong>VERIFIED</strong>
+}
+                                            @if (setData?.VERIFIED != 'Y') {
+<strong>NOT VERIFIED</strong>
+}
                                         </td>
 								      </tr>
-								      <tr *ngIf="setData?.VERIFIED == 'Y'">
+								      @if (setData?.VERIFIED == 'Y') {
+<tr>
 									     <td class="col-form-span-label centerlabel red" colspan="4">   
-                                            <strong *ngIf="setData?.LOADDT != 'Y'">LOADING CONFIRMATION DONE</strong>  
-                                            <strong *ngIf="setData?.LOADDT == 'Y'">LOADING CONFIRMATION NOT DONE</strong>
+                                            @if (setData?.LOADDT != 'Y') {
+<strong>LOADING CONFIRMATION DONE</strong>
+}  
+                                            @if (setData?.LOADDT == 'Y') {
+<strong>LOADING CONFIRMATION NOT DONE</strong>
+}
                                         </td>
 								      </tr>
+}
 								      <tr>
 									     <td class="col-form-span-label centerlabel" colspan="4"></td>
 								      </tr>

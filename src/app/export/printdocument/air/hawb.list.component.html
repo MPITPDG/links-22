@@ -41,9 +41,14 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngIf="searchLength==0"><td colspan="8" class="centerlabel"><img src="assets/img/loading.gif" /></td></tr>
-					<tr *ngIf="searchLength==-1"><td colspan="8" class="centerlabel"><span class="col-form-span-label">No Record Found!</span></td></tr>
-					<tr *ngFor="let obj of searchList">
+					@if (searchLength==0) {
+<tr><td colspan="8" class="centerlabel"><img src="assets/img/loading.gif" /></td></tr>
+}
+					@if (searchLength==-1) {
+<tr><td colspan="8" class="centerlabel"><span class="col-form-span-label">No Record Found!</span></td></tr>
+}
+					@for (obj of searchList; track obj) {
+<tr>
 						<td class="centerlabel">
 							<input type="checkbox" (checked)="obj.Select == true" [disabled]="obj.Disabled == true" (click)="validate(obj.EXPTNO, obj.SHIPPER, obj.CONSIGNEE)" />
 						</td>
@@ -55,6 +60,7 @@
 						<td><span class="col-form-span-label">{{obj.GRWT}}</span></td>
 						<td><span class="col-form-span-label">{{obj.CHBLWT}}</span></td>
 					</tr>
+}
 				</tbody>
 			</table>
 		</div>

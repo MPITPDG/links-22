@@ -16,7 +16,9 @@ import { LoaderService } from './shared/service/loader.service';
     template: ` 
                 <toaster-container [toasterconfig]="config1"></toaster-container>
                 <router-outlet></router-outlet>
-				<div *ngIf="showLoader==true" class="loading" > </div>
+				@if (showLoader==true) {
+<div class="loading" > </div>
+}
             `,
 	styleUrls: ['./spinner.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,

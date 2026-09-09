@@ -54,7 +54,8 @@
                                 </td>
 
                             </tr>
-                            <tr *ngIf="showjobdtls">
+                            @if (showjobdtls) {
+<tr>
                                 <td colspan="7">
 <div class="collapsible-container"  >
   <!-- Header Row with + / - toggle -->
@@ -64,7 +65,8 @@
   </div>
 
   <!-- Collapsible Table -->
-  <div class="collapsible-body" *ngIf="jobDetailsVisible"  [@slideToggle]="jobDetailsVisible ? 'open' : 'closed'">
+  @if (jobDetailsVisible) {
+<div class="collapsible-body"  [@slideToggle]="jobDetailsVisible ? 'open' : 'closed'">
     <div class="table-container" style="height:250px">
     <table class="table table-borderlessjob table-sm-new " style="width:100%" >
       <thead>
@@ -79,7 +81,8 @@
         </tr>
       </thead>
       <tbody> 
-        <tr *ngFor="let obj of joblist">
+        @for (obj of joblist; track obj) {
+<tr>
           <td>
             <input type="checkbox" [(ngModel)]="obj.CHECKED"
                    (ngModelChange)="getCheckboxValues($event, obj)">
@@ -91,13 +94,16 @@
           <td><span class="col-form-span-label">{{ obj.PKGS }}</span></td>
           <td><span class="col-form-span-label">{{ obj.PCS }}</span></td>
         </tr>
+}
       </tbody>
     </table>
     </div>
   </div>
+}
      </div>
     </td>
-        </tr>                
+        </tr>
+}                
                     <!-- <tr>
                         <td colspan="12">
                             <table class="table table-borderlessjob  table-sm-new" style="width:100%">
@@ -297,7 +303,8 @@
                                     </span>
                                 </td>
                             </tr>
-                              <tr *ngIf="trSubAir == 'Y'" class="col-form-span-heading">
+                              @if (trSubAir == 'Y') {
+<tr class="col-form-span-heading">
                                 <td colspan="12">
                                     <table class="table table-borderless table-sm-new" style="width:100%">
                                         <tr>
@@ -323,6 +330,7 @@
                                 </td>
 
                             </tr>
+}
                             <tr>
                                 <td colspan="12" class="centerlabel">
                                     <button type="button" class="btn btn-sm btn-primary" (click)="autojobsubmit()"><span
@@ -372,7 +380,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let obj of exptnolist" [class.updated-row]="obj.JOBTYPE=== 'AUTOJOB'">
+                                @for (obj of exptnolist; track obj) {
+<tr [class.updated-row]="obj.JOBTYPE=== 'AUTOJOB'">
                                     <td style="width: 30px;" class="centerlabel">
                                         <i class="fa fa-pencil" (click)="Redirecttoedit(obj.EXPTNO)"></i>
 
@@ -395,6 +404,7 @@
                                             class="col-form-span-label">{{obj.USERNAME}}</span></td>
 
                                 </tr>
+}
                             <tbody>
                         </table>
 
@@ -405,7 +415,8 @@
         </div>
     </div>
 </div>
-<div *ngIf="showPopup" class="popup-card" 
+@if (showPopup) {
+<div class="popup-card" 
      [ngStyle]="{ top: popupPosition.top + 'px', left: popupPosition.left + 'px' }">
   <!-- <div class="popup-header">
     <h3>Job Details</h3>
@@ -419,6 +430,7 @@
     <div class="popup-row"><span class="label">Pcs:</span> <span class="value">{{ filteredjobpcs }}</span></div>
   </div>
 </div>
+}
 <!-- <div *ngIf="showPopup"  class="popup-card absolute"
      [ngStyle]="{ top: popupPosition.top + 'px', left: popupPosition.left + 'px' }">
   

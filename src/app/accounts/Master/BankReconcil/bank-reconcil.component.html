@@ -4,7 +4,8 @@
   <!-- SEARCH SCREEN -->
   <!-- ========================================================= -->
 
-  <div *ngIf="!showResult">
+  @if (!showResult) {
+<div>
 <div class="br-card search-card-clean">
   <div class="clean-row-layout">
 
@@ -59,6 +60,7 @@
 </div>
 
 </div>
+}
 
  
 
@@ -67,7 +69,8 @@
   <!-- RESULT SCREEN -->
   <!-- ========================================================= -->
 
-  <div *ngIf="showResult" class="br-result-view">
+  @if (showResult) {
+<div class="br-result-view">
 
     <!-- TOP BAR -->
 
@@ -87,17 +90,23 @@
 
         <div class="br-summary-val">
 
-          <span class="dr" *ngIf="OpBalDr">
+          @if (OpBalDr) {
+<span class="dr">
             {{ OpBalDr }}
           </span>
+}
 
-          <span class="cr" *ngIf="OpBalCr">
+          @if (OpBalCr) {
+<span class="cr">
             {{ OpBalCr }}
           </span>
+}
 
-          <span class="neutral" *ngIf="!OpBalDr && !OpBalCr">
+          @if (!OpBalDr && !OpBalCr) {
+<span class="neutral">
             —
           </span>
+}
 
         </div>
 
@@ -118,15 +127,19 @@
 
         <div class="br-summary-val">
 
-          <span class="dr" *ngIf="BalanceDr">
+          @if (BalanceDr) {
+<span class="dr">
             <!-- {{ BalanceDr }} -->
               {{closingdrref}}
           </span>
+}
 
-          <span class="cr" *ngIf="BalanceCr">
+          @if (BalanceCr) {
+<span class="cr">
             <!-- {{ BalanceCr }} -->
               {{closingcrref}}
           </span>
+}
 
         </div>
 
@@ -142,13 +155,17 @@
 
         <div class="br-summary-val stacked">
 
-          <span class="dr" *ngIf="DrReflected">
+          @if (DrReflected) {
+<span class="dr">
             {{ DrReflected }}
           </span>
+}
 
-          <span class="cr" *ngIf="CrReflected">
+          @if (CrReflected) {
+<span class="cr">
             {{ CrReflected }}
           </span>
+}
 
         </div>
 
@@ -165,13 +182,17 @@
 
         <div class="br-summary-val stacked">
 
-          <span class="dr" *ngIf="DrNotRef">
+          @if (DrNotRef) {
+<span class="dr">
             {{ DrNotRef }}
           </span>
+}
 
-          <span class="cr" *ngIf="CrNotRef">
+          @if (CrNotRef) {
+<span class="cr">
             {{ CrNotRef }}
           </span>
+}
 
         </div>
 
@@ -188,17 +209,23 @@
 
         <div class="br-summary-val">
 
-          <span class="dr" *ngIf="DrRef">
+          @if (DrRef) {
+<span class="dr">
             {{ DrRef }}
           </span>
+}
 
-          <span class="cr" *ngIf="CrRef">
+          @if (CrRef) {
+<span class="cr">
             {{ CrRef }}
           </span>
+}
 
-          <span class="neutral" *ngIf="!DrRef && !CrRef">
+          @if (!DrRef && !CrRef) {
+<span class="neutral">
             Pending
           </span>
+}
 
         </div>
 
@@ -356,8 +383,9 @@
 
           <tbody>
 
-            <tr
-              *ngFor="let data of filteredBankreconcilList"
+            @for (data of filteredBankreconcilList; track data) {
+<tr
+             
               [class.br-row--receipt]="data.STATUS === 'BR'"
               [class.br-row--payment]="data.STATUS === 'BP'">
 
@@ -398,15 +426,17 @@
                   [innerHTML]="data.PARTYNAME">
                 </div>
 
-                <div
+                @if (data.CHEQUENO) {
+<div
                   class="br-party-ref"
-                  *ngIf="data.CHEQUENO">
+                 >
 
                   {{ data.CHEQUETYPE }}
                   |
                   {{ data.CHEQUENO }}
 
                 </div>
+}
 
               </td>
 
@@ -432,15 +462,19 @@
 
               <td class="num dr-amt">
 
-                <span *ngIf="data.DRAMT">
+                @if (data.DRAMT) {
+<span>
                   {{ data.DRAMT | number:'1.2-2' }}
                 </span>
+}
 
-                <span
-                  *ngIf="!data.DRAMT"
+                @if (!data.DRAMT) {
+<span
+                 
                   class="muted">
                   —
                 </span>
+}
 
               </td>
 
@@ -448,15 +482,19 @@
 
               <td class="num cr-amt">
 
-                <span *ngIf="data.CRAMT">
+                @if (data.CRAMT) {
+<span>
                   {{ data.CRAMT | number:'1.2-2' }}
                 </span>
+}
 
-                <span
-                  *ngIf="!data.CRAMT"
+                @if (!data.CRAMT) {
+<span
+                 
                   class="muted">
                   —
                 </span>
+}
 
               </td>
 
@@ -464,23 +502,28 @@
 
               <td>
 
-              <my-date-picker
-  *ngIf="activeTab === 'UNCLEARED'"
+              @if (activeTab === 'UNCLEARED') {
+<my-date-picker
+ 
   name="dtbld_{{ data.ENTRYNO }}"
   [options]="myDatePickerOptions"
   [(ngModel)]="data.CLEARANCEDATE"
   class="form-control br-datepicker br-datepicker--inline">
 </my-date-picker>
+}
 
+@if (activeTab === 'CLEARED') {
 <span
-  *ngIf="activeTab === 'CLEARED'"
+ 
   class="br-cleared-text">
   {{ data.CLEARANCEDATE?.formatted }}
 </span>
+}
 
               </td>
 
             </tr>
+}
 
           </tbody>
 
@@ -520,16 +563,19 @@
     <i class="fa fa-ban"></i> Reset
   </button>
 
-  <button
-    *ngIf="activeTab === 'UNCLEARED'"
+  @if (activeTab === 'UNCLEARED') {
+<button
+   
     class="br-btn br-btn--submit"
     type="button"
     (click)="BankRecUpdate()">
     <i class="fa fa-check-circle"></i> Submit Reconciliation
   </button>
+}
 
 </div>
 
   </div>
+}
 
 </div>

@@ -22,7 +22,8 @@
                 </tr>  
                 <tr>
                     <td>
-                            <table class="table table-bordered table-sm-new bgwhite" *ngIf ="orderbookinglist.length>0">                    
+                            @if (orderbookinglist.length>0) {
+<table class="table table-bordered table-sm-new bgwhite">                    
                                
                               <tr>
                                 <td colspan="16">
@@ -66,7 +67,8 @@
                                         <!-- </tr> -->
                                      </thead>
                                     <tbody>
-                                            <tr *ngFor="let obj of orderbookinglist; let i = index">                                                        
+                                            @for (obj of orderbookinglist; track obj; let i = $index) {
+<tr>                                                        
                                                 
                                                 <td><span class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.CLIENTLOC" [checked]="obj.selected" (change)="chkonchange(obj.ORDERNO,obj.STYLENO,obj.CLIENTLOC)"/> </span></td>
                                                 <td class="col-form-span-label">{{obj.ORDERNO}}</td>  
@@ -86,6 +88,7 @@
                                                  <td class="col-form-span-label">{{obj.CREATEDON}}</td>  
                                                   
                                             </tr>
+}
                                     </tbody>
                                       <!-- <thead>
                                         <tr>
@@ -113,6 +116,7 @@
                                    <td colspan="16" class="col-form-span-heading"><b>Total Unauthorised Order Nos :</b>{{orderbookinglist.length}} </td>  
                                      </tr>  -->
                                        </table>
+}
                                      
                                    <!-- </div> -->
                                    </td>

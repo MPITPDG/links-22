@@ -15,8 +15,11 @@
     <div class="row">
         <div class="col-sm-2">
         </div>
-        <div class="col-sm-8 centerlabel" *ngIf="displayData==undefined"><img src="assets/img/loading.gif"/></div>
-        <div class="col-sm-8" *ngIf="displayData!==undefined">
+        @if (displayData==undefined) {
+<div class="col-sm-8 centerlabel"><img src="assets/img/loading.gif"/></div>
+}
+        @if (displayData!==undefined) {
+<div class="col-sm-8">
             <table class="table table-bordered table-sm-new">
                 <tbody class="bgwhite">
                     <tr>
@@ -123,27 +126,36 @@
             </table>
             <table class="table table-bordered table-sm-new">
                 <tbody class="bgwhite">
-                    <tr [ngStyle]="{ 'color': 'red'}" *ngIf="exptNoList.length>0">
+                    @if (exptNoList.length>0) {
+<tr [ngStyle]="{ 'color': 'red'}">
                         <td colspan="8">
                             <span class="col-form-span-label">
                                 <b>ALL INFORMATION WILL BE AUTOMATICALLY GET UPDATED IN THE FOLLOWING EXPORTS</b>
                             </span>
                         </td>
                     </tr>
-                    <tr [ngStyle]="{ 'color': 'red'}" *ngIf="exptNoList.length>0">
+}
+                    @if (exptNoList.length>0) {
+<tr [ngStyle]="{ 'color': 'red'}">
                         <td colspan="2" [ngStyle]="{ 'width': '20%'}">
                             <span class="col-form-span-label">
                                 <b>Export No.</b>
                             </span>
                         </td>
                         <td colspan="6">
-                            <span class="col-form-span-label" *ngFor="let obj of exptNoList; last as isLast">
+                            @for (obj of exptNoList; track obj; let isLast = $last) {
+<span class="col-form-span-label">
                                 <b>{{obj.EXPTNO}}</b>
-                                <br *ngIf="!isLast" />
+                                @if (!isLast) {
+<br />
+}
                             </span>
+}
                         </td>
                     </tr>
-                    <tr class="trbg" *ngIf="CityCode==DAC">
+}
+                    @if (CityCode==DAC) {
+<tr class="trbg">
                         <td colspan="2">
                             <span class="col-form-span-label">
                                 <b>SubAgent</b>
@@ -155,6 +167,7 @@
                             </ng-select>
                         </td>
                     </tr>
+}
                     <tr>
                         <td colspan="2">
                             <span class="col-form-span-label">
@@ -215,7 +228,8 @@
                                         </td>
                                     </tr>
                                   
-                                    <tr  *ngIf="displayData?.ACTUALFLIGHTNO != ''">
+                                    @if (displayData?.ACTUALFLIGHTNO != '') {
+<tr >
                                         <td colspan="2" [ngStyle]="{ 'width' : '20%'}">
                                             <span class="col-form-span-label">
                                                 <b>Flight No.</b>
@@ -225,7 +239,9 @@
                                             <span class="col-form-span-label">{{ACTUALFLIGHTNO}}</span>
                                         </td>
                                     </tr>
-                                    <tr  *ngIf="displayData?.ACTUALFLIGHTDT != ''">
+}
+                                    @if (displayData?.ACTUALFLIGHTDT != '') {
+<tr >
                                         <td colspan="2">
                                             <span class="col-form-span-label">
                                                 <b>Flight Date</b>
@@ -236,7 +252,9 @@
                                            
                                         </td>
                                     </tr>
-                                    <tr  *ngIf="displayData?.ACTUALFLIGHTNO == ''">
+}
+                                    @if (displayData?.ACTUALFLIGHTNO == '') {
+<tr >
                                         <td colspan="2" [ngStyle]="{ 'width' : '20%'}">
                                             <span class="col-form-span-label">
                                                 <b>Flight No.</b>
@@ -246,7 +264,9 @@
                                             <input type="textbox" class="form-control width100" [(ngModel)]="ACTUALFLIGHTNO" />
                                         </td>
                                     </tr>
-                                    <tr  *ngIf="displayData?.ACTUALFLIGHTDT == ''">
+}
+                                    @if (displayData?.ACTUALFLIGHTDT == '') {
+<tr >
                                         <td colspan="2">
                                             <span class="col-form-span-label">
                                                 <b>Flight Date</b>
@@ -256,6 +276,7 @@
                                              <my-date-picker name="ACTUALFLIGHTDT" [options]="myDatePickerOptions" [(ngModel)]="ACTUALFLIGHTDT"></my-date-picker> 
                                         </td>
                                     </tr>
+}
                                 </tbody>
                             </table>
                         </td>
@@ -311,7 +332,9 @@
 
                          <select class="form-control " [(ngModel)]="MAWBDEST">
                             <option value="">--select--</option>
-                             <option *ngFor="let d of commoncities" value={{d.CITY_CODE}}>{{d.CITY_COUNTRY}}</option>
+                             @for (d of commoncities; track d) {
+<option value={{d.CITY_CODE}}>{{d.CITY_COUNTRY}}</option>
+}
                         </select>
 
                             
@@ -386,7 +409,9 @@
                                     </ng-select> -->
                             <select class="form-control " [(ngModel)]="transportone"  [disabled]="transtype == 'Direct'">
                                 <option value="">--select--</option>
-                                    <option *ngFor="let d of commoncities" value={{d.CITY_CODE}}>{{d.CITY_COUNTRY}}</option>
+                                    @for (d of commoncities; track d) {
+<option value={{d.CITY_CODE}}>{{d.CITY_COUNTRY}}</option>
+}
                             </select>
                         </td>
                     </tr>
@@ -438,7 +463,9 @@
                             </ng-select> -->
                             <select class="form-control " [(ngModel)]="transporttwo"  [disabled]="transtype == 'Direct'">
                                 <option value="">--select--</option>
-                                    <option *ngFor="let d of commoncities" value={{d.CITY_CODE}}>{{d.CITY_COUNTRY}}</option>
+                                    @for (d of commoncities; track d) {
+<option value={{d.CITY_CODE}}>{{d.CITY_COUNTRY}}</option>
+}
                             </select>
                         </td>
                     </tr>
@@ -485,6 +512,7 @@
                 </tbody>
             </table>
         </div>
+}
         <div class="col-sm-2">
         </div>
     </div>

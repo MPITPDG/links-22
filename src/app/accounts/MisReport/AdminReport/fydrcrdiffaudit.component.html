@@ -4,14 +4,17 @@
   <!-- SEARCH -->
   <!-- ========================================================= -->
 
-  <div class="br-card search-card-clean" *ngIf="!Searched">
+  @if (!Searched) {
+<div class="br-card search-card-clean">
     <div class="clean-row-layout">
 
       <!-- BRANCH -->
       <div class="clean-field clean-branch">
         <label>Branch</label>
         <select class="form-control" name="Branch" [(ngModel)]="Branch">
-          <option *ngFor="let b of BranchList" value="{{b.CITYCODE1}}">{{b.CITYNAME}}</option>
+          @for (b of BranchList; track b) {
+<option value="{{b.CITYCODE1}}">{{b.CITYNAME}}</option>
+}
         </select>
       </div>
 
@@ -46,12 +49,14 @@
 
     </div>
   </div>
+}
 
   <!-- ========================================================= -->
   <!-- RESULT -->
   <!-- ========================================================= -->
 
-  <div *ngIf="Searched" class="br-result-view">
+  @if (Searched) {
+<div class="br-result-view">
 
     <!-- TOP BAR -->
 
@@ -59,7 +64,9 @@
 
       <div class="br-topbar-title">
         <span class="pl-title">{{ Header }}</span>
-        <span class="pl-meta" *ngIf="cmpnyname">{{ cmpnyname }}</span>
+        @if (cmpnyname) {
+<span class="pl-meta">{{ cmpnyname }}</span>
+}
       </div>
 
       <div class="br-topbar-right">
@@ -96,7 +103,8 @@
 
       </div>
 
-      <div class="recon-equation" *ngIf="!IsClean">
+      @if (!IsClean) {
+<div class="recon-equation">
 
         <div class="recon-seg">
           <span class="recon-seg-label">Check Types Flagged</span>
@@ -114,22 +122,26 @@
         </div>
 
       </div>
+}
 
     </div>
 
     <!-- CLEAN STATE -->
 
-    <div class="br-card" *ngIf="IsClean">
+    @if (IsClean) {
+<div class="br-card">
       <div class="audit-clean">
         <i class="fa fa-check-circle"></i>
         <div class="audit-clean-title">No debit/credit differences found</div>
         <div class="audit-clean-sub">Every voucher checked balanced for this period and branch selection.</div>
       </div>
     </div>
+}
 
     <!-- CHECKTYPE GROUPS (drill-down into vouchers) -->
 
-    <div class="br-card br-table-card" *ngIf="!IsClean">
+    @if (!IsClean) {
+<div class="br-card br-table-card">
 
       <div class="br-card-header">
         <div class="br-card-title">
@@ -150,7 +162,8 @@
             </tr>
           </thead>
           <tbody>
-            <ng-container *ngFor="let g of Groups">
+            @for (g of Groups; track g) {
+
 
               <tr class="pl-grp-row" (click)="Toggle(g.CHECKTYPE)">
                 <td>
@@ -164,7 +177,8 @@
                 <td class="num less">{{ g.TOTAL_DIFF | number:'1.2-2' }}</td>
               </tr>
 
-              <tr *ngIf="IsExpanded(g.CHECKTYPE)" class="pl-ledger-row">
+              @if (IsExpanded(g.CHECKTYPE)) {
+<tr class="pl-ledger-row">
                 <td colspan="3">
                   <div class="pl-ledger-wrap">
                     <table class="br-table pl-ledger-table">
@@ -181,7 +195,8 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr *ngFor="let d of GetDetails(g.CHECKTYPE)">
+                        @for (d of GetDetails(g.CHECKTYPE); track d) {
+<tr>
                           <td class="mono">{{ d.VTYPE }}</td>
                           <td class="mono">{{ d.VOUCHERNO }}</td>
                           <td class="mono">{{ d.VDATE }}</td>
@@ -191,19 +206,24 @@
                           <td class="num less">{{ d.DIFF | number:'1.2-2' }}</td>
                           <td class="audit-remark">{{ d.REMARK }}</td>
                         </tr>
+}
                       </tbody>
                     </table>
                   </div>
                 </td>
               </tr>
+}
 
-            </ng-container>
+            
+}
           </tbody>
         </table>
       </div>
 
     </div>
+}
 
   </div>
+}
 
 </div>

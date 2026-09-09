@@ -52,8 +52,10 @@
                             <th style="width: 100px;" class="col-form-span-label" align="center" >ADVANCE PAID ON BEHALF</th>
                         </tr>
                     </thead>
-                    <tbody *ngIf="cloutList.length > 0">
-                        <ng-container *ngFor="let data of cloutList | clntoutageingfilterpipe: searchString" >
+                    @if (cloutList.length > 0) {
+<tbody>
+                        @for (data of cloutList | clntoutageingfilterpipe: searchString; track data) {
+
                         <tr (click)="data.expanded = !data.expanded">
                             <td ><span  class="col-form-span-label " >{{ data.expanded ? '&ndash;' : '+'}} </span></td> 
                             <td style="width: 250px;"><span  class="col-form-span-label " >{{data.ACCTNAME}}</span> </td> 
@@ -72,7 +74,8 @@
                             <td style="white-space: pre-wrap;width: 100px;" ><span class="col-form-span-label">{{data.ADVANCE_PAIDBYUS}}</span>  </td>
                            
                         </tr>
-                        <ng-container *ngIf="data.expanded">
+                        @if (data.expanded) {
+
                             <tr class="title-head formheading table-primary">
                                 <th ></th>
                                 <th class="col-form-span-label" align="center">ASSIGNED ON:</th>
@@ -81,15 +84,19 @@
                                 <th class="col-form-span-label" align="center">INVOICE CITY:</th>      
                               
                             </tr>
-                        <tr class="title-head formheading table-primary" *ngFor="let details of findDetails(data)">
+                        @for (details of findDetails(data); track details) {
+<tr class="title-head formheading table-primary">
                             <td>  </td>
                              <td> <span class="col-form-span-label">{{details.ASSIGNED_ON}}</span>  </td>
                             <td> <span class="col-form-span-label">{{details.FOLLOW_ASSIGNED_TO}}</span>  </td>
                             <td> <span class="col-form-span-label">{{details.CLIENT_STATUS}}</span>  </td>
                             <td> <span class="col-form-span-label">{{details.CITYNAME}}</span>  </td>
                           </tr>
-                        </ng-container>
-                    </ng-container>
+}
+                        
+}
+                    
+}
                         <!-- <tr *ngIf ="CHECK==true" >
                             <td  colspan="4">                                
                                 <table class="table table-bordered table-sm-new bgwhite" >
@@ -103,6 +110,7 @@
                             </td>
                         </tr> -->
                     </tbody>
+}
                     <!-- <tbody *ngIf="cloutList.length > 0">
                         <tr *ngIf ="CHECK==true" >
                             <td  colspan="4">                                

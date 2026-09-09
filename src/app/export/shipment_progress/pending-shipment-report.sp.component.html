@@ -26,7 +26,8 @@
 		</td>
 	</tr>
 </table>
-<div class="row yscroll" style="height:300px" *ngIf="ExportList.length > 0">
+@if (ExportList.length > 0) {
+<div class="row yscroll" style="height:300px">
 	<table class="table table-bordered table-sm-new" style="white-space:nowrap;">
 	   <thead>
 			<tr class="col-form-span-heading">
@@ -40,7 +41,8 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr *ngFor="let obj of ExportList">
+			@for (obj of ExportList; track obj) {
+<tr>
 				<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
 				<td><span class="col-form-span-label">{{obj.EXP_NAME}}</span></td>
 				<td><span class="col-form-span-label">{{obj.CON_NAME}}</span></td>
@@ -49,10 +51,13 @@
 				<td><span class="col-form-span-label">{{obj.EXPT_NOOFPCS}}</span></td>
 				<td><span class="col-form-span-label">{{obj.ORDERNO}}</span></td>
 			</tr>
+}
 		</tbody>
 	</table>
 </div>
-<div class="row yscroll" style="height:300px" *ngIf="ContainerList.length > 0">
+}
+@if (ContainerList.length > 0) {
+<div class="row yscroll" style="height:300px">
 	<table class="table table-bordered table-sm-new" style="white-space:nowrap;">
 	   <thead>
 			<tr class="col-form-span-heading">
@@ -63,14 +68,19 @@
 			</tr>
 		</thead>
 		<tbody>
-			<ng-container *ngFor="let obj of ContainerList">
+			@for (obj of ContainerList; track obj) {
+
 				<tr>
-					<td *ngIf="obj.CONTAINERNO !== ''" [attr.rowspan]="obj.TOTAL_COUNT" style="vertical-align: middle;"><span class="col-form-span-label">{{obj.CONTAINERNO}}</span></td>
+					@if (obj.CONTAINERNO !== '') {
+<td [attr.rowspan]="obj.TOTAL_COUNT" style="vertical-align: middle;"><span class="col-form-span-label">{{obj.CONTAINERNO}}</span></td>
+}
 					<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
 					<td><span class="col-form-span-label">{{obj.NOOFPKGS}}</span></td>
 					<td><span class="col-form-span-label">{{obj.CBM}}</span></td>
 				</tr>
-			</ng-container>
+			
+}
 		</tbody>
 	</table>
 </div>
+}

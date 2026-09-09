@@ -8,7 +8,8 @@
 					<td colspan="8"><span class="col-form-span-label"><b>CONTAINER LOADING CONFIRMATION </b></span></td>
 				</tr>
 			</table>
-			<table class="table table-bordered table-sm-new" *ngIf="this.viewType == 'Search'">
+			@if (this.viewType == 'Search') {
+<table class="table table-bordered table-sm-new">
 				<tr>
 					<td class="width100"><span class="col-form-span-label">Vessel Name<span class="col-form-span-error"> *</span></span></td>
 					<td colspan="3">
@@ -25,7 +26,9 @@
 					</td>
 				</tr>
 			</table>
-			<div class="row yscroll" style="height:300px" *ngIf="this.viewType=='Search'&&searchList.length > 0">
+}
+			@if (this.viewType=='Search'&&searchList.length > 0) {
+<div class="row yscroll" style="height:300px">
 				<table class="table table-bordered table-sm-new">
 					<thead>
 						<tr class="col-form-span-heading" style="white-space:nowrap;">
@@ -35,30 +38,43 @@
 						</tr>
 					</thead>
 					<tbody class="bgwhite">
-						<tr *ngFor="let obj of searchList" (click)="rowSearchSendClick(obj.VSL_RTNO, obj.VSL_NAME, obj.VSL_VOYNO, obj.ETD);" style="cursor: pointer;">
+						@for (obj of searchList; track obj) {
+<tr (click)="rowSearchSendClick(obj.VSL_RTNO, obj.VSL_NAME, obj.VSL_VOYNO, obj.ETD);" style="cursor: pointer;">
 							<td><span class="col-form-span-label">{{obj.VSL_NAME}}</span></td>
 							<td><span class="col-form-span-label">{{obj.VSL_VOYNO}}</span></td>
 							<td><span class="col-form-span-label">{{obj.ETD}}</span></td>
 						</tr>
+}
 					</tbody>
 				</table>
 			</div>
-			<table class="table table-bordered table-sm-new" *ngIf="this.viewType=='Search'&&searchList.length > 0">
+}
+			@if (this.viewType=='Search'&&searchList.length > 0) {
+<table class="table table-bordered table-sm-new">
 				<tr class="trbg">
 					<td colspan="8">
 						<span class="error-text">{{searchList.length + ' Rows Found.'}}</span>
 					</td>
 				</tr>
 			</table>
-			<app-shipment-progress-container-loading-view [DataSet]="ContainerDataSet" *ngIf="this.viewType=='View'" (backtosearch)="back($event)" (editdata)="editdata($event)"></app-shipment-progress-container-loading-view>
-			<app-shipment-progress-container-loading-update [DataSet]="UpdateDataSet" [EditData]="EditData" *ngIf="this.viewType=='Update'" (updatedata)="reportdata($event)" (backtosearch)="back($event)"></app-shipment-progress-container-loading-update>
-			<app-shipment-progress-container-loading-report [DataSet]="ReportDataSet" *ngIf="this.viewType=='Report'" (backtosearch)="back($event)"></app-shipment-progress-container-loading-report>
+}
+			@if (this.viewType=='View') {
+<app-shipment-progress-container-loading-view [DataSet]="ContainerDataSet" (backtosearch)="back($event)" (editdata)="editdata($event)"></app-shipment-progress-container-loading-view>
+}
+			@if (this.viewType=='Update') {
+<app-shipment-progress-container-loading-update [DataSet]="UpdateDataSet" [EditData]="EditData" (updatedata)="reportdata($event)" (backtosearch)="back($event)"></app-shipment-progress-container-loading-update>
+}
+			@if (this.viewType=='Report') {
+<app-shipment-progress-container-loading-report [DataSet]="ReportDataSet" (backtosearch)="back($event)"></app-shipment-progress-container-loading-report>
+}
 			<table class="table table-bordered table-sm-new">
-				<tr class="trbg centerlabel" *ngIf="ErrorMessage !== ''">
+				@if (ErrorMessage !== '') {
+<tr class="trbg centerlabel">
 					<td colspan="8">
 						<span class="error-text">{{ErrorMessage}}</span>
 					</td>
 				</tr>
+}
 			</table>
 		</div>
 		<div class="col-sm-2">

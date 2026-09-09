@@ -13,8 +13,12 @@
 								</button>
 								<button class="btn btn-primary" (click)="redirectTo('S')">
 									<!-- <span class="col-form-span-label"><i class="fa fa-arrow-left"></i> Back to Search</span> -->
-										<span *ngIf="jobtype=='M'" class="col-form-span-label"><i class="fa fa-arrow-left"></i> Back to Search</span>
-									<span *ngIf="jobtype=='A'" class="col-form-span-label"><i class="fa fa-arrow-left"></i> Back to Auto Job list</span>
+										@if (jobtype=='M') {
+<span class="col-form-span-label"><i class="fa fa-arrow-left"></i> Back to Search</span>
+}
+									@if (jobtype=='A') {
+<span class="col-form-span-label"><i class="fa fa-arrow-left"></i> Back to Auto Job list</span>
+}
 								</button>
 							</div>
 						</div>
@@ -33,7 +37,8 @@
 				<div class="card-body">
 					<div class="row">
 						<div class="col-sm-12">
-							<table *ngIf=" jobno != ''   else other">
+							@if ( jobno != ''  ) {
+<table>
 								<tr>
 									<td class="width30 align-top" ><img src="assets/icon/buy.jpg" class="normal-icon"></td>
 									<td class="width300"><span class="link-label" (click)="edit('VIEW')">Consignment View</span></td>
@@ -66,7 +71,8 @@
 									<td class="width300" colspan="3"><span class="link-label" (click)="edit('JOB')">Edit Job Freight Rate</span></td>
 								</tr>
 							</table>
-							<ng-template #other>
+} @else {
+
                             <table class="table-sm-new bgwhite">
 								<tr>
 										<td class="width30 align-top" rowspan="2"><img src="assets/icon/buy.jpg" class="normal-icon"></td>
@@ -91,7 +97,9 @@
 									<td>&nbsp;</td>
 								</tr>
 							</table>
-						</ng-template>
+						
+}
+							
 						</div>
 					</div>
 					<div class="row">
@@ -99,23 +107,38 @@
 					
 					<div class="row">
 						<div class="col-sm-12">
-                            <table class="table-sm-new bgwhite"  *ngIf="jobno ==''" >
+                            @if (jobno =='') {
+<table class="table-sm-new bgwhite"  >
 								<tr>
 									<td class="width30 align-top" rowspan="3"><img src="assets/icon/1265187760.png" class="normal-icon"></td>
 									<td class="width300"><span class="link-label" (click)="edit('MAIN')">Shipper / BillTo / Manufature / Consignee / Consignee Bank / Buyer / Source Agent</span></td>
-									<td class="width30 align-top" rowspan="3"><img src="assets/icon/1262723459.png" *ngIf="editList.IS_EDITABLE != 'NO'" class="normal-icon"></td>
+									<td class="width30 align-top" rowspan="3">@if (editList.IS_EDITABLE != 'NO') {
+<img src="assets/icon/1262723459.png" class="normal-icon">
+}</td>
 									<td class="width300">
-										<span class="link-label" (click)="edit('PORT')" *ngIf="editList.IS_EDITABLE != 'NO'">Edit Shipment Details / Origin / Destination / Pkgs / Pcs / GrWt / NetWt / Cbm Etc</span>
-										<span class="link-label" *ngIf="editList.IS_EDITABLE == 'NO' && ISDIFFAIR == '1'">Edit Vessel/Shipment Details / Origin / Destination / Pkgs / Pcs / GrWt / NetWt / Cbm Etc</span>
-										<span class="link-label" (click)="edit('PORT')" *ngIf="editList.IS_EDITABLE == 'NO' && ISDIFFAIR == '2'">Edit Shipment Details/Shipment Details / Origin / Destination / Pkgs / Pcs / GrWt / NetWt / Cbm Etc</span>
+										@if (editList.IS_EDITABLE != 'NO') {
+<span class="link-label" (click)="edit('PORT')">Edit Shipment Details / Origin / Destination / Pkgs / Pcs / GrWt / NetWt / Cbm Etc</span>
+}
+										@if (editList.IS_EDITABLE == 'NO' && ISDIFFAIR == '1') {
+<span class="link-label">Edit Vessel/Shipment Details / Origin / Destination / Pkgs / Pcs / GrWt / NetWt / Cbm Etc</span>
+}
+										@if (editList.IS_EDITABLE == 'NO' && ISDIFFAIR == '2') {
+<span class="link-label" (click)="edit('PORT')">Edit Shipment Details/Shipment Details / Origin / Destination / Pkgs / Pcs / GrWt / NetWt / Cbm Etc</span>
+}
 									</td>
 								</tr>
 								<tr>
 									<td><span class="col-form-span-label">Edit Shipper, BillTo, Manufature, Consignee, Consignee Bank, Buyer, Source Agent, Etc...</span></td>
 									<td>
-										<span class="col-form-span-label" *ngIf="editList.IS_EDITABLE != 'NO'">Edit Shipment Details, Origin, Destination, Pkgs, Pcs, GrWt, NetWt, Cbm, Etc...</span>
-										<span class="col-form-span-label red" *ngIf="editList.IS_EDITABLE == 'NO' "><strong>Consignment is already containerised, hence you can not change the pkgs,pcs,grwt,netwt,cbm etc.</strong></span>
-										<span class="col-form-span-label " *ngIf="editList.IS_EDITABLE == 'NO' && ISDIFFAIR == '2'">Edit Shipment Details, Origin, Destination, Pkgs, Pcs, GrWt, NetWt, Cbm, Etc...</span>
+										@if (editList.IS_EDITABLE != 'NO') {
+<span class="col-form-span-label">Edit Shipment Details, Origin, Destination, Pkgs, Pcs, GrWt, NetWt, Cbm, Etc...</span>
+}
+										@if (editList.IS_EDITABLE == 'NO' ) {
+<span class="col-form-span-label red"><strong>Consignment is already containerised, hence you can not change the pkgs,pcs,grwt,netwt,cbm etc.</strong></span>
+}
+										@if (editList.IS_EDITABLE == 'NO' && ISDIFFAIR == '2') {
+<span class="col-form-span-label ">Edit Shipment Details, Origin, Destination, Pkgs, Pcs, GrWt, NetWt, Cbm, Etc...</span>
+}
 									</td>
 								</tr>
 								<tr>
@@ -123,13 +146,15 @@
 									<td>&nbsp;</td>
 								</tr>
 							</table>
+}
 						</div>
 					</div>
 					<div class="row">
 					</div>
 					<div class="row">
 						<div class="col-sm-12">
-                            <table class="table-sm-new bgwhite" *ngIf="jobno ==''">
+                            @if (jobno =='') {
+<table class="table-sm-new bgwhite">
 								<tr>
 									<td class="width30 align-top"  rowspan="2"><img src="assets/icon/home-features_why.gif" class="normal-icon"></td>
 									<td class="width300" ><span class="link-label"  (click)="edit('INVOICE')">Invoice Details</span></td>
@@ -141,13 +166,15 @@
 									<td>&nbsp;</td>
 								</tr>
 							</table>
+}
 						</div>
 					</div>
 					<div class="row">
 					</div>
 					<div class="row">
 						<div class="col-sm-12">
-                            <table class="table-sm-new bgwhite" *ngIf="jobno ==''">
+                            @if (jobno =='') {
+<table class="table-sm-new bgwhite">
 								<tr>
 									<td class="width30 align-top" rowspan="2"><img src="assets/icon/1264378617.png" class="normal-icon"></td>
 									<td class="width300"><span class="link-label" (click)="edit('ORDER')">Order No. Details</span></td>
@@ -159,13 +186,15 @@
 									<td>&nbsp;</td>
 								</tr>
 							</table>
+}
 						</div>
 					</div>
 					<div class="row">
 					</div>
 					<div class="row">
 						<div class="col-sm-12">
-                            <table class="table-sm-new bgwhite" *ngIf="jobno ==''">
+                            @if (jobno =='') {
+<table class="table-sm-new bgwhite">
 								<tr>
 									<td class="width30 align-top" rowspan="2"><img src="assets/icon/1265194537.png" class="normal-icon"></td>
 									<td class="width300"><span class="link-label" (click)="edit('MARKS_NUMBERS')">Marks & Numbers Details</span></td>
@@ -181,24 +210,30 @@
 									<td>&nbsp;</td>
 								</tr>
 							</table>
+}
 						</div>
 					</div>
 					<div class="row">
 					</div>
 					<div class="row">
 						<div class="col-sm-12">
-               <table class="table-sm-new bgwhite" *ngIf="jobno ==''">
+               @if (jobno =='') {
+<table class="table-sm-new bgwhite">
 								<tr>
 									<td class="width30 align-top" rowspan="2"><img src="assets/icon/contact.jpg" class="normal-icon"></td>
 									<td class="width300"><span class="link-label" (click)="edit('CONREMARK')">Consignee Remark Details</span></td>
-									<div *ngIf=" mode ==='AIR' || ISDIFFAIR=='2' else seamode">
+									@if ( mode ==='AIR' || ISDIFFAIR=='2') {
+<div>
 										<td class="width30 align-top" rowspan="2"><img src="assets/icon/company.png" class="normal-icon"></td>
 										<td class="width300"><span class="link-label" (click)="edit('MAWB')">Edit MAWB Freight Rate</span></td>
 									</div>
-									<ng-template #seamode>
+} @else {
+
 											<td> &nbsp;</td>
 											<td>&nbsp;</td>
-									</ng-template>
+									
+}
+									
 									
 								</tr>
 								<tr>
@@ -206,32 +241,39 @@
 									<td>&nbsp;</td>
 								</tr>
 							</table>
+}
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-sm-12">
-              <table class="table-sm-new bgwhite" *ngIf="jobno ==''" >
+              @if (jobno =='') {
+<table class="table-sm-new bgwhite" >
 								<tr>
-									<div *ngIf=" mode ==='AIR' || ISDIFFAIR=='2'"  >
+									@if ( mode ==='AIR' || ISDIFFAIR=='2') {
+<div  >
 										<td class="width30 align-top" rowspan="2"><img src="assets/icon/company.png" class="normal-icon"></td>
 										<td class="width300"><span class="link-label" (click)="edit('HAWB')">Edit HAWB Freight Rate</span></td>
 										<td class="width30 align-top" rowspan="2"><img src="assets/icon/company.png" class="normal-icon"></td>
 										<td class="width300"><span class="link-label" (click)="edit('JOB')">Edit Job Freight Rate</span></td>
 									</div>
+}
 								</tr>
 								<tr>
 									<td>&nbsp;</td>
 									<td>&nbsp;</td>
 								</tr>
 								<tr >
-										<div  *ngIf="jobno ==''">
+										@if (jobno =='') {
+<div >
 									<td class="width30 align-top" rowspan="2"><img src="assets/icon/1265194537.png" class="normal-icon"></td>
 									<td class="width300"><span class="link-label" (click)="edit('CANCEL')">Cancel Shipment</span></td>
 									<td>&nbsp;</td>
 									<td>&nbsp;</td>
 									</div>
+}
 								</tr>
 							</table>
+}
 						</div>
 					</div>
 				

@@ -32,30 +32,44 @@
 		<td colspan="7"><span class="col-form-span-label">{{VesselDetail?.SAILING}}</span></td>
 	</tr>
 </table>
-<div class="xyscroll" style="height:300px" *ngIf="ContainerList.length > 0">
+@if (ContainerList.length > 0) {
+<div class="xyscroll" style="height:300px">
 	<table class="table table-bordered table-sm-new">
 		<thead>
 			<tr class="col-form-span-heading" style="white-space:nowrap;">
 				<th class="centerlabel width20"></th>
-				<ng-container *ngFor=" let key of keys; let i = index;">
-					<th class="centerlabel" *ngIf="i!=0&&i!=1&&i!=2"><span class="col-form-span-label">{{key}}</span></th>
-				</ng-container>
+				@for ( key of keys; track  key; let i = $index) {
+
+					@if (i!=0&&i!=1&&i!=2) {
+<th class="centerlabel"><span class="col-form-span-label">{{key}}</span></th>
+}
+				
+}
 			</tr>
 		</thead>
 		<tbody class="bgwhite">
-			<tr *ngFor="let obj of ContainerList">
+			@for (obj of ContainerList; track obj) {
+<tr>
 				<td class="centerlabel width20"><i class="fa fa-edit" style="cursor: pointer;" (click)="edit(obj[keys[0]],obj[keys[1]],obj[keys[2]],obj[keys[3]])"></i></td>
-				<ng-container *ngFor=" let key of keys; let i = index;">
-					<td *ngIf="i!=0&&i!=1&&i!=2"><span class="col-form-span-label">{{obj[key]}}</span></td>
-				</ng-container>
+				@for ( key of keys; track  key; let i = $index) {
+
+					@if (i!=0&&i!=1&&i!=2) {
+<td><span class="col-form-span-label">{{obj[key]}}</span></td>
+}
+				
+}
 			</tr>
+}
 		</tbody>
 	</table>
 </div>
-<table class="table table-bordered table-sm-new" *ngIf="ErrorMessage !== ''">
+}
+@if (ErrorMessage !== '') {
+<table class="table table-bordered table-sm-new">
 	<tr class="trbg centerlabel">
 		<td colspan="8">
 			<span class="error-text">{{ErrorMessage}}</span>
 		</td>
 	</tr>
 </table>
+}

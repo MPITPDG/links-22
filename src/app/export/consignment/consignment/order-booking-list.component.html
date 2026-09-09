@@ -31,8 +31,11 @@
 					</tr>
 				</thead>
 				<tbody class="bgwhite">
-					<tr *ngIf="OrderList.length==0"><td colspan="5" class="centerlabel"><img src="assets/img/loading.gif" /></td></tr>
-					<tr *ngFor="let obj of OrderList">
+					@if (OrderList.length==0) {
+<tr><td colspan="5" class="centerlabel"><img src="assets/img/loading.gif" /></td></tr>
+}
+					@for (obj of OrderList; track obj) {
+<tr>
 						<td class="centerlabel"><input type="checkbox" [(ngModel)]="obj.Check" (click)="setPieces(obj.ID, obj.Check)"/></td>
 						<td><span class="col-form-span-label">{{obj.ORDERNO}}</span></td>
 						<td><span class="col-form-span-label">{{obj.STYLENO}}</span></td>
@@ -43,6 +46,7 @@
 						</td>
 						<td><span class="col-form-span-label">{{obj.TYPEOFPCS}}</span></td>
 					</tr>
+}
 				</tbody>
 				<tfoot class="trbg">
 					<tr>

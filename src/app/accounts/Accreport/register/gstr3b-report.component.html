@@ -9,7 +9,9 @@
 
       <div class="clean-field clean-title">
         <span class="pl-title">{{ Header }}</span>
-        <span class="pl-meta" *ngIf="cmpnyname">{{ cmpnyname }}</span>
+        @if (cmpnyname) {
+<span class="pl-meta">{{ cmpnyname }}</span>
+}
       </div>
 
       <div class="clean-field clean-date">
@@ -41,19 +43,22 @@
 
     </div>
 
-    <div class="search-note" *ngIf="Searched">
+    @if (Searched) {
+<div class="search-note">
       Showing <b>{{ PeriodLabel }}</b>. Reverse-charge credit is availed in the month after the
       liability month, so this report claims the previous month's RCM credit and defers the
       current month's. Export To Excel always writes the full period, whatever is filtered on
       screen.
     </div>
+}
   </div>
 
   <!-- ========================================================= -->
   <!-- RESULT                                                    -->
   <!-- ========================================================= -->
 
-  <div *ngIf="Searched" class="br-result-view">
+  @if (Searched) {
+<div class="br-result-view">
 
     <!-- TABS -->
     <div class="g3-tabs">
@@ -75,7 +80,9 @@
       </button>
       <button class="g3-tab g3-tab--warn" [class.active]="ActiveTab=='WARN'"
         (click)="ActiveTab='WARN'">
-        <i class="fa fa-exclamation-triangle" *ngIf="Warnings.length > 0"></i>
+        @if (Warnings.length > 0) {
+<i class="fa fa-exclamation-triangle"></i>
+}
         Check Before Filing
         <span class="g3-tab-count" [class.g3-tab-count--warn]="Warnings.length > 0">
           {{ Warnings.length }}
@@ -84,7 +91,8 @@
     </div>
 
     <!-- ------------------------ SUMMARY ------------------------ -->
-    <div class="br-card br-table-card" *ngIf="ActiveTab=='SUMMARY'">
+    @if (ActiveTab=='SUMMARY') {
+<div class="br-card br-table-card">
       <div class="br-card-header">
         <span class="br-card-title">
           GSTR-3B Section Wise
@@ -99,9 +107,11 @@
           <ng-select class="g3-ngsel" [items]="Branches" [multiple]="true" [closeOnSelect]="false"
             placeholder="All branches" [(ngModel)]="Filters.SUMMARY.branch"
             (ngModelChange)="refreshAll()"></ng-select>
-          <button class="g3-clear" *ngIf="hasFilter('SUMMARY')" (click)="clearFilter('SUMMARY')">
+          @if (hasFilter('SUMMARY')) {
+<button class="g3-clear" (click)="clearFilter('SUMMARY')">
             <i class="fa fa-times"></i> Clear
           </button>
+}
           <span class="br-record-chip">{{ ViewSummary.length }} / {{ Summary.length }}</span>
         </div>
       </div>
@@ -134,7 +144,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let r of ViewSummary; let i = index" [ngClass]="rowClass(r.SECTION)"
+            @for (r of ViewSummary; track r; let i = $index) {
+<tr [ngClass]="rowClass(r.SECTION)"
               [class.g3-branch-start]="showBranch(i)">
               <td class="g3-branch-name">{{ showBranch(i) ? r.BRANCH : '' }}</td>
               <td>{{ r.SECTION }}</td>
@@ -144,9 +155,12 @@
               <td class="num">{{ r.SGST | number:'1.2-2' }}</td>
               <td class="num num-strong">{{ r.TOTAL_TAX | number:'1.2-2' }}</td>
             </tr>
-            <tr *ngIf="ViewSummary.length == 0">
+}
+            @if (ViewSummary.length == 0) {
+<tr>
               <td colspan="7" class="g3-empty">No rows match the filter.</td>
             </tr>
+}
           </tbody>
         </table>
       </div>
@@ -158,9 +172,11 @@
           deferred to next month, not part of this month's set-off</span>
       </div>
     </div>
+}
 
     <!-- ------------------------ NET POSITION ------------------------ -->
-    <div class="br-card br-table-card" *ngIf="ActiveTab=='NET'">
+    @if (ActiveTab=='NET') {
+<div class="br-card br-table-card">
       <div class="br-card-header">
         <span class="br-card-title">
           Net Position
@@ -175,9 +191,11 @@
           <ng-select class="g3-ngsel" [items]="Branches" [multiple]="true" [closeOnSelect]="false"
             placeholder="All branches" [(ngModel)]="Filters.NET.branch"
             (ngModelChange)="refreshAll()"></ng-select>
-          <button class="g3-clear" *ngIf="hasFilter('NET')" (click)="clearFilter('NET')">
+          @if (hasFilter('NET')) {
+<button class="g3-clear" (click)="clearFilter('NET')">
             <i class="fa fa-times"></i> Clear
           </button>
+}
           <span class="br-record-chip">{{ ViewNet.length }} / {{ NetPosition.length }}</span>
         </div>
       </div>
@@ -217,7 +235,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let r of ViewNet">
+            @for (r of ViewNet; track r) {
+<tr>
               <td class="g3-branch-name">{{ r.BRANCH }}</td>
               <td class="num">{{ r.LIAB_IGST | number:'1.2-2' }}</td>
               <td class="num">{{ r.LIAB_CGST | number:'1.2-2' }}</td>
@@ -231,11 +250,15 @@
                 {{ r.NET_PAYABLE | number:'1.2-2' }}
               </td>
             </tr>
-            <tr *ngIf="ViewNet.length == 0">
+}
+            @if (ViewNet.length == 0) {
+<tr>
               <td colspan="10" class="g3-empty">No rows match the filter.</td>
             </tr>
+}
           </tbody>
-          <tfoot *ngIf="ViewNet.length > 0">
+          @if (ViewNet.length > 0) {
+<tfoot>
             <tr>
               <td>TOTAL</td>
               <td class="num">{{ total('LIAB_IGST') | number:'1.2-2' }}</td>
@@ -249,6 +272,7 @@
               <td class="num">{{ total('NET_PAYABLE') | number:'1.2-2' }}</td>
             </tr>
           </tfoot>
+}
         </table>
       </div>
 
@@ -258,9 +282,11 @@
           adds up only the rows currently shown.</span>
       </div>
     </div>
+}
 
     <!-- ------------------------ RCM DEFERRED ------------------------ -->
-    <div class="br-card br-table-card" *ngIf="ActiveTab=='RCM'">
+    @if (ActiveTab=='RCM') {
+<div class="br-card br-table-card">
       <div class="br-card-header">
         <span class="br-card-title">
           Reverse-Charge ITC Deferred
@@ -275,9 +301,11 @@
           <ng-select class="g3-ngsel" [items]="Branches" [multiple]="true" [closeOnSelect]="false"
             placeholder="All branches" [(ngModel)]="Filters.RCM.branch"
             (ngModelChange)="refreshAll()"></ng-select>
-          <button class="g3-clear" *ngIf="hasFilter('RCM')" (click)="clearFilter('RCM')">
+          @if (hasFilter('RCM')) {
+<button class="g3-clear" (click)="clearFilter('RCM')">
             <i class="fa fa-times"></i> Clear
           </button>
+}
           <span class="br-record-chip">{{ ViewRcm.length }} / {{ RcmDeferred.length }}</span>
         </div>
       </div>
@@ -307,7 +335,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let r of ViewRcm" class="g3-memo">
+            @for (r of ViewRcm; track r) {
+<tr class="g3-memo">
               <td class="g3-branch-name">{{ r.BRANCH }}</td>
               <td class="num">{{ r.RCM_LIABILITY_PAID | number:'1.2-2' }}</td>
               <td class="num">{{ r.DEFER_IGST | number:'1.2-2' }}</td>
@@ -318,12 +347,15 @@
               <td class="num">{{ r.BF_FROM_LAST_MONTH | number:'1.2-2' }}</td>
               <td><span class="g3-pill g3-pill--rcm">{{ r.BF_MONTH }}</span></td>
             </tr>
-            <tr *ngIf="ViewRcm.length == 0">
+}
+            @if (ViewRcm.length == 0) {
+<tr>
               <td colspan="9" class="g3-empty">
                 {{ RcmDeferred.length == 0 ? 'No reverse-charge credit in this period.' : 'No rows
                 match the filter.' }}
               </td>
             </tr>
+}
           </tbody>
         </table>
       </div>
@@ -334,9 +366,11 @@
           Position.</span>
       </div>
     </div>
+}
 
     <!-- ------------------------ LEDGER DETAIL ------------------------ -->
-    <div class="br-card br-table-card" *ngIf="ActiveTab=='LEDGER'">
+    @if (ActiveTab=='LEDGER') {
+<div class="br-card br-table-card">
       <div class="br-card-header">
         <span class="br-card-title">
           Ledger Detail
@@ -351,9 +385,11 @@
           <ng-select class="g3-ngsel" [items]="Branches" [multiple]="true" [closeOnSelect]="false"
             placeholder="All branches" [(ngModel)]="Filters.LEDGER.branch"
             (ngModelChange)="refreshAll()"></ng-select>
-          <button class="g3-clear" *ngIf="hasFilter('LEDGER')" (click)="clearFilter('LEDGER')">
+          @if (hasFilter('LEDGER')) {
+<button class="g3-clear" (click)="clearFilter('LEDGER')">
             <i class="fa fa-times"></i> Clear
           </button>
+}
           <span class="br-record-chip">{{ ViewLedger.length }} / {{ LedgerDetail.length }}</span>
         </div>
       </div>
@@ -377,7 +413,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let r of ViewLedger">
+            @for (r of ViewLedger; track r) {
+<tr>
               <td class="g3-branch-name">{{ r.BRANCH }}</td>
               <td>
                 <span class="g3-pill"
@@ -386,23 +423,32 @@
                 </span>
               </td>
               <td>
-                <span class="g3-pill g3-pill--rcm" *ngIf="r.RCM == 'REVERSE CHARGE'">RCM</span>
-                <span *ngIf="r.RCM != 'REVERSE CHARGE'">&ndash;</span>
+                @if (r.RCM == 'REVERSE CHARGE') {
+<span class="g3-pill g3-pill--rcm">RCM</span>
+}
+                @if (r.RCM != 'REVERSE CHARGE') {
+<span>&ndash;</span>
+}
               </td>
               <td>{{ r.ACCTCODE }}</td>
               <td>{{ r.LEDGER }}</td>
               <td class="num num-strong">{{ r.AMOUNT | number:'1.2-2' }}</td>
             </tr>
-            <tr *ngIf="ViewLedger.length == 0">
+}
+            @if (ViewLedger.length == 0) {
+<tr>
               <td colspan="6" class="g3-empty">No rows match the filter.</td>
             </tr>
+}
           </tbody>
         </table>
       </div>
     </div>
+}
 
     <!-- ------------------------ CHECK BEFORE FILING ------------------------ -->
-    <div class="br-card br-table-card" *ngIf="ActiveTab=='WARN'">
+    @if (ActiveTab=='WARN') {
+<div class="br-card br-table-card">
       <div class="br-card-header">
         <span class="br-card-title">
           Check Before Filing
@@ -420,9 +466,11 @@
           <ng-select class="g3-ngsel" [items]="Branches" [multiple]="true" [closeOnSelect]="false"
             placeholder="All branches" [(ngModel)]="Filters.WARN.branch"
             (ngModelChange)="refreshAll()"></ng-select>
-          <button class="g3-clear" *ngIf="hasFilter('WARN')" (click)="clearFilter('WARN')">
+          @if (hasFilter('WARN')) {
+<button class="g3-clear" (click)="clearFilter('WARN')">
             <i class="fa fa-times"></i> Clear
           </button>
+}
           <span class="br-record-chip" [class.br-record-chip--warn]="ViewWarn.length > 0">
             {{ ViewWarn.length }} / {{ Warnings.length }}
           </span>
@@ -457,7 +505,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let w of ViewWarn">
+            @for (w of ViewWarn; track w) {
+<tr>
               <td><span class="g3-pill"
                   [ngClass]="w.SEVERITY == 'HIGH' ? 'g3-pill--liab' : 'g3-pill--rcm'">{{ w.ENTRY_TYPE
                   }}</span></td>
@@ -473,29 +522,38 @@
                 {{ w.DIFF | number:'1.2-2' }}</td>
               <td class="g3-detail">{{ w.DETAIL }}</td>
             </tr>
-            <tr *ngIf="ViewWarn.length == 0 && Warnings.length == 0">
+}
+            @if (ViewWarn.length == 0 && Warnings.length == 0) {
+<tr>
               <td colspan="11" class="g3-empty">
                 <i class="fa fa-check-circle" style="color:#059669;"></i>
                 Nothing to review for this period.
               </td>
             </tr>
-            <tr *ngIf="ViewWarn.length == 0 && Warnings.length > 0">
+}
+            @if (ViewWarn.length == 0 && Warnings.length > 0) {
+<tr>
               <td colspan="11" class="g3-empty">No rows match the filter.</td>
             </tr>
+}
           </tbody>
         </table>
       </div>
 
-      <div class="g3-legend" *ngIf="Warnings.length > 0">
+      @if (Warnings.length > 0) {
+<div class="g3-legend">
         <span>Purchase entry has no automatic GST calculation, so the ledger and amount are typed
           by hand. Clear the HIGH rows before filing &ndash; the set-off figures inherit the
           mistakes.</span>
       </div>
+}
     </div>
+}
 
 
     <!-- ------------------------ FILED ARCHIVE ------------------------ -->
-    <div class="br-card br-table-card" *ngIf="ActiveTab=='FILED'">
+    @if (ActiveTab=='FILED') {
+<div class="br-card br-table-card">
 
       <!-- list of filings -->
       <div class="br-card-header">
@@ -504,14 +562,17 @@
           <span class="br-hint">what was filed, kept as proof</span>
         </span>
         <div class="g3-filter">
-          <button class="g3-clear" *ngIf="OpenFiling" (click)="CloseFiling()">
+          @if (OpenFiling) {
+<button class="g3-clear" (click)="CloseFiling()">
             <i class="fa fa-arrow-left"></i> Back to list
           </button>
+}
           <span class="br-record-chip">{{ Filings.length }} FILING</span>
         </div>
       </div>
 
-      <div class="br-table-wrap" *ngIf="!OpenFiling">
+      @if (!OpenFiling) {
+<div class="br-table-wrap">
         <table class="br-table">
           <thead>
             <tr>
@@ -526,7 +587,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let f of Filings">
+            @for (f of Filings; track f) {
+<tr>
               <td class="g3-branch-name">{{ f.FILING_ID }}</td>
               <td>{{ f.PERIOD_FROM }} &ndash; {{ f.PERIOD_TO }}</td>
               <td>{{ f.FILED_BY }}</td>
@@ -544,17 +606,22 @@
                 </button>
               </td>
             </tr>
-            <tr *ngIf="Filings.length == 0">
+}
+            @if (Filings.length == 0) {
+<tr>
               <td colspan="8" class="g3-empty">
                 Nothing filed yet. Search a period and use <b>Mark as Filed</b> to archive it.
               </td>
             </tr>
+}
           </tbody>
         </table>
       </div>
+}
 
       <!-- one filing: transaction-level statement, as filed vs as it stands now -->
-      <div class="br-table-wrap" *ngIf="OpenFiling">
+      @if (OpenFiling) {
+<div class="br-table-wrap">
         <div class="g3-filedbar"
           [ngClass]="OpenFiling.CHANGED_ROWS > 0 ? 'g3-filedbar--changed' : 'g3-filedbar--ok'">
           <b>Filing #{{ OpenFiling.FILING_ID }}</b>
@@ -562,15 +629,19 @@
           &nbsp;|&nbsp; filed by {{ OpenFiling.FILED_BY }} on {{ OpenFiling.FILED_ON }}
           &nbsp;|&nbsp; {{ OpenFiling.FILED_ROWS }} transactions archived
           &nbsp;|&nbsp;
-          <span *ngIf="OpenFiling.CHANGED_ROWS > 0">
+          @if (OpenFiling.CHANGED_ROWS > 0) {
+<span>
             <i class="fa fa-exclamation-triangle"></i>
             <b>{{ OpenFiling.CHANGED_ROWS }} changed since filing</b>
             &nbsp;({{ OpenFiling.AMENDED_ROWS }} amended, {{ OpenFiling.ADDED_ROWS }} added,
             {{ OpenFiling.DELETED_ROWS }} deleted)
           </span>
-          <span *ngIf="OpenFiling.CHANGED_ROWS == 0">
+}
+          @if (OpenFiling.CHANGED_ROWS == 0) {
+<span>
             <i class="fa fa-check-circle"></i> Live data still matches what was filed
           </span>
+}
           <span style="margin-left:auto;">
             <label class="g3-onlychg">
               <input type="checkbox" [(ngModel)]="FilingOnlyChanged" /> differences only
@@ -598,7 +669,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let l of FilingRows" [class.g3-changed]="l.STATUS != 'UNCHANGED'">
+            @for (l of FilingRows; track l) {
+<tr [class.g3-changed]="l.STATUS != 'UNCHANGED'">
               <td><span class="g3-pill"
                   [ngClass]="l.NATURE == 'LIABILITY' ? 'g3-pill--liab' : 'g3-pill--setoff'">{{
                   l.ENTRY_TYPE }}</span></td>
@@ -614,15 +686,19 @@
                 {{ l.DIFFERENCE | number:'1.2-2' }}</td>
               <td [ngClass]="l.STATUS != 'UNCHANGED' ? 'g3-warn-name' : ''">{{ l.STATUS }}</td>
             </tr>
-            <tr *ngIf="FilingRows.length == 0">
+}
+            @if (FilingRows.length == 0) {
+<tr>
               <td colspan="11" class="g3-empty">
                 <i class="fa fa-check-circle" style="color:#059669;"></i>
                 No differences &ndash; live data matches what was filed.
               </td>
             </tr>
+}
           </tbody>
         </table>
       </div>
+}
 
       <div class="g3-legend">
         <span>The archive stores the full transaction-level GST ledger statement as the server
@@ -630,7 +706,9 @@
           Re-filing a period supersedes the earlier archive but never deletes it.</span>
       </div>
     </div>
+}
 
   </div>
+}
 
 </div>

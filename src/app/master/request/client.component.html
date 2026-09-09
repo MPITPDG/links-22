@@ -105,7 +105,9 @@
                     <td>
                         <select class="form-control width150"  [(ngModel)]="city" (change)="Countryfilter($event.target.value,'DOC')">
                             <option value="">Please select</option>
-                            <option *ngFor="let d of Citylist" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+                            @for (d of Citylist; track d) {
+<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+}
                         </select>
                     </td>
                     <td><span class="col-form-span-label"><b>Country</b> </span></td>         
@@ -139,7 +141,9 @@
                         <td>
                             <select class="form-control width150"  [(ngModel)]="city2" (change)="Countryfilter($event.target.value,'INV')">
                                 <option value="">Please select</option>
-                                <option *ngFor="let d of Citylist" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+                                @for (d of Citylist; track d) {
+<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+}
                             </select>
                         </td>
                         <td><span class="col-form-span-label"><b>State</b> </span></td>         
@@ -193,7 +197,8 @@
                         </tr>
                         <tr>
                             <td colspan="4">
-                                <div class="row xyscroll" *ngIf="gstlist.length > 0">
+                                @if (gstlist.length > 0) {
+<div class="row xyscroll">
                                     <table class="table table-responsive-sm table-bordered"> 
                                         <thead>
                                             <tr class="col-form-span-heading">
@@ -203,8 +208,10 @@
                                                 <th class="width100 centerlabel"><span class="col-form-span-label">GST ARN No.</span></th>                                                     
                                             </tr>
                                         </thead>
-                                        <tbody   *ngIf="gstlist.length>0">
-                                            <tr *ngFor="let obj of gstlist">
+                                        @if (gstlist.length>0) {
+<tbody  >
+                                            @for (obj of gstlist; track obj) {
+<tr>
                                                 <td class="centerlabel">
                                                     <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)" ></i>
                                                     &nbsp;
@@ -214,15 +221,19 @@
                                                 <td><span class="col-form-span-label">{{obj.GST_NO}}</span></td>
                                                 <td><span class="col-form-span-label">{{obj.GST_ARNNO}}</span></td>
                                             </tr>
+}
                                         </tbody>
+}
                                     </table>
                                 </div>
+}
                             </td>
                         </tr> 
                         <tr>                    
                             <td colspan="4"  (click)="getcollapse(CHECK,'other')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">OTHER DETAILS</b></span></td>
                         </tr>
-                        <tr *ngIf ="CHECK==true">
+                        @if (CHECK==true) {
+<tr>
                             <td  colspan="4">                                
                                 <table class="table table-bordered table-sm-new bgwhite" >
                                      
@@ -306,11 +317,13 @@
                                         </tr>
                                 </table>
                             </td>
-                        </tr> 
+                        </tr>
+} 
                         <tr>                    
                             <td colspan="4"  (click)="getcollapse(CHECKB,'bank')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">BANK DETAILS</b></span></td>
                         </tr>
-                        <tr *ngIf ="CHECKB==true">                        
+                        @if (CHECKB==true) {
+<tr>                        
                             <td   colspan="4">                                
                                 <table class="table table-bordered table-sm-new bgwhite" >
                                     <tr>                             
@@ -346,11 +359,13 @@
                                     </tr>  
                                 </table>
                             </td>
-                        </tr>  
+                        </tr>
+}  
                         <tr>                    
                             <td colspan="4"  (click)="getcollapse(CHECKC1,'contact1')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">CONTACT 1 DETAILS</b></span></td>
                         </tr>
-                        <tr *ngIf ="CHECKC1==true">                        
+                        @if (CHECKC1==true) {
+<tr>                        
                             <td   colspan="4">                                
                                 <table class="table table-bordered table-sm-new bgwhite" >
                                 <tr>  
@@ -381,13 +396,15 @@
                                 </table>
                             </td>
                         </tr>
+}
                          <!-- <tr class="trheader">
                         <td colspan="4"> <span class="col-form-span-label"><b>  CONTACT 1 DETAILS</b> </span>  </td>
                          </tr> -->
                         <tr>                    
                             <td colspan="4"  (click)="getcollapse(CHECKC2,'contact2')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">CONTACT 2 DETAILS</b></span></td>
                         </tr>
-                        <tr *ngIf ="CHECKC2==true">                        
+                        @if (CHECKC2==true) {
+<tr>                        
                             <td   colspan="4">                                
                                 <table class="table table-bordered table-sm-new bgwhite" >
                                     <tr>  
@@ -417,11 +434,13 @@
                                     </tr>     
                                 </table>
                             </td>
-                        </tr> 
+                        </tr>
+} 
                     <tr>                    
                         <td colspan="4"  (click)="getcollapse(CHECKC3,'contact3')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">CONTACT 3 DETAILS</b></span></td>
                     </tr>
-                    <tr *ngIf ="CHECKC3==true">                        
+                    @if (CHECKC3==true) {
+<tr>                        
                         <td   colspan="4">                                
                             <table class="table table-bordered table-sm-new bgwhite" >
                                 <tr>  
@@ -452,12 +471,14 @@
                             </table>
                         </td>
                     </tr>
+}
             
                       
                     <tr>                    
                         <td colspan="4"  (click)="getcollapse(CHECKC4,'contact4')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">CONTACT 4 DETAILS</b></span></td>
                     </tr>
-                    <tr *ngIf ="CHECKC4==true">                        
+                    @if (CHECKC4==true) {
+<tr>                        
                         <td   colspan="4">                                
                             <table class="table table-bordered table-sm-new bgwhite" >
                                 <tr>  
@@ -488,6 +509,7 @@
                             </table>
                         </td>
                     </tr>
+}
                     <!-- <tr>                    
                         <td colspan="4"  (click)="getcollapse(CHECKC5,'doc')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">DOCUMNET UPLOAD</b></span></td>
                     </tr>
@@ -553,12 +575,14 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                                <tr *ngFor="let obj of citybranchlict; let i = index">                                                        
+                                                @for (obj of citybranchlict; track obj; let i = $index) {
+<tr>                                                        
                                                     <td><span class="col-form-span-label">{{obj.CITYNAME}}</span></td>
                                                     <td><span class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.CLIENTLOC" (change)="chkonchange(obj.CITYCODE,obj.CLIENTLOC,'E')"/> </span></td>
                                                     <td><span class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.CLIENTLOC1" (change)="chkonchange(obj.CITYCODE,obj.CLIENTLOC1,'I')"/></span></td>
                                                     <td><span class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.CLIENTLOC2" (change)="chkonchange(obj.CITYCODE,obj.CLIENTLOC2,'S')"/></span></td>
                                                 </tr>
+}
                                         </tbody>
 
                                     </table>

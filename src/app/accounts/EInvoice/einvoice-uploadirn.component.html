@@ -86,8 +86,10 @@
                     <th   align="center"> <span  class="col-form-span-label">RESPONSE UPDATED BY</span> </th>
                 </tr>
             </thead>
-            <tbody *ngIf="data_table.length > 0">
-                <tr *ngFor="let data of data_table">
+            @if (data_table.length > 0) {
+<tbody>
+                @for (data of data_table; track data) {
+<tr>
                   
                     <td><span  class="col-form-span-label">{{data.INVNO}}</span>  </td>
                     <td><span class="col-form-span-label">{{data.INVDATE}}</span>   </td>
@@ -99,7 +101,9 @@
                     <td><span  class="col-form-span-label">{{ data['JSON CREATED BY']}}</span>  </td>
                     <td><span  class="col-form-span-label">{{ data['RESPONSE UPDATED BY']}}</span>  </td>
                 </tr>
+}
             </tbody>
+}
 
         </table>
     </div>

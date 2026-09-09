@@ -14,11 +14,13 @@
 						<my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="CartingDate"  ></my-date-picker>
 					</td>
 				</tr>
-				<tr class="trbg centerlabel" *ngIf="ErrorMessage != ''">
+				@if (ErrorMessage != '') {
+<tr class="trbg centerlabel">
 					<td colspan="8">
 						<span class="col-form-span-error">{{ErrorMessage}}</span>
 					</td>
 				</tr>
+}
 				<tr class="trbg centerlabel">
 					<td colspan="8">
 						<button type="button" name="submitButton" class="btn btn-l btn-success" (click)="submit();" [disabled]="ErrorMessage != ''" #submitButton>

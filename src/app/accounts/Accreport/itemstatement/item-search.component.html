@@ -1,5 +1,6 @@
 <div class="animated fadeIn" >  
-    <div class="row no-gutters" *ngIf="displayType=='SEARCH'" >
+    @if (displayType=='SEARCH') {
+<div class="row no-gutters" >
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header formheading">
@@ -12,7 +13,9 @@
             </div>
         </div>
     </div>
-    <div class="row no-gutters" *ngIf="displayType=='SEARCH'">
+}
+    @if (displayType=='SEARCH') {
+<div class="row no-gutters">
         <div class="col-sm-12 col-md-3 col-lg-3">
         </div>
         <div class="col-sm-12 col-md-6 col-lg-6 ">
@@ -75,7 +78,9 @@
 
 
     </div>
-    <div class="row no-gutters"  *ngIf="displayType=='LIST'">
+}
+    @if (displayType=='LIST') {
+<div class="row no-gutters" >
         <div class="col-sm-12 col-md-1 col-lg-1">
         </div>
          <div class="col-sm-12 col-md-10 col-lg-10 ">
@@ -125,7 +130,9 @@
     <div class="col-sm-12 col-md-1 col-lg-1">
     </div>
     </div>
-    <div class="row no-gutters"  *ngIf="displayType=='LIST'">
+}
+    @if (displayType=='LIST') {
+<div class="row no-gutters" >
         <div class="col-sm-12 col-md-1 col-lg-1">
         </div>
         <div class="col-sm-12 col-md-10 col-lg-10 ">
@@ -143,8 +150,10 @@
                             <th class="col-form-span-label" align="center">Credit</th>                          
                         </tr>
                     </thead>
-					 <tbody *ngIf="SearchItemdata_list.length > 0">
-                        <tr *ngFor="let data of SearchItemdata_list">
+					 @if (SearchItemdata_list.length > 0) {
+<tbody>
+                        @for (data of SearchItemdata_list; track data) {
+<tr>
                             <td  style="width: 30px;"><span  class="col-form-span-label" >{{data.TRANSTYPE}}</span> </td> 
                              <td  style="width: 130px;"><span   class="col-form-span-label anchor-link " (click)="Openprint(data.TRANSCODE,data.TRANSTYPE)" >{{data.TRANSCODE}}</span> </td> 
                              <td  style="width: 90px;"><span  class="col-form-span-label">{{data.TRANSDATE}}</span> </td>
@@ -155,7 +164,9 @@
                             <td  style="width: 100px;"><span class="col-form-span-label">{{data.DRAMT}}</span>  </td>                             
                             <td  style="width: 100px;"><span class="col-form-span-label">{{data.CRAMT}}</span>  </td>
                         </tr>
+}
                     </tbody>
+}
                 </table>
             </div>
              
@@ -163,7 +174,8 @@
         <div class="col-sm-12 col-md-1 col-lg-1">
         </div>
      
-    </div>  
+    </div>
+}  
   
 </div>
 <div class="modal" [style.display]="showModal_Advance ? 'block' : 'none'">
@@ -213,13 +225,15 @@
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  <tr *ngFor="let data of AdvanceTable">
+                                  @for (data of AdvanceTable; track data) {
+<tr>
                                     <td class="col-form-span-label">{{data.transtype}}</td>
                                     <td class="col-form-span-label">{{data.Transcode}}</td>
                                     <td class="col-form-span-label">{{data.Transdate}}</td>
                                     <td class="col-form-span-label">{{data.exp_sname}},{{data.sup_sname}},{{data.acctname}}</td>
                                     <td class="col-form-span-label">{{data.cramt|number:'2.2-4'}}</td>
                                   </tr>
+}
                                 </tbody>
                               </table>
                              <!-- KC <div style="float: center;"> -->

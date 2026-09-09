@@ -7,26 +7,33 @@
 		</div>
 	</div>
 </div>
-<div class="row" *ngIf="setLoader==0">
+@if (setLoader==0) {
+<div class="row">
 	<div class="col-sm-12 centerlabel">
 		<img src="assets/img/loading.gif" /><br />
 		<span class="col-form-span-label">Please wait until Pre-Alert send !</span>
 	</div>
 </div>
-<div class="row" *ngIf="setLoader==1">
+}
+@if (setLoader==1) {
+<div class="row">
 	<div class="col-sm-12 centerlabel">
 		<img src="assets/img/loading.gif" /><br />
 		<span class="col-form-span-label">Pre-Alert Send Successfully. Please wait for Details.........</span>
 	</div>
 </div>
-<div class="row" *ngIf="setLoader==2">
+}
+@if (setLoader==2) {
+<div class="row">
 	<div class="col-sm-12 centerlabel">
 		<span class="col-form-span-label">Timeout Error.........</span>
 	</div>
 </div>
+}
 <div class="row">
 	<div class="col-sm-12">
-		<div class="row y350heightscroll" *ngIf="consoleList.length > 0">
+		@if (consoleList.length > 0) {
+<div class="row y350heightscroll">
 			<table class="table table-bordered table-sm-new bgwhite">
 				<thead>
 					<tr class="title-head table-darkgreen-main">
@@ -42,7 +49,8 @@
 					</tr>
 				</thead>
 				<tbody>
-					<ng-container *ngFor="let objCon of consoleList; let i=index">
+					@for (objCon of consoleList; track objCon; let i = $index) {
+
 						<tr>
 							<!-- <td><span class="col-form-span-label"><strong>{{i + 1}})</strong></span></td> -->
 							<td><span class="col-form-span-label"><b>{{objCon.CONSOLENO}}</b></span></td>
@@ -72,8 +80,10 @@
 										</tr>
 									</thead>
 									<tbody>
-										<ng-container *ngFor="let objJob of jobList">
-											<tr *ngIf="objJob.JOB_CONSOLENO == objCon.CONSOLENO">
+										@for (objJob of jobList; track objJob) {
+
+											@if (objJob.JOB_CONSOLENO == objCon.CONSOLENO) {
+<tr>
 												<td><span class="col-form-span-label"><b>{{objJob.JOBNO}}</b></span></td>
 												<td><span class="col-form-span-label">{{objJob.HAWBNO}}</span></td>
 												<td><span class="col-form-span-label">{{objJob.HAWBDT}}</span></td>
@@ -84,6 +94,7 @@
 												<td><span class="col-form-span-label">{{objJob.EXPOTER}}</span></td>
 												<td><span class="col-form-span-label">{{objJob.EXPTNO}}</span></td>
 											</tr>
+}
 											<tr>
 												<td>&nbsp;</td>
 												<td colspan="8">
@@ -95,31 +106,40 @@
 															</tr>
 														</thead>
 														<tbody>
-															<ng-container *ngFor="let objOrder of orderList">
-																<tr *ngIf="objJob.JOB_CONSOLENO == objOrder.ORDER_CONSOLENO">
+															@for (objOrder of orderList; track objOrder) {
+
+																@if (objJob.JOB_CONSOLENO == objOrder.ORDER_CONSOLENO) {
+<tr>
 																	<td><span class="col-form-span-label">{{objOrder.ORDERNO}}</span></td>
 																	<td><span class="col-form-span-label">{{objOrder.NOOFPCS}}</span></td>
 																</tr>
-															</ng-container>
+}
+															
+}
 														</tbody>
 													</table>
 												</td>
 											</tr>
-										</ng-container>
+										
+}
 									</tbody>
 								</table>
 							</td>
 						</tr>
-					</ng-container>
+					
+}
 				</tbody>
 			</table>
 		</div>
+}
 	</div>
 </div>
-<div class="row" *ngIf="consoleList.length > 0">
+@if (consoleList.length > 0) {
+<div class="row">
 	<div class="col-sm-12 centerlabel">
 		<button (click)="exitClick()" class="btn btn-sm btn-danger">
 			Exit&nbsp;<i class="fa fa-share-square"></i>
 		</button>
 	</div>
 </div>
+}

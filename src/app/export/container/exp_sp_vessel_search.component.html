@@ -35,7 +35,9 @@
 								<td colspan="3">								 
 									<select class="form-control width250" [(ngModel)]="vslcmpName" [disabled]="vsllist != '2'">
 										<option value="-1">Please select</option>
-										<option *ngFor="let d of vessel" value={{d.VALUEFILED}}>{{d.VSLNAME}}</option>
+										@for (d of vessel; track d) {
+<option value={{d.VALUEFILED}}>{{d.VSLNAME}}</option>
+}
 									</select>
 								</td>
 							</tr>
@@ -46,7 +48,8 @@
 								</td>	
 							</tr>
 						</table>
-						<table class="table table-bordered table-sm-new bgwhite" *ngIf="this.vesselSearch.length>1">
+						@if (this.vesselSearch.length>1) {
+<table class="table table-bordered table-sm-new bgwhite">
 								<thead>
 									<tr class="col-form-span-heading" style="white-space:nowrap;">
 										<th class="col-form-span-label">Vessel det</th>
@@ -56,7 +59,8 @@
 									</tr>
 								</thead>
 								<tbody class="bgwhite">
-									<tr *ngFor="let prtAgt of this.vesselSearch">
+									@for (prtAgt of this.vesselSearch; track prtAgt) {
+<tr>
 										<td><span class="col-form-span-label anchor-link" (click)="ListOnclick(prtAgt.VSL_RTNO,prtAgt.PORT)"
 												style="cursor:pointer;">{{prtAgt.VSLNAME}}</span></td>
 				
@@ -64,8 +68,10 @@
 										<td class="col-form-span-label">{{prtAgt.ETD}}</td>
 									   
 									</tr>
+}
 								</tbody>
 							</table>
+}
 						
 					</div>
 				</div>

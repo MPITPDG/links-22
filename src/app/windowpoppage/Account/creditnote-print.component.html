@@ -1,4 +1,5 @@
-<div class="printmain" *ngIf="printmodal">
+@if (printmodal) {
+<div class="printmain">
     <div id="demo">
       <table bordercolor="black" height="764" cellspacing="0" cellpadding="2" width="100%" border="0">
         <tbody>
@@ -277,18 +278,28 @@
                             <td id="tdCharges" align="center" colspan="3">
                               <table cellspacing="0" cellpadding="0" width="100%" border="0" class="Rpt_Label_content">
                                 <tbody>
-                                  <tr *ngFor="let data2 of chargestable">
+                                  @for (data2 of chargestable; track data2) {
+<tr>
                                     <td width="1px"></td>
                                     <td width="560px" valign="top">{{data2.CHRG_DESC1}} </td>
-                                    <td width="70px" style="BORDER-LEFT: 1px solid" align="right" valign="bottom" *ngIf="(inrtype=='0')" >
+                                    @if ((inrtype=='0')) {
+<td width="70px" style="BORDER-LEFT: 1px solid" align="right" valign="bottom" >
                                       {{data2.TAXABLE_AMT_INR|number:'2.2-4'}}&nbsp;</td>
-                                      <td width="70px" style="BORDER-LEFT: 1px solid" align="right" valign="bottom" *ngIf="(inrtype=='1')" >
+}
+                                      @if ((inrtype=='1')) {
+<td width="70px" style="BORDER-LEFT: 1px solid" align="right" valign="bottom" >
                                         {{data2.TAXABLEAMT |number:'2.2-4'}}&nbsp;</td>
-                                        <td width="70px" style="BORDER-LEFT: 1px solid" align="right" valign="bottom" *ngIf="(inrtype=='0')" >
+}
+                                        @if ((inrtype=='0')) {
+<td width="70px" style="BORDER-LEFT: 1px solid" align="right" valign="bottom" >
                                           {{data2.NON_TAXABLE_AMT_INR |number:'2.2-4'}}&nbsp;</td>
-                                          <td width="70px" style="BORDER-LEFT: 1px solid" align="right" valign="bottom" *ngIf="(inrtype=='1')" >
+}
+                                          @if ((inrtype=='1')) {
+<td width="70px" style="BORDER-LEFT: 1px solid" align="right" valign="bottom" >
                                             {{data2.NONTAXABLEAMT |number:'2.2-4'}}&nbsp;</td>
+}
                                   </tr>
+}
                                 </tbody>
                               </table>
                             </td>
@@ -349,20 +360,29 @@
                     </td>
                     <td style="border-top: black 1px solid; border-left: black 1px solid; border-bottom: black 3px solid"
                       align="right" width="70" height="25">
-                      <span class="Rpt_Label_content" style="display:inline-block;width:100%;"  *ngIf="(inrtype=='1')" >{{datatable6[0].TAXAMT|number:'2.2-4'}}</span>
-                      <span class="Rpt_Label_content" style="display:inline-block;width:100%;"  *ngIf="(inrtype=='0')" >{{datatable6[0].TAXAMT_INR|number:'2.2-4'}}</span>
+                      @if ((inrtype=='1')) {
+<span class="Rpt_Label_content" style="display:inline-block;width:100%;"  >{{datatable6[0].TAXAMT|number:'2.2-4'}}</span>
+}
+                      @if ((inrtype=='0')) {
+<span class="Rpt_Label_content" style="display:inline-block;width:100%;"  >{{datatable6[0].TAXAMT_INR|number:'2.2-4'}}</span>
+}
   
                      
               
                     </td>
                     <td style="border-top: black 1px solid; border-left: black 1px solid; border-bottom: black 3px solid"
                       align="right" width="69" height="25">
-                      <span class="Rpt_Label_content" style="display:inline-block;width:100%;"  *ngIf="(inrtype=='1')" >{{datatable6[0].NONTAXABLEAMT|number:'2.2-4'}}</span>
-                      <span class="Rpt_Label_content" style="display:inline-block;width:100%;"  *ngIf="(inrtype=='0')" >{{datatable6[0].NONTAXABLEAMT_INR|number:'2.2-4'}}</span>
+                      @if ((inrtype=='1')) {
+<span class="Rpt_Label_content" style="display:inline-block;width:100%;"  >{{datatable6[0].NONTAXABLEAMT|number:'2.2-4'}}</span>
+}
+                      @if ((inrtype=='0')) {
+<span class="Rpt_Label_content" style="display:inline-block;width:100%;"  >{{datatable6[0].NONTAXABLEAMT_INR|number:'2.2-4'}}</span>
+}
   
                     </td>
                   </tr>
-                  <tr *ngFor="let data of gsttable">
+                  @for (data of gsttable; track data) {
+<tr>
                     <td id="tdTaxableAmt" style="border-bottom: black 1px solid" nowrap="nowrap" colspan="2">
                       <table cellspacing="0" cellpadding="0" width="100%" border="0" class="Rpt_Label_content">
                         <tbody>
@@ -381,10 +401,14 @@
                           <tr>
                             <td width="1px"></td>
                              
-                            <td width="559px"  align="right" valign="top"   *ngIf="(inrtype=='1')">
+                            @if ((inrtype=='1')) {
+<td width="559px"  align="right" valign="top"  >
                               {{data.TAXABLEAMT|number:'2.2-4'}}</td>
-                              <td width="559px"  align="right" valign="top"   *ngIf="(inrtype=='0')">
-                                {{data.TAXABLEAMTINR|number:'2.2-4'}}</td>  
+}
+                              @if ((inrtype=='0')) {
+<td width="559px"  align="right" valign="top"  >
+                                {{data.TAXABLEAMTINR|number:'2.2-4'}}</td>
+}  
                          
                           </tr>
                         </tbody>
@@ -397,9 +421,13 @@
                         <tbody>
                           <tr>
                             <td width="1px"></td>
-                            <td width="359px"  align="right" valign="top"   *ngIf="(inrtype=='1')"></td>
+                            @if ((inrtype=='1')) {
+<td width="359px"  align="right" valign="top"  ></td>
+}
                               <!-- {{data.TOTCRT_AMOUNT|number:'2.2-4'}}</td> -->
-                              <td width="359px"  align="right" valign="top"   *ngIf="(inrtype=='0')"></td>
+                              @if ((inrtype=='0')) {
+<td width="359px"  align="right" valign="top"  ></td>
+}
                                 <!-- {{data.TOTCRT_INRAMT|number:'2.2-4'}}</td>  -->
                        
                           </tr>
@@ -408,6 +436,7 @@
                     </td>
   
                   </tr>
+}
                   <tr  style="border-top: black 3px solid">
                     <td style="border-bottom: black 1px solid" align="left" width="630" colspan="3">
                       <span class="Rpt_Label_content">Amount Rounded off</span>
@@ -421,8 +450,12 @@
                       <span class="Rpt_Label_content">{{sum_words}} </span>
                     </td>
                     <td style="border-left: black 1px solid; border-bottom: black 1px solid" align="right" width="69">
-                      <span class="Rpt_Label_content"  style="display:inline-block;width:100%;"  *ngIf="(inrtype=='1')">{{datatable4[0].TOTAMT |number:'2.2-4'}}</span>
-                      <span class="Rpt_Label_content"  style="display:inline-block;width:100%;"  *ngIf="(inrtype=='0')">{{datatable4[0].TOTINRAMT |number:'2.2-4'}}</span>
+                      @if ((inrtype=='1')) {
+<span class="Rpt_Label_content"  style="display:inline-block;width:100%;" >{{datatable4[0].TOTAMT |number:'2.2-4'}}</span>
+}
+                      @if ((inrtype=='0')) {
+<span class="Rpt_Label_content"  style="display:inline-block;width:100%;" >{{datatable4[0].TOTINRAMT |number:'2.2-4'}}</span>
+}
 
                     </td>
                   </tr>
@@ -469,7 +502,8 @@
                     <td valign="top">
                       <table id="tbl_Despatch" class="Rpt_Label_content" style="font-size: 7pt" cellspacing="0"
                         cellpadding="1" width="90%" border="0">
-                        <tr *ngFor="let data of dispatchtable">
+                        @for (data of dispatchtable; track data) {
+<tr>
                           <td style="border-bottom: black 1px solid" width="45%">
                             <span class="Rpt_Label_content">{{data.inv_desc}}</span>
                           </td>
@@ -477,6 +511,7 @@
                             <span class="Rpt_Label_content">{{data.inv_number}} </span>
                           </td>
                         </tr>
+}
   
                       </table>
                     </td>
@@ -583,6 +618,7 @@
       </div>
     </div>
   </div>
+}
   
   <div class="modal" [style.display]="showModal ? 'block' : 'none'">
     <table style="width: 250px; height: 88px; text-align: center" cellspacing="1" cellpadding="1" width="250"

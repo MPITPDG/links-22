@@ -61,7 +61,9 @@
                 <td colspan="3">
                 <select class="form-control width500"  [(ngModel)]="OurBank" (change)="GetOurBankName($event)" >
                     <option value="0">Please select</option>
-                    <option *ngFor="let d of OurBankList"  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+                    @for (d of OurBankList; track d) {
+<option  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+}
                 </select>
             </td>
             </tr>
@@ -115,7 +117,9 @@
                 <td>
                  <select class="form-control width150"  [(ngModel)]="Department" (change)="GetDepartmentName($event)" >
                     <option value="0">Please select</option>
-                    <option *ngFor="let d of Departmentlist"  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                    @for (d of Departmentlist; track d) {
+<option  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 
                 </select>
 
@@ -168,7 +172,8 @@
             <tr>
                  <td colspan="4" > style="width:615px;" -->
                     <div class="row xyscroll" style="width:715px;"   >
-                        <table class="table table-responsive-sm table-bordered" *ngIf="Accountlist.length>0" >
+                        @if (Accountlist.length>0) {
+<table class="table table-responsive-sm table-bordered" >
                             <thead>
                                 <tr class="bakgrdliteBlue">
                                     <th  class="col-form-span-label font-weight-bold headerwhite" ></th>
@@ -184,7 +189,8 @@
                                 </tr>
                             </thead>
                              <tbody   >
-                                <tr *ngFor="let obj of Accountlist">
+                                @for (obj of Accountlist; track obj) {
+<tr>
                                     <td class="centerlabel">
                                         <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)" ></i>
                                         &nbsp;
@@ -200,8 +206,10 @@
                                     <td><span class="col-form-span-label">{{obj.DEPARTMENT}}</span></td>
                                     <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
                                 </tr>
+}
                             </tbody>
                         </table>
+}
                    </div>
                  <!-- </td>
             </tr>
@@ -254,7 +262,8 @@
                                     </thead>
                                     <tbody >
                                        
-                                        <tr *ngFor="let obj of ListBill ">
+                                        @for (obj of ListBill ; track obj) {
+<tr>
                                             <td class="col-form-span-label">
                                                 <input type="checkbox" [(ngModel)]="obj.CHECKED" [id]="i" [value]="i"
                                                     (ngModelChange)="getCheckboxValues($event,obj.INV_NO,obj.INV_JOBNO,obj.TOTALAMT,obj.CLIENT)">
@@ -266,6 +275,7 @@
                                             <td class="col-form-span-label"> <input [(ngModel)]="obj.NARRATION"  type="text" maxlenght="40"  class="form-control width150" ></td> -->
 
                                         </tr>
+}
                                     </tbody>
                                 </td>
                             </tr>

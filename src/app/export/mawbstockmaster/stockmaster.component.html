@@ -47,7 +47,9 @@
                       <td colspan="4">
                         <select class="form-control width400"  [(ngModel)]="iataagent" [disabled]='disable_iataagent' >
                             <option value="">Please select</option>
-                            <option *ngFor="let i of iataagentlist" value={{i.DATAVALUEFIELD}}>{{i.DATATEXTFIELD}}</option>
+                            @for (i of iataagentlist; track i) {
+<option value={{i.DATAVALUEFIELD}}>{{i.DATATEXTFIELD}}</option>
+}
                         </select>
                     </td>
                     </tr>
@@ -56,7 +58,9 @@
                         <td colspan="4">
                             <select class="form-control width400"  [(ngModel)]="airline"  [disabled]='disable_airline'  (change)="getAirlinecodee(airline);" >
                                 <option value="">Please select</option>
-                                <option *ngFor="let a of airlinelist" value={{a.DATAVALUEFIELD}}>{{a.DATATEXTFIELD}}</option>
+                                @for (a of airlinelist; track a) {
+<option value={{a.DATAVALUEFIELD}}>{{a.DATATEXTFIELD}}</option>
+}
                             </select>
                              </td>
                         </tr>
@@ -83,7 +87,9 @@
                         <td >
                             <select class="form-control width120" [(ngModel)]="Type">
                                 <option  value="">Please select</option>
-                                <option *ngFor="let c of typelist" value={{c.CODE}}>{{c.SNAME}}</option>
+                                @for (c of typelist; track c) {
+<option value={{c.CODE}}>{{c.SNAME}}</option>
+}
                             </select>
                         </td>
                     </tr>

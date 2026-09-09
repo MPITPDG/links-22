@@ -86,7 +86,9 @@
                         <td>
                             <select class="form-control width150"  [(ngModel)]="city2" (change)="Countryfilter($event.target.value,'INV')">
                                 <option value="">Please select</option>
-                                <option *ngFor="let d of Citylist" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+                                @for (d of Citylist; track d) {
+<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+}
                             </select>
                         </td>
                         <td><span class="col-form-span-label"><b>State</b> </span></td>         
@@ -147,7 +149,8 @@
                         </tr>
                         <tr>
                             <td colspan="4">
-                                <div class="row xyscroll" *ngIf="gstlist.length > 0">
+                                @if (gstlist.length > 0) {
+<div class="row xyscroll">
                                     <table class="table table-responsive-sm table-bordered"> 
                                         <thead>
                                             <tr class="col-form-span-heading">
@@ -157,8 +160,10 @@
                                                 <th class="width100 centerlabel"><span class="col-form-span-label">GST ARN No.</span></th>                                                     
                                             </tr>
                                         </thead>
-                                        <tbody   *ngIf="gstlist.length>0">
-                                            <tr *ngFor="let obj of gstlist">
+                                        @if (gstlist.length>0) {
+<tbody  >
+                                            @for (obj of gstlist; track obj) {
+<tr>
                                                 <td class="centerlabel">
                                                     <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)" ></i>
                                                     &nbsp;
@@ -168,9 +173,12 @@
                                                 <td><span class="col-form-span-label">{{obj.GST_NO}}</span></td>
                                                 <td><span class="col-form-span-label">{{obj.GST_ARNNO}}</span></td>
                                             </tr>
+}
                                         </tbody>
+}
                                     </table>
                                 </div>
+}
                             </td>
                         </tr> 
                         <!-- TDS  -->
@@ -180,18 +188,23 @@
                             </td>
                         </tr>
                         
-                            <tr *ngIf="(queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ') 
-                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ')">   
+                            @if ((queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ') 
+                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ')) {
+<tr>   
                                 <td><span class="col-form-span-label"><b>Section</b> </span><span class="col-form-span-error">*</span></td>         
                                 <td>  <select class="form-control width150"  [(ngModel)]="sections" >
                                     <option value="">Please select</option>
-                                    <option *ngFor="let d of Sectionlist" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+                                    @for (d of Sectionlist; track d) {
+<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+}
                                 </select>  </td> 
                                 <!-- <td><span class="col-form-span-label"><b>Base % Rate</b> </span></td>         
                                 <td>  <input [(ngModel)]="secRate" type="text"    class="form-control width50" OnlyNumber="true"  > </td>          -->
                             </tr>
-                            <tr *ngIf="(queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ')
-                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ')">
+}
+                            @if ((queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ')
+                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ')) {
+<tr>
                                <td><span class="col-form-span-label"><b>From Date</b> </span></td>        
                                 <td> 
                                     <my-date-picker name="frmdt" [options]="myDatePickerOptions" [(ngModel)]="frmdt" required></my-date-picker>
@@ -201,8 +214,10 @@
                                     <my-date-picker name="todt" [options]="myDatePickerOptions" [(ngModel)]="todt" required></my-date-picker>
                                 </td>         
                             </tr>
-                            <tr *ngIf="(queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ')
-                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ') ">   
+}
+                            @if ((queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ')
+                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ') ) {
+<tr>   
                                 <td><span class="col-form-span-label"><b>TDS Type</b> </span></td>         
                                 <td>    <select class="form-control width150"  [(ngModel)]="tdstype"  (change)="EnableLDSRate($event.target.value)"   >
                                     <option value="">Please Select</option>	
@@ -215,27 +230,34 @@
                                 <td>  <input [(ngModel)]="secRate" type="text"    class="form-control width50" OnlyNumber="true"  > </td>                           
                              
                             </tr>
-                            <tr *ngIf="(queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ')
-                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ')"> 
+}
+                            @if ((queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ')
+                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ')) {
+<tr> 
                                 <td><span class="col-form-span-label"><b>LDC % Rate</b> </span></td>         
                                 <td>  <input [(ngModel)]="ldcRate" type="text" [disabled]='disableldcrate'   class="form-control width50" OnlyNumber="true"  > </td>         
                                 <td><span class="col-form-span-label"><b>Amount Limit</b> </span></td>         
                                 <td>  <input [(ngModel)]="tdsLimit" type="text" OnlyNumber="true"   class="form-control width100"  [disabled]='disablelimitamt' > </td>  
                                
                             </tr>
-                            <tr *ngIf="(queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ')
-                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ')"> 
+}
+                            @if ((queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ')
+                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ')) {
+<tr> 
                             <td><span class="col-form-span-label"><b>Company</b> </span></td>    
                             <td>
                                 <select class="form-control width250"  [(ngModel)]="Company"  [disabled]='disablecompany' >
                                     <option value="">Please select</option>
-                                    <option *ngFor="let d of CompanyList" value={{d.CMP_CODE}}>{{d.CMP_NAME}}</option>
+                                    @for (d of CompanyList; track d) {
+<option value={{d.CMP_CODE}}>{{d.CMP_NAME}}</option>
+}
                                 </select> 
                                </td>
                                 <td><span class="col-form-span-label"><b>Certificate No.</b> </span></td>         
                                 <td>  <input [(ngModel)]="LdccertNo" type="text" OnlyNumber="true"   class="form-control width100"  [disabled]='disablecertno' > </td>  
                                
                             </tr>
+}
                                                         <!-- <tr>                             
                                 <td><span class="col-form-span-label"><b>TDS Type</b> </span></td>         
                                 <td>    <select class="form-control width150"  [(ngModel)]="tdstype"  >
@@ -246,16 +268,19 @@
                                     
                                 </select></td>  
                             </tr> -->
-                            <tr *ngIf="(queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ')
-                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ')">
+                            @if ((queryParamsReqType=='TEMP' && quryParamsSupCode!= ' ') || (queryParamsReqType==' ' && quryParamsSupCode== ' ')
+                            || (queryParamsReqType==' ' && quryParamsSupCode!= ' ')) {
+<tr>
                                 <td colspan="4"  class="centerlabel">                                
                                     <button class="btn btn-sm btn-success" type="submit" (click)="AddTDScildrcrd()"> <span class="col-form-span-label"><i class="fa fa-plus" ></i> {{txtchildTDS}}</span></button>
                                     <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="ResetTDScildrcrd();"><i class="fa fa-ban"></i> Reset</span></button>
                                 </td>
                             </tr>
+}
                             <tr>
                                 <td colspan="4">
-                                    <div class="row xyscroll" style="overflow-y: auto; width:715px" *ngIf="TdsList.length > 0">
+                                    @if (TdsList.length > 0) {
+<div class="row xyscroll" style="overflow-y: auto; width:715px">
 
                                         
                                         <table class="table table-responsive-sm table-bordered"> 
@@ -273,8 +298,10 @@
                                                     <th class="width100 centerlabel"><span class="col-form-span-label">COMPANY</span></th>                                                                                                        
                                                 </tr>
                                             </thead>
-                                            <tbody   *ngIf="TdsList.length>0">
-                                                <tr *ngFor="let obj of TdsList">
+                                            @if (TdsList.length>0) {
+<tbody  >
+                                                @for (obj of TdsList; track obj) {
+<tr>
                                                     <td class="centerlabel">
                                                         <i class="fa fa-pencil" (click)="EDIT_Tds(obj.PKID)" ></i>
                                                         <!-- &nbsp;
@@ -290,9 +317,12 @@
                                                     <td><span class="col-form-span-label">{{obj.LDCCERTNO }}</span></td>
                                                     <td><span class="col-form-span-label">{{obj.CMP_NAME }}</span></td>
                                                 </tr>
+}
                                             </tbody>
+}
                                         </table>
                                     </div>
+}
                                 </td>
                             </tr> 
 
@@ -300,7 +330,8 @@
                         <tr>                    
                             <td colspan="4"  (click)="getcollapse(CHECKC1,'contact1')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">CONTACT 1 DETAILS</b></span></td>
                         </tr>
-                        <tr *ngIf ="CHECKC1==true">                        
+                        @if (CHECKC1==true) {
+<tr>                        
                             <td   colspan="4">                                
                                 <table class="table table-bordered table-sm-new bgwhite" >
                                 <tr>  
@@ -331,11 +362,13 @@
                                 </table>
                             </td>
                         </tr>
+}
                        
                         <tr>                    
                             <td colspan="4"  (click)="getcollapse(CHECKC2,'contact2')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">CONTACT 2 DETAILS</b></span></td>
                         </tr>
-                        <tr *ngIf ="CHECKC2==true">                        
+                        @if (CHECKC2==true) {
+<tr>                        
                             <td   colspan="4">                                
                                 <table class="table table-bordered table-sm-new bgwhite" >
                                     <tr>  
@@ -365,11 +398,13 @@
                                     </tr>     
                                 </table>
                             </td>
-                        </tr> 
+                        </tr>
+} 
                     <tr>                    
                         <td colspan="4"  (click)="getcollapse(CHECKC3,'contact3')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">CONTACT 3 DETAILS</b></span></td>
                     </tr>
-                    <tr *ngIf ="CHECKC3==true">                        
+                    @if (CHECKC3==true) {
+<tr>                        
                         <td   colspan="4">                                
                             <table class="table table-bordered table-sm-new bgwhite" >
                                 <tr>  
@@ -400,12 +435,14 @@
                             </table>
                         </td>
                     </tr>
+}
             
                       
                     <tr>                    
                         <td colspan="4"  (click)="getcollapse(CHECKC4,'contact4')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">CONTACT 4 DETAILS</b></span></td>
                     </tr>
-                    <tr *ngIf ="CHECKC4==true">                        
+                    @if (CHECKC4==true) {
+<tr>                        
                         <td   colspan="4">                                
                             <table class="table table-bordered table-sm-new bgwhite" >
                                 <tr>  
@@ -436,6 +473,7 @@
                             </table>
                         </td>
                     </tr>
+}
                     <tr class="trheader">
                         <td  colspan="4"><span class="col-form-span-label"><b>SHIPMENT DETAILS</b> </span> </td>
                     </tr> 
@@ -478,11 +516,13 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                                <tr *ngFor="let obj of citybranchlict; let i = index">                                                        
+                                                @for (obj of citybranchlict; track obj; let i = $index) {
+<tr>                                                        
                                                     <td colspan="3"><span class="col-form-span-label">{{obj.CITYNAME}}</span></td>
                                                     <td><span class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.CLIENTLOC" (change)="chkonchange(obj.CITYCODE,obj.CLIENTLOC)"/> </span></td>
                                                     
                                                 </tr>
+}
                                         </tbody>
 
                                     </table>

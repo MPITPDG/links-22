@@ -74,30 +74,42 @@
                         </td>
 
                         <td>
-                             <label *ngIf="shipmode=='SEA'" for="client" class="form-label">Shipping Line</label>
-                              <span *ngIf="shipmode=='SEA'" class="col-form-span-error">*</span>
-                               <label *ngIf="shipmode=='AIR'" for="client" class="form-label">Air Line</label>
+                             @if (shipmode=='SEA') {
+<label for="client" class="form-label">Shipping Line</label>
+}
+                              @if (shipmode=='SEA') {
+<span class="col-form-span-error">*</span>
+}
+                               @if (shipmode=='AIR') {
+<label for="client" class="form-label">Air Line</label>
+}
                             <!-- <span *ngIf="shipmode=='SEA'" class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Shipping Line</span> -->
                             <!-- <span *ngIf="shipmode=='SEA'" class="col-form-span-error">*</span> -->
                              <!-- <span *ngIf="shipmode=='AIR'" class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Air Line</span> -->
-                             <span *ngIf="shipmode=='AIR'" class="col-form-span-error">*</span>
+                             @if (shipmode=='AIR') {
+<span class="col-form-span-error">*</span>
+}
                         
                         </td>
                         <td class="liner-td">
-                            <ng-select *ngIf="shipmode=='SEA'" [items]="linertable"
+                            @if (shipmode=='SEA') {
+<ng-select [items]="linertable"
                                 bindLabel="DATATEXTVALUE"
                                 bindValue="DATAVALUE"
                                 [(ngModel)]="liner"
                                 class="custom rounded-pill  fixed-select liner-select"
                                 placeholder="--Please Select Shipping Line--">
                             </ng-select>
-                             <ng-select *ngIf="shipmode=='AIR'" [items]="airlinetable"
+}
+                             @if (shipmode=='AIR') {
+<ng-select [items]="airlinetable"
                                 bindLabel="DATATEXTVALUE"
                                 bindValue="DATAVALUE"
                                 [(ngModel)]="airline"
                                 class="custom rounded-pill  fixed-select liner-select"
                                 placeholder="--Please Select Airline Line--">
                             </ng-select>
+}
                         </td>
                     </tr>
                     <!-- <tr>
@@ -178,7 +190,8 @@
                     </tr>
                  
 
-                      <tr *ngIf="shipmode=='AIR'">
+                      @if (shipmode=='AIR') {
+<tr>
                         <td>
                             <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Volume</span><span class="col-form-span-error">*</span> -->
                             <label for="volume" class="form-label">Volume</label>
@@ -196,7 +209,9 @@
                         </td>
                                      
                     </tr>
-                     <tr *ngIf="shipmode=='AIR'">
+}
+                     @if (shipmode=='AIR') {
+<tr>
                         <td>
                             <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Ch Weight</span><span class="col-form-span-error">*</span> -->
                             <label for="chweight" class="form-label">Ch Weight</label>
@@ -214,6 +229,7 @@
                         </td>
                                      
                     </tr>
+}
 
 
                        <tr>
@@ -230,11 +246,14 @@
                                 placeholder="--Please Select Incoterm--">
                             </ng-select>
                         </td>
-                        <td *ngIf="shipmode=='SEA'" >
+                        @if (shipmode=='SEA') {
+<td >
                             <!-- <span class="col-form-span-label fw-semibold text-dark" style="font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif; font-size: 1rem;">Load Type</span><span class="col-form-span-error">*</span> -->
                             <label for="loadtype" class="form-label">Load Type</label>
                         </td>
-                        <td *ngIf="shipmode=='SEA'">
+}
+                        @if (shipmode=='SEA') {
+<td>
                             <ng-select [items]="containerloadtypetable"
                                 bindLabel="DATATEXTVALUE"
                                 bindValue="DATAVALUE"
@@ -243,6 +262,7 @@
                                 placeholder="--Please Select Load Type--">
                              </ng-select>
                         </td>
+}
                         
                     
                     </tr>
@@ -606,7 +626,8 @@
       </thead>
 
       <tbody>
-        <tr *ngFor="let obj of chargesdetails; index as i" class=    "border-bottom">
+        @for (obj of chargesdetails; track obj; let i = $index) {
+<tr class=    "border-bottom">
           <td class="text-center width100">
             <i class="fa fa-pencil text-primary cursor-pointer" (click)="Editchildrecd(obj)"></i> &nbsp;
             <i class="fa fa-trash text-primary cursor-pointer" (click)="Deletechildrecd(obj.PKID,obj.QUOTDTLID)"></i>
@@ -627,6 +648,7 @@
           <td class="label text-start">{{ obj.CUR_SNAME }}</td>
           <td class="label text-end">{{ obj.RATE }}</td>
           <td class="label text-end"> {{ obj.MIN_RATE }} </td>   </tr>
+}
       </tbody>
     </table>
   </td>

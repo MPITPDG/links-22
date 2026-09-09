@@ -12,7 +12,8 @@
             </div>
         </div>
     </div>
-    <div class="row no-gutters"  *ngIf="displayType=='SEARCH'">
+    @if (displayType=='SEARCH') {
+<div class="row no-gutters" >
         <div class="col-sm-12 col-md-3 col-lg-3">
         </div>
         <div class="col-sm-12 col-md-6 col-lg-6 ">
@@ -61,6 +62,7 @@
         <div class="col-sm-12 col-md-3 col-lg-3">
         </div>
     </div>
+}
     <!-- <div class="row no-gutters" *ngIf="displayType=='LIST'" style="overflow-y: auto; height:532px; ">
 
         <div class="col-sm-12 col-md-12 col-lg-12">
@@ -175,7 +177,8 @@
         </div>
 
     </div> -->
-    <main *ngIf="reconcildataList.length >= 1">
+    @if (reconcildataList.length >= 1) {
+<main>
         <div class="row no-gutters">
 
             <!-- <div class="col-sm-12 col-md-1 col-lg-1"> </div> -->
@@ -238,8 +241,10 @@
 
                                             </tr>
                                         </thead>
-                                        <tbody *ngIf="reconcildataList.length > 0">
-                                            <tr *ngFor="let data of reconcildataList" >
+                                        @if (reconcildataList.length > 0) {
+<tbody>
+                                            @for (data of reconcildataList; track data) {
+<tr >
                                                 <td  ><span  class="col-form-span-label" >{{data.BANKREFNO}}</span> </td>
                                                  <td  ><span   class="col-form-span-label">{{data.DEPOSIT}}</span> </td>
                                                  <td  ><span  class="col-form-span-label">{{data.WITHDRAWAL}}</span> </td>
@@ -254,7 +259,9 @@
                                                  <td  ><span class="col-form-span-label">{{data.DEDUCTION|number:'2.2-4'}}</span>  </td>
                                                 <td ><span class="col-form-span-label">{{data.CLEARANCEDT}}</span>  </td>
                                             </tr>
+}
                                         </tbody>
+}
                                     </table>
                      </div>
                   </div>
@@ -295,8 +302,10 @@
 
                                     </tr>
                                 </thead>
-                                <tbody *ngIf="unreconcildataList.length > 0">
-                                    <tr *ngFor="let data of unreconcildataList" >
+                                @if (unreconcildataList.length > 0) {
+<tbody>
+                                    @for (data of unreconcildataList; track data) {
+<tr >
                                         <td ><span  class="col-form-span-label" >{{data.BANKREFNO}}</span> </td>
                                          <td ><span   class="col-form-span-label ">{{data.DEPOSIT}}</span> </td>
                                          <td ><span  class="col-form-span-label">{{data.WITHDRAWAL}}</span> </td>
@@ -310,7 +319,9 @@
                                          <td  ><span class="col-form-span-label">{{data.DEDUCTION|number:'2.2-4'}}</span>  </td>
                                         <td ><span class="col-form-span-label">{{data.CLEARANCEDT}}</span>  </td>
                                     </tr>
+}
                                 </tbody>
+}
                             </table>
                         </div>
                     </div>
@@ -324,4 +335,5 @@
         </div>
 
     </main>
+}
 </div>

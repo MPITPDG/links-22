@@ -4,7 +4,8 @@
   <!-- SEARCH -->
   <!-- ========================================================= -->
 
-  <div class="br-card search-card-clean" *ngIf="!showResult">
+  @if (!showResult) {
+<div class="br-card search-card-clean">
     <div class="clean-row-layout">
 
       <!-- BANK ACCOUNT -->
@@ -68,12 +69,14 @@
 
     </div>
   </div>
+}
 
   <!-- ========================================================= -->
   <!-- RESULT -->
   <!-- ========================================================= -->
 
-  <div *ngIf="showResult" class="br-result-view">
+  @if (showResult) {
+<div class="br-result-view">
 
     <!-- RECONCILIATION SUMMARY -->
 
@@ -83,7 +86,9 @@
 
         <div class="recon-title-group">
           <span class="recon-schedule-title">Bank Reconciliation Statement</span>
-          <span class="recon-meta" *ngIf="OurBankName">{{ OurBankName }}</span>
+          @if (OurBankName) {
+<span class="recon-meta">{{ OurBankName }}</span>
+}
           <span class="recon-meta">{{ FromDate }} – {{ ToDate }}</span>
         </div>
 
@@ -173,7 +178,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let data of bankpayList">
+            @for (data of bankpayList; track data) {
+<tr>
               <td class="mono">
                 <a href="javascript:void(0);" class="anchor-link" (click)="Openprint(data.ENTRYNO,data.STATUS)">{{ data.ENTRYNO }}</a>
               </td>
@@ -185,9 +191,12 @@
               <td class="mono">{{ data.CHEQUEDT || '—' }}</td>
               <td class="num dr-amt">{{ data.ACTUALAMOUNT | number:'1.2-2' }}</td>
             </tr>
-            <tr *ngIf="bankpayList.length === 0">
+}
+            @if (bankpayList.length === 0) {
+<tr>
               <td colspan="6" class="text-center text-muted">Nothing outstanding for this period</td>
             </tr>
+}
           </tbody>
         </table>
       </div>
@@ -219,7 +228,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let data of bankrecList">
+            @for (data of bankrecList; track data) {
+<tr>
               <td class="mono">
                 <a href="javascript:void(0);" class="anchor-link" (click)="Openprint(data.ENTRYNO,data.STATUS)">{{ data.ENTRYNO }}</a>
               </td>
@@ -231,9 +241,12 @@
               <td class="mono">{{ data.CHEQUEDT || '—' }}</td>
               <td class="num cr-amt">{{ data.ACTUALAMOUNT | number:'1.2-2' }}</td>
             </tr>
-            <tr *ngIf="bankrecList.length === 0">
+}
+            @if (bankrecList.length === 0) {
+<tr>
               <td colspan="6" class="text-center text-muted">Nothing outstanding for this period</td>
             </tr>
+}
           </tbody>
         </table>
       </div>
@@ -259,5 +272,6 @@
     </div>
 
   </div>
+}
 
 </div>

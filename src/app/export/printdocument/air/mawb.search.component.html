@@ -26,12 +26,16 @@
 				<td >
 					<select class="form-control width250"   [(ngModel)]="AirLine" >
 						<option value="0">Please select</option>
-						<option *ngFor="let d of AirLineList" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+						@for (d of AirLineList; track d) {
+<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+}
 
 					</select>
 				</td>
 				<td class="width300">
-					<span class="col-form-span-error" *ngIf="error == 1">Please select AirLine*</span>
+					@if (error == 1) {
+<span class="col-form-span-error">Please select AirLine*</span>
+}
 				</td>
 			</tr>
 			<!-- <tr class="title-head trbg">
@@ -58,8 +62,12 @@
 					<input type="text" [(ngModel)]="mawbno" class="form-control width120"  [OnlyNumber]="true" [maxlength]="11" />
 				</td>
 				<td class="width300">
-					<span class="col-form-span-error" *ngIf="error == 2">Please enter Mawb Number*</span>
-					<span class="col-form-span-error" *ngIf="error == 3">Invalid Mawb Number*</span>
+					@if (error == 2) {
+<span class="col-form-span-error">Please enter Mawb Number*</span>
+}
+					@if (error == 3) {
+<span class="col-form-span-error">Invalid Mawb Number*</span>
+}
 				</td>
 			</tr>
 			<tr class="title-head trbg">
@@ -70,7 +78,9 @@
 					<my-date-picker name="mawbdate" [options]="myDatePickerOptions" [(ngModel)]="mawbdate"></my-date-picker>
 				</td>
 				<td class="width300">
-					<span class="col-form-span-error" *ngIf="error == 4">Mawb date can not blank*</span>
+					@if (error == 4) {
+<span class="col-form-span-error">Mawb date can not blank*</span>
+}
 				</td>
 			</tr>
 			<tr class="title-head trbg">

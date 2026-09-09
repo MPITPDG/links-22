@@ -8,12 +8,14 @@
         </div>-->
 		<div class="selectormodule open">
 			<ul>
-				<li *ngFor="let obj of moduleData" [ngStyle]="obj.listyle">
+				@for (obj of moduleData; track obj) {
+<li [ngStyle]="obj.listyle">
 					<label for="{{ 'c'+ obj.id}}"  [ngStyle]="obj.labelstyle" (click)="modules(obj.moduleid, obj.url)">
 						<i class="{{obj.icon}}"></i><br />
 						<b><u>{{obj.name}}</u></b>
 					</label>
 				</li>
+}
 			</ul>
 			<button>MODULES</button>
 		</div>

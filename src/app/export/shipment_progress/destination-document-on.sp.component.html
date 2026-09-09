@@ -9,12 +9,15 @@
 					<td colspan="8"><span class="col-form-span-label"><b>DESTINATION DOCUMENTS DETAILS</b></span></td>
 				</tr>
 			</table>
-			<table class="table table-bordered table-sm-new" *ngIf="docRecdList.length>0">
+			@if (docRecdList.length>0) {
+<table class="table table-bordered table-sm-new">
 				<tr class="trbg">
 					<td colspan="8"><span class="col-form-span-label"><b>DOCUMENTS RECEIVED</b></span></td>
 				</tr>
 			</table>
-			<table class="table table-bordered table-sm-new" *ngIf="docRecdList.length>0">
+}
+			@if (docRecdList.length>0) {
+<table class="table table-bordered table-sm-new">
 				<thead>
 					<tr class="trbg">
 						<th class="width100"><span class="col-form-span-label"></span></th>
@@ -23,19 +26,23 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let obj of docRecdList">
+					@for (obj of docRecdList; track obj) {
+<tr>
 						<td class="width100"><span class="col-form-span-label">{{obj.DOCCODE}}</span></td>
 						<td><span class="col-form-span-label">{{obj.DOCUMENT}}</span></td>
 						<td><span class="col-form-span-label">{{obj.RECDDT}}</span></td>
 					</tr>
+}
 				</tbody>
 			</table>
+}
 			<table class="table table-bordered table-sm-new">
 				<tr class="trbg">
 					<td colspan="8"><span class="col-form-span-label"><b>OTHER DOCUMENTS</b></span></td>
 				</tr>
 			</table>
-			<table class="table table-bordered table-sm-new" *ngIf="mainList.length>0">
+			@if (mainList.length>0) {
+<table class="table table-bordered table-sm-new">
 				<thead>
 					<tr class="trbg">
 						<th class="width100"><span class="col-form-span-label"></span></th>
@@ -46,7 +53,8 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let obj of mainList">
+					@for (obj of mainList; track obj) {
+<tr>
 						<td class="width100"><span class="col-form-span-label">{{obj.DOCCODE}}</span></td>
 						<td colspan="3"><span class="col-form-span-label">{{obj.DOCUMENT}}</span></td>
 						<td class="centerlabel">
@@ -68,14 +76,19 @@
 							</span>
 						</td>
 					</tr>
+}
 				</tbody>
 			</table>
-			<table class="table table-bordered table-sm-new" *ngIf="IsDocumentSent">
+}
+			@if (IsDocumentSent) {
+<table class="table table-bordered table-sm-new">
 				<tr class="trbg">
 					<td colspan="8"><span class="col-form-span-label"><b>DOCUMENT SENT TO CONSIGNEE</b></span></td>
 				</tr>
 			</table>
-			<table class="table table-bordered table-sm-new" *ngIf="IsDocumentSent">
+}
+			@if (IsDocumentSent) {
+<table class="table table-bordered table-sm-new">
 				<tr>
 					<td class="width150"><span class="col-form-span-label">Date</span></td>
 					<td colspan="3">
@@ -93,12 +106,15 @@
 					</td>
 				</tr>
 			</table>
+}
 			<table class="table table-bordered table-sm-new">
-				<tr class="trbg centerlabel" *ngIf="ErrorMessage != ''">
+				@if (ErrorMessage != '') {
+<tr class="trbg centerlabel">
 					<td colspan="8">
 						<span class="col-form-span-error">{{ErrorMessage}}</span>
 					</td>
 				</tr>
+}
 				<tr class="trbg centerlabel">
 					<td colspan="8">
 						<button type="button" name="submitButton" class="btn btn-l btn-success" (click)="submit();" [disabled]="ErrorMessage != ''" #submitButton>

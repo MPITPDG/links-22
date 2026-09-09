@@ -4,14 +4,17 @@
   <!-- SEARCH -->
   <!-- ========================================================= -->
 
-  <div class="br-card search-card-clean" *ngIf="!Searched">
+  @if (!Searched) {
+<div class="br-card search-card-clean">
     <div class="clean-row-layout">
 
       <!-- BRANCH -->
       <div class="clean-field clean-branch">
         <label>Branch <span class="br-req">*</span></label>
         <select class="form-control" name="Branch" [(ngModel)]="Branch">
-          <option *ngFor="let b of BranchList" value="{{b.CITYCODE1}}">{{b.CITYNAME}}</option>
+          @for (b of BranchList; track b) {
+<option value="{{b.CITYCODE1}}">{{b.CITYNAME}}</option>
+}
         </select>
       </div>
 
@@ -46,12 +49,14 @@
 
     </div>
   </div>
+}
 
   <!-- ========================================================= -->
   <!-- RESULT -->
   <!-- ========================================================= -->
 
-  <div *ngIf="Searched" class="br-result-view">
+  @if (Searched) {
+<div class="br-result-view">
 
     <!-- TOP BAR -->
 
@@ -59,7 +64,9 @@
 
       <div class="br-topbar-title">
         <span class="pl-title">{{ Header }}</span>
-        <span class="pl-meta" *ngIf="cmpnyname">{{ cmpnyname }}</span>
+        @if (cmpnyname) {
+<span class="pl-meta">{{ cmpnyname }}</span>
+}
       </div>
 
       <div class="br-topbar-right">
@@ -75,7 +82,8 @@
 
     <!-- SUMMARY STRIP -->
 
-    <div class="br-card recon-schedule" *ngIf="Summary">
+    @if (Summary) {
+<div class="br-card recon-schedule">
 
       <div class="recon-topline">
 
@@ -120,6 +128,7 @@
       </div>
 
     </div>
+}
 
     <!-- LIABILITIES / ASSETS (two-column drill-down) -->
 
@@ -147,23 +156,27 @@
                 </tr>
               </thead>
               <tbody>
-                <ng-container *ngFor="let r of Liabilities">
+                @for (r of Liabilities; track r) {
+
 
                   <tr
                     [ngClass]="IsTotalRow(r) ? 'pl-total-row' : 'pl-grp-row'"
                     (click)="Toggle(r)">
                     <td>
-                      <i
+                      @if (!IsTotalRow(r)) {
+<i
                         class="fa pl-chevron"
-                        *ngIf="!IsTotalRow(r)"
+                       
                         [ngClass]="IsExpanded(r) ? 'fa-minus-square-o' : 'fa-plus-square-o'">
                       </i>
+}
                       {{ r.GROUPNAME }}
                     </td>
                     <td class="num" [ngClass]="r.AMOUNT < 0 ? 'less' : ''">{{ r.AMOUNT | number:'1.2-2' }}</td>
                   </tr>
 
-                  <tr *ngIf="IsExpanded(r)" class="pl-ledger-row">
+                  @if (IsExpanded(r)) {
+<tr class="pl-ledger-row">
                     <td colspan="2">
                       <div class="pl-ledger-wrap">
                         <table class="br-table pl-ledger-table">
@@ -178,7 +191,8 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr *ngFor="let l of GetLedgers(r)">
+                            @for (l of GetLedgers(r); track l) {
+<tr>
                               <td>
                                 <a href="javascript:void(0)" class="anchor-link" (click)="OpenLedger(l)" title="Open Ledger Statement">
                                   {{ l.CODE }}
@@ -194,13 +208,16 @@
                               <td class="num cr-amt">{{ l.CUR_CR | number:'1.2-2' }}</td>
                               <td class="num" [ngClass]="l.CLOSING < 0 ? 'less' : ''">{{ l.CLOSING | number:'1.2-2' }}</td>
                             </tr>
+}
                           </tbody>
                         </table>
                       </div>
                     </td>
                   </tr>
+}
 
-                </ng-container>
+                
+}
               </tbody>
             </table>
           </div>
@@ -230,23 +247,27 @@
                 </tr>
               </thead>
               <tbody>
-                <ng-container *ngFor="let r of Assets">
+                @for (r of Assets; track r) {
+
 
                   <tr
                     [ngClass]="IsTotalRow(r) ? 'pl-total-row' : 'pl-grp-row'"
                     (click)="Toggle(r)">
                     <td>
-                      <i
+                      @if (!IsTotalRow(r)) {
+<i
                         class="fa pl-chevron"
-                        *ngIf="!IsTotalRow(r)"
+                       
                         [ngClass]="IsExpanded(r) ? 'fa-minus-square-o' : 'fa-plus-square-o'">
                       </i>
+}
                       {{ r.GROUPNAME }}
                     </td>
                     <td class="num" [ngClass]="r.AMOUNT < 0 ? 'less' : ''">{{ r.AMOUNT | number:'1.2-2' }}</td>
                   </tr>
 
-                  <tr *ngIf="IsExpanded(r)" class="pl-ledger-row">
+                  @if (IsExpanded(r)) {
+<tr class="pl-ledger-row">
                     <td colspan="2">
                       <div class="pl-ledger-wrap">
                         <table class="br-table pl-ledger-table">
@@ -261,7 +282,8 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr *ngFor="let l of GetLedgers(r)">
+                            @for (l of GetLedgers(r); track l) {
+<tr>
                               <td>
                                 <a href="javascript:void(0)" class="anchor-link" (click)="OpenLedger(l)" title="Open Ledger Statement">
                                   {{ l.CODE }}
@@ -277,13 +299,16 @@
                               <td class="num cr-amt">{{ l.CUR_CR | number:'1.2-2' }}</td>
                               <td class="num" [ngClass]="l.CLOSING < 0 ? 'less' : ''">{{ l.CLOSING | number:'1.2-2' }}</td>
                             </tr>
+}
                           </tbody>
                         </table>
                       </div>
                     </td>
                   </tr>
+}
 
-                </ng-container>
+                
+}
               </tbody>
             </table>
           </div>
@@ -294,12 +319,14 @@
     </div>
 
   </div>
+}
 
   <!-- ========================================================= -->
   <!-- LEDGER STATEMENT POPUP -->
   <!-- ========================================================= -->
 
-  <div class="pl-overlay" *ngIf="ShowLedger" (click)="CloseLedger()">
+  @if (ShowLedger) {
+<div class="pl-overlay" (click)="CloseLedger()">
     <div
       class="br-card pl-modal"
       (click)="$event.stopPropagation()"
@@ -334,11 +361,14 @@
 
       <div class="pl-modal-body">
 
-        <div class="pl-loading" *ngIf="LedgerLoading">
+        @if (LedgerLoading) {
+<div class="pl-loading">
           <i class="fa fa-spinner fa-spin"></i> Loading Ledger Statement ...
         </div>
+}
 
-        <table class="br-table pl-ledger-table" *ngIf="!LedgerLoading">
+        @if (!LedgerLoading) {
+<table class="br-table pl-ledger-table">
           <thead>
             <tr>
               <th>Date</th>
@@ -350,12 +380,15 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngIf="LedgerSummary" class="pl-summary-row">
+            @if (LedgerSummary) {
+<tr class="pl-summary-row">
               <td colspan="4">OPENING BALANCE</td>
               <td class="num">{{ LedgerSummary.OPBAL >= 0 ? (LedgerSummary.OPBAL | number:'1.2-2') : '' }}</td>
               <td class="num">{{ LedgerSummary.OPBAL < 0 ? (LedgerSummary.OPBAL * -1 | number:'1.2-2') : '' }}</td>
             </tr>
-            <tr *ngFor="let t of LedgerRows">
+}
+            @for (t of LedgerRows; track t) {
+<tr>
               <td>{{ t.TRANSDATE }}</td>
               <td>{{ t.TRANSTYPE }}</td>
               <td>{{ t.TRANSCODE }}</td>
@@ -363,22 +396,29 @@
               <td class="num dr-amt">{{ t.DRAMT | number:'1.2-2' }}</td>
               <td class="num cr-amt">{{ t.CRAMT | number:'1.2-2' }}</td>
             </tr>
-            <tr class="pl-summary-row" *ngIf="LedgerSummary">
+}
+            @if (LedgerSummary) {
+<tr class="pl-summary-row">
               <td colspan="4">CURRENT TOTAL</td>
               <td class="num">{{ LedgerSummary.TLDR | number:'1.2-2' }}</td>
               <td class="num">{{ LedgerSummary.TLCR | number:'1.2-2' }}</td>
             </tr>
-            <tr class="pl-summary-row" *ngIf="LedgerSummary">
+}
+            @if (LedgerSummary) {
+<tr class="pl-summary-row">
               <td colspan="4">CLOSING BALANCE</td>
               <td class="num">{{ LedgerSummary.CLBAL >= 0 ? (LedgerSummary.CLBAL | number:'1.2-2') : '' }}</td>
               <td class="num">{{ LedgerSummary.CLBAL < 0 ? (LedgerSummary.CLBAL * -1 | number:'1.2-2') : '' }}</td>
             </tr>
+}
           </tbody>
         </table>
+}
 
       </div>
 
     </div>
   </div>
+}
 
 </div>

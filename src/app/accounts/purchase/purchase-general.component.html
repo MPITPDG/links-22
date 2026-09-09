@@ -77,8 +77,10 @@
                     <td colspan="3">
                         <select class="form-control" [(ngModel)]="billaddress" [disabled]='disablesupplieraddr'>
                             <option value="">Please select</option>
-                            <option *ngFor="let d of billaddressfilter" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}
+                            @for (d of billaddressfilter; track d) {
+<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}
                             </option>
+}
                         </select>
                     </td>
                 </tr>
@@ -276,7 +278,8 @@
                 <tr style="height: 150px;">
                     <td colspan="4">
                         <div class="row xyscroll" style="overflow-y: auto; width:720px">
-                            <table class="table table-responsive-sm table-bordered" *ngIf="Accountlist.length>0">
+                            @if (Accountlist.length>0) {
+<table class="table table-responsive-sm table-bordered">
                                 <thead>
                                     <tr class="bakgrdliteBlue">
                                         <th class="col-form-span-label"></th>
@@ -292,8 +295,10 @@
 
                                     </tr>
                                 </thead>
-                                <tbody *ngIf="Accountlist.length>0">
-                                    <tr *ngFor="let obj of Accountlist">
+                                @if (Accountlist.length>0) {
+<tbody>
+                                    @for (obj of Accountlist; track obj) {
+<tr>
                                         <td class="centerlabel">
                                             <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)"></i>
                                             &nbsp;
@@ -311,15 +316,22 @@
                                         <td><span class="col-form-span-label">{{obj.SRPIPASSAMOUNT}}</span></td>
                                         <td><span class="col-form-span-label">{{obj.ITEM}}</span></td>
                                         <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
-                                        <td><span *ngIf="obj.CLIENT=='G100741'" class="col-form-span-label" [innerHtml]="obj.NARRATION"></span>
-                                            <span *ngIf="obj.CLIENT!='G100741'" class="col-form-span-label">{{obj.NARRATION}}</span></td>
+                                        <td>@if (obj.CLIENT=='G100741') {
+<span class="col-form-span-label" [innerHtml]="obj.NARRATION"></span>
+}
+                                            @if (obj.CLIENT!='G100741') {
+<span class="col-form-span-label">{{obj.NARRATION}}</span>
+}</td>
 
                                       <!--   <td style="width:200px; " class="col-form-span-label">
                                             <p    style="white-space: pre-wrap;width: 200px; " > {{obj.NARRATION}}</p>
                                         </td> -->
                                     </tr>
+}
                                 </tbody>
+}
                             </table>
+}
                         </div>
                     </td>
                 </tr>
@@ -382,7 +394,8 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr *ngFor="let obj of MAWABlist,let i = index">
+                                            @for (obj of MAWABlist; track obj; let i = $index) {
+<tr>
                                                 <td class="centerlabel">
                                                     <input type="checkbox" (checked)="obj.Select == true" [disabled]="obj.Disabled == true"
                                                     (click)="validate(obj.AEROBILLNO)" />
@@ -411,6 +424,7 @@
                                             <td> <input [(ngModel)]="obj.MISCHARGE" type="text" class="form-control"
                                                 [disabled]="obj.Disabled == true" OnlyNumber="true"> </td>
                                             </tr>
+}
                                         </tbody>
                                     </table>
                                 </div>
@@ -512,7 +526,8 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                           <tr *ngFor="let obj of TDSList ">
+                                           @for (obj of TDSList ; track obj) {
+<tr>
                                             <td class="col-form-span-label">
                                                 <input type="checkbox" [(ngModel)]="obj.Checked" [id]="i" [value]="i" [disabled]="obj.Disabled"
                                                      (ngModelChange)="getCheckedTDSData($event,obj.TDSACCTID,obj.RATE,obj.TDSAMOUNT,obj.AMOUNT,obj.ITEMCODE,obj.NARRATION,obj.RATETYPE,obj.LDCRATE,obj.ACCTID,obj.OFFLAG)">
@@ -530,6 +545,7 @@
 
 
                                         </tr>
+}
 
 
                         </tbody>
@@ -553,10 +569,12 @@
                                              </tr>
                                         </thead>
                                         <tbody>
-                                            <tr *ngFor="let obj of TotalTDSList ">
+                                            @for (obj of TotalTDSList ; track obj) {
+<tr>
                                              <td class="col-form-span-label"><b>{{obj.SECTIONNAME}}</b></td>
                                              <td class="col-form-span-label"><b>{{obj.TOTTDSAMOUNT}}</b></td>
                                          </tr>
+}
                                          </tbody>
                                     </td>
                                 </tr>

@@ -89,7 +89,9 @@
                         <td>
                             <select class="form-control width120" [(ngModel)]="origin">
                                 <option value="">--Please Select--</option>
-                                <option *ngFor="let d of origintable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+                                @for (d of origintable; track d) {
+<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+}
                             </select>
                         </td>
                      </tr>
@@ -100,8 +102,10 @@
                         <td>
                             <select class="form-control width120" [(ngModel)]="shipmode">
                                 <option value="">--Please Select --</option>
-                                <option *ngFor="let d of shpmodetable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                                @for (d of shpmodetable; track d) {
+<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
                                 </option>
+}
                             </select>
                         </td>
                         <td><span class="col-form-span-label"><b>Shipment Type </b> </span><span
@@ -110,8 +114,10 @@
                     <td>
                         <select class="form-control width120" [(ngModel)]="shiptype">
                             <option value="">--Please Select --</option>
-                            <option *ngFor="let d of shipmentable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                            @for (d of shipmentable; track d) {
+<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
                             </option>
+}
                         </select>
                     </td>
                     </tr> 
@@ -122,7 +128,9 @@
                         <td colspan="3">
                             <select class="form-control" [(ngModel)]="company">
                                 <option value="">--Please Select--</option>
-                                <option *ngFor="let d of compnytable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+                                @for (d of compnytable; track d) {
+<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+}
                             </select>
                         </td>
                     </tr>
@@ -133,7 +141,9 @@
                         <td colspan="3">
                             <select class="form-control" [(ngModel)]="liner">
                                 <option value="">--Please Select--</option>
-                                <option *ngFor="let d of linertable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+                                @for (d of linertable; track d) {
+<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+}
                             </select>
                         </td>
                     </tr>
@@ -179,7 +189,9 @@
                 <td >
                     <select class="form-control" [(ngModel)]="pol">
                         <option value="">--Please Select--</option>
-                        <option *ngFor="let d of commoncities" value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
+                        @for (d of commoncities; track d) {
+<option value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
+}
                     </select>
                      </td>
                 <td><span class="col-form-span-label"><b>Pod </b> </span><span
@@ -188,7 +200,9 @@
             <td >
                 <select class="form-control" [(ngModel)]="pod">
                     <option value="">--Please Select--</option>
-                    <option *ngFor="let d of commoncities" value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
+                    @for (d of commoncities; track d) {
+<option value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
+}
                 </select>
             </td>
                     </tr>
@@ -212,8 +226,10 @@
                         <td colspan="3">
                             <select class="form-control width230" [(ngModel)]="chngetype">
                                 <option value="">--Please Select--</option>
-                                <option *ngFor="let d of chngetypetable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                                @for (d of chngetypetable; track d) {
+<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
                                 </option>
+}
                             </select>
                         </td>
                         
@@ -241,8 +257,10 @@
                         <td >
                             <select class="form-control width120" [(ngModel)]="currency">
                                 <option value="">--Please Select Currency--</option>
-                                <option *ngFor="let d of currencytable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                                @for (d of currencytable; track d) {
+<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
                                 </option>
+}
 
                             </select>
                         </td>
@@ -264,7 +282,9 @@
                         <td colspan="3" >
                             <select class="form-control width150" [(ngModel)]="unit">
                                 <option value="">--Please Select Unit--</option>
-                                <option *ngFor="let d of unitabel" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+                                @for (d of unitabel; track d) {
+<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+}
                             </select>
                         </td>
 
@@ -288,7 +308,9 @@
                                     <thead>
                                         <tr class="title-head formheading">
                                             <th class="col-form-span-label"></th>
-                                            <th *ngIf="visible=='1'" class="col-form-span-label">Index</th>
+                                            @if (visible=='1') {
+<th class="col-form-span-label">Index</th>
+}
                                             <th class="col-form-span-label">Charge name</th>
                                             <th class="col-form-span-label">Unit</th>
                                             <th class="col-form-span-label">Currency</th>
@@ -296,19 +318,25 @@
                                             <th class="col-form-span-label">Min Rate</th>
                                         </tr>
                                     </thead>
-                                    <tbody *ngIf="chargesdetails.length>0">
-                                        <tr *ngFor="let obj of chargesdetails;index as i">
+                                    @if (chargesdetails.length>0) {
+<tbody>
+                                        @for (obj of chargesdetails; track obj; let i = $index) {
+<tr>
                                             <td class="centerlabel">
                                                 <i class="fa fa-pencil" (click)="Editchildrecd(obj)"></i>
                                             </td>
-                                            <td *ngIf="visible=='1'"><span class="col-form-span-label">{{i}}</span></td>
+                                            @if (visible=='1') {
+<td><span class="col-form-span-label">{{i}}</span></td>
+}
                                             <td><span class="col-form-span-label">{{obj.chrg_desc}}</span></td>
                                             <td><span class="col-form-span-label">{{obj.STR_TEXT}}</span></td>
                                             <td><span class="col-form-span-label">{{obj.CUR_SNAME}}</span></td>
                                             <td><span class="col-form-span-label">{{obj.RATE}}</span></td>
                                             <td><span class="col-form-span-label">{{obj.MIN_RATE}}</span></td>
                                         </tr>
+}
                                     </tbody>
+}
                                 </table>
                             </div>
                         </td>

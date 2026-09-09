@@ -1,7 +1,8 @@
 ﻿<br />
 <!-- <div class="row y350heightscroll" *ngIf="searchList.length > 0"> commented to remove height -->
 
-	<div  *ngIf="searchList.length > 0">
+	@if (searchList.length > 0) {
+<div >
 	<table class="table table-bordered table-striped table-sm-new bgwhite">
 		<thead>
 			<tr class="title-head formheading">
@@ -17,7 +18,8 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr *ngFor="let obj of searchList">
+			@for (obj of searchList; track obj) {
+<tr>
 				<td class="centerlabel">
 					<input type="checkbox" (checked)="obj.SELECT == true" [disabled]="obj.Disabled == true"   (click)="validate(obj.MODEOFSHIP,obj.EXPTNO)" />
 				</td>
@@ -30,9 +32,11 @@
 				<td><span class="col-form-span-label">{{obj.PCS}}</span></td>
 				<td><span class="col-form-span-label">{{obj.MODEOFSHIP}}</span></td>
 			</tr>
+}
 		</tbody>
 	</table>
 </div>
+}
 <div class="row">
 	<div class="col-sm-12 right-text">
 		<br />

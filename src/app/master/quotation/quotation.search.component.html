@@ -141,8 +141,12 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header ">
-                    <strong *ngIf="displayType=='SEARCH'">Quotation Search</strong>
-                    <strong *ngIf="displayType=='LIST'">Quotation List</strong>
+                    @if (displayType=='SEARCH') {
+<strong>Quotation Search</strong>
+}
+                    @if (displayType=='LIST') {
+<strong>Quotation List</strong>
+}
                       <div style="float: right;">
         <a href="javascript:void(0);" 
            (click)="displayType='SEARCH'; quotationlist=[]"
@@ -155,7 +159,8 @@
             </div>
         </div>
     </div>
-<div class="row justify-content-center" *ngIf="displayType=='SEARCH'">
+@if (displayType=='SEARCH') {
+<div class="row justify-content-center">
   <div class="col-md-6">
 
     <div class="search-card shadow rounded bg-white p-3">
@@ -263,7 +268,9 @@
 
   </div>
 </div>
-<div class="row justify-content-center" *ngIf="displayType=='LIST'">
+}
+@if (displayType=='LIST') {
+<div class="row justify-content-center">
 
   <div class="col-md-12">
 
@@ -284,7 +291,8 @@
           </thead>
 
           <tbody>
-            <tr *ngFor="let obj of quotationlist | paginate: config">
+            @for (obj of quotationlist | paginate: config; track obj) {
+<tr>
               <td>
                 <span class="anchor-link text-primary fw-semibold"
                       (click)="ListOnclick(obj.PK_QUOTID,obj.QUOT_CODE,obj.SHIP_MODE)">
@@ -298,10 +306,15 @@
               <td>{{obj.SHIP_TYPE}}</td>
 
               <td>
-                <span *ngIf="obj.SHIP_MODE=='SEA'">{{obj.SHIPPINGLINE}}</span>
-                <span *ngIf="obj.SHIP_MODE=='AIR'">{{obj.AIRLINENAME}}</span>
+                @if (obj.SHIP_MODE=='SEA') {
+<span>{{obj.SHIPPINGLINE}}</span>
+}
+                @if (obj.SHIP_MODE=='AIR') {
+<span>{{obj.AIRLINENAME}}</span>
+}
               </td>
             </tr>
+}
           </tbody>
         </table>
       </div>
@@ -311,4 +324,5 @@
   </div>
 
 </div>
+}
 

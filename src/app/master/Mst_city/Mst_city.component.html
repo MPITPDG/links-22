@@ -32,7 +32,9 @@
                     <td> 
                         <select class="form-control width180"  [(ngModel)]="drpcity_country">
                             <option value="">Please select</option>
-                            <option *ngFor="let d of Countrylist" value={{d.country_name}}>{{d.country_name}}</option>
+                            @for (d of Countrylist; track d) {
+<option value={{d.country_name}}>{{d.country_name}}</option>
+}
                         </select>
                     </td> 
                     
@@ -40,9 +42,11 @@
                 <tr>
                     <!-- <td><span class="col-form-span-label"><b></b> </span></td>          -->
                     <td colspan="2" class="" > 
-                        <div *ngFor="let data of Transpoints" class="col-form-span-label ">
+                        @for (data of Transpoints; track data) {
+<div class="col-form-span-label ">
                                 <input type="checkbox" class="centerlabel" (change)="onChange(data.Transpoint, $event.target.checked)"   > {{data.Transpoint}}<br>
                         </div>
+}
                         <!-- <input  type="checkbox"  [(ngModel)]="chkcity"   >  -->
                     </td> 
                 </tr>

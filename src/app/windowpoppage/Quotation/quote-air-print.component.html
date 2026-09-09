@@ -78,9 +78,15 @@
             </div>
             <div class="summary-item">
               <!-- <img *ngIf="shipmode=='SEA'" src="assets/icons/ship-icon.svg" alt="Ship Mode" class="ship-icon-image"> -->
-                <i *ngIf="shipmode=='SEA'" class="fa fa-ship"></i> &nbsp; 
-                <span *ngIf="shipmode=='SEA'" class="label">Ocean:</span>
-                 <span *ngIf="shipmode=='AIR'" class="fa fa-air">Air:</span>
+                @if (shipmode=='SEA') {
+<i class="fa fa-ship"></i>
+} &nbsp; 
+                @if (shipmode=='SEA') {
+<span class="label">Ocean:</span>
+}
+                 @if (shipmode=='AIR') {
+<span class="fa fa-air">Air:</span>
+}
                 <span class="value">{{ocean}}</span>
             </div>
             <div class="summary-item ">
@@ -104,8 +110,9 @@
         </tr>
       </thead>
       <tbody>
-      <tr
-  *ngFor="let item of quotdtltable; let i = index"
+      @for (item of quotdtltable; track item; let i = $index) {
+<tr
+ 
   [ngClass]="{
     'charge-group-divider': item.CHARGENAME === 'TOTAL',
     'charge-header-row': item.CHARGETYPEHEADER === 'ORIGIN' || item.CHARGETYPEHEADER === 'DESTINATION' || item.CHARGETYPEHEADER === 'PICKUP' || item.CHARGETYPEHEADER === 'OCEANFREIGHT' || item.CHARGETYPEHEADER === 'DELIVERY' 
@@ -122,10 +129,12 @@
     >
         {{ item.CHARGENAME }} 
         
-        <span 
-            *ngIf="item.CHARGENAME !== 'ORIGIN CHARGES' && item.CHARGENAME !== 'DESTINATION CHARGES' && item.CHARGENAME !== 'TOTAL'" 
+        @if (item.CHARGENAME !== 'ORIGIN CHARGES' && item.CHARGENAME !== 'DESTINATION CHARGES' && item.CHARGENAME !== 'TOTAL') {
+<span 
+            
             class="small-box-separator"
         ></span>
+}
     </span> 
     
     <span class="labelseperator" > {{item.UNITNAME}} </span>
@@ -148,6 +157,7 @@
             >{{ item.TOTPRICE}}</span>
           </td>
         </tr>
+}
       </tbody>
     </table>
   </section>

@@ -99,7 +99,9 @@
                 <td colspan="3">
                 <select class="form-control width500"  [(ngModel)]="OurBank" (change)="GetOurBankName($event)" >
                     <option value="0">Please select</option>
-                    <option *ngFor="let d of OurBankList"  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+                    @for (d of OurBankList; track d) {
+<option  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+}
 
                 </select>
             </td>
@@ -187,7 +189,9 @@
                     <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
                         <select class="form-control width150"  [(ngModel)]="EntryType" [disabled]='disableEntryType' (change)="listbillpopup($event.target.value)"  [disabled]="disable_EntryType" >
                         <option value="0">Please select</option>
-                        <option *ngFor="let d of EntryTypeList"  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                        @for (d of EntryTypeList; track d) {
+<option  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
                         </select>
 
             </td>
@@ -195,7 +199,9 @@
                 <td>
                  <select class="form-control width150"  [(ngModel)]="Department" (change)="GetDepartmentName($event)" >
                     <option value="0">--Please select--</option>
-                    <option *ngFor="let d of Departmentlist"  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                    @for (d of Departmentlist; track d) {
+<option  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 
                 </select>
 
@@ -254,7 +260,8 @@
             <tr>
                  <td colspan="4" > style="width:615px;" -->
                     <div class="row xyscroll"  style="width:800px;" >
-                        <table class="table table-responsive-sm table-bordered" *ngIf="Accountlist.length>0" >
+                        @if (Accountlist.length>0) {
+<table class="table table-responsive-sm table-bordered" >
                             <thead>
                                 <tr class="bakgrdliteBlue">
                                     <th  class="col-form-span-label font-weight-bold headerwhite" ></th>
@@ -272,7 +279,8 @@
                                 </tr>
                             </thead>
                              <tbody   >
-                                <tr *ngFor="let obj of Accountlist">
+                                @for (obj of Accountlist; track obj) {
+<tr>
                                     <td class="centerlabel">
                                         <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)" ></i>
                                         &nbsp;
@@ -290,8 +298,10 @@
                                     <td><span class="col-form-span-label">{{obj.DEPARTMENT}}</span></td>
                                     <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
                                 </tr>
+}
                             </tbody>
                         </table>
+}
                    </div>
                  <!-- </td>
             </tr>
@@ -350,7 +360,8 @@
                                     </thead>
                                     <tbody >
 
-                                        <tr *ngFor="let obj of ListChq ">
+                                        @for (obj of ListChq ; track obj) {
+<tr>
 
                                             <td class="col-form-span-label">{{obj.entryno}}</td>
                                             <td class="col-form-span-label">{{obj.entrydt}}</td>
@@ -362,6 +373,7 @@
 
 
                                         </tr>
+}
                                     </tbody>
                                 </td>
                             </tr>
@@ -410,7 +422,8 @@
                                     </thead>
                                     <tbody >
 
-                                        <tr *ngFor="let obj of ListBill ">
+                                        @for (obj of ListBill ; track obj) {
+<tr>
                                             <td class="col-form-span-label">
                                                 <input type="checkbox" [(ngModel)]="obj.CHECKED" [id]="i" [value]="i"
                                                     (ngModelChange)="getCheckboxValues($event,obj.INV_NO,obj.INV_JOBNO,obj.TOTALAMT,obj.SUPPLIER)">
@@ -422,6 +435,7 @@
                                             <td class="col-form-span-label"> <input [(ngModel)]="obj.NARRATION"  type="text" maxlenght="40"  class="form-control width150" ></td> -->
 
                                         </tr>
+}
                                     </tbody>
                                 </td>
                             </tr>
@@ -474,7 +488,8 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                           <tr *ngFor="let obj of TDSList ">
+                                           @for (obj of TDSList ; track obj) {
+<tr>
                                             <td class="col-form-span-label">
                                                 <input type="checkbox" [(ngModel)]="obj.Checked" [id]="i" [value]="i" [disabled]="obj.Disabled"
                                                      (ngModelChange)="getCheckedTDSData($event,obj.TDSACCTID,obj.RATE,obj.TDSAMOUNT,obj.AMOUNT,obj.ITEMCODE,obj.NARRATION,obj.RATETYPE,obj.LDCRATE,obj.ACCTID,obj.OFFLAG)">
@@ -492,6 +507,7 @@
 
 
                                         </tr>
+}
 
 
                         </tbody>
@@ -515,10 +531,12 @@
                                              </tr>
                                         </thead>
                                         <tbody>
-                                            <tr *ngFor="let obj of TotalTDSList ">
+                                            @for (obj of TotalTDSList ; track obj) {
+<tr>
                                              <td class="col-form-span-label"><b>{{obj.SECTIONNAME}}</b></td>
                                              <td class="col-form-span-label"><b>{{obj.TOTTDSAMOUNT}}</b></td>
                                          </tr>
+}
                                          </tbody>
                                     </td>
                                 </tr>

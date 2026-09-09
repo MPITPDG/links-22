@@ -13,11 +13,14 @@
         <!-- <app-staffpurchase-view [callgetdataforauth]="getdataforauth()" ></app-staffpurchase-view> -->
       </div>
       <div   class="col-md-10" style="overflow-y: auto;height: 500px;">
-        <table *ngIf=" srpidata != ''" class="table table-bordered table-sm-new bgwhite table-hover" >
+        @if ( srpidata != '') {
+<table class="table table-bordered table-sm-new bgwhite table-hover" >
           <thead>
            
             <tr class="col-form-span-heading" style="white-space:nowrap;">
-              <th *ngIf=" FLAG != 'VIEW'" class="col-form-span-label"><input type="checkbox"  [(ngModel)]='checkbox' (change)="checkAll($event)" /> &nbsp; </th>
+              @if ( FLAG != 'VIEW') {
+<th class="col-form-span-label"><input type="checkbox"  [(ngModel)]='checkbox' (change)="checkAll($event)" /> &nbsp; </th>
+}
           
               <th class="col-form-span-label">
                 REQ CODE
@@ -40,11 +43,14 @@
             </tr>
           </thead>
           <tbody class="bgwhite">
-            <tr
-              *ngFor="let obj of srpidata "  
+            @for (obj of srpidata ; track obj) {
+<tr
+               
               >
-              <td *ngIf=" FLAG != 'VIEW'" class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.Checked"
+              @if ( FLAG != 'VIEW') {
+<td class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.Checked"
                   (ngModelChange)="getCheckboxValues($event,obj.REQCODE)"> &nbsp; </td>
+}
         
                <td class="col-form-span-label link-label"  (click)="srpinvoiceviewdata(obj.REQCODE,FLAG,authstatus,Status)"><u> {{obj.REQCODE}}</u> </td> 
               <!-- <td class="col-form-span-label link-label" (click)="srpinvoiceviewdata(obj.REQCODE,FLAG,authstatus)">{{obj.REQCODE}}</td> -->
@@ -54,21 +60,29 @@
               <td class="col-form-span-label" >{{obj.AUTHORISEDBY}}</td>
               <td class="col-form-span-label" >{{obj.AUTHORISATIONDATE}}</td>
             </tr>
+}
           </tbody>
         
           <tr >
-               <td *ngIf="(hidebtnrow =='U' || hidebtnrow == 'M')  "  colspan="8" class="right-text pr-2">
-                <button *ngIf="Status=='RPI'" class="btn btn-sm btn-success" type="submit" (click)="Verify()"> <span
+               @if ((hidebtnrow =='U' || hidebtnrow == 'M')  ) {
+<td  colspan="8" class="right-text pr-2">
+                @if (Status=='RPI') {
+<button class="btn btn-sm btn-success" type="submit" (click)="Verify()"> <span
                   class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Verify</span></button>
+}
                   <button class="btn btn-sm btn-success" type="submit" (click)="rejectdata()"> <span
                     class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Reject</span></button>
-                       <button class="btn btn-sm btn-success" *ngIf=" hidebtnrow =='U' " type="submit" (click)="Passdatatomanagement()"> <span
+                       @if ( hidebtnrow =='U' ) {
+<button class="btn btn-sm btn-success" type="submit" (click)="Passdatatomanagement()"> <span
                   class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Management</span></button>
+}
                  
             </td>
+}
           </tr>
         
         </table>
+}
         <table class="table table-bordered table-sm-new bgwhite table-hover">
           <tr>
             <td colspan="10" class="right-text pr-2">
@@ -102,7 +116,9 @@
         
         </div>
             <div class="modal-body modal-fix-body">
-              <app-staffpurchase-view  (hideModal)="abortStaff($event)"  [purcode]="PURCODE" [flag]="FLAG" [authstatus]="authstatus" [authstatlist]="authstat" *ngIf="PURCODE !=''"></app-staffpurchase-view>  
+              @if (PURCODE !='') {
+<app-staffpurchase-view  (hideModal)="abortStaff($event)"  [purcode]="PURCODE" [flag]="FLAG" [authstatus]="authstatus" [authstatlist]="authstat"></app-staffpurchase-view>
+}  
                <!-- <app-accounts-transaction-purchase-search></app-accounts-transaction-purchase-search>    -->
             </div>
         </div>

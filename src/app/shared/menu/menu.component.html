@@ -7,46 +7,76 @@
 		<li class="nav-title">
            {{menuModuleName}}
         </li>
-		<li class="{{ml.ischild == 'y' ? 'nav-item nav-dropdown' : 'nav-item'}}"  *ngFor="let ml of menuList" appNavDropdown>
-			<a *ngIf="ml.ischild == 'y'" class="nav-link nav-dropdown-toggle" href="#"  appNavDropdownToggle>  
+		@for (ml of menuList; track ml) {
+<li class="{{ml.ischild == 'y' ? 'nav-item nav-dropdown' : 'nav-item'}}"  appNavDropdown>
+			@if (ml.ischild == 'y') {
+<a class="nav-link nav-dropdown-toggle" href="#"  appNavDropdownToggle>  
 				<i [ngClass]="ml.icon"></i>{{ ml.menuname }}
-			</a>  
-			<a *ngIf="ml.ischild == 'n'" [routerLink]="[ml.routerlink]" class="nav-link">  
+			</a>
+}  
+			@if (ml.ischild == 'n') {
+<a [routerLink]="[ml.routerlink]" class="nav-link">  
 				<i [ngClass]="ml.icon"></i>{{ ml.menuname }} 
 			</a>
-			<ul class="nav-dropdown-items" *ngIf="ml.data.length > 0" style="font-size: 12px;">
-				<li class="{{mlchild.ischild == 'y' ? 'nav-item nav-dropdown' : 'nav-item'}}" *ngFor="let mlchild of ml.data" appNavDropdown>
-					<a *ngIf="mlchild.ischild == 'y'" class="nav-link nav-dropdown-toggle" href="#" appNavDropdownToggle>  
+}
+			@if (ml.data.length > 0) {
+<ul class="nav-dropdown-items" style="font-size: 12px;">
+				@for (mlchild of ml.data; track mlchild) {
+<li class="{{mlchild.ischild == 'y' ? 'nav-item nav-dropdown' : 'nav-item'}}" appNavDropdown>
+					@if (mlchild.ischild == 'y') {
+<a class="nav-link nav-dropdown-toggle" href="#" appNavDropdownToggle>  
 						<i [ngClass]="mlchild.icon"></i>{{ mlchild.menuname }}
-					</a>  
-					<a *ngIf="mlchild.ischild == 'n'" [routerLink]="[mlchild.routerlink]" class="nav-link">  
+					</a>
+}  
+					@if (mlchild.ischild == 'n') {
+<a [routerLink]="[mlchild.routerlink]" class="nav-link">  
 						<i [ngClass]="mlchild.icon"></i> {{ mlchild.menuname }} 
-					</a> 
-					<ul class="nav-dropdown-items" *ngIf="mlchild.data.length > 0">
-						<li class="{{mlsubchild.ischild == 'y' ? 'nav-item nav-dropdown' : 'nav-item'}}" *ngFor="let mlsubchild of mlchild.data" appNavDropdown>
-							<a *ngIf="mlsubchild.ischild == 'y'" class="nav-link nav-dropdown-toggle" href="#" appNavDropdownToggle>  
+					</a>
+} 
+					@if (mlchild.data.length > 0) {
+<ul class="nav-dropdown-items">
+						@for (mlsubchild of mlchild.data; track mlsubchild) {
+<li class="{{mlsubchild.ischild == 'y' ? 'nav-item nav-dropdown' : 'nav-item'}}" appNavDropdown>
+							@if (mlsubchild.ischild == 'y') {
+<a class="nav-link nav-dropdown-toggle" href="#" appNavDropdownToggle>  
 								<i [ngClass]="mlsubchild.icon"></i>{{ mlsubchild.menuname }}
-							</a>  
-							<a *ngIf="mlsubchild.ischild == 'n'" [routerLink]="[mlsubchild.routerlink]" class="nav-link">  
+							</a>
+}  
+							@if (mlsubchild.ischild == 'n') {
+<a [routerLink]="[mlsubchild.routerlink]" class="nav-link">  
 								<i [ngClass]="mlsubchild.icon"></i> {{ mlsubchild.menuname }} 
-							</a> 
-							<ul class="nav-dropdown-items" *ngIf="mlsubchild.data.length > 0">
-								<li class="{{mlsubsubchild.ischild == 'y' ? 'nav-item nav-dropdown' : 'nav-item'}}" *ngFor="let mlsubsubchild of mlsubchild.data" appNavDropdown>
-									<a *ngIf="mlsubsubchild.ischild == 'y'" class="nav-link nav-dropdown-toggle" href="#" appNavDropdownToggle>  
+							</a>
+} 
+							@if (mlsubchild.data.length > 0) {
+<ul class="nav-dropdown-items">
+								@for (mlsubsubchild of mlsubchild.data; track mlsubsubchild) {
+<li class="{{mlsubsubchild.ischild == 'y' ? 'nav-item nav-dropdown' : 'nav-item'}}" appNavDropdown>
+									@if (mlsubsubchild.ischild == 'y') {
+<a class="nav-link nav-dropdown-toggle" href="#" appNavDropdownToggle>  
 										<i [ngClass]="mlsubsubchild.icon"></i>{{ mlsubsubchild.menuname }}
-									</a>  
-									<a *ngIf="mlsubsubchild.ischild == 'n'" [routerLink]="[mlsubsubchild.routerlink]" class="nav-link">  
+									</a>
+}  
+									@if (mlsubsubchild.ischild == 'n') {
+<a [routerLink]="[mlsubsubchild.routerlink]" class="nav-link">  
 										<i [ngClass]="mlsubsubchild.icon"></i> {{ mlsubsubchild.menuname }} 
-									</a> 
+									</a>
+} 
 									
 									
 								</li>
+}
 							</ul>
+}
 						</li>
+}
 					</ul>
+}
 				</li>
-			</ul>	
+}
+			</ul>
+}	
 		</li>
+}
 
       </ul>
     </nav>

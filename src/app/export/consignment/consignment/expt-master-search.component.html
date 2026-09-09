@@ -36,7 +36,8 @@
 				</tr>
 			</table>
 			<table class="table table-sm-new bgwhite">
-				<tr *ngIf="checkWise == '1'" class="trbg">
+				@if (checkWise == '1') {
+<tr class="trbg">
 					<td class="width150" rowspan="3">
 						<span class="col-form-span-label">Title </span>
 					</td>
@@ -58,7 +59,9 @@
 							<input type="radio" name="NumberWise" (click)="numberOption('BL No.','BL_NO')" [checked]="numberWise == 'BL_NO'" />BL No.</span>
 					</td>
 				</tr>
-				<tr *ngIf="checkWise == '1'" class="trbg">
+}
+				@if (checkWise == '1') {
+<tr class="trbg">
 					<td class="width250">
 						<span class="col-form-span-label">
 							<input type="radio" name="NumberWise" (click)="numberOption('HAWB No.','HAWB_NO')" [checked]="numberWise == 'HAWB_NO'" /> HAWB No.</span>
@@ -77,7 +80,9 @@
 							/>Shipping Bill No.</span>
 					</td>
 				</tr>
-				<tr *ngIf="checkWise == '1'" class="trbg">
+}
+				@if (checkWise == '1') {
+<tr class="trbg">
 					<td class="width250">
 						<span class="col-form-span-label">
 							<input type="radio" name="NumberWise" (click)="numberOption('Order No.','ORDER_NO')" [checked]="numberWise == 'ORDER_NO'"
@@ -98,7 +103,9 @@
 							/>No. of Pcs</span>
 					</td>
 				</tr>
-				<tr *ngIf="checkWise == '1'" class="trbg">
+}
+				@if (checkWise == '1') {
+<tr class="trbg">
 					<td class="width75">
 						<span class="col-form-span-label">{{numberName}}</span>
 					</td>
@@ -106,7 +113,9 @@
 						<input type="text" [(ngModel)]="numberText" class="form-control width130" />
 					</td>
 				</tr>
-				<tr *ngIf="checkWise == '2'" class="trbg">
+}
+				@if (checkWise == '2') {
+<tr class="trbg">
 					<td class="width75">
 						<span class="col-form-span-label">Vessel Name </span>
 					</td>
@@ -123,7 +132,9 @@
 						<i class="fa fa-eye" aria-hidden="true" (click)="getVessel()"></i>
 					</td>
 				</tr>
-				<tr *ngIf="checkWise == '2'" class="trbg">
+}
+				@if (checkWise == '2') {
+<tr class="trbg">
 					<td class="width150">
 						<span class="col-form-span-label">Vessel Name </span>
 					</td>
@@ -133,11 +144,15 @@
 						</ng-select> -->
 						<select class="form-control width450"  [(ngModel)]="searchby">
 							<option value="">Please select</option>
-							<option *ngFor="let d of vesselList" value={{d.VALUE_FIELD}}>{{d.TEXT_FIELD}}</option>
+							@for (d of vesselList; track d) {
+<option value={{d.VALUE_FIELD}}>{{d.TEXT_FIELD}}</option>
+}
 						</select> 
 					</td>
 				</tr>
-				<tr *ngIf="checkWise == '3'" class="trbg">
+}
+				@if (checkWise == '3') {
+<tr class="trbg">
 					<td class="width150" rowspan="2">
 						<span class="col-form-span-label">Title </span>
 					</td>
@@ -153,7 +168,9 @@
 					<td></td>
 					<td></td>
 				</tr>
-				<tr *ngIf="checkWise == '3'" class="trbg">
+}
+				@if (checkWise == '3') {
+<tr class="trbg">
 					<td class="width250">
 						<span class="col-form-span-label">
 							<input type="radio" name="Shipments" (click)="changeShipmentType('BILL_CUR')" [checked]="shipmentWise == 'BILL_CUR'" />Bill To (current shipments)</span>
@@ -165,7 +182,9 @@
 					<td></td>
 					<td></td>
 				</tr>
-				<tr *ngIf="checkWise == '3'" class="trbg">
+}
+				@if (checkWise == '3') {
+<tr class="trbg">
 					<td class="width150">
 						<span class="col-form-span-label">Search By</span>
 					</td>
@@ -175,24 +194,34 @@
 						</ng-select>
 					</td>
 				</tr>
-				<tr *ngIf="checkWise == '3'" class="trbg">
+}
+				@if (checkWise == '3') {
+<tr class="trbg">
 					<td class="width150">
 						<span class="col-form-span-label">{{shippersearchby}}</span>
 					</td>
 					<td colspan="3">
-						<ng-select [items]="countryList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"  [(ngModel)]="shippercountry"
-						 class="form-control" *ngIf="shippersearchby == 'COUNTRY'">
+						@if (shippersearchby == 'COUNTRY') {
+<ng-select [items]="countryList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"  [(ngModel)]="shippercountry"
+						 class="form-control">
 						</ng-select>
-						<ng-select [items]="cityList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"   [(ngModel)]="shippercity"
-						 class="form-control" *ngIf="shippersearchby == 'CITY'">
+}
+						@if (shippersearchby == 'CITY') {
+<ng-select [items]="cityList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"   [(ngModel)]="shippercity"
+						 class="form-control">
 						</ng-select>
-						<input type="text" [(ngModel)]="shippername" class="form-control width150" *ngIf="shippersearchby == 'NAME'" />
+}
+						@if (shippersearchby == 'NAME') {
+<input type="text" [(ngModel)]="shippername" class="form-control width150" />
+}
 					</td>
 					<td class="width50">
 						<i class="fa fa-eye" aria-hidden="true" (click)="getShipper()"></i>
 					</td>
 				</tr>
-				<tr *ngIf="checkWise == '3'" class="trbg">
+}
+				@if (checkWise == '3') {
+<tr class="trbg">
 					<td class="width150 title-head">
 						<span class="col-form-span-label">Shipper</span>
 					</td>
@@ -202,7 +231,9 @@
 						</ng-select>
 					</td>
 				</tr>
-				<tr *ngIf="checkWise == '4'" class="trbg">
+}
+				@if (checkWise == '4') {
+<tr class="trbg">
 					<td class="width150">
 						<span class="col-form-span-label">Title </span>
 					</td>
@@ -218,7 +249,9 @@
 					<td></td>
 					<td></td>
 				</tr>
-				<tr *ngIf="checkWise == '4'" class="trbg">
+}
+				@if (checkWise == '4') {
+<tr class="trbg">
 					<td class="width150">
 						<span class="col-form-span-label">Search By</span>
 					</td>
@@ -228,21 +261,29 @@
 						</ng-select>
 					</td>
 				</tr>
-				<tr *ngIf="checkWise == '4'" class="trbg">
+}
+				@if (checkWise == '4') {
+<tr class="trbg">
 					<td class="width150">
 						<span class="col-form-span-label">{{consigneesearchby}}</span>
 					</td>
 					<td colspan="3">
-						<ng-select [items]="countryList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"   [(ngModel)]="consigneecountry"
-						 class="form-control" *ngIf="consigneesearchby == 'COUNTRY'">
+						@if (consigneesearchby == 'COUNTRY') {
+<ng-select [items]="countryList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"   [(ngModel)]="consigneecountry"
+						 class="form-control">
 						</ng-select>
-						<input type="text" [(ngModel)]="consigneename" class="form-control width150" *ngIf="consigneesearchby == 'NAME'" />
+}
+						@if (consigneesearchby == 'NAME') {
+<input type="text" [(ngModel)]="consigneename" class="form-control width150" />
+}
 					</td>
 					<td class="width50">
 						<i class="fa fa-eye" aria-hidden="true" (click)="getConsignee()"></i>
 					</td>
 				</tr>
-				<tr *ngIf="checkWise == '4'" class="trbg">
+}
+				@if (checkWise == '4') {
+<tr class="trbg">
 					<td class="width150 title-head">
 						<span class="col-form-span-label">Consignee </span>
 					</td>
@@ -252,6 +293,7 @@
 						</ng-select>
 					</td>
 				</tr>
+}
 				<tr class="trbg centerlabel">
 					<td colspan="5">
 						<button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="search();">
@@ -268,7 +310,8 @@
 	<div class="row">
 		<br />
 	</div>
-	<div class="row" *ngIf="searchList.length > 0">
+	@if (searchList.length > 0) {
+<div class="row">
 		<div class="col-sm-12" style="height:300px;overflow-y: scroll;">
 			<table class="table table-sm-new bgwhite">
 				<thead>
@@ -277,7 +320,8 @@
 					</tr>
 				</thead>
 			</table>
-			<table class="table table-sm-new bgwhite" *ngIf ="numberWise == 'MAWB_NO'">
+			@if (numberWise == 'MAWB_NO') {
+<table class="table table-sm-new bgwhite">
 				<thead>
 						<tr class="title-head formheading">
 								<th> MAWB NO.</th>
@@ -317,6 +361,7 @@
 						</tr>
 				</thead>
 				</table>
+}
 			<table class="table table-sm-new bgwhite">
 				<thead>
 					<tr class="title-head formheading">
@@ -337,7 +382,8 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let obj of searchList">
+					@for (obj of searchList; track obj) {
+<tr>
 						<td class="centerlabel">
 							<i class="fa fa-pencil" aria-hidden="true" (click)="setValue(obj)"></i>
 						</td>
@@ -381,10 +427,12 @@
 						</td>
 						<td><span class="col-form-span-label">{{obj.FREIGHT}}</span></td>
 					</tr>
+}
 				</tbody>
 			</table>
 		</div>
 	</div>
+}
 </div>
 
 <app-ok-modal #okModal> </app-ok-modal>

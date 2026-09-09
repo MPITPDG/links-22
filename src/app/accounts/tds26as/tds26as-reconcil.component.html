@@ -4,7 +4,8 @@
   <!-- UPLOAD FORM                                               -->
   <!-- ========================================================= -->
 
-  <div class="t26-card upload-card" *ngIf="displayType=='SEARCH'">
+  @if (displayType=='SEARCH') {
+<div class="t26-card upload-card">
 
     <div class="card-heading">
       <i class="fa fa-cloud-upload"></i> {{Header}} — Upload Statement
@@ -35,30 +36,38 @@
         <button class="t26-btn t26-btn--primary" type="button" (click)="upload()">
           <i class="fa fa-cloud-upload"></i> Upload &amp; Reconcile
         </button>
-        <button class="t26-btn t26-btn--ghost" type="button" *ngIf="summaryList.length > 0" (click)="displayType='LIST'">
+        @if (summaryList.length > 0) {
+<button class="t26-btn t26-btn--ghost" type="button" (click)="displayType='LIST'">
           <i class="fa fa-arrow-circle-left"></i> Back to last statement
         </button>
+}
       </div>
     </div>
 
-    <div class="t26-fileinfo" *ngIf="selfilename">
+    @if (selfilename) {
+<div class="t26-fileinfo">
       <span class="t26-chip"><i class="fa fa-file-text-o"></i> {{selfilename}}</span>
     </div>
+}
 
   </div>
+}
 
   <!-- ========================================================= -->
   <!-- RECONCILIATION RESULT                                     -->
   <!-- ========================================================= -->
 
-  <ng-container *ngIf="displayType=='LIST'">
+  @if (displayType=='LIST') {
+
 
     <div class="t26-topbar">
       <div class="t26-topbar-left">
         <span class="t26-page-title">{{Header}}</span>
-        <span class="t26-meta" *ngIf="batchInfo">
+        @if (batchInfo) {
+<span class="t26-meta">
           PAN {{batchInfo.PANNO}} &middot; FY {{batchInfo.FINYEAR}} &middot; {{batchInfo.FILENAME}}
         </span>
+}
       </div>
       <div class="t26-topbar-right">
         <button class="t26-btn t26-btn--ghost" type="button" (click)="openGuide()">
@@ -77,7 +86,8 @@
     </div>
 
     <!-- statement-level totals -->
-    <div class="t26-summary-strip" *ngIf="summaryList.length > 0">
+    @if (summaryList.length > 0) {
+<div class="t26-summary-strip">
       <div class="t26-stat">
         <span class="t26-stat-label">26AS Amount Credited</span>
         <span class="t26-stat-value">{{totAmtCredited | number:'1.2-2'}}</span>
@@ -91,6 +101,7 @@
         <span class="t26-stat-value">{{totInvoiced | number:'1.2-2'}}</span>
       </div>
     </div>
+}
 
     <div class="t26-view-toggle">
       <button class="toggle-btn" type="button" [class.active]="activeTab=='ALL'" (click)="activeTab='ALL'">
@@ -122,13 +133,17 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let row of filteredList">
+            @for (row of filteredList; track row) {
+<tr>
               <td>{{row.SRNO}}</td>
               <td>{{row.DEDUCTOR_NAME}}</td>
               <td class="mono">{{row.TAN}}</td>
               <td>
-                <span *ngIf="row.MATCHTYPE">{{row.CLIENT_NAME || row.EXP_CODE}}</span>
-                <ng-select *ngIf="!row.MATCHTYPE"
+                @if (row.MATCHTYPE) {
+<span>{{row.CLIENT_NAME || row.EXP_CODE}}</span>
+}
+                @if (!row.MATCHTYPE) {
+<ng-select
                   class="t26-map-select"
                   [items]="clientList"
                   bindLabel="TEXTFIELD"
@@ -137,50 +152,74 @@
                   [appendTo]="'body'"
                   placeholder="Map to client...">
                 </ng-select>
+}
               </td>
               <td class="ctr">
-                <span class="t26-badge t26-badge--tan" *ngIf="row.MATCHTYPE=='TAN'">TAN</span>
-                <span class="t26-badge t26-badge--name" *ngIf="row.MATCHTYPE=='NAME'">NAME</span>
-                <span class="t26-badge t26-badge--manual" *ngIf="row.MATCHTYPE=='MANUAL'">MANUAL</span>
-                <button class="t26-btn t26-btn--mini" type="button" *ngIf="!row.MATCHTYPE" (click)="saveMapping(row)">
+                @if (row.MATCHTYPE=='TAN') {
+<span class="t26-badge t26-badge--tan">TAN</span>
+}
+                @if (row.MATCHTYPE=='NAME') {
+<span class="t26-badge t26-badge--name">NAME</span>
+}
+                @if (row.MATCHTYPE=='MANUAL') {
+<span class="t26-badge t26-badge--manual">MANUAL</span>
+}
+                @if (!row.MATCHTYPE) {
+<button class="t26-btn t26-btn--mini" type="button" (click)="saveMapping(row)">
                   <i class="fa fa-save"></i> Save
                 </button>
+}
               </td>
               <td class="num">{{row.TOT_AMTCREDITED | number:'1.2-2'}}</td>
               <td class="num">{{row.TOT_TDSDEPOSITED | number:'1.2-2'}}</td>
               <td class="num">
-                <span *ngIf="row.MATCHTYPE">{{row.FY_INVOICED | number:'1.2-2'}}</span>
-                <span class="muted" *ngIf="!row.MATCHTYPE">&mdash;</span>
+                @if (row.MATCHTYPE) {
+<span>{{row.FY_INVOICED | number:'1.2-2'}}</span>
+}
+                @if (!row.MATCHTYPE) {
+<span class="muted">&mdash;</span>
+}
               </td>
               <td class="num">
-                <span *ngIf="row.MATCHTYPE"
+                @if (row.MATCHTYPE) {
+<span
                       [class.diff-pos]="row.DIFFERENCE > 0.005"
                       [class.diff-neg]="row.DIFFERENCE < -0.005">
                   {{row.DIFFERENCE | number:'1.2-2'}}
                 </span>
-                <span class="muted" *ngIf="!row.MATCHTYPE">&mdash;</span>
+}
+                @if (!row.MATCHTYPE) {
+<span class="muted">&mdash;</span>
+}
               </td>
               <td class="ctr">
                 <a href="javascript:void(0)" class="t26-link" (click)="openDetail(row)">{{row.TXNCOUNT}}</a>
               </td>
             </tr>
+}
           </tbody>
         </table>
 
-        <div class="t26-empty" *ngIf="filteredList.length === 0">
+        @if (filteredList.length === 0) {
+<div class="t26-empty">
           <i class="fa fa-inbox"></i> Nothing on this tab.
         </div>
+}
       </div>
     </div>
 
-  </ng-container>
+  
+}
 
   <!-- ========================================================= -->
   <!-- DRILL-DOWN MODAL                                          -->
   <!-- ========================================================= -->
 
-  <div class="t26-modal-backdrop" *ngIf="showModal_Detail" (click)="closeDetail()"></div>
-  <div class="t26-modal" *ngIf="showModal_Detail">
+  @if (showModal_Detail) {
+<div class="t26-modal-backdrop" (click)="closeDetail()"></div>
+}
+  @if (showModal_Detail) {
+<div class="t26-modal">
     <div class="t26-modal-head">
       <span>{{detailDeductor?.DEDUCTOR_NAME}} <span class="mono">({{detailDeductor?.TAN}})</span></span>
       <button class="t26-btn t26-btn--ghost" type="button" (click)="closeDetail()">
@@ -200,7 +239,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let d of detailList">
+              @for (d of detailList; track d) {
+<tr>
                 <td>{{d.SRNO}}</td>
                 <td>{{d.SECTION}}</td>
                 <td class="ctr">{{d.TXNDATE}}</td>
@@ -209,6 +249,7 @@
                 <td class="num">{{d.AMTCREDITED | number:'1.2-2'}}</td>
                 <td class="num">{{d.TDSDEPOSITED | number:'1.2-2'}}</td>
               </tr>
+}
             </tbody>
           </table>
         </div>
@@ -226,20 +267,25 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let inv of detailInvList">
+              @for (inv of detailInvList; track inv) {
+<tr>
                 <td class="mono">{{inv.INV_NO}}</td>
                 <td class="ctr">{{inv.INV_DATE}}</td>
                 <td class="num">{{inv.INV_INRAMT | number:'1.2-2'}}</td>
               </tr>
+}
             </tbody>
           </table>
-          <div class="t26-empty" *ngIf="detailInvList.length === 0">
+          @if (detailInvList.length === 0) {
+<div class="t26-empty">
             <i class="fa fa-inbox"></i> No invoices found for this client in the FY.
           </div>
+}
         </div>
       </div>
 
     </div>
   </div>
+}
 
 </div>

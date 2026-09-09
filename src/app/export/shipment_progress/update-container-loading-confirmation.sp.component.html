@@ -147,23 +147,31 @@
 			</td>
 	</tr>
 
-	<tr *ngIf="MessageLoadNotDone !== ''">
+	@if (MessageLoadNotDone !== '') {
+<tr>
 		<td colspan="8">
 			<span class="error-text">{{MessageLoadNotDone}}</span>
 		</td>
 	</tr>
+}
 	<tr>
 		<td colspan="5" style="white-space:nowrap;"><span class="col-form-span-label"><strong>CONTAINER LOADING AT ORIGIN CONFIRMATION DATE</strong></span></td>
 		<td colspan="3">
-			<span class="col-form-span-label" *ngIf="LabelLoadOriginDt !== ''">{{LabelLoadOriginDt}}</span>
-			<input type="checkbox" [checked]="CheckLoadOriginDt==true" [(ngModel)]="CheckLoadOriginDt" *ngIf="LabelLoadOriginDt==''&&MessageLoadOriginDtMsg==''">
+			@if (LabelLoadOriginDt !== '') {
+<span class="col-form-span-label">{{LabelLoadOriginDt}}</span>
+}
+			@if (LabelLoadOriginDt==''&&MessageLoadOriginDtMsg=='') {
+<input type="checkbox" [checked]="CheckLoadOriginDt==true" [(ngModel)]="CheckLoadOriginDt">
+}
 		</td>
 	</tr>
-	<tr *ngIf="MessageLoadOriginDtMsg !== ''">
+	@if (MessageLoadOriginDtMsg !== '') {
+<tr>
 		<td colspan="8">
 			<span class="error-text">{{MessageLoadOriginDtMsg}}</span>
 		</td>
 	</tr>
+}
 	<tr class="centerlabel">
 		<td colspan="8">
 			<span class="col-form-span-label"><input type="radio" name="TransType" [checked]="TransType=='Direct'" (change)="TransType='Direct'" /> Direct</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -216,24 +224,32 @@
 			<my-date-picker name="date" [options]="myDatePickerOptions" [(ngModel)]="ATAPort"></my-date-picker>
 		</td>
 	</tr>
-	<tr *ngIf="MessageConnLoadNotDone !== ''">
+	@if (MessageConnLoadNotDone !== '') {
+<tr>
 		<td colspan="8">
 			<span class="error-text">{{MessageConnLoadNotDone}}</span>
 		</td>
 	</tr>
+}
 	<tr>
 		<td colspan="5" style="white-space:nowrap;"><span class="col-form-span-label"><strong>CONTAINER LOADING AT TRANSHIPMENT PORT1 CONFIRMATION DATE</strong></span></td>
 		<td colspan="3">
-			<span class="col-form-span-label" *ngIf="LabelLoadOrigin2Dt !==''">{{LabelLoadOrigin2Dt}}</span>
-			<input type="checkbox" [checked]="LoadOrigin2Dt==true" [(ngModel)]="LoadOrigin2Dt" *ngIf="LabelLoadOrigin2Dt==''&&MessageLoadOrigin2Dt==''" />
+			@if (LabelLoadOrigin2Dt !=='') {
+<span class="col-form-span-label">{{LabelLoadOrigin2Dt}}</span>
+}
+			@if (LabelLoadOrigin2Dt==''&&MessageLoadOrigin2Dt=='') {
+<input type="checkbox" [checked]="LoadOrigin2Dt==true" [(ngModel)]="LoadOrigin2Dt" />
+}
 			<!-- <input type="checkbox" [checked]="CheckLoadOriginDt==true" [(ngModel)]="CheckLoadOriginDt" *ngIf="LabelLoadOriginDt==''&&MessageLoadOriginDtMsg==''"> -->
 		</td>
 	</tr>
-	<tr *ngIf="MessageLoadOrigin2Dt !== ''">
+	@if (MessageLoadOrigin2Dt !== '') {
+<tr>
 		<td colspan="8">
 			<span class="error-text">{{MessageLoadOrigin2Dt}}</span>
 		</td>
 	</tr>
+}
 	<tr>
 		<td class="width150"><span class="col-form-span-label"><strong>Trans. Port2</strong></span></td>
 		<td colspan="7">
@@ -274,24 +290,30 @@
 			<my-date-picker name="date" [options]="myDatePickerOptions" [(ngModel)]="ETATwo" [disabled]="(TransType=='Direct'||ConnVesselOne==null)"></my-date-picker>
 		</td>
 	</tr>
-	<tr *ngIf="MessageConnLoadNotDone1 !== ''">
+	@if (MessageConnLoadNotDone1 !== '') {
+<tr>
 		<td colspan="8">
 			<span class="error-text">{{MessageConnLoadNotDone1}}</span>
 		</td>
 	</tr>
+}
 	<tr>
 		<td colspan="5" style="white-space:nowrap;"><span class="col-form-span-label"><strong>CONTAINER LOADING AT TRANSHIPMENT PORT2 CONFIRMATION DATE</strong></span></td>
 		<td colspan="3">
-			<span class="col-form-span-label" *ngIf="LabelLoadOrigin3Dt!=''">{{LabelLoadOrigin3Dt}}</span>
+			@if (LabelLoadOrigin3Dt!='') {
+<span class="col-form-span-label">{{LabelLoadOrigin3Dt}}</span>
+}
 			<input type="checkbox" [checked]="LoadOrigin3Dt==true" [(ngModel)]="LoadOrigin3Dt"  >
 		 
 		</td>
 	</tr>
-	<tr *ngIf="MessageLoadOrigin3Dt !== ''">
+	@if (MessageLoadOrigin3Dt !== '') {
+<tr>
 		<td colspan="8">
 			<span class="error-text">{{MessageLoadOrigin3Dt}}</span>
 		</td>
 	</tr>
+}
 	<tr>
 		<td colspan="4" rowspan="4" style="padding: 20px;">
 			<span class="col-form-span-label">

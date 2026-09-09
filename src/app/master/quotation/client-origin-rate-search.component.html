@@ -4,7 +4,8 @@
     <div class="row">
         <div class="col-sm-3"></div>
         <div class="col-sm-6">
-            <table class="table table-bordered table-sm-new bgwhite" style="font-family:  Verdana;font-size: 12px;" *ngIf="Masterdetail_list.length==0">
+            @if (Masterdetail_list.length==0) {
+<table class="table table-bordered table-sm-new bgwhite" style="font-family:  Verdana;font-size: 12px;">
                 <tbody style='height:30px'>
                     <tr class="trbg">
                         <td class="col-form-span-heading" colspan="5">
@@ -44,7 +45,9 @@
                 <td colspan="4">
                             <select class="form-control width240" [(ngModel)]="origin" [disabled]="exampleRadios1 != '2'">
                             <option value="">--Please Select --</option>
-                            <option *ngFor="let d of origintable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+                            @for (d of origintable; track d) {
+<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+}
                         </select>                  
                                                        
                 </td>
@@ -85,17 +88,21 @@
             </tr>
                 </tbody>
             </table>
+}
 
         </div>
      
     <div class="col-sm-3"></div>
-    <div *ngIf="Masterdetail_list.length >0" >  
+    @if (Masterdetail_list.length >0) {
+<div >  
         <button class="btn btn-sm btn-warning" style="float: right;" (click)="displayType='SEARCH';Masterdetail_list=[]"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to search</u></span></button>
-    </div>  
+    </div>
+}  
 </div>
  
     <!-- <div  *ngIf="Masterdetail_list.length>0"> -->
-        <main *ngIf="Masterdetail_list.length >0">   
+        @if (Masterdetail_list.length >0) {
+<main>   
         <div class="container">
                     <div class="row yscroll" style="max-height:300px">
                     <table class="table table-hover table-bordered table-sm-new bgwhite">
@@ -111,7 +118,8 @@
                             </tr>
                         </thead>
                         <tbody class="bgwhite">
-                            <tr *ngFor="let obj of Masterdetail_list| paginate: config">
+                            @for (obj of Masterdetail_list| paginate: config; track obj) {
+<tr>
                                 <!-- <td><span class="col-form-span-label">{{obj.PKQUTID}}</span></td> -->
                                 <td><span class="col-form-span-label anchor-link" (click)="ListOnclick(obj.PKQUTID,obj.QUT_CODE)">{{obj.QUT_CODE}}</span></td>
                                 <td><span class="col-form-span-label " >{{obj.EXP_SNAME}}</span></td>
@@ -120,6 +128,7 @@
                                 <td><span class="col-form-span-label">{{obj.SHIPMENTTYPE}}</span></td>
                                 <td><span class="col-form-span-label">{{obj.SHIPPINGLINE}}</span></td>
                             </tr>
+}
                         </tbody>
                     </table>
         
@@ -129,6 +138,7 @@
                     <pagination-controls (pageChange)="pageChanged($event)"  autoHide="true"></pagination-controls>
                 </div>
         </div>
-    </main> 
+    </main>
+} 
 </div>
 </div>

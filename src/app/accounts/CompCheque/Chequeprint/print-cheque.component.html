@@ -18,7 +18,9 @@
                 <td>
                     <select class="form-control width350"  [(ngModel)]="BankName" (ngModelChange)="cheserchprint()">
                         <option value="">Please select</option>
-                        <option *ngFor="let d of BankList"  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+                        @for (d of BankList; track d) {
+<option  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+}
                     </select>
                 </td>.
                 <td colspan="2" align="center">
@@ -64,15 +66,21 @@
                         <td  class="col-form-span-label font-weight-bold ">Bank Ref No</td >
                     </tr>
                 </thead>
-                <tbody *ngIf="searvhptintlist.length>0" >
-                    <tr *ngFor="let obj of searvhptintlist |paginate: { itemsPerPage:20, currentPage: PageActual }">
+                @if (searvhptintlist.length>0) {
+<tbody >
+                    @for (obj of searvhptintlist |paginate: { itemsPerPage:20, currentPage: PageActual }; track obj) {
+<tr>
                         <td class="col-form-span-label"><input type="checkbox" [(ngModel)]="obj.Checked"   [disabled]="obj.PRINTSTATUS=='Not Authorised'"
                             (ngModelChange)="getCheckboxValues($event,obj.ENTRYNO,obj.CHEQUETYPE,obj.AMOUNT,obj.BANKREFNO)"> &nbsp;</td>
                         <td><span class="col-form-span-label">{{obj.PRINTSTATUS}} </span>
                         </td>
                         <td><span class="col-form-span-label"  (click)="OpenView(obj.ENTRYNO)">{{obj.ENTRYNO}}</span></td>
-                        <td   > <span class="col-form-span-label"  *ngIf="obj.Checked != true">{{obj.CHEQUENO}}</span>
-                            <span [ngClass]="{'class1':CHEQUENO=='Not Available.', 'class2':CHEQUENO!='Not Available.'}" *ngIf="obj.Checked==true && flag=='1'">{{CHEQUENO}}</span>
+                        <td   > @if (obj.Checked != true) {
+<span class="col-form-span-label" >{{obj.CHEQUENO}}</span>
+}
+                            @if (obj.Checked==true && flag=='1') {
+<span [ngClass]="{'class1':CHEQUENO=='Not Available.', 'class2':CHEQUENO!='Not Available.'}">{{CHEQUENO}}</span>
+}
                         </td>
                         <td><span class="col-form-span-label">{{obj.CHEQUETYPE}}</span></td>
                         <td><span class="col-form-span-label">{{obj.PAYEENAME}}</span></td>
@@ -81,11 +89,17 @@
                         <td><span class="col-form-span-label">{{obj.RequestedBy}}</span></td>
                         <td><span class="col-form-span-label">{{obj.ENTRYDT}}</span></td>
                         <!-- <td><span class="col-form-span-label">{{obj.BANKREFNO}}</span></td> -->
-                        <td class="col-form-span-label"> <input [(ngModel)]="obj.BANKREFNO"  (change)="getbankrefno(obj.ENTRYNO,obj.BANKREFNO)" [disabled]="obj.PRINTSTATUS=='Not Authorised'" *ngIf="obj.CHEQUETYPE!=''" type="text" maxlenght="40" autofocus class="form-control width150">
-                            <span [ngClass]="{'class1':StartCheck=='Not Available.', 'class2':StartCheck!='Not Available.'}"  *ngIf="obj.Checked==true && (obj.CHEQUETYPE=='CHQ' || obj.CHEQUETYPE=='')">{{BankRefNo}}</span></td>
+                        <td class="col-form-span-label"> @if (obj.CHEQUETYPE!='') {
+<input [(ngModel)]="obj.BANKREFNO"  (change)="getbankrefno(obj.ENTRYNO,obj.BANKREFNO)" [disabled]="obj.PRINTSTATUS=='Not Authorised'" type="text" maxlenght="40" autofocus class="form-control width150">
+}
+                            @if (obj.Checked==true && (obj.CHEQUETYPE=='CHQ' || obj.CHEQUETYPE=='')) {
+<span [ngClass]="{'class1':StartCheck=='Not Available.', 'class2':StartCheck!='Not Available.'}" >{{BankRefNo}}</span>
+}</td>
                     </tr>
+}
 
                 </tbody>
+}
                 <!-- <tr>
                     <td colspan="9">
                       <div class="row justify-content-center no-gutters"
@@ -142,9 +156,11 @@
                                         </tr>
                                     </thead>
                                     <tbody >
-                                        <tr *ngFor="let obj of cheque_nolist | paginate: { itemsPerPage: 10, currentPage: p2, id: 'second' }">
+                                        @for (obj of cheque_nolist | paginate: { itemsPerPage: 10, currentPage: p2, id: 'second' }; track obj) {
+<tr>
                                             <td class="col-form-span-label ">{{obj.CHEQUENO}}</td>
                                         </tr>
+}
                                     </tbody>
 
                         </table>

@@ -38,12 +38,14 @@ import { ActivatedRoute } from '@angular/router';
 									                <th><span class="col-form-span-label">Recd Where</span></th>
 									                <th><span class="col-form-span-label">Recd Locally</span></th>
                                                 </tr>
-								                <tr *ngFor="let obj of cargoRecdData">
+								                @for (obj of cargoRecdData; track obj) {
+<tr>
 									                <td><span class="col-form-span-label">{{obj.NOOFPKGS}}</span> </td>
 									                <td><span class="col-form-span-label">{{obj.RECDDATE}}</span></td>
 									                <td><span class="col-form-span-label">{{obj.RECDWHERE}}</span> </td>
 									                <td><span class="col-form-span-label">{{obj.RECDLOCAL}}</span></td>
 								                </tr>
+}
 								            </tbody>
 							            </table>
                                     </td>
@@ -58,13 +60,16 @@ import { ActivatedRoute } from '@angular/router';
 									 <td class="width150"><span class="col-form-span-label">Custom Cleared On </span> </td>
 									 <td colspan="3"><span class="col-form-span-label">{{chronData?.EXPT_SHIPCUSTOM}}</span></td>
 								  </tr>
-								   <tr *ngIf="chronData?.EXPT_MODE != 'SEA'">
+								   @if (chronData?.EXPT_MODE != 'SEA') {
+<tr>
 									 <td class="width150"><span class="col-form-span-label">Carted Date</span> </td>
 									 <td colspan="3"><span class="col-form-span-label">{{chronData?.CARTEDDT}}</span></td>
 								  </tr>
+}
 								</tbody>
 							</table>
-                            <table class="table table-bordered table-sm-new bgwhite" *ngIf="chronData?.EXPT_MODE == 'SEA'">
+                            @if (chronData?.EXPT_MODE == 'SEA') {
+<table class="table table-bordered table-sm-new bgwhite">
 							   <tbody>
 								   <tr>
 									 <th  class="col-form-span-heading" colspan="4"><span class="col-form-span-label">Carting Details</span></th>
@@ -78,17 +83,20 @@ import { ActivatedRoute } from '@angular/router';
 									                <th><span class="col-form-span-label">No.of Packages</span></th>
 									                <th><span class="col-form-span-label">Remark</span></th>
                                                 </tr>
-								                <tr *ngFor="let obj of cartingData">
+								                @for (obj of cartingData; track obj) {
+<tr>
 									                <td><span class="col-form-span-label">{{obj.CARTEDON}}</span> </td>
 									                <td><span class="col-form-span-label">{{obj.NOOFPKG}}</span></td>
 									                <td><span class="col-form-span-label">{{obj.REMARK}}</span> </td>
 								                </tr>
+}
 								            </tbody>
 							            </table>
                                      </td>
 								  </tr>
 								</tbody>
 							</table>
+}
                             <table class="table table-bordered table-sm-new  bgwhite">
 							   <tbody>
 								   <tr>
@@ -97,7 +105,8 @@ import { ActivatedRoute } from '@angular/router';
 								  </tr>
 								</tbody>
 							</table>
-                            <table class="table table-bordered table-sm-new bgwhite" *ngIf="chronData?.EXPT_MODE == 'SEA'">
+                            @if (chronData?.EXPT_MODE == 'SEA') {
+<table class="table table-bordered table-sm-new bgwhite">
 							   <tbody>
 								   <tr>
 									 <td colspan="3"><span class="col-form-span-label">Container Loading at Origin Confirmation Date</span> </td>
@@ -105,7 +114,9 @@ import { ActivatedRoute } from '@angular/router';
 								  </tr>
 								</tbody>
 							</table>
-                            <table class="table table-bordered table-sm-new bgwhite" *ngIf="chronData?.EXPT_MODE == 'SEA'">
+}
+                            @if (chronData?.EXPT_MODE == 'SEA') {
+<table class="table table-bordered table-sm-new bgwhite">
 							   <tbody>
 								   <tr>
 									 <td class="width150"><span class="col-form-span-label">E.T.D. (SCHEDULED)</span> </td>
@@ -117,24 +128,33 @@ import { ActivatedRoute } from '@angular/router';
 								  </tr>
 								</tbody>
 							</table>
-                            <table class="table table-bordered table-sm-new bgwhite" *ngIf="chronData?.EXPT_MODE == 'SEA'">
+}
+                            @if (chronData?.EXPT_MODE == 'SEA') {
+<table class="table table-bordered table-sm-new bgwhite">
 							   <tbody>
-								   <tr *ngIf="loadTrans?.EXPT_TRANSPORT1 != ''">
+								   @if (loadTrans?.EXPT_TRANSPORT1 != '') {
+<tr>
 									 <td  colspan="3"><span class="col-form-span-label">Container Loading at Transhipment Port1 Confirmation Date</span> </td>
 									 <td class="width150"><span class="col-form-span-label">{{loadTrans?.EXPT_LOAD1_DATE}}</span></td>
 								  </tr>
-								   <tr *ngIf="loadTrans?.EXPT_TRANSPORT2 != ''">
+}
+								   @if (loadTrans?.EXPT_TRANSPORT2 != '') {
+<tr>
 									 <td colspan="3"><span class="col-form-span-label">Container Loading at Transhipment Port2 Confirmation Date</span> </td>
 									 <td class="width150"><span class="col-form-span-label">{{loadTrans?.EXPT_LOAD2_DATE}}</span></td>
 								  </tr>
+}
 								</tbody>
 							</table>
+}
                             <table class="table table-bordered table-sm-new bgwhite">
 							   <tbody>
-								   <tr *ngIf="chronData?.EXPT_MODE != 'SEA'">
+								   @if (chronData?.EXPT_MODE != 'SEA') {
+<tr>
 									 <td class="width150"><span class="col-form-span-label">Flight Date</span> </td>
 									 <td colspan="3"><span class="col-form-span-label">{{chronData?.FLIGHTDT}}</span></td>
 								  </tr>
+}
 								   <tr>
 									 <td class="width150"><span class="col-form-span-label">EP Copy Recd Date</span> </td>
 									 <td colspan="3"><span class="col-form-span-label">{{chronData?.EPCOPYDT}}</span></td>
@@ -149,7 +169,8 @@ import { ActivatedRoute } from '@angular/router';
 								  </tr>
 								</tbody>
 							</table>
-                            <table class="table table-bordered table-sm-new bgwhite" *ngIf="destDocData.length > 0">
+                            @if (destDocData.length > 0) {
+<table class="table table-bordered table-sm-new bgwhite">
 							   <tbody>
 								   <tr>
 									 <th colspan="4"><span class="col-form-span-label">DESTINATION DOCUMENTS RECEIVED :</span></th>
@@ -163,39 +184,50 @@ import { ActivatedRoute } from '@angular/router';
 									                <th><span class="col-form-span-label">List Of Documents</span></th>
 									                <th><span class="col-form-span-label">Recd. Date</span></th>
                                                 </tr>
-								                <tr *ngFor="let obj of destDocData">
+								                @for (obj of destDocData; track obj) {
+<tr>
 									                <td><span class="col-form-span-label">{{obj.ID}}</span> </td>
 									                <td><span class="col-form-span-label">{{obj.DOCUMENT}}</span></td>
 									                <td><span class="col-form-span-label">{{obj.RECDDT}}</span> </td>
 								                </tr>
+}
 								            </tbody>
 							            </table>
                                      </td>
 								  </tr>
 								</tbody>
 							</table>
+}
                             <table class="table table-bordered table-sm-new bgwhite">
 							   <tbody>
-								   <tr *ngIf="destDocData.length > 0">
+								   @if (destDocData.length > 0) {
+<tr>
 									 <th colspan="4"><span class="col-form-span-label">DOCUMENT SENT TO CONSIGNEE :</span></th>
 								  </tr>
-								   <tr *ngIf="destDocData.length > 0">
+}
+								   @if (destDocData.length > 0) {
+<tr>
 									 <td class="width150"><span class="col-form-span-label">Date.</span> </td>
 									 <td><span class="col-form-span-label">{{chronData?.DOCSENTDT}}</span></td>
 									 <td class="width150"><span class="col-form-span-label">Courier No.</span></td>
 									 <td><span class="col-form-span-label">{{chronData?.COURIERNO}}</span></td>
 								  </tr>
-								   <tr *ngIf="destDocData.length > 0">
+}
+								   @if (destDocData.length > 0) {
+<tr>
 									 <td class="width150"><span class="col-form-span-label">Remark</span> </td>
 									 <td colspan="3"><span class="col-form-span-label">{{chronData?.DESTDOCRMK}}</span></td>
 								  </tr>
+}
 								   <tr>
 									 <td class="width150"><span class="col-form-span-label">Actual Arrival date</span> </td>
 									 <td colspan="3"><span class="col-form-span-label">{{chronData?.EXPT_ACT_ARRIVAL_DATE}}</span></td>
 								  </tr>
 								   <tr>
 									 <td class="width150"><span class="col-form-span-label">Delivery given date</span> </td>
-									 <td colspan="3"><span class="col-form-span-label" *ngFor="let obj of deliveryData">{{chronData?.ACTUALDT}}</span></td>
+									 <td colspan="3">@for (obj of deliveryData; track obj) {
+<span class="col-form-span-label">{{chronData?.ACTUALDT}}</span>
+}</td>
 								  </tr>
 								   <tr>
 									 <td class="width150"><span class="col-form-span-label">CC No.</span> </td>

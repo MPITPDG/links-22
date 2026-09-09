@@ -1,6 +1,7 @@
 <div class="animated fadeIn">
     <div class="container">
-        <div class="row" *ngIf="Searchdata_list.length==0">
+        @if (Searchdata_list.length==0) {
+<div class="row">
             <div class="col-sm-3"></div>
             <div class="col-sm-6">
                 <table class="table table-bordered table-sm-new bgwhite" style="font-family:  Verdana;font-size: 12px;">
@@ -125,51 +126,82 @@
             </div>
             <div class="col-sm-3"></div>
         </div>
-         <div *ngIf="Searchdata_list.length >1" >  
+}
+         @if (Searchdata_list.length >1) {
+<div >  
             <!-- <button class="btn btn-sm btn-warning" style="float: right;" (click)="back();"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to search</u></span></button> -->
             <button class="btn btn-sm btn-warning" style="float: right;" (click)="Searchdata_list=[]"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to search</u></span></button>
        </div>
+}
       
        
-                <main *ngIf="Searchdata_list.length >1"> 
+                @if (Searchdata_list.length >1) {
+<main> 
                 <div id="content"> 
                 <div class="table-wrapper">
                 <table class="table table-bordered table-sm-new bgwhite"> 
                     <thead class="title-head formheading" >
                         <tr > 
-                            <th *ngIf="exampleRadios1=='6'" class="centerlabel"><input type="checkbox" [(ngModel)]='checkbox'  (change)="checkAll($event)" /> &nbsp; </th>
+                            @if (exampleRadios1=='6') {
+<th class="centerlabel"><input type="checkbox" [(ngModel)]='checkbox'  (change)="checkAll($event)" /> &nbsp; </th>
+}
                             <th align="center">INV NO</th>
                             <th align="center"  [class.active]="order === 'INV_DATE'" (click)="setOrder('INV_DATE')">INV DATE  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
                             <th align="center" [class.active]="order === 'EXP_NAME'" (click)="setOrder('EXP_NAME')" >CLIENT  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
                             <th align="center"  [class.active]="order === 'INV_BILLTYPE'" (click)="setOrder('INV_BILLTYPE')">BILLTYPE  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
                            
-                            <th  *ngIf="exampleRadios1!='6'"  [class.active]="order === 'INVOICED_ON'" (click)="setOrder('INVOICED_ON')"  align="center">INVOICED ON <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
-                            <th  *ngIf="exampleRadios1!='6'"  align="center">AUTHORISED ON</th>
-                            <th  *ngIf="exampleRadios1!='6'"  [class.active]="order === 'AUTHORISEDBY'" (click)="setOrder('AUTHORISEDBY')"  align="center">AUTHORISED BY  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
-                            <th  *ngIf="exampleRadios1=='6'"  [class.active]="order === 'TOTALAMT'" (click)="setOrder('TOTALAMT')"  align="center">TOTAL AMT  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
+                            @if (exampleRadios1!='6') {
+<th   [class.active]="order === 'INVOICED_ON'" (click)="setOrder('INVOICED_ON')"  align="center">INVOICED ON <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
+}
+                            @if (exampleRadios1!='6') {
+<th   align="center">AUTHORISED ON</th>
+}
+                            @if (exampleRadios1!='6') {
+<th   [class.active]="order === 'AUTHORISEDBY'" (click)="setOrder('AUTHORISEDBY')"  align="center">AUTHORISED BY  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
+}
+                            @if (exampleRadios1=='6') {
+<th   [class.active]="order === 'TOTALAMT'" (click)="setOrder('TOTALAMT')"  align="center">TOTAL AMT  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
+}
                         </tr>
                     </thead>
-                    <tbody *ngIf="Searchdata_list.length > 1">                       
-                        <tr *ngFor="let data of Searchdata_list | orderBy: order:reverse:'case-insensitive'">
-                            <td *ngIf="exampleRadios1=='6'" class="centerlabel"> <input type="checkbox" [(ngModel)]="data.Checked" (ngModelChange)="getCheckboxValues($event,data.INV_NO)"> &nbsp; </td>
+                    @if (Searchdata_list.length > 1) {
+<tbody>                       
+                        @for (data of Searchdata_list | orderBy: order:reverse:'case-insensitive'; track data) {
+<tr>
+                            @if (exampleRadios1=='6') {
+<td class="centerlabel"> <input type="checkbox" [(ngModel)]="data.Checked" (ngModelChange)="getCheckboxValues($event,data.INV_NO)"> &nbsp; </td>
+}
                             <td><span class="col-form-span-label anchor-link"  (click)="ListOnclick(data.INV_NO)">{{data.INV_NO}}</span>  </td>
                             <td><span class="col-form-span-label">{{data.INV_DATE}}</span></td>
                             <td><span class="col-form-span-label">{{data.EXP_NAME}}</span></td>
                             <td><span class="col-form-span-label">{{data.INV_BILLTYPE}}</span></td>                           
-                            <td *ngIf="exampleRadios1!='6'" ><span class="col-form-span-label">{{data.INVOICED_ON}}</span></td>
-                            <td *ngIf="exampleRadios1!='6'"><span class="col-form-span-label">{{data.AUTHORISEDON}}</span></td>
-                            <td *ngIf="exampleRadios1!='6'"><span class="col-form-span-label">{{data.AUTHORISEDBY}}</span></td>
-                            <td *ngIf="exampleRadios1=='6'"><span class="col-form-span-label">{{data.TOTALAMT}}</span></td>
+                            @if (exampleRadios1!='6') {
+<td ><span class="col-form-span-label">{{data.INVOICED_ON}}</span></td>
+}
+                            @if (exampleRadios1!='6') {
+<td><span class="col-form-span-label">{{data.AUTHORISEDON}}</span></td>
+}
+                            @if (exampleRadios1!='6') {
+<td><span class="col-form-span-label">{{data.AUTHORISEDBY}}</span></td>
+}
+                            @if (exampleRadios1=='6') {
+<td><span class="col-form-span-label">{{data.TOTALAMT}}</span></td>
+}
                         </tr>
+}
                     </tbody>
+}
                     <tr>
-                        <td *ngIf="exampleRadios1=='6'" colspan="10" class="right-text pr-2">
+                        @if (exampleRadios1=='6') {
+<td colspan="10" class="right-text pr-2">
                             <button class="btn btn-sm btn-success" type="submit" (click)="PrintInvoice()"> <span  class="col-form-span-label"><i class="fa fa-print"></i>&nbsp;Print</span></button>
                         </td>
+}
                     </tr>
                 </table>
                 </div>                    
             </div>
-        </main>     
+        </main>
+}     
     </div>
 </div>

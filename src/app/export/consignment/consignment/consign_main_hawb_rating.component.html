@@ -1,6 +1,8 @@
 ﻿<table class="table table-bordered table-sm-new bglightmaroon">
    <tbody>
-	  <tr *ngIf="ErrorMessage != null || ErrorMessage != ''"><td colspan="10"><span class="col-form-span-label red"><b><small>{{ErrorMessage}}</small></b></span></td></tr>
+	  @if (ErrorMessage != null || ErrorMessage != '') {
+<tr><td colspan="10"><span class="col-form-span-label red"><b><small>{{ErrorMessage}}</small></b></span></td></tr>
+}
 	  <tr>
 		 <td colspan="3"><span class="col-form-span-label"><strong>HAWB Print Type </strong></span></td>
 		 <td colspan="7">
@@ -151,7 +153,9 @@
 				</ng-select> -->
 				<select class="form-control  width120" [(ngModel)]="DrpExchRate" (change)="checkExchRateCurDrp(DrpExchRate)">
 					<option value="null">--select--</option>
-					<option *ngFor="let d of rateList" value={{d.CUR_CODE}}>{{d.CUR_CODE}}</option>
+					@for (d of rateList; track d) {
+<option value={{d.CUR_CODE}}>{{d.CUR_CODE}}</option>
+}
 			  </select>
 				<span class="col-form-span-label"><strong>=</strong></span>
 			</span>
@@ -215,7 +219,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="PPchrg_SellingCur" (change)="fnChkExchangeRate(1, 'PP', PPchrg_SellingCur)" [disabled]="FreightRate == 'CC'">
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -236,7 +242,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="Ccchrg_SellingCur" (change)="fnChkExchangeRate(1, 'CC', Ccchrg_SellingCur)" [disabled]="FreightRate == 'PP'">
 				<option value="">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -283,7 +291,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="PpFsc_SellingCur"  (change)="fnChkExchangeRate(2, 'PP', PpFsc_SellingCur)" [disabled]="(FreightRate == 'CC' || FreightChargeble == 1)">
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -304,7 +314,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="CcFsc_SellingCur"   (change)="fnChkExchangeRate(2, 'CC', CcFsc_SellingCur)"  [disabled]="(FreightChargeble == 1 || FreightRate == 'PP')">
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -348,7 +360,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="PpIrc_SellingCur"  (change)="fnChkExchangeRate(3, 'PP', PpIrc_SellingCur)" 	[disabled]="(FreightRate == 'CC' || FreightChargeble == 1)">
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -369,7 +383,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="CcIrc_SellingCur"  (change)="fnChkExchangeRate(3, 'CC', CcIrc_SellingCur)"	 [disabled]="(FreightChargeble == 1 || FreightRate == 'PP')">
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -414,7 +430,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="PpXray_SellingCur"  (change)="fnChkExchangeRate(4, 'PP', PpXray_SellingCur)">
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -435,7 +453,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="CcXray_SellingCur"  (change)="fnChkExchangeRate(4, 'CC', CcXray_SellingCur)" >
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -478,7 +498,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="McCurPP"  (change)="fnChkExchangeRate(5, 'PP', McCurPP)" [disabled]="FreightRate == 'CC'">
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -500,7 +522,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="McCur"   (change)="fnChkExchangeRate(5, 'CC', McCur)" [disabled]="FreightRate == 'PP'">
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -545,7 +569,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="fobCurPP"  (change)="fnChkExchangeRate(18, 'PP', fobCurPP)" [disabled]="FreightRate == 'CC'">
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -567,7 +593,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="fobCur"  (change)="fnChkExchangeRate(18, 'CC', fobCur)"  	[disabled]="FreightRate == 'PP'">
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -814,7 +842,9 @@
 			</ng-select> -->
 			<select class="form-control width80"   [(ngModel)]="DcCurPP" (change)="fnChkExchangeRate(9, 'PP', DcCurPP)" 	[disabled]="FreightRate == 'CC'">
 				<option value="null">--</option>
-				 <option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				 @for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 			</select>
 		</td>
 		<td>
@@ -835,7 +865,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="DcCur"  (change)="fnChkExchangeRate(9, 'CC', DcCur)" [disabled]="FreightRate == 'PP'">
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -865,7 +897,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="ScrCurPP"  (change)="fnChkExchangeRate(10, 'PP', ScrCurPP)" [disabled]="FreightRate == 'CC'">
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -886,7 +920,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="ScrCur"   (change)="fnChkExchangeRate(10, 'CC', ScrCur)"  [disabled]="FreightRate == 'PP'">
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -916,7 +952,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="MycCurPP"   (change)="fnChkExchangeRate(11, 'PP', MycCurPP)"  [disabled]="FreightRate == 'CC'">
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -937,7 +975,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="MycCur"  (change)="fnChkExchangeRate(11, 'CC', MycCur)"  [disabled]="FreightRate == 'PP'">
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -978,7 +1018,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="HawbCurPP" (change)="fnChkExchangeRate(13, 'PP', HawbCurPP)" [disabled]="FreightRate == 'CC'"  >
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -999,7 +1041,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="HawbCur"  (change)="fnChkExchangeRate(13, 'CC', HawbCur)"  [disabled]="FreightRate == 'PP'"  >
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -1025,7 +1069,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="PcaCurPP"   (change)="fnChkExchangeRate(14, 'PP', PcaCurPP)"  [disabled]="FreightRate == 'CC'"  >
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -1046,7 +1092,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="PcaCur"   	(change)="fnChkExchangeRate(14, 'CC', PcaCur)"   	[disabled]="FreightRate == 'PP'"  >
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -1102,7 +1150,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="OtherRateCurPP"  (change)="fnChkExchangeRate(17, 'PP', OtherRateCurPP)" [disabled]="FreightRate == 'CC'" >
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -1123,7 +1173,9 @@
 			</ng-select> -->
 			<select class="form-control  width80" [(ngModel)]="OtherRateCur"   (change)="fnChkExchangeRate(17, 'CC', OtherRateCur)" [disabled]="FreightRate == 'PP'" >
 				<option value="null">--</option>
-				<option *ngFor="let d of currencyList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 		  </select>
 		</td>
 		<td>
@@ -1141,13 +1193,17 @@
 					<td>
 						<select class="form-control width80" [(ngModel)]="CHARGETYPE" (change)="GetChrges(CHARGETYPE)" >
 						   <option value="null">--Select--</option>
-						   <option *ngFor="let d of ChrgTypelist" value={{d.DataValueField}}>{{d.DataTextField}}</option>
+						   @for (d of ChrgTypelist; track d) {
+<option value={{d.DataValueField}}>{{d.DataTextField}}</option>
+}
 				   </select>
 					</td>
 					<td>
 						<select class="form-control  width130" [(ngModel)]="CHARGENAME" >
 						<option value="null">--</option>
-						<option *ngFor="let d of AirLineCharges" value={{d.DataValueField}}>{{d.DataTextField}}</option>
+						@for (d of AirLineCharges; track d) {
+<option value={{d.DataValueField}}>{{d.DataTextField}}</option>
+}
 				  </select></td>
 
 					<td class="width60"></td>
@@ -1195,7 +1251,8 @@
 				  </tr>
 				<tr>
 					<td colspan="11">
-						<table class="table table-bordered  table-sm-new bgwhite" *ngIf="Chargeslist.length>0" width="100%" >
+						@if (Chargeslist.length>0) {
+<table class="table table-bordered  table-sm-new bgwhite" width="100%" >
 											<thead>
 												<tr class="formheading">
 													<th></th>
@@ -1209,7 +1266,8 @@
 												</tr>
 											</thead>
 											 <tbody   >
-												<tr *ngFor="let obj of Chargeslist">
+												@for (obj of Chargeslist; track obj) {
+<tr>
 													<td class="centerlabel">
 														<i class="fa fa-pencil" (click)="Editchildrecd(obj.PK_ID)"  ></i>
 														&nbsp;
@@ -1223,8 +1281,10 @@
 													<td><span class="col-form-span-label">{{obj.RATE_NET_FRT}}</span></td>
 													<td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
 												</tr>
+}
 											</tbody>
 										</table>
+}
 
 					</td>
 				</tr>

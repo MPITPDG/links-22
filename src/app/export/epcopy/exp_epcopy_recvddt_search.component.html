@@ -42,7 +42,8 @@
 		<div class="col-sm-3">
 		</div>
     </div>
-    <div class="row" *ngIf="searchList.length > 0">
+    @if (searchList.length > 0) {
+<div class="row">
 		<div class="col-sm-12">
 			<br />
 			<table class="table table-bordered table-striped table-sm-new bgwhite">
@@ -57,7 +58,8 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let obj of searchList" (click)="rowClick(obj['M.P.REFERENCE'])" style="cursor: pointer;">
+					@for (obj of searchList; track obj) {
+<tr (click)="rowClick(obj['M.P.REFERENCE'])" style="cursor: pointer;">
 						<td><span class="col-form-span-label">{{obj["exptno"]}}</span></td>
 						<td><span class="col-form-span-label">{{obj["exp_name"]}}</span></td>
 						<td><span class="col-form-span-label">{{obj["con_name"]}}</span></td>
@@ -65,14 +67,18 @@
 						<td><span class="col-form-span-label">{{obj["expt_noofpcs"]}}</span></td>
 						<td><span class="col-form-span-label">{{obj["Order_No_Style_Details"]}}</span></td>
 					</tr>
+}
 				</tbody>
 			</table>
 		</div>
 	</div>
-	<div class="row" *ngIf="searchListLength == -1">
+}
+	@if (searchListLength == -1) {
+<div class="row">
 		<div class="col-sm-12 centerlabel">
 			<br /><br />
 			<span class="col-form-span-label">No Record Found!</span>
 		</div>
 	</div>
+}
 </div>

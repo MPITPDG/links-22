@@ -5,14 +5,22 @@ import { filter } from 'rxjs/operators';
 @Component({
   selector: 'app-breadcrumbs',
   template: `
-  <ng-template ngFor let-breadcrumb [ngForOf]="breadcrumbs" let-last = last>
-    <li class="breadcrumb-item"
-        *ngIf="breadcrumb.label.title&&breadcrumb.url.substring(breadcrumb.url.length-1) == '/'||breadcrumb.label.title&&last"
+  @for (breadcrumb of breadcrumbs; track breadcrumb; let last = $last) {
+
+    @if (breadcrumb.label.title&&breadcrumb.url.substring(breadcrumb.url.length-1) == '/'||breadcrumb.label.title&&last) {
+<li class="breadcrumb-item"
+       
         [ngClass]="{active: last}">
-      <a *ngIf="!last" [routerLink]="breadcrumb.url">{{breadcrumb.label.title}}</a>
-      <span *ngIf="last" [routerLink]="breadcrumb.url">{{breadcrumb.label.title}}</span>
+      @if (!last) {
+<a [routerLink]="breadcrumb.url">{{breadcrumb.label.title}}</a>
+}
+      @if (last) {
+<span [routerLink]="breadcrumb.url">{{breadcrumb.label.title}}</span>
+}
     </li>
-  </ng-template>`,
+}
+  
+}`,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

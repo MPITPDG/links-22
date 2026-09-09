@@ -20,7 +20,9 @@
                         <!--select class="form-control width150"  [(ngModel)]="city"-->
                             <select class="form-control width150"  [(ngModel)]="undergroup"  (change)="getgroupcode($event.target.value)" style="border-radius: 7px;">
                             <option value="">Please select</option>
-                            <option *ngFor="let d of undergrouplist" value={{d.Code}}>{{d.Name}}</option>
+                            @for (d of undergrouplist; track d) {
+<option value={{d.Code}}>{{d.Name}}</option>
+}
                         </select>
                     </td>
                     </tr>
@@ -293,7 +295,8 @@
                             </td>
 
                         </tr>
-                        <tr  *ngIf="grp=='M000020' || grp=='M000024'">
+                        @if (grp=='M000020' || grp=='M000024') {
+<tr >
                             <td class="col-form-span-heading   " colspan="4">
                                 <!-- <input type="checkbox"   [(ngModel)]="IS_TDSApp" (change)="checkValue(IS_TDSApp?'TDS':'')"  /> -->
                                 <input type="checkbox"   [(ngModel)]="IS_TDSApp" (change)="checkValue(IS_TDSApp?'TDS':'')"  />
@@ -301,15 +304,21 @@
                                     
                             </td>
                         </tr>
+}
 
-                            <tr *ngIf="IS_TDSApp==true"  >
+                            @if (IS_TDSApp==true) {
+<tr  >
                                 <td><span class="col-form-span-label"><b>Section</b> </span><span class="col-form-span-error">*</span></td>
                                 <td colspan="3"><select class="form-control width150"  [(ngModel)]="sections" style="border-radius: 7px;">
                                     <option value="">Please select</option>
-                                    <option *ngFor="let d of Sectionlist" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+                                    @for (d of Sectionlist; track d) {
+<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+}
                                 </select>  </td>
                             </tr>
-                            <tr *ngIf="IS_TDSApp==true" >
+}
+                            @if (IS_TDSApp==true) {
+<tr >
                                <td><span class="col-form-span-label"><b>From Date</b> </span></td>
                                 <td style="width: 30%;">
                                     <my-date-picker name="frmdt" [options]="myDatePickerOptions" [(ngModel)]="frmdt" required></my-date-picker>
@@ -319,7 +328,9 @@
                                     <my-date-picker name="todt" [options]="myDatePickerOptions" [(ngModel)]="todt" required></my-date-picker>
                                 </td>
                             </tr>
-                            <tr  *ngIf="IS_TDSApp==true">
+}
+                            @if (IS_TDSApp==true) {
+<tr >
                                 <td><span class="col-form-span-label"><b>TDS Type</b> </span></td>
                                 <td>    <select class="form-control width150"  [(ngModel)]="tdstype"  (change)="EnableLDSRate($event.target.value)" style="border-radius: 7px;">
                                     <option value="">Please Select</option>
@@ -332,33 +343,43 @@
                                 <td>  <input [(ngModel)]="secRate" type="text" class="form-control width50" OnlyNumber="true" style="border-radius: 7px;"> </td>
 
                             </tr>
-                            <tr   *ngIf="IS_TDSApp==true">
+}
+                            @if (IS_TDSApp==true) {
+<tr  >
                                 <td><span class="col-form-span-label"><b>LDC % Rate</b> </span></td>
                                 <td>  <input [(ngModel)]="ldcRate" type="text" [disabled]='disableldcrate' class="form-control width50" OnlyNumber="true" style="border-radius: 7px;"> </td>
                                 <td><span class="col-form-span-label"><b>Amount Limit</b> </span></td>
                                 <td><input [(ngModel)]="tdsLimit" type="text" OnlyNumber="true" class="form-control width100" [disabled]='disablelimitamt' style="border-radius: 7px;"> </td>
 
                             </tr>
-                            <tr *ngIf="IS_TDSApp==true" >
+}
+                            @if (IS_TDSApp==true) {
+<tr >
                             <td><span class="col-form-span-label"><b>Company</b> </span></td>
                             <td>
                                 <select class="form-control width250"  [(ngModel)]="Company" [disabled]='disablecompany' style="border-radius: 7px;">
                                     <option value="">Please select</option>
-                                    <option *ngFor="let d of TDSCompanyList" value={{d.CMP_CODE}}>{{d.CMP_NAME}}</option>
+                                    @for (d of TDSCompanyList; track d) {
+<option value={{d.CMP_CODE}}>{{d.CMP_NAME}}</option>
+}
                                 </select>
                                </td>
                                 <td><span class="col-form-span-label"><b>Certificate No.</b> </span></td>
                                 <td>  <input [(ngModel)]="LdccertNo" type="text" OnlyNumber="true"   class="form-control width100"  [disabled]='disablecertno' style="border-radius: 7px;"> </td>
 
                             </tr>
+}
 
-                            <tr  *ngIf="IS_TDSApp==true">
+                            @if (IS_TDSApp==true) {
+<tr >
                                 <td colspan="4"  class="centerlabel">
                                     <button class="btn btn-sm btn-success" type="submit" (click)="AddTDScildrcrd()"> <span class="col-form-span-label"><i class="fa fa-plus" ></i> {{txtchildTDS}}</span></button>
                                     <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="ResetTDScildrcrd();"><i class="fa fa-ban"></i> Reset</span></button>
                                 </td>
                             </tr>
-                            <tr *ngIf="IS_TDSApp==true">
+}
+                            @if (IS_TDSApp==true) {
+<tr>
                                 <td colspan="4">
                                     <!-- <div class="row xyscroll" style="overflow-y: auto; width:715px" *ngIf="TdsList.length > 0"> -->
                                         <div class="row xyscroll" style="overflow-y: auto; width:715px">
@@ -378,8 +399,10 @@
                                                         <th class="width100 centerlabel"><span class="col-form-span-label">COMPANY</span></th>
                                                     </tr>
                                                 </thead>
-                                                <tbody   *ngIf="TdsList.length>0">
-                                                    <tr *ngFor="let obj of TdsList">
+                                                @if (TdsList.length>0) {
+<tbody  >
+                                                    @for (obj of TdsList; track obj) {
+<tr>
                                                         <td class="width50 centerlabel">
                                                             <i class="fa fa-pencil" (click)="EDIT_Tds(obj.PKID)" ></i>
                                                             <!-- &nbsp;
@@ -395,11 +418,14 @@
                                                         <td><span class="width100 col-form-span-label">{{obj.LDCCERTNO }}</span></td>
                                                         <td><span class="width100 col-form-span-label">{{obj.CMP_NAME }}</span></td>
                                                     </tr>
+}
                                                 </tbody>
+}
                                             </table>
                                     </div>
                                 </td>
                             </tr>
+}
                         <tr>
                             <td colspan="4"  class="centerlabel">
                                 <button class="btn btn-sm btn-success" type="submit" (click)="AddMain()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{text}}</span></button>

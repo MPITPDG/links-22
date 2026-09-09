@@ -49,7 +49,9 @@
 				<td>
 					<select class="form-control width150" id="selePrt" name="selePrt" [(ngModel)]="Vslport">
 						<option value="-1">Please select</option>
-						 <option *ngFor="let d of ports" value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
+						 @for (d of ports; track d) {
+<option value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
+}
 					</select>
 				</td>
 				<td>
@@ -120,7 +122,9 @@
 				<td>
 					<select class="form-control width200" id="seleAgnt" name="seleAgnt" (change)="onAgentSelect($event.target.value)" [(ngModel)]="VslAgent" >
 						<option value="0">Please select</option>
-						<option *ngFor="let a of Agents" value={{a.AGT_CODE}}>{{a.AGT_NAME}}</option>
+						@for (a of Agents; track a) {
+<option value={{a.AGT_CODE}}>{{a.AGT_NAME}}</option>
+}
 					</select>
 				</td>
 				<td>
@@ -129,7 +133,9 @@
 				<td>
 					<select class="form-control width200" id="SeleShpLine" name="SeleShpLine" [(ngModel)]="VslspLine">
 						<option value="0">Please select</option>
-							<option *ngFor="let l of Arrliner" value={{l.LINER_CODE}}>{{l.LINER_NAME}}</option>
+							@for (l of Arrliner; track l) {
+<option value={{l.LINER_CODE}}>{{l.LINER_NAME}}</option>
+}
 					</select>
 				</td>
 			</tr>
@@ -178,7 +184,8 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let prtAgt of SavPrtAgt">									 
+					@for (prtAgt of SavPrtAgt; track prtAgt) {
+<tr>									 
 						<td>											
 							<i class="fa fa-pencil" (click)="Edit_prtAgtDtls(prtAgt.TBL_INDEXID)"></i>	
 							<i class="fa fa-trash" (click)="delete_prtagt(prtAgt.TBL_INDEXID)" ></i>											 
@@ -196,6 +203,7 @@
 						<td><span class="col-form-span-label">{{prtAgt.AGT_CARTCLERK}}</span></td>
 						
 					</tr>
+}
 				</tbody>									
 			</table>
 		</div>

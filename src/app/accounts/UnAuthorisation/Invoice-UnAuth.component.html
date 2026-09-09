@@ -40,8 +40,9 @@
           </tr>
         </thead>
         <tbody class="bgwhite">
-          <tr
-            *ngFor="let obj of unauthtable | accountpipefilter: searchString|orderBy: order:reverse:'case-insensitive'|paginate: { itemsPerPage:25, currentPage: PageActual }">
+          @for (obj of unauthtable | accountpipefilter: searchString|orderBy: order:reverse:'case-insensitive'|paginate: { itemsPerPage:25, currentPage: PageActual }; track obj) {
+<tr
+           >
             <td class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.Checked" (ngModelChange)="getCheckboxValues($event,obj.INV_CRTNO)"> &nbsp; </td>
             <td class="col-form-span-label">{{obj.TRNS_TYPE}}</td>
             <td class="col-form-span-label"  (click)="datapopup(obj.INV_CRTNO,template)" >{{obj.INV_CRTNO}}</td> 
@@ -52,6 +53,7 @@
             <td class="col-form-span-label" [innerHTML]="obj.CLIENTNAME"></td>
             <td class="col-form-span-label" style="text-align: right;">{{obj.TOTAL_AMT|number:'2.2-4'}}</td>
           </tr>
+}
         </tbody>
         <tr>
           <td colspan="8" class="right-text pr-2">

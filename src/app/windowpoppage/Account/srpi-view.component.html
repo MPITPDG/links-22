@@ -54,7 +54,8 @@
     <td class="col-form-span-heading " colspan="4">
         Account Details 
     </td>
-    <tr *ngIf=" flag != 'Y' &&  flag == 'EDIT'">
+    @if ( flag != 'Y' &&  flag == 'EDIT') {
+<tr>
       <td><span class="col-form-span-label"><b>Account Name</b> </span><span class="col-form-span-error">*</span></td>
       <td colspan="3">
         <span class="col-form-span-label">{{ACCTNAME}}</span>  
@@ -64,7 +65,9 @@
 
       </td>
   </tr>
-  <tr *ngIf=" flag == 'VIEW'">
+}
+  @if ( flag == 'VIEW') {
+<tr>
       <td><span class="col-form-span-label"><b>Item</b> </span><span class="col-form-span-error">*</span></td>
       <td colspan="3">
         <span class="col-form-span-label">{{ItemName}}</span>
@@ -73,7 +76,9 @@
       </ng-select> -->
       </td>
   </tr>
-  <tr *ngIf=" flag == 'EDIT'">
+}
+  @if ( flag == 'EDIT') {
+<tr>
       <td><span class="col-form-span-label"><b> Amount</b> </span><span class="col-form-span-error">*</span></td>
       <td> <span class="col-form-span-label">{{Amount}}</span> </td>
       <!-- <td >  <input [(ngModel)]="Amount"  [disabled]="disable_Amount" type="text"    class="form-control width150" maxlength="40" > </td> -->
@@ -81,7 +86,9 @@
       <!-- <td >  <input [(ngModel)]="Deduction"  type="text"    class="form-control width150" maxlength="40" > </td> -->
       <td> <span class="col-form-span-label">{{Deduction}}</span> </td>
   </tr>
-  <tr *ngIf=" flag == 'EDIT'">
+}
+  @if ( flag == 'EDIT') {
+<tr>
       <td><span class="col-form-span-label"><b> Job No</b> </span><span class="col-form-span-error">*</span></td>
       <td> <span class="col-form-span-label">{{JobNo}}</span> </td>
       <!-- <td >  <input [(ngModel)]="JobNo" type="text" [disabled]="disable_JobNo"  class="form-control width150" maxlength="40" > </td> -->
@@ -89,36 +96,53 @@
       <td >  <input [(ngModel)]="actpassedamount"  type="text"    class="form-control width150" maxlength="40" > </td>
 
   </tr>
-  <tr *ngIf=" flag != 'VIEW'">
+}
+  @if ( flag != 'VIEW') {
+<tr>
       <td><span class="col-form-span-label"><b>Narration</b> </span></td>
       <td colspan="3">
           <input [(ngModel)]="ActNarration" type="text"    class="form-control width500" maxlength="40" >
       </td>
   </tr>
+}
 
-  <tr *ngIf=" flag == 'EDIT'">
+  @if ( flag == 'EDIT') {
+<tr>
       <td colspan="4"  class="centerlabel">
           <button class="btn btn-sm btn-success" type="submit" (click)="Addchildrcrd()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{txtchild}}</span></button>
           <!-- <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Resetchildrcrd();"><i class="fa fa-ban"></i> Reset</span></button> -->
       </td>
   </tr>
+}
   <tr>
 
   </tr>
   <tr >
 
       <td><span class="col-form-span-heading"><b> Net Total</b> </span></td>
-      <td *ngIf=" flag == 'EDIT'" colspan="3">  <input [(ngModel)]="NetAmt" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
-      <td *ngIf=" flag == 'VIEW'" colspan="3"> <span class="col-form-span-label">{{NetAmt}}</span> </td>
+      @if ( flag == 'EDIT') {
+<td colspan="3">  <input [(ngModel)]="NetAmt" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
+}
+      @if ( flag == 'VIEW') {
+<td colspan="3"> <span class="col-form-span-label">{{NetAmt}}</span> </td>
+}
 </tr>
 
 <tr>
   <td><span class="col-form-span-label"><b> Amount</b> </span></td>
-  <td *ngIf=" flag == 'EDIT'">  <input [(ngModel)]="NetAmount" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
-  <td *ngIf=" flag == 'VIEW'"> <span class="col-form-span-label">{{NetAmount}}</span> </td>
+  @if ( flag == 'EDIT') {
+<td>  <input [(ngModel)]="NetAmount" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
+}
+  @if ( flag == 'VIEW') {
+<td> <span class="col-form-span-label">{{NetAmount}}</span> </td>
+}
   <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
-  <td *ngIf=" flag == 'EDIT'">  <input [(ngModel)]="Netdeduction" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
-  <td *ngIf=" flag == 'VIEW'"> <span class="col-form-span-label">{{Netdeduction}}</span> </td>
+  @if ( flag == 'EDIT') {
+<td>  <input [(ngModel)]="Netdeduction" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
+}
+  @if ( flag == 'VIEW') {
+<td> <span class="col-form-span-label">{{Netdeduction}}</span> </td>
+}
 </tr>
 <!-- <tr>
   <td colspan="4"  class="centerlabel">
@@ -131,7 +155,9 @@
         <table class="table table-bordered table-sm-new bgwhite ">
           <thead>
             <tr class="col-form-span-heading ">
-              <th  *ngIf=" flag == 'EDIT'" class="col-form-span-label" ></th>
+              @if ( flag == 'EDIT') {
+<th  class="col-form-span-label" ></th>
+}
               <th class="col-form-span-label">Account Name</th>
               <th class="col-form-span-label">Amount</th>
               <th class="col-form-span-label">Deduction</th>
@@ -143,12 +169,15 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let data of datatabl_1">
-              <td *ngIf=" flag == 'EDIT'" class="centerlabel">
+            @for (data of datatabl_1; track data) {
+<tr>
+              @if ( flag == 'EDIT') {
+<td class="centerlabel">
                 <i class="fa fa-pencil" (click)="Editchildrecd(data.ID)" ></i>
                 &nbsp;
                 <i class="fa fa-trash" (click)="deletechildrecd(data.ID,obj.ACC_PURCHASEDTLS_ID)"></i>
             </td>
+}
             <td><span class="col-form-span-label"  [innerHtml]="data.ACCOUNT_NAME"> </span></td>
               <td class="col-form-span-label">{{data.AMOUNT}}</td>
               <td class="col-form-span-label">{{data.DEDUCTION}}</td>
@@ -157,6 +186,7 @@
               <td class="col-form-span-label">{{data.JOBNO}}</td>
               <td class="col-form-span-label">{{data.NARRATION}}</td>
             </tr>
+}
         
           </tbody>
         </table>
@@ -164,9 +194,13 @@
     </tr>
     <tr  >
       <td colspan="4"  class="centerlabel">
-          <button class="btn btn-sm btn-success" *ngIf=" flag == 'EDIT'" type="submit" (click)="SaveVerify()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{text}}</span></button>
-          <button *ngIf=" flag == 'EDIT'" class="btn btn-sm btn-danger" (click)="abortModal()"><span class="col-form-span-label"><i class="fa fa-ban"
+          @if ( flag == 'EDIT') {
+<button class="btn btn-sm btn-success" type="submit" (click)="SaveVerify()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{text}}</span></button>
+}
+          @if ( flag == 'EDIT') {
+<button class="btn btn-sm btn-danger" (click)="abortModal()"><span class="col-form-span-label"><i class="fa fa-ban"
             aria-hidden="true"></i> Abort</span></button>
+}
             
       </td>
   </tr>

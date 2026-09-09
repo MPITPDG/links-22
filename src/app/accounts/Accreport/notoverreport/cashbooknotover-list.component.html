@@ -19,8 +19,10 @@
                             <th class="col-form-span-label" align="center">Amount </th>                        
                         </tr>
                     </thead>
-                    <tbody *ngIf="NotOverList.length > 0">
-                        <tr *ngFor="let data of NotOverList">
+                    @if (NotOverList.length > 0) {
+<tbody>
+                        @for (data of NotOverList; track data) {
+<tr>
                             <td ><span  class="col-form-span-label anchor-link" (click)="OpenPrint(data.entryno,data.status)" >{{data.entryno}}</span> </td> 
                             <td  ><span class="col-form-span-label">{{data.entrydt}}</span>  </td>                             
                             <td  ><span class="col-form-span-label">{{data.chequeno}}</span>  </td>
@@ -29,7 +31,9 @@
                             <td  ><span class="col-form-span-label">{{data.acctname}}</span>  </td>
                             <td  ><span class="col-form-span-label">{{data.actualamount}}</span>  </td>
                         </tr>
+}
                     </tbody>
+}
                     <!-- <tr> <td colspan="7" class="centerlabel">
                        &nbsp;
                     </td>

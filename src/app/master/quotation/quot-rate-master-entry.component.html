@@ -75,8 +75,10 @@
                         <td>
                             <select class="form-control width120" [(ngModel)]="shipmenttype">
                                 <option value="">--Please Select --</option>
-                                <option *ngFor="let d of shipmenttypetable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                                @for (d of shipmenttypetable; track d) {
+<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
                                 </option>
+}
                             </select>
                         </td>
                         <td ><span class="col-form-span-label"><b>Shipment Mode </b> </span>
@@ -85,8 +87,10 @@
                         <td>
                             <select class="form-control width100" [(ngModel)]="shipmentmode">
                                 <option value="">-- Select --</option>
-                                <option *ngFor="let d of shipmentmodetable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                                @for (d of shipmentmodetable; track d) {
+<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
                                 </option>
+}
                             </select>
                         </td>
                      </tr>
@@ -97,7 +101,9 @@
                     <td>
                         <select class="form-control width120" [(ngModel)]="stufftype">
                             <option value="">--Please Select--</option>
-                            <option *ngFor="let d of stufftypetable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+                            @for (d of stufftypetable; track d) {
+<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+}
                         </select>
                     </td>
                     </tr> 
@@ -122,8 +128,10 @@
                     <td>
                         <select class="form-control width120" [(ngModel)]="loadingportterminal">
                             <option value="">--Please Select --</option>
-                            <option *ngFor="let d of portterminal" value={{d.ID}}>{{d.TERMINAL}}
+                            @for (d of portterminal; track d) {
+<option value={{d.ID}}>{{d.TERMINAL}}
                             </option>
+}
                         </select>
                         <!-- <ng-select [items]="portterminal"
                         bindLabel="TERMINAL"
@@ -156,8 +164,10 @@
                     <td>
                         <select class="form-control width120" [(ngModel)]="itemtype">
                             <option value="">-- Select --</option>
-                            <option *ngFor="let d of itemtypetable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                            @for (d of itemtypetable; track d) {
+<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
                             </option>
+}
                         </select>
                     </td>
                      
@@ -169,7 +179,9 @@
                         <td >
                             <select class="form-control width120" [(ngModel)]="conttype">
                                 <option value="">--Please Select--</option>
-                                <option *ngFor="let d of conttypetable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+                                @for (d of conttypetable; track d) {
+<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+}
                             </select>
                         </td>
                         <td><span class="col-form-span-label"><b>Container Size </b> </span><span
@@ -178,8 +190,10 @@
                         <td>
                         <select class="form-control width120" [(ngModel)]="contsize">
                             <option value="">--Please Select --</option>
-                            <option *ngFor="let d of contsizetable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                            @for (d of contsizetable; track d) {
+<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
                             </option>
+}
                         </select>
                         </td>
                                  
@@ -209,8 +223,10 @@
                         <td >
                             <select class="form-control width150" [(ngModel)]="currency">
                                 <option value="">--Please Select Currency--</option>
-                                <option *ngFor="let d of currencytable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
+                                @for (d of currencytable; track d) {
+<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
                                 </option>
+}
 
                             </select>
                         </td>
@@ -268,8 +284,10 @@
                                            
                                         </tr>
                                     </thead>
-                                    <tbody *ngIf="ratedetails.length>0">
-                                        <tr *ngFor="let obj of ratedetails">
+                                    @if (ratedetails.length>0) {
+<tbody>
+                                        @for (obj of ratedetails; track obj) {
+<tr>
                                             <td class="centerlabel">
                                                 <i class="fa fa-pencil" (click)="EditQuotationrate(obj.PKRTID)"></i>
                                                 &nbsp;
@@ -285,7 +303,9 @@
                                             <td><span class="col-form-span-label">{{obj.RATE}}</span></td>
                                             <td><span class="col-form-span-label">{{obj.EXRATE}}</span></td>
                                         </tr>
+}
                                     </tbody>
+}
                                 </table>
                             </div>
                         </td>

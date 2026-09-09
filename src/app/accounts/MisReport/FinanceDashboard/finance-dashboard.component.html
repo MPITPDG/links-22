@@ -5,12 +5,15 @@
         <div class="fd-title-wrap">
             <div class="fd-title-row">
                 <h1 class="fd-title">Finance Dashboard <span class="fd-company">{{ cmpnyname }}</span></h1>
-                <span class="fd-badge" *ngIf="Searched">{{ BranchLabel }}</span>
+                @if (Searched) {
+<span class="fd-badge">{{ BranchLabel }}</span>
+}
             </div>
         </div>
 
         <div class="fd-header-actions">
-            <div class="fd-tabs" *ngIf="Searched">
+            @if (Searched) {
+<div class="fd-tabs">
                 <button type="button" class="fd-tab" [class.active]="Tab === 'OVERVIEW'"
                         (click)="SetTab('OVERVIEW')">Overview</button>
                 <button type="button" class="fd-tab" [class.active]="Tab === 'RECEIVABLES'"
@@ -24,6 +27,7 @@
                 <button type="button" class="fd-tab" [class.active]="Tab === 'AUDIT'"
                         (click)="SetTab('AUDIT')">Audit</button>
             </div>
+}
             <button type="button" class="fd-icon-btn" (click)="LegendOpen = true" title="Legend - what the badges, colours and abbreviations mean">
                 <i class="fa fa-question-circle-o"></i>
             </button>
@@ -53,7 +57,9 @@
 
             <div class="fd-field fd-field--branch" title="Branch">
                 <select class="form-control" [(ngModel)]="Branch">
-                    <option *ngFor="let b of BranchList" value="{{ b.CITYCODE1 }}">{{ b.CITYNAME }}</option>
+                    @for (b of BranchList; track b) {
+<option value="{{ b.CITYCODE1 }}">{{ b.CITYNAME }}</option>
+}
                 </select>
             </div>
 
@@ -85,37 +91,51 @@
                 <button type="button" class="fd-btn fd-btn--outline" (click)="ExportExposure()" [disabled]="!Searched">
                     <i class="fa fa-download"></i> Export
                 </button>
-                <button type="button" class="fd-btn fd-btn--outline fd-btn--icon" *ngIf="Searched" (click)="SyncNow()"
+                @if (Searched) {
+<button type="button" class="fd-btn fd-btn--outline fd-btn--icon" (click)="SyncNow()"
                         title="Bypass the 2-hour cache and pull fresh figures for everyone">
                     <i class="fa fa-refresh"></i>
                 </button>
+}
             </div>
         </div>
 
-        <div class="fd-asof" *ngIf="Searched && CacheInfo">
+        @if (Searched && CacheInfo) {
+<div class="fd-asof">
             <i class="fa" [ngClass]="num(CacheInfo.IS_CACHED) === 1 ? 'fa-database' : 'fa-bolt'"></i>
             Data as of {{ CacheInfo.CACHED_AT }}
-            <b *ngIf="num(CacheInfo.IS_CACHED) === 1">&middot; {{ cacheAge() }}</b>
-            <b *ngIf="num(CacheInfo.IS_CACHED) === 0">&middot; live</b>
+            @if (num(CacheInfo.IS_CACHED) === 1) {
+<b>&middot; {{ cacheAge() }}</b>
+}
+            @if (num(CacheInfo.IS_CACHED) === 0) {
+<b>&middot; live</b>
+}
         </div>
+}
     </div>
 
-    <div class="fd-note" *ngIf="!Searched">
+    @if (!Searched) {
+<div class="fd-note">
         Outstanding, ageing and exposure are shown <b>as on the To Date</b>.
         Billing mix, recovery days, margin and unbilled cover the <b>selected period</b>.
         Choose a period and press <b>Apply Filters</b>.
     </div>
+}
 
     <!-- ============================== RESULTS ============================== -->
-    <div class="fd-body" *ngIf="Searched">
+    @if (Searched) {
+<div class="fd-body">
 
-        <div class="fd-chip" *ngIf="ClientCode" style="margin-bottom:12px;">
+        @if (ClientCode) {
+<div class="fd-chip" style="margin-bottom:12px;">
             Client: {{ ClientLabel() }}
             <a href="javascript:void(0)" (click)="ClearClient()">&times;</a>
         </div>
+}
 
         <!-- ======================= OVERVIEW ======================= -->
-        <div *ngIf="Tab === 'OVERVIEW'">
+        @if (Tab === 'OVERVIEW') {
+<div>
 
             <div class="fd-grid fd-grid--main">
                 <!-- ---- KPI cards ---- -->
@@ -166,14 +186,18 @@
                                 </b>
                             </div>
                             <!-- range: fastest / slowest settled bill in the period (needs proc with FASTEST_/SLOWEST_ columns) -->
-                            <div class="fd-kpi-row fd-kpi-row--range" *ngIf="Kpi.FASTEST_DAYS !== undefined && Kpi.FASTEST_DAYS !== null"
+                            @if (Kpi.FASTEST_DAYS !== undefined && Kpi.FASTEST_DAYS !== null) {
+<div class="fd-kpi-row fd-kpi-row--range"
                                  [title]="'Inv ' + Kpi.FASTEST_INV + ' - ' + Kpi.FASTEST_CLIENT">
                                 <span>Fastest</span><b class="fd-pos">{{ Kpi.FASTEST_DAYS | number }} days</b>
                             </div>
-                            <div class="fd-kpi-row fd-kpi-row--range" *ngIf="Kpi.SLOWEST_DAYS !== undefined && Kpi.SLOWEST_DAYS !== null"
+}
+                            @if (Kpi.SLOWEST_DAYS !== undefined && Kpi.SLOWEST_DAYS !== null) {
+<div class="fd-kpi-row fd-kpi-row--range"
                                  [title]="'Inv ' + Kpi.SLOWEST_INV + ' - ' + Kpi.SLOWEST_CLIENT">
                                 <span>Slowest</span><b class="fd-neg">{{ Kpi.SLOWEST_DAYS | number }} days</b>
                             </div>
+}
                         </div>
                     </div>
 
@@ -270,12 +294,14 @@
                         <span class="fd-card-title">Top Exposure <i class="fd-info" title="Largest client exposures. Click a client for detail.">i</i></span>
                     </div>
                     <div class="fd-rank">
-                        <div class="fd-rank-item fd-row-click" *ngFor="let r of Exposure.slice(0, 7); let i = index" (click)="OpenDrill(r)">
+                        @for (r of Exposure.slice(0, 7); track r; let i = $index) {
+<div class="fd-rank-item fd-row-click" (click)="OpenDrill(r)">
                             <span class="fd-dot" [style.background]="rankColor(i)"></span>
                             <span class="fd-rank-name">{{ r.CLIENTNAME }}</span>
                             <span class="fd-rank-val">{{ fmtShort(r.TOTAL_EXPOSURE) }}</span>
                             <span class="fd-rank-pct">{{ pctOf(r.TOTAL_EXPOSURE, Kpi.TOTAL_EXPOSURE) | number:'1.0-0' }}%</span>
                         </div>
+}
                     </div>
                 </div>
             </div>
@@ -291,7 +317,8 @@
             <div class="fd-grid fd-grid--2">
                 <div class="fd-card">
                     <div class="fd-funnel">
-                        <ng-container *ngFor="let f of Funnel; let i = index">
+                        @for (f of Funnel; track f; let i = $index) {
+
                             <div class="fd-funnel-stage" [style.width.%]="funnelWidth(f)"
                                  [ngClass]="'fd-funnel-s' + f.STAGE_NO">
                                 <div class="fd-funnel-head">
@@ -302,10 +329,13 @@
                                     <small>{{ f.VALUE_LABEL }}</small>
                                 </div>
                             </div>
-                            <div class="fd-funnel-drop" *ngIf="i > 0 && f.PCT_OF_PREV !== null">
+                            @if (i > 0 && f.PCT_OF_PREV !== null) {
+<div class="fd-funnel-drop">
                                 {{ f.PCT_OF_PREV | number:'1.0-1' }}% of previous stage
                             </div>
-                        </ng-container>
+}
+                        
+}
                     </div>
                     <div class="fd-kpi-tip" style="margin-top:12px;">
                         Stage 1 shows cost booked on jobs (an unbilled job has no revenue figure yet).
@@ -313,7 +343,8 @@
                     </div>
                 </div>
 
-                <div class="fd-card" *ngIf="Coverage">
+                @if (Coverage) {
+<div class="fd-card">
                     <div class="fd-card-head">
                         <span class="fd-card-title">Billing Speed <i class="fd-info"
                               title="How quickly finished jobs turn into invoices">i</i></span>
@@ -350,15 +381,18 @@
                             <span class="fd-rank-name">Over 60 days</span>
                             <span class="fd-rank-val">{{ Coverage.LAG_60P | number }}</span>
                         </div>
-                        <div class="fd-rank-item" *ngIf="num(Coverage.UNBILLED_JOBS) > 0">
+                        @if (num(Coverage.UNBILLED_JOBS) > 0) {
+<div class="fd-rank-item">
                             <span class="fd-dot" style="background:#737373"></span>
                             <span class="fd-rank-name">Still unbilled
                                 <small style="color:var(--fd-muted-fg)"> &middot; oldest {{ Coverage.OLDEST_UNBILLED_DAYS }} days</small>
                             </span>
                             <span class="fd-rank-val">{{ Coverage.UNBILLED_JOBS | number }}</span>
                         </div>
+}
                     </div>
                 </div>
+}
             </div>
 
             <div class="fd-section-title"><i class="fa fa-bar-chart"></i> Collection &amp; Revenue Insights</div>
@@ -413,7 +447,8 @@
                               title="Open jobs by age, valued at cost already booked">i</i></span>
                     </div>
                     <div class="fd-rank">
-                        <div class="fd-rank-item" *ngFor="let u of UnbilledAge">
+                        @for (u of UnbilledAge; track u) {
+<div class="fd-rank-item">
                             <span class="fd-dot" [style.background]="bucketColor(u.SORTORDER)"></span>
                             <span class="fd-rank-name">
                                 {{ u.AGE_BUCKET }}
@@ -423,14 +458,19 @@
                             </span>
                             <span class="fd-rank-val">{{ u.COST_VALUE | number:'1.0-0' }}</span>
                         </div>
-                        <div class="fd-empty" *ngIf="UnbilledAge.length === 0">No open jobs in this period.</div>
+}
+                        @if (UnbilledAge.length === 0) {
+<div class="fd-empty">No open jobs in this period.</div>
+}
                     </div>
                 </div>
             </div>
         </div>
+}
 
         <!-- ======================= RECEIVABLES ======================= -->
-        <div *ngIf="Tab === 'RECEIVABLES'">
+        @if (Tab === 'RECEIVABLES') {
+<div>
             <div class="fd-card" style="margin-bottom:14px;">
                 <div class="fd-card-head">
                     <span class="fd-card-title">Client Exposure &amp; Risk</span>
@@ -456,10 +496,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let r of Exposure" (click)="OpenDrill(r)" class="fd-row-click">
+                            @for (r of Exposure; track r) {
+<tr (click)="OpenDrill(r)" class="fd-row-click">
                                 <td>
                                     {{ r.CLIENTNAME }}
-                                    <span class="fd-flag" *ngIf="r.CLIENT_FLAG">{{ r.CLIENT_FLAG }}</span>
+                                    @if (r.CLIENT_FLAG) {
+<span class="fd-flag">{{ r.CLIENT_FLAG }}</span>
+}
                                 </td>
                                 <td class="num">{{ r.CREDIT_PERIOD }}</td>
                                 <td class="num">{{ r.SUGGESTED_LIMIT | number:'1.0-0' }}</td>
@@ -482,14 +525,19 @@
                                 </td>
                                 <td><span class="fd-pill" [ngClass]="pillClass(r.RISK_STATUS)">{{ r.RISK_STATUS }}</span></td>
                                 <td>
-                                    <button type="button" class="fd-icon-btn fd-remind" *ngIf="num(r.OVERDUE) > 0.01"
+                                    @if (num(r.OVERDUE) > 0.01) {
+<button type="button" class="fd-icon-btn fd-remind"
                                             title="Compose a payment reminder for this client"
                                             (click)="OpenReminder(r, $event)">
                                         <i class="fa fa-envelope-o"></i>
                                     </button>
+}
                                 </td>
                             </tr>
-                            <tr *ngIf="Exposure.length === 0"><td colspan="12" class="fd-empty">No records.</td></tr>
+}
+                            @if (Exposure.length === 0) {
+<tr><td colspan="12" class="fd-empty">No records.</td></tr>
+}
                         </tbody>
                     </table>
                 </div>
@@ -508,7 +556,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let a of Ageing">
+                            @for (a of Ageing; track a) {
+<tr>
                                 <td>{{ a.CLIENTNAME }}</td>
                                 <td class="num"><b>{{ a.RECEIVABLE | number:'1.0-0' }}</b></td>
                                 <td class="num">{{ a.DAYS_000_030 | number:'1.0-0' }}</td>
@@ -521,15 +570,20 @@
                                 <td class="num fd-neg">{{ a.DAYS_731_1095 | number:'1.0-0' }}</td>
                                 <td class="num fd-neg">{{ a.DAYS_1096_9999 | number:'1.0-0' }}</td>
                             </tr>
-                            <tr *ngIf="Ageing.length === 0"><td colspan="11" class="fd-empty">No records.</td></tr>
+}
+                            @if (Ageing.length === 0) {
+<tr><td colspan="11" class="fd-empty">No records.</td></tr>
+}
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+}
 
         <!-- ======================= MARGIN ======================= -->
-        <div *ngIf="Tab === 'MARGIN'">
+        @if (Tab === 'MARGIN') {
+<div>
             <div class="fd-card">
                 <div class="fd-card-head">
                     <span class="fd-card-title">Margin by Service Type</span>
@@ -559,7 +613,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <ng-container *ngFor="let m of MarginSorted()">
+                            @for (m of MarginSorted(); track m) {
+
                                 <tr class="fd-row-click" (click)="ToggleMargin(m.CLIENTCODE + '|' + m.SERVICE_TYPE)">
                                     <td>
                                         <i class="fa" [ngClass]="MarginOpen[m.CLIENTCODE + '|' + m.SERVICE_TYPE] ? 'fa-caret-down' : 'fa-caret-right'"
@@ -568,10 +623,12 @@
                                     </td>
                                     <td>
                                         <span class="fd-pill fd-pill--svc" [title]="m.SERVICE_TYPE">{{ svcLabel(m.SERVICE_TYPE) }}</span>
-                                        <span class="fd-pill fd-pill--amber" *ngIf="num(m.INFERRED_JOBS) > 0"
+                                        @if (num(m.INFERRED_JOBS) > 0) {
+<span class="fd-pill fd-pill--amber"
                                               title="Service type derived from invoice charge heads (Agency / Origin THC), not recorded on the shipment. ~96% accurate on sea export.">
                                             INFERRED {{ m.INFERRED_JOBS }}/{{ m.JOBS }}
                                         </span>
+}
                                     </td>
                                     <td class="fd-lastbilled">{{ m.LAST_BILLED || '-' }}</td>
                                     <td class="num">{{ m.JOBS }}</td>
@@ -587,7 +644,8 @@
                                 <!-- job-wise P&L for this client + service type, same grain as the Job Profit report.
                                      Rendered as rows of the SAME table so every figure sits under the master header:
                                      Job (Client col) | Mode / date / status (Service Type col) | - | Income | Expense | Profit (Margin col) | Profit % | link -->
-                                <ng-container *ngIf="MarginOpen[m.CLIENTCODE + '|' + m.SERVICE_TYPE]">
+                                @if (MarginOpen[m.CLIENTCODE + '|' + m.SERVICE_TYPE]) {
+
                                     <tr class="fd-subhead">
                                         <td>Job No</td>
                                         <td>Mode &middot; Job Date &middot; Status</td>
@@ -599,7 +657,8 @@
                                         <td class="num">Profit %</td>
                                         <td colspan="2"></td>
                                     </tr>
-                                    <tr *ngFor="let j of JobsFor(m.CLIENTCODE, m.SERVICE_TYPE)" class="fd-subline">
+                                    @for (j of JobsFor(m.CLIENTCODE, m.SERVICE_TYPE); track j) {
+<tr class="fd-subline">
                                         <td>
                                             <span class="fd-subindent"><a href="javascript:void(0)" class="fd-joblink" (click)="OpenJobDrawer(j.JOBNO); $event.stopPropagation();"
                                                title="Open the Job Profit statement here">{{ j.JOBNO }}</a></span>
@@ -607,18 +666,24 @@
                                                title="Open the Job Profit statement in its own window" style="margin:0 6px 0 4px;">
                                                 <i class="fa fa-external-link"></i>
                                             </a>
-                                            <span class="fd-pill fd-pill--amber" *ngIf="j.SERVICE_SRC === 'INFERRED'"
+                                            @if (j.SERVICE_SRC === 'INFERRED') {
+<span class="fd-pill fd-pill--amber"
                                                   title="Service type derived from invoice charge heads, not recorded on the shipment">INFERRED</span>
-                                            <span class="fd-pill fd-pill--green" *ngIf="j.SERVICE_SRC === 'MASTER'"
+}
+                                            @if (j.SERVICE_SRC === 'MASTER') {
+<span class="fd-pill fd-pill--green"
                                                   title="Service type as ticked on the import job (Ex-works / Custom Clearance / Freight Forwarding)">JOB</span>
+}
                                         </td>
                                         <td>
                                             {{ j.MODE_ }} &middot; {{ j.JOB_DATE }}
                                             <span class="fd-pill" [ngClass]="j.IS_BILLED ? 'fd-pill--green' : 'fd-pill--amber'">
                                                 {{ j.IS_BILLED ? 'BILLED' : 'OPEN' }}
                                             </span>
-                                            <span class="fd-pill fd-pill--amber" *ngIf="j.IS_BILLED && num(j.EXPENSE) <= 0.01"
+                                            @if (j.IS_BILLED && num(j.EXPENSE) <= 0.01) {
+<span class="fd-pill fd-pill--amber"
                                                   title="Billed, but no purchase / payment / JV cost is booked on this job yet - profit is provisional">COST PENDING</span>
+}
                                         </td>
                                         <td class="fd-lastbilled">{{ j.LAST_BILLED || '-' }}</td>
                                         <td></td>
@@ -630,20 +695,29 @@
                                         </td>
                                         <td colspan="2"></td>
                                     </tr>
-                                    <tr *ngIf="JobsFor(m.CLIENTCODE, m.SERVICE_TYPE).length === 0" class="fd-subline">
+}
+                                    @if (JobsFor(m.CLIENTCODE, m.SERVICE_TYPE).length === 0) {
+<tr class="fd-subline">
                                         <td colspan="10" class="fd-empty" style="padding:10px;">No job rows for this service type.</td>
                                     </tr>
-                                </ng-container>
-                            </ng-container>
-                            <tr *ngIf="Margin.length === 0"><td colspan="10" class="fd-empty">No records.</td></tr>
+}
+                                
+}
+                            
+}
+                            @if (Margin.length === 0) {
+<tr><td colspan="10" class="fd-empty">No records.</td></tr>
+}
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+}
 
         <!-- ======================= UNBILLED ======================= -->
-        <div *ngIf="Tab === 'UNBILLED'">
+        @if (Tab === 'UNBILLED') {
+<div>
             <div class="fd-card">
                 <div class="fd-card-head"><span class="fd-card-title">Unbilled Jobs</span></div>
                 <div class="fd-card-sub">
@@ -668,7 +742,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <ng-container *ngFor="let j of UnbilledSorted()">
+                            @for (j of UnbilledSorted(); track j) {
+
                                 <tr class="fd-row-click" (click)="ToggleUnbilled(j.JOBNO)">
                                     <td>
                                         <i class="fa" [ngClass]="UnbilledOpen[j.JOBNO] ? 'fa-caret-down' : 'fa-caret-right'"
@@ -692,7 +767,8 @@
                                 <!-- voucher-level lines: which purchase / payment / JV put cost on this job.
                                      Rows of the SAME table, column-synced with the master header: the amount sits
                                      under the Purchase / Bank-Cash / JV column it belongs to. -->
-                                <ng-container *ngIf="UnbilledOpen[j.JOBNO]">
+                                @if (UnbilledOpen[j.JOBNO]) {
+
                                     <tr class="fd-subhead">
                                         <td>Source &middot; Voucher No</td>
                                         <td></td>
@@ -704,7 +780,8 @@
                                         <td class="num">JV</td>
                                         <td class="num">Amount</td>
                                     </tr>
-                                    <tr *ngFor="let l of LinesFor(j.JOBNO)" class="fd-subline">
+                                    @for (l of LinesFor(j.JOBNO); track l) {
+<tr class="fd-subline">
                                         <td><span class="fd-subindent"><span class="fd-pill fd-pill--svc" [title]="vchName(l.VCH_TYPE || l.SOURCE_)">{{ l.VCH_TYPE || l.SOURCE_ }}</span> {{ l.REFNO }}</span></td>
                                         <td></td>
                                         <td>{{ l.ACCTNAME }}</td>
@@ -715,20 +792,29 @@
                                         <td class="num">{{ l.SOURCE_ === 'JV'        ? (l.AMOUNT | number:'1.2-2') : '' }}</td>
                                         <td class="num">{{ l.AMOUNT | number:'1.2-2' }}</td>
                                     </tr>
-                                    <tr *ngIf="LinesFor(j.JOBNO).length === 0" class="fd-subline">
+}
+                                    @if (LinesFor(j.JOBNO).length === 0) {
+<tr class="fd-subline">
                                         <td colspan="9" class="fd-empty" style="padding:10px;">No expense vouchers found for this job.</td>
                                     </tr>
-                                </ng-container>
-                            </ng-container>
-                            <tr *ngIf="UnbilledJobs.length === 0"><td colspan="9" class="fd-empty">No unbilled jobs.</td></tr>
+}
+                                
+}
+                            
+}
+                            @if (UnbilledJobs.length === 0) {
+<tr><td colspan="9" class="fd-empty">No unbilled jobs.</td></tr>
+}
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+}
 
         <!-- ======================= AUDIT ======================= -->
-        <div *ngIf="Tab === 'AUDIT'">
+        @if (Tab === 'AUDIT') {
+<div>
             <div class="fd-card">
                 <div class="fd-card-head">
                     <span class="fd-card-title">Data Quality Audit</span>
@@ -749,10 +835,15 @@
                     they silently distort the overdue and ageing figures everyone else reads.
                 </div>
 
-                <div class="fd-empty" *ngIf="AuditLoading">Running checks&hellip;</div>
-                <div class="fd-empty" *ngIf="AuditLoaded && VisibleChecks().length === 0">All checks passing.</div>
+                @if (AuditLoading) {
+<div class="fd-empty">Running checks&hellip;</div>
+}
+                @if (AuditLoaded && VisibleChecks().length === 0) {
+<div class="fd-empty">All checks passing.</div>
+}
 
-                <div class="fd-audit-card" *ngFor="let c of VisibleChecks()">
+                @for (c of VisibleChecks(); track c) {
+<div class="fd-audit-card">
                     <div class="fd-audit-head fd-row-click" (click)="ToggleAudit(c.CHECK_CODE)">
                         <i class="fa" [ngClass]="AuditOpen[c.CHECK_CODE] ? 'fa-caret-down' : 'fa-caret-right'"
                            style="width:14px;color:var(--fd-muted-fg);"></i>
@@ -760,45 +851,61 @@
                         <span class="fd-audit-name">{{ c.CHECK_NAME }}</span>
                         <span class="fd-audit-nums">
                             <b>{{ c.ITEMS | number }}</b> items
-                            <ng-container *ngIf="num(c.ACTIONABLE_VALUE) > 0.01">
+                            @if (num(c.ACTIONABLE_VALUE) > 0.01) {
+
                                 &middot; <b class="fd-neg">{{ fmtShort(c.ACTIONABLE_VALUE) }}</b> actionable
-                            </ng-container>
-                            <ng-container *ngIf="num(c.BY_DESIGN_VALUE) > 0.01">
+                            
+}
+                            @if (num(c.BY_DESIGN_VALUE) > 0.01) {
+
                                 &middot; <span class="fd-hint">{{ fmtShort(c.BY_DESIGN_VALUE) }} by design</span>
-                            </ng-container>
+                            
+}
                         </span>
                     </div>
                     <div class="fd-audit-note">{{ c.NOTE }}</div>
 
-                    <div *ngIf="AuditOpen[c.CHECK_CODE] && AuditRows(c.CHECK_CODE).length > 0" class="fd-table-scroll" style="margin-top:8px;">
+                    @if (AuditOpen[c.CHECK_CODE] && AuditRows(c.CHECK_CODE).length > 0) {
+<div class="fd-table-scroll" style="margin-top:8px;">
                         <table class="fd-table fd-subtable">
                             <thead>
                                 <tr><th>Code</th><th>Name</th><th>Reference</th><th>Date</th>
                                     <th class="num">Value</th><th>Detail</th></tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let d of AuditRows(c.CHECK_CODE)">
+                                @for (d of AuditRows(c.CHECK_CODE); track d) {
+<tr>
                                     <td>{{ d.ENTITY_CODE }}</td>
                                     <td>{{ d.ENTITY_NAME }}</td>
                                     <td>{{ d.REF_NO }}</td>
                                     <td>{{ d.REF_DATE }}</td>
                                     <td class="num">{{ d.VALUE_INR | number:'1.2-2' }}</td>
                                     <td style="white-space:normal;max-width:380px;">
-                                        <span class="fd-pill fd-pill--grey" *ngIf="d.BY_DESIGN">BY DESIGN</span>
+                                        @if (d.BY_DESIGN) {
+<span class="fd-pill fd-pill--grey">BY DESIGN</span>
+}
                                         {{ d.DETAIL }}
                                     </td>
                                 </tr>
+}
                             </tbody>
                         </table>
                     </div>
+}
                 </div>
+}
             </div>
         </div>
+}
     </div>
+}
 
     <!-- ==================== LEGEND / HELP ==================== -->
-    <div class="fd-backdrop" *ngIf="LegendOpen" (click)="LegendOpen = false"></div>
-    <div class="fd-reminder fd-helppanel" *ngIf="LegendOpen">
+    @if (LegendOpen) {
+<div class="fd-backdrop" (click)="LegendOpen = false"></div>
+}
+    @if (LegendOpen) {
+<div class="fd-reminder fd-helppanel">
         <div class="fd-drawer-head">
             <div>
                 <div class="fd-card-title"><i class="fa fa-question-circle-o"></i> Legend &mdash; badges, colours &amp; abbreviations</div>
@@ -908,10 +1015,14 @@
             <div class="fd-lg-note">Click the coloured icon on any KPI card for the exact arithmetic behind that figure.</div>
         </div>
     </div>
+}
 
     <!-- ==================== HOW IS THIS CALCULATED? ==================== -->
-    <div class="fd-backdrop" *ngIf="ExplainKey" (click)="CloseExplain()"></div>
-    <div class="fd-reminder fd-explain" *ngIf="ExplainKey && explain() as ex">
+    @if (ExplainKey) {
+<div class="fd-backdrop" (click)="CloseExplain()"></div>
+}
+    @if (ExplainKey && explain(); as ex) {
+<div class="fd-reminder fd-explain">
         <div class="fd-drawer-head">
             <div>
                 <div class="fd-card-title"><i class="fa fa-calculator"></i> How is "{{ ex.title }}" calculated?</div>
@@ -924,35 +1035,47 @@
 
             <div class="fd-ex-h">The arithmetic</div>
             <table class="fd-ex-table">
-                <tr *ngFor="let st of ex.steps">
+                @for (st of ex.steps; track st) {
+<tr>
                     <td class="fd-ex-op">{{ st.op }}</td>
                     <td class="fd-ex-lbl">{{ st.label }}</td>
                     <td class="fd-ex-val">{{ st.value }}</td>
                 </tr>
+}
                 <tr class="fd-ex-result">
                     <td class="fd-ex-op">=</td>
                     <td class="fd-ex-lbl">{{ ex.result.label }}</td>
-                    <td class="fd-ex-val">{{ ex.result.value }} <span class="fd-ex-short" *ngIf="ex.result.short">({{ ex.result.short }})</span></td>
+                    <td class="fd-ex-val">{{ ex.result.value }} @if (ex.result.short) {
+<span class="fd-ex-short">({{ ex.result.short }})</span>
+}</td>
                 </tr>
-                <tr *ngFor="let x of ex.extra" class="fd-ex-extra">
+                @for (x of ex.extra; track x) {
+<tr class="fd-ex-extra">
                     <td class="fd-ex-op"></td>
                     <td class="fd-ex-lbl">{{ x.label }}</td>
                     <td class="fd-ex-val">{{ x.value }}</td>
                 </tr>
+}
             </table>
 
             <div class="fd-ex-h">Where the numbers come from</div>
             <div class="fd-ex-src">{{ ex.source }}</div>
 
-            <div class="fd-ex-h" *ngIf="ex.notes?.length">Good to know</div>
+            @if (ex.notes?.length) {
+<div class="fd-ex-h">Good to know</div>
+}
             <ul class="fd-ex-notes">
-                <li *ngFor="let nt of ex.notes">{{ nt }}</li>
+                @for (nt of ex.notes; track nt) {
+<li>{{ nt }}</li>
+}
             </ul>
         </div>
     </div>
+}
 
         <!-- ======================= PAYABLES ======================= -->
-        <div *ngIf="Tab === 'PAYABLES'">
+        @if (Tab === 'PAYABLES') {
+<div>
 
             <!-- under test: these figures have not been reconciled with Accounts yet -->
             <div class="fd-testbar">
@@ -977,18 +1100,23 @@
                 <label class="fd-check" title="Also compute receivables so the forecast can show money in vs money out. Slower.">
                     <input type="checkbox" [(ngModel)]="PayInflow" (ngModelChange)="ReloadPayables()"> Include money-in
                 </label>
-                <span class="fd-asof" *ngIf="PayCacheInfo">
+                @if (PayCacheInfo) {
+<span class="fd-asof">
                     <i class="fa" [ngClass]="num(PayCacheInfo.IS_CACHED) === 1 ? 'fa-database' : 'fa-bolt'"></i>
                     Data as of {{ PayCacheInfo.CACHED_AT }}
                 </span>
+}
                 <button type="button" class="fd-btn fd-btn--outline" (click)="SyncPayables()" title="Pull fresh figures now">
                     <i class="fa fa-refresh"></i> Sync now
                 </button>
             </div>
 
-            <div class="fd-note" *ngIf="PayLoading">Loading payables &hellip;</div>
+            @if (PayLoading) {
+<div class="fd-note">Loading payables &hellip;</div>
+}
 
-            <ng-container *ngIf="PayKpi">
+            @if (PayKpi) {
+
                 <!-- ---- KPI cards ---- -->
                 <div class="fd-grid fd-grid--3" style="margin-bottom:12px;">
                     <div class="fd-card fd-kpi">
@@ -1082,16 +1210,22 @@
                 <div class="fd-note" style="margin-left:0;margin-right:0;">
                     <b>{{ PayKpi.PCT_WITH_DUEDATE | number:'1.0-0' }}%</b> of bills carry a usable due date;
                     the rest are aged on bill date + 30 days, so their overdue status is an assumption.
-                    <span *ngIf="num(PayKpi.DUEDATE_IGNORED) > 0">
+                    @if (num(PayKpi.DUEDATE_IGNORED) > 0) {
+<span>
                         <b>{{ PayKpi.DUEDATE_IGNORED }}</b> due dates were rejected as not credible.
                     </span>
-                    <span *ngIf="num(PayKpi.DUPLICATE_BILL_CODES) > 0">
+}
+                    @if (num(PayKpi.DUPLICATE_BILL_CODES) > 0) {
+<span>
                         <b>{{ PayKpi.DUPLICATE_BILL_CODES }}</b> duplicate purchase codes were collapsed.
                     </span>
-                    <span *ngIf="num(PayKpi.OPEN_BILLS) > num(PayKpi.BILL_LIST_CAP)">
+}
+                    @if (num(PayKpi.OPEN_BILLS) > num(PayKpi.BILL_LIST_CAP)) {
+<span>
                         The bill list below shows the {{ PayKpi.BILL_LIST_CAP | number }} most overdue of
                         {{ PayKpi.OPEN_BILLS | number }}.
                     </span>
+}
                 </div>
 
                 <!-- ---- ageing + forecast ---- -->
@@ -1099,7 +1233,8 @@
                     <div class="fd-card">
                         <div class="fd-card-head"><span class="fd-card-title">Payable Ageing</span></div>
                         <div class="fd-card-sub">How old the unpaid bills are. Gross of money paid without naming a bill.</div>
-                        <div class="fd-agebar" *ngFor="let a of PayAge">
+                        @for (a of PayAge; track a) {
+<div class="fd-agebar">
                             <span class="fd-agebar-lbl">{{ a.BUCKET }}</span>
                             <span class="fd-agebar-track">
                                 <span class="fd-agebar-fill" [class.fd-agebar-fill--old]="a.SORTORDER >= 4"
@@ -1107,6 +1242,7 @@
                             </span>
                             <span class="fd-agebar-val">{{ fmtShort(a.AMOUNT) }}</span>
                         </div>
+}
                     </div>
 
                     <div class="fd-card">
@@ -1120,7 +1256,8 @@
                                     <tr><th>When</th><th class="num">Money in</th><th class="num">Money out</th><th class="num">Gap</th></tr>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let f of PayFlow">
+                                    @for (f of PayFlow; track f) {
+<tr>
                                         <td>{{ f.BUCKET }}</td>
                                         <td class="num">{{ num(f.INFLOW_INCLUDED) === 1 ? (f.INFLOW | number:'1.0-0') : '-' }}</td>
                                         <td class="num">{{ f.OUTFLOW | number:'1.0-0' }}</td>
@@ -1128,12 +1265,15 @@
                                             {{ num(f.INFLOW_INCLUDED) === 1 ? (f.NET_GAP | number:'1.0-0') : '-' }}
                                         </td>
                                     </tr>
+}
                                 </tbody>
                             </table>
                         </div>
-                        <div class="fd-kpi-tip" *ngIf="PayFlow.length && num(PayFlow[0].INFLOW_INCLUDED) !== 1">
+                        @if (PayFlow.length && num(PayFlow[0].INFLOW_INCLUDED) !== 1) {
+<div class="fd-kpi-tip">
                             Money-in is not computed. Tick <b>Include money-in</b> above to add receivables.
                         </div>
+}
                     </div>
                 </div>
 
@@ -1145,12 +1285,15 @@
                             (click)="PayView = 'BILLS'">Bills to pay</button>
                     <button type="button" class="fd-btn" [class.fd-btn--primary]="PayView === 'DQ'"
                             (click)="PayView = 'DQ'">
-                        Data to fix <span class="fd-count" *ngIf="PayDqSum.length">{{ PayDqSum.length }}</span>
+                        Data to fix @if (PayDqSum.length) {
+<span class="fd-count">{{ PayDqSum.length }}</span>
+}
                     </button>
                 </div>
 
                 <!-- ---- by supplier ---- -->
-                <div class="fd-card" *ngIf="PayView === 'SUPPLIER'">
+                @if (PayView === 'SUPPLIER') {
+<div class="fd-card">
                     <div class="fd-card-head"><span class="fd-card-title">Supplier Exposure</span></div>
                     <div class="fd-card-sub">Biggest payable first. Paid-no-bill is money given to the supplier that names no bill.</div>
                     <div class="fd-table-scroll fd-table-scroll--tall">
@@ -1167,7 +1310,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let s of PaySupp">
+                                @for (s of PaySupp; track s) {
+<tr>
                                     <td>{{ s.SUPNAME }}</td>
                                     <td class="num">{{ s.GROSS_PENDING | number:'1.0-0' }}</td>
                                     <td class="num">{{ s.ADVANCE_PAID | number:'1.0-0' }}</td>
@@ -1182,14 +1326,19 @@
                                     <td class="num">{{ s.DPO_DAYS === null ? '-' : (s.DPO_DAYS | number:'1.0-0') }}</td>
                                     <td><span class="fd-pill" [ngClass]="payStatusClass(s.PAY_STATUS)">{{ s.PAY_STATUS }}</span></td>
                                 </tr>
-                                <tr *ngIf="PaySupp.length === 0"><td colspan="13" class="fd-empty">No records.</td></tr>
+}
+                                @if (PaySupp.length === 0) {
+<tr><td colspan="13" class="fd-empty">No records.</td></tr>
+}
                             </tbody>
                         </table>
                     </div>
                 </div>
+}
 
                 <!-- ---- bills to pay ---- -->
-                <div class="fd-card" *ngIf="PayView === 'BILLS'">
+                @if (PayView === 'BILLS') {
+<div class="fd-card">
                     <div class="fd-card-head">
                         <span class="fd-card-title">Bills to Pay</span>
                         <label class="fd-check">
@@ -1212,15 +1361,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let b of PayBillRows()">
+                                @for (b of PayBillRows(); track b) {
+<tr>
                                     <td>{{ b.PUR_CODE }}</td>
                                     <td>{{ b.PUR_INVNO }}</td>
                                     <td>{{ b.SUPNAME }}</td>
                                     <td>{{ b.BILL_DATE }}</td>
                                     <td>
                                         {{ b.DUE_DATE }}
-                                        <span class="fd-pill fd-pill--muted" *ngIf="num(b.HAS_TERMS) === 0"
+                                        @if (num(b.HAS_TERMS) === 0) {
+<span class="fd-pill fd-pill--muted"
                                               title="No usable due date on the bill - assumed 30 days">assumed</span>
+}
                                     </td>
                                     <td class="num">{{ b.AGE_DAYS | number }}d</td>
                                     <td class="num" [ngClass]="num(b.OVERDUE_DAYS) > 0 ? 'fd-neg' : ''">
@@ -1232,14 +1384,19 @@
                                     <td class="num">{{ b.PAID_AMOUNT | number:'1.0-0' }}</td>
                                     <td class="num"><b>{{ b.PENDING | number:'1.0-0' }}</b></td>
                                 </tr>
-                                <tr *ngIf="PayBillRows().length === 0"><td colspan="12" class="fd-empty">No bills.</td></tr>
+}
+                                @if (PayBillRows().length === 0) {
+<tr><td colspan="12" class="fd-empty">No bills.</td></tr>
+}
                             </tbody>
                         </table>
                     </div>
                 </div>
+}
 
                 <!-- ---- data to fix ---- -->
-                <div class="fd-card" *ngIf="PayView === 'DQ'">
+                @if (PayView === 'DQ') {
+<div class="fd-card">
                     <div class="fd-card-head"><span class="fd-card-title">Data to Fix</span></div>
                     <div class="fd-card-sub">
                         Problems found in <b>this period</b> while building the report. Click a row for the bills to correct.
@@ -1251,7 +1408,8 @@
                                 <tr><th>Issue</th><th>Severity</th><th class="num">Rows</th><th class="num">Value</th><th>What it means</th></tr>
                             </thead>
                             <tbody>
-                                <ng-container *ngFor="let d of PayDqSum">
+                                @for (d of PayDqSum; track d) {
+
                                     <tr class="fd-row-click" (click)="TogglePayDq(d.ISSUE_CODE)">
                                         <td>
                                             <i class="fa" [ngClass]="PayDqOpen[d.ISSUE_CODE] ? 'fa-caret-down' : 'fa-caret-right'"
@@ -1263,27 +1421,35 @@
                                         <td class="num">{{ d.VALUE_ | number:'1.0-0' }}</td>
                                         <td style="white-space:normal;">{{ d.WHAT_IT_MEANS }}</td>
                                     </tr>
-                                    <ng-container *ngIf="PayDqOpen[d.ISSUE_CODE]">
+                                    @if (PayDqOpen[d.ISSUE_CODE]) {
+
                                         <tr class="fd-subhead">
                                             <td>Bill No</td><td>Supplier</td><td class="num">Bill Date</td>
                                             <td class="num">Amount</td><td>Detail</td>
                                         </tr>
-                                        <tr class="fd-subline" *ngFor="let r of PayDqFor(d.ISSUE_CODE)">
+                                        @for (r of PayDqFor(d.ISSUE_CODE); track r) {
+<tr class="fd-subline">
                                             <td><span class="fd-subindent">{{ r.PUR_CODE }}</span></td>
                                             <td>{{ r.SUPNAME || r.SUPPLIER }}</td>
                                             <td class="num">{{ r.BILL_DATE }}</td>
                                             <td class="num">{{ r.AMOUNT | number:'1.0-0' }}</td>
                                             <td style="white-space:normal;">{{ r.WHAT_TO_DO }}</td>
                                         </tr>
-                                    </ng-container>
-                                </ng-container>
-                                <tr *ngIf="PayDqSum.length === 0">
+}
+                                    
+}
+                                
+}
+                                @if (PayDqSum.length === 0) {
+<tr>
                                     <td colspan="5" class="fd-empty">Nothing to fix in this period.</td>
                                 </tr>
+}
                             </tbody>
                         </table>
                     </div>
                 </div>
+}
 
                 <!-- ---- pay speed + unlinked ---- -->
                 <div class="fd-grid fd-grid--2">
@@ -1297,7 +1463,8 @@
                                         <th class="num">Fastest</th><th class="num">Slowest</th><th class="num">Bills</th></tr>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let d of PaySpeed">
+                                    @for (d of PaySpeed; track d) {
+<tr>
                                         <td>{{ d.SUPNAME }}</td>
                                         <td class="num">{{ d.PURCHASED_PERIOD | number:'1.0-0' }}</td>
                                         <td class="num">{{ d.PAY_DAYS_WTD === null ? '-' : (d.PAY_DAYS_WTD | number:'1.0-0') }}</td>
@@ -1305,13 +1472,17 @@
                                         <td class="num fd-neg">{{ d.SLOWEST_DAYS | number }}</td>
                                         <td class="num">{{ d.BILLS | number }}</td>
                                     </tr>
-                                    <tr *ngIf="PaySpeed.length === 0"><td colspan="6" class="fd-empty">No settled bills in this period.</td></tr>
+}
+                                    @if (PaySpeed.length === 0) {
+<tr><td colspan="6" class="fd-empty">No settled bills in this period.</td></tr>
+}
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <div class="fd-card" *ngIf="PayUnlinked">
+                    @if (PayUnlinked) {
+<div class="fd-card">
                         <div class="fd-card-head"><span class="fd-card-title">Cost Not Linked to a Job</span></div>
                         <div class="fd-card-sub">
                             Purchase lines in the period that carry no job number. This cost can never reach a job P&amp;L,
@@ -1325,13 +1496,19 @@
                             <div class="fd-kpi-row"><span>Unlinked lines</span><b>{{ PayUnlinked.UNLINKED_LINES | number }}</b></div>
                         </div>
                     </div>
+}
                 </div>
-            </ng-container>
+            
+}
         </div>
+}
 
     <!-- ========================= JOB PROFIT DRAWER ========================= -->
-    <div class="fd-backdrop" *ngIf="JobDrawerNo" (click)="CloseJobDrawer()"></div>
-    <div class="fd-drawer fd-drawer--job" *ngIf="JobDrawerNo">
+    @if (JobDrawerNo) {
+<div class="fd-backdrop" (click)="CloseJobDrawer()"></div>
+}
+    @if (JobDrawerNo) {
+<div class="fd-drawer fd-drawer--job">
         <div class="fd-drawer-head">
             <div>
                 <div class="fd-card-title">Job Profit Statement</div>
@@ -1346,10 +1523,14 @@
         </div>
         <iframe class="fd-drawer-frame" [src]="JobDrawerUrl" title="Job Profit Statement"></iframe>
     </div>
+}
 
     <!-- ========================= PAYMENT REMINDER ========================= -->
-    <div class="fd-backdrop" *ngIf="ReminderOpen" (click)="CloseReminder()"></div>
-    <div class="fd-reminder" *ngIf="ReminderOpen">
+    @if (ReminderOpen) {
+<div class="fd-backdrop" (click)="CloseReminder()"></div>
+}
+    @if (ReminderOpen) {
+<div class="fd-reminder">
         <div class="fd-drawer-head">
             <div>
                 <div class="fd-card-title">Payment Reminder</div>
@@ -1368,10 +1549,12 @@
                 <label>Message <span class="fd-hint">(review and edit before sending)</span></label>
                 <textarea class="fd-input fd-reminder-text" #remArea [(ngModel)]="ReminderText"></textarea>
             </div>
-            <div class="fd-kpi-tip" *ngIf="ReminderTooLong()" style="color:var(--fd-danger);">
+            @if (ReminderTooLong()) {
+<div class="fd-kpi-tip" style="color:var(--fd-danger);">
                 This message is too long for a mail-client link (Outlook truncates around 2,000 characters).
                 Use <b>Copy</b> and paste it into a new email instead.
             </div>
+}
             <div class="fd-btn-row">
                 <button type="button" class="fd-btn fd-btn--outline" (click)="CopyReminder(remArea)">
                     <i class="fa fa-clipboard"></i> Copy to clipboard
@@ -1388,10 +1571,14 @@
             </div>
         </div>
     </div>
+}
 
     <!-- ========================= CLIENT DRILL-DOWN ========================= -->
-    <div class="fd-backdrop" *ngIf="DrillClient" (click)="CloseDrill()"></div>
-    <div class="fd-drawer" *ngIf="DrillClient">
+    @if (DrillClient) {
+<div class="fd-backdrop" (click)="CloseDrill()"></div>
+}
+    @if (DrillClient) {
+<div class="fd-drawer">
         <div class="fd-drawer-head">
             <div>
                 <div class="fd-card-title">{{ DrillClient.CLIENTNAME }}</div>
@@ -1434,7 +1621,8 @@
                 </div>
             </div>
 
-            <div class="fd-card" *ngIf="DrillAgeing">
+            @if (DrillAgeing) {
+<div class="fd-card">
                 <div class="fd-card-head"><span class="fd-card-title">Ageing</span></div>
                 <div class="fd-table-scroll">
                     <table class="fd-table">
@@ -1459,8 +1647,10 @@
                     </table>
                 </div>
             </div>
+}
 
-            <div class="fd-card" *ngIf="DrillMargin.length > 0">
+            @if (DrillMargin.length > 0) {
+<div class="fd-card">
                 <div class="fd-card-head"><span class="fd-card-title">Margin by Service Type</span></div>
                 <div class="fd-table-scroll">
                     <table class="fd-table">
@@ -1469,7 +1659,8 @@
                                 <th class="num">Expense</th><th class="num">Margin</th><th class="num">Margin %</th></tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let m of DrillMargin">
+                            @for (m of DrillMargin; track m) {
+<tr>
                                 <td><span class="fd-pill fd-pill--svc" [title]="m.SERVICE_TYPE">{{ svcLabel(m.SERVICE_TYPE) }}</span></td>
                                 <td class="num">{{ m.JOBS }}</td>
                                 <td class="num">{{ m.REVENUE | number:'1.0-0' }}</td>
@@ -1479,12 +1670,15 @@
                                     {{ m.MARGIN_PCT === null ? '-' : (m.MARGIN_PCT | number:'1.1-1') + '%' }}
                                 </td>
                             </tr>
+}
                         </tbody>
                     </table>
                 </div>
             </div>
+}
 
-            <div class="fd-card" *ngIf="DrillJobs.length > 0">
+            @if (DrillJobs.length > 0) {
+<div class="fd-card">
                 <div class="fd-card-head"><span class="fd-card-title">Unbilled Jobs</span></div>
                 <div class="fd-table-scroll">
                     <table class="fd-table">
@@ -1492,15 +1686,18 @@
                             <tr><th>Job No</th><th>Mode</th><th>Job Date</th><th class="num">Age</th><th class="num">Cost</th></tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let j of DrillJobs">
+                            @for (j of DrillJobs; track j) {
+<tr>
                                 <td>{{ j.JOBNO }}</td><td>{{ j.MODE_ }}</td><td>{{ j.JOB_DATE }}</td>
                                 <td class="num">{{ j.AGE_DAYS }}</td>
                                 <td class="num">{{ j.TOTAL_COST | number:'1.0-0' }}</td>
                             </tr>
+}
                         </tbody>
                     </table>
                 </div>
             </div>
+}
 
             <div class="fd-btn-row">
                 <button type="button" class="fd-btn fd-btn--primary" (click)="LoadClient(DrillClient.CLIENTCODE)">
@@ -1509,4 +1706,5 @@
             </div>
         </div>
     </div>
+}
 </div>

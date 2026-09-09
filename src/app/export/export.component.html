@@ -23,7 +23,8 @@
               </table>
               <div class="chart-wrapper xscroll" style="height: 550px;">
               <accordion [closeOthers]="oneAtATime" >
-                <accordion-group *ngFor="let c of Searchdata" [heading]="c.vsldet" (click)="getVslJob(c.VSL_RTNO,c.PORT)"   >
+                @for (c of Searchdata; track c) {
+<accordion-group [heading]="c.vsldet" (click)="getVslJob(c.VSL_RTNO,c.PORT)"   >
                 
                   <div class="row  xyscroll" style="height: 200px;">
                   <table class="table table-responsive-sm table-hover table-outline mb-0">
@@ -41,7 +42,8 @@
                               <th class="col-form-span-label">REMARK</th>
                             </thead>
                             <tbody>
-                              <ng-container *ngFor="let obj of filtjoblist" >
+                              @for (obj of filtjoblist; track obj) {
+
                                 <tr>                                
                                   <td class="text-center">
                                     <div class="clearfix">
@@ -100,7 +102,8 @@
                                 </div>
                                   </td>
                                 </tr>
-                              </ng-container>
+                              
+}
                             </tbody>
                           </table>
                         </td>
@@ -110,6 +113,7 @@
                   </div>
                          
                 </accordion-group>
+}
               </accordion>
               </div>
            

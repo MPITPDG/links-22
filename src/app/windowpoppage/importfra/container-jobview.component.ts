@@ -54,9 +54,12 @@ import { LoaderService } from '../../shared/service/loader.service';
                                     <td colspan="4"><span class="col-form-span-label">{{setData?.OTHERAMT1}}</span></td>
                                   </tr> 
                                   <tr>                                        
-                                    <td colspan="4"><span class="col-form-span-label  centerlabel" *ngIf="DIRECTVSL=='DIRECT'"  ><b>{{setData?.DIRECTVSL}}</b></span></td>
+                                    <td colspan="4">@if (DIRECTVSL=='DIRECT') {
+<span class="col-form-span-label  centerlabel"  ><b>{{setData?.DIRECTVSL}}</b></span>
+}</td>
                                   </tr>
-                                  <ng-container  *ngIf="DIRECTVSL=='TRANSHIPMENT'" >
+                                  @if (DIRECTVSL=='TRANSHIPMENT') {
+
                                   <table class="table table-bordered table-striped table-sm-new">
                                     <tbody>
                                         <tr>                                        
@@ -96,7 +99,8 @@ import { LoaderService } from '../../shared/service/loader.service';
                                     </tr>  
                                   </tbody>
                                    </table>
-                                  </ng-container> 	
+                                  
+} 	
                                   <tr>
                                     <td class="width150"><span class="col-form-span-label"><strong>ETA</strong></span></td>
                                     <td colspan="3"><span class="col-form-span-label">{{setData?.ETA}}</span></td>
@@ -139,7 +143,8 @@ import { LoaderService } from '../../shared/service/loader.service';
 									<tbody>
 								</table>
                               </div>
-                                <table class="table table-bordered table-sm-new" *ngIf="jobdtls.length > 0">
+                                @if (jobdtls.length > 0) {
+<table class="table table-bordered table-sm-new">
 								    <thead>
 								        <tr>
 									        <td class="width150 col-form-span-heading centerlabel" colspan="10">Consignment Details.</td>
@@ -153,15 +158,18 @@ import { LoaderService } from '../../shared/service/loader.service';
 								    </thead>
 							        <tbody>
                                        
-								            <tr *ngFor ="let obj of jobdtls">
+								            @for (obj of jobdtls; track obj) {
+<tr>
 									            <td  ><span class="col-form-span-label">{{obj.JOBNO}}</span></td>											
                                                 <td><span class="col-form-span-label">{{obj.NOOFPKGS}}</span></td>	
                                                 <td><span class="col-form-span-label">{{obj.CBM}}</span></td>											
 											    <td><span class="col-form-span-label">{{obj.CLPSEQUENCE}}</span></td>
-								            </tr>	
+								            </tr>
+}	
                                          
                                     </tbody>
 							    </table>
+}
                                 
         `,
     changeDetection: ChangeDetectionStrategy.Eager,

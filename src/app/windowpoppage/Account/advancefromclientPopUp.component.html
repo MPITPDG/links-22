@@ -31,24 +31,38 @@
                         </tr>   
                    </thead>
                     <tbody>
-                        <tr *ngFor="let obj of ClAdvList">
+                        @for (obj of ClAdvList; track obj) {
+<tr>
                             <td><span class="col-form-span-label " style="cursor:pointer;">{{obj.CLIENTNAME}}</span></td>
                            <td><span class="col-form-span-label anchor-link" (click)="OpenJobPrint(obj.JOBNO)" >{{obj.JOBNO.replace("'", "")}}</span></td>
                            <td> <span class="col-form-span-label">{{obj.TYPE}}</span></td>
-                           <td> <span *ngIf="obj.TYPE!=''" class="col-form-span-label anchor-link" (click)="OpenPrint(obj.TRANSCODE,obj.TYPE)">{{obj.TRANSCODE.replace("'", "")}}</span>
-                            <span *ngIf="obj.TYPE==''" class="col-form-span-label " ><b>{{obj.TRANSCODE.replace("'", "")}}</b></span> </td>
+                           <td> @if (obj.TYPE!='') {
+<span class="col-form-span-label anchor-link" (click)="OpenPrint(obj.TRANSCODE,obj.TYPE)">{{obj.TRANSCODE.replace("'", "")}}</span>
+}
+                            @if (obj.TYPE=='') {
+<span class="col-form-span-label " ><b>{{obj.TRANSCODE.replace("'", "")}}</b></span>
+} </td>
                             <!-- <td> <span class="col-form-span-label">{{obj.TRANSDATE}}</span></td> -->
                             <td>
-                                <span *ngIf="obj.TYPE!=''" class="col-form-span-label ">{{obj.TRANSDATE}}</span>
-                                <span *ngIf="obj.TYPE==''" class="col-form-span-label " ><b>{{obj.TRANSDATE}}</b></span>
+                                @if (obj.TYPE!='') {
+<span class="col-form-span-label ">{{obj.TRANSDATE}}</span>
+}
+                                @if (obj.TYPE=='') {
+<span class="col-form-span-label " ><b>{{obj.TRANSDATE}}</b></span>
+}
                             </td>
                             <td><span class="col-form-span-label">{{obj.DRAMT|number:'2.2-4'}}</span></td>
                             <!-- <td><span class="col-form-span-label">{{obj.CRAMT|number:'2.2-4'}}</span></td> -->
                             <td>
-                                <span *ngIf="obj.TYPE!=''" class="col-form-span-label ">{{obj.CRAMT|number:'2.2-4'}}</span>
-                                <span *ngIf="obj.TYPE==''" class="col-form-span-label " ><b>{{obj.CRAMT|number:'2.2-4'}}</b></span>
+                                @if (obj.TYPE!='') {
+<span class="col-form-span-label ">{{obj.CRAMT|number:'2.2-4'}}</span>
+}
+                                @if (obj.TYPE=='') {
+<span class="col-form-span-label " ><b>{{obj.CRAMT|number:'2.2-4'}}</b></span>
+}
                             </td>
                     </tr>
+}
                     </tbody>
                     <!-- <tr> <td colspan="7" class="centerlabel">
                         <button class="btn btn-sm btn-primary" type="submit" (click)="ExportAdvfrmClnt()" > <span

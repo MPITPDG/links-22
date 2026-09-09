@@ -68,8 +68,9 @@
                     </tr>
                 </thead>
                 <tbody class="bgwhite">
-                    <tr
-                        *ngFor="let obj of DataList | ReqBPFilter: searchString| orderBy: order:reverse:'case-insensitive'" >
+                    @for (obj of DataList | ReqBPFilter: searchString| orderBy: order:reverse:'case-insensitive'; track obj) {
+<tr
+                        >
                         <td class="col-form-span-label"><input type="checkbox" [(ngModel)]="obj.Checked"   [disabled]="obj.CHKPRINTAUTHORITY=='1'" 
                             (ngModelChange)="getCheckboxValues($event,obj.ENTRYNO,obj.CHKPRINTAUTHORITY,obj.AUTHORISATIONDATE)"> &nbsp;</td>
                         <td class="col-form-span-label anchor-link"  (click)=reqviewdata(obj.ENTRYNO)>{{obj.ENTRYNO}}</td>
@@ -83,6 +84,7 @@
                         <td class="col-form-span-label">{{obj.TYPE}}</td>
 
                     </tr>
+}
                 </tbody>
                 <!-- <tr>
                     <td colspan="10">
@@ -135,7 +137,8 @@
                                 </tr>
                             </thead>
                             <tbody>                                      
-                                <tr *ngFor="let obj of rejectlist" (click)=reqviewdata(obj.ENTRYNO)>
+                                @for (obj of rejectlist; track obj) {
+<tr (click)=reqviewdata(obj.ENTRYNO)>
                                     <td class="col-form-span-label anchor-link">{{obj.ENTRYNO}}</td>              
                                     <td class="col-form-span-label">{{obj.ENTRYDT}}</td>
                                     <td class="col-form-span-label">{{obj.CREATEDBY}}</td>
@@ -145,6 +148,7 @@
                                     <td class="col-form-span-label">{{obj.REJECTEDBY}}</td>
                                     <td class="col-form-span-label">{{obj.REJECTIONDATE}}</td>
                                 </tr>
+}
                             </tbody>                           
                         </table>
                     </div>

@@ -108,7 +108,8 @@
                     <td style="white-space:nowrap;">Debit</td>
                     <td style="white-space:nowrap;">Credit</td>
                 </tr>
-                <tr class="dgItem" *ngFor="let data of table1"> 
+                @for (data of table1; track data) {
+<tr class="dgItem"> 
                     <!-- <td style="white-space:nowrap;" >{{data.ACCTNAME}} <br> (Being {{data.JV_NARR}} )</td> -->
                     <td><span style="font-family:Verdana;">{{data.ACCTNAME}}</span>
                     <br><span style="font-family:Verdana;font-style:italic;">(Being {{data.JV_NARR}} )</span></td>
@@ -116,12 +117,21 @@
                     <td style="white-space:nowrap;">{{data.JV_INVOICENO}}</td>
                     <td style="white-space:nowrap;">{{data.ENTRYTYPENM}}</td>
                     <!-- <td align="right" style="white-space:nowrap;">{{data.JV_DEBIT}}</td> -->
-                    <td align="right" > <span *ngIf="data.JV_DEBIT==0.00"> </span>
-                        <span *ngIf="data.JV_DEBIT!=0.00">{{data.JV_DEBIT}}</span></td>
-                        <td align="right" > <span *ngIf="data.JV_CREDIT==0.00"> </span>
-                            <span *ngIf="data.JV_CREDIT!=0.00">{{data.JV_CREDIT}}</span></td>
+                    <td align="right" > @if (data.JV_DEBIT==0.00) {
+<span> </span>
+}
+                        @if (data.JV_DEBIT!=0.00) {
+<span>{{data.JV_DEBIT}}</span>
+}</td>
+                        <td align="right" > @if (data.JV_CREDIT==0.00) {
+<span> </span>
+}
+                            @if (data.JV_CREDIT!=0.00) {
+<span>{{data.JV_CREDIT}}</span>
+}</td>
                   <!-- <td align="right" style="white-space:nowrap;">{{data.JV_CREDIT}}</td> -->
                </tr>
+}
                 <tr class="dgItem">
                     <td align="center" colspan="4" style="font-family:Verdana;font-weight:bold;">TOTAL</td>
                     <td align="right"> <span  class="Rpt_Label_content" style="font-family:Verdana;font-weight:bold;">{{getTotalDebit()}}</span></td>

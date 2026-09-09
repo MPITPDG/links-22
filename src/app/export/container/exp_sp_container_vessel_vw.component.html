@@ -71,7 +71,8 @@
 												<th></th>
 											</thead>
 											<tbody>	
-												<ng-container *ngFor="let c of contList">
+												@for (c of contList; track c) {
+
 													<tr>	 
 														<td >  <i [ngClass]="(c.CHECK==true) ? 'fa fa-minus-square-o': 'fa fa-plus-square-o'" (click)="getContJob(c.CONTAINERNO)"></i>  </td>
 														<td class="col-form-span-label font-weight-bold">{{c.VERIFIED}}</td>												 
@@ -83,7 +84,8 @@
 														<td class="col-form-span-label font-weight-bold">{{c.CBM}}</td>	
                                                         <td class="col-form-span-label font-weight-bold"> <i class="fa fa-download" (click)="ClpDownload(c.CONTAINERNO)"></i></td>	
 													</tr>
-													<tr *ngIf="c.CHECK==true">
+													@if (c.CHECK==true) {
+<tr>
 														<td colspan="9" >
 															<table class="bakgrdwhite width100per">
 																<tr>
@@ -135,7 +137,9 @@
 																	</table>
 																</td>
 															</tr>
-															<tr *ngIf="c.CHECK==true">
+}
+															@if (c.CHECK==true) {
+<tr>
 																<td colspan="9" >
 																	
 																	<table class="bakgrdwhite width100per">																
@@ -152,7 +156,8 @@
 																			<th class="col-form-span-label">CLP Seq.</th>
 																		</thead>	
 																		<tbody>
-																			<ng-container *ngFor="let obj of filtjoblist" >
+																			@for (obj of filtjoblist; track obj) {
+
 																				<tr>
 																					<td rowspan="3" class="col-form-span-label">{{obj.EXPTNO}}</td>
 																					<td class="col-form-span-label">{{obj.EXP_NAME}}</td>
@@ -164,11 +169,15 @@
 																					<td class="col-form-span-label">{{obj.CBM}}</td>
 																					<td>
 																						<table class="table table-hover">
-																							<tr *ngFor="let o of orderList">
-																								<td  *ngIf ="obj.EXPTNO==o.EXPTNO_O"  class="col-form-span-label">{{o.ORDERNO}}															
+																							@for (o of orderList; track o) {
+<tr>
+																								@if (obj.EXPTNO==o.EXPTNO_O) {
+<td   class="col-form-span-label">{{o.ORDERNO}}															
 																									
 																								</td>
-																							</tr>													
+}
+																							</tr>
+}													
 																						</table>
 																					</td>																		
 																					<td class="col-form-span-label">{{obj.CLP_SEQUENCE}}</td>															 
@@ -183,12 +192,15 @@
 																					<th class="col-form-span-label" colspan="2" >FCR Date</th>
 																					<td class="col-form-span-label" colspan="5">{{obj.FCR_DATE}}</td>
 																				</tr>	
-																			</ng-container>															
+																			
+}															
 																		</tbody>															
 																	</table>
 																</td>
 															</tr>
-														</ng-container>
+}
+														
+}
 													</tbody>
 												</table>									
 											</td>									

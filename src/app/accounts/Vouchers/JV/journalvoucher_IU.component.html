@@ -74,7 +74,9 @@
                 <td>
                  <select class="form-control width150"  [(ngModel)]="Department" (change)="GetDepartmentName($event)" >
                     <option value="0">Please select</option>
-                    <option *ngFor="let d of Departmentlist"  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                    @for (d of Departmentlist; track d) {
+<option  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
                  </select>
                 <!-- <ng-select class="form-control width150" [items]="Departmentlist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Department"
                 (change)="GetDepartmentName($event)" class="custom " placeholder="--Select--">
@@ -118,7 +120,8 @@
         <tr>
              <td colspan="4" >
                 <div class="row xyscroll" style="width:715px;"   > 
-                    <table class="table table-responsive-sm table-bordered"  *ngIf="Accountlist.length>0" >
+                    @if (Accountlist.length>0) {
+<table class="table table-responsive-sm table-bordered"  >
                         <thead>
                             <tr class="bakgrdliteBlue">
                                 <th  class="col-form-span-label  font-weight-bold headerwhite" ></th>
@@ -134,7 +137,8 @@
                             </tr>
                         </thead>
                          <tbody  >
-                            <tr *ngFor="let obj of Accountlist">
+                            @for (obj of Accountlist; track obj) {
+<tr>
                                 <td class="centerlabel">
                                     <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)" ></i>
                                     &nbsp;
@@ -150,8 +154,10 @@
                                 <td><span class="col-form-span-label">{{obj.DEPARTMENT}}</span></td>
                                 <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
                             </tr>
+}
                         </tbody>  
                     </table>
+}
                </div> 
              </td>
         </tr>

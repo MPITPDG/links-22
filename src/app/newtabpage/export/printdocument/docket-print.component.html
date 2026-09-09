@@ -1,9 +1,12 @@
-<div class="row" *ngIf="lengthData==0">
+@if (lengthData==0) {
+<div class="row">
     <div class="col-sm-12 centerlabel">
         <img src="assets/img/loading.gif"/>
     </div>
 </div>
-<table width="100%" border="1" cellspacing="3" cellpadding="3" height="514" style="background-color: white;border-collapse: separate;" *ngIf="lengthData==1">
+}
+@if (lengthData==1) {
+<table width="100%" border="1" cellspacing="3" cellpadding="3" height="514" style="background-color: white;border-collapse: separate;">
     <tr>
         <td height="2">
             <table width="98%" border="0" cellspacing="0" cellpadding="0">
@@ -60,7 +63,8 @@
                     </td>
                     <td width="32%" height="2">
                         <table width="98%" border="0" cellspacing="0" cellpadding="0">
-                            <tr *ngIf="dataTable?.EXPT_MODE=='SEA'">
+                            @if (dataTable?.EXPT_MODE=='SEA') {
+<tr>
                                 <td align="center">
                                     <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
                                         <!-- <b>{{(dataTable?.SHIP_BILL=='yes')? dataTable?.SHIP_BILL + ' STUFFED' : 'DOCK STUFFED'}}</b> -->
@@ -68,26 +72,32 @@
                                     </font>
                                 </td>
                             </tr>
-                            <tr *ngIf="dataTable?.EXPT_MODE=='SEA'">
+}
+                            @if (dataTable?.EXPT_MODE=='SEA') {
+<tr>
                                 <td align="center">
                                     <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
                                         <b>{{dataTable?.LDG_PORT}}</b>
                                     </font>
                                 </td>
                             </tr>
-                            <tr *ngIf="dataTable?.EXPT_MODE=='AIR'">
+}
+                            @if (dataTable?.EXPT_MODE=='AIR') {
+<tr>
                                 <td align="center">
                                     <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
                                         <b>{{'BY AIR'}}</b>
                                     </font>
                                 </td>
                             </tr>
+}
                         </table>
                     </td>
                 </tr>
                
 
-                <tr *ngIf="billto !=''">
+                @if (billto !='') {
+<tr>
                     <td width="3%">
                         <font face="Verdana, Arial, Helvetica, sans-serif" size="2"></font>
                         <font size="2">.</font>
@@ -102,6 +112,7 @@
                         <font face="Verdana, Arial, Helvetica, sans-serif" size="2">{{billto}}</font>
                     </td>
                 </tr>
+}
 
                 <tr>
                     <td width="3%">
@@ -255,7 +266,8 @@
                                 </td>
                             </tr>
                             <!-- <tr> -->
-                            <tr *ngFor="let obj of dataTable1"> 
+                            @for (obj of dataTable1; track obj) {
+<tr> 
                                 <td align=left>
                                     <font size="1" face="Verdana, Arial, Helvetica, sans-serif">{{obj.ORDERNO}}</font>
                                 </td>
@@ -266,6 +278,7 @@
                                     <font size="1" face="Verdana, Arial, Helvetica, sans-serif">{{obj.PIECES}}</font>
                                 </td>
                             </tr>
+}
                         </table>
                         <font size="2">
 
@@ -396,7 +409,8 @@
             </table>
         </td>
     </tr>
-    <tr *ngIf="dataTable?.EXPT_MODE=='SEA'">
+    @if (dataTable?.EXPT_MODE=='SEA') {
+<tr>
         <td height="88">
             <font size="2">
 
@@ -490,7 +504,9 @@
             </font>
         </td>
     </tr>
-    <tr *ngIf="dataTable?.EXPT_MODE=='AIR'">
+}
+    @if (dataTable?.EXPT_MODE=='AIR') {
+<tr>
         <td height="88">
             <font size="2">
 
@@ -578,7 +594,9 @@
             </font>
         </td>
     </tr>
-    <tr *ngIf="dataTable?.EXPT_MODE=='SEA'">
+}
+    @if (dataTable?.EXPT_MODE=='SEA') {
+<tr>
         <td height="59">
             <font size="2">
 
@@ -617,25 +635,31 @@
                         <td valign="top">
                             <font face="Verdana, Arial, Helvetica, sans-serif" size="2">CONTAINER NUMBER</font>
                         </td>
-                        <ng-container *ngIf="dataTable3?.CONTAINERNO != 'undefined' ;else container ">
+                        @if (dataTable3?.CONTAINERNO != 'undefined' ) {
+
                         <td valign="top"  >
                             <table>
-                                <tr  *ngFor="let obj of dataTable3">
+                                @for (obj of dataTable3; track obj) {
+<tr >
                                     <td>
                                         <font size="2" face="Verdana, Arial, Helvetica, sans-serif">
                                                 {{obj.CONTAINERNO+ ' '+obj.CONTAINERSIZE+ ' '+obj.CONTAINERSIZE1+ ' '+obj.CONTAINERSTATUS}}
                                         </font>
                                     </td>
                                 </tr>
+}
                             </table>
                            
                         </td>
-                    </ng-container>
-                    <ng-template #container>
+                    
+} @else {
+
                         <td valign="top" >
                             <font size="2" face="Verdana, Arial, Helvetica, sans-serif">&nbsp;  </font>
                         </td>
-                    </ng-template>
+                    
+}
+                    
                     </tr>
                 <tr>
                     <td width="4%" valign="top">
@@ -669,7 +693,9 @@
             </font>
         </td>
     </tr>
-    <tr *ngIf="dataTable?.EXPT_MODE=='AIR'">
+}
+    @if (dataTable?.EXPT_MODE=='AIR') {
+<tr>
         <td height="59">
             <font size="2">
             </font>
@@ -718,6 +744,7 @@
             </font>
         </td>
     </tr>
+}
     <tr>
         <td height="56" valign="top">
             <table width="98%" cellspacing="0" cellpadding="0">
@@ -749,3 +776,4 @@
         </td>
     </tr>
 </table>
+}

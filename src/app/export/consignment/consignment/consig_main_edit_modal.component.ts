@@ -140,12 +140,16 @@ export class ConsignmentEditModalComponent implements OnInit {
     template: `
                         <table class="table table-bordered table-striped table-sm-new">
 						    <tbody>
-                                <tr *ngIf="viewData?.Table[0].EXPTCANCEL == 'Y'">
+                                @if (viewData?.Table[0].EXPTCANCEL == 'Y') {
+<tr>
 						            <td colspan="4"><span class="col-form-span-label red"><strong>CONSIGNMENT IS CANCELLED</strong></span></td>
 							    </tr>
-							    <tr  *ngIf="edocView == 1">
+}
+							    @if (edocView == 1) {
+<tr >
 								    <th class="col-form-span-heading centerlabel  link-label" colspan="4"><span (click)="openEdoc()">E-Document - View/Upload File</span></th>
 							    </tr>
+}
                                 <tr>
 						            <td class="width150"><span class="col-form-span-label">EXPORT NO </span></td>
 						            <td colspan="3"><span class="col-form-span-label">{{exptno_view}}</span></td>
@@ -154,8 +158,12 @@ export class ConsignmentEditModalComponent implements OnInit {
 						            <td class="width150"><span class="col-form-span-label">Mode Of Shipment</span></td>
 						            <td colspan="2"><span class="col-form-span-label">{{modeship}}</span></td>
 						            <td class="width130 centerlabel" rowspan="14">
-                                        <span class="col-form-span-label" *ngIf="viewData?.Table[0].CLEARANCE == 'S'"><strong>SHIPMENT CLEARANCE BY SHIPPER'S AGENT</strong></span>
-                                        <span class="col-form-span-label" *ngIf="viewData?.Table[0].CLEARANCE != 'S'"><strong>SHIPMENT CLEARANCE BY US</strong></span>
+                                        @if (viewData?.Table[0].CLEARANCE == 'S') {
+<span class="col-form-span-label"><strong>SHIPMENT CLEARANCE BY SHIPPER'S AGENT</strong></span>
+}
+                                        @if (viewData?.Table[0].CLEARANCE != 'S') {
+<span class="col-form-span-label"><strong>SHIPMENT CLEARANCE BY US</strong></span>
+}
                                     </td>
 							    </tr>
                                 <tr>
@@ -262,10 +270,13 @@ export class ConsignmentEditModalComponent implements OnInit {
 									</tr>
 								</thead>
 								<tbody>
-									<tr *ngFor="let obj of viewData?.Table4">
+									@for (obj of viewData?.Table4; track obj) {
+<tr>
                                         <td class="centerlabel">
                                             <span class="col-form-span-label">
-                                                <a href="javascript:void(0);" *ngIf="viewData?.Table[0]?.GRPID=='1'" (click)="openWindow(obj.ORDERNO, obj.STYLENO, obj.CONCODE)">{{obj.ORDERNO}}</a>
+                                                @if (viewData?.Table[0]?.GRPID=='1') {
+<a href="javascript:void(0);" (click)="openWindow(obj.ORDERNO, obj.STYLENO, obj.CONCODE)">{{obj.ORDERNO}}</a>
+}
                                                   </span>
                                         </td>
 										<td class="width100"><span class="col-form-span-label">{{obj.STYLENO}}</span></td>
@@ -285,6 +296,7 @@ export class ConsignmentEditModalComponent implements OnInit {
 										<td class="width100"><span class="col-form-span-label">{{obj.CNEEDEPT}}</span></td>
 										<td class="width100"><span class="col-form-span-label">{{obj.CONTAINERNO}}</span></td>
 									</tr>
+}
 								</tbody>
 							</table>
 						</div><br />
@@ -304,19 +316,24 @@ export class ConsignmentEditModalComponent implements OnInit {
 								</tr>
 							</thead>
 							<tbody>
-								<tr *ngFor="let obj of viewData?.Table5">
+								@for (obj of viewData?.Table5; track obj) {
+<tr>
 									<td class="width150"><span class="col-form-span-label">{{obj.FROM}}</span></td>
 									<td class="width150"><span class="col-form-span-label">{{obj.TO}}</span></td>
 									<td><span class="col-form-span-label">{{obj.ALPHABET}}</span></td>
 								</tr>
+}
 							</tbody>
 						</table><br />
-                        <table class="table table-bordered table-striped table-sm-new"  *ngIf="viewData?.Table[0].EXPT_MODE == 'SEA'">
+                        @if (viewData?.Table[0].EXPT_MODE == 'SEA') {
+<table class="table table-bordered table-striped table-sm-new" >
 						    <tbody>
                                 <tr>
 						            <td class="width150"><span class="col-form-span-label">Container No </span></td>
 						            <td colspan="3">
-                                        <p class="col-form-span-label" *ngFor="let obj of containerData"><span class="link-label" (click)="showClpView(obj.CONTAINERNO)"><u>{{obj.CONTAINER}}</u></span>{{obj.CONTAINER_STATUS}}</p>
+                                        @for (obj of containerData; track obj) {
+<p class="col-form-span-label"><span class="link-label" (click)="showClpView(obj.CONTAINERNO)"><u>{{obj.CONTAINER}}</u></span>{{obj.CONTAINER_STATUS}}</p>
+}
                                     </td>
 							    </tr>
                                 <tr>
@@ -359,21 +376,28 @@ export class ConsignmentEditModalComponent implements OnInit {
 						            <td class="width150"><span class="col-form-span-label">E.T.D. (SCHEDULED) </span></td>
 						            <td colspan="3"><span class="col-form-span-label">{{viewData?.Table[0].ETD}}</span></td>
 							    </tr>
-                                <tr *ngIf="viewData?.Table[0].SAILING == ''">
+                                @if (viewData?.Table[0].SAILING == '') {
+<tr>
 						            <td colspan="4" class="bglightgreen red"><strong><span class="col-form-span-label">VESSEL DELAYED</span></strong></td>
 							    </tr>
+}
                                 <tr>
 						            <td class="width150"><span class="col-form-span-label">SAILED ON (ACTUAL) </span></td>
 						            <td colspan="3"><span class="col-form-span-label">{{viewData?.Table[0].SAILING}}</span></td>
 							    </tr>
-                                <tr *ngIf="viewData?.Table[0].EXPT_MODE == 'SEA'">
+                                @if (viewData?.Table[0].EXPT_MODE == 'SEA') {
+<tr>
 						            <td class="width150"><span class="col-form-span-label"></span></td>
 						            <td colspan="3"><span class="col-form-span-label">Direct </span></td>
 							    </tr>
+}
 							</tbody>
                         </table>
-                        <ng-container *ngIf="viewData?.Table2.length > 0" >
-                        <table class="table table-bordered table-striped table-sm-new" *ngIf="viewData?.Table[0].EXPT_MODE == 'SEA'">
+}
+                        @if (viewData?.Table2.length > 0) {
+
+                        @if (viewData?.Table[0].EXPT_MODE == 'SEA') {
+<table class="table table-bordered table-striped table-sm-new">
 						    <tbody>
                                 <tr><td colspan="4"><span class="col-form-span-label"><strong>TRANSHIPMENT DETAILS - VESSEL #1</strong></span></td></tr>
                                 <tr>
@@ -415,7 +439,9 @@ export class ConsignmentEditModalComponent implements OnInit {
 							    </tr>
 							</tbody>
 						</table>
-                        <table class="table table-bordered table-striped table-sm-new" *ngIf="viewData?.Table[0].EXPT_MODE == 'SEA'">
+}
+                        @if (viewData?.Table[0].EXPT_MODE == 'SEA') {
+<table class="table table-bordered table-striped table-sm-new">
 						    <tbody>
                                 <tr>
 						            <td colspan="4"><span class="col-form-span-label"><strong>ONWARD TRANSPORTATION DETAILS</strong></span></td>
@@ -438,7 +464,9 @@ export class ConsignmentEditModalComponent implements OnInit {
 							    </tr>
 							</tbody>
                         </table>
-                        </ng-container>
+}
+                        
+}
 
                         <table class="table table-bordered table-striped table-sm-new">
 						    <tbody>
@@ -470,10 +498,12 @@ export class ConsignmentEditModalComponent implements OnInit {
 						            <td class="width150"><span class="col-form-span-label">House AWB Date.</span></td>
 						            <td><span class="col-form-span-label">{{viewData?.Table[0].HOUSEBILLDT}}</span></td>
 							    </tr>
-                                <tr *ngIf="viewData?.Table[0].EXPT_MODE == 'AIR'">
+                                @if (viewData?.Table[0].EXPT_MODE == 'AIR') {
+<tr>
 						            <td class="width150"><span class="col-form-span-label"></span></td>
 						            <td colspan="3"><span class="col-form-span-label">Direct </span></td>
 							    </tr>
+}
 							</tbody>
 						</table>
                         <table class="table table-bordered table-striped table-sm-new">
@@ -509,12 +539,16 @@ export class ConsignmentEditModalComponent implements OnInit {
 						            <td class="width150"><span class="col-form-span-label">ETA</span></td>
 						            <td colspan="3"><span class="col-form-span-label">{{viewData?.Table[0].ETAPORT2}}</span></td>
                                 </tr>
-                                <ng-container *ngIf="viewData?.Table2.length > 0" >
-                                    <tr  *ngIf="viewData?.Table2[0].DIRECTVSL == 'YES'">
+                                @if (viewData?.Table2.length > 0) {
+
+                                    @if (viewData?.Table2[0].DIRECTVSL == 'YES') {
+<tr >
                                         <td class="width150"><span class="col-form-span-label">E.T.A</span></td>
                                         <td colspan="3"><span class="col-form-span-label">{{viewData?.Table[0].FCRSDT}}</span></td>
                                     </tr>
-                                </ng-container>
+}
+                                
+}
                                 <tr>
 						            <td class="width150"><span class="col-form-span-label">D/douane No.</span></td>
 						            <td colspan="3"><span class="col-form-span-label">{{viewData?.Table[0].FCRSDT}}</span></td>
@@ -536,9 +570,11 @@ export class ConsignmentEditModalComponent implements OnInit {
 						            <td colspan="3">
                                         <table class="table table-bordered table-striped table-sm-new">
 						                    <tbody>
-                                                <tr *ngFor="let obj of viewData?.Table3">
+                                                @for (obj of viewData?.Table3; track obj) {
+<tr>
 						                            <td class="width150"><span class="col-form-span-label">{{obj.ACTUALDT}}</span></td>
 							                    </tr>
+}
 							                </tbody>
 						                </table>
                                     </td>
@@ -783,7 +819,9 @@ export class ShipmentClearanceEditComponent {
 
                                             <select class="form-control " [(ngModel)]="drpShipper">
                                                 <option value="">--select--</option>
-                                                <option *ngFor="let d of exporters" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                                                @for (d of exporters; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
                                             </select>
                                       </td>
 								  </tr>
@@ -793,7 +831,9 @@ export class ShipmentClearanceEditComponent {
 
                                             <select class="form-control " [(ngModel)]="drpBillTo">
                                             <option value="">--select--</option>
-                                            <option *ngFor="let d of exporters" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                                            @for (d of exporters; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
                                         </select>
                                       </td>
 								  </tr>
@@ -803,7 +843,9 @@ export class ShipmentClearanceEditComponent {
 
                                             <select class="form-control " [(ngModel)]="drpManufact">
                                             <option value="">--select--</option>
-                                            <option *ngFor="let d of exporters" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                                            @for (d of exporters; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
                                         </select>
                                       </td>
 								  </tr>
@@ -814,7 +856,9 @@ export class ShipmentClearanceEditComponent {
 
                                     <select class="form-control " [(ngModel)]="drpConsignee">
                                     <option value="">--select--</option>
-                                    <option *ngFor="let d of consignees" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                                    @for (d of consignees; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
                                      </select>
 
                                       </td>
@@ -825,7 +869,9 @@ export class ShipmentClearanceEditComponent {
 
                                         <select class="form-control " [(ngModel)]="drpBank">
                                         <option value="">--select--</option>
-                                        <option *ngFor="let d of banks" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                                        @for (d of banks; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
                                          </select>
                                       </td>
 								  </tr>
@@ -839,7 +885,9 @@ export class ShipmentClearanceEditComponent {
 
                                             <select class="form-control " [(ngModel)]="drpBuyer">
                                             <option value="">--select--</option>
-                                            <option *ngFor="let d of consignees" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                                            @for (d of consignees; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
                                              </select>
                                       </td>
 								  </tr>
@@ -849,7 +897,9 @@ export class ShipmentClearanceEditComponent {
 
                                             <select class="form-control " [(ngModel)]="drpSrcAgt" [disabled]="agents == null" >
                                             <option value="">--select--</option>
-                                            <option *ngFor="let d of agents" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                                            @for (d of agents; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
                                              </select>
                                       </td>
 								  </tr>
@@ -1032,7 +1082,8 @@ export class MainEditComponent {
     selector: 'app-consignment-port-edit',
     template: `
     <div class="animated fadeIn">
-        <table class="table table-bordered table-striped table-sm-new" *ngIf="isvisiblevessel == 'SEA' ">
+        @if (isvisiblevessel == 'SEA' ) {
+<table class="table table-bordered table-striped table-sm-new">
             <tbody>
                 <tr>
                     <td class="col-form-span-heading" colspan="4">VESSEL DETAILS
@@ -1070,14 +1121,18 @@ export class MainEditComponent {
                 </tr>
             </tbody>
         </table>
-        <table class="table table-bordered table-striped table-sm-new"  *ngIf="isvisiblevessel == 'AIR' || ISDIFFAIR == '2'">
+}
+        @if (isvisiblevessel == 'AIR' || ISDIFFAIR == '2') {
+<table class="table table-bordered table-striped table-sm-new" >
                 <tbody>
                     <tr>
                         <td class="col-form-span-heading" colspan="4">AIR SHIPMENT DETAILS</td>
                     </tr>
             </tbody>
         </table>
-        <table class="table table-bordered table-striped table-sm-new"  *ngIf="isvisiblevessel == 'AIR' || ISDIFFAIR == '2'">
+}
+        @if (isvisiblevessel == 'AIR' || ISDIFFAIR == '2') {
+<table class="table table-bordered table-striped table-sm-new" >
                 <tbody>
                     <tr>
                         <td colspan="4" class="col-form-span-heading">
@@ -1087,16 +1142,22 @@ export class MainEditComponent {
                     </tr>
             </tbody>
         </table>
-        <table class="table-sm-new bgwhite" *ngIf="fontIndex == 9 || isvisiblevessel == 'AIR' || ISDIFFAIR == '2'">
+}
+        @if (fontIndex == 9 || isvisiblevessel == 'AIR' || ISDIFFAIR == '2') {
+<table class="table-sm-new bgwhite">
                 <tbody>
-                    <tr *ngFor="let obj of exptnoList">
+                    @for (obj of exptnoList; track obj) {
+<tr>
                         <td colspan="4">
                             <span class="col-form-span-label">{{obj.EXPTNO}}</span>
                         </td>
                     </tr>
+}
             </tbody>
         </table>
-        <table class="table table-bordered table-striped table-sm-new"  *ngIf="isvisiblevessel == 'AIR' || ISDIFFAIR == '2'">
+}
+        @if (isvisiblevessel == 'AIR' || ISDIFFAIR == '2') {
+<table class="table table-bordered table-striped table-sm-new" >
                 <tbody>
                     <tr>
                         <td class="width150"><span class="col-form-span-label">Carting Date</span> </td>
@@ -1209,6 +1270,7 @@ export class MainEditComponent {
                     </tr>
                 </tbody>
             </table>
+}
             <table class="table table-bordered table-striped table-sm-new">
                 <tbody>
                     <tr>
@@ -2684,7 +2746,8 @@ export class InvoiceEditComponent {
 @Component({
     selector: 'app-consignment-document-edit',
     template: `
-                        <table class="table table-bordered table-striped table-sm-new" *ngIf="receivedocumentlist.length > 0">
+                        @if (receivedocumentlist.length > 0) {
+<table class="table table-bordered table-striped table-sm-new">
                            <thead>
                               <tr>
                                  <td class="col-form-span-heading" colspan="3">Received Documents </td>
@@ -2696,14 +2759,18 @@ export class InvoiceEditComponent {
                               </tr>
 						   </thead>
                            <tbody>
-                              <tr *ngFor="let doc of receivedocumentlist">
+                              @for (doc of receivedocumentlist; track doc) {
+<tr>
                                  <td class="width75"><span class="col-form-span-label">{{doc.DOCCODE}}</span> </td>
                                  <td><span class="col-form-span-label">{{doc.DOCUMENT}}</span></td>
                                  <td class="width150"><span class="col-form-span-label">{{doc.RECDDATE}}</span></td>
                               </tr>
+}
 							</tbody>
 						</table>
-                        <table class="table table-bordered table-striped table-sm-new" *ngIf="calldocumentlist.length > 0">
+}
+                        @if (calldocumentlist.length > 0) {
+<table class="table table-bordered table-striped table-sm-new">
                            <thead>
                               <tr>
                                  <td class="col-form-span-heading" colspan="6">Call Documents </td>
@@ -2716,7 +2783,8 @@ export class InvoiceEditComponent {
                               </tr>
 						   </thead>
                            <tbody>
-                              <tr *ngFor="let doc of calldocumentlist">
+                              @for (doc of calldocumentlist; track doc) {
+<tr>
                                  <td class="width75"><span class="col-form-span-label">{{doc.DOCCODE}}</span> </td>
                                  <td><span class="col-form-span-label">{{doc.DOCUMENT}}</span></td>
                                 <td class="width10 centerlabel">
@@ -2730,11 +2798,14 @@ export class InvoiceEditComponent {
                                 </td>
                                  <td class="width150"><span class="col-form-span-label">{{doc.CALLEDDATE}}</span></td>
                               </tr>
+}
 
                             </tbody>
 
                         </table>
-                        <table *ngIf ="ActDocRECDT == '' ">
+}
+                        @if (ActDocRECDT == '' ) {
+<table>
                             <tbody>
                                 <tr>
                                     <td class="col-form-span-label" colspan="3" style="background-color: #91b57785; "><b>Actual Document Received on </b> </td>
@@ -2744,7 +2815,9 @@ export class InvoiceEditComponent {
                                 </tr>
                             </tbody>
                         </table>
-                        <table class="table table-bordered table-striped table-sm-new" *ngIf="otherdocumentlist.length > 0">
+}
+                        @if (otherdocumentlist.length > 0) {
+<table class="table table-bordered table-striped table-sm-new">
                            <thead>
                               <tr>
                                  <td class="col-form-span-heading" colspan="7">Other Documents </td>
@@ -2758,7 +2831,8 @@ export class InvoiceEditComponent {
                               </tr>
 							</thead>
                             <tbody>
-							    <tr *ngFor="let doc of otherdocumentlist">
+							    @for (doc of otherdocumentlist; track doc) {
+<tr>
                                     <td class="width75"><span class="col-form-span-label">{{doc.DOCCODE}}</span></td>
                                     <td><span class="col-form-span-label">{{doc.DOCUMENT}}</span></td>
                                     <td class="width10 centerlabel">
@@ -2777,11 +2851,13 @@ export class InvoiceEditComponent {
                                         <input type="radio" name="{{doc.DOCCODE}}" value="{{'N'+doc.DOCCODE}}" [(ngModel)]="doc.NA" (click)="changeDocumentList(doc.DOCCODE, 'N')"/>
                                     </td>
                                 </tr>
+}
 
                             </tbody>
 
 
 						</table>
+}
                 `,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
@@ -2994,14 +3070,19 @@ export class DocumentEditComponent {
 								  </tr>
 								  <tr class="centerlabel">
 									 <td colspan="6">
-										<button type="button" class="btn btn-success" (click)="addEditITCDtls()" *ngIf="this.hditcid == '0'"><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
-										<button type="button" class="btn btn-success" (click)="addEditITCDtls()" *ngIf="this.hditcid != '0'"><span class="col-form-span-label"><i class="fa fa-refresh"></i>&nbsp;Update</span></button>
+										@if (this.hditcid == '0') {
+<button type="button" class="btn btn-success" (click)="addEditITCDtls()"><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
+}
+										@if (this.hditcid != '0') {
+<button type="button" class="btn btn-success" (click)="addEditITCDtls()"><span class="col-form-span-label"><i class="fa fa-refresh"></i>&nbsp;Update</span></button>
+}
 										<button type="button" class="btn btn-secondary" (click)="resetITC()"><span class="col-form-span-label"><i class="fa fa-undo"></i>&nbsp;Reset</span></button>
 									 </td>
 								  </tr>
 								</tbody>
 							</table>
-                            <div class="row xscroll" *ngIf="itclist.length > 0">
+                            @if (itclist.length > 0) {
+<div class="row xscroll">
                                 <table class="table table-bordered table-striped table-sm-new">
 									<thead>
 										<tr class="col-form-span-heading">
@@ -3022,7 +3103,8 @@ export class DocumentEditComponent {
 											</tr>
 									</thead>
 									<tbody>
-										<tr *ngFor="let obj of itclist">
+										@for (obj of itclist; track obj) {
+<tr>
 											<td class="centerlabel">
 												<i class="fa fa-pencil" (click)="editITC(obj.TBL_INDEXID,obj.ITCCODEID,obj.ITCCODE,obj.EXPTNO)"></i>
 												&nbsp;
@@ -3042,9 +3124,11 @@ export class DocumentEditComponent {
 											<td><span class="col-form-span-label">{{obj.RATEPERUNIT}}</span></td>
 											<td><span class="col-form-span-label">{{obj.DESCRIPTION}}</span></td>
 											</tr>
+}
 									<tbody>
 								</table>
                               </div>
+}
         `,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
@@ -3354,14 +3438,19 @@ export class ITCCodeEditComponent {
                               </tr>
 							  <tr class="centerlabel">
                                  <td colspan="6">
-									<button type="button" class="btn btn-success" (click)="addEditOrderDtls()" *ngIf="this.hdordernoid == '0'"><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
-									<button type="button" class="btn btn-success" (click)="addEditOrderDtls()" *ngIf="this.hdordernoid != '0'"><span class="col-form-span-label"><i class="fa fa-refresh"></i>&nbsp;Update</span></button>
+									@if (this.hdordernoid == '0') {
+<button type="button" class="btn btn-success" (click)="addEditOrderDtls()"><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
+}
+									@if (this.hdordernoid != '0') {
+<button type="button" class="btn btn-success" (click)="addEditOrderDtls()"><span class="col-form-span-label"><i class="fa fa-refresh"></i>&nbsp;Update</span></button>
+}
 									<button type="button" class="btn btn-secondary" (click)="resetOrder()"><span class="col-form-span-label"><i class="fa fa-undo"></i>&nbsp;Reset</span></button>
 								 </td>
                               </tr>
 							</tbody>
 						</table>
-                        <div class="row xscroll" *ngIf="orderlist.length > 0">
+                        @if (orderlist.length > 0) {
+<div class="row xscroll">
                             <table class="table table-bordered table-striped table-sm-new">
 							    <thead>
 								    <tr class="col-form-span-heading">
@@ -3388,7 +3477,8 @@ export class ITCCodeEditComponent {
 									    </tr>
 							    </thead>
 							    <tbody>
-								    <tr *ngFor="let obj of orderlist">
+								    @for (obj of orderlist; track obj) {
+<tr>
 									    <td class="centerlabel">
 										    <i class="fa fa-pencil" (click)="editOrder(obj.TBL_INDEXID,obj.ORDERID,obj.EXPTNO,obj.ORDERNO)"></i>
 										    <i class="fa fa-trash" (click)="deleteOrder(obj.TBL_INDEXID,obj.ORDERID,obj.EXPTNO,obj.ORDERNO)"></i>
@@ -3413,9 +3503,11 @@ export class ITCCodeEditComponent {
                                         <td><span class="col-form-span-label">{{obj.ICSHSCode}}</span></td>
                                         <td><span class="col-form-span-label">{{obj.ICSHSDescription}}</span></td>
 									    </tr>
+}
 							    <tbody>
 						    </table>
                         </div>
+}
     `,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
@@ -3927,14 +4019,19 @@ export class OrderNoQualityCheckingComponent implements OnInit {
                            <tbody>
                               <tr>
                                  <td class="centerlabel">
-									<button type="button" class="btn btn-success" (click)="addEditPkgDtls()" *ngIf="this.hdpkgindexid == '0'"><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
-									<button type="button" class="btn btn-success" (click)="addEditPkgDtls()" *ngIf="this.hdpkgindexid != '0'"><span class="col-form-span-refresh"><i class="fa fa-plus"></i>&nbsp;Update</span></button>
+									@if (this.hdpkgindexid == '0') {
+<button type="button" class="btn btn-success" (click)="addEditPkgDtls()"><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
+}
+									@if (this.hdpkgindexid != '0') {
+<button type="button" class="btn btn-success" (click)="addEditPkgDtls()"><span class="col-form-span-refresh"><i class="fa fa-plus"></i>&nbsp;Update</span></button>
+}
                                     <button type="button" class="btn btn-secondary" (click)="resetPackage()"><span class="col-form-span-label"><i class="fa fa-undo"></i>&nbsp;Reset</span></button>
 								</td>
                               </tr>
 							</tbody>
 						</table>
-                        <table class="table table-bordered table-striped table-sm-new" *ngIf="packagelist.length > 0">
+                        @if (packagelist.length > 0) {
+<table class="table table-bordered table-striped table-sm-new">
 							<thead>
 								<tr class="col-form-span-heading">
 									<th class="width50 centerlabel"><span class="col-form-span-label"></span></th>
@@ -3944,7 +4041,8 @@ export class OrderNoQualityCheckingComponent implements OnInit {
 									</tr>
 							</thead>
 							<tbody>
-								<tr *ngFor="let pl of packagelist">
+								@for (pl of packagelist; track pl) {
+<tr>
 									<td class="centerlabel">
 										<i class="fa fa-pencil" (click)="editPackage(pl.TBL_INDEXID,pl.PKGNOID,pl.EXPTNO)"></i>
 										&nbsp;&nbsp;
@@ -3954,8 +4052,10 @@ export class OrderNoQualityCheckingComponent implements OnInit {
 									<td colspan="2"><span class="col-form-span-label">{{pl.TO}}</span></td>
 									<td colspan="3"><span class="col-form-span-label">{{pl.ALPHABET}}</span></td>
 									</tr>
+}
 							<tbody>
 						</table>
+}
                 `,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false

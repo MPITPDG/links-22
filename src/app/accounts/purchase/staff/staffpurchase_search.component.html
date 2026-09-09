@@ -8,7 +8,8 @@
             </div>
         </div>
     </div>
-    <div class="row" *ngIf="searchList==0">
+    @if (searchList==0) {
+<div class="row">
         <div class="col-sm-3">
         </div>
         <div class="col-sm-6">
@@ -38,7 +39,9 @@
                          
                                  <select class="form-control width200"  [(ngModel)]="Staff" [disabled]="Type!='STAFF'">
                                     <option value="">Please select</option>
-                                    <option *ngFor="let d of Stafflist" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option> 
+                                    @for (d of Stafflist; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+} 
                                 </select>
                             
                        
@@ -129,7 +132,9 @@
         <div class="col-sm-3">
         </div>
     </div>
-    <div class="row" *ngIf="searchList >0">
+}
+    @if (searchList >0) {
+<div class="row">
         <div class="col-sm-12 xyscroll" style="height:300px;">
             <table class="table table-sm-new table-bordered bgwhite">
                 <thead>
@@ -147,7 +152,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let obj of searchList">
+                    @for (obj of searchList; track obj) {
+<tr>
                         <td>
                             <span class="col-form-span-label anchor-link" (click)="redirectToEdit(obj.PUR_CODE)" style="cursor:pointer;">{{obj.PUR_CODE}}</span>
                           
@@ -160,8 +166,10 @@
                         </td>
                       
                     </tr>
+}
                 </tbody>
             </table>
         </div>
     </div>
+}
 </div>

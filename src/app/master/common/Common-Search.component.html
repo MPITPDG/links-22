@@ -13,7 +13,8 @@
     <div class="col-sm-1">  </div>
     <div class="col-sm-10">
         <table class="table table-bordered table-sm-new bgwhite">   
-            <tr *ngIf="Reqlist.length == 0">
+            @if (Reqlist.length == 0) {
+<tr>
                 <td colspan="4">
                     <table class="table table-bordered table-sm-new bgwhite">
                         <tr   >
@@ -28,18 +29,22 @@
             
                             <td   >   
                                 <ul class="list-group">
-                                <li class="list-group-item"  *ngFor="let item of itemsList" style="height: 30px;">
+                                @for (item of itemsList; track item) {
+<li class="list-group-item"  style="height: 30px;">
                                     <input type="radio" [(ngModel)]="radioSelected" name="list_name" value="{{item.value}}" (change)="onItemChange(item)"/> 
                                     {{item.name}}                        
                                   </li>
+}
                                 </ul>
                             </td> 
                             <td>   
                                 <ul class="list-group">
-                                <li class="list-group-item"  *ngFor="let item of ReqitemsList" style="height: 30px;">
+                                @for (item of ReqitemsList; track item) {
+<li class="list-group-item"  style="height: 30px;">
                                     <input type="radio" [(ngModel)]="radioSelected" name="list_name" value="{{item.value}}" (change)="onItemChange(item)"/> 
                                     {{item.name}}                        
                                   </li>
+}
                                 </ul>
                             </td> 
                         </tr>
@@ -64,9 +69,11 @@
                         </tr>
                     </table>
                 </td>
-            </tr>            
+            </tr>
+}            
            
-            <tr *ngIf="Reqlist.length > 0">
+            @if (Reqlist.length > 0) {
+<tr>
                 <td colspan="4">
                     <table class="table table-sm-new bgwhite">
                         <thead>
@@ -83,7 +90,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let obj of Reqlist  | paginate: config">
+                            @for (obj of Reqlist  | paginate: config; track obj) {
+<tr>
 
                                
                                 <td>
@@ -111,12 +119,14 @@
                                     <span class="col-form-span-label">{{obj.USER}}</span>
                                 </td>
                             </tr>
+}
                         
                         </tbody>
                     </table>
                     <pagination-controls (pageChange)="pageChanged($event)"></pagination-controls> 
                 </td>
             </tr>
+}
             
             </table>
     </div>

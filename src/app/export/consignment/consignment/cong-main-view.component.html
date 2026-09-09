@@ -3,22 +3,29 @@
         <div class="col-sm-2">
         </div>
         <div class="col-sm-8">
-            <div *ngIf="links == 'L'"></div>
-            <div *ngIf="links == 'M'">
+            @if (links == 'L') {
+<div></div>
+}
+            @if (links == 'M') {
+<div>
                 <table class="table table-bordered table-sm-new bgwhite">
                     <tbody>
-                        <tr *ngIf="viewData?.Table[0]?.EXPTCANCEL == 'Y'">
+                        @if (viewData?.Table[0]?.EXPTCANCEL == 'Y') {
+<tr>
                             <td colspan="4">
                                 <span class="col-form-span-label red">
                                     <strong>CONSIGNMENT IS CANCELLED</strong>
                                 </span>
                             </td>
                         </tr>
-                        <tr *ngIf="edocView == 1">
+}
+                        @if (edocView == 1) {
+<tr>
                             <th class="col-form-span-heading centerlabel  link-label" colspan="4">
                                 <span (click)="openEdoc()">E-Document - View/Upload File</span>
                             </th>
                         </tr>
+}
                         <tr>
                             <td class="width150">
                                 <span class="col-form-span-label">EXPORT NO </span>
@@ -35,12 +42,16 @@
                                 <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_MODE}}</span>
                             </td>
                             <td class="width130 centerlabel" rowspan="14">
-                                <span class="col-form-span-label" *ngIf="viewData?.Table[0]?.CLEARANCE == 'S'">
+                                @if (viewData?.Table[0]?.CLEARANCE == 'S') {
+<span class="col-form-span-label">
                                     <strong>SHIPMENT CLEARANCE BY SHIPPER'S AGENT</strong>
                                 </span>
-                                <span class="col-form-span-label" *ngIf="viewData?.Table[0]?.CLEARANCE != 'S'">
+}
+                                @if (viewData?.Table[0]?.CLEARANCE != 'S') {
+<span class="col-form-span-label">
                                     <strong>SHIPMENT CLEARANCE BY US</strong>
                                 </span>
+}
                             </td>
                         </tr>
                         <tr>
@@ -263,7 +274,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let obj of viewData?.Table4">
+                            @for (obj of viewData?.Table4; track obj) {
+<tr>
                                 <td class="centerlabel">
                                     <span class="col-form-span-label">{{obj.ORDERNO}}</span>
                                 </td>  
@@ -321,6 +333,7 @@
                                     <span class="col-form-span-label">{{obj.CONTAINERNO}}</span>
                                 </td>
                             </tr>
+}
                         </tbody>
                     </table>
                 </div>
@@ -351,7 +364,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let obj of viewData?.Table5">
+                        @for (obj of viewData?.Table5; track obj) {
+<tr>
                             <td class="width150">
                                 <span class="col-form-span-label">{{obj.FROM}}</span>
                             </td>
@@ -362,20 +376,24 @@
                                 <span class="col-form-span-label">{{obj.ALPHABET}}</span>
                             </td>
                         </tr>
+}
                     </tbody>
                 </table>
                 <br />
-                <table class="table table-bordered table-sm-new bgwhite" *ngIf="viewData?.Table[0]?.EXPT_MODE == 'SEA'">
+                @if (viewData?.Table[0]?.EXPT_MODE == 'SEA') {
+<table class="table table-bordered table-sm-new bgwhite">
                     <tbody>
                         <tr>
                             <td class="width150">
                                 <span class="col-form-span-label">Container No </span>
                             </td>
                             <td colspan="3">
-                                <p class="col-form-span-label" *ngFor="let obj of containerData">
+                                @for (obj of containerData; track obj) {
+<p class="col-form-span-label">
                                     <span class="link-label" (click)="showClpView(obj.CONTAINERNO)">
                                         <u>{{obj.CONTAINER}}</u>
                                     </span>{{obj.CONTAINER_STATUS}}</p>
+}
                             </td>
                         </tr>
                         <tr>
@@ -466,13 +484,15 @@
                                 <span class="col-form-span-label">{{viewData?.Table[0]?.ETD}}</span>
                             </td>
                         </tr>
-                        <tr *ngIf="viewData?.Table[0]?.SAILING == ''">
+                        @if (viewData?.Table[0]?.SAILING == '') {
+<tr>
                             <td colspan="4" class="bglightgreen red">
                                 <strong>
                                     <span class="col-form-span-label">VESSEL DELAYED</span>
                                 </strong>
                             </td>
                         </tr>
+}
                         <tr>
                             <td class="width150">
                                 <span class="col-form-span-label">SAILED ON (ACTUAL) </span>
@@ -481,7 +501,8 @@
                                 <span class="col-form-span-label">{{viewData?.Table[0]?.SAILING}}</span>
                             </td>
                         </tr>
-                        <tr *ngIf="viewData?.Table[0]?.EXPT_MODE == 'SEA'">
+                        @if (viewData?.Table[0]?.EXPT_MODE == 'SEA') {
+<tr>
                             <td class="width150">
                                 <span class="col-form-span-label"></span>
                             </td>
@@ -489,9 +510,12 @@
                                 <span class="col-form-span-label">Direct </span>
                             </td>
                         </tr>
+}
                     </tbody>
                 </table>
-                <table class="table table-bordered table-sm-new bgwhite" *ngIf="viewData?.Table[0]?.EXPT_MODE == 'SEA'">
+}
+                @if (viewData?.Table[0]?.EXPT_MODE == 'SEA') {
+<table class="table table-bordered table-sm-new bgwhite">
                     <tbody>
                         <tr>
                             <td colspan="4">
@@ -585,7 +609,9 @@
                         </tr>
                     </tbody>
                 </table>
-                <table class="table table-bordered table-sm-new bgwhite" *ngIf="viewData?.Table[0]?.EXPT_MODE == 'SEA'">
+}
+                @if (viewData?.Table[0]?.EXPT_MODE == 'SEA') {
+<table class="table table-bordered table-sm-new bgwhite">
                     <tbody>
                         <tr>
                             <td colspan="4">
@@ -628,6 +654,7 @@
                         </tr>
                     </tbody>
                 </table>
+}
                 <table class="table table-bordered table-sm-new bgwhite">
                     <tbody>
                         <tr>
@@ -672,7 +699,9 @@
                             </td>
                             <td>
                                 <span class="col-form-span-label">{{viewData?.Table[0]?.AEROBILLNO}}</span>
-                                <span class="col-form-span-label" *ngIf="viewData?.Table[0]?.AEROBILLNO != ''"> </span>
+                                @if (viewData?.Table[0]?.AEROBILLNO != '') {
+<span class="col-form-span-label"> </span>
+}
                             </td>
                             <td class="width150">
                                 <span class="col-form-span-label">MAWB Date</span>
@@ -687,7 +716,9 @@
                             </td>
                             <td>
                                 <span class="col-form-span-label">{{viewData?.Table[0]?.HOUSEBILLNO}}</span>
-                                <span class="col-form-span-label" *ngIf="viewData?.Table[0]?.HOUSEBILLNO != ''"> </span>
+                                @if (viewData?.Table[0]?.HOUSEBILLNO != '') {
+<span class="col-form-span-label"> </span>
+}
                             </td>
                             <td class="width150">
                                 <span class="col-form-span-label">House AWB Date.</span>
@@ -696,7 +727,8 @@
                                 <span class="col-form-span-label">{{viewData?.Table[0]?.HOUSEBILLDT}}</span>
                             </td>
                         </tr>
-                        <tr *ngIf="viewData?.Table[0]?.EXPT_MODE == 'AIR'">
+                        @if (viewData?.Table[0]?.EXPT_MODE == 'AIR') {
+<tr>
                             <td class="width150">
                                 <span class="col-form-span-label"></span>
                             </td>
@@ -704,6 +736,7 @@
                                 <span class="col-form-span-label">Direct </span>
                             </td>
                         </tr>
+}
                     </tbody>
                 </table>
                 <table class="table table-bordered table-sm-new bgwhite">
@@ -775,7 +808,8 @@
                                 <span class="col-form-span-label">{{viewData?.Table[0]?.ETAPORT2}}</span>
                             </td>
                         </tr>
-                        <tr *ngIf="viewData?.Table2[0]?.DIRECTVSL == 'YES'">
+                        @if (viewData?.Table2[0]?.DIRECTVSL == 'YES') {
+<tr>
                             <td class="width150">
                                 <span class="col-form-span-label">E.T.A</span>
                             </td>
@@ -783,6 +817,7 @@
                                 <span class="col-form-span-label">{{viewData?.Table[0]?.FCRSDT}}</span>
                             </td>
                         </tr>
+}
                         <tr>
                             <td class="width150">
                                 <span class="col-form-span-label">D/douane No.</span>
@@ -818,11 +853,13 @@
                             <td colspan="3">
                                 <table class="table table-bordered table-sm-new bgwhite">
                                     <tbody>
-                                        <tr *ngFor="let obj of viewData?.Table3">
+                                        @for (obj of viewData?.Table3; track obj) {
+<tr>
                                             <td class="width150">
                                                 <span class="col-form-span-label">{{obj.ACTUALDT}}</span>
                                             </td>
                                         </tr>
+}
                                     </tbody>
                                 </table>
                             </td>
@@ -853,15 +890,26 @@
                     </tbody>
                 </table>
             </div>
-            <app-consignment-invoice-view [exptno]="ExptNo" *ngIf="links == 'I'"></app-consignment-invoice-view>
-            <app-consignment-chronology-view [exptno]="ExptNo" [deliveryData]="deliveryData" [loadTrans]="loadTrans" *ngIf="links == 'C'"></app-consignment-chronology-view>
-            <app-consignment-remark-view [exptno]="ExptNo" [remarkData]="remark" *ngIf="links == 'R'"></app-consignment-remark-view>
-            <app-consignment-clp-view [exptno]="ExptNo" [containerno]="containerno" [vessel]="vessel" *ngIf="links == 'CLP'"></app-consignment-clp-view>
+}
+            @if (links == 'I') {
+<app-consignment-invoice-view [exptno]="ExptNo"></app-consignment-invoice-view>
+}
+            @if (links == 'C') {
+<app-consignment-chronology-view [exptno]="ExptNo" [deliveryData]="deliveryData" [loadTrans]="loadTrans"></app-consignment-chronology-view>
+}
+            @if (links == 'R') {
+<app-consignment-remark-view [exptno]="ExptNo" [remarkData]="remark"></app-consignment-remark-view>
+}
+            @if (links == 'CLP') {
+<app-consignment-clp-view [exptno]="ExptNo" [containerno]="containerno" [vessel]="vessel"></app-consignment-clp-view>
+}
             <br />
-            <div *ngIf="links=='I'||links=='C'||links=='R'||links=='CLP'">
+            @if (links=='I'||links=='C'||links=='R'||links=='CLP') {
+<div>
                 <button class="btn btn-sm btn-warning" (click)="links='M'">
                     <i class="fa fa-arrow-circle-o-left"></i>&nbsp;back to main</button>
             </div>
+}
         </div>
         <div class="col-sm-2">
         </div>

@@ -8,7 +8,8 @@
             </div>
         </div>
     </div>
-    <div class="row" *ngIf="displayType=='SEARCH'">
+    @if (displayType=='SEARCH') {
+<div class="row">
         <div class="col-sm-3">
         </div>
         <div class="col-sm-6">
@@ -140,8 +141,10 @@
         <div class="col-sm-3">
         </div>
     </div>
+}
    
-    <div class="row" *ngIf="displayType=='LIST'">
+    @if (displayType=='LIST') {
+<div class="row">
         <div class="col-sm-12 xyscroll" style="height:300px;" >
             <table class="table table-sm-new table-bordered bgwhite">
                 <thead>
@@ -159,7 +162,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let obj of searchList">
+                    @for (obj of searchList; track obj) {
+<tr>
                         <td>
                             <span class="col-form-span-label anchor-link" (click)="redirectToEdit(obj.JVCODE,obj.STATUS)" style="cursor:pointer;">{{obj.JVCODE}}</span>
                             <!-- <span class="col-form-span-label">
@@ -174,9 +178,11 @@
                         </td>
                       
                     </tr>
+}
                 </tbody>
             </table>
         </div>
     </div>
+}
    
 </div>

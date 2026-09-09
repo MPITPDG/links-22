@@ -71,7 +71,8 @@
        </tr>
      </tbody>
  </table>
- <div class="row xscroll" *ngIf="itcData.length > 0">
+ @if (itcData.length > 0) {
+<div class="row xscroll">
      <table class="table table-bordered table-striped table-sm-new">
          <thead>
              <tr class="col-form-span-heading">
@@ -91,7 +92,8 @@
                  </tr>
          </thead>
          <tbody>
-             <tr *ngFor="let obj of itcData">
+             @for (obj of itcData; track obj) {
+<tr>
                  <td><span class="col-form-span-label">{{obj.ITCCODE}}</span></td>
                  <td><span class="col-form-span-label">{{obj.FOBINR}}</span></td>
                  <td><span class="col-form-span-label">{{obj.DBKSUBSRNO}}</span></td>
@@ -106,9 +108,11 @@
                  <td><span class="col-form-span-label">{{obj.RATEPERUNIT}}</span></td>
                  <td><span class="col-form-span-label">{{obj.DESCRIPTION}}</span></td>
                  </tr>
+}
          <tbody>
      </table>
    </div>
+}
  <table class="table table-bordered table-striped table-sm-new">
     <tbody>
         <tr>

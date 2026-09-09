@@ -59,8 +59,10 @@
                                     <th class="col-form-span-label ">Status</th>
                                 </tr>
                             </thead>
-                            <tbody *ngIf="details.length>0">
-                                <tr *ngFor="let obj of details; index as i">
+                            @if (details.length>0) {
+<tbody>
+                                @for (obj of details; track obj; let i = $index) {
+<tr>
                                     <td><span class="col-form-span-label">{{i+1}}
                                         </span>
                                     </td>
@@ -69,7 +71,9 @@
                                     <td><span class="col-form-span-label">{{obj.CRParentEntryNo}}</span></td>
 
                                 </tr>
+}
                             </tbody>
+}
                         </table>
 
 

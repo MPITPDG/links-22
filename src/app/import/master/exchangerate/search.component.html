@@ -25,9 +25,11 @@
                     <td>
                         <select class="form-control" [(ngModel)]="CurrencyType">
                             <option value="0">-- Select --</option>
-                            <ng-template ngFor let-item [ngForOf]="CurrencyList">
+                            @for (item of CurrencyList; track item) {
+
                                 <option value="{{item.DATAVALUEFIELD}}">{{item.DATATEXTFIELD}}</option>
-                            </ng-template>
+                            
+}
                         </select>
                     </td>
                 </tr>
@@ -38,9 +40,11 @@
                     <td>
                         <select class="form-control" [(ngModel)]="BranchName">
                             <option value="0">-- Select --</option>
-                            <ng-template ngFor let-item [ngForOf]="BranchList">
+                            @for (item of BranchList; track item) {
+
                                 <option value="{{item.DATAVALUEFIELD}}">{{item.DATATEXTFIELD}}</option>
-                            </ng-template>
+                            
+}
                         </select>
                     </td>
                 </tr>
@@ -81,7 +85,8 @@
         <div class="col-sm-4">
         </div>
     </div><br />
-    <div class="row" *ngIf="DisplayList.length > 0">
+    @if (DisplayList.length > 0) {
+<div class="row">
         <div class="col-sm-2">
         </div>
         <div class="col-sm-8">
@@ -94,17 +99,20 @@
                         <th><span class="col-form-span-label">TO</span> </th>
                         <th><span class="col-form-span-label">EXCHANGE RATE</span> </th>
                     </tr>
-                    <tr *ngFor="let obj of DisplayList" class="tr-hover" (click)="goTo(obj.pk_ExchangeRateId)" style="cursor:pointer;">
+                    @for (obj of DisplayList; track obj) {
+<tr class="tr-hover" (click)="goTo(obj.pk_ExchangeRateId)" style="cursor:pointer;">
                         <td class="width150"><span class="col-form-span-label">{{obj["CURRENCY TYPE"]}}</span></td>
                         <td><span class="col-form-span-label">{{obj["BRANCH NAME"]}}</span> </td>
                         <td class="width150"><span class="col-form-span-label">{{obj["FROM"]}}</span></td>
                         <td><span class="col-form-span-label">{{obj["TO"]}}</span> </td>
                         <td class="width150"><span class="col-form-span-label">{{obj["EXCHANGE RATE"]}}</span></td>
                     </tr>
+}
                 </table>
             </div>
         </div>
         <div class="col-sm-2">
         </div>
     </div>
+}
 </div>

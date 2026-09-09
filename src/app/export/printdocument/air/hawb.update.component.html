@@ -12,7 +12,8 @@
 	</div>
 	<div class="col-sm-8">
 		<table class="table table-bordered table-sm-new bgwhite">
-			<tr class="title-head trbg" *ngIf="hawb_issue=='1'; else  otherhawbno">
+			@if (hawb_issue=='1') {
+<tr class="title-head trbg">
 				<td class="width150">
 					<span class="col-form-span-label">HAWB No.</span><span class="col-form-span-error">*</span>
 				</td>
@@ -26,7 +27,8 @@
 					<my-date-picker name="mawbdate" [options]="myDatePickerOptions" [(ngModel)]="hawbdate" [disabled]="hawbno != ''"></my-date-picker>
 				</td>
 			</tr>
-			<ng-template #otherhawbno> 
+} @else {
+ 
 				<tr class="title-head trbg">
 					<td class="width150">
 						<span class="col-form-span-label">HAWB No.</span><span class="col-form-span-error">*</span>
@@ -41,7 +43,9 @@
 						<my-date-picker name="mawbdate" [options]="myDatePickerOptions" [(ngModel)]="hawbdate" [disabled]="hawbno != ''"></my-date-picker>
 					</td>
 				</tr>
-			</ng-template>
+			
+}
+			
 
 			<tr class="title-head trbg">
 				<td class="width150">
@@ -77,7 +81,9 @@
 					</ng-select> -->
 					<select class="form-control width120"   [(ngModel)]="Fcurrency">
 						<option value="0">Please select</option>
-						<option *ngFor="let d of currencyList" value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+						@for (d of currencyList; track d) {
+<option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+}
 					
 					</select>
 				</td>
@@ -91,7 +97,8 @@
 				</td>
 			</tr>
 		</table>
-		<table class="table table-bordered table-sm-new bgwhite" *ngIf="hawbnoList.length > 0">
+		@if (hawbnoList.length > 0) {
+<table class="table table-bordered table-sm-new bgwhite">
 			<thead>
 					<tr class="title-head formheading">
 						<th>EXPT NO</th>
@@ -104,7 +111,8 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let obj of hawbnoList">
+					@for (obj of hawbnoList; track obj) {
+<tr>
 						<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
 						<td><span class="col-form-span-label">{{obj.SHIPPER}}</span></td>
 						<td><span class="col-form-span-label">{{obj.CONSIGNEE}}</span></td>
@@ -113,6 +121,7 @@
 						<td><span class="col-form-span-label">{{obj.GRWT}}</span></td>
 						<td><span class="col-form-span-label">{{obj.CHBLWT}}</span></td>
 					</tr>
+}
 					<tr class="trbg">
 						<td><span class="col-form-span-label"></span></td>
 						<td><span class="col-form-span-label"></span></td>
@@ -124,9 +133,12 @@
 					</tr>
 				</tbody>
 		</table>
-		<table class="table table-bordered table-sm-new bgwhite" *ngIf="hawbnoList.length < 0">
+}
+		@if (hawbnoList.length < 0) {
+<table class="table table-bordered table-sm-new bgwhite">
 			<tr><td colspan="6" class="centerlabel"><span class="col-form-span-error">please wait data is loading.........</span></td></tr>
 		</table>
+}
 		<table class="table table-bordered table-sm-new bgwhite">
 			<tr class="title-head trbg">
 				<td colspan="6" class="centerlabel">

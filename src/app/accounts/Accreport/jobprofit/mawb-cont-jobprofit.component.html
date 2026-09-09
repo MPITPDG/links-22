@@ -35,7 +35,8 @@
         <div class="col-sm-12 col-md-3 col-lg-3">
         </div>
     </div>
-    <div class="row no-gutters" *ngIf="detailsdata_serch">
+    @if (detailsdata_serch) {
+<div class="row no-gutters">
         <div class="col-sm-12 col-md-1 col-lg-1">
         </div>
         <div class="col-sm-12 col-md-10 col-lg-10 xyscroll" style="height: 470px;">
@@ -57,7 +58,8 @@
                             </thead>
                             <tbody>
 
-                                <tr *ngFor="let data of cont_table1" style="font-weight: bold;">
+                                @for (data of cont_table1; track data) {
+<tr style="font-weight: bold;">
                                     <td data-toggle="collapse" data-target="#accordion_containerdetail"
                                         (click)="setOrder_CONT()" class="clickable" style="width: 15px;"><span
                                             [hidden]="reverse_CONT" id="icon_show">+</span>
@@ -72,6 +74,7 @@
                                     <td><span class="col-form-span-label">{{data.GRANDVALUE}}</span> </td>
 
                                 </tr>
+}
                             </tbody>
                         </table>
 
@@ -101,7 +104,8 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr *ngFor="let data of vouchr_table3">
+                                        @for (data of vouchr_table3; track data) {
+<tr>
                                             <td></td>
                                             <td colspan="2"><span class="col-form-span-label"
                                                      (click)="voucherprint(data.VOUCHER_NO,data.VOUCHERNO)" 
@@ -111,6 +115,7 @@
                                             <td><span class="col-form-span-label">{{data.PAYMENT_EURO}}</span> </td>
                                             <td><span class="col-form-span-label">{{data.RECOVERY_EURO}}</span></td>
                                         </tr>
+}
                                     </tbody>
                                 </table>
                             </div>
@@ -128,7 +133,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <ng-container *ngFor="let data of job_table2">
+                                    @for (data of job_table2; track data) {
+
                                         <tr>
                                             <td style="width: 15px;" (click)="setOrder_JOB(data.JOBNO)"
                                                 class="clickable">
@@ -160,7 +166,8 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr *ngFor="let childdata of data.childdetail">
+                                                            @for (childdata of data.childdetail; track childdata) {
+<tr>
                                                                 <td></td>
                                                                 <td colspan="2">
                                                                     <span class="col-form-span-label"
@@ -178,13 +185,15 @@
                                                                 <td><span class="col-form-span-label">{{childdata.RECOVERY_EURO}}</span>
                                                                 </td>
                                                             </tr>
+}
                                                         </tbody>
                                                     </table>
                                                 <!-- </span> -->
                                             </td>
                                         </tr>
 
-                                    </ng-container>
+                                    
+}
                                 </tbody>
                             </table>
                         </div>
@@ -195,4 +204,5 @@
         <div class="col-sm-12 col-md-1 col-lg-1">
         </div>
     </div>
+}
 </div>

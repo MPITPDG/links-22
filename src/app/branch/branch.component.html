@@ -3,14 +3,20 @@
 		<div class="col-sm-5">
 		</div>
 		<div class="col-sm-2">
-			<img src="assets/img/loading.gif" *ngIf="countries.length==0"/>
-			<div class="card" *ngIf="countries.length > 0">
+			@if (countries.length==0) {
+<img src="assets/img/loading.gif"/>
+}
+			@if (countries.length > 0) {
+<div class="card">
 				<div class="card-body">
-					<button type="button" class="btn btn-outline-primary btn-block" [ngStyle]="{'margin-top':'0rem'}" *ngFor="let obj of countries" (click)="setCity(obj.CITYCODE);">
+					@for (obj of countries; track obj) {
+<button type="button" class="btn btn-outline-primary btn-block" [ngStyle]="{'margin-top':'0rem'}" (click)="setCity(obj.CITYCODE);">
 						<u>{{ obj.CITYNAME | titlecase }}</u>
 					</button>
+}
 				</div>
 			</div>
+}
 		</div>
 		<div class="col-sm-5">
 		</div>

@@ -32,8 +32,9 @@
             </tr>
           </thead>
           <tbody class="bgwhite">
-            <tr
-              *ngFor="let obj of resetjsonlist "   [ngClass]="{ 'disabled-row': obj.SUPTYPE === 'B2CS' }"
+            @for (obj of resetjsonlist ; track obj) {
+<tr
+                [ngClass]="{ 'disabled-row': obj.SUPTYPE === 'B2CS' }"
               >
               <td class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.Checked" [id]="i" [value]="i"
                   (ngModelChange)="getCheckboxValues($event,obj.FK_JSON_ID,obj.ID,obj.INV_NO,i)"> &nbsp; </td>
@@ -53,6 +54,7 @@
               <td class="col-form-span-label">{{obj.ROUNDOFFAMT}}</td>
               <td class="col-form-span-label">{{obj.TOTALAMT}}</td>
             </tr>
+}
           </tbody>
           <!-- <tr>
             <td colspan="12" class="right-text pr-2">

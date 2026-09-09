@@ -76,7 +76,8 @@
         <div class="col-sm-12 col-md-3 col-lg-3">
         </div>
     </div>
-    <div *ngIf="data_table.length > 0" class="row no-gutters">
+    @if (data_table.length > 0) {
+<div class="row no-gutters">
       
         <div class="col-sm-12 col-md-12 col-lg-12 ">
             <table class="table table-bordered table-sm-new bgwhite">
@@ -94,8 +95,10 @@
                         <th   align="center"> <span  class="col-form-span-label">Consignee</span> </th>
                     </tr>
                 </thead>
-                <tbody *ngIf="data_table.length > 0">
-                    <tr *ngFor="let data of data_table">
+                @if (data_table.length > 0) {
+<tbody>
+                    @for (data of data_table; track data) {
+<tr>
                       
                         
                         <td><span class="col-form-span-label">{{data.EXPT_BLNO}}</span>   </td>
@@ -108,12 +111,15 @@
                         <td><span  class="col-form-span-label">{{ data.CONSIGNORNAME}}</span>  </td>
                         <td><span  class="col-form-span-label">{{ data.CONSIGNEENAME}}</span>  </td>
                     </tr>
+}
                 </tbody>
+}
 
             </table>
         </div>
   
     </div>
+}
 </div>
 
 

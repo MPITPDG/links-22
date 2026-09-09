@@ -11,9 +11,11 @@
 				<td  >
 					<select class="form-control width300"  [(ngModel)]="VslName" (change)="onAgentSelect($event.target.value)">
 						<option value="">Please select</option>
-                        <option *ngFor="let d of vslnameList" value={{d.RTNOPRT}}>
+                        @for (d of vslnameList; track d) {
+<option value={{d.RTNOPRT}}>
                             {{d.VSL_NAME}}
                         </option>
+}
 					</select>
 				</td>
 			</tr>
@@ -24,7 +26,9 @@
 				<td  >
 					<select class="form-control width200"  [(ngModel)]="VslAgent"  >
 						<option value="">Please select</option>
-						<option *ngFor="let d of Agentlist" value={{d.agt_code}}>{{d.agt_name}}</option>
+						@for (d of Agentlist; track d) {
+<option value={{d.agt_code}}>{{d.agt_name}}</option>
+}
 					</select>
 				</td>
 			</tr>
@@ -32,8 +36,12 @@
 				<td colspan="2" class="centerlabel" >
 					<button class="btn btn-sm btn-success" type="submit"  name="btnAgtAdd" (click)="onsearch()" #searchButton> 
 						<span class="col-form-span-label">
-							<i class="fa fa-search" *ngIf="!loading"></i>
-							<i class="fa fa-spinner fa-spin" *ngIf="loading"></i>
+							@if (!loading) {
+<i class="fa fa-search"></i>
+}
+							@if (loading) {
+<i class="fa fa-spinner fa-spin"></i>
+}
 							Search 
 						</span>
 					</button>

@@ -139,7 +139,9 @@ export class MAWBModelpopupcomponent  implements OnInit {
              </ng-select> -->
              <select class="form-control " [(ngModel)]="SupplierNet">
                  <option value="">--select--</option>
-                  <option *ngFor="let d of netData" value={{d.DataValueField}}>{{d.DataTextField}}</option>
+                  @for (d of netData; track d) {
+<option value={{d.DataValueField}}>{{d.DataTextField}}</option>
+}
              </select>
          </td>
        </tr>
@@ -161,12 +163,20 @@ export class MAWBModelpopupcomponent  implements OnInit {
        <tr>
           <td colspan="3"><span class="col-form-span-label"><strong><u>DESCRIPTION</u></strong></span></td>
           <td colspan="3">
-             <span class="col-form-span-label" *ngIf="FreightRate == 'PP' || FreightRate == null"><strong><u>Payable On / Rate / Prepaid</u></strong></span>
-             <span class="col-form-span-label" *ngIf="FreightRate == 'CC'"><strong><u>Payable On / Rate / Collect</u></strong></span>
+             @if (FreightRate == 'PP' || FreightRate == null) {
+<span class="col-form-span-label"><strong><u>Payable On / Rate / Prepaid</u></strong></span>
+}
+             @if (FreightRate == 'CC') {
+<span class="col-form-span-label"><strong><u>Payable On / Rate / Collect</u></strong></span>
+}
           </td>
           <td colspan="3">
-             <span class="col-form-span-label" *ngIf="FreightRate == 'PP' || FreightRate == null"><strong><u>Payable On / Rate / Prepaid</u></strong></span>
-             <span class="col-form-span-label" *ngIf="FreightRate == 'CC'"><strong><u>Payable On / Rate / Collect</u></strong></span>
+             @if (FreightRate == 'PP' || FreightRate == null) {
+<span class="col-form-span-label"><strong><u>Payable On / Rate / Prepaid</u></strong></span>
+}
+             @if (FreightRate == 'CC') {
+<span class="col-form-span-label"><strong><u>Payable On / Rate / Collect</u></strong></span>
+}
           </td>
        </tr>
        <tr>
@@ -714,7 +724,8 @@ export class MAWBModelpopupcomponent  implements OnInit {
              </table>
           </td>
        </tr>
-       <tr *ngIf="CityCode != 'DAC'">
+       @if (CityCode != 'DAC') {
+<tr>
           <td colspan="3"><span class="col-form-span-label"><strong>(8) BUSINESS PROMOTION </strong></span></td>
           <td colspan="3">
                <table class="table-sm-new bglightgray">
@@ -795,6 +806,7 @@ export class MAWBModelpopupcomponent  implements OnInit {
              </table>
           </td>
        </tr>
+}
        <tr>
           <td colspan="3"><span class="col-form-span-label"><strong>(9) AMS </strong></span></td>
           <td colspan="3">
@@ -1010,13 +1022,17 @@ export class MAWBModelpopupcomponent  implements OnInit {
                    <td>
                        <select class="form-control width80" [(ngModel)]="CHARGETYPE" (change)="GetChrges(CHARGETYPE)" >
                           <option value="null">--Select--</option>
-                          <option *ngFor="let d of ChrgTypelist" value={{d.DataValueField}}>{{d.DataTextField}}</option>
+                          @for (d of ChrgTypelist; track d) {
+<option value={{d.DataValueField}}>{{d.DataTextField}}</option>
+}
                   </select>
                    </td>
                    <td>
                        <select class="form-control  width130" [(ngModel)]="CHARGENAME" >
                        <option value="null">--</option>
-                       <option *ngFor="let d of AirLineCharges" value={{d.DataValueField}}>{{d.DataTextField}}</option>
+                       @for (d of AirLineCharges; track d) {
+<option value={{d.DataValueField}}>{{d.DataTextField}}</option>
+}
                  </select></td>
 
                    <td class="width60"></td>
@@ -1105,7 +1121,8 @@ export class MAWBModelpopupcomponent  implements OnInit {
 
                <tr>
                    <td colspan="11">
-                       <table class="table table-bordered  table-sm-new bgwhite" *ngIf="Chargeslist.length>0" width="100%" >
+                       @if (Chargeslist.length>0) {
+<table class="table table-bordered  table-sm-new bgwhite" width="100%" >
                                            <thead>
                                                <tr class="formheading">
                                                    <th></th>
@@ -1119,7 +1136,8 @@ export class MAWBModelpopupcomponent  implements OnInit {
                                                </tr>
                                            </thead>
                                             <tbody   >
-                                               <tr *ngFor="let obj of Chargeslist">
+                                               @for (obj of Chargeslist; track obj) {
+<tr>
                                                    <td class="centerlabel">
                                                        <i class="fa fa-pencil" (click)="Editchildrecd(obj.PK_ID)"  ></i>
                                                        &nbsp;
@@ -1133,8 +1151,10 @@ export class MAWBModelpopupcomponent  implements OnInit {
                                                    <td><span class="col-form-span-label">{{obj.RATE_NET_FRT}}</span></td>
                                                    <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
                                                </tr>
+}
                                            </tbody>
                                        </table>
+}
 
                    </td>
                </tr>
@@ -1302,7 +1322,8 @@ export class MAWBModelpopupcomponent  implements OnInit {
              </table>
           </td>
        </tr>
-       <tr *ngIf="CityCode == 'DAC'">
+       @if (CityCode == 'DAC') {
+<tr>
           <td colspan="3"><span class="col-form-span-label"><strong>(20) Business Promotion</strong></span></td>
           <td colspan="3"><span class="col-form-span-label"></span></td>
           <td colspan="3">
@@ -1315,6 +1336,7 @@ export class MAWBModelpopupcomponent  implements OnInit {
              </table>
           </td>
        </tr>
+}
        <tr>
           <td colspan="3"><span class="col-form-span-label"><strong>(21) TDS </strong></span></td>
           <td colspan="3">
@@ -1328,7 +1350,9 @@ export class MAWBModelpopupcomponent  implements OnInit {
              </ng-select> -->
              <select class="form-control " [(ngModel)]="DrpTDS">
                  <option value="">--</option>
-                  <option *ngFor="let d of tdsData" value={{d.DataValueField}}>{{d.DataTextField}}</option>
+                  @for (d of tdsData; track d) {
+<option value={{d.DataValueField}}>{{d.DataTextField}}</option>
+}
              </select>
           </td>
           <td colspan="3">
@@ -1354,7 +1378,9 @@ export class MAWBModelpopupcomponent  implements OnInit {
              </ng-select> -->
              <select class="form-control " [(ngModel)]="DrpServiceTax">
                  <option value="">--</option>
-                  <option *ngFor="let d of serviceTax" value={{d.DataValueField}}>{{d.DataTextField}}</option>
+                  @for (d of serviceTax; track d) {
+<option value={{d.DataValueField}}>{{d.DataTextField}}</option>
+}
              </select>
           </td>
           <td colspan="3">

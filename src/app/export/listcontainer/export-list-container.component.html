@@ -2,7 +2,8 @@
 	<div class="col-sm-2">
 	</div>
 	<div class="col-sm-8">	 
-		<table class="table table-bordered table-striped table-sm-new" *ngIf="Searchdata.length===0" >
+		@if (Searchdata.length===0) {
+<table class="table table-bordered table-striped table-sm-new" >
 				<tbody style='height:30px'>
                         <tr>
                             <td class="col-form-span-heading" colspan="2"  >
@@ -26,7 +27,9 @@
                         </tr>
 						 </tbody>
 		</table>
-		<table class="table table-bordered table-striped table-sm-new" *ngIf="Searchdata.length>0">
+}
+		@if (Searchdata.length>0) {
+<table class="table table-bordered table-striped table-sm-new">
 			<tbody>
 				<tr class="col-form-span-heading">
 					<td colspan="4" class="centerlabel"><span class="col-form-span-label red "><strong>CLP</strong></span></td>
@@ -45,14 +48,19 @@
 					<td colspan="2"><span class="col-form-span-label">{{Searchdata[0]?.LOADDT}}</span></td>
 				</tr>
 				
-				<tr *ngIf="Searchdata[0]?.VSLDELAY != ''">
+				@if (Searchdata[0]?.VSLDELAY != '') {
+<tr>
 					<td class="width150" colspan="4"><span class="col-form-span-label"><b>VESSEL DELAYED</b></span></td>					 
 				</tr>
+}
 				
-				<tr *ngIf="Searchdata[0]?.DIRECTVSL == 'yes'">
+				@if (Searchdata[0]?.DIRECTVSL == 'yes') {
+<tr>
 					<td class="width150" colspan="4" style="BACKGROUND-COLOR: aquamarine;"><span class="col-form-span-label centerlabel"><b>DIRECT</b></span></td>					 
 				</tr>
-				<tr *ngIf="Searchdata[0]?.DIRECTVSL == 'no'">
+}
+				@if (Searchdata[0]?.DIRECTVSL == 'no') {
+<tr>
 					<td class="width150" colspan="4" >
 						<table class="table table-bordered table-striped table-sm-new">
 							<tr class="col-form-span-heading">
@@ -68,19 +76,24 @@
 								<td colspan="3" class="width150"><span class="col-form-span-label"><b>CONTAINER LOADING AT TRANSHIPMENT PORT1 CONFIRMATION DATE </b></span></td>
 								<td><span class="col-form-span-label">{{Searchdata[0]?.PORT1LOADDT}}</span></td>
 							</tr>
-							<tr *ngIf="transport2 != ''">
+							@if (transport2 != '') {
+<tr>
 								<td class="width150"><span class="col-form-span-label"><b>NAME OF TRANSHIPMENT PORT #2</b></span></td>
 								<td  ><span class="col-form-span-label">{{Searchdata[0]?.TRANSPORT2}}</span></td>
 								<td class="width150"><span class="col-form-span-label"><b>TRANSHIPMENT VESSEL #2 DETAILS</b></span></td>
 								<td><span class="col-form-span-label">{{Searchdata[0]?.VESSEL2}}</span></td>
 							</tr>
-							<tr *ngIf="transport2 != ''">
+}
+							@if (transport2 != '') {
+<tr>
 								<td colspan="3" class="width150"><span class="col-form-span-label"><b>CONTAINER LOADING AT TRANSHIPMENT PORT2 CONFIRMATION DATE </b></span></td>
 								<td  ><span class="col-form-span-label">{{Searchdata[0]?.PORT2LOADDT}}</span></td>
 							</tr>
+}
 						</table>
 					</td>					
 				</tr>
+}
 				
 				<tr>
 					<td class="width150"><span class="col-form-span-label"><b>Liner</b> </span></td>
@@ -102,15 +115,21 @@
 					<td class="width150"><span class="col-form-span-label"><b>REAL ETA</b></span></td>
 					<td><span class="col-form-span-label">{{Searchdata[0]?.REALETA}}</span></td>
 				</tr>
-				<tr *ngIf="SINGLESHPR == 'Y'">
+				@if (SINGLESHPR == 'Y') {
+<tr>
 					<td class="width150" class="centerlabel" style="BACKGROUND-COLOR: #2eb1b5;" colspan="4"><span class="col-form-span-label"><b>SINGLE SHIPPER </b></span></td>
 					
 				</tr>
+}
 				<tr>
 					<td class="width150"><span class="col-form-span-label"><b>STEAMER AGENT SEAL NO. </b></span></td>
 					<td ><span class="col-form-span-label">{{Searchdata[0]?.AGTSEALNO}}</span></td>
-					<td *ngIf="Searchdata[0]?.HSTUFFED == 'YES'" class="width150"><span class="col-form-span-label"><b>HOUSE STUFFED AT</b></span></td>
-					<td *ngIf="Searchdata[0]?.HSTUFFED == 'NO'" class="width150"><span class="col-form-span-label"><b>STUFFED AT</b></span></td>
+					@if (Searchdata[0]?.HSTUFFED == 'YES') {
+<td class="width150"><span class="col-form-span-label"><b>HOUSE STUFFED AT</b></span></td>
+}
+					@if (Searchdata[0]?.HSTUFFED == 'NO') {
+<td class="width150"><span class="col-form-span-label"><b>STUFFED AT</b></span></td>
+}
 					<td><span class="col-form-span-label">{{Searchdata[0]?.STUFFWHERE}}</span></td>
 				</tr>
 				 
@@ -182,15 +201,20 @@
 				</td>
 			</tr>
 		</table>
-		<table class="table table-bordered table-striped table-sm-new" *ngIf="Searchdata.length>0">
+}
+		@if (Searchdata.length>0) {
+<table class="table table-bordered table-striped table-sm-new">
 			<tbody>
 				<tr class="col-form-span-heading">
 					<td class="centerlabel"><span class="col-form-span-label"><strong>Consignment Details :</strong></span></td>
 				</tr>
 			</tbody>
 		</table>
-		<div class="row xscroll" *ngIf="Searchdata.length>0">
-			<table class="table table-bordered table-striped table-sm-new" *ngIf="Searchdata.length>0">
+}
+		@if (Searchdata.length>0) {
+<div class="row xscroll">
+			@if (Searchdata.length>0) {
+<table class="table table-bordered table-striped table-sm-new">
 				<thead>
 					<tr class="col-form-span-heading">
 						<th class="centerlabel"><span class="col-form-span-label">Exptno No.</span></th>
@@ -207,7 +231,8 @@
 					</tr>
 				</thead>
 				<tbody>
-						<ng-container *ngFor="let obj of Exportdata" >
+						@for (obj of Exportdata; track obj) {
+
 					<tr  >
 						<td rowspan="3" class="centerlabel"><span class="col-form-span-label" >
 								<a href="javascript:void(0);"   (click)="consignmentview(obj.EXPTNO);">{{obj.EXPTNO}}</a>
@@ -233,19 +258,26 @@
 						<td  class="centerlabel"><span class="col-form-span-label"> <b>FCR Date</b></span></td>
 						<td colspan="4" class="centerlabel"><span class="col-form-span-label">{{obj.EXPT_HBLDT}}</span></td>
 					</tr>
-				</ng-container>	
+				
+}	
 				</tbody>
 			</table>
-		</div> 	
-		<table class="table table-bordered table-striped table-sm-new" *ngIf="Searchdata.length>0">
+}
+		</div>
+} 	
+		@if (Searchdata.length>0) {
+<table class="table table-bordered table-striped table-sm-new">
 			<tbody>
 				<tr class="col-form-span-heading">
 					<td class="centerlabel"><span class="col-form-span-label"><strong>No. of Pallets Details</strong></span></td>
 				</tr>
 			</tbody>
 		</table>
-		<div class="row xscroll" *ngIf="Searchdata.length>0">
-			<table class="table table-bordered table-striped table-sm-new" *ngIf="Searchdata.length>0">
+}
+		@if (Searchdata.length>0) {
+<div class="row xscroll">
+			@if (Searchdata.length>0) {
+<table class="table table-bordered table-striped table-sm-new">
 				<thead>
 					<tr class="col-form-span-heading">
 						<th class="centerlabel"><span class="col-form-span-label">Exporter</span></th>
@@ -255,17 +287,22 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let obj of Palletdata">
+					@for (obj of Palletdata; track obj) {
+<tr>
 						<td rowspan="2" class="centerlabel"><span class="col-form-span-label">{{obj.EXP_NAME}}</span></td>
 						<td class="width100"><span class="col-form-span-label">{{obj.NO_OF_PALLETS}}</span></td>
 						 			 
 					</tr>
+}
 					 
 				</tbody>
 			</table>
+}
 			
-		</div> 	
-		<table class="table table-bordered table-striped table-sm-new" *ngIf="Searchdata.length>0">
+		</div>
+} 	
+		@if (Searchdata.length>0) {
+<table class="table table-bordered table-striped table-sm-new">
 			<tbody>
 				<tr>
 					<td class="col-form-span-label font-weight-bold">Download Clp <i class="fa fa-download" (click)="ClpDownload(Containerno)"></i></td>	
@@ -278,6 +315,7 @@
 				</tr>
 			</tbody>
 		</table>
+}
 	</div>
 	<div class="col-sm-2">
 	</div>

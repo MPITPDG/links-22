@@ -9,7 +9,8 @@
     <div class="row">
         <div class="col-sm-3">
         </div>
-        <div class="col-sm-6"  *ngIf="accountlist.length==0">
+        @if (accountlist.length==0) {
+<div class="col-sm-6" >
 
             <table class="table table-bordered table-sm-new bgwhite">
 				<tr>
@@ -225,6 +226,7 @@
 			</tr>
             </table>
 		</div>
+}
     </div>
 
         <div class="col-sm-3">
@@ -234,7 +236,8 @@
 
 	<!--div class="row" *ngIf="displayType=='LIST'"-->
 
-		<div class="col-sm-12 xyscroll" *ngIf="accountlist.length>0">
+		@if (accountlist.length>0) {
+<div class="col-sm-12 xyscroll">
 
 			<table class="table table-hover" >
 				<thead>
@@ -255,7 +258,8 @@
 					</tr>
 				 </thead>
 				<tbody class="bgwhite">
-					<tr *ngFor="let obj of accountlist | paginate: config">
+					@for (obj of accountlist | paginate: config; track obj) {
+<tr>
 						<td><span class="col-form-span-label anchor-link" (click)="ListOnclick(obj.ID)" style="cursor:pointer;" >{{obj.Account}}</span></td>
 						<!--td class="col-form-span-label">{{obj.Account}}</td-->
 						<td class="col-form-span-label">{{obj.UnderGroup}}</td>
@@ -264,7 +268,9 @@
 						 <td class="col-form-span-label">{{obj.Active_comp}}</td>
 
 					</tr>
+}
 				</tbody>
 			</table>
 			<pagination-controls (pageChange)="pageChanged($event)"></pagination-controls>
 		</div>
+}

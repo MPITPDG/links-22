@@ -62,15 +62,18 @@
                                 </button>
                         </td>
                     </tr>
-                    <tr class="title-head trbg" *ngIf="ErrorMessage!=''">
+                    @if (ErrorMessage!='') {
+<tr class="title-head trbg">
                         <td colspan="5">
                             <span class="error-text">{{ErrorMessage}}</span>
                         </td>
                     </tr>
+}
             </table>
             <table class="table table-bordered table-sm-new bgwhite" #addArea>
                 <tbody>
-                    <tr class="col-form-span-heading" *ngIf="isVisibleRebooking=='edit'">
+                    @if (isVisibleRebooking=='edit') {
+<tr class="col-form-span-heading">
                         <td class="centerlabel" colspan="4">
                             <span class="col-form-span-label">
                                 <label class="checkbox-inline">
@@ -80,6 +83,7 @@
                             </span>
                         </td>
                     </tr>
+}
                     <tr class="title-head trbg">
                         <td class="width180">
                             <span class="col-form-span-label">Booking Date</span>
@@ -302,15 +306,18 @@
                             </button>
                         </td>
                     </tr>
-                    <tr class="title-head trbg" *ngIf="ErrorMessage!=''">
+                    @if (ErrorMessage!='') {
+<tr class="title-head trbg">
                         <td colspan="3">
                             <span class="col-form-span-error">{{ErrorMessage}}</span>
                         </td>
                     </tr>
+}
                 </tbody>
             </table>
             <div class="row xyscroll" [ngStyle]="{'height': '120px'}" #listArea>
-                <table class="table table-bordered table-striped table-sm-new bgwhite" *ngIf="addList.length > 0">
+                @if (addList.length > 0) {
+<table class="table table-bordered table-striped table-sm-new bgwhite">
                     <thead>
                         <tr class="title-head formheading">
                             <th></th>
@@ -331,12 +338,17 @@
                             <th>Appr Extd</th>
                             <th>App. Dt</th>
                             <th>App. By</th>
-                            <th *ngIf="EdiGroup===2">Sup.Cont dt.</th>
-                            <th *ngIf="EdiGroup===3">Ref/Assorti</th>
+                            @if (EdiGroup===2) {
+<th>Sup.Cont dt.</th>
+}
+                            @if (EdiGroup===3) {
+<th>Ref/Assorti</th>
+}
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let obj of addList">
+                        @for (obj of addList; track obj) {
+<tr>
                             <td class="centerlabel width20">
                                 <i class="fa fa-edit" title="Edit" (click)="editPopulateData(obj.ID)"></i>
                             </td>
@@ -391,15 +403,21 @@
                             <td>
                                 <span class="col-form-span-label">{{obj.ACTLAPPROVALBY}}</span>
                             </td>
-                            <td *ngIf="EdiGroup===2">
+                            @if (EdiGroup===2) {
+<td>
                                 <span class="col-form-span-label">{{obj.SUP_CONTACT_DT}}</span>
                             </td>
-                            <td *ngIf="EdiGroup===3">
+}
+                            @if (EdiGroup===3) {
+<td>
                                 <span class="col-form-span-label">{{obj.REF_ASSORTI}}</span>
                             </td>
+}
                         </tr>
+}
                     </tbody>
                 </table>
+}
             </div>
         </div>
         <div class="col-sm-2">

@@ -381,10 +381,12 @@
                             </thead>
 
                             <tbody>
-                                <tr *ngFor="let obj of enquirydetails; index as i" class=    "border-bottom reduced-height-row">
+                                @for (obj of enquirydetails; track obj; let i = $index) {
+<tr class=    "border-bottom reduced-height-row">
                                 <td style="width: 35px;">
-                                    <i class="fa fa-pencil text-primary cursor-pointer" (click)="EditEnquiry(obj)"></i> 
-                                    <!-- <i class="fa fa-trash text-primary cursor-pointer" (click)="DeleteEnquiry(obj.PK_ID)"></i></td> -->
+                                    <i class="fa fa-pencil text-primary cursor-pointer" (click)="EditEnquiry(obj)"></i>
+                                    <!-- <i class="fa fa-trash text-primary cursor-pointer" (click)="DeleteEnquiry(obj.PK_ID)"></i> -->
+                                </td>
                               <td class="label text-start" style="width: 100px;">{{ obj.DISPNO }}</td>
                                 <td class="label text-start" style="width: 90px;">{{ obj.ENQRECPTDT}}</td>
                                 <td class="label text-start" style="width: 90px;" >{{ obj.ENQTYPE }}</td>
@@ -394,7 +396,8 @@
                                 <td class="label text-start" style="width: 175px;">{{ obj.CONSIGNEE }}</td>
                                 <td class="label text-start" style="width: 175px;">{{ obj.SALESPERSONNM }}</td>
                                 <td class="label text-end" style="width: 100px;">{{ obj.CITY_NAME }}</td>
-                         
+                                </tr>
+                                }
                             </tbody>
                       </table>
                 </div>

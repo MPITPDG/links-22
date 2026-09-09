@@ -39,7 +39,8 @@
   </div>
 
   <!-- Data Table -->
-  <div *ngIf="displayType=='LIST'">
+  @if (displayType=='LIST') {
+<div>
     <div class="card shadow-sm border-0">
       <div class="card-body p-0">
         
@@ -50,7 +51,8 @@
         </div> -->
 
         <!-- Data Table -->
-        <div *ngIf="workOrders.length > 0" 
+        @if (workOrders.length > 0) {
+<div 
              class="table-scroll-container">
           <table class="table mb-0 modern-data-table">
             <thead>
@@ -72,7 +74,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let order of workOrders | clientedifilterpipe: searchString"
+              @for (order of workOrders | clientedifilterpipe: searchString; track order) {
+<tr
                   [class.row-disabled]="!(order.ISIRNDONE == 1 
                   && order.ISBOL_SENT == 1 
                   && order.ISAUTHODONE == 0) && order.BILLTYPEFLAG == 1">
@@ -98,27 +101,34 @@
                 <td [title]="order.SAILING">{{ order.SAILING }}</td>
                 <td class="invoice-cell">
                   <div class="invoice-list">
-                    <ng-container *ngFor="let inv of order.INVOICENO?.split('<br>')">
+                    @for (inv of order.INVOICENO?.split('<br>'); track inv) {
+
                       <span class="invoice-link" (click)="viewinvoice(inv)" [title]="inv">
                         {{ inv }}
                       </span>
-                    </ng-container>
+                    
+}
                   </div>
                 </td>
               </tr>
+}
             </tbody>
           </table>
         </div>
+}
 
         <!-- No Data State -->
-        <div *ngIf="!isLoading && (!workOrders || workOrders.length === 0)" 
+        @if (!isLoading && (!workOrders || workOrders.length === 0)) {
+<div 
              class="text-center p-4">
           <i class="fa fa-inbox fa-2x text-muted mb-2"></i>
           <p class="text-muted mb-0 small">No work orders found.</p>
         </div>
+}
 
       </div>
     </div>
   </div>
+}
 
 </div>

@@ -32,10 +32,18 @@
                         <input type="text" [(ngModel)]="AirlineCodeII" class="form-control width70" [maxlength]="4"/>
                     </td>
                     <td>
-                        <span class="col-form-span-error" *ngIf="ErrorType=='1'">Please Enter first input</span>
-                        <span class="col-form-span-error" *ngIf="ErrorType=='1.1'">First input must be 3 characters in numeric</span>
-                        <span class="col-form-span-error" *ngIf="ErrorType=='2'">Please Enter second input</span>
-                        <span class="col-form-span-error" *ngIf="ErrorType=='2.1'">Second input must be 4 characters in numeric</span>
+                        @if (ErrorType=='1') {
+<span class="col-form-span-error">Please Enter first input</span>
+}
+                        @if (ErrorType=='1.1') {
+<span class="col-form-span-error">First input must be 3 characters in numeric</span>
+}
+                        @if (ErrorType=='2') {
+<span class="col-form-span-error">Please Enter second input</span>
+}
+                        @if (ErrorType=='2.1') {
+<span class="col-form-span-error">Second input must be 4 characters in numeric</span>
+}
                     </td>
                 </tr>
                 <tr>
@@ -51,7 +59,9 @@
                 <tr>
                     <td></td>
                     <td colspan="3">
-                        <span class="col-form-span-error" *ngIf="ErrorType=='3'">Please enter AirLine Name.</span>
+                        @if (ErrorType=='3') {
+<span class="col-form-span-error">Please enter AirLine Name.</span>
+}
                     </td>
                 </tr>
                 <tr class="trbg centerlabel">

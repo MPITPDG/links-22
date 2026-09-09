@@ -8,7 +8,8 @@
 					<td colspan="8"><span class="col-form-span-label"><b>SCAN DOCS SENT DATE</b></span></td>
 				</tr>
 			</table>
-			<table class="table table-bordered table-sm-new" *ngIf="viewType=='Search'">
+			@if (viewType=='Search') {
+<table class="table table-bordered table-sm-new">
 				<tr>
 					<td class="width150"><span class="col-form-span-label">Container No<span class="col-form-span-error"> *</span></span></td>
 					<td class="width100">
@@ -19,13 +20,17 @@
 					</td>
 				</tr>
 			</table>
-			<table class="table table-bordered table-sm-new" *ngIf="viewType=='List'">
+}
+			@if (viewType=='List') {
+<table class="table table-bordered table-sm-new">
 				<tr class="trbg">
 					<td class="width150"><span class="col-form-span-label"><strong>Container No</strong></span></td>
 					<td colspan="7"><span class="col-form-span-label">{{ContainerNo}}</span></td>
 				</tr>
 			</table>
-			<table class="table table-bordered table-sm-new" *ngIf="viewType=='List'">
+}
+			@if (viewType=='List') {
+<table class="table table-bordered table-sm-new">
 				<thead>
 					<tr class="col-form-span-heading" style="white-space:nowrap;">
 						<th class="centerlabel"><span class="col-form-span-label">Sent</span></th>
@@ -39,10 +44,15 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let obj of searchList">
+					@for (obj of searchList; track obj) {
+<tr>
 						<td>
-							<input type="checkbox" [(ngModel)]="obj.Sent" *ngIf="obj.SCANDOCS === 'NO'"/>
-							<span class="col-form-span-label" *ngIf="obj.SCANDOCS !== 'NO'">{{obj.SCANDOCS}}</span>
+							@if (obj.SCANDOCS === 'NO') {
+<input type="checkbox" [(ngModel)]="obj.Sent"/>
+}
+							@if (obj.SCANDOCS !== 'NO') {
+<span class="col-form-span-label">{{obj.SCANDOCS}}</span>
+}
 						</td>
 						<td><span class="col-form-span-label">{{obj.CITYCODE}}</span></td>
 						<td><span class="col-form-span-label">{{obj.EXPT_VESSEL}}</span></td>
@@ -52,19 +62,25 @@
 						<td><span class="col-form-span-label">{{obj.AGT_NAME}}</span></td>
 						<td><span class="col-form-span-label">{{obj.LINER}}</span></td>
 					</tr>
+}
 				</tbody>
 			</table>
+}
 			<table class="table table-bordered table-sm-new">
-				<tr class="trbg centerlabel" *ngIf="ErrorMessage != ''">
+				@if (ErrorMessage != '') {
+<tr class="trbg centerlabel">
 					<td colspan="8">
 						<span class="error-text">{{ErrorMessage}}</span>
 					</td>
 				</tr>
+}
 				<tr class="trbg centerlabel">
 					<td colspan="8">
-						<button type="button" name="submitButton" class="btn btn-l btn-success" (click)="submit();" *ngIf="getCount() > 0" [disabled]="ErrorMessage != ''" #submitButton>
+						@if (getCount() > 0) {
+<button type="button" name="submitButton" class="btn btn-l btn-success" (click)="submit();" [disabled]="ErrorMessage != ''" #submitButton>
 							<span class="col-form-span-label"><app-font-changer [fontIndex]="'14'"></app-font-changer> Submit</span>
 						</button>
+}
 						<button type="button" name="abortButton" class="btn btn-l btn-danger" (click)="searchList=[];ContainerNo='';viewType='Search';ErrorMessage=''">
 							<span class="col-form-span-label"><app-font-changer [fontIndex]="'6'"></app-font-changer> Reset</span>
 						</button>

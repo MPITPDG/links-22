@@ -199,10 +199,15 @@
                      </tab>
                      <tab customClass="ngx-tab-style">
                         <ng-template tabHeading>
-							<span class="title-head" *ngIf="isvisiblevessel != null"><u>#Vessel/Port/Goods</u></span>
-							<span class="title-head" *ngIf="isvisiblevessel == null"><u>#Air/Port/Goods</u></span>
+							@if (isvisiblevessel != null) {
+<span class="title-head"><u>#Vessel/Port/Goods</u></span>
+}
+							@if (isvisiblevessel == null) {
+<span class="title-head"><u>#Air/Port/Goods</u></span>
+}
 						</ng-template>
-                        <table class="table table-bordered table-sm-new" *ngIf="isvisiblevessel != null">
+                        @if (isvisiblevessel != null) {
+<table class="table table-bordered table-sm-new">
                            <tbody>
 							  <tr>
                                  <td class="col-form-span-heading" colspan="4">VESSEL DETAILS
@@ -229,7 +234,9 @@
                               </tr>
 							</tbody>
 						</table>
-						<table class="table table-bordered table-sm-new" *ngIf="isvisiblevessel == null">
+}
+						@if (isvisiblevessel == null) {
+<table class="table table-bordered table-sm-new">
                            <tbody>
                               <tr>
                                  <td class="col-form-span-heading" colspan="4">AIR SHIPMENT DETAILS</td>
@@ -345,6 +352,7 @@
                               </tr>
 							</tbody>
 						</table>
+}
 						<table class="table table-bordered table-sm-new">
                            <tbody>
 							  <tr>
@@ -514,7 +522,9 @@
 
 									<select class="form-control width150"   [(ngModel)]="currency"  (change)="changeCurrency(currency)">
 											<option value="0">Please select</option>
-											<option *ngFor="let d of commoncurrencies" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+											@for (d of commoncurrencies; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
 										</select>
 									 </td>
 									 <td class="width150"><span class="col-form-span-label">Currency Rate  </span> </td>
@@ -757,13 +767,15 @@
                               </tr>
 						   </thead>
                            <tbody>
-							  <tr *ngFor="let doc of documentlist">
+							  @for (doc of documentlist; track doc) {
+<tr>
                                  <td class="width150"><span class="col-form-span-label">{{doc.DOCCODE}}</span></td>
                                  <td><span class="col-form-span-label">{{doc.DOCUMENT}}</span></td>
                                  <td class="width75 centerlabel"><input type="radio" name="{{doc.DOCCODE}}" value="{{'R'+doc.DOCCODE}}" [(ngModel)]="doc.RECD" (click)="changeDocumentList(doc.DOCCODE, 'R')"/></td><!-- [checked]="doc.DOCCODE < 103" -->
                                  <td class="width75 centerlabel"><input type="radio" name="{{doc.DOCCODE}}" value="{{'C'+doc.DOCCODE}}" [(ngModel)]="doc.CALL" (click)="changeDocumentList(doc.DOCCODE, 'C')"/></td>
 								 <td class="width75 centerlabel"><input type="radio" name="{{doc.DOCCODE}}" value="{{'N'+doc.DOCCODE}}" [(ngModel)]="doc.NA" (click)="changeDocumentList(doc.DOCCODE, 'N')"/></td><!--  [checked]="doc.DOCCODE > 102"  -->
 							  </tr>
+}
 							  <tr class="trbg">
 								  <td><span class="col-form-span-label"><b>Actual Doc Received</b></span></td>
 								  <td colspan="4">
@@ -819,12 +831,17 @@
 								  </tr>
 								  <tr class="centerlabel">
 									 <td colspan="6">
-										<button type="button" class="btn btn-sm btn-success" (click)="addEditITCDtls()" *ngIf="this.hditcid == '0'"><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
-										<button type="button" class="btn btn-sm btn-success" (click)="addEditITCDtls()" *ngIf="this.hditcid != '0'"><span class="col-form-span-label"><i class="fa fa-refresh"></i>&nbsp;Update</span></button>
+										@if (this.hditcid == '0') {
+<button type="button" class="btn btn-sm btn-success" (click)="addEditITCDtls()"><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
+}
+										@if (this.hditcid != '0') {
+<button type="button" class="btn btn-sm btn-success" (click)="addEditITCDtls()"><span class="col-form-span-label"><i class="fa fa-refresh"></i>&nbsp;Update</span></button>
+}
 										<button type="button" class="btn btn-sm btn-secondary" (click)="resetITC()"><span class="col-form-span-label"><i class="fa fa-undo"></i>&nbsp;Reset</span></button>
 									 </td>
 								  </tr>
-								  <tr *ngIf="itclist.length > 0">
+								  @if (itclist.length > 0) {
+<tr>
 									 <td colspan="8">
 										<table>
 											<thead>
@@ -846,7 +863,8 @@
 												 </tr>
 											</thead>
 											<tbody>
-												<tr *ngFor="let obj of itclist">
+												@for (obj of itclist; track obj) {
+<tr>
 													<td class="centerlabel">
 														<i class="fa fa-pencil" (click)="editITC(obj.TBL_INDEXID,obj.ITCCODEID,obj.ITCCODE,obj.EXPTNO)"></i>
 														&nbsp;
@@ -865,11 +883,13 @@
 													<td><span class="col-form-span-label">{{obj.DBKPERCENT}}</span></td>
 													<td><span class="col-form-span-label">{{obj.RATEPERUNIT}}</span></td>
 													<td><span class="col-form-span-label">{{obj.DESCRIPTION}}</span></td>
-												 </tr></tbody>
+												 </tr>
+}</tbody>
 											<tbody>
 										</table>
 									 </td>
 								  </tr>
+}
 								</tbody>
 							</table>
                      </tab>
@@ -963,14 +983,19 @@
                               </tr>
 							  <tr class="centerlabel">
                                  <td colspan="6">
-									<button type="button" class="btn btn-sm btn-success" (click)="addEditOrderDtls()" *ngIf="this.hdordernoid == '0'"><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
-									<button type="button" class="btn btn-sm btn-success" (click)="addEditOrderDtls()" *ngIf="this.hdordernoid != '0'"><span class="col-form-span-label"><i class="fa fa-refresh"></i>&nbsp;Update</span></button>
+									@if (this.hdordernoid == '0') {
+<button type="button" class="btn btn-sm btn-success" (click)="addEditOrderDtls()"><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
+}
+									@if (this.hdordernoid != '0') {
+<button type="button" class="btn btn-sm btn-success" (click)="addEditOrderDtls()"><span class="col-form-span-label"><i class="fa fa-refresh"></i>&nbsp;Update</span></button>
+}
 									<button type="button" class="btn btn-sm btn-secondary" (click)="resetOrder()"><span class="col-form-span-label"><i class="fa fa-undo"></i>&nbsp;Reset</span></button>
 								 </td>
 							  </tr>
 							  </tbody>
 							</table>
-							<div class="row xyscroll" *ngIf="orderlist.length > 0">
+							@if (orderlist.length > 0) {
+<div class="row xyscroll">
 								<table class="table table-responsive-sm table-bordered">
 									<thead>
 										<tr class="col-form-span-heading">
@@ -997,7 +1022,8 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr *ngFor="let obj of orderlist">
+										@for (obj of orderlist; track obj) {
+<tr>
 											<td class="centerlabel">
 												<i class="fa fa-pencil" (click)="editOrder(obj.TBL_INDEXID,obj.ORDERID,obj.EXPTNO,obj.ORDERNO)"></i>
 												&nbsp;
@@ -1023,9 +1049,11 @@
 											<td><span class="col-form-span-label">{{obj.ICSHSCode}}</span></td>
 											<td><span class="col-form-span-label">{{obj.ICSHSDescription}}</span></td>
 										</tr>
+}
 									<tbody>
 								</table>
 							</div>
+}
                      </tab>
                      <tab customClass="ngx-tab-style">
                         <ng-template tabHeading><span class="title-head"><u>#Package No</u></span></ng-template>
@@ -1042,14 +1070,19 @@
 									 <td class="width75"><span class="col-form-span-label">Alphabet </span> </td>
 									 <td class="width200"><input type="text" class="form-control" [(ngModel)]="packagealphabet" OnlyCharacter="true" /></td>
 									 <td>
-										<button type="button" class="btn btn-sm btn-success" (click)="addEditPkgDtls()" *ngIf="this.hdpkgindexid == '0'"><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
-										<button type="button" class="btn btn-sm btn-success" (click)="addEditPkgDtls()" *ngIf="this.hdpkgindexid != '0'"><span class="col-form-span-refresh"><i class="fa fa-plus"></i>&nbsp;Update</span></button>
+										@if (this.hdpkgindexid == '0') {
+<button type="button" class="btn btn-sm btn-success" (click)="addEditPkgDtls()"><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
+}
+										@if (this.hdpkgindexid != '0') {
+<button type="button" class="btn btn-sm btn-success" (click)="addEditPkgDtls()"><span class="col-form-span-refresh"><i class="fa fa-plus"></i>&nbsp;Update</span></button>
+}
 									</td>
 									<td>
 										<button type="button" class="btn btn-sm btn-secondary" (click)="resetPackage()"><span class="col-form-span-label"><i class="fa fa-undo"></i>&nbsp;Reset</span></button>
 									</td>
 								  </tr>
-								  <tr *ngIf="packagelist.length > 0">
+								  @if (packagelist.length > 0) {
+<tr>
 									 <td colspan="8">
 										<table>
 											<thead>
@@ -1061,7 +1094,8 @@
 												 </tr>
 											</thead>
 											<tbody>
-												<tr *ngFor="let pl of packagelist">
+												@for (pl of packagelist; track pl) {
+<tr>
 													<td class="centerlabel">
 														<i class="fa fa-pencil" (click)="editPackage(pl.TBL_INDEXID,pl.PKGNOID,pl.EXPTNO)"></i>
 														&nbsp;&nbsp;
@@ -1071,10 +1105,12 @@
 													<td colspan="2"><span class="col-form-span-label">{{pl.TO}}</span></td>
 													<td colspan="3"><span class="col-form-span-label">{{pl.ALPHABET}}</span></td>
 												 </tr>
+}
 											<tbody>
 										</table>
 									 </td>
 								  </tr>
+}
 								</tbody>
 							</table>
                      </tab>

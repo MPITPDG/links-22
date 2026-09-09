@@ -41,7 +41,9 @@
                         <td>
                             <select class="form-control width150"  [(ngModel)]="city">
                                 <option value="">Please select</option>
-                                <option *ngFor="let d of Citylist" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+                                @for (d of Citylist; track d) {
+<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+}
                             </select>
                         </td> 
                         
@@ -164,7 +166,9 @@
                            <td>
                                <select class="form-control width150"  [(ngModel)]="city2">
                                    <option value="">Please select</option>
-                                   <option *ngFor="let d of Citylist1" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+                                   @for (d of Citylist1; track d) {
+<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+}
                                </select>
                            </td> 
                            
@@ -272,8 +276,10 @@
 
                                         </tr>
                                     </thead>
-                                    <tbody   *ngIf="addrlist.length>0">
-                                        <tr *ngFor="let obj of addrlist">
+                                    @if (addrlist.length>0) {
+<tbody  >
+                                        @for (obj of addrlist; track obj) {
+<tr>
                                             <td class="centerlabel">
                                                 <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)" ></i>
                                                 &nbsp;
@@ -295,7 +301,9 @@
                                             <!--td><span class="col-form-span-label">{{obj.BRCSTMNT}}</span></td>
                                             <td><span class="col-form-span-label">{{obj.BRCSTMNTEMAIL}}</span></td-->
                                         </tr>
+}
                                     </tbody>
+}
                                 </table>
                             </div>
                         </td>

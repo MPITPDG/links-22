@@ -1,5 +1,6 @@
 <div class="animated fadeIn" >  
-    <div class="row no-gutters" *ngIf="displayType=='SEARCH'" >
+    @if (displayType=='SEARCH') {
+<div class="row no-gutters" >
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header formheading">
@@ -12,7 +13,9 @@
             </div>
         </div>
     </div>
-    <div class="row no-gutters" *ngIf="displayType=='SEARCH'">
+}
+    @if (displayType=='SEARCH') {
+<div class="row no-gutters">
         <div class="col-sm-12 col-md-3 col-lg-3">
         </div>
         <div class="col-sm-12 col-md-6 col-lg-6 ">
@@ -23,8 +26,10 @@
            </tr>
                 <tr>
                     <td >
-                        <span  class="col-form-span-label"><b>Account Name</b> </span><span *ngIf="  PageType=='Account'"
+                        <span  class="col-form-span-label"><b>Account Name</b> </span>@if (  PageType=='Account') {
+<span
                         class="col-form-span-error">*</span>
+}
                     </td>
 
                             <td colspan="3" >
@@ -66,8 +71,10 @@
 
 
     </div>
+}
   
-    <div class="row no-gutters"  *ngIf="displayType=='LIST'" >
+    @if (displayType=='LIST') {
+<div class="row no-gutters"  >
         <div class="col-sm-12 col-md-1 col-lg-1">
         </div>
 		 <div class="col-sm-12 col-md-10 col-lg-10 ">
@@ -107,7 +114,9 @@
     <div class="col-sm-12 col-md-1 col-lg-1">
     </div>
     </div>
-    <div class="row no-gutters"   *ngIf="displayType=='LIST'">
+}
+    @if (displayType=='LIST') {
+<div class="row no-gutters"  >
         <div class="col-sm-12 col-md-1 col-lg-1">
         </div>
         <div class="col-sm-12 col-md-10 col-lg-10 ">
@@ -123,12 +132,15 @@
                             <th class="col-form-span-label" align="center">Credit</th>                          
                         </tr>
                     </thead>
-                    <tbody *ngIf="SearchdataItemAct_list.length > 0">
-                        <tr *ngFor="let data of SearchdataItemAct_list">
+                    @if (SearchdataItemAct_list.length > 0) {
+<tbody>
+                        @for (data of SearchdataItemAct_list; track data) {
+<tr>
                             <td ><span  class="col-form-span-label" >{{data.ITEMNAME}}</span> </td> 
                             <td  ><span class="col-form-span-label">{{data.DRAMT}}</span>  </td>                             
                             <td  ><span class="col-form-span-label">{{data.CRAMT}}</span>  </td>
                         </tr>
+}
                         <tr> <td colspan="6" class="centerlabel">
                             <button class="btn btn-sm btn-primary" type="submit" (click)="ExportItemstatement()" > <span
                             class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
@@ -136,6 +148,7 @@
                         </td>
                 </tr>
                     </tbody>
+}
                 </table>
             </div>
              
@@ -144,7 +157,8 @@
         </div>
         
                       
-    </div>  
+    </div>
+}  
 </div>
     <div class="modal" [style.display]="showModal_Advance ? 'block' : 'none'">
         <div class="modal-dialog modal-lg" role="document"  >
@@ -193,13 +207,15 @@
                                       </tr>
                                     </thead>
                                     <tbody>
-                                      <tr *ngFor="let data of AdvanceTable">
+                                      @for (data of AdvanceTable; track data) {
+<tr>
                                         <td class="col-form-span-label">{{data.transtype}}</td>
                                         <td class="col-form-span-label">{{data.Transcode}}</td>
                                         <td class="col-form-span-label">{{data.Transdate}}</td>
                                         <td class="col-form-span-label">{{data.exp_sname}},{{data.sup_sname}},{{data.acctname}}</td>
                                         <td class="col-form-span-label">{{data.cramt|number:'2.2-4'}}</td>
                                       </tr>
+}
                                     </tbody>
                                   </table>
                                  <!-- KC <div style="float: center;"> -->

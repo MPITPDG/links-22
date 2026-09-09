@@ -47,7 +47,9 @@
 
 			<select class="form-control width120"   [(ngModel)]="Fcurrency">
 				<option value="-1">Please select</option>
-				<option *ngFor="let d of currencyList" value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+				@for (d of currencyList; track d) {
+<option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+}
 			
 			</select>
 			 
@@ -96,7 +98,9 @@
 			</ng-select> -->
 			<select class="form-control width300"   [(ngModel)]="ShipDest" [disabled]="ShipType == '0' || ShipType == null">
 				<option value="0">Please select</option>
-				<option *ngFor="let d of destinationList" value={{d.PK_ID}}>{{d.DDX_DESTINATION}}</option>
+				@for (d of destinationList; track d) {
+<option value={{d.PK_ID}}>{{d.DDX_DESTINATION}}</option>
+}
 			
 			</select>
 		</td>
@@ -115,7 +119,8 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr *ngFor="let obj of mawbnoList">
+			@for (obj of mawbnoList; track obj) {
+<tr>
 				<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
 				<td><span class="col-form-span-label">{{obj.SHIPPER}}</span></td>
 				<td><span class="col-form-span-label">{{obj.CONSIGNEE}}</span></td>
@@ -124,6 +129,7 @@
 				<td><span class="col-form-span-label">{{obj.CHBLWT}}</span></td>
 				<td><span class="col-form-span-label">{{obj.PCS}}</span></td>
 			</tr>
+}
 			<tr class="trbg">
 				<td><span class="col-form-span-label"></span></td>
 				<td><span class="col-form-span-label"></span></td>

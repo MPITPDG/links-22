@@ -112,7 +112,8 @@
                 <tr>
                     <td colspan="4">
                         <div class="row xyscroll">
-                            <table class="table table-responsive-sm table-bordered" *ngIf="Accountlist.length>0">
+                            @if (Accountlist.length>0) {
+<table class="table table-responsive-sm table-bordered">
                                 <thead>
                                     <tr class="bakgrdliteBlue">
                                       
@@ -125,8 +126,10 @@
                                         <th class="col-form-span-label font-weight-bold headerwhite">Narration</th>
                                     </tr>
                                 </thead>
-                                <tbody *ngIf="Accountlist.length>0">
-                                    <tr *ngFor="let obj of Accountlist">
+                                @if (Accountlist.length>0) {
+<tbody>
+                                    @for (obj of Accountlist; track obj) {
+<tr>
                                       
                                         <td><span class="col-form-span-label" [innerHtml]="obj.ACCOUNT_NAME"> </span>
                                         </td>
@@ -137,8 +140,11 @@
                                         <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
                                         <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
                                     </tr>
+}
                                 </tbody>
+}
                             </table>
+}
                         </div>
                     </td>
                 </tr>

@@ -36,7 +36,9 @@
                             </ng-select>
                         </td>
                         <td class="width200">
-                            <span class="col-form-span-error" *ngIf="ValidateField==1">Select EDI GROUP !</span>
+                            @if (ValidateField==1) {
+<span class="col-form-span-error">Select EDI GROUP !</span>
+}
                         </td>
                     </tr>
                     <tr class="title-head trbg">
@@ -48,8 +50,12 @@
                             <input type="text" [(ngModel)]="OrderNo" class="form-control width120" />
                         </td>
                         <td class="width300">
-                            <span class="col-form-span-error" *ngIf="ValidateField==2.1">ORDER NO can not be Blank !</span>
-                            <span class="col-form-span-error" *ngIf="ValidateField==2.2">Orderno should be minimum 6 digit!</span>
+                            @if (ValidateField==2.1) {
+<span class="col-form-span-error">ORDER NO can not be Blank !</span>
+}
+                            @if (ValidateField==2.2) {
+<span class="col-form-span-error">Orderno should be minimum 6 digit!</span>
+}
                         </td>
                     </tr>
                     <tr class="title-head trbg">
@@ -64,11 +70,13 @@
                             </button>
                         </td>
                     </tr>
-                    <tr class="title-head trbg" *ngIf="ErrorMessage!=''">
+                    @if (ErrorMessage!='') {
+<tr class="title-head trbg">
                         <td colspan="3">
                             <span class="col-form-span-error">{{ErrorMessage}}</span>
                         </td>
                     </tr>
+}
                 </tbody>
             </table>
         </div>
@@ -102,7 +110,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let obj of OrderNoList; let i = index">
+                    @for (obj of OrderNoList; track obj; let i = $index) {
+<tr>
                         <td class="centerlabel">
                             <input type="checkbox" [(ngModel)]="obj.ISCHECKED" (ngModelChange)="updateValidator(i, obj, obj.ISCHECKED)"/>
                         </td>
@@ -143,6 +152,7 @@
                             <span class="col-form-span-label">{{obj.Ref_Assorti}}</span>
                         </td>
                     </tr>
+}
                 </tbody>
             </table>
             <table class="table table-bordered table-sm-new bgwhite">

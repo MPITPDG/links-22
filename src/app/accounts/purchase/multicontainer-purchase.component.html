@@ -72,8 +72,10 @@
                                 <td colspan="3">
                                     <select class="form-control" [(ngModel)]="billaddress_step1">
                                         <option value="">Please select</option>
-                                        <option *ngFor="let d of billaddressfilter_step1" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}
+                                        @for (d of billaddressfilter_step1; track d) {
+<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}
                                         </option>
+}
                                     </select>
                                 </td>
                             </tr>
@@ -198,7 +200,8 @@
                                                 </tr>
                                             </thead>
                                             <tbody >
-                                                <tr *ngFor="let obj of Accountlist_step1">
+                                                @for (obj of Accountlist_step1; track obj) {
+<tr>
                                                     <td class="centerlabel">
                                                         <i class="fa fa-pencil" (click)="Editchildrecdstep1(obj.ID)"></i>
                                                         &nbsp;
@@ -213,6 +216,7 @@
                                                     <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
                                                     <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
                                                 </tr>
+}
                                             </tbody>
                                         </table>
                                     </div>
@@ -286,8 +290,10 @@
                                 <td colspan="3">
                                     <select class="form-control" disabled [(ngModel)]="billaddress">
                                         <option value="">Please select</option>
-                                        <option *ngFor="let d of billaddressfilter" value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}
+                                        @for (d of billaddressfilter; track d) {
+<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}
                                         </option>
+}
                                     </select>
                                 </td>
                             </tr>
@@ -478,7 +484,8 @@
                                 <td colspan="6">
                                     <div class="row xyscroll" style="overflow-y: auto; width:670px">
                                         <div class="col-12">
-                                        <table class="table table-responsive-sm table-bordered" *ngIf="Accountlist_step2.length>0" style="width:100%">
+                                        @if (Accountlist_step2.length>0) {
+<table class="table table-responsive-sm table-bordered" style="width:100%">
                                             <thead>
                                                 <tr class="bakgrdliteBlue">
                                                     <th class="col-form-span-label"></th>
@@ -492,8 +499,10 @@
                                                     <th class="col-form-span-label font-weight-bold headerwhite">Narration</th>
                                                 </tr>
                                             </thead>
-                                            <tbody *ngIf="Accountlist_step2.length>0">
-                                                <tr *ngFor="let obj of Accountlist_step2">
+                                            @if (Accountlist_step2.length>0) {
+<tbody>
+                                                @for (obj of Accountlist_step2; track obj) {
+<tr>
                                                     <td class="centerlabel">
                                                         <i class="fa fa-pencil" (click)="Editchildrecdstep2(obj.ID)"></i>
                                                         &nbsp;
@@ -507,12 +516,19 @@
                                                     <td><span class="col-form-span-label">{{obj.GST}}</span></td>
                                                     <td><span class="col-form-span-label">{{obj.ITEM}}</span></td>
                                                     <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
-                                                    <td><span *ngIf="obj.CLIENT=='G100741'" class="col-form-span-label" [innerHtml]="obj.NARRATION"></span>
-                                                        <span *ngIf="obj.CLIENT!='G100741'" class="col-form-span-label">{{obj.NARRATION}}</span></td>      
+                                                    <td>@if (obj.CLIENT=='G100741') {
+<span class="col-form-span-label" [innerHtml]="obj.NARRATION"></span>
+}
+                                                        @if (obj.CLIENT!='G100741') {
+<span class="col-form-span-label">{{obj.NARRATION}}</span>
+}</td>      
                                                     <!-- <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td> -->
                                                 </tr>
+}
                                             </tbody>
+}
                                         </table>
+}
                                     </div>
                                     </div>
                                 </td>
@@ -573,7 +589,8 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                               <tr *ngFor="let obj of TDSList ">
+                                               @for (obj of TDSList ; track obj) {
+<tr>
                                                 <td class="col-form-span-label">
                                                     <input type="checkbox" [(ngModel)]="obj.Checked" [id]="i" [value]="i" [disabled]="obj.Disabled"
                                                          (ngModelChange)="getCheckedTDSData($event,obj.TDSACCTID,obj.RATE,obj.TDSAMOUNT,obj.AMOUNT,obj.ITEMCODE,obj.NARRATION,obj.RATETYPE,obj.ACCTID,obj.OFFLAG)">
@@ -589,6 +606,7 @@
                                                 <td class="col-form-span-label">{{obj.TDSAMOUNT}}</td>
                                                 <td class="col-form-span-label">{{obj.NARRATION}}</td>
                                             </tr>
+}
                                           
                              
                             </tbody>
@@ -612,10 +630,12 @@
                                                  </tr>
                                             </thead> 
                                             <tbody>
-                                                <tr *ngFor="let obj of TotalTDSList ">
+                                                @for (obj of TotalTDSList ; track obj) {
+<tr>
                                                  <td class="col-form-span-label"><b>{{obj.SECTIONNAME}}</b></td>
                                                  <td class="col-form-span-label"><b>{{obj.TOTTDSAMOUNT}}</b></td>
                                              </tr>
+}
                                              </tbody> 
                                         </td>
                                     </tr>

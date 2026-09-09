@@ -7,19 +7,24 @@
 		</div>
 	</div>
 </div>
-<div class="row" *ngIf="searchListLength == 0">
+@if (searchListLength == 0) {
+<div class="row">
 	<div class="col-sm-12 centerlabel">
 		<img src="assets/img/loading.gif" />
 	</div>
 </div>
-<div class="row" *ngIf="searchListLength == -1">
+}
+@if (searchListLength == -1) {
+<div class="row">
 	<div class="col-sm-12 centerlabel">
 		<span class="col-form-span-label">No Record Found!</span>
 	</div>
 </div>
+}
 <div class="row">
 	<div class="col-sm-12">
-		<div class="row y350heightscroll" *ngIf="searchList.length > 0">
+		@if (searchList.length > 0) {
+<div class="row y350heightscroll">
 			<table class="table table-bordered table-striped table-sm-new bgwhite">
 				<thead>
 					<tr class="title-head formheading">
@@ -43,11 +48,14 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let obj of searchList">
+					@for (obj of searchList; track obj) {
+<tr>
 						<td>
-							<button (click)="autoClick(obj.MAWBNO,obj.CITY)" class="btn btn-sm btn-success" *ngIf="obj.MAWBNO != ''">
+							@if (obj.MAWBNO != '') {
+<button (click)="autoClick(obj.MAWBNO,obj.CITY)" class="btn btn-sm btn-success">
 								<span class="col-form-span-label"><i class="fa fa-window-maximize"></i>&nbsp;Generate</span>
 							</button>
+}
 							<!-- <button class="btn btn-sm btn-warning" *ngIf="obj.ISDISABLED == true" [disabled]="obj.ISDISABLED">
 								<span class="col-form-span-label"><i class="fa fa-download"></i>Processing..</span>
 							</button> -->
@@ -83,8 +91,10 @@
 						<td><span class="col-form-span-label">{{obj.EXPT_INVTYPE}}</span></td>
 						<td><span class="col-form-span-label">{{obj.MAWBDEST}}</span></td>
 					</tr>
+}
 				</tbody>
 			</table>
 		</div>
+}
 	</div>
 </div>

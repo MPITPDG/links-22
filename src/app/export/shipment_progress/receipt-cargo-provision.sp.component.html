@@ -7,13 +7,16 @@
 				<tr class="trbg">
 					<td colspan="6"><span class="col-form-span-label"><b>RECEIPT OF CARGO (WITHOUT JOBNO) DETAILS</b></span></td>
 					<td colspan="2">
-						<span class="col-form-span-label" *ngIf="viewType=='Add'">
+						@if (viewType=='Add') {
+<span class="col-form-span-label">
 							<u><a href="javascript:void(0);" (click)="viewType='Search'"><i class="fa fa-arrow-left"></i> Back To Search</a></u>
 						</span>
+}
 					</td>
 				</tr>
 			</table>
-			<table class="table table-bordered table-sm-new" *ngIf="viewType=='Search'">
+			@if (viewType=='Search') {
+<table class="table table-bordered table-sm-new">
 				<tr>
 					<td class="width150"><span class="col-form-span-label">Shipper<span class="col-form-span-error"> *</span></span></td>
 					<td colspan="7">
@@ -46,7 +49,9 @@
 					</td>
 				</tr>
 			</table>
-			<table class="table table-bordered table-sm-new" *ngIf="viewType=='Add'">
+}
+			@if (viewType=='Add') {
+<table class="table table-bordered table-sm-new">
 				<tr>
 					<td class="width150"><span class="col-form-span-label">Shipper</span></td>
 					<td colspan="7"></td>
@@ -124,12 +129,17 @@
 				</tr>
 				<tr class="trbg centerlabel">
 					<td colspan="8">
-						<button type="button" class="btn btn-sm btn-success" name="addButton" (click)="addUpdate()" *ngIf="Type == 'A'"  #addButton><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
-						<button type="button" class="btn btn-sm btn-info" name="updateButton" (click)="addUpdate()" *ngIf="Type == 'E'"  #updateButton><span class="col-form-span-label"><i class="fa fa-refresh"></i>&nbsp;Update</span></button>
+						@if (Type == 'A') {
+<button type="button" class="btn btn-sm btn-success" name="addButton" (click)="addUpdate()"  #addButton><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
+}
+						@if (Type == 'E') {
+<button type="button" class="btn btn-sm btn-info" name="updateButton" (click)="addUpdate()"  #updateButton><span class="col-form-span-label"><i class="fa fa-refresh"></i>&nbsp;Update</span></button>
+}
 						<button type="button" class="btn btn-sm btn-secondary" (click)="reset()"><span class="col-form-span-label"><i class="fa fa-undo"></i>&nbsp;Reset</span></button>
 					</td>
 				</tr>
 			</table>
+}
 			<div class="row yscroll" style="height:150px">
 				<table class="table table-bordered table-striped table-sm-new">
 					<thead>
@@ -142,7 +152,8 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr *ngFor="let obj of cargoList">
+						@for (obj of cargoList; track obj) {
+<tr>
 							<td class="width75">
 								<span class="col-form-span-label">
 									<i class="fa fa-pencil fa-1x" (click)="populate('E',obj.TBL_INDEXID,obj.CARGOID, obj.GUID, obj.EXPTNO, obj.NOOFPKGS, obj.RECDDATE, obj.RECDTIME, obj.RECDWHERE, obj.RECDLOCAL, obj.RECDLOCALTIME)"></i>&nbsp;&nbsp;
@@ -154,15 +165,18 @@
 							<td><span class="col-form-span-label">{{obj.RECDWHERE}}</span></td>
 							<td><span class="col-form-span-label">{{obj.RECDLOCAL + ' ' + obj.RECDLOCALTIME}}</span></td>
 						</tr>
+}
 					</tbody>
 				</table>
 			</div>
 			<table class="table table-bordered table-sm-new">
-				<tr class="trbg centerlabel" *ngIf="ErrorMessage != ''">
+				@if (ErrorMessage != '') {
+<tr class="trbg centerlabel">
 					<td colspan="8">
 						<span class="col-form-span-error">{{ErrorMessage}}</span>
 					</td>
 				</tr>
+}
 				<tr class="trbg right-text">
 					<td colspan="8">
 						<button type="button" name="submitButton" class="btn btn-sm btn-success" (click)="submit();" [disabled]="ErrorMessage != ''" #submitButton>

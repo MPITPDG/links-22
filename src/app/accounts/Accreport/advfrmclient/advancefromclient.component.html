@@ -9,7 +9,8 @@
             </div>
         </div>
     </div>
-    <div class="row no-gutters" *ngIf="displayType=='SEARCH'">
+    @if (displayType=='SEARCH') {
+<div class="row no-gutters">
         <div class="col-sm-12 col-md-3 col-lg-3">
         </div>
         <div class="col-sm-12 col-md-6 col-lg-6 ">
@@ -34,7 +35,9 @@
                        
                                  <select class="form-control width300"  [(ngModel)]="Exporter" [disabled]="Type!='CLIENT'">
                                     <option value="">Please select</option>
-                                    <option *ngFor="let d of ExporterList" value={{d.EXP_CODE}}>{{d.EXP_NAME_CITY}}</option> 
+                                    @for (d of ExporterList; track d) {
+<option value={{d.EXP_CODE}}>{{d.EXP_NAME_CITY}}</option>
+} 
                                 </select>
                    </td>
                 </tr>
@@ -58,12 +61,14 @@
     <div class="col-sm-12 col-md-3 col-lg-3">
     </div>
     </div>
+}
     <div class="row no-gutters">
         <div class="col-sm-12 col-md-1 col-lg-1">
         </div>
         <div class="col-sm-12 col-md-10 col-lg-10">
     <!-- <div  class="row xyscroll"  *ngIf="displayType=='LIST'"> -->
-        <div class="row  xyscroll" *ngIf="displayType=='LIST'">
+        @if (displayType=='LIST') {
+<div class="row  xyscroll">
       
             <table class="table table-bordered table-sm-new table-striped   " >
 
@@ -84,24 +89,38 @@
                     </tr>   
                </thead>
                 <tbody>
-                    <tr *ngFor="let obj of ClAdvList">
+                    @for (obj of ClAdvList; track obj) {
+<tr>
                         <td><span class="col-form-span-label " style="cursor:pointer;">{{obj.CLIENTNAME}}</span></td>
                        <td><span class="col-form-span-label anchor-link" (click)="OpenJobPrint(obj.JOBNO)" >{{obj.JOBNO.replace("'", "")}}</span></td>
                        <td> <span class="col-form-span-label">{{obj.TYPE}}</span></td>
-                       <td> <span *ngIf="obj.TYPE!=''" class="col-form-span-label anchor-link" (click)="OpenPrint(obj.TRANSCODE,obj.TYPE)">{{obj.TRANSCODE.replace("'", "")}}</span>
-                        <span *ngIf="obj.TYPE==''" class="col-form-span-label " ><b>{{obj.TRANSCODE.replace("'", "")}}</b></span> </td>
+                       <td> @if (obj.TYPE!='') {
+<span class="col-form-span-label anchor-link" (click)="OpenPrint(obj.TRANSCODE,obj.TYPE)">{{obj.TRANSCODE.replace("'", "")}}</span>
+}
+                        @if (obj.TYPE=='') {
+<span class="col-form-span-label " ><b>{{obj.TRANSCODE.replace("'", "")}}</b></span>
+} </td>
                         <!-- <td> <span class="col-form-span-label">{{obj.TRANSDATE}}</span></td> -->
                         <td>
-                            <span *ngIf="obj.TYPE!=''" class="col-form-span-label ">{{obj.TRANSDATE}}</span>
-                            <span *ngIf="obj.TYPE==''" class="col-form-span-label " ><b>{{obj.TRANSDATE}}</b></span>
+                            @if (obj.TYPE!='') {
+<span class="col-form-span-label ">{{obj.TRANSDATE}}</span>
+}
+                            @if (obj.TYPE=='') {
+<span class="col-form-span-label " ><b>{{obj.TRANSDATE}}</b></span>
+}
                         </td>
                         <td><span class="col-form-span-label">{{obj.DRAMT|number:'2.2-4'}}</span></td>
                         <!-- <td><span class="col-form-span-label">{{obj.CRAMT|number:'2.2-4'}}</span></td> -->
                         <td>
-                            <span *ngIf="obj.TYPE!=''" class="col-form-span-label ">{{obj.CRAMT|number:'2.2-4'}}</span>
-                            <span *ngIf="obj.TYPE==''" class="col-form-span-label " ><b>{{obj.CRAMT|number:'2.2-4'}}</b></span>
+                            @if (obj.TYPE!='') {
+<span class="col-form-span-label ">{{obj.CRAMT|number:'2.2-4'}}</span>
+}
+                            @if (obj.TYPE=='') {
+<span class="col-form-span-label " ><b>{{obj.CRAMT|number:'2.2-4'}}</b></span>
+}
                         </td>
                 </tr>
+}
                 </tbody>
                 <tr> <td colspan="7" class="centerlabel">
                     <button class="btn btn-sm btn-primary" type="submit" (click)="ExportAdvfrmClnt()" > <span
@@ -111,6 +130,7 @@
         </tr>
             </table>
         </div>
+}
 
     </div>
     <div class="col-sm-12 col-md-1 col-lg-1">

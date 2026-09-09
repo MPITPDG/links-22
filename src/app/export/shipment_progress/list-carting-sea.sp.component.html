@@ -4,11 +4,13 @@
 	<div class="col-sm-10">	 
 		<table class="table table-bordered table-sm-new">	
 		<thead class="">
-			<tr *ngFor="let d of SearchHead"  class="col-form-span-heading">
+			@for (d of SearchHead; track d) {
+<tr  class="col-form-span-heading">
 				<th colspan="12" class="col-form-span-label"> 
 					<span class="col-form-span-label" >{{d.vsl}}</span>
 				</th>
-			</tr> 
+			</tr>
+} 
 		</thead>
 		<thead>
 		 <tr class="col-form-span-heading">		 	 
@@ -28,7 +30,8 @@
 		 </tr>
 		 </thead>
 			<tbody class="bgwhite">
-				<tr *ngFor="let d of CartingList"  [ngStyle]="{'background-color':d.SELEJOB!=true ? '' : 'white' }" >	
+				@for (d of CartingList; track d) {
+<tr  [ngStyle]="{'background-color':d.SELEJOB!=true ? '' : 'white' }" >	
 					<td><input type="checkbox" [(ngModel)]="d.SELEJOB" > </td>
 					<td class="col-form-span-label">{{d.EXPTNO}}</td>
 					<td class="col-form-span-label">{{d.SHIPPER}}</td>													 
@@ -44,6 +47,7 @@
 					<td><input type="Textbox" class="form-control width150" [(ngModel)]="d.REMARK" [disabled]="d.SELEJOB!=true"  > </td>
 					<td><button class="btn btn-sm btn-danger" type="submit"   name="btndelete" [disabled]="d.CARTID==0"   (click)="OnDelete(d.containerno,d.CARTID)"><span class="col-form-span-label "> <i class="fa fa-trash"></i>  </span> </button>				 </td>
 				</tr>
+}
 				
 			</tbody>
 		</table>

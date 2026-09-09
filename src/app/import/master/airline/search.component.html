@@ -34,7 +34,8 @@
         <div class="col-sm-3">
         </div>
     </div><br/>
-    <div class="row" *ngIf="List.length > 0">
+    @if (List.length > 0) {
+<div class="row">
         <div class="col-sm-2">
         </div>
         <div class="col-sm-8">
@@ -44,14 +45,17 @@
                         <th class="width100"><span class="col-form-span-label">Airline Code</span></th>
                         <th><span class="col-form-span-label">Airline Name</span> </th>
                     </tr>
-                    <tr *ngFor="let obj of List" class="tr-hover" (click)="goTo(obj.pk_ArilineId)" style="cursor:pointer;">
+                    @for (obj of List; track obj) {
+<tr class="tr-hover" (click)="goTo(obj.pk_ArilineId)" style="cursor:pointer;">
                         <td class="width150"><span class="col-form-span-label">{{obj["Airline Code"]}}</span></td>
                         <td><span class="col-form-span-label">{{obj["Airline Name"]}}</span> </td>
                     </tr>
+}
                 </table>
             </div>
         </div>
         <div class="col-sm-2">
         </div>
     </div>
+}
 </div>

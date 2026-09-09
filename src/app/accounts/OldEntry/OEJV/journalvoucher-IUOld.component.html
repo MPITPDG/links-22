@@ -22,7 +22,8 @@
                     <b> Rules for Old Entry </b>
                 </td>
             </tr>
-            <tr *ngIf="chkrules=='Y'">
+            @if (chkrules=='Y') {
+<tr>
                 <td colspan="4">
                     <table>
                         <td>
@@ -42,6 +43,7 @@
                     </table>
                  </td>
             </tr>
+}
             <tr class="trheader">
                 <td class="col-form-span-label" style="color: whitesmoke;" colspan="4">
                     <b> General Details </b>
@@ -55,7 +57,9 @@
                         <tbody  style="border: none;">
                         <tr>
                                <td >  <input [(ngModel)]="VoucherNo" type="text"  [disabled]='disablevoucherno' class="form-control width150" maxlength="40" ></td>
-                               <td *ngIf="showhidebtn==false"> <button type="submit" (click)="ShowoldData(VoucherNo)"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Search</span></button> </td> 
+                               @if (showhidebtn==false) {
+<td> <button type="submit" (click)="ShowoldData(VoucherNo)"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Search</span></button> </td>
+} 
                         </tr>
                     </tbody>
                     </table>
@@ -79,11 +83,13 @@
                     <b> Original Accounts Detail </b>
                 </td>
             </tr>
-            <tr *ngIf="chkoriginactdtl==true">
+            @if (chkoriginactdtl==true) {
+<tr>
                 <td colspan="4" class="table table-bordered table-sm-new bgblue">
                     <table>
                         <div class="row xyscroll"  style="width:715px;" >
-                            <table class="table table-responsive-sm table-bordered" *ngIf="OriginalAccountlist.length>0" >
+                            @if (OriginalAccountlist.length>0) {
+<table class="table table-responsive-sm table-bordered" >
                                 <thead>
                                     <tr class="bakgrdliteBlue">
                                     
@@ -99,7 +105,8 @@
                                     </tr>
                                 </thead>
                                  <tbody   >
-                                    <tr *ngFor="let obj of OriginalAccountlist">
+                                    @for (obj of OriginalAccountlist; track obj) {
+<tr>
                                         <td><span class="col-form-span-label"  [innerHtml]="obj.ACCOUNT_NAME"> </span></td>
                                         <td><span class="col-form-span-label">{{obj.DEBIT}}</span></td>
                                          <td><span class="col-form-span-label">{{obj.CREDIT}}</span></td>
@@ -110,24 +117,29 @@
                                          <td><span class="col-form-span-label">{{obj.DEPARTMENT}}</span></td>
                                          <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
                                     </tr>
+}
                                 </tbody>
                             </table>
+}
                        </div>
                     </table>
 
                 </td>
             </tr>
+}
             <tr class="trheader">
                 <td  class="col-form-span-label" style="color: whitesmoke;"  colspan="4">
                     <i [ngClass]="(chkactwisedtl==false) ? 'fa fa-plus-square-o': 'fa fa-minus-square-o'" (click)="showrules('A')"></i>  
                     <b> Accounts Wise Detail </b>
                 </td>
             </tr>
-            <tr *ngIf="chkactwisedtl==true">
+            @if (chkactwisedtl==true) {
+<tr>
                 <td colspan="4">
                     <table class="table table-bordered table-sm-new bgblue">
                         <div class="row xyscroll"  style="width:715px;" >
-                            <table class="table table-responsive-sm table-bordered" *ngIf="Accountwiselist.length>0" >
+                            @if (Accountwiselist.length>0) {
+<table class="table table-responsive-sm table-bordered" >
                                 <thead>
                                     <tr class="bakgrdliteBlue">
                                         <th class="col-form-span-label font-weight-bold headerwhite">Account Name</th>
@@ -137,19 +149,23 @@
                                     </tr>
                                 </thead>
                                  <tbody   >
-                                    <tr *ngFor="let obj of Accountwiselist">
+                                    @for (obj of Accountwiselist; track obj) {
+<tr>
                                        <td><span class="col-form-span-label"  [innerHtml]="obj.ACCOUNT_NAME"> </span></td>
                                        <td><span class="col-form-span-label">{{obj.TOT_DEBIT}}</span></td>
                                        <td><span class="col-form-span-label">{{obj.TOT_CREDIT}}</span></td>
                                      
                                     </tr>
+}
                                 </tbody>
                             </table>
+}
                        </div>
                     </table>
 
                 </td>
             </tr>
+}
 
             <tr class="trheader">
                 <td class="col-form-span-label" style="color: whitesmoke;"  colspan="4">
@@ -193,7 +209,9 @@
                 <td>
                  <select class="form-control width150"  [(ngModel)]="Department" (change)="GetDepartmentName($event)" >
                     <option value="0">Please select</option>
-                    <option *ngFor="let d of Departmentlist"  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                    @for (d of Departmentlist; track d) {
+<option  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
                     
                 </select>
                 <!-- <ng-select class="form-control width150" [items]="Departmentlist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Department"
@@ -222,12 +240,14 @@
                 </td>
             </tr>
 
-            <tr *ngIf="showhidebtn==true">
+            @if (showhidebtn==true) {
+<tr>
                 <td colspan="4"  class="centerlabel">
                     <button class="btn btn-sm btn-success" [disabled]='toggleupdatechldbtn' type="submit" (click)="Addchildrcrd()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{txtchild}}</span></button>
                     <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Resetchildrcrd();"><i class="fa fa-ban"></i> Reset</span></button>
                 </td>
             </tr>
+}
             <tr>
 
             </tr>
@@ -248,7 +268,8 @@
         <tr>
              <td colspan="4" >
                 <div class="row xyscroll" style="width:715px;"   > 
-                    <table class="table table-responsive-sm table-bordered"  *ngIf="Accountlist.length>0" >
+                    @if (Accountlist.length>0) {
+<table class="table table-responsive-sm table-bordered"  >
                         <thead>
                             <tr class="bakgrdliteBlue">
                                 <th  class="col-form-span-label  font-weight-bold headerwhite" ></th>
@@ -264,7 +285,8 @@
                             </tr>
                         </thead>
                          <tbody  >
-                            <tr *ngFor="let obj of Accountlist">
+                            @for (obj of Accountlist; track obj) {
+<tr>
                                 <td class="centerlabel">
                                     <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)" ></i>
                                     &nbsp;
@@ -280,17 +302,21 @@
                                 <td><span class="col-form-span-label">{{obj.DEPARTMENT}}</span></td>
                                 <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
                             </tr>
+}
                         </tbody>  
                     </table>
+}
                </div> 
              </td>
         </tr>
-        <tr *ngIf="showhidebtn==true">
+        @if (showhidebtn==true) {
+<tr>
             <td colspan="4"  class="centerlabel">
                 <button class="btn btn-sm btn-success" [disabled]='toggleupdatebtn' type="submit" (click)="Add_Main()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{text}}</span></button>
                 <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
             </td>
         </tr>
+}
     </table>   
 </div>
 <div class="col-sm-12 col-md-2 col-lg-2">

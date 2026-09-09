@@ -8,7 +8,8 @@
             </div>
         </div>
     </div>
-    <div class="row no-gutters"  *ngIf="displayType=='SEARCH'">
+    @if (displayType=='SEARCH') {
+<div class="row no-gutters" >
         <div class="col-sm-12 col-md-3 col-lg-3"> </div>
         <div class="col-sm-12 col-md-6 col-lg-6">
             <table class="table table-bordered table-sm-new bgwhite">
@@ -18,7 +19,9 @@
                     <td >
                         <select class="form-control"  [(ngModel)]="OurBank">
                             <option value="">Please select</option>
-                            <option *ngFor="let d of OurBankList"  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+                            @for (d of OurBankList; track d) {
+<option  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+}
                         </select>
                     </td>
                 </tr>
@@ -36,7 +39,9 @@
         </div>
         <div class="col-sm-12 col-md-3 col-lg-3"> </div>
     </div>
-    <div class="row no-gutters"  *ngIf="displayType=='LIST'">
+}
+    @if (displayType=='LIST') {
+<div class="row no-gutters" >
         <div class="col-12 col-md-1 col-lg-1"> </div>
         <div class="col-12 col-md-10 col-lg-10">
             <table class="table table-bordered table-sm-new bgwhite">
@@ -69,8 +74,10 @@
                         <th class="col-form-span-label" align="center">Printed On</th>
                     </tr>
                 </thead>
-                <tbody *ngIf="Searchdata_list.length > 0">
-                    <tr *ngFor="let data of Searchdata_list | chqstockFilter: searchString|paginate: { itemsPerPage:25, currentPage: PageActual }">
+                @if (Searchdata_list.length > 0) {
+<tbody>
+                    @for (data of Searchdata_list | chqstockFilter: searchString|paginate: { itemsPerPage:25, currentPage: PageActual }; track data) {
+<tr>
                        
                         <td><span class="col-form-span-label">{{data.ChequeNo}}</span>
                         </td>
@@ -91,7 +98,9 @@
                         </td>
                        
                     </tr>
+}
                 </tbody>
+}
                 <tr>
                     <td colspan="8">
                       <div class="row justify-content-center no-gutters"
@@ -105,4 +114,5 @@
         <div class="col-12 col-md-1 col-lg-1"> </div>
 
     </div>
+}
     </div>

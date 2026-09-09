@@ -60,15 +60,23 @@
                     <tbody><tr>
                         <td width="25%">
                             &nbsp;
-                            <span *ngIf=" Status == 'PI' || Status == 'GENPI'" class="Rpt_CodeDate"  style="font-family:Verdana;font-weight:bold;cursor:hand;" (click)="openEdocument()">{{table0[0].pur_code}}</span>
-                            <span *ngIf=" Status == 'RPI' || Status == 'SRPI'" class="Rpt_CodeDate"  style="font-family:Verdana;font-weight:bold;cursor:hand;" (click)="openEdocument()">{{table0[0].PUR_CODE}}</span>
+                            @if ( Status == 'PI' || Status == 'GENPI') {
+<span class="Rpt_CodeDate"  style="font-family:Verdana;font-weight:bold;cursor:hand;" (click)="openEdocument()">{{table0[0].pur_code}}</span>
+}
+                            @if ( Status == 'RPI' || Status == 'SRPI') {
+<span class="Rpt_CodeDate"  style="font-family:Verdana;font-weight:bold;cursor:hand;" (click)="openEdocument()">{{table0[0].PUR_CODE}}</span>
+}
                         </td>
                         <td align="center"  >
                             <span style="font-family:Verdana;font-size:12pt;font-weight:bold;">{{printheader}}</span>
                         </td>
                         <td align="right" >
-                            <span   *ngIf=" Status == 'PI' || Status == 'GENPI'"class="Rpt_CodeDate" style="font-family:Verdana;font-weight:bold;">{{table0[0].pur_date}}</span>&nbsp;
-                            <span   *ngIf=" Status == 'RPI' || Status=='SRPI'"class="Rpt_CodeDate" style="font-family:Verdana;font-weight:bold;">{{table0[0].PUR_DATE}}</span>&nbsp;
+                            @if ( Status == 'PI' || Status == 'GENPI') {
+<span  class="Rpt_CodeDate" style="font-family:Verdana;font-weight:bold;">{{table0[0].pur_date}}</span>
+}&nbsp;
+                            @if ( Status == 'RPI' || Status=='SRPI') {
+<span  class="Rpt_CodeDate" style="font-family:Verdana;font-weight:bold;">{{table0[0].PUR_DATE}}</span>
+}&nbsp;
                         </td>
                     </tr>
                 </tbody></table>
@@ -87,8 +95,12 @@
                                         <span class="Rpt_Label_content" style="font-weight:bold;">SUPPLIER :</span>
                                     </td>
                                     <td>
-                                        <span  *ngIf=" Status == 'PI' || Status == 'GENPI'" class="Rpt_Label_content" style="display:inline-block;width:100%;">{{table0[0].supplier}}</span>
-                                        <span  *ngIf="Status == 'RPI' || Status=='SRPI'" class="Rpt_Label_content" style="display:inline-block;width:100%;">{{table0[0].SUPPLIER}}</span>
+                                        @if ( Status == 'PI' || Status == 'GENPI') {
+<span  class="Rpt_Label_content" style="display:inline-block;width:100%;">{{table0[0].supplier}}</span>
+}
+                                        @if (Status == 'RPI' || Status=='SRPI') {
+<span  class="Rpt_Label_content" style="display:inline-block;width:100%;">{{table0[0].SUPPLIER}}</span>
+}
                                     </td>
                                 </tr>
                                 <tr>
@@ -96,8 +108,12 @@
                                         <span class="Rpt_Label_content" style="font-weight:bold;">INVOICE NO :</span>
                                     </td>
                                     <td>
-                                        <span *ngIf=" Status == 'PI' || Status == 'GENPI'" class="Rpt_Label_content" style="display:inline-block;width:100%;" [innerHtml]="table0[0].pur_invno"></span>
-                                        <span *ngIf=" Status == 'RPI' || Status=='SRPI'" class="Rpt_Label_content" style="display:inline-block;width:100%;" [innerHtml]="table0[0].PUR_INVNO"></span>
+                                        @if ( Status == 'PI' || Status == 'GENPI') {
+<span class="Rpt_Label_content" style="display:inline-block;width:100%;" [innerHtml]="table0[0].pur_invno"></span>
+}
+                                        @if ( Status == 'RPI' || Status=='SRPI') {
+<span class="Rpt_Label_content" style="display:inline-block;width:100%;" [innerHtml]="table0[0].PUR_INVNO"></span>
+}
                                     </td>
                                 </tr>
                                 <tr>
@@ -105,8 +121,12 @@
                                         <span class="Rpt_Label_content" style="font-weight:bold;">DUE DATE :</span>
                                     </td>
                                     <td nowrap="">
-                                        <span  *ngIf=" Status == 'PI' || Status == 'GENPI'" class="Rpt_Label_content" style="display:inline-block;width:100%;">{{table0[0].pur_duedt}}</span>
-                                        <span  *ngIf="  Status == 'RPI' || Status=='SRPI'" class="Rpt_Label_content" style="display:inline-block;width:100%;">{{table0[0].PUR_DUEDT}}</span>
+                                        @if ( Status == 'PI' || Status == 'GENPI') {
+<span  class="Rpt_Label_content" style="display:inline-block;width:100%;">{{table0[0].pur_duedt}}</span>
+}
+                                        @if (  Status == 'RPI' || Status=='SRPI') {
+<span  class="Rpt_Label_content" style="display:inline-block;width:100%;">{{table0[0].PUR_DUEDT}}</span>
+}
                                     </td>
                                 </tr>
                             </tbody></table>
@@ -133,7 +153,8 @@
                 <td style="white-space:nowrap;">Deduction</td>
                 <td style="white-space:nowrap;">Narration</td>
             </tr>
-            <tr class="dgItem" *ngFor="let data of table1"> 
+            @for (data of table1; track data) {
+<tr class="dgItem"> 
                 <td style="white-space:nowrap;">{{data.ACCTNAME}}</td>
                 <td style="white-space:nowrap;cursor:hand; "  (click)="printjobReport(data.PUR_JOBNO)">{{data.PUR_JOBNO}}</td>
                 <td style="white-space:nowrap;">{{data.ITEMNAME}}</td>
@@ -141,10 +162,12 @@
                 <td align="right" style="white-space:nowrap;">{{data.PUR_DEDUCTION|number:'2.2-4'}}</td>
                 <td style="white-space:nowrap;">{{data.PUR_DESC}}</td>
 			</tr>
+}
 		</tbody></table>
             </td>
     </tr>
-    <tr *ngIf="table4.length>0">
+    @if (table4.length>0) {
+<tr>
 		<td  valign="top" >
                     <!-- <table id="Table11" cellspacing="1" cellpadding="1" width="100%" border="0">
                         <tbody><tr>
@@ -162,7 +185,8 @@
                 <td style="white-space:nowrap;">Cr Amt</td>
                 <td style="white-space:nowrap;">Dr Amt</td>
             </tr>
-            <tr class="dgItem" *ngFor="let data of table4"> 
+            @for (data of table4; track data) {
+<tr class="dgItem"> 
                 <td style="white-space:nowrap;">{{data.TRANSTYPE}}</td>
                 <td style="white-space:nowrap;cursor:hand;">{{data.ENTRYNO}}</td>
                 <td style="white-space:nowrap;">{{data.ENTRYDT}}</td>
@@ -170,9 +194,11 @@
                 <td align="right" style="white-space:nowrap;">{{data.CRAMT|number:'2.2-4'}}</td>
                 <td style="white-space:nowrap;">{{data.DRAMT|number:'2.2-4'}}</td>
 			</tr>
+}
 		</tbody></table>
             </td>
     </tr>
+}
     <tr>
 		<td style="border-bottom: black 1px solid" valign="top">
                 <span  class="Rpt_Label_content">{{table0[0].Remarks}}</span>

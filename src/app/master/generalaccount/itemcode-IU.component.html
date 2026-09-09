@@ -19,7 +19,9 @@
                     <td colspan="3">
                         <select class="form-control width300"  [(ngModel)]="company" (change)="selectionChange($event.target.value)">
                             <option value="">Please select</option>
-                            <option *ngFor="let d of Companylist" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                            @for (d of Companylist; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
                         </select>
                     </td> 
                     
@@ -29,7 +31,9 @@
                     <td>
                         <select class="form-control width300"  [(ngModel)]="city" >
                             <option value="">Please select</option>
-                            <option *ngFor="let d of Citylist" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                            @for (d of Citylist; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
                         </select>
                     </td> 
                     
@@ -39,7 +43,9 @@
                     <td colspan="3">
                         <select class="form-control width300"  [(ngModel)]="accountname" (change)="bindlist($event.target.value)">
                             <option value="">Please select</option>
-                            <option *ngFor="let d of AccountNamelist" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                            @for (d of AccountNamelist; track d) {
+<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+}
                         </select>
                       
                     </td> 
@@ -52,7 +58,8 @@
                     <!--div class="c"ol-sm-6 xyscroll" *ngIf="ItemList.length>0"-->
                        <tr>
                         <td colspan="4">
-                            <table class="table table-hover" *ngIf="ItemList.length>0">
+                            @if (ItemList.length>0) {
+<table class="table table-hover">
                                 <tr>
                                    
                                     <td><span class="col-form-span-label"><b>Item Name </b> </span><span class="col-form-span-error">*</span></td>         
@@ -72,6 +79,7 @@
                                 <!-- </div> -->
                             </tr>
                             </table>
+}
                             </td>
                        </tr>
                         <!-- <td colspan="4">
@@ -89,7 +97,8 @@
                         </td>      -->
                         <tr>  
                             <td colspan="4" height="95px">
-                        <table class="table table-hover" *ngIf="ItemList.length>0">
+                        @if (ItemList.length>0) {
+<table class="table table-hover">
                           
                             <thead>
                               
@@ -105,7 +114,8 @@
                                 </tr>
                              </thead>
                             <tbody class="bgwhite">
-                                <tr *ngFor="let obj of ItemList">
+                                @for (obj of ItemList; track obj) {
+<tr>
                                     
                                     <!--td><span class="col-form-span-label anchor-link" (click)="ListOnclick(obj.ITEMCODE)" >{{obj.ITEMNAME}}</span></td-->
                                     <td class="col-form-span-label" (click)="ListOnclick(obj.ITEMCODE)">{{obj.ITEMNAME}}</td>  
@@ -114,6 +124,7 @@
                                      
                                     
                                 </tr>
+}
                               
                             </tbody>
                             <!-- <tr  *ngIf="ItemList.length>0">
@@ -121,17 +132,21 @@
                                 
                             </tr>    -->
                         </table>
+}
                     </td>
                    
                     <!--/div-->
                 </tr>    
-                <tr   *ngIf="accountname!=''" >
+                @if (accountname!='') {
+<tr   >
                     <td colspan="4" class="col-form-span-heading">{{ItemList.length}} <b>Record(s) found</b>  </td>  
                     
-                </tr>   
+                </tr>
+}   
                 <tr >
                     <td colspan="4">
-                        <table class="table table-hover"  *ngIf="accountname!=''">
+                        @if (accountname!='') {
+<table class="table table-hover" >
                             <tr>
                             <td><span class="col-form-span-label"><b>Item Name </b> </span><span class="col-form-span-error">*</span></td>         
                         <td colspan="3">  <input [(ngModel)]="ItemName" type="text"    class="form-control width300"   > </td> 
@@ -152,6 +167,7 @@
                     <td colspan="3">  <input [(ngModel)]="Remark" type="text"    class="form-control width300"   > </td>   
             </tr>
                         </table>
+}
                     </td>
               
                 <tr >

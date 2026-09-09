@@ -36,13 +36,17 @@
                     <td>
                         <select class="form-control" [(ngModel)]="ClientName">
                             <option value="0">-- Select --</option>
-                            <ng-template ngFor let-item [ngForOf]="ClientList">
+                            @for (item of ClientList; track item) {
+
                                 <option value="{{item.DATAVALUEFIELD}}">{{item.DATATEXTFIELD}}</option>
-                            </ng-template>
+                            
+}
                         </select>
                     </td>
                     <td class="width200">
-                        <span class="col-form-span-error" *ngIf="ErrorType=='1'">Please enter client name.</span>
+                        @if (ErrorType=='1') {
+<span class="col-form-span-error">Please enter client name.</span>
+}
                     </td>
                 </tr>
                 <tr>
@@ -56,7 +60,9 @@
                             [OnlyNumber]="true" />
                     </td>
                     <td>
-                        <span class="col-form-span-error" *ngIf="ErrorType=='2'">Please enter no. of pkgs.</span>
+                        @if (ErrorType=='2') {
+<span class="col-form-span-error">Please enter no. of pkgs.</span>
+}
                     </td>
                 </tr>
                 <tr>

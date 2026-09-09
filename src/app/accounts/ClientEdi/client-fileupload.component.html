@@ -32,14 +32,17 @@
             (drop)="onDrop($event)"
             (click)="fileInput.click()">
             
-            <div *ngIf="!selectedFile" class="drop-zone-content">
+            @if (!selectedFile) {
+<div class="drop-zone-content">
               <i class="fa fa-cloud-upload drop-icon"></i>
               <p class="drop-text">Drag & Drop file here</p>
               <p class="drop-subtext">or <span class="browse-link">browse</span> to choose file</p>
               <p class="allowed-types">Allowed: XLS, XLSX, CSV, PDF, DOC, DOCX</p>
             </div>
+}
 
-            <div *ngIf="selectedFile" class="file-preview">
+            @if (selectedFile) {
+<div class="file-preview">
               <i class="fa file-type-icon" [ngClass]="getFileIcon()"></i>
               <div class="file-info">
                 <p class="file-name">{{ selectedFile.name }}</p>
@@ -52,6 +55,7 @@
                 <i class="fa fa-times"></i>
               </button>
             </div>
+}
 
           </div>
 
@@ -98,7 +102,8 @@
           </div>
 
           <!-- Progress Bar -->
-          <div *ngIf="isUploading" class="mt-3">
+          @if (isUploading) {
+<div class="mt-3">
             <div class="d-flex justify-content-between mb-1">
               <small class="text-muted">Uploading...</small>
               <small class="text-muted">{{ uploadProgress }}%</small>
@@ -110,18 +115,23 @@
               </div>
             </div>
           </div>
+}
 
           <!-- Success Message -->
-          <div *ngIf="uploadSuccess" class="alert alert-success mt-3 py-2">
+          @if (uploadSuccess) {
+<div class="alert alert-success mt-3 py-2">
             <i class="fa fa-check-circle me-2"></i>
             File uploaded successfully!
           </div>
+}
 
           <!-- Error Message -->
-          <div *ngIf="errorMessage" class="alert alert-danger mt-3 py-2">
+          @if (errorMessage) {
+<div class="alert alert-danger mt-3 py-2">
             <i class="fa fa-exclamation-circle me-2"></i>
             {{ errorMessage }}
           </div>
+}
 
           <!-- Action Buttons -->
           <div class="d-flex justify-content-center gap-2 mt-4">

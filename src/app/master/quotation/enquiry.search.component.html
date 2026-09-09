@@ -4,12 +4,16 @@
             <div class="card">
               <div class="card-header ">
                     <div class="row no-gutters ">
-                  <div class="col-sm-4" *ngIf="displayType=='SEARCH'" >
+                  @if (displayType=='SEARCH') {
+<div class="col-sm-4" >
                             <strong>Enquiry Search</strong>
                    </div>
-                   <div class="col-sm-4" *ngIf="displayType=='LIST'">
+}
+                   @if (displayType=='LIST') {
+<div class="col-sm-4">
                             <strong>Enquiry List</strong>
                    </div>
+}
           
                      <!-- <div class="col-sm-8" *ngIf="displayType=='LIST'">
                             <button style="float: right; margin-left: 15px;"class="btn btn-sm btn-primary" type="submit" (click)="Exporttoxl()"> <span
@@ -22,8 +26,9 @@
                               </a>
                            
                         </div> -->
-                       <div class="col-sm-8 d-flex justify-content-end align-items-center" 
-     *ngIf="displayType=='LIST'" 
+                       @if (displayType=='LIST') {
+<div class="col-sm-8 d-flex justify-content-end align-items-center" 
+     
      style="gap: 15px;">
 
   <a style="text-decoration: underline; color: red;"
@@ -37,6 +42,7 @@
   </button>
 
 </div>
+}
  
        
                  </div>
@@ -44,7 +50,8 @@
             </div>
         </div>
     </div>
-<div class="row justify-content-center" *ngIf="displayType=='SEARCH'">
+@if (displayType=='SEARCH') {
+<div class="row justify-content-center">
   <div class="col-md-6">
 
   <div class="search-card shadow rounded bg-white p-3">
@@ -129,7 +136,9 @@
 
   </div>
 </div>
-<div class="row justify-content-center" *ngIf="displayType=='LIST'">
+}
+@if (displayType=='LIST') {
+<div class="row justify-content-center">
 
   <div class="col-md-12">
 
@@ -156,7 +165,8 @@
           </thead>
 
           <tbody>
-            <tr *ngFor="let obj of enquirylist | paginate: config">
+            @for (obj of enquirylist | paginate: config; track obj) {
+<tr>
               <td>
                 <span class="anchor-link text-primary fw-semibold"
                       (click)="ListOnclick(obj.ENQREFNO)">
@@ -172,6 +182,7 @@
                  <td>{{obj.CREATEDDATE}}</td>
               <!-- <td>{{obj.CITY_COUNTRY}}</td> -->
             </tr>
+}
           </tbody>
         </table>
       </div>
@@ -181,6 +192,7 @@
   </div>
 
 </div>
+}
 
  
  <!-- <div class="animated fadeIn">

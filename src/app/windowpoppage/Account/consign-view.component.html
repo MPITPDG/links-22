@@ -3,22 +3,29 @@
         <div class="col-sm-2">
         </div>
         <div class="col-sm-8">
-            <div *ngIf="links == 'L'"></div>
-            <div *ngIf="links == 'M'">
+            @if (links == 'L') {
+<div></div>
+}
+            @if (links == 'M') {
+<div>
                 <table class="table table-bordered table-sm-new bgwhite">
                     <tbody>
-                        <tr *ngIf="viewData?.Table[0]?.EXPTCANCEL == 'Y'">
+                        @if (viewData?.Table[0]?.EXPTCANCEL == 'Y') {
+<tr>
                             <td colspan="4">
                                 <span class="col-form-span-label red">
                                     <strong>CONSIGNMENT IS CANCELLED</strong>
                                 </span>
                             </td>
                         </tr>
-                        <tr *ngIf="edocView == 1">
+}
+                        @if (edocView == 1) {
+<tr>
                             <th class="col-form-span-heading centerlabel  link-label" colspan="4">
                                 <span (click)="openEdoc()">E-Document - View/Upload File</span>
                             </th>
                         </tr>
+}
                         <tr>
                             <td class="width150">
                                 <span class="col-form-span-label">EXPORT NO </span>
@@ -35,12 +42,16 @@
                                 <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_MODE}}</span>
                             </td>
                             <td class="width130 centerlabel" rowspan="14">
-                                <span class="col-form-span-label" *ngIf="viewData?.Table[0]?.CLEARANCE == 'S'">
+                                @if (viewData?.Table[0]?.CLEARANCE == 'S') {
+<span class="col-form-span-label">
                                     <strong>SHIPMENT CLEARANCE BY SHIPPER'S AGENT</strong>
                                 </span>
-                                <span class="col-form-span-label" *ngIf="viewData?.Table[0]?.CLEARANCE != 'S'">
+}
+                                @if (viewData?.Table[0]?.CLEARANCE != 'S') {
+<span class="col-form-span-label">
                                     <strong>SHIPMENT CLEARANCE BY US</strong>
                                 </span>
+}
                             </td>
                         </tr>
                         <tr>
@@ -154,6 +165,7 @@
                         <tbody>
                 </table>
                       </div>
+}
           
         </div>
         <div class="col-sm-2">

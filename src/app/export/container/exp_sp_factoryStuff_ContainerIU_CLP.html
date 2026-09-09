@@ -40,7 +40,9 @@
                                 <td colspan="3">
                                     <select class="form-control width500"  [(ngModel)]="Vslagt" (change)="onfillshipline($event.target.value)">
                                         <option value="">Please select</option>
-                                        <option *ngFor="let d of vslAgent" value={{d.AGT_CODE}}>{{d.AGT_NAME}}</option>
+                                        @for (d of vslAgent; track d) {
+<option value={{d.AGT_CODE}}>{{d.AGT_NAME}}</option>
+}
                                     </select>
                                 </td>
                             </tr>
@@ -51,7 +53,9 @@
                                 <td colspan="3">
                                     <select class="form-control width500"  [(ngModel)]="Vslshpgline">
                                         <option value="">Please select</option>
-                                        <option *ngFor="let d of vslshpline" value={{d.AGT_LINER}}>{{d.LINER_NAME}}</option>
+                                        @for (d of vslshpline; track d) {
+<option value={{d.AGT_LINER}}>{{d.LINER_NAME}}</option>
+}
                                     </select>
                                 </td>
                             </tr>
@@ -116,7 +120,9 @@
                                 <td>
                                     <select class="form-control width150"  [(ngModel)]="destport">
                                         <option value="">Please select</option>												 
-                                        <option *ngFor="let d of city" value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
+                                        @for (d of city; track d) {
+<option value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
+}
                                     </select>
                                 </td>
                                 <td><select class="form-control width70"  [(ngModel)]="Movetype">
@@ -154,7 +160,9 @@
                                 <td>
                                     <select class="form-control width150"  [(ngModel)]="exptno" (change)="OnChangeExjob($event.target.value)">
                                         <option value="">Please select</option>
-                                        <option *ngFor="let d of ExptNoList" value={{d.EXPTNO}}>{{d.EXPTNO}}</option>
+                                        @for (d of ExptNoList; track d) {
+<option value={{d.EXPTNO}}>{{d.EXPTNO}}</option>
+}
                                     </select>
                                 </td>
                                 <td class="col-form-span-label width40">{{TOTAL_NOOFPKGS}}</td>
@@ -211,7 +219,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                     <tr *ngFor="let obj of containerClp ">									 
+                                     @for (obj of containerClp ; track obj) {
+<tr>									 
                                         <td>											
                                             <i class="fa fa-pencil" (click)="EditchildExptNo(obj.ID)"></i>	
                                             <i class="fa fa-trash" (click)="deletechildExptNo(obj.ID,obj.CONTAINERID)" ></i>											 
@@ -225,7 +234,8 @@
                                         <td><span class="col-form-span-label">{{obj.GRWT}}</span></td>
                                         <td><span class="col-form-span-label">{{obj.NETWT}}</span></td>
                                         <td><span class="col-form-span-label">{{obj.CLP_SEQ}}</span></td>                                        
-                                    </tr>  
+                                    </tr>
+}  
                                 </tbody>									
                             </table>
                         </div>

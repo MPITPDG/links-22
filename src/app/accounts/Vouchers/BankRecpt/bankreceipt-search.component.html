@@ -10,7 +10,8 @@
             </div>
         </div>
     </div>
-    <div class="row no-gutters" *ngIf="displayType=='SEARCH'">
+    @if (displayType=='SEARCH') {
+<div class="row no-gutters">
         <div class="col-sm-3">
         </div>
         <div class="col-sm-6">
@@ -201,7 +202,9 @@
         <div class="col-sm-3">
         </div>
     </div>
-    <div class="row no-gutters" *ngIf="displayType=='LIST'">
+}
+    @if (displayType=='LIST') {
+<div class="row no-gutters">
         <div class="col-sm-1">
         </div>
         <div class="col-10 xyscroll" style="height:550px;" >
@@ -214,8 +217,10 @@
                         </th>
                     </tr>
                     <tr class="title-head formheading">
-                        <th *ngIf="Type=='PRINTAV'" class="centerlabel"><input type="checkbox" [(ngModel)]='checkbox'
+                        @if (Type=='PRINTAV') {
+<th class="centerlabel"><input type="checkbox" [(ngModel)]='checkbox'
                             (change)="checkAll($event)" /> &nbsp; </th>
+}
                         <th>Entry No</th>
                         <th>Entry Date</th>
                         <th>Status</th>
@@ -229,9 +234,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let obj of searchList">
-                        <td *ngIf="Type=='PRINTAV'"  class="centerlabel"> <input type="checkbox" [(ngModel)]="obj.Checked"
+                    @for (obj of searchList; track obj) {
+<tr>
+                        @if (Type=='PRINTAV') {
+<td  class="centerlabel"> <input type="checkbox" [(ngModel)]="obj.Checked"
                             (ngModelChange)="getCheckboxValues($event,obj.ENTRYNO)"> &nbsp; </td>
+}
                         <td>
                             <span class="col-form-span-label anchor-link" (click)="redirectToEdit(obj.ENTRYNO)" style="cursor:hand;">{{obj.ENTRYNO}}</span>
                             <!-- <span class="col-form-span-label">
@@ -265,19 +273,23 @@
                         </td>
                       
                     </tr>
+}
                 </tbody>
-                <tr *ngIf="Type=='PRINTAV'" >
+                @if (Type=='PRINTAV') {
+<tr >
                     <td colspan="9" class="right-text pr-2">
                         <button class="btn btn-sm btn-success" type="submit" (click)="Print_Multiple()"> <span
                                 class="col-form-span-label"><i class="fa fa-print"></i>&nbsp;Print</span></button>
                     </td>
                 </tr>
+}
             </table>
         
         </div>
         <div class="col-sm-1">
         </div>
     </div>
+}
    
 </div>
 <!-- <div class="animated fadeIn">

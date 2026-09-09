@@ -87,7 +87,8 @@
         <tr>
              -->
                 <div  style="width:100%"   >
-                    <table class="table table-responsive-sm table-bordered" style="width:100%"  *ngIf="Dimensionlist.length>0" >
+                    @if (Dimensionlist.length>0) {
+<table class="table table-responsive-sm table-bordered" style="width:100%"  >
                         <thead>
                             <tr class="bakgrdliteBlue">
                                 <th  class="col-form-span-label font-weight-bold headerwhite" ></th>
@@ -100,7 +101,8 @@
                             </tr>
                         </thead>
                          <tbody   >
-                            <tr *ngFor="let obj of Dimensionlist">
+                            @for (obj of Dimensionlist; track obj) {
+<tr>
                                 <td class="centerlabel">
                                     <i class="fa fa-pencil" (click)="EditDimension(obj.PK_ID)" ></i>
                                     &nbsp;
@@ -114,8 +116,10 @@
                                 <td><span class="col-form-span-label">{{obj.DIMVOLUME}}</span></td>
 
                                  </tr>
+}
                         </tbody>
                     </table>
+}
                </div>
 
         <!-- </tr> -->

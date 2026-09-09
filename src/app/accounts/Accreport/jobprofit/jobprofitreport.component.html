@@ -61,38 +61,48 @@
                                 [(ngModel)]="modetype" [disabled]="searchtype != 'DATE'" (click)="clearDateControls()" >&nbsp;<b>All</b>
                         </div><br>
                         <div class="col-form-span-label" style="padding-left: 15px;">
-                            <span  *ngIf="modetype=='SEA_exp'"> <input type="radio"  name="mode_subtyperadio" value='DOC'
+                            @if (modetype=='SEA_exp') {
+<span > <input type="radio"  name="mode_subtyperadio" value='DOC'
                                 [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>DocRecDate </b><br>
                                 <input type="radio"  name="mode_subtyperadio" value='SALING'
                                 [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>Sailing Date </b><br>
                                 <input type="radio"  name="mode_subtyperadio" value='INV'
                                 [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>Invoice Date</b>
                             </span>
-                            <span  *ngIf="modetype=='AIR_exp'"> <input type="radio"  name="mode_subtyperadio" value='DOC'
+}
+                            @if (modetype=='AIR_exp') {
+<span > <input type="radio"  name="mode_subtyperadio" value='DOC'
                                 [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>DocRecDate </b><br>
                                 <input type="radio"  name="mode_subtyperadio" value='FLIGHT'
                                 [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>Flight Date </b>  <br>
                                 <input type="radio"  name="mode_subtyperadio" value='INV'
                                 [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>Invoice Date</b>                           
                             </span>
-                            <span  *ngIf="modetype=='SEA_imp'"> <input type="radio"  name="mode_subtyperadio" value='DOCI'
+}
+                            @if (modetype=='SEA_imp') {
+<span > <input type="radio"  name="mode_subtyperadio" value='DOCI'
                                 [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>DocRecDate </b><br>
                                 <input type="radio"  name="mode_subtyperadio" value='BL'
                                 [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>BL  Date </b><br>
                                 <input type="radio"  name="mode_subtyperadio" value='INV'
                                 [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>Invoice Date</b>
                             </span>
-                            <span  *ngIf="modetype=='AIR_imp'"> <input type="radio"  name="mode_subtyperadio" value='DOCI'
+}
+                            @if (modetype=='AIR_imp') {
+<span > <input type="radio"  name="mode_subtyperadio" value='DOCI'
                                 [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>DocRecDate </b><br>
                                 <input type="radio"  name="mode_subtyperadio" value='BL'
                                 [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>BL  Date </b><br>
                                 <input type="radio"  name="mode_subtyperadio" value='INV'
                                 [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>Invoice Date</b>
                             </span>
-                            <span  *ngIf="modetype=='ALL'"> 
+}
+                            @if (modetype=='ALL') {
+<span > 
                                 <input type="radio"  name="mode_subtyperadio" value='INV'
                                 [(ngModel)]="mode_subtype" [disabled]="searchtype != 'DATE'">&nbsp;<b>Invoice Date</b>
                             </span>
+}
                         </div>
                         <div style="display: inline-flex;">
                             <span class="col-form-span-label">From &nbsp;</span>
@@ -151,17 +161,21 @@
                 </tr>
                 <tr  >
                     <td colspan="6" class="centerlabel">
-                        <span *ngIf="searchtype=='singlejob'; else elseBlock1">
+                        @if (searchtype=='singlejob') {
+<span>
                             <button class="btn btn-sm btn-primary" type="submit" (click)="print()">
                                 <span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Print</span>
                                </button> 
                         </span>
-                        <ng-template #elseBlock1>
+} @else {
+
                             <button class="btn btn-sm btn-primary" type="submit" (click)="expt_excl()">
                                 <span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Export To Excel</span>
        
                                </button> 
-                        </ng-template>                    
+                        
+}
+                                            
                 <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
                         (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
                     </td>
