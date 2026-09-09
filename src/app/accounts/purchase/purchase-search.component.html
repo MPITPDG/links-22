@@ -8,7 +8,8 @@
             </div>
         </div>
     </div>
-    <div class="row no-gutters" *ngIf="displayType=='SEARCH'">
+    @if (displayType=='SEARCH') {
+<div class="row no-gutters">
         <div class="col-sm-3"> </div>
         <div class="col-sm-6">
             <table class="table table-bordered table-sm-new bgwhite">
@@ -115,7 +116,9 @@
         <div class="col-sm-3">
         </div>
     </div>
-    <div class="row no-gutters" *ngIf="displayType=='LIST'">
+}
+    @if (displayType=='LIST') {
+<div class="row no-gutters">
         <div class="col-sm-2"></div>
         <div class="col-sm-8" style="height:500px;overflow-y:scroll;">
             <table class="table table-sm-new table-bordered bgwhite">
@@ -129,38 +132,64 @@
                         <th class="centerlabel"><input type="checkbox"  [(ngModel)]='checkbox' (change)="checkAll($event)" /> &nbsp; </th>
                         <th>Purchase Code</th>
                         <th>Purchase Date</th>
-                        <th *ngIf="STATUS=='RPI' || STATUS=='PI'">Supplier</th>
-                        <th *ngIf="STATUS=='SRPI'">Staff</th>
+                        @if (STATUS=='RPI' || STATUS=='PI') {
+<th>Supplier</th>
+}
+                        @if (STATUS=='SRPI') {
+<th>Staff</th>
+}
                         <th>Supp Inv No</th>
                         <th>Amount</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let obj of searchList">
+                    @for (obj of searchList; track obj) {
+<tr>
                         <td class="centerlabel"> <input type="checkbox" [(ngModel)]="obj.Checked"
                             (ngModelChange)="getCheckboxValues($event,obj.pur_code)"> &nbsp; </td>
                         <td>
-                            <span *ngIf="STATUS=='PI'"class="col-form-span-label anchor-link" (click)="redirectToEdit(obj.pur_code)" style="cursor:pointer;">{{obj.pur_code}}</span>          
-                            <span *ngIf="STATUS=='RPI' || STATUS=='SRPI'" class="col-form-span-label anchor-link" (click)="redirectToEdit(obj.PUR_CODE)" style="cursor:pointer;">{{obj.PUR_CODE}}</span>                                
+                            @if (STATUS=='PI') {
+<span class="col-form-span-label anchor-link" (click)="redirectToEdit(obj.pur_code)" style="cursor:pointer;">{{obj.pur_code}}</span>
+}          
+                            @if (STATUS=='RPI' || STATUS=='SRPI') {
+<span class="col-form-span-label anchor-link" (click)="redirectToEdit(obj.PUR_CODE)" style="cursor:pointer;">{{obj.PUR_CODE}}</span>
+}                                
                         </td>
                         <td>
-                            <span *ngIf="STATUS=='RPI' || STATUS=='SRPI'"class="col-form-span-label">{{obj.PUR_DATE}}</span>
-                            <span *ngIf="STATUS=='PI'"class="col-form-span-label">{{obj.pur_date}}</span>
+                            @if (STATUS=='RPI' || STATUS=='SRPI') {
+<span class="col-form-span-label">{{obj.PUR_DATE}}</span>
+}
+                            @if (STATUS=='PI') {
+<span class="col-form-span-label">{{obj.pur_date}}</span>
+}
                         </td>
                         <td>
-                            <span *ngIf="STATUS=='RPI' || Status=='SRPI'"class="col-form-span-label">{{obj.SUPPLIER}}</span>
-                            <span *ngIf="STATUS=='PI'" class="col-form-span-label">{{obj.supplier}}</span>
+                            @if (STATUS=='RPI' || Status=='SRPI') {
+<span class="col-form-span-label">{{obj.SUPPLIER}}</span>
+}
+                            @if (STATUS=='PI') {
+<span class="col-form-span-label">{{obj.supplier}}</span>
+}
                         </td>
                         <td>
-                            <span *ngIf="STATUS=='RPI' || Status=='SRPI'"class="col-form-span-label">{{obj.PUR_INVNO}}</span>
-                            <span *ngIf="STATUS=='PI'" class="col-form-span-label">{{obj.pur_invno}}</span>
+                            @if (STATUS=='RPI' || Status=='SRPI') {
+<span class="col-form-span-label">{{obj.PUR_INVNO}}</span>
+}
+                            @if (STATUS=='PI') {
+<span class="col-form-span-label">{{obj.pur_invno}}</span>
+}
                         </td>
                         <td>
-                            <span *ngIf="STATUS=='RPI' || Status=='SRPI'"class="col-form-span-label">{{obj.TOTALAMT}}</span>
-                            <span *ngIf="STATUS=='PI'" class="col-form-span-label">{{obj.totalamt}}</span>
+                            @if (STATUS=='RPI' || Status=='SRPI') {
+<span class="col-form-span-label">{{obj.TOTALAMT}}</span>
+}
+                            @if (STATUS=='PI') {
+<span class="col-form-span-label">{{obj.totalamt}}</span>
+}
                         </td>
                       
                     </tr>
+}
                 </tbody>
                 <tr>
                     <td colspan="8" class="right-text pr-2">
@@ -173,4 +202,5 @@
         <div class="col-sm-2"></div>
 
     </div>
+}
 </div>

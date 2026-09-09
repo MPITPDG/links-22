@@ -19,13 +19,15 @@
                     <td><span class="col-form-span-label"><b>CreditNote dt.</b> </span></td>
                     <td  style="text-align: left;">    <my-date-picker name="crtdate" [options]="myDatePickerOptionsInv"
                             (dateChanged)="CreditnoteDateChanged($event)" [selDate]="crtdate"></my-date-picker>
-                </tr>
+                </td></tr>
                 <tr>
                     <td>  <span class="col-form-span-label "><b>Mode</b></span> </td>
                     <td>
                         <select class="form-control width180" [(ngModel)]="mode" [disabled]="modecondition">
                             <option value="">--Please select--</option>
-                            <option *ngFor="let d of table5_mode" value={{d.DTATVALUE}}>{{d.DTATTEXT}}</option>
+                            @for (d of table5_mode; track d) {
+<option value={{d.DTATVALUE}}>{{d.DTATTEXT}}</option>
+}
                         </select>
                     </td>
                     <td colspan="2"></td>
@@ -75,7 +77,8 @@
                                                         </td>
                                                         <td colspan="2"></td>
                                                     </tr>
-                                                        <tr *ngIf="show_pkg_piece">
+                                                        @if (show_pkg_piece) {
+<tr>
                                                             <td><span class="col-form-span-label"><b>Packages</b> </span><span   class="col-form-span-error">*</span></td>
                                                             <td> <input type="text" class="form-control width180" OnlyNumber="true" [(ngModel)]="packages"> </td>
                                                             <td><span class="col-form-span-label"><b>Prop.Wt.</b> </span></td>
@@ -83,15 +86,20 @@
                                                                 <input type="text" class="form-control width180" OnlyNumber="true" [(ngModel)]="propweight">
                                                             </div>
                                                         </tr>
+}
                                                         <tr>
                                                             <td colspan="4" align="center">
                                                                 <div style="margin: 0 auto;margin-top:3px;">
-                                                                    <span *ngIf="addjob">
+                                                                    @if (addjob) {
+<span>
                                                                         <button class="btn btn-sm btn-success"   type="submit" (click)="populatejob()"> <span class="col-form-span-label"><i  class="fa fa-plus"></i>   Add</span></button>
                                                                     </span>
-                                                                    <span *ngIf="jobupdate">
+}
+                                                                    @if (jobupdate) {
+<span>
                                                                         <button class="btn btn-sm btn-success"   type="submit" (click)="updatejob()"> <span  class="col-form-span-label"><i  class="fa fa-plus"></i> Update</span></button>
                                                                     </span>
+}
 
                                                                     <button class="btn btn-sm btn-danger" type="submit"  (click)="resetjob()"> <span  class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
                                                                 </div>
@@ -115,7 +123,8 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr *ngFor="let obj of jobdatalist">
+                                                            @for (obj of jobdatalist; track obj) {
+<tr>
                                                                 <td align="center">
                                                                     <i class="fa fa-pencil" (click)="Editjob(obj)"></i>
                                                                     &nbsp;
@@ -127,6 +136,7 @@
                                                                 <td><span class="col-form-span-label"   [innerHtml]="obj.INV_STR" (click)="viewjob($event)" ></span></td>
                                                                 <td><span class="col-form-span-label">{{obj.ADV_AMOUNT}}</span> </td>
                                                             </tr>
+}
                                                         </tbody>
                                                         </table>
                                                                     </div>
@@ -192,8 +202,10 @@
                                         <td>
                                             <select class="form-control width180" [(ngModel)]="billtype">
                                                 <option value="">--Please select--</option>
-                                                <option *ngFor="let d of table4_billtype" value={{d.DTATVALUE}}>
+                                                @for (d of table4_billtype; track d) {
+<option value={{d.DTATVALUE}}>
                                                     {{d.DTATTEXT}}</option>
+}
                                             </select>
                                         </td>
                                     </tr>
@@ -206,8 +218,10 @@
                                             <select class="form-control width180" [(ngModel)]="currency"
                                                 (ngModelChange)="GetCurrencyName($event)">
                                                 <option value="">Please select</option>
-                                                <option *ngFor="let d of table3_curreny" value={{d.cur_code}}>
+                                                @for (d of table3_curreny; track d) {
+<option value={{d.cur_code}}>
                                                     {{d.curname}}</option>
+}
                                             </select>
                                         </td>
                                     </tr>
@@ -238,8 +252,10 @@
                                                     [(ngModel)]="no_pkgs">
                                                 <select class="form-control width120" [(ngModel)]="pkgs">
                                                     <option value="">--Please select--</option>
-                                                    <option *ngFor="let d of table6_pkgs" value={{d.UNIT_CODE}}>
+                                                    @for (d of table6_pkgs; track d) {
+<option value={{d.UNIT_CODE}}>
                                                         {{d.UNIT_NAME}}</option>
+}
                                                 </select>
 
                                             </div>
@@ -262,8 +278,10 @@
                                                     [(ngModel)]="no_pieces">
                                                 <select class="form-control width120" [(ngModel)]="pieces">
                                                     <option value="">--Please select--</option>
-                                                    <option *ngFor="let d of table7_pieces" value={{d.UNIT_CODE}}>
+                                                    @for (d of table7_pieces; track d) {
+<option value={{d.UNIT_CODE}}>
                                                         {{d.UNIT_NAME}}</option>
+}
                                                 </select>
                                             </div>
                                         </td>
@@ -394,8 +412,10 @@
                                                     <td>
                                                         <select class="form-control width80" [(ngModel)]="currencytype"  (ngModelChange)="getexchangerate($event)">
                                                             <option value="">Please select</option>
-                                                            <option *ngFor="let d of table13_currencytype" value={{d.DATAVALUE}}>
+                                                            @for (d of table13_currencytype; track d) {
+<option value={{d.DATAVALUE}}>
                                                                 {{d.DATATEXTVALUE}}</option>
+}
 
                                                         </select>
                                                     </td>
@@ -408,14 +428,18 @@
                                                             [disabled]=true>
                                                     </td>
                                                     <td>
-                                                        <span *ngIf="tax==='G'; else elseBlock1">
+                                                        @if (tax==='G') {
+<span>
                                                             <input type="text" class="form-control width120"
                                                                 [(ngModel)]="taxamount_G" [disabled]=true>
                                                         </span>
-                                                        <ng-template #elseBlock1>
+} @else {
+
                                                             <input type="text" class="form-control width120"
                                                                 [(ngModel)]="taxamount_N" [disabled]=true>
-                                                        </ng-template>
+                                                        
+}
+                                                        
                                                     </td>
 
                                                 </tr>
@@ -514,8 +538,10 @@
 
                                                             </tr>
                                                         </thead>
-                                                        <tbody *ngIf="chargetable.length > 0">
-                                                            <tr *ngFor="let data of chargetable">
+                                                        @if (chargetable.length > 0) {
+<tbody>
+                                                            @for (data of chargetable; track data) {
+<tr>
                                                                 <td>
                                                                     <i class="fa fa-pencil"
                                                                         (click)="editcharge(data)"></i>
@@ -535,8 +561,10 @@
                                                                 <td><span  class="col-form-span-label">{{data.TAXABLEAMT}}</span>  </td>
 
                                                             </tr>
+}
 
-                                                    </table>
+                                                    </tbody>
+}</table>
                                                 </div>
                                             </div>
                                         </td>
@@ -578,8 +606,10 @@
                                                                 <th align="center">  <span  class="col-form-span-label">Adjust</span>   </th>
                                                             </tr>
                                                         </thead>
-                                                        <tbody *ngIf="despach_table.length >0">
-                                                            <tr *ngFor="let data of despach_table">
+                                                        @if (despach_table.length >0) {
+<tbody>
+                                                            @for (data of despach_table; track data) {
+<tr>
                                                                 <td> <i class="fa fa-pencil"
                                                                         (click)="despachedit(data)"></i>
                                                                     &nbsp;
@@ -590,7 +620,9 @@
                                                                 <td><span  class="col-form-span-label">{{data.CRT_AMOUNT}}</span>  </td>
                                                                 <td><span class="col-form-span-label">{{data.CRT_ADJUST}}</span>    </td>
 
-                                                    </table>
+                                                    </tr>
+}</tbody>
+}</table>
                                                 </div>
                                             </div>
                                         </td>

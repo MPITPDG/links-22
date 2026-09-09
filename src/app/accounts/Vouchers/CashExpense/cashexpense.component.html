@@ -66,15 +66,23 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><span *ngIf=" Type == 'CE'" class="col-form-span-label"><b>Employee</b> </span>
-                        <span *ngIf=" Type == 'CP'" class="col-form-span-label"><b>Entry Type</b> </span></td>
+                    <td>@if ( Type == 'CE') {
+<span class="col-form-span-label"><b>Employee</b> </span>
+}
+                        @if ( Type == 'CP') {
+<span class="col-form-span-label"><b>Entry Type</b> </span>
+}</td>
                     <td>
-                        <ng-select *ngIf=" Type == 'CE'" [items]="employyetable" bindLabel="ACCTNAME" bindValue="ACCTCODE"
+                        @if ( Type == 'CE') {
+<ng-select [items]="employyetable" bindLabel="ACCTNAME" bindValue="ACCTCODE"
                         (ngModelChange)="FillAmount($event)" [(ngModel)]="employee" class="custom " placeholder="--Select--">
                         </ng-select>
-                        <ng-select *ngIf=" Type == 'CP'"[items]="employyetable" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+}
+                        @if ( Type == 'CP') {
+<ng-select [items]="employyetable" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
                          [(ngModel)]="employee" class="custom " placeholder="--Select--">
                         </ng-select>
+}
                       
                     </td>
                     <td><span class="col-form-span-label"><b>Department</b> </span></td>
@@ -130,7 +138,8 @@
                     <td colspan="4">
                         <div class="row xyscroll" style="width:715px;">
                             <div class="col-12">
-                                <table class="table table-responsive-sm table-bordered" *ngIf="Accountlist.length>0">
+                                @if (Accountlist.length>0) {
+<table class="table table-responsive-sm table-bordered">
                                     <thead>
                                         <tr class="bakgrdliteBlue">
                                             <th class="col-form-span-label"></th>
@@ -143,8 +152,10 @@
                                             <th class="col-form-span-label font-weight-bold headerwhite">Narration</th>
                                         </tr>
                                     </thead>
-                                    <tbody *ngIf="Accountlist.length>0">
-                                        <tr *ngFor="let obj of Accountlist">
+                                    @if (Accountlist.length>0) {
+<tbody>
+                                        @for (obj of Accountlist; track obj) {
+<tr>
                                             <td class="centerlabel">
                                                 <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)"></i>
                                                 &nbsp;
@@ -159,8 +170,11 @@
                                             <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
                                             <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
                                         </tr>
+}
                                     </tbody>
+}
                                 </table>
+}
                             </div>
                         </div>
                     </td>

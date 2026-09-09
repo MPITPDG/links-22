@@ -23,12 +23,15 @@
 									
 									<td colspan="2" class="centerlabel" >
 										<button class="btn btn-sm btn-success" type="submit" id="btnSearch" name="btnSearch"    (click)="jobserch()"> <i class="fa fa-search"></i> Search</button>
-										<button *ngIf="exptdt.length>0" class="btn btn-sm btn-danger   " type="reset"     (click)="onprint()"><i class="fa fa-print "></i> Print</button>
+										@if (exptdt.length>0) {
+<button class="btn btn-sm btn-danger   " type="reset"     (click)="onprint()"><i class="fa fa-print "></i> Print</button>
+}
 			
 									</td>
 								</tr>
 							</tbody>
-							<tbody *ngIf="exptdt.length>0">
+							@if (exptdt.length>0) {
+<tbody>
 								<tr>
 									<td class="col-form-span-heading"  colspan="4">
 										LIST OF CONSIGNMENTS
@@ -84,7 +87,9 @@
 									<td>
 										<select class="form-control width150" [(ngModel)]="currency">
 											<option value="-1">Please select</option>
-											<option *ngFor="let d of listCurreny" value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+											@for (d of listCurreny; track d) {
+<option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+}
 										</select>
 									</td>
 								</tr>
@@ -115,7 +120,8 @@
 									</td>
 								</tr>
 								<tr>
-									<td colspan="4" *ngIf="exptdt.length>0">
+									@if (exptdt.length>0) {
+<td colspan="4">
 										
 										<table class="table table-hover">
 											<thead>
@@ -130,7 +136,8 @@
 											</thead>
 											 
 											<tbody>
-												<tr *ngFor="let d of exptdt"  >	
+												@for (d of exptdt; track d) {
+<tr  >	
 													<td><input type="checkbox" [disabled]="JOBSELE" [(ngModel)]="d.SELETJOB" > </td>
                                                     <td class="col-form-span-label">{{d.EXPTNO}}</td>
                                                     <td class="col-form-span-label">{{d.SHIPPER}}</td>
@@ -139,11 +146,14 @@
 													<td class="col-form-span-label">{{d.PCS}}</td>
 													<td class="col-form-span-label">{{d.GRWT}}</td>													
 												</tr>
+}
 											</tbody>
 										</table>									
 									</td>
+}
 								</tr>
 							</tbody>
+}
 						</table>
 					</div>
 					
@@ -153,12 +163,14 @@
 			</div>
 		</div>
 		
-		<div class="card-footer rightlabel "*ngIf="exptdt.length>0">
+		@if (exptdt.length>0) {
+<div class="card-footer rightlabel ">
 			
 			<button class="btn btn-sm btn-success   " type="submit" id="btnAgtAdd" name="btnAgtAdd"   (click)="AddMbl()" ><i class="fa fa-dot-circle-o" ></i> Submit</button>
 			<button class="btn btn-sm btn-danger   " type="reset" id="btnAgtRest" name="btnAgtrest" (click)="ResetAll()"><i class="fa fa-ban"></i> Reset</button>
 			
 		</div>
+}
 	</div>
 	
 </div>

@@ -66,11 +66,15 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><span *ngIf=" Type == 'CP'" class="col-form-span-label"><b>Entry Type</b> </span></td>
+                    <td>@if ( Type == 'CP') {
+<span class="col-form-span-label"><b>Entry Type</b> </span>
+}</td>
                     <td>
-                       <ng-select *ngIf=" Type == 'CP'"[items]="entrytypetable" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                       @if ( Type == 'CP') {
+<ng-select [items]="entrytypetable" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
                          [(ngModel)]="entrytype" (ngModelChange)="EntryTypeChg($event.target.value)" class="custom " placeholder="--Select--">
                         </ng-select>
+}
                       
                     </td>
                     <td><span class="col-form-span-label"><b>Department</b> </span></td>
@@ -141,7 +145,8 @@
                     <td colspan="4">
                         <div class="row xyscroll">
                             <div class="col-12">
-                                <table class="table table-responsive-sm table-bordered" *ngIf="Accountlist.length>0">
+                                @if (Accountlist.length>0) {
+<table class="table table-responsive-sm table-bordered">
                                     <thead>
                                         <tr class="bakgrdliteBlue">
                                             <th class="col-form-span-label"></th>
@@ -154,8 +159,10 @@
                                             <th class="col-form-span-label font-weight-bold headerwhite">Narration</th>
                                         </tr>
                                     </thead>
-                                    <tbody *ngIf="Accountlist.length>0">
-                                        <tr *ngFor="let obj of Accountlist">
+                                    @if (Accountlist.length>0) {
+<tbody>
+                                        @for (obj of Accountlist; track obj) {
+<tr>
                                             <td class="centerlabel">
                                                 <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)"></i>
                                                 &nbsp;
@@ -170,8 +177,11 @@
                                             <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
                                             <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
                                         </tr>
+}
                                     </tbody>
+}
                                 </table>
+}
                             </div>
                         </div>
                     </td>

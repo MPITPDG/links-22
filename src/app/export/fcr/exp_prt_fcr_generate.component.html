@@ -23,13 +23,18 @@
 									
 									<td colspan="2" class="centerlabel" >
 										<button class="btn btn-sm btn-success" type="submit" id="btnSearch" name="btnSearch"    (click)="jobserch()"> <i class="fa fa-search"></i> Search</button>
-										<button *ngIf="exptdt.length>0" class="btn btn-sm btn-danger   " type="reset"     (click)="onpreview()"><i class="fa fa-print "></i> Preview</button>
-										<button *ngIf="exptdt.length>0" class="btn btn-sm btn-danger   " type="reset"     (click)="onprint()"><i class="fa fa-print "></i> Print</button>
+										@if (exptdt.length>0) {
+<button class="btn btn-sm btn-danger   " type="reset"     (click)="onpreview()"><i class="fa fa-print "></i> Preview</button>
+}
+										@if (exptdt.length>0) {
+<button class="btn btn-sm btn-danger   " type="reset"     (click)="onprint()"><i class="fa fa-print "></i> Print</button>
+}
 			
 									</td>
 								</tr>
 							</tbody>
-							<tbody *ngIf="exptdt.length>0">
+							@if (exptdt.length>0) {
+<tbody>
 								<tr>
 									<td class="col-form-span-heading"  colspan="4">
 										LIST OF CONSIGNMENTS
@@ -72,7 +77,9 @@
 									<td>
 										<select class="form-control width150"   [(ngModel)]="bltype" [disabled]="switchhbl!= '0'" >
 											<option value="-1">Please select</option>
-											<option *ngFor="let d of listBltype" value={{d.HBLCODE}}>{{d.HBLNAME}}</option>
+											@for (d of listBltype; track d) {
+<option value={{d.HBLCODE}}>{{d.HBLNAME}}</option>
+}
 										</select>
 									</td>
 								</tr>
@@ -93,7 +100,9 @@
 									<td>
 										<select class="form-control width150" [(ngModel)]="currency">
 											<option value="-1">Please select</option>
-											<option *ngFor="let d of listCurreny" value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+											@for (d of listCurreny; track d) {
+<option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+}
 										</select>
 									</td>
 								</tr>
@@ -118,37 +127,48 @@
 									<td >
 										<select class="form-control width150"   [(ngModel)]="deliveryTo">
 											 
-											<option *ngFor="let d of listSupp" value={{d.SUP_CODE}}>{{d.SUPNAME}}</option>
+											@for (d of listSupp; track d) {
+<option value={{d.SUP_CODE}}>{{d.SUPNAME}}</option>
+}
 										</select>
 									</td> 
 									<td colspan="2"   ><input type="checkbox" [disabled]="bltype!= 'M' " [(ngModel)]="switchhbl" (change)="checkValue(switchhbl?'1':'')"  >
 										<span class="col-form-span-label "><b>switch HBL</b></span>
 									</td>
 								</tr>
-								<tr class="title-head trbg" *ngIf="ishablissue=='1'; else  otherhbl">
+								@if (ishablissue=='1') {
+<tr class="title-head trbg">
 								<!-- <tr> -->
-									<td   *ngIf="FCRNo==''"  class="col-form-span-heading"  colspan="4">
+									@if (FCRNo=='') {
+<td    class="col-form-span-heading"  colspan="4">
 										HOUSE B/L NO. WILL START WITH  {{pod}} 
 									</td>
-									 <td   *ngIf="FCRNo!=''"  class="col-form-span-heading"  colspan="4">
+}
+									 @if (FCRNo!='') {
+<td    class="col-form-span-heading"  colspan="4">
 										HOUSE B/L NO. " {{FCRNo}} "
 									</td>
+}
 								</tr>
-								<ng-template #otherhbl> 
+} @else {
+ 
 										<td class="width150">
 												<span class="col-form-span-label"><b>HBL No.</b></span><span class="col-form-span-error">*</span>
 											</td>
 											<td >						 
 												 <input    type="text" [(ngModel)]="FCRNo" [disabled]="FCRNo != ''"  class="form-control width120"    />
 											</td>	
-								</ng-template>
+								
+}
+								
 								<tr>
 									<td class="col-form-span-heading"  colspan="4">
 										FOLLOWING EXPORT NOS. FOUND WITH ABOVE SHIPPER, VESSEL AND VESSEL AGENT
 									</td>
 								</tr>
 								<tr>
-									<td colspan="4" *ngIf="exptdt.length>0">
+									@if (exptdt.length>0) {
+<td colspan="4">
 										
 										<table class="table table-hover">
 											<thead>
@@ -162,7 +182,8 @@
 											</thead>
 											<!-- (change)="addhobno($event,d.EXPTNO)" -->
 											<tbody>
-												<tr *ngFor="let d of exptdt"  >	
+												@for (d of exptdt; track d) {
+<tr  >	
 													<td><input type="checkbox" [disabled]="FRMBL" [(ngModel)]="d.SELEJOB" > </td>
 													<td class="col-form-span-label">{{d.EXPTNO}}</td>
 													<td class="col-form-span-label">{{d.EXPT_CONSIGNEE}}</td>													 
@@ -170,11 +191,14 @@
 													<td class="col-form-span-label">{{d.EXPT_GRWT}}</td>
 													<td class="col-form-span-label">{{d.EXPT_NOOFPCS}}</td>													
 												</tr>
+}
 											</tbody>
 										</table>									
 									</td>
+}
 								</tr>
 							</tbody>
+}
 						</table>
 					</div>
 					
@@ -184,12 +208,16 @@
 			</div>
 		</div>
 		
-		<div class="card-footer rightlabel "*ngIf="exptdt.length>0">
-			<button class="btn btn-sm btn-success" type="submit" id="btnswtAdd" style="BACKGROUND-COLOR: ORANGE;BORDER-COLOR: ORANGE;"  *ngIf ="viewswitch != '1'"   (click)="GenSwitchBL()" ><i class="fa fa-dot-circle-o" ></i> Gen. Switch BL</button>
+		@if (exptdt.length>0) {
+<div class="card-footer rightlabel ">
+			@if (viewswitch != '1') {
+<button class="btn btn-sm btn-success" type="submit" id="btnswtAdd" style="BACKGROUND-COLOR: ORANGE;BORDER-COLOR: ORANGE;"    (click)="GenSwitchBL()" ><i class="fa fa-dot-circle-o" ></i> Gen. Switch BL</button>
+}
 			<button class="btn btn-sm btn-success" type="submit" id="btnAgtAdd" name="btnAgtAdd"   (click)="AddFCR()" ><i class="fa fa-dot-circle-o" ></i> Submit</button>
 			<button class="btn btn-sm btn-danger" type="reset" id="btnAgtRest" name="btnAgtrest" (click)="ResetAll()"><i class="fa fa-ban"></i> Reset</button>
 			   
 		</div>
+}
 		
 		  
 										

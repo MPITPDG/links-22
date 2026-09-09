@@ -18,7 +18,9 @@
                             <td>
                                 <select class="form-control width250"  [(ngModel)]="OurBank"  >
                                     <option value="0">Please select</option>
-                                    <option *ngFor="let d of OurBankList"  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>                
+                                    @for (d of OurBankList; track d) {
+<option  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+}                
                                 </select>
                             </td>                         
                             <td colspan="2">
@@ -48,7 +50,8 @@
             </div>
             <div class="col-sm-3"></div> 
         </div>  
-        <div class="row xyscroll" *ngIf="displayType=='LIST'">
+        @if (displayType=='LIST') {
+<div class="row xyscroll">
         <div class="col-12">
             <table class="table table-sm-new table-responsive-sm table-bordered"  >
                 <thead>                    
@@ -64,8 +67,10 @@
                         <th class="col-form-span-label" align="center">Requested On</th>                            
                     </tr>
                 </thead>
-                <tbody *ngIf="data_list.length > 0">
-                    <tr *ngFor="let data of data_list">
+                @if (data_list.length > 0) {
+<tbody>
+                    @for (data of data_list; track data) {
+<tr>
                         <td  class="col-form-span-label"> <input type="checkbox" [(ngModel)]="data.Checked"
                             (ngModelChange)="getCheckboxValues($event,data.ENTRYNO,data.CHEQUETYPE)"   > &nbsp; </td>
                             <td><span
@@ -95,9 +100,12 @@
                         class="col-form-span-label">{{data.ENTRYDT}}</span>
                         </td>
                     
-            </table>
+            </tr>
+}</tbody>
+}</table>
         </div>
     </div>
+}
 </div>
          
 </div>
@@ -137,9 +145,11 @@
                                                 </tr>
                                             </thead>
                                             <tbody >                                               
-                                                <tr *ngFor="let obj of ListChq ">                                                
+                                                @for (obj of ListChq ; track obj) {
+<tr>                                                
                                                     <td class="col-form-span-label">{{obj.CHEQUENO}}</td>                                                 
                                                 </tr>
+}
                                             </tbody>
                                         </td>
                                     </tr> 

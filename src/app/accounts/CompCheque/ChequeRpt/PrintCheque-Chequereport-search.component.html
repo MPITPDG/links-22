@@ -1,7 +1,8 @@
 <div class="animated fadeIn">
     <div class="container">
         <!-- <div class="row" *ngIf="Searchdata_list.length==0"> -->
-            <div class="row" *ngIf="displayType=='SEARCH'">
+            @if (displayType=='SEARCH') {
+<div class="row">
             <div class="col-sm-3"></div>
             <div class="col-sm-6">
                 <table class="table table-bordered table-sm-new bgwhite" style="font-family:  Verdana;font-size: 12px;">
@@ -107,8 +108,10 @@
             </div>
 
             <div class="col-sm-3"></div>        </div>
+}
   
-                         <div class="row xyscroll "  *ngIf="displayType=='LIST'">
+                         @if (displayType=='LIST') {
+<div class="row xyscroll " >
                             <div class="col-12">
                                 <table class="table table-sm-new table-responsive-sm table-bordered"  >
                                     <thead>
@@ -137,15 +140,25 @@
                                              <th class="col-form-span-label" align="center">AUTHORISED DATE</th>
                                               <th class="col-form-span-label" align="center">PRINTED BY</th>
                                              <th class="col-form-span-label" align="center">PRINTED ON</th>
-                                             <th *ngIf=" chequetype == 'C' || chequetype == 'CR' || chequetype == 'B'" class="col-form-span-label" align="center">REASON</th>
-                                             <th *ngIf=" chequetype == 'C' || chequetype == 'CR' || chequetype == 'B'" class="col-form-span-label" align="center">REPRINTED CHEQUE</th>
-                                             <th *ngIf=" chequetype == 'C' || chequetype == 'CR' || chequetype == 'B'" class="col-form-span-label" align="center">REPRINTED BY</th>
-                                             <th *ngIf=" chequetype == 'C' || chequetype == 'CR' || chequetype == 'B'" class="col-form-span-label" align="center">REPRINTED ON</th>
+                                             @if ( chequetype == 'C' || chequetype == 'CR' || chequetype == 'B') {
+<th class="col-form-span-label" align="center">REASON</th>
+}
+                                             @if ( chequetype == 'C' || chequetype == 'CR' || chequetype == 'B') {
+<th class="col-form-span-label" align="center">REPRINTED CHEQUE</th>
+}
+                                             @if ( chequetype == 'C' || chequetype == 'CR' || chequetype == 'B') {
+<th class="col-form-span-label" align="center">REPRINTED BY</th>
+}
+                                             @if ( chequetype == 'C' || chequetype == 'CR' || chequetype == 'B') {
+<th class="col-form-span-label" align="center">REPRINTED ON</th>
+}
                                              <th class="col-form-span-label" align="center">STATUS</th>
                                         </tr>
                                     </thead>
-                                    <tbody *ngIf="Searchdata_list.length > 0">
-                                        <tr *ngFor="let data of Searchdata_list">
+                                    @if (Searchdata_list.length > 0) {
+<tbody>
+                                        @for (data of Searchdata_list; track data) {
+<tr>
                                              <td><span
                                                 class="col-form-span-label" >{{data.CHEQUENO}}</span>
                                             </td> 
@@ -189,30 +202,41 @@
                                                              <td><span
                                                class="col-form-span-label">{{data.PRINTEDON}}</span>
                                                  </td>
-                                         <td *ngIf=" chequetype == 'C' || chequetype == 'CR' || chequetype == 'B'"><span
+                                         @if ( chequetype == 'C' || chequetype == 'CR' || chequetype == 'B') {
+<td><span
                                                 class="col-form-span-label">{{data.REASON}}</span>
                                         </td>
-                                        <td *ngIf=" chequetype == 'C' || chequetype == 'CR' || chequetype == 'B'"><span
+}
+                                        @if ( chequetype == 'C' || chequetype == 'CR' || chequetype == 'B') {
+<td><span
                                                  class="col-form-span-label">{{data.REPRINTEDCHEQUE}}</span>
                                            </td>
-                                           <td *ngIf=" chequetype == 'C' || chequetype == 'CR'|| chequetype == 'B'"><span
+}
+                                           @if ( chequetype == 'C' || chequetype == 'CR'|| chequetype == 'B') {
+<td><span
                                             class="col-form-span-label">{{data.REPRINTEDBY}}</span>
                                         </td>
-                                        <td *ngIf=" chequetype == 'C' || chequetype == 'CR' || chequetype == 'B'"><span
+}
+                                        @if ( chequetype == 'C' || chequetype == 'CR' || chequetype == 'B') {
+<td><span
                                             class="col-form-span-label">{{data.REPRINTEDON}}</span>
                                         </td>
+}
                                         <td ><span
                                             class="col-form-span-label">{{data.STATUS}}</span>
                                     </td>
                                         </tr>
+}
                                         <tr>
                                             <td colspan="19">
                                                 <span class="col-form-span-label"><b>{{Searchdata_list.length}}  Records found</b></span>
                                             </td>
 
                                         </tr>
-                                </table>
+                                </tbody>
+}</table>
                             </div>
                         </div>
+}
             </div>
         </div>
