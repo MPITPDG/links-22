@@ -26,10 +26,14 @@ function toMyDateModel(date: Date, format: string): IMyDateModel {
     // (readonly fields -- editableDateField:false -- show nothing at all when
     // empty). Restore the original mydatepicker affordance: the date format as
     // placeholder text plus a calendar button that opens the picker.
+    // The wrapper/input/button also carry the original mydatepicker class names
+    // (mydp, selectiongroup, selection, btnpicker) so the per-screen stylesheets
+    // written against the old markup keep applying to the shim.
     template: `
-        <span class="mydp-shim">
+        <div class="mydp">
+        <span class="mydp-shim selectiongroup">
             <input type="text"
-                   class="form-control mydp-shim-input"
+                   class="form-control mydp-shim-input selection"
                    autocomplete="off"
                    [name]="name"
                    [placeholder]="placeholder"
@@ -43,28 +47,46 @@ function toMyDateModel(date: Date, format: string): IMyDateModel {
                    [isDisabled]="isDisabled"
                    (bsValueChange)="onDateSelected($event)"
                    (blur)="onTouched()" />
-            <button type="button" class="mydp-shim-btn" tabindex="-1"
+            <button type="button" class="mydp-shim-btn btnpicker" tabindex="-1"
                     [disabled]="isDisabled" (click)="dp.toggle()">
                 <i class="fa fa-calendar"></i>
             </button>
         </span>
+        </div>
     `,
     styles: [`
-        .mydp-shim { display: inline-flex; align-items: stretch; vertical-align: middle; }
-        .mydp-shim-input {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-        }
-        .mydp-shim-btn {
+        :host { display: inline-block; }
+        .mydp { display: inline-block; }
+        /* The wrapper draws the border, like the original .selectiongroup, so
+           screen stylesheets that strip the inner input's border still get a
+           framed control. */
+        .mydp-shim {
+            display: inline-flex;
+            align-items: stretch;
+            vertical-align: middle;
             border: 1px solid #ced4da;
-            border-left: 0;
-            border-top-right-radius: 4px;
-            border-bottom-right-radius: 4px;
+            border-radius: 4px;
+            background: #fff;
+            overflow: hidden;
+        }
+        .mydp-shim-input {
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+        .mydp-shim-input:focus { box-shadow: none; }
+        .mydp-shim-btn {
+            border: 0;
+            border-left: 1px solid #ced4da;
+            border-radius: 0;
             background: #f0f0f0;
             cursor: pointer;
             padding: 0 8px;
             display: inline-flex;
             align-items: center;
+            flex: 0 0 auto;
         }
         .mydp-shim-btn[disabled] { cursor: not-allowed; opacity: .5; }
     `],
