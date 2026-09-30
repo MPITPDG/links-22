@@ -116,28 +116,31 @@
 
       </div>
 
-      <!-- BOOK BAL -->
+      <!-- COMPANY BOOK -->
 
       <div class="br-summary-card">
 
         <div class="br-summary-label">
-          <!-- Company Book Balance -->
-           Balance as per Bank
+          Balance As Per Company Book
         </div>
 
         <div class="br-summary-val">
 
-          @if (BalanceDr) {
+          @if (BookBalDr) {
 <span class="dr">
-            <!-- {{ BalanceDr }} -->
-              {{closingdrref}}
+            {{ BookBalDr }}
           </span>
 }
 
-          @if (BalanceCr) {
+          @if (BookBalCr) {
 <span class="cr">
-            <!-- {{ BalanceCr }} -->
-              {{closingcrref}}
+            {{ BookBalCr }}
+          </span>
+}
+
+          @if (!BookBalDr && !BookBalCr) {
+<span class="neutral">
+            —
           </span>
 }
 
@@ -203,27 +206,26 @@
       <div class="br-summary-card br-summary-card--highlight">
 
         <div class="br-summary-label">
-          <!-- Target Bank Balance -->
-           Balance As Per Company Book 
+          Balance As Per Bank
         </div>
 
         <div class="br-summary-val">
 
-          @if (DrRef) {
+          @if (BankBalDr) {
 <span class="dr">
-            {{ DrRef }}
+            {{ BankBalDr }}
           </span>
 }
 
-          @if (CrRef) {
+          @if (BankBalCr) {
 <span class="cr">
-            {{ CrRef }}
+            {{ BankBalCr }}
           </span>
 }
 
-          @if (!DrRef && !CrRef) {
+          @if (!BankBalDr && !BankBalCr) {
 <span class="neutral">
-            Pending
+            —
           </span>
 }
 
@@ -235,7 +237,7 @@
 
     <!-- VIEW TOGGLE -->
 
-    <div class="br-view-toggle">
+    <div class="br-view-toggle" #toggleRow>
 
       <div class="br-view-toggle-tabs">
 
@@ -261,20 +263,17 @@
 
       </div>
 
-      <!-- Totals for the active tab, anchored at a fixed offset from the LEFT
-           edge of this row (735px = Entry No+Date+Type+Party+ChqType+Cheque No+
-           Cheque Dt column widths) — the same left edge the table below starts
-           from. Anchoring from the left avoids any scrollbar/right-edge
-           dependency entirely, since a vertical scrollbar only ever eats into
-           the right side of .br-table-wrap, never the left. -->
+      <!-- Totals for the active tab. Each box is positioned over its own
+           column (left/width measured from the Debit/Credit header cells in
+           alignTotals()), so they stay aligned at any page width. -->
       <div class="br-view-toggle-totals">
 
-        <div class="br-col-total">
+        <div class="br-col-total" [style.left.px]="drTotalLeft" [style.width.px]="drTotalWidth">
           <div class="br-col-total-label">Debit</div>
           <div class="br-col-total-val dr">{{ activeDrTotal | number:'1.2-2' }}</div>
         </div>
 
-        <div class="br-col-total">
+        <div class="br-col-total" [style.left.px]="crTotalLeft" [style.width.px]="crTotalWidth">
           <div class="br-col-total-label">Credit</div>
           <div class="br-col-total-val cr">{{ activeCrTotal | number:'1.2-2' }}</div>
         </div>
@@ -329,7 +328,7 @@
 
       <!-- TABLE -->
 
-      <div class="br-table-wrap">
+      <div class="br-table-wrap" (scroll)="alignTotals()">
 
         <table class="br-table">
 
@@ -365,11 +364,11 @@
                 Chq Dt
               </th>
 
-              <th class="num">
+              <th class="num" #drTh>
                 Debit
               </th>
 
-              <th class="num">
+              <th class="num" #crTh>
                 Credit
               </th>
 
@@ -553,7 +552,7 @@
   </button>
 
   <!-- ✅ Diff pill — also left side -->
-  <!-- <div class="br-diff-pill" [ngClass]="isDifferenceZero ? 'ok' : 'warn'">
+  <!-- <div class="br-diff-pill">
     Difference : {{ differenceLabel }}
   </div> -->
 

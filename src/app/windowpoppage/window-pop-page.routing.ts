@@ -9,6 +9,7 @@ import { ContainerjobviewComponent } from './importfra/container-jobview.compone
 import {CalCbmViewComponent } from './export/calculatecbm-view.component';
 import { InvoicePrintComponent } from './Account/invoice-print.component';
 import { InvoiceViewComponent } from './Account/invoice-view.component';
+import { InvoiceViewPageComponent } from '../accounts/transaction/invoice/invoice-view-page.component';
 import { CreditnoteViewComponent } from './Account/creditnote-view.component';
 import { CreditnotePrintComponent } from './Account/creditnote-print.component';
 import { PurchasePrintComponent } from './Account/purchase-print.component';
@@ -26,6 +27,7 @@ import {srpiViewComponent} from './Account/srpi-view.component';
 import {ConsigneeViewComponent} from './Account/consign-view.component';
 import {QuotationPrintComponent } from './Account/Admin-Quotation-Print.component';
 import { ProformaInvoicePrintComponent } from './Account/proformainvoice-print.component';
+import { ProformaPrintComponent } from './Account/proforma-print.component';
 import {QuoteSeaPrintComponent} from './Quotation/quote-sea-print.component';
 import {SalesQuotationPrintComponent} from './Quotation/quotation-print.component';
 import {QuoteAirPrintComponent} from './Quotation/quote-air-print.component';
@@ -52,6 +54,8 @@ const routes: Routes = [
       { path: 'consignment-calcbm-view/:exptno', component: CalCbmViewComponent, data: { title: 'Calculate CBM View' } },
       { path: 'Account-Invoice-print/:InvNo', component: InvoicePrintComponent, data: { title: 'Invoice Print' } },
       { path: 'Account-Invoice-View/:InvNo', component: InvoiceViewComponent, data: { title: 'Invoice View' } },
+      // Same invoice, new audit layout. Both are routable so the two can be compared directly.
+      { path: 'Account-Invoice-View-New/:invno', component: InvoiceViewPageComponent, data: { title: 'Invoice View (new)', popup: true } },
       { path: 'Account-CreditNote-View/:CrtNo', component: CreditnoteViewComponent, data: { title: 'CreditNote View' } },
       { path: 'Account-CreditNote-print/:CrtNo', component: CreditnotePrintComponent, data: { title: 'CreditNote Print' } },
       { path: 'Account-Purchase-print/:SuppNo/:Status', component: PurchasePrintComponent, data: { title: 'Purchase Print' } },
@@ -69,6 +73,7 @@ const routes: Routes = [
       { path: 'Export-Consignment-view/:expt_no', component: ConsigneeViewComponent, data: { title: 'Consignment View' } },
       { path: 'Admin-Quotation-Print/:QuotNo', component: QuotationPrintComponent, data: { title: 'Quotation Print' } },
       { path: 'Account-ProformaInvoice-Print/:InvNo', component: ProformaInvoicePrintComponent, data: { title: 'Proforma Invoice Print' } },
+      { path: 'Account-Proforma-Print/:ProfNo', component: ProformaPrintComponent, data: { title: 'Proforma Invoice Print' } },
         { path: 'Sea-Quotationprint/:quotno', component: QuoteSeaPrintComponent, data: { title: 'Sea Quotation Print' } },
       { path: 'Wisor-Quotationprint/:quotno', component: SalesQuotationPrintComponent, data: { title: 'Wisor Quotation Print' } },
       { path: 'Air-Quotationprint/:quotno', component: QuoteAirPrintComponent, data: { title: 'Air Quotation Print' } },

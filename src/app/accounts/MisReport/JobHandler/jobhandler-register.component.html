@@ -1,0 +1,141 @@
+<div class="animated fadeIn">
+    <div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header formheading">
+                    <strong>{{Header}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row no-gutters">
+        <div class="col-sm-12 col-md-2 col-lg-2"></div>
+        <div class="col-sm-12 col-md-8 col-lg-8">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <tr class="trbg">
+                    <td class="width120"><span class="col-form-span-label"><b>From</b></span>
+                        <span class="col-form-span-error">*</span></td>
+                    <td style="text-align: left;">
+                        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate"></my-date-picker>
+                    </td>
+                    <td class="width120"><span class="col-form-span-label"><b>To</b></span>
+                        <span class="col-form-span-error">*</span></td>
+                    <td style="text-align: left;">
+                        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate"></my-date-picker>
+                    </td>
+                </tr>
+                <tr class="trbg">
+                    <td><span class="col-form-span-label"><b>Sales Person</b></span></td>
+                    <td>
+                        <ng-select [items]="SalesPersonList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                            placeholder="-- All Sales Persons --" [(ngModel)]="SalesPerson" class="form-control">
+                        </ng-select>
+                    </td>
+                    <td><span class="col-form-span-label"><b>Job Type</b></span></td>
+                    <td>
+                        <select class="form-control" [(ngModel)]="JobType">
+                            @for (t of JobTypeList; track t) {
+<option [value]="t.VALUEFIELD">{{t.TEXTFIELD}}</option>
+}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="centerlabel">
+                        <button class="btn btn-sm btn-primary" type="button" (click)="Search()">
+                            <span class="col-form-span-label"><i class="fa fa-search"></i> Search</span></button>&nbsp;
+                        <button class="btn btn-sm btn-success" type="button" (click)="ExportExcel()" [disabled]="registerdata.length==0">
+                            <span class="col-form-span-label"><i class="fa fa-file-excel-o"></i> Excel</span></button>&nbsp;
+                        <button class="btn btn-sm btn-danger" type="button" (click)="Reset()">
+                            <span class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-2 col-lg-2"></div>
+    </div>
+
+    <!-- per-handler summary -->
+    @if (summary.length > 0) {
+<div class="row no-gutters">
+        <div class="col-sm-12 col-md-3 col-lg-3"></div>
+        <div class="col-sm-12 col-md-6 col-lg-6">
+            <table class="table table-bordered table-sm-new bgwhite">
+                <thead>
+                    <tr class="title-head formheading table-primary">
+                        <th class="col-form-span-label">Handler (Sales Person)</th>
+                        <th class="col-form-span-label jh-right">Export</th>
+                        <th class="col-form-span-label jh-right">Import</th>
+                        <th class="col-form-span-label jh-right">Misc</th>
+                        <th class="col-form-span-label jh-right">Total Jobs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (s of summary; track s) {
+<tr>
+                        <td class="col-form-span-label">{{s.Handler}}</td>
+                        <td class="col-form-span-label jh-right">{{s.EXPORT}}</td>
+                        <td class="col-form-span-label jh-right">{{s.IMPORT}}</td>
+                        <td class="col-form-span-label jh-right">{{s.MISC}}</td>
+                        <td class="col-form-span-label jh-right"><b>{{s.Total}}</b></td>
+                    </tr>
+}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3"></div>
+    </div>
+}
+
+    <!-- job list -->
+    @if (registerdata.length > 0) {
+<div class="row no-gutters">
+        <div class="col-sm-12">
+            <div class="jh-scroll">
+                <table class="table table-bordered table-sm-new bgwhite jh-table">
+                    <thead>
+                        <tr class="title-head formheading table-primary">
+                            <th class="col-form-span-label">#</th>
+                            <th class="col-form-span-label">Job Type</th>
+                            <th class="col-form-span-label">Job No</th>
+                            <th class="col-form-span-label">Job Date</th>
+                            <th class="col-form-span-label">Mode</th>
+                            <th class="col-form-span-label">Client</th>
+                            <th class="col-form-span-label">Handler</th>
+                            <th class="col-form-span-label">Controller</th>
+                            <th class="col-form-span-label">POL</th>
+                            <th class="col-form-span-label">POD</th>
+                            <th class="col-form-span-label">Agent</th>
+                            <th class="col-form-span-label">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (r of registerdata; track r; let i = $index) {
+<tr>
+                            <td class="col-form-span-label">{{i + 1}}</td>
+                            <td class="col-form-span-label">{{r['Job Type']}}</td>
+                            <td class="col-form-span-label" [ngClass]="{'anchor-link': r['Job Type']=='EXPORT'}" (click)="ViewJob(r)">{{r['Job No']}}</td>
+                            <td class="col-form-span-label">{{r['Job Date']}}</td>
+                            <td class="col-form-span-label">{{r['Mode']}}</td>
+                            <td class="col-form-span-label">{{r['Client']}}</td>
+                            <td class="col-form-span-label">{{r['Handler']}}</td>
+                            <td class="col-form-span-label">{{r['Controller']}}</td>
+                            <td class="col-form-span-label">{{r['POL']}}</td>
+                            <td class="col-form-span-label">{{r['POD']}}</td>
+                            <td class="col-form-span-label">{{r['Agent']}}</td>
+                            <td class="col-form-span-label" style="color: red;">{{r['Status']}}</td>
+                        </tr>
+}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+    @if (searched && registerdata.length == 0) {
+<div class="row no-gutters">
+        <div class="col-sm-12 centerlabel"><span class="col-form-span-label">No jobs found for the selected filters.</span></div>
+    </div>
+}
+</div>

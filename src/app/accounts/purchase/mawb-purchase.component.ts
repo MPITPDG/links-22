@@ -62,6 +62,7 @@ import { HttpClient } from '@angular/common/http';
         z-index: 2;
     }
     `],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
   export class MAWBPurchaseComponent implements OnInit {

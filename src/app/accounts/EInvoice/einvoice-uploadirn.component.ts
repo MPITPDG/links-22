@@ -18,6 +18,8 @@ import { LoaderService } from '../../shared/service/loader.service';
     //form: FormGroup;
     Header:string="E-INVOICE UPLOAD JSON RESPONSE";
     rdbtype:string="INV";
+    // radio (change) handler named in the template; rdbtype already carries the choice via ngModel
+    lblchange(event: any) { }
     filesToUpload: Array<File>;
     selectedFileNames: string[] = [];
     FileName:string;
@@ -50,9 +52,6 @@ import { LoaderService } from '../../shared/service/loader.service';
           this.uploadurl=this._config.ServerWithApiUrl;
           this.url=this.uploadurl + "Accounts/UploadIRNFile";
         }
-    lblchange(event: any) {
-        // rdbtype is kept in sync via [(ngModel)]; hook for Invoice / Credit Note toggle side effects
-    }
         onFileChange(event) {
           this.selectedFile= event.target.files[0];
           this.selfilename= this.selectedFile.name;

@@ -1012,12 +1012,12 @@ export class ExptMTOprintview implements OnChanges {
     standalone: false
 })
 export class ExptPrintview implements OnInit {
+    expressbill: boolean = false;   // header checkbox, bound in the template; checkValue passes it on
     Type: any = "";
     buttonStatus = false;
     ISPRINT :string="";
     WaterMarkoption:boolean=false;
     watermarkval:string="0";
-    expressbill: boolean = false;
     @ViewChild(ExptFCRPrintview, {static: false}) public viewFCR: ExptFCRPrintview;
     @ViewChild(ExptMTOprintview, {static: false}) public viewMTO: ExptMTOprintview;
 

@@ -74,6 +74,9 @@ a:hover,a:focus{
     standalone: false
 })
 export class CreditNoteComponent implements OnInit {
+    /*  Called by the template but never implemented on this page (pre-existing). Declared so the
+        production (AOT) build compiles; clicking it does nothing, as before, and logs a warning.  */
+    Calcamount(..._args: any[]): any { console.warn('CreditNoteComponent: Calcamount is not implemented on this page'); }
     Header: string = "Credit Note ";
     TotalAmount = 0;
     checkno
@@ -414,17 +417,6 @@ export class CreditNoteComponent implements OnInit {
         else{
            return final1;
         }
-    }
-    Calcamount() {
-        var data = this.qty * this.rateperqty
-        this.Curamount = data;
-        var exchage = 1;
-        if (this.currencytype == "CR115") {
-            exchage = data * 1
-        } else { exchage = data * this.excrate }
-        var final = exchage.toFixed(3)
-        this.INV_Amt_INR = final;
-        this.taxamount_G_Inr = final;
     }
     get taxamount_G() {
         var data = this.qty * this.rateperqty

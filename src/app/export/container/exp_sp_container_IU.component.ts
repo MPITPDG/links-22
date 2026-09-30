@@ -17,6 +17,7 @@ import { TabsetComponent  } from 'ngx-bootstrap/tabs';
     standalone: false
 })
 export class ExptSpContainerIU implements OnInit {
+    public clp: any;   // read by the template; declared for the production (AOT) build
   //  this._loginService.getLogin
     @ViewChild('containerTabs', {static: true}) containerTabs: TabsetComponent;
 

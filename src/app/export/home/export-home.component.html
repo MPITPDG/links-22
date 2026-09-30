@@ -1,0 +1,718 @@
+<!--  Export module home. Renders only with the View right (or as SA); without it this stays
+      empty and /export is the blank landing page with a working menu.
+      Order = the questions people ask: anything wrong? what's coming? where is the work?
+      where is my job? the bigger picture.                                                   -->
+@if (canView) {
+<div class="animated fadeIn x-page eh-page" [class.eh-dark]="dark">
+
+    <!-- ================= TOOLBAR ================= -->
+    <div class="x-toolbar">
+        <div class="x-mark"><i class="fa fa-ship" aria-hidden="true"></i></div>
+        <div class="x-titlewrap">
+            <span class="x-eyebrow">Export</span>
+            <h1 class="x-title">{{ greeting() }}@if (userName()) {
+, {{ userName() }}
+}</h1>
+        </div>
+        @if (login) {
+<span class="x-pill x-pill-brand"><i class="fa fa-map-marker" aria-hidden="true"></i> {{ login.CITYNAME }}</span>
+}
+
+        <div class="eh-tools">
+            @if (windowFrom && !busy) {
+<span class="eh-updated"
+                  title="Jobs are picked by the date the export job was created in the system (EXPT_MASTER.SYSEXPT_DOCRECD). Stages, documents and ETDs are as they stand right now.">
+                <i class="fa fa-calendar-o" aria-hidden="true"></i>
+                Jobs created {{ windowFrom | date:'dd MMM yyyy' }} &ndash; today &middot; status as of {{ updatedAt | date:'dd MMM, HH:mm' }}
+            </span>
+}
+            <div class="x-seg" role="group" aria-label="Jobs opened in the last">
+                <label class="x-seg-btn" [class.active]="days === 30" (click)="setDays(30)" title="Jobs opened in the last 30 days">30 days</label>
+                <label class="x-seg-btn" [class.active]="days === 90" (click)="setDays(90)" title="Jobs opened in the last 90 days">90 days</label>
+                <label class="x-seg-btn" [class.active]="days === 365" (click)="setDays(365)" title="Jobs opened in the last year">1 year</label>
+            </div>
+            <button type="button" class="x-btn x-btn-classic" (click)="load()" [disabled]="busy">
+                <i class="fa fa-refresh" [class.fa-spin]="busy" aria-hidden="true"></i> {{ busy ? 'Working' : 'Refresh' }}
+            </button>
+            <button type="button" class="x-btn x-btn-classic x-iconbtn eh-topbtn" (click)="helpOpen = true" title="How to read this page">
+                <i class="fa fa-question-circle-o" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="x-btn x-btn-classic x-iconbtn eh-topbtn" (click)="toggleDark()" [title]="dark ? 'Light mode' : 'Dark mode'">
+                <i class="fa" [ngClass]="dark ? 'fa-sun-o' : 'fa-moon-o'" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= LOADING (in page, menu stays clickable) ================= -->
+    @if (busy) {
+<div class="eh-busy" role="status" aria-live="polite">
+        <span class="eh-busy-spin" aria-hidden="true"></span>
+        <span class="eh-busy-text">
+            <span class="eh-busy-title">{{ loaded ? 'Refreshing the export board...' : 'Loading the export board...' }}</span>
+            <span class="eh-busy-hint">This usually takes a few seconds. The menu stays available &mdash; you can move to another screen.</span>
+        </span>
+    </div>
+}
+    @if (busy && !loaded) {
+<div class="eh-skeleton">
+        @for (s of [1,2,3,4]; track s) {
+<div class="eh-sk-card"></div>
+}
+    </div>
+}
+
+    @if (loaded && failed && !busy) {
+<div class="eh-alert">
+        <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        The export board could not be loaded. The menu still works; try Refresh in a moment.
+        @if (failReason) {
+<div class="eh-alert-detail">{{ failReason }}</div>
+}
+    </div>
+}
+
+    @if (loaded && !failed) {
+
+
+        <!-- ================= 1. STATUS STRIP: the four things people check first ================= -->
+        <div class="eh-status">
+            <div class="eh-stat" [class.eh-stat-ok]="attentionCount === 0" [class.eh-stat-warn]="attentionCount > 0">
+                <span class="eh-stat-ico"><i class="fa" [ngClass]="attentionCount ? 'fa-bell' : 'fa-check'" aria-hidden="true"></i></span>
+                <span class="eh-stat-body">
+                    <span class="eh-stat-k">Needs attention</span>
+                    <span class="eh-stat-v">{{ attentionCount ? attentionCount : 'All clear' }}</span>
+                    @if (attentionCount) {
+<span class="eh-stat-s">
+                        @if (late.length) {
+{{ late.length }} sailed this week
+}@if (late.length && dueSoon.length) {
+ &middot; 
+}@if (dueSoon.length) {
+{{ dueSoon.length }} sail within {{ RISK_DAYS }} days
+}, no document yet
+                    </span>
+}
+                    @if (!attentionCount) {
+<span class="eh-stat-s">no job sails before its document is ready</span>
+}
+                </span>
+            </div>
+            <div class="eh-stat">
+                <span class="eh-stat-ico"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+                <span class="eh-stat-body">
+                    <span class="eh-stat-k">Sailing this week</span>
+                    <span class="eh-stat-v">{{ vesselsThisWeek }} <small>vessel{{ vesselsThisWeek === 1 ? '' : 's' }}</small></span>
+                    <span class="eh-stat-s">{{ jobsThisWeek }} of our jobs on board in the next 7 days</span>
+                </span>
+            </div>
+            <div class="eh-stat">
+                <span class="eh-stat-ico"><i class="fa fa-file-text-o" aria-hidden="true"></i></span>
+                <span class="eh-stat-body">
+                    <span class="eh-stat-k">Documented</span>
+                    <span class="eh-stat-v">{{ pct(documented, total) }}<small>%</small></span>
+                    <span class="eh-progress"><span [style.width.%]="pct(documented, total)"></span></span>
+                    <span class="eh-stat-s">{{ documented | number }} of {{ total | number }} jobs have their BL / AWB</span>
+                </span>
+            </div>
+            <div class="eh-stat">
+                <span class="eh-stat-ico"><i class="fa fa-cubes" aria-hidden="true"></i></span>
+                <span class="eh-stat-body">
+                    <span class="eh-stat-k">Jobs opened &middot; {{ days === 365 ? '1 year' : days + ' days' }}</span>
+                    <span class="eh-stat-v">{{ total | number }}</span>
+                    <span class="eh-stat-s">
+                        <span class="eh-dot eh-fill-sea"></span>Sea {{ sea | number }}
+                        <span class="eh-dot eh-fill-air eh-ml"></span>Air {{ air | number }}
+                        &middot; {{ inProgress | number }} in progress
+                    </span>
+                </span>
+            </div>
+        </div>
+
+        <!-- ================= 2. ATTENTION + WEEK AHEAD ================= -->
+        <div class="eh-row eh-row-2">
+            <!-- needs attention -->
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="eh-sec-ico" [class.eh-sec-warn]="attentionCount > 0" [class.eh-sec-ok]="attentionCount === 0">
+                        <i class="fa" [ngClass]="attentionCount ? 'fa-exclamation-triangle' : 'fa-check'" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">Needs attention</h2>
+                    @if (attentionCount) {
+<span class="x-count">{{ attentionCount }}</span>
+}
+                    <span class="eh-head-sub">vessel sails before the document is ready</span>
+                </div>
+
+                @if (!attentionCount) {
+<div class="eh-calm">
+                    <i class="fa fa-smile-o" aria-hidden="true"></i>
+                    <div>
+                        <b>Nothing to chase right now.</b>
+                        <span>No job in the list has its vessel sailing within {{ RISK_DAYS }} days without a BL / AWB.</span>
+                    </div>
+                </div>
+}
+
+                @for (r of riskShown; track trackByRisk($index, r)) {
+<div class="eh-risk" [class.eh-risk-late]="r.days < 0">
+                    <span class="eh-risk-when">
+                        <b>{{ r.etd | date:'dd' }}</b><span>{{ r.etd | date:'MMM' | uppercase }}</span>
+                    </span>
+                    <span class="eh-risk-m">
+                        <span class="eh-risk-t">
+                            <a class="eh-jobno" [routerLink]="['/export/Consignment/view', r.job.EXPTNO]">{{ r.job.EXPTNO }}</a>
+                            <span class="eh-badge" [class.eh-badge-air]="r.job.MODE === 'air'">{{ modeLabel(r.job) }}</span>
+                        </span>
+                        <span class="eh-risk-s eh-ellip">{{ r.job.CONSIGNEE }}@if (r.job.AGENT) {
+ &middot; agent {{ r.job.AGENT }}
+}@if (r.job.VSL_NAME) {
+ &middot; {{ vesselVoyage(r.job) }}
+}</span>
+                    </span>
+                    <span class="eh-risk-r">
+                        <span class="eh-risk-flag">{{ riskText(r.days) }}</span>
+                        <span class="eh-risk-stage">at: {{ stageName(r.job.STAGE_CODE) }}</span>
+                    </span>
+                </div>
+}
+
+                @if (attentionCount > 6) {
+<div class="eh-card-f">
+                    <button type="button" class="eh-link" (click)="showAllRisk = !showAllRisk">
+                        {{ showAllRisk ? 'Show fewer' : 'Show all ' + attentionCount }}</button>
+                </div>
+}
+
+                <!-- older paperwork: quiet, folded away -->
+                @if (stale.length) {
+<div class="eh-tidy">
+                    <button type="button" class="eh-tidy-h" (click)="showStale = !showStale" [attr.aria-expanded]="showStale">
+                        <i class="fa fa-folder-o" aria-hidden="true"></i>
+                        <span><b>{{ stale.length }} older job{{ stale.length === 1 ? '' : 's' }} to tidy up</b>
+                            &middot; vessel sailed over {{ LATE_DAYS }} days ago, BL / AWB not yet entered</span>
+                        <i class="fa eh-ml-auto" [ngClass]="showStale ? 'fa-angle-up' : 'fa-angle-down'" aria-hidden="true"></i>
+                    </button>
+                    @if (showStale) {
+<div class="eh-tidy-list">
+                        @for (r of stale; track trackByRisk($index, r)) {
+<div class="eh-tidy-row">
+                            <a class="eh-jobno" [routerLink]="['/export/Consignment/view', r.job.EXPTNO]">{{ r.job.EXPTNO }}</a>
+                            <span class="eh-ellip">{{ r.job.CONSIGNEE }}</span>
+                            <span class="eh-tidy-s">{{ r.job.VSL_NAME }} &middot; ETD {{ r.job.ETD }} &middot; {{ stageName(r.job.STAGE_CODE) }}</span>
+                        </div>
+}
+                    </div>
+}
+                </div>
+}
+
+                <div class="eh-card-f">
+                    <a class="eh-link eh-ml-auto" routerLink="/export/Consignment/search">Open consignments &rsaquo;</a>
+                </div>
+            </div>
+
+            <!-- the week ahead -->
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="eh-sec-ico"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">The week ahead</h2>
+                    <span class="eh-head-sub">vessels sailing and our jobs on them</span>
+                </div>
+
+                @if (!week.length) {
+<div class="eh-calm">
+                    <i class="fa fa-coffee" aria-hidden="true"></i>
+                    <div><b>A quiet week.</b><span>No vessel from this branch sails in the next 7 days.</span></div>
+                </div>
+}
+
+                @for (g of week; track g) {
+<div class="eh-day">
+                    <div class="eh-day-h">
+                        <span class="eh-day-date"><b>{{ g.date | date:'dd' }}</b><span>{{ g.date | date:'MMM' | uppercase }}</span></span>
+                        <span class="eh-day-name">{{ dayLabel(g.days) }} <span class="eh-day-dow">{{ g.date | date:'EEEE' }}</span></span>
+                        @if (g.jobs.length) {
+<span class="eh-day-sum">
+                            {{ readyCount(g) }} of {{ g.jobs.length }} job{{ g.jobs.length === 1 ? '' : 's' }} ready
+                            <span class="eh-progress eh-progress-sm"><span [style.width.%]="readyCount(g) * 100 / g.jobs.length"></span></span>
+                        </span>
+}
+                    </div>
+                    @for (v of g.vessels; track v) {
+<div class="eh-day-v">
+                        <i class="fa fa-ship" aria-hidden="true"></i>
+                        <span class="eh-ellip eh-vname" [title]="v.VSLDET">{{ vesselName(v) }}@if (vesselVoy(v)) {
+<span class="eh-voy"> &middot; {{ vesselVoy(v) }}</span>
+}</span>
+                        <span class="eh-day-port">{{ v.PORT }}</span>
+                        @if (jobsOnVessel(g, v)) {
+<span class="eh-chip">{{ jobsOnVessel(g, v) }} job{{ jobsOnVessel(g, v) === 1 ? '' : 's' }}</span>
+}
+                    </div>
+}
+                    @if (g.jobs.length) {
+<div class="eh-day-jobs">
+                        @for (j of g.jobs; track j) {
+<a class="eh-jobchip" [class.eh-jobchip-ready]="j.STAGE_CODE >= 6"
+                           [routerLink]="['/export/Consignment/view', j.EXPTNO]"
+                           [title]="j.EXPTNO + ' · ' + j.CONSIGNEE + ' · ' + stageName(j.STAGE_CODE)">
+                            <i class="fa" [ngClass]="j.STAGE_CODE >= 6 ? 'fa-check' : 'fa-clock-o'" aria-hidden="true"></i>
+                            {{ j.EXPTNO | slice:-5 }} <span class="eh-ellip">{{ j.CONSIGNEE }}</span>
+                        </a>
+}
+                    </div>
+}
+                </div>
+}
+            </div>
+        </div>
+
+        <!-- ================= 3. PIPELINE ================= -->
+        <div class="x-card eh-block">
+            <div class="x-card-head">
+                <span class="eh-sec-ico"><i class="fa fa-road" aria-hidden="true"></i></span>
+                <h2 class="x-card-title">Where the jobs are</h2>
+                <span class="eh-head-sub">each job counted once, at the furthest step it has reached &middot; click a step to list its jobs &middot; prealert is sent for MP Cargo jobs only</span>
+                <span class="eh-legend">
+                    <span><i class="eh-sw eh-fill-sea"></i>Sea</span>
+                    <span><i class="eh-sw eh-fill-air"></i>Air</span>
+                </span>
+            </div>
+            <div class="eh-pipe">
+                @for (p of pipeline; track p; let last = $last) {
+<button type="button" class="eh-step"
+                        [class.eh-step-on]="stageFilter === p.def.code" [class.eh-step-done]="p.def.code >= 6"
+                        (click)="pickStage(p.def.code, jobsCard)" [title]="p.def.long + ': ' + p.total + ' (Sea ' + p.sea + ', Air ' + p.air + ')'">
+                    <span class="eh-step-ico"><i class="fa" [ngClass]="p.def.icon" aria-hidden="true"></i></span>
+                    <span class="eh-step-v">{{ p.total | number }}</span>
+                    <span class="eh-step-k">{{ p.def.long }}</span>
+                    <span class="eh-step-bar">
+                        <span class="eh-fill-sea" [style.width.%]="p.sea * 100 / pipeMax"></span><span class="eh-fill-air" [style.width.%]="p.air * 100 / pipeMax"></span>
+                    </span>
+                    @if (!last) {
+<i class="fa fa-angle-right eh-step-arrow" aria-hidden="true"></i>
+}
+                </button>
+}
+            </div>
+            <div class="eh-foot eh-pad">The steps add up to {{ total | number }}.@if (cancelled) {
+ {{ cancelled | number }} cancelled job{{ cancelled === 1 ? '' : 's' }} not counted.
+}</div>
+        </div>
+
+        <!-- ================= 3b. VESSELS SAILING NEXT + SAILING RISK (as in the new ERP) ================= -->
+        <div class="eh-row eh-row-12">
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="eh-sec-ico"><i class="fa fa-ship" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">Vessels sailing next</h2>
+                    <span class="x-count">{{ vesselsWeek }}</span>
+                    <span class="eh-head-sub">this week &middot; from the export vessel list</span>
+                </div>
+                @if (!upcoming.length) {
+<div class="eh-calm">
+                    <i class="fa fa-coffee" aria-hidden="true"></i>
+                    <div><b>No sailings ahead.</b><span>No vessel from this branch has an ETD from today on.</span></div>
+                </div>
+}
+                @for (v of vesselsShown; track v) {
+<div class="eh-vsl">
+                    <span class="eh-risk-when eh-datebox"><b>{{ v.etd | date:'d' }}</b><span>{{ v.etd | date:'MMM' | uppercase }}</span></span>
+                    <span class="eh-vsl-m">
+                        <span class="eh-vsl-t eh-mono" [title]="v.row.VSLDET">{{ v.row.VSLDET }}</span>
+                        <span class="eh-vsl-s">{{ v.row.PORT }} &middot; ETD {{ v.etd | date:'dd/MM/yyyy' }}</span>
+                    </span>
+                    <span class="eh-chip" [class.eh-chip-soon]="v.days <= 1">{{ inDays(v.days) }}</span>
+                </div>
+}
+                @if (upcoming.length > 6) {
+<div class="eh-card-f">
+                    <span class="eh-head-sub">{{ vesselsShown.length }} of {{ upcoming.length }}</span>
+                    <button type="button" class="eh-link eh-ml-auto" (click)="showAllVessels = !showAllVessels">{{ showAllVessels ? 'Show fewer' : 'Show all' }}</button>
+                </div>
+}
+            </div>
+
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="eh-sec-ico eh-sec-warn"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">Sailing risk</h2>
+                    @if (riskAll.length) {
+<span class="x-count">{{ riskAll.length }}</span>
+}
+                    <span class="eh-head-sub">vessel sails before the job is ready &middot; soonest ETD first &middot;
+                        <a class="eh-link" routerLink="/export/Consignment/search">Consignments</a></span>
+                </div>
+                @if (riskAll.length && (hasAgents || hasExporters)) {
+<div class="eh-filters">
+                    @if (hasAgents) {
+<select class="eh-select" [(ngModel)]="riskAgent" aria-label="Agent">
+                        <option value="">Every agent</option>
+                        @for (a of riskAgents; track a) {
+<option [value]="a">{{ a }}</option>
+}
+                    </select>
+}
+                    @if (hasExporters) {
+<select class="eh-select" [(ngModel)]="riskExporter" aria-label="Exporter">
+                        <option value="">Every exporter</option>
+                        @for (e of riskExporters; track e) {
+<option [value]="e">{{ e }}</option>
+}
+                    </select>
+}
+                    <span class="eh-head-sub">{{ riskFiltered.length }} of {{ riskAll.length }}</span>
+                    @if (riskAgent || riskExporter) {
+<button type="button" class="eh-link" (click)="clearRiskFilters()">Clear</button>
+}
+                </div>
+}
+                @if (riskAll.length) {
+<div class="x-tablewrap">
+                    <table class="x-table">
+                        <thead><tr><th>EXPORT NO.</th><th>MODE</th><th>STAGE</th>@if (hasExporters) {
+<th>EXPORTER</th>
+}<th>CONSIGNEE</th>@if (hasAgents) {
+<th>AGENT</th>
+}<th>VESSEL / VOYAGE</th><th>ETD</th><th class="eh-r">DAYS</th></tr></thead>
+                        <tbody>
+                            @if (!riskFiltered.length) {
+<tr><td colspan="9" class="x-empty">No job matches these filters.</td></tr>
+}
+                            @for (r of riskFiltered; track trackByRisk($index, r)) {
+<tr>
+                                <td><a class="eh-jobno" [routerLink]="['/export/Consignment/view', r.job.EXPTNO]">{{ r.job.EXPTNO }}</a></td>
+                                <td><span class="eh-badge" [class.eh-badge-air]="r.job.MODE === 'air'">{{ modeLabel(r.job) }}</span></td>
+                                <td>{{ stageName(r.job.STAGE_CODE) }}</td>
+                                @if (hasExporters) {
+<td>{{ r.job.EXPORTER || '—' }}</td>
+}
+                                <td>{{ r.job.CONSIGNEE }}</td>
+                                @if (hasAgents) {
+<td [class.eh-mp]="isMpCargo(r.job.AGENT)">{{ r.job.AGENT || '—' }}</td>
+}
+                                <td>{{ vesselVoyage(r.job) }}</td>
+                                <td class="eh-nowrap">{{ r.job.ETD }}</td>
+                                <td class="eh-r eh-nowrap eh-mono" [class.eh-days-late]="r.days < 0">{{ riskDays(r.days) }}</td>
+                            </tr>
+}
+                        </tbody>
+                    </table>
+                </div>
+}
+                @if (!riskAll.length) {
+<div class="eh-calm">
+                    <i class="fa fa-smile-o" aria-hidden="true"></i>
+                    <div><b>No sailing risk.</b><span>Every job whose vessel sails within {{ RISK_DAYS }} days, or has sailed, has its document.</span></div>
+                </div>
+}
+            </div>
+        </div>
+
+        <!-- ================= 3b2. PREALERT (MP CARGO ONLY) + AGENT-WISE SHIPMENTS ================= -->
+        @if (hasAgents) {
+<div class="eh-row eh-row-2">
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="eh-sec-ico" [class.eh-sec-warn]="mpDocIssued > 0"><i class="fa fa-paper-plane" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">Prealert &middot; MP Cargo</h2>
+                    @if (mpDocIssued) {
+<span class="x-count">{{ mpDocIssued }}</span>
+}
+                    <span class="eh-head-sub">prealert is sent for agent MP Cargo only &middot; document issued, prealert not sent yet</span>
+                </div>
+                <div class="eh-pre-figs">
+                    <div><b [class.eh-days-late]="mpDocIssued">{{ mpDocIssued | number }}</b><span>to send</span></div>
+                    <div><b>{{ mpPrealertSent | number }}</b><span>sent</span></div>
+                    <div><b>{{ mpTotal | number }}</b><span>MP Cargo jobs in the window</span></div>
+                </div>
+                @if (!mpDocIssued) {
+<div class="eh-calm">
+                    <i class="fa fa-smile-o" aria-hidden="true"></i>
+                    <div><b>No prealert waiting.</b><span>Every MP Cargo job with its document issued has had its prealert.</span></div>
+                </div>
+}
+                @for (j of prealertShown; track trackByExptno($index, j)) {
+<div class="eh-risk">
+                    <span class="eh-risk-m">
+                        <span class="eh-risk-t">
+                            <a class="eh-jobno" [routerLink]="['/export/Consignment/view', j.EXPTNO]">{{ j.EXPTNO }}</a>
+                            <span class="eh-badge" [class.eh-badge-air]="j.MODE === 'air'">{{ modeLabel(j) }}</span>
+                        </span>
+                        <span class="eh-risk-s eh-ellip">{{ j.CONSIGNEE }}@if (j.VSL_NAME) {
+ &middot; {{ vesselVoyage(j) }}
+}</span>
+                    </span>
+                    <span class="eh-risk-r">
+                        <span class="eh-risk-stage eh-mono">{{ documentNo(j) }}</span>
+                        <span class="eh-risk-stage">ETD {{ j.ETD || '—' }}</span>
+                    </span>
+                </div>
+}
+                @if (mpDocIssued) {
+<div class="eh-card-f">
+                    @if (prealertDue.length > 6) {
+<button type="button" class="eh-link" (click)="showAllPrealert = !showAllPrealert">{{ showAllPrealert ? 'Show fewer' : 'Show all ' + prealertDue.length }}</button>
+}
+                    @if (prealertDue.length < mpDocIssued) {
+<span class="eh-head-sub">{{ prealertDue.length }} of {{ mpDocIssued }} listed (the newest jobs)</span>
+}
+                    <a class="eh-link eh-ml-auto" routerLink="/export/print-documents/prealert/sendprealert">Send prealert &rsaquo;</a>
+                </div>
+}
+            </div>
+
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="eh-sec-ico"><i class="fa fa-handshake-o" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">Shipments by agent</h2>
+                    <span class="x-count">{{ agentTotals.length }}</span>
+                    <span class="eh-head-sub">every job in the window &middot; click an agent to list its jobs</span>
+                </div>
+                <div class="x-card-body">
+                    @for (a of agentTotals.slice(0, 8); track a) {
+<button type="button" class="eh-agent" [class.eh-agent-on]="agentFilter === a.name"
+                            (click)="pickAgent(a.name, jobsCard)" [title]="a.name + ': ' + a.n + ' jobs (sea ' + a.sea + ', air ' + a.air + ')'">
+                        <span class="eh-hbar-l"><span class="eh-ellip" [class.eh-mp]="isMpCargo(a.name)">{{ a.name }}</span><b>{{ a.n }}</b></span>
+                        <span class="eh-step-bar"><span class="eh-fill-sea" [style.width.%]="a.sea * 100 / agentMax"></span><span class="eh-fill-air" [style.width.%]="a.air * 100 / agentMax"></span></span>
+                    </button>
+}
+                    @if (!agentTotals.length) {
+<div class="x-empty">No jobs in this window.</div>
+}
+                    @if (agentTotals.length > 8) {
+<div class="eh-foot">{{ agentTotals.length - 8 }} more agents in the job list filter below.</div>
+}
+                </div>
+            </div>
+        </div>
+}
+
+        <!-- ================= 3c. DEPARTING NEXT (as in the new ERP) ================= -->
+        <div class="x-card eh-block">
+            <div class="x-card-head">
+                <span class="eh-sec-ico"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></span>
+                <h2 class="x-card-title">Departing next</h2>
+                <span class="eh-head-sub">export jobs by ETD</span>
+            </div>
+            @if (departing.length) {
+<div class="eh-dep">
+                @for (d of departing; track d) {
+<div class="eh-dep-i">
+                    <span class="eh-risk-when eh-datebox"><b>{{ d.etd | date:'d' }}</b><span>{{ d.etd | date:'MMM' | uppercase }}</span></span>
+                    <span class="eh-vsl-m">
+                        <a class="eh-jobno" [routerLink]="['/export/Consignment/view', d.job.EXPTNO]">{{ d.job.EXPTNO }}</a>
+                        <span class="eh-vsl-s">{{ modeLabel(d.job) }} &middot; {{ d.job.CONSIGNEE }}@if (d.job.AGENT) {
+ &middot; {{ d.job.AGENT }}
+} &middot; {{ stageName(d.job.STAGE_CODE) }}</span>
+                    </span>
+                </div>
+}
+            </div>
+}
+            @if (!departing.length) {
+<div class="eh-calm">
+                <i class="fa fa-coffee" aria-hidden="true"></i>
+                <div><b>Nothing departing.</b><span>No job in the window has an ETD from today on.</span></div>
+            </div>
+}
+        </div>
+
+        <!-- ================= 4. FIND A JOB ================= -->
+        <div class="x-card eh-block" #jobsCard>
+            <div class="x-card-head">
+                <span class="eh-sec-ico"><i class="fa fa-search" aria-hidden="true"></i></span>
+                <h2 class="x-card-title">Recent jobs</h2>
+                <span class="x-count">{{ filtered.length | number }}</span>
+                <span class="eh-head-sub">newest opened first</span>
+            </div>
+            <div class="eh-filters">
+                <span class="eh-searchbox">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                    <input type="text" [(ngModel)]="search" (ngModelChange)="onFilter()" placeholder="Export no., exporter, consignee, agent, vessel or BL / AWB" aria-label="Search jobs">
+                </span>
+                <div class="x-seg" role="group" aria-label="Mode">
+                    <label class="x-seg-btn" [class.active]="modeFilter === 'all'" (click)="setMode('all')">All</label>
+                    <label class="x-seg-btn" [class.active]="modeFilter === 'sea'" (click)="setMode('sea')">Sea</label>
+                    <label class="x-seg-btn" [class.active]="modeFilter === 'air'" (click)="setMode('air')">Air</label>
+                </div>
+                <select class="eh-select" [(ngModel)]="stageFilter" (ngModelChange)="onFilter()" aria-label="Stage">
+                    <option [ngValue]="-1">Every stage</option>
+                    @for (s of stages; track s) {
+<option [ngValue]="s.code">{{ s.long }}</option>
+}
+                </select>
+                @if (hasAgents) {
+<select class="eh-select" [(ngModel)]="agentFilter" (ngModelChange)="onFilter()" aria-label="Agent">
+                    <option value="">Every agent</option>
+                    @for (a of agentOptions; track a) {
+<option [value]="a">{{ a }}</option>
+}
+                </select>
+}
+                @if (hasExporters) {
+<select class="eh-select" [(ngModel)]="exporterFilter" (ngModelChange)="onFilter()" aria-label="Exporter">
+                    <option value="">Every exporter</option>
+                    @for (e of exporterOptions; track e) {
+<option [value]="e">{{ e }}</option>
+}
+                </select>
+}
+                @if (hasFilters) {
+<button type="button" class="eh-link" (click)="clearFilters()">Clear</button>
+}
+            </div>
+            <div class="x-tablewrap">
+                <table class="x-table">
+                    <thead>
+                        <tr><th>Export no.</th>@if (hasExporters) {
+<th>Exporter</th>
+}<th>Consignee</th>@if (hasAgents) {
+<th>Agent</th>
+}<th>Progress</th><th>Vessel / voyage</th><th>ETD</th><th>BL / AWB</th><th class="eh-r">Opened</th></tr>
+                    </thead>
+                    <tbody>
+                        @for (j of pageRows; track trackByExptno($index, j)) {
+<tr>
+                            <td class="eh-nowrap">
+                                <a class="eh-jobno" [routerLink]="['/export/Consignment/view', j.EXPTNO]">{{ j.EXPTNO }}</a>
+                                <span class="eh-badge eh-ml" [class.eh-badge-air]="j.MODE === 'air'">{{ modeLabel(j) }}</span>
+                            </td>
+                            @if (hasExporters) {
+<td>{{ j.EXPORTER || '—' }}</td>
+}
+                            <td>{{ j.CONSIGNEE }}</td>
+                            @if (hasAgents) {
+<td [class.eh-mp]="isMpCargo(j.AGENT)">{{ j.AGENT || '—' }}</td>
+}
+                            <td class="eh-prog-cell">
+                                <span class="eh-prog-k">{{ stageName(j.STAGE_CODE) }}</span>
+                                <span class="eh-progress eh-progress-sm" [class.eh-progress-done]="j.STAGE_CODE >= 6"><span [style.width.%]="stageProgress(j.STAGE_CODE)"></span></span>
+                            </td>
+                            <td>{{ vesselVoyage(j) }}</td>
+                            <td class="eh-nowrap">{{ j.ETD }}</td>
+                            <td class="eh-mono">{{ documentNo(j) || '—' }}</td>
+                            <td class="eh-r eh-nowrap">{{ openedOn(j) | date:'dd MMM' }} <span class="eh-age">{{ ageDays(j) }}d</span></td>
+                        </tr>
+}
+                        @if (!filtered.length) {
+<tr><td [attr.colspan]="7 + (hasAgents ? 1 : 0) + (hasExporters ? 1 : 0)" class="x-empty">
+                            {{ hasFilters ? 'No job matches these filters.' : 'No export job opened in this window.' }}
+                            @if (hasFilters) {
+<button type="button" class="eh-link" (click)="clearFilters()">Clear filters</button>
+}
+                        </td></tr>
+}
+                    </tbody>
+                </table>
+            </div>
+            @if (filtered.length) {
+<div class="eh-card-f">
+                <span class="eh-head-sub">Showing <b>{{ pageFrom }}&ndash;{{ pageTo }}</b> of <b>{{ filtered.length | number }}</b></span>
+                @if (pageCount > 1) {
+<div class="eh-pager">
+                    <button type="button" (click)="goPage(page - 1)" [disabled]="page === 1" aria-label="Previous page">&lsaquo;</button>
+                    @for (p of pageLinks; track p) {
+
+                        @if (p === null) {
+<span class="eh-gap">&hellip;</span>
+}
+                        @if (p !== null) {
+<button type="button" [class.active]="p === page" (click)="goPage(p)">{{ p }}</button>
+}
+                    
+}
+                    <button type="button" (click)="goPage(page + 1)" [disabled]="page === pageCount" aria-label="Next page">&rsaquo;</button>
+                </div>
+}
+            </div>
+}
+        </div>
+
+        <!-- ================= 5. THE BIGGER PICTURE ================= -->
+        <div class="eh-row eh-row-3">
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="eh-sec-ico"><i class="fa fa-pie-chart" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">Sea and air</h2>
+                </div>
+                <div class="eh-ringwrap">
+                    <svg class="eh-ring" viewBox="0 0 140 140" role="img" [attr.aria-label]="pct(sea, total) + '% sea'">
+                        <circle class="eh-ring-air" cx="70" cy="70" r="52"></circle>
+                        <circle class="eh-ring-sea" cx="70" cy="70" r="52" [attr.stroke-dasharray]="seaDash" transform="rotate(-90 70 70)"></circle>
+                        <text x="70" y="68" text-anchor="middle" class="eh-ring-v">{{ pct(sea, total) }}%</text>
+                        <text x="70" y="86" text-anchor="middle" class="eh-ring-n">sea</text>
+                    </svg>
+                    <div class="eh-ring-legend">
+                        <div><span class="eh-sw eh-fill-sea"></span><span>Sea</span><b>{{ sea | number }}</b></div>
+                        <div><span class="eh-sw eh-fill-air"></span><span>Air</span><b>{{ air | number }}</b></div>
+                        <div class="eh-ring-total"><span></span><span>Total</span><b>{{ total | number }}</b></div>
+                    </div>
+                </div>
+            </div>
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="eh-sec-ico"><i class="fa fa-users" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">Busiest consignees</h2>
+                </div>
+                <div class="x-card-body">
+                    @for (c of topConsignees; track c) {
+<div class="eh-hbar">
+                        <div class="eh-hbar-l"><span class="eh-ellip" [title]="c.name">{{ c.name }}</span><b>{{ c.n }}</b></div>
+                        <div class="eh-bar"><div class="eh-bar-fill" [style.width.%]="c.n * 100 / barMax(topConsignees)"></div></div>
+                    </div>
+}
+                    @if (!topConsignees.length) {
+<div class="x-empty">No jobs in this window.</div>
+}
+                </div>
+            </div>
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="eh-sec-ico"><i class="fa fa-anchor" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">Busiest vessels &amp; flights</h2>
+                </div>
+                <div class="x-card-body">
+                    @for (v of topVessels; track v) {
+<div class="eh-hbar">
+                        <div class="eh-hbar-l"><span class="eh-ellip" [title]="v.name">{{ v.name }}</span><b>{{ v.n }}</b></div>
+                        <div class="eh-bar"><div class="eh-bar-fill" [style.width.%]="v.n * 100 / barMax(topVessels)"></div></div>
+                    </div>
+}
+                    @if (!topVessels.length) {
+<div class="x-empty">No vessel or flight on the jobs in this window.</div>
+}
+                </div>
+            </div>
+        </div>
+
+        <div class="eh-note">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            The headline numbers and the steps count every job. The lists count the newest 50 jobs at each step
+            ({{ sampleSize | number }} jobs), so on a busy branch they show the recent work, not all {{ total | number }}.
+            <button type="button" class="eh-link" (click)="helpOpen = true">How this page works</button>
+        </div>
+    
+}
+
+    <!-- ================= HELP ================= -->
+    @if (helpOpen) {
+<div class="eh-modal-back" (click)="helpOpen = false">
+        <div class="x-card eh-help" (click)="$event.stopPropagation()" role="dialog" aria-label="How this page works">
+            <div class="x-card-head">
+                <span class="eh-sec-ico"><i class="fa fa-question" aria-hidden="true"></i></span>
+                <h2 class="x-card-title">How this page works</h2>
+                <button type="button" class="x-btn x-btn-classic x-iconbtn eh-ml-auto" (click)="helpOpen = false" aria-label="Close"><i class="fa fa-times" aria-hidden="true"></i></button>
+            </div>
+            <div class="eh-help-grid">
+                <div><b>Which jobs (the date used)</b>Export jobs of your branch whose job was created in the system (the entry date stamped when the export job is opened) within the chosen window &mdash; last 30 days, 90 days or 1 year, up to today. One per export number; cancelled jobs are left out. Everything else &mdash; stage, BL / AWB, ETD &mdash; is shown as it stands right now.</div>
+                <div><b>Needs attention</b>A job with no BL / AWB yet whose vessel sails within {{ RISK_DAYS }} days, or sailed in the last {{ LATE_DAYS }} days (in red). Jobs whose vessel sailed longer ago are folded into "older jobs to tidy up" &mdash; usually the BL just was not entered.</div>
+                <div><b>The week ahead</b>Vessels from the export vessel list sailing in the next 7 days, with our jobs by ETD. A tick means the job already has its document.</div>
+                <div><b>Where the jobs are</b>Each job sits at the furthest step it has reached: opened, shipping bill, cargo received, carted, containerised (sea), out of charge, document issued, prealert sent.</div>
+                <div><b>Documented</b>Jobs with an FCR / HBL, master BL, MAWB or HAWB number recorded.</div>
+                <div><b>Lists and top 5</b>Built from the newest 50 jobs at each step, so they show recent work. The headline numbers always count every job.</div>
+            </div>
+        </div>
+    </div>
+}
+</div>
+}

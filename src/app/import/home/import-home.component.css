@@ -1,0 +1,47 @@
+/*  Same design as the Finance (Accounts) home: its own stylesheet, plus a few Import additions. */
+@import '../../accounts/home/accounts-home.component.css';
+
+.ih-code { font-family: var(--ex-mono); font-weight: 700; color: #2A78D6; }
+.ah-dark .ih-code { color: #6FA6EE; }
+.ih-close { margin-left: auto; }
+.ah-pipe-item.ih-on { border-color: #2A78D6; box-shadow: 0 0 0 2px rgba(42, 120, 214, .18); }
+
+/* arrivals ahead: soonest in blue, later bands paler */
+.ih-ahead-1 .ah-age-fill { background: #2A78D6; }
+.ih-ahead-2 .ah-age-fill { background: #6FA6EE; }
+.ih-ahead-3 .ah-age-fill { background: #A9C8EE; }
+.ih-ahead-4 .ah-age-fill { background: #B4B2A9; }
+.ih-ahead-1, .ih-ahead-2, .ih-ahead-3, .ih-ahead-4 { background: #fff; border-color: var(--ah-border); }
+.ah-dark .ih-ahead-1, .ah-dark .ih-ahead-2, .ah-dark .ih-ahead-3, .ah-dark .ih-ahead-4 { background: #171717; }
+
+.ih-filters { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 14px; border-bottom: 1px solid var(--ah-border); }
+.ih-search { flex: 1 1 240px; max-width: 360px; height: 32px; font-size: 13px; }
+.ih-pager { display: flex; align-items: center; gap: 4px; justify-content: flex-end; flex-wrap: wrap; padding: 8px 14px; border-top: 1px solid var(--ah-border); }
+.ih-pager .ah-pct { margin-right: auto; }
+.ih-pager .x-btn { min-width: 32px; padding: 4px 8px; }
+.ih-page-on { background: #2A78D6 !important; border-color: #2A78D6 !important; color: #fff !important; }
+
+/* period buttons in the toolbar; period comparison table */
+.ih-periods { margin-right: 4px; }
+.ih-compare th, .ih-compare td { white-space: nowrap; }
+.ih-compare-row { cursor: pointer; }
+.ih-compare-row:hover td { background: #F7F9FC; }
+.ih-compare-on td { background: #EFF5FD; }
+.ih-compare-on td:first-child { box-shadow: inset 3px 0 0 #2A78D6; }
+.ah-dark .ih-compare-row:hover td { background: #1F2227; }
+.ah-dark .ih-compare-on td { background: #18222F; }
+.ih-mini { grid-template-columns: minmax(0, 1fr); margin: 1px 0; }
+.ih-compare .ah-barcol { width: 14%; min-width: 90px; }
+/* keep the period buttons on one line at every width (a narrow-screen rule elsewhere stacks .x-seg) */
+.ah-page .x-seg { grid-auto-flow: column; }
+.ih-periods { max-width: 100%; overflow-x: auto; }
+
+/* nothing on the page is cut off: long card titles wrap to a second line, and the period
+   text in the toolbar wraps under the buttons instead of running off the right edge */
+.ah-page .ah-kpi-top { align-items: flex-start; }
+.ah-page .ah-kpi-label { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.3; }
+.ah-page .ah-tools { flex-wrap: wrap; row-gap: 8px; min-width: 0; }
+.ah-page .ah-period { white-space: normal; flex-wrap: wrap; row-gap: 4px; min-width: 0; }
+.ah-page .ah-period-v { white-space: nowrap; }
+.ah-page .x-toolbar { flex-wrap: wrap; }
+.ah-page .ah-tools { flex: 1 1 420px; justify-content: flex-end; }

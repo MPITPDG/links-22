@@ -7,6 +7,8 @@ import { MyDatePickerModule } from 'mydatepicker';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { SharedModule } from '../shared/shared.module';
 import { ExportComponent } from './export.component';
+import { ExportHomeComponent } from './home/export-home.component';
+import { ExportHomeService } from './home/export-home.service';
 import {
     VesselSharedDataSerice,
     FcrSharedDataService,
@@ -37,7 +39,8 @@ import { AccordionModule } from 'ngx-bootstrap/accordion';
         AccordionModule,],
     declarations: [
         ExportComponent,
-       
+        ExportHomeComponent,
+
         DeleteModalComponent,
         CommonModalComponent,
         OkModalComponent,
@@ -53,7 +56,8 @@ import { AccordionModule } from 'ngx-bootstrap/accordion';
         ContainerIUSharedDataService,
         cartingVslAgnt,
         mblsharedservice,
-        prealertshareservice 
+        prealertshareservice,
+        ExportHomeService
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA,NO_ERRORS_SCHEMA],
     

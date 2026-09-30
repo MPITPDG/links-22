@@ -4,6 +4,7 @@ import { InvoiceComponent } from './general-invoice.component';
 //import { GeneralComponent } from './general/general.component';
 import { GeneralInvoiceSearchComponent } from './general-invoice-search.component';
 import { ProformaInvoicePrintList } from './proforma-invoice-list.component';
+import { InvoiceViewPageComponent } from './invoice-view-page.component';
 const routes: Routes = [
     {
         path: '',
@@ -12,6 +13,7 @@ const routes: Routes = [
         },
         children: [
             { path: 'general/:invoiceno', component: InvoiceComponent, data: { title: 'Home' } },
+            { path: 'view/:invno', component: InvoiceViewPageComponent, data: { title: 'View' } },
             { path: 'invoicesearch', component: GeneralInvoiceSearchComponent, data: { title: 'Search' },pathMatch: 'full' },
             { path: 'proformainvoice', component: ProformaInvoicePrintList, data: { title: 'Search' },pathMatch: 'full' },
            // { path: 'general', component: GeneralComponent, data: { title: 'General' } },

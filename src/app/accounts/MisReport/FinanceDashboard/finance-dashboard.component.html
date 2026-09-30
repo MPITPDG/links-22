@@ -140,7 +140,8 @@
             <div class="fd-grid fd-grid--main">
                 <!-- ---- KPI cards ---- -->
                 <div class="fd-grid fd-grid--3" style="margin-bottom:0;">
-                    <div class="fd-card fd-kpi">
+                    <div class="fd-card fd-kpi fd-kpi--click" (click)="OpenExplain('EXPOSURE')"
+                         title="Click anywhere on this card to see how it is worked out, and the rows behind it">
                         <div class="fd-kpi-top">
                             <div class="fd-kpi-label">Total Exposure <i class="fd-info"
                                  title="Net outstanding plus cost booked on jobs not yet invoiced, as on the To Date">i</i></div>
@@ -154,7 +155,8 @@
                         </div>
                     </div>
 
-                    <div class="fd-card fd-kpi">
+                    <div class="fd-card fd-kpi fd-kpi--click" (click)="OpenExplain('OUTSTANDING')"
+                         title="Click anywhere on this card to see how it is worked out, and the rows behind it">
                         <div class="fd-kpi-top">
                             <div class="fd-kpi-label">Outstanding <i class="fd-info"
                                  title="Bills pending less credits never applied to a bill">i</i></div>
@@ -163,13 +165,28 @@
                         <div class="fd-kpi-value">{{ fmtShort(Kpi.TOTAL_OUTSTANDING) }}<span class="fd-kpi-unit">net</span></div>
                         <div class="fd-kpi-tip">What customers still owe us today, after deducting payments received but not yet matched to a bill.</div>
                         <div class="fd-kpi-sub">
-                            <div class="fd-kpi-row"><span>Bills pending</span><b>{{ fmtShort(Kpi.GROSS_PENDING) }}</b></div>
-                            <div class="fd-kpi-row"><span>Unapplied credit</span><b>{{ fmtShort(Kpi.UNADJUSTED_CREDITS) }}</b></div>
+                            @if (HasPeriodSplit()) {
+
+                                <div class="fd-kpi-row" title="Bills dated inside the From / To dates you selected that are not yet paid"><span>Raised in selected dates</span><b>{{ fmtShort(PendingPeriod()) }}</b></div>
+                                <div class="fd-kpi-row" title="Bills raised before the From date that are still unpaid - they stay in Outstanding until they are paid or written off"><span>Raised before {{ FromLabel() }}</span><b>{{ fmtShort(PendingOlder()) }}</b></div>
+                                @if (num(Kpi.OPENING_PENDING) > 0.5) {
+<div class="fd-kpi-row fd-kpi-row--sub"
+                                     title="Balance brought forward from before the ERP went live, less the receipts entered against it (AO - against opening). The Billwise Receivable statement shows it as its OP. BALANCE line.">
+                                    <span>of which opening balance b/f {{ Kpi.OPENING_ASOF }}</span><b>{{ fmtShort(Kpi.OPENING_PENDING) }}</b>
+                                </div>
+}
+                            
+}
+                            <div class="fd-kpi-row fd-kpi-row--sum" title="This is the line to compare with a ledger or Billwise Outstanding statement. The headline above is lower because it also deducts credit held on account."><span>Bills pending</span><b>{{ fmtShort(Kpi.GROSS_PENDING) }}</b></div>
+                            <div class="fd-kpi-foot">Compare <b>Bills pending</b> with a ledger closing &mdash; and remember the ledger shows this financial year only.</div>
+                            <div class="fd-kpi-row" title="Receipts on account that did knock off open bills of the same client"><span>Credit applied</span><b>{{ fmtShort(CreditApplied()) }}</b></div>
+                            <div class="fd-kpi-row" title="Money held from clients who have no open bill left to set it against - it cannot reduce anybody else's dues"><span>Credit left over</span><b>{{ fmtShort(CreditStranded()) }}</b></div>
                             <div class="fd-kpi-row"><span>Overdue</span><b class="fd-neg">{{ fmtShort(Kpi.OVERDUE_AMT) }}</b></div>
                         </div>
                     </div>
 
-                    <div class="fd-card fd-kpi">
+                    <div class="fd-card fd-kpi fd-kpi--click" (click)="OpenExplain('RECOVERY')"
+                         title="Click anywhere on this card to see how it is worked out, and the rows behind it">
                         <div class="fd-kpi-top">
                             <div class="fd-kpi-label">Recovery <i class="fd-info"
                                  title="Value-weighted days from invoice to last receipt, against the agreed credit period">i</i></div>
@@ -201,7 +218,8 @@
                         </div>
                     </div>
 
-                    <div class="fd-card fd-kpi">
+                    <div class="fd-card fd-kpi fd-kpi--click" (click)="OpenExplain('BILLED')"
+                         title="Click anywhere on this card to see how it is worked out, and the rows behind it">
                         <div class="fd-kpi-top">
                             <div class="fd-kpi-label">Billed in Period <i class="fd-info"
                                  title="Invoice value raised between the From and To dates">i</i></div>
@@ -215,7 +233,8 @@
                         </div>
                     </div>
 
-                    <div class="fd-card fd-kpi">
+                    <div class="fd-card fd-kpi fd-kpi--click" (click)="OpenExplain('UNBILLED')"
+                         title="Click anywhere on this card to see how it is worked out, and the rows behind it">
                         <div class="fd-kpi-top">
                             <div class="fd-kpi-label">Unbilled <i class="fd-info"
                                  title="Cost already booked against jobs with no invoice. A cost figure, not revenue.">i</i></div>
@@ -229,7 +248,8 @@
                         </div>
                     </div>
 
-                    <div class="fd-card fd-kpi">
+                    <div class="fd-card fd-kpi fd-kpi--click" (click)="OpenExplain('MARGIN')"
+                         title="Click anywhere on this card to see how it is worked out, and the rows behind it">
                         <div class="fd-kpi-top">
                             <div class="fd-kpi-label">Margin <i class="fd-info"
                                  title="Job-wise income less expense. Duty billed to clients sits outside job income, so clearance work can read negative.">i</i></div>
@@ -596,11 +616,31 @@
                     negative &mdash; the duty columns show by how much. A job costed but not yet fully invoiced also reads negative.
                     <a href="javascript:void(0)" (click)="LegendOpen = true"><i class="fa fa-question-circle-o"></i> What do INFERRED / JOB and the service codes mean?</a>
                 </div>
+                <div class="fd-marginby">
+                    <span class="fd-marginby-lbl">Show by</span>
+                    <button type="button" class="fd-seg" [class.fd-seg--on]="MarginBy === 'BILLED'"
+                            (click)="SetMarginBy('BILLED')">Billed party</button>
+                    <button type="button" class="fd-seg" [class.fd-seg--on]="MarginBy === 'SHIPPER'"
+                            (click)="SetMarginBy('SHIPPER')">Shipper</button>
+                    @if (MarginBy === 'BILLED') {
+<span class="fd-marginby-note">
+                        Grouped by <b>who received the bill</b> &mdash; the same name you see in the ledger, Receivables and Outstanding.
+                        When one job is billed to several parties, each gets its own invoices as income and the cost of the charges it was billed for
+                        (ocean freight to whoever was billed ocean freight); cost with no matching charge is shared by income. Totals never change.
+                    </span>
+}
+                    @if (MarginBy === 'SHIPPER') {
+<span class="fd-marginby-note">
+                        Grouped by <b>whose cargo it was</b> (the party on the job file), with the company that paid the bill shown underneath.
+                        Totals are the same either way &mdash; only the name the money sits under changes.
+                    </span>
+}
+                </div>
                 <div class="fd-table-scroll fd-table-scroll--tall">
                     <table class="fd-table">
                         <thead>
                             <tr>
-                                <th class="fd-sortable" (click)="SortMargin('CLIENTNAME')">Client {{ sortArrow('CLIENTNAME') }}</th>
+                                <th class="fd-sortable" (click)="SortMargin('CLIENTNAME')">{{ MarginBy === 'SHIPPER' ? 'Shipper' : 'Client (billed)' }} {{ sortArrow('CLIENTNAME') }}</th>
                                 <th class="fd-sortable" (click)="SortMargin('SERVICE_TYPE')">Service Type {{ sortArrow('SERVICE_TYPE') }}</th>
                                 <th class="fd-sortable" (click)="SortMargin('LAST_BILLED_YMD')" title="Latest invoice date among this row's jobs">Last Billed {{ sortArrow('LAST_BILLED_YMD') }}</th>
                                 <th class="num fd-sortable" (click)="SortMargin('JOBS')">Jobs {{ sortArrow('JOBS') }}</th>
@@ -620,6 +660,13 @@
                                         <i class="fa" [ngClass]="MarginOpen[m.CLIENTCODE + '|' + m.SERVICE_TYPE] ? 'fa-caret-down' : 'fa-caret-right'"
                                            style="width:14px;color:var(--fd-muted-fg);"></i>
                                         {{ m.CLIENTNAME }}
+                                        @if (m.OTHER_CODE && m.OTHER_CODE !== m.CLIENTCODE) {
+<div class="fd-othername">
+                                            {{ OtherLabel() }}: {{ m.OTHER_NAME }}@if (num(m.OTHER_COUNT) > 1) {
+<span> +{{ num(m.OTHER_COUNT) - 1 }} more</span>
+}
+                                        </div>
+}
                                     </td>
                                     <td>
                                         <span class="fd-pill fd-pill--svc" [title]="m.SERVICE_TYPE">{{ svcLabel(m.SERVICE_TYPE) }}</span>
@@ -673,6 +720,14 @@
                                             @if (j.SERVICE_SRC === 'MASTER') {
 <span class="fd-pill fd-pill--green"
                                                   title="Service type as ticked on the import job (Ex-works / Custom Clearance / Freight Forwarding)">JOB</span>
+}
+                                            @if (num(j.SPLIT) > 1) {
+<span class="fd-pill fd-pill--split"
+                                                  title="This job was billed to {{ j.SPLIT }} parties. This row is this client's share: its own invoices, and the cost of the charges it was billed for. Whole job: income {{ j.JOB_INCOME | number:'1.0-0' }}, expense {{ j.JOB_EXPENSE | number:'1.0-0' }}.">SPLIT {{ j.SPLIT }} WAYS</span>
+}
+                                            @if (num(j.UNMATCHED) > 0.5) {
+<span class="fd-pill fd-pill--amber"
+                                                  title="{{ j.UNMATCHED | number:'1.0-0' }} of this cost had no matching charge billed on the job, so it is shared by each client's share of the job's income.">UNMATCHED {{ j.UNMATCHED | number:'1.0-0' }}</span>
 }
                                         </td>
                                         <td>
@@ -1007,7 +1062,10 @@
 
             <div class="fd-lg-h">Other terms</div>
             <table class="fd-lg-table">
-                <tr><td><b>Unapplied credit</b></td><td>Money received from a client that was never matched to a bill (GR / OA / AO receipts). Deducted per client to get the net outstanding.</td></tr>
+                <tr><td><b>Billed party</b></td><td>The company the invoice was raised on - who owes us the money. This is the name used in the ledger, Receivables and Outstanding, and it is how the Margin tab groups by default.</td></tr>
+                <tr><td><b>Shipper / job party</b></td><td>The company whose cargo moved, as recorded on the job file. On nomination and freight-collect exports the overseas agent is billed instead of the shipper, so the two names differ - about half of Mumbai export revenue. Use the Show by switch to see the same money under either name.</td></tr>
+                <tr><td><b>Credit applied</b></td><td>On-account money (GR / OA / AO receipts, never matched to a bill) that did cover that client's own open bills. Bills pending less credit applied is exactly the net outstanding.</td></tr>
+                <tr><td><b>Credit left over</b></td><td>On-account money held from clients who have no open bill left to set it against. It cannot reduce anybody else's dues, so it is shown separately instead of being subtracted from the headline.</td></tr>
                 <tr><td><b>Recovery gap</b></td><td>Actual days to get paid minus the agreed credit period. Positive = paying late.</td></tr>
                 <tr><td><b>Unbilled (cost)</b></td><td>Cost already spent on jobs with no invoice &mdash; a floor, not the bill value.</td></tr>
                 <tr><td><b>Data as of &middot; live / cached</b></td><td>Results are cached for 2 hours; <i class="fa fa-refresh"></i> Sync now pulls fresh figures for everyone.</td></tr>
@@ -1057,6 +1115,55 @@
                 </tr>
 }
             </table>
+
+            @if (Evidence(); as ev) {
+<div>
+                <div class="fd-ex-h">The data behind this figure</div>
+                <div class="fd-ex-note">{{ ev.note }}</div>
+                <div class="fd-ex-scroll">
+                    <table class="fd-table fd-ex-data">
+                        <thead>
+                            <tr>@for (c of ev.cols; track c) {
+<th [class.num]="c.num">{{ c.label }}</th>
+}</tr>
+                        </thead>
+                        <tbody>
+                            @for (r of ev.shown; track r) {
+<tr>
+                                @for (c of ev.cols; track c) {
+<td [class.num]="c.num">
+                                    {{ c.num ? (num(r[c.k]) | number:'1.0-0') : (r[c.k] || '-') }}
+                                </td>
+}
+                            </tr>
+}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td [attr.colspan]="ev.cols.length - 1">
+                                    {{ ev.count }} row{{ ev.count === 1 ? '' : 's' }} in total
+                                    @if (!EvidenceAll && ev.count > 10) {
+<span> &middot; showing the 10 biggest</span>
+}
+                                </td>
+                                <td class="num">{{ ev.total | number:'1.0-0' }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="fd-ex-actions">
+                    @if (ev.count > 10) {
+<button type="button" class="fd-seg" (click)="ToggleEvidenceAll()">
+                        {{ EvidenceAll ? 'Show only the 10 biggest' : 'Show all ' + ev.count + ' rows' }}
+                    </button>
+}
+                    <button type="button" class="fd-seg" (click)="ExportEvidence()">
+                        <i class="fa fa-download"></i> Export the full list
+                    </button>
+                    <span class="fd-ex-tally">These rows add up to the figure on the card.</span>
+                </div>
+            </div>
+}
 
             <div class="fd-ex-h">Where the numbers come from</div>
             <div class="fd-ex-src">{{ ex.source }}</div>
@@ -1119,7 +1226,8 @@
 
                 <!-- ---- KPI cards ---- -->
                 <div class="fd-grid fd-grid--3" style="margin-bottom:12px;">
-                    <div class="fd-card fd-kpi">
+                    <div class="fd-card fd-kpi fd-kpi--click" (click)="OpenExplain('PAY_TOTAL')"
+                         title="Click anywhere on this card to see how it is worked out, and the rows behind it">
                         <div class="fd-kpi-top">
                             <div class="fd-kpi-label">Total Payable <i class="fd-info"
                                  title="Bills not yet knocked off, less money paid to the supplier that names no bill. Per supplier, floored at zero.">i</i></div>
@@ -1134,7 +1242,8 @@
                         </div>
                     </div>
 
-                    <div class="fd-card fd-kpi">
+                    <div class="fd-card fd-kpi fd-kpi--click" (click)="OpenExplain('PAY_OVERDUE')"
+                         title="Click anywhere on this card to see how it is worked out, and the rows behind it">
                         <div class="fd-kpi-top">
                             <div class="fd-kpi-label">Overdue <i class="fd-info"
                                  title="Past the due date on the bill, or bill date + 30 days where no usable due date was keyed.">i</i></div>
@@ -1150,7 +1259,8 @@
                         </div>
                     </div>
 
-                    <div class="fd-card fd-kpi">
+                    <div class="fd-card fd-kpi fd-kpi--click" (click)="OpenExplain('PAY_DUE')"
+                         title="Click anywhere on this card to see how it is worked out, and the rows behind it">
                         <div class="fd-kpi-top">
                             <div class="fd-kpi-label">Falling due <i class="fd-info"
                                  title="Not yet overdue. Each figure is cumulative from today.">i</i></div>
@@ -1163,7 +1273,8 @@
                         </div>
                     </div>
 
-                    <div class="fd-card fd-kpi">
+                    <div class="fd-card fd-kpi fd-kpi--click" (click)="OpenExplain('PAY_DPO')"
+                         title="Click anywhere on this card to see how it is worked out, and the rows behind it">
                         <div class="fd-kpi-top">
                             <div class="fd-kpi-label">DPO <i class="fd-info"
                                  title="Days we actually take to pay, value-weighted, on bills raised in the period that were settled.">i</i></div>
@@ -1177,7 +1288,8 @@
                         </div>
                     </div>
 
-                    <div class="fd-card fd-kpi">
+                    <div class="fd-card fd-kpi fd-kpi--click" (click)="OpenExplain('PAY_PURCHASED')"
+                         title="Click anywhere on this card to see how it is worked out, and the rows behind it">
                         <div class="fd-kpi-top">
                             <div class="fd-kpi-label">Purchased in period <i class="fd-info"
                                  title="Net of the TDS and round-off the bill itself deducts.">i</i></div>
@@ -1191,7 +1303,8 @@
                         </div>
                     </div>
 
-                    <div class="fd-card fd-kpi">
+                    <div class="fd-card fd-kpi fd-kpi--click" (click)="OpenExplain('PAY_PAID')"
+                         title="Click anywhere on this card to see how it is worked out, and the rows behind it">
                         <div class="fd-kpi-top">
                             <div class="fd-kpi-label">Paid in period <i class="fd-info"
                                  title="Payments that named a bill. Job cost paid with no purchase bill behind it is shown separately.">i</i></div>

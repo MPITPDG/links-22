@@ -122,7 +122,7 @@ export class AgentJobprofitComponent implements OnInit {
                // console.log(this.ClientList);
             })
     }
-    updateDtlable(modetype?: any) {
+    updateDtlable(_arg?: any) {   // template passes the mode; the method reads it from the model
         if (this.modetype === 'SEA_exp' || this.modetype === 'AIR_exp') {
           this.dtlable = 'Doc Recd Dt';
         } else {

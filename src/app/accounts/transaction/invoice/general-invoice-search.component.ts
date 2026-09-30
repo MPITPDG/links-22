@@ -8,12 +8,14 @@ import { ToastCommonService } from '../../../shared/service/toastService';
 import { LoaderService } from '../../../shared/service/loader.service';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HostListener } from '@angular/core';
 import {environment}  from '../../../../environments/environment.prod'
 import { OrderPipe } from 'ngx-order-pipe';
 import { FilterPipe } from 'ngx-filter-pipe';
 @Component({
   selector: 'app-general-invoice-search',
   templateUrl: './general-invoice-search.component.html',
+  styleUrls: ['./general-invoice-search.component.css'],
   styles: [ `main{
     position: absolute;
     top: 110px;
@@ -28,11 +30,44 @@ import { FilterPipe } from 'ngx-filter-pipe';
     height: 100%;
     display: flex;
     flex-direction: column;
-  }`],
+  }
+    /* ---- invoice detail drawer ---- */
+    .iv-backdrop {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(15, 23, 35, .45);
+        z-index: 1040;
+    }
+    .iv-drawer {
+        position: fixed;
+        top: 0; right: 0; bottom: 0;
+        width: 74%;
+        min-width: 620px;
+        max-width: 1240px;
+        background: #F4F7FB;
+        box-shadow: -8px 0 28px rgba(15, 23, 35, .18);
+        z-index: 1041;
+        overflow-y: auto;
+    }
+    @media (max-width: 1100px) {
+        .iv-drawer { width: 94%; min-width: 0; }
+    }
+`],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class GeneralInvoiceSearchComponent implements OnInit {
+  /*  Client-side filter over the rows already fetched. Fine at this list
+      size; if the result sets grow this is what moves to the server.   */
+  term: string = '';
+
+  /*  ngx-pagination page number, named as everywhere else in this app. */
+  PageActual: number = 1;
+
+  /*  Select-all in the 'Print all of a day' grid. The template has always bound
+      to this; it was never declared, which AOT can reject.                   */
+  checkbox: boolean = false;
+
   order: string = 'CLIENTNAME';
   reverse: boolean = false;
   sortedCollection: any[];
@@ -185,10 +220,23 @@ export class GeneralInvoiceSearchComponent implements OnInit {
       alert("Enter 15 digit Invoice No !")
       return false
     }
-    let theTop = (screen.height / 2) - (483 / 2);
-    let theLeft = (screen.width / 2) - (780 / 2);
-    let toolbar = 'resizable=no,scrollbars=no,width=800,height=450,status=no,left=' + theLeft + ',top=' + theTop;
-    window.open('./#/popup/Account-Invoice-View/' + Invoiceno + '/' , "Invoice View", toolbar);
+    /*  A drawer over the results rather than a popup window: the list you came from stays
+        behind it, and the detached window is one click away inside the drawer. The popup
+        component is untouched and still serves Authorisation, UnAuthorisation, Credit Note
+        and E-Invoice.                                                                    */
+    this.DrawerInvNo = Invoiceno;
+}
+
+/*  Invoice detail drawer. */
+DrawerInvNo: string = '';
+
+CloseDrawer() {
+    this.DrawerInvNo = '';
+}
+
+@HostListener('document:keydown.escape')
+onEsc() {
+    if (this.DrawerInvNo) { this.CloseDrawer(); }
 }
 // InvoicePrint(Invoiceno) {
 //   if(Invoiceno ==''||Invoiceno==undefined || Invoiceno.length < 15){
@@ -288,11 +336,17 @@ ListOnclick(INVOICENO) {
       })
   }
 
+  backToSearch() {
+    this.Searchdata_list = [];
+    this.term = '';
+    this.PageActual = 1;
+  }
+
   getCheckboxValues(event, data) {
     var index = this.printarray.findIndex(x => x.invoiceno == data);
     if (event) {
       let obj = {
-        printno: data
+        invoiceno: data
       }
       this.printarray.push(obj);
       //console.log(  this.printarray)

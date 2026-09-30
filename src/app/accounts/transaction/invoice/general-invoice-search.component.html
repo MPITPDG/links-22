@@ -1,207 +1,345 @@
-<div class="animated fadeIn">
-    <div class="container">
-        @if (Searchdata_list.length==0) {
-<div class="row">
-            <div class="col-sm-3"></div>
-            <div class="col-sm-6">
-                <table class="table table-bordered table-sm-new bgwhite" style="font-family:  Verdana;font-size: 12px;">
-                    <tbody style='height:30px'>
-                        <tr>
-                            <td class="col-form-span-heading" colspan="5">
-                                INVOICE SEARCH
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="radio" name="exampleRadios" value='INVOICENO'  [(ngModel)]="exampleRadios1">&nbsp;  Invoice No
-                            </td>
-                            <td class="col-form-span-label width240" colspan="4">
-                                <div style="display:flex;">
-                                    <input type="text" class="form-control width180" [maxlength]="15" [OnlyNumber]="true" [(ngModel)]="invoiceno" [disabled]="exampleRadios1 != 'INVOICENO'">
-                                    <button class="btn btn-sm btn-success" type="submit"  (click)="InvoicePrint(invoiceno)"><span class="col-form-span-label"><i   class="fa fa-print"></i>Print</span></button>
-                                    <button class="btn btn-sm btn-danger" type="reset"> <span  class="col-form-span-label" (click)="InvoiceView(invoiceno);"><i  class="fa fa-search"></i>View</span></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                <table>
-                                    <tr>
-                                        <td class="col-form-span-label width100">
-                                            <input type="radio" name="exampleRadios" value='CLIENT'  [(ngModel)]="exampleRadios1"> Client Name
-                                        </td>
-                                        <td class="col-form-span-label width500" colspan="4">
-                                            <ng-select [items]="clientable"
-                                                      bindLabel="EXP_NAME_CITY"
-                                                      bindValue="EXP_CODE"
-                                                      [(ngModel)]="client" class="custom"
-                                                      placeholder="--Please Select Client --" 
-                                                     [disabled]="exampleRadios1 != 'CLIENT'">
-                                             </ng-select>
+<div class="animated fadeIn x-page">
 
-                                    
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td>
-                                            <span class="col-form-span-label width150"><b>Start Date</b> </span>
-                                            <span class="col-form-span-error">*</span>
-                                        </td>
-                                        <td>
-                                            <my-date-picker name="StartDate" [options]="myDatePickerOptions"  [(ngModel)]="client_startdate" [disabled]="exampleRadios1 != 'CLIENT'">
-                                            </my-date-picker>
-                                        </td>
-                                        <td>
-                                            <span class="col-form-span-label width150"><b>End Date</b> </span>
-                                            <span class="col-form-span-error">*</span>
-                                        </td>
-                                        <td>
-                                            <my-date-picker name="EndDate" [options]="myDatePickerOptions"  [(ngModel)]="client_enddate" [disabled]="exampleRadios1 != 'CLIENT'">
-                                            </my-date-picker>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="col-form-span-label width100">
-                                <input type="radio" name="exampleRadios" value='JOBNO' [(ngModel)]="exampleRadios1">&nbsp;   Job No
-                            </td>
-                            <td class="col-form-span-label width240" colspan="4">
-                                <input type="text" class="form-control width180" [(ngModel)]="jobno"  [maxlength]="15" [OnlyNumber]="true" [disabled]="exampleRadios1 != 'JOBNO'">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="col-form-span-label width100">
-                                <input type="radio" name="exampleRadios" value='AMOUNT'  [(ngModel)]="exampleRadios1">&nbsp;  Amount
-                            </td>
-                            <td class="col-form-span-label width240" colspan="4">
-                                <input type="text" class="form-control width180" [(ngModel)]="amount"  [disabled]="exampleRadios1 != 'AMOUNT'">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="col-form-span-label width100">
-                             <input type="radio" name="exampleRadios" id="exampleRadios2" value="DATE"  [(ngModel)]="exampleRadios1"> Date Wise
-                            </td>
-                            <td>
-                                <span class="col-form-span-label width150"><b>Start Date</b> </span>
-                                <span class="col-form-span-error">*</span>
-                            </td>
-                            <td>
-                                <my-date-picker name="StartDate" [options]="myDatePickerOptions"   [(ngModel)]="datewise_startdate" [disabled]="exampleRadios1 != 'DATE'">
-                                </my-date-picker>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label width150"><b>End Date</b> </span>
-                                <span class="col-form-span-error">*</span>
-                            </td>
-                            <td>
-                                <my-date-picker name="EndDate" [options]="myDatePickerOptions"   [(ngModel)]="datewise_enddate" [disabled]="exampleRadios1 != 'DATE'">
-                                </my-date-picker>
-                            </td>
+    <!-- ================= HEADER =================
+         Once there are results, the count, filter and Back to Search live up here beside the
+         title rather than in a second strip of their own.                                  -->
+    <div class="x-toolbar">
+        <div class="x-mark">
+            <i class="fa fa-search" aria-hidden="true"></i>
+        </div>
+        <div class="x-titlewrap">
+            <span class="x-eyebrow">Accounts</span>
+            <h1 class="x-title">Invoice Search</h1>
+        </div>
 
-                        </tr>
-                        <tr>
-                            <td class="col-form-span-label width100" colspan="2">
-                                <input type="radio" name="exampleRadios" value="6" [(ngModel)]="exampleRadios1"> Print  All Invoice of That Day
-                            </td>
-                            <td colspan="3">
-                                <my-date-picker name="StartDate" [options]="myDatePickerOptions"
-                                    [(ngModel)]="printall_date" [disabled]="exampleRadios1 != '6'">
-                                </my-date-picker>
-                            </td>
+        @if (Searchdata_list.length > 0) {
+<span class="x-count ps-toolcount">
+            {{ (Searchdata_list | filter: term).length }} of {{Searchdata_list.length}}
+        </span>
+}
 
-                        </tr>
-                        <tr>
-                            <td colspan="5" class="centerlabel">
-                                <button class="btn btn-sm btn-success" type="submit" (click)="searchlist()"><span
-                                        class="col-form-span-label"><i class="fa fa-search"></i> Search</span></button>
-                                <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
-                                        (click)="reset();"><i class="fa fa-ban"></i> Reset</span></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-sm-3"></div>
+        @if (Searchdata_list.length > 0) {
+<div class="ps-search">
+            <i class="fa fa-search" aria-hidden="true"></i>
+            <input type="text" class="form-control" [(ngModel)]="term"
+                   (ngModelChange)="PageActual = 1"
+                   placeholder="Filter these results…" />
+            @if (term) {
+<i class="fa fa-times ps-clear" (click)="term = ''" title="Clear"></i>
+}
         </div>
 }
-         @if (Searchdata_list.length >1) {
-<div >  
-            <!-- <button class="btn btn-sm btn-warning" style="float: right;" (click)="back();"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to search</u></span></button> -->
-            <button class="btn btn-sm btn-warning" style="float: right;" (click)="Searchdata_list=[]"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to search</u></span></button>
-       </div>
+
+        @if (Searchdata_list.length > 0) {
+<button type="button" class="x-btn x-btn-classic"
+                (click)="backToSearch()">
+            <i class="fa fa-arrow-left" aria-hidden="true"></i> Back to Search
+        </button>
 }
-      
-       
-                @if (Searchdata_list.length >1) {
-<main> 
-                <div id="content"> 
-                <div class="table-wrapper">
-                <table class="table table-bordered table-sm-new bgwhite"> 
-                    <thead class="title-head formheading" >
-                        <tr > 
-                            @if (exampleRadios1=='6') {
-<th class="centerlabel"><input type="checkbox" [(ngModel)]='checkbox'  (change)="checkAll($event)" /> &nbsp; </th>
+    </div>
+
+    <!-- ================= SEARCH ================= -->
+    @if (Searchdata_list.length == 0) {
+<div class="x-card ps-searchcard">
+
+        <!-- mode: segmented control -->
+        <div class="x-seg ps-seg">
+            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == 'INVOICENO'">
+                <input type="radio" name="exampleRadios" value="INVOICENO" [(ngModel)]="exampleRadios1" /> Invoice No.
+            </label>
+            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == 'CLIENT'">
+                <input type="radio" name="exampleRadios" value="CLIENT" [(ngModel)]="exampleRadios1" /> Client Wise
+            </label>
+            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == 'JOBNO'">
+                <input type="radio" name="exampleRadios" value="JOBNO" [(ngModel)]="exampleRadios1" /> Job No.
+            </label>
+            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == 'AMOUNT'">
+                <input type="radio" name="exampleRadios" value="AMOUNT" [(ngModel)]="exampleRadios1" /> Amount
+            </label>
+            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == 'DATE'">
+                <input type="radio" name="exampleRadios" value="DATE" [(ngModel)]="exampleRadios1" /> Date Wise
+            </label>
+            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == '6'">
+                <input type="radio" name="exampleRadios" value="6" [(ngModel)]="exampleRadios1" /> Print All of a Day
+            </label>
+        </div>
+
+        <!-- ============ INVOICE NO. ============ -->
+        @if (exampleRadios1 == 'INVOICENO') {
+<div class="ps-criteria">
+            <div class="ps-row">
+                <div class="ps-field">
+                    <label class="x-lbl">Invoice No.</label>
+                    <div class="ps-searchgroup">
+                        <i class="fa fa-search ps-searchicon" aria-hidden="true"></i>
+                        <input type="text" class="form-control" [maxlength]="15" [OnlyNumber]="true"
+                               [(ngModel)]="invoiceno" placeholder="15-digit Invoice No."
+                               (keyup.enter)="searchlist()" />
+                        <button type="button" class="ps-searchbtn" (click)="searchlist()">Search</button>
+                    </div>
+                </div>
+                <div class="ps-field ps-field-action">
+                    <button type="button" class="x-btn x-btn-primary" (click)="InvoiceView(invoiceno)">
+                        <i class="fa fa-eye" aria-hidden="true"></i> View
+                    </button>
+                    <button type="button" class="x-btn x-btn-classic" (click)="InvoicePrint(invoiceno)">
+                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                    </button>
+                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
+                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
 }
-                            <th align="center">INV NO</th>
-                            <th align="center"  [class.active]="order === 'INV_DATE'" (click)="setOrder('INV_DATE')">INV DATE  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
-                            <th align="center" [class.active]="order === 'EXP_NAME'" (click)="setOrder('EXP_NAME')" >CLIENT  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
-                            <th align="center"  [class.active]="order === 'INV_BILLTYPE'" (click)="setOrder('INV_BILLTYPE')">BILLTYPE  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
-                           
-                            @if (exampleRadios1!='6') {
-<th   [class.active]="order === 'INVOICED_ON'" (click)="setOrder('INVOICED_ON')"  align="center">INVOICED ON <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
+
+        <!-- ============ CLIENT WISE ============ -->
+        @if (exampleRadios1 == 'CLIENT') {
+<div class="ps-criteria">
+            <div class="ps-row">
+                <div class="ps-field ps-field-wide">
+                    <label class="x-lbl">Client</label>
+                    <ng-select [items]="clientable" bindLabel="EXP_NAME_CITY" bindValue="EXP_CODE"
+                               [(ngModel)]="client" class="form-control"
+                               placeholder="Type to search client…" [searchable]="true" [clearable]="true">
+                    </ng-select>
+                </div>
+            </div>
+            <div class="ps-row">
+                <div class="ps-field ps-field-narrow">
+                    <label class="x-lbl">Start Date <span class="x-req">*</span></label>
+                    <my-date-picker name="ClientStartDate" [options]="myDatePickerOptions"
+                                    [(ngModel)]="client_startdate"></my-date-picker>
+                </div>
+                <div class="ps-field ps-field-narrow">
+                    <label class="x-lbl">End Date <span class="x-req">*</span></label>
+                    <my-date-picker name="ClientEndDate" [options]="myDatePickerOptions"
+                                    [(ngModel)]="client_enddate"></my-date-picker>
+                </div>
+                <div class="ps-field ps-field-action">
+                    <button type="button" class="ps-searchbtn ps-searchbtn-solo" (click)="searchlist()">
+                        <i class="fa fa-search" aria-hidden="true"></i> Search
+                    </button>
+                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
+                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
 }
-                            @if (exampleRadios1!='6') {
-<th   align="center">AUTHORISED ON</th>
+
+        <!-- ============ JOB NO. ============ -->
+        @if (exampleRadios1 == 'JOBNO') {
+<div class="ps-criteria">
+            <div class="ps-row">
+                <div class="ps-field">
+                    <label class="x-lbl">Job No.</label>
+                    <div class="ps-searchgroup">
+                        <i class="fa fa-search ps-searchicon" aria-hidden="true"></i>
+                        <input type="text" class="form-control" [maxlength]="15" [OnlyNumber]="true"
+                               [(ngModel)]="jobno" placeholder="Job No." (keyup.enter)="searchlist()" />
+                        <button type="button" class="ps-searchbtn" (click)="searchlist()">Search</button>
+                    </div>
+                </div>
+                <div class="ps-field ps-field-action">
+                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
+                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
 }
-                            @if (exampleRadios1!='6') {
-<th   [class.active]="order === 'AUTHORISEDBY'" (click)="setOrder('AUTHORISEDBY')"  align="center">AUTHORISED BY  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
+
+        <!-- ============ AMOUNT ============ -->
+        @if (exampleRadios1 == 'AMOUNT') {
+<div class="ps-criteria">
+            <div class="ps-row">
+                <div class="ps-field">
+                    <label class="x-lbl">Amount</label>
+                    <div class="ps-searchgroup">
+                        <i class="fa fa-search ps-searchicon" aria-hidden="true"></i>
+                        <input type="text" class="form-control" [(ngModel)]="amount"
+                               placeholder="Exact invoice total" (keyup.enter)="searchlist()" />
+                        <button type="button" class="ps-searchbtn" (click)="searchlist()">Search</button>
+                    </div>
+                </div>
+                <div class="ps-field ps-field-action">
+                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
+                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
 }
-                            @if (exampleRadios1=='6') {
-<th   [class.active]="order === 'TOTALAMT'" (click)="setOrder('TOTALAMT')"  align="center">TOTAL AMT  <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
+
+        <!-- ============ DATE WISE ============ -->
+        @if (exampleRadios1 == 'DATE') {
+<div class="ps-criteria">
+            <div class="ps-row">
+                <div class="ps-field ps-field-narrow">
+                    <label class="x-lbl">Start Date <span class="x-req">*</span></label>
+                    <my-date-picker name="DateStartDate" [options]="myDatePickerOptions"
+                                    [(ngModel)]="datewise_startdate"></my-date-picker>
+                </div>
+                <div class="ps-field ps-field-narrow">
+                    <label class="x-lbl">End Date <span class="x-req">*</span></label>
+                    <my-date-picker name="DateEndDate" [options]="myDatePickerOptions"
+                                    [(ngModel)]="datewise_enddate"></my-date-picker>
+                </div>
+                <div class="ps-field ps-field-action">
+                    <button type="button" class="ps-searchbtn ps-searchbtn-solo" (click)="searchlist()">
+                        <i class="fa fa-search" aria-hidden="true"></i> Search
+                    </button>
+                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
+                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
 }
-                        </tr>
-                    </thead>
-                    @if (Searchdata_list.length > 1) {
-<tbody>                       
-                        @for (data of Searchdata_list | orderBy: order:reverse:'case-insensitive'; track data) {
-<tr>
-                            @if (exampleRadios1=='6') {
-<td class="centerlabel"> <input type="checkbox" [(ngModel)]="data.Checked" (ngModelChange)="getCheckboxValues($event,data.INV_NO)"> &nbsp; </td>
+
+        <!-- ============ PRINT ALL OF A DAY ============ -->
+        @if (exampleRadios1 == '6') {
+<div class="ps-criteria">
+            <div class="ps-row">
+                <div class="ps-field ps-field-narrow">
+                    <label class="x-lbl">Date <span class="x-req">*</span></label>
+                    <my-date-picker name="PrintAllDate" [options]="myDatePickerOptions"
+                                    [(ngModel)]="printall_date"></my-date-picker>
+                </div>
+                <div class="ps-field ps-field-action">
+                    <button type="button" class="ps-searchbtn ps-searchbtn-solo" (click)="searchlist()">
+                        <i class="fa fa-search" aria-hidden="true"></i> Search
+                    </button>
+                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
+                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
+                    </button>
+                </div>
+            </div>
+            <p class="x-sub">
+                Lists every invoice raised on that date so they can be selected and printed together.
+            </p>
+        </div>
 }
-                            <td><span class="col-form-span-label anchor-link"  (click)="ListOnclick(data.INV_NO)">{{data.INV_NO}}</span>  </td>
-                            <td><span class="col-form-span-label">{{data.INV_DATE}}</span></td>
-                            <td><span class="col-form-span-label">{{data.EXP_NAME}}</span></td>
-                            <td><span class="col-form-span-label">{{data.INV_BILLTYPE}}</span></td>                           
-                            @if (exampleRadios1!='6') {
-<td ><span class="col-form-span-label">{{data.INVOICED_ON}}</span></td>
+    </div>
 }
-                            @if (exampleRadios1!='6') {
-<td><span class="col-form-span-label">{{data.AUTHORISEDON}}</span></td>
-}
-                            @if (exampleRadios1!='6') {
-<td><span class="col-form-span-label">{{data.AUTHORISEDBY}}</span></td>
-}
-                            @if (exampleRadios1=='6') {
-<td><span class="col-form-span-label">{{data.TOTALAMT}}</span></td>
-}
-                        </tr>
-}
-                    </tbody>
-}
+
+    <!-- ================= RESULTS =================
+         Rendered from one result upwards. The old page required more than one row, so a
+         search that matched a single invoice showed nothing at all.                     -->
+    @if (Searchdata_list.length > 0) {
+<div class="x-card">
+        <div class="x-tablewrap ps-resultwrap">
+            <table class="x-table">
+                <thead>
                     <tr>
-                        @if (exampleRadios1=='6') {
-<td colspan="10" class="right-text pr-2">
-                            <button class="btn btn-sm btn-success" type="submit" (click)="PrintInvoice()"> <span  class="col-form-span-label"><i class="fa fa-print"></i>&nbsp;Print</span></button>
+                        @if (exampleRadios1 == '6') {
+<th class="ps-checkcol">
+                            <input type="checkbox" [(ngModel)]="checkbox" (change)="checkAll($event)" />
+                        </th>
+}
+                        <th>INVOICE NO.</th>
+                        <th class="ps-sort" [class.active]="order === 'INV_DATE'" (click)="setOrder('INV_DATE')">
+                            INV DATE <span [hidden]="reverse">&#9660;</span><span [hidden]="!reverse">&#9650;</span>
+                        </th>
+                        <th class="ps-sort" [class.active]="order === 'EXP_NAME'" (click)="setOrder('EXP_NAME')">
+                            CLIENT <span [hidden]="reverse">&#9660;</span><span [hidden]="!reverse">&#9650;</span>
+                        </th>
+                        <th class="ps-sort" [class.active]="order === 'INV_BILLTYPE'" (click)="setOrder('INV_BILLTYPE')">
+                            BILL TYPE <span [hidden]="reverse">&#9660;</span><span [hidden]="!reverse">&#9650;</span>
+                        </th>
+                        @if (exampleRadios1 != '6') {
+<th class="ps-sort"
+                            [class.active]="order === 'INVOICED_ON'" (click)="setOrder('INVOICED_ON')">
+                            INVOICED ON <span [hidden]="reverse">&#9660;</span><span [hidden]="!reverse">&#9650;</span>
+                        </th>
+}
+                        @if (exampleRadios1 != '6') {
+<th>AUTHORISED ON</th>
+}
+                        @if (exampleRadios1 != '6') {
+<th class="ps-sort"
+                            [class.active]="order === 'AUTHORISEDBY'" (click)="setOrder('AUTHORISEDBY')">
+                            AUTHORISED BY <span [hidden]="reverse">&#9660;</span><span [hidden]="!reverse">&#9650;</span>
+                        </th>
+}
+                        @if (exampleRadios1 == '6') {
+<th class="x-num ps-sort"
+                            [class.active]="order === 'TOTALAMT'" (click)="setOrder('TOTALAMT')">
+                            TOTAL AMT <span [hidden]="reverse">&#9660;</span><span [hidden]="!reverse">&#9650;</span>
+                        </th>
+}
+                        <th class="ps-actioncol">ACTION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (data of Searchdata_list | filter: term | orderBy: order:reverse:'case-insensitive' | paginate: { itemsPerPage: 25, currentPage: PageActual }; track data) {
+<tr>
+                        @if (exampleRadios1 == '6') {
+<td class="ps-checkcol">
+                            <input type="checkbox" [(ngModel)]="data.Checked"
+                                   (ngModelChange)="getCheckboxValues($event, data.INV_NO)" />
                         </td>
 }
+                        <td class="x-num ps-link" (click)="ListOnclick(data.INV_NO)"
+                            title="Open the invoice for editing">{{data.INV_NO}}</td>
+                        <td>{{data.INV_DATE}}</td>
+                        <td>{{data.EXP_NAME}}</td>
+                        <td>{{data.INV_BILLTYPE}}</td>
+                        @if (exampleRadios1 != '6') {
+<td>{{data.INVOICED_ON}}</td>
+}
+                        @if (exampleRadios1 != '6') {
+<td>{{data.AUTHORISEDON}}</td>
+}
+                        @if (exampleRadios1 != '6') {
+<td>{{data.AUTHORISEDBY}}</td>
+}
+                        @if (exampleRadios1 == '6') {
+<td class="x-num">{{data.TOTALAMT}}</td>
+}
+                        <td class="ps-actioncol">
+                            <button type="button" class="x-btn x-btn-primary x-btn-sm"
+                                    (click)="InvoiceView(data.INV_NO)">
+                                <i class="fa fa-eye" aria-hidden="true"></i> View
+                            </button>
+                        </td>
                     </tr>
-                </table>
-                </div>                    
-            </div>
-        </main>
-}     
+}
+                    @if ((Searchdata_list | filter: term).length == 0) {
+<tr>
+                        <td colspan="10" class="x-empty">No invoice matches “{{term}}”.</td>
+                    </tr>
+}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="ps-pager">
+            <pagination-controls (pageChange)="PageActual = $event" autoHide="true"
+                                 previousLabel="Prev" nextLabel="Next"></pagination-controls>
+        </div>
+
+        @if (exampleRadios1 == '6') {
+<div class="x-actions">
+            <button type="button" class="x-btn x-btn-primary" (click)="PrintInvoice()">
+                <i class="fa fa-print" aria-hidden="true"></i> Print selected
+            </button>
+        </div>
+}
     </div>
+}
 </div>
+
+<!-- ========================= INVOICE DETAIL DRAWER =========================
+     Slides over the results so the search you ran is still behind it. Rendered
+     inline rather than in an iframe, so it carries the application theme.     -->
+@if (DrawerInvNo) {
+<div class="iv-backdrop" (click)="CloseDrawer()"></div>
+}
+@if (DrawerInvNo) {
+<div class="iv-drawer">
+    <app-invoice-view-page [invNoInput]="DrawerInvNo" [embedded]="true"
+                           (closed)="CloseDrawer()"></app-invoice-view-page>
+</div>
+}

@@ -43,6 +43,8 @@ export class ConsigneeJobprofitComponent implements OnInit {
     ToDate: any = "";
     SearchType = "DATE"
     modetype: string = "SEA";
+    // mode radio (change) handler named in the template; this page shows no date label, so nothing to update
+    updateDtlable(_mode?: any) { }
     to_datewise: any = "";
     from_datewise: any = "";
     single_jobno: string = "";
@@ -175,13 +177,6 @@ export class ConsigneeJobprofitComponent implements OnInit {
         link.click();
         document.body.removeChild(link);
 }
-    updateDtlable(modetype: any) {
-        if (modetype === 'SEA') {
-            this.mode = 'SEA';
-        } else if (modetype === 'AIR') {
-            this.mode = 'AIR';
-        }
-    }
 
     Reset() {
         this.consignee = undefined;

@@ -1,0 +1,456 @@
+<!--  Import module home, on the Finance (Accounts) home's design. Renders only with the View right
+      (or as SA); without it this stays empty and /import is the blank landing page.           -->
+@if (canView) {
+<div class="animated fadeIn x-page ah-page" [class.ah-dark]="dark">
+
+    <!-- ================= TOOLBAR ================= -->
+    <div class="x-toolbar">
+        <div class="x-mark"><i class="fa fa-download" aria-hidden="true"></i></div>
+        <div class="x-titlewrap">
+            <span class="x-eyebrow">Import</span>
+            <h1 class="x-title">{{ greeting() }}@if (userName()) {
+, {{ userName() }}
+}</h1>
+        </div>
+        @if (login) {
+<span class="x-pill x-pill-brand ah-branch"><i class="fa fa-map-marker" aria-hidden="true"></i> {{ login.CITYNAME }}</span>
+}
+
+        <div class="ah-tools">
+            @if (mtdFrom) {
+<div class="ah-period">
+                <div class="x-seg ih-periods" role="group" aria-label="Period">@for (p of periods; track p) {
+<label class="x-seg-btn" [class.active]="sel === p.key" (click)="setPeriod(p.key)">{{ p.label }}</label>
+}</div>
+                <span class="ah-period-k">{{ sel === 'mtd' ? 'Month to date' : 'Last ' + sel + ' days' }}</span>
+                <span class="ah-period-v">{{ mtdFrom | date:'dd/MM/yyyy' }} &ndash; {{ mtdTo | date:'dd/MM/yyyy' }}</span>
+                <span class="ah-period-k">compared with</span>
+                <span class="ah-period-v">{{ pmFrom | date:'dd/MM/yyyy' }} &ndash; {{ pmTo | date:'dd/MM/yyyy' }}</span>
+            </div>
+}
+            @if (updatedAt) {
+<span class="ah-asof"><i class="fa fa-clock-o" aria-hidden="true"></i> As of {{ updatedAt | date:'dd-MM-yyyy HH:mm' }}</span>
+}
+            <button type="button" class="x-btn x-btn-classic" (click)="load()" [disabled]="busy">
+                <i class="fa fa-refresh" [class.fa-spin]="busy" aria-hidden="true"></i> {{ busy ? 'Working' : 'Refresh' }}
+            </button>
+            <button type="button" class="x-btn x-btn-classic x-iconbtn ah-topbtn" (click)="helpOpen = true" title="How to read this page"><i class="fa fa-question-circle-o" aria-hidden="true"></i></button>
+            <button type="button" class="x-btn x-btn-classic x-iconbtn ah-topbtn" (click)="toggleDark()" [title]="dark ? 'Light mode' : 'Dark mode'"><i class="fa" [ngClass]="dark ? 'fa-sun-o' : 'fa-moon-o'" aria-hidden="true"></i></button>
+        </div>
+    </div>
+
+    <!-- ================= LOADING (in page, menu stays clickable) ================= -->
+    @if (busy) {
+<div class="ah-busy" role="status" aria-live="polite">
+        <span class="ah-busy-spin" aria-hidden="true"></span>
+        <span class="ah-busy-text">
+            <span class="ah-busy-title">{{ loaded ? 'Refreshing the import summary...' : 'Loading the import summary...' }}</span>
+            <span class="ah-busy-hint">This usually takes a few seconds. The menu stays available &mdash; you can move to another screen.</span>
+        </span>
+    </div>
+}
+    @if (busy && !loaded) {
+<div class="ah-skeleton">@for (s of [1,2,3,4,5,6]; track s) {
+<div class="ah-sk-card"></div>
+}</div>
+}
+
+    @if (loaded && failed && !busy) {
+<div class="ah-alert">
+        <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        The summary could not be loaded. The menu still works; try Refresh in a moment.
+        @if (failReason) {
+<div class="ah-alert-detail">{{ failReason }}</div>
+}
+    </div>
+}
+
+    @if (loaded && !failed) {
+
+
+        <!-- ================= KPI ROW ================= -->
+        <div class="ah-kpis">
+            <div class="ah-kpi">
+                <div class="ah-kpi-top"><span class="ah-kpi-label">Jobs opened <span class="ah-hint">{{ periodName }}</span></span><span class="ah-kpi-ico ah-ico-blue"><i class="fa fa-cubes" aria-hidden="true"></i></span></div>
+                <div class="ah-kpi-value">{{ mtd.jobs | number }}</div>
+                <div class="ah-cmp">
+                    <div class="ah-cmp-row"><span class="ah-cmp-k">{{ curLabel }}</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct(mtd.jobs, pm.jobs)"></span></span><span class="ah-cmp-v">{{ mtd.jobs }}</span></div>
+                    <div class="ah-cmp-row"><span class="ah-cmp-k">{{ prevLabel }}</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct(pm.jobs, mtd.jobs)"></span></span><span class="ah-cmp-v">{{ pm.jobs }}</span></div>
+                </div>
+                <div class="ah-kpi-foot"><span class="ah-delta" [ngClass]="deltaClass(mtd.jobs, pm.jobs)">{{ deltaText(mtd.jobs, pm.jobs) }}</span><span class="ah-kpi-sub">sea {{ mtd.sea }} &middot; air {{ mtd.air }}</span></div>
+            </div>
+
+            <div class="ah-kpi">
+                <div class="ah-kpi-top"><span class="ah-kpi-label">Sea <span class="ah-hint">jobs</span></span><span class="ah-kpi-ico ah-ico-blue"><i class="fa fa-ship" aria-hidden="true"></i></span></div>
+                <div class="ah-kpi-value">{{ mtd.sea | number }}</div>
+                <div class="ah-cmp">
+                    <div class="ah-cmp-row"><span class="ah-cmp-k">{{ curLabel }}</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct(mtd.sea, pm.sea)"></span></span><span class="ah-cmp-v">{{ mtd.sea }}</span></div>
+                    <div class="ah-cmp-row"><span class="ah-cmp-k">{{ prevLabel }}</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct(pm.sea, mtd.sea)"></span></span><span class="ah-cmp-v">{{ pm.sea }}</span></div>
+                </div>
+                <div class="ah-kpi-foot"><span class="ah-delta" [ngClass]="deltaClass(mtd.sea, pm.sea)">{{ deltaText(mtd.sea, pm.sea) }}</span></div>
+            </div>
+
+            <div class="ah-kpi">
+                <div class="ah-kpi-top"><span class="ah-kpi-label">Air <span class="ah-hint">jobs</span></span><span class="ah-kpi-ico ah-ico-blue"><i class="fa fa-plane" aria-hidden="true"></i></span></div>
+                <div class="ah-kpi-value">{{ mtd.air | number }}</div>
+                <div class="ah-cmp">
+                    <div class="ah-cmp-row"><span class="ah-cmp-k">{{ curLabel }}</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct(mtd.air, pm.air)"></span></span><span class="ah-cmp-v">{{ mtd.air }}</span></div>
+                    <div class="ah-cmp-row"><span class="ah-cmp-k">{{ prevLabel }}</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct(pm.air, mtd.air)"></span></span><span class="ah-cmp-v">{{ pm.air }}</span></div>
+                </div>
+                <div class="ah-kpi-foot"><span class="ah-delta" [ngClass]="deltaClass(mtd.air, pm.air)">{{ deltaText(mtd.air, pm.air) }}</span></div>
+            </div>
+
+            <div class="ah-kpi">
+                <div class="ah-kpi-top"><span class="ah-kpi-label">Gross weight <span class="ah-hint">{{ periodName }}</span></span><span class="ah-kpi-ico ah-ico-blue"><i class="fa fa-balance-scale" aria-hidden="true"></i></span></div>
+                <div class="ah-kpi-value">{{ tonnes(mtd.kg) }} <span class="ah-unit">t</span></div>
+                <div class="ah-cmp">
+                    <div class="ah-cmp-row"><span class="ah-cmp-k">{{ curLabel }}</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct(mtd.kg, pm.kg)"></span></span><span class="ah-cmp-v">{{ tonnes(mtd.kg) }} t</span></div>
+                    <div class="ah-cmp-row"><span class="ah-cmp-k">{{ prevLabel }}</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct(pm.kg, mtd.kg)"></span></span><span class="ah-cmp-v">{{ tonnes(pm.kg) }} t</span></div>
+                </div>
+                <div class="ah-kpi-foot"><span class="ah-delta" [ngClass]="deltaClass(mtd.kg, pm.kg)">{{ deltaText(mtd.kg, pm.kg) }}</span><span class="ah-kpi-sub">{{ mtd.pkgs | number:'1.0-0' }} packages</span></div>
+            </div>
+
+            <div class="ah-kpi ah-kpi-click" (click)="openList('arriving')" title="Click to see the jobs">
+                <div class="ah-kpi-top"><span class="ah-kpi-label">Arriving <span class="ah-hint">next 7 days</span></span><span class="ah-kpi-ico ah-ico-blue"><i class="fa fa-calendar" aria-hidden="true"></i></span></div>
+                <div class="ah-kpi-value">{{ arriving.length }}</div>
+                <div class="ah-kpi-foot"><span class="ah-kpi-sub">{{ arrivingVessels }} vessel{{ arrivingVessels === 1 ? '' : 's' }} due, by ETA</span></div>
+                <div class="ah-drill-link">See the jobs &rsaquo;</div>
+            </div>
+
+            <div class="ah-kpi ah-kpi-click" [class.ah-kpi-warn]="justArrived.length" (click)="openList('arrived')" title="Click to see the jobs">
+                <div class="ah-kpi-top"><span class="ah-kpi-label">Just arrived <span class="ah-hint">last 7 days</span></span><span class="ah-kpi-ico ah-ico-red"><i class="fa fa-anchor" aria-hidden="true"></i></span></div>
+                <div class="ah-kpi-value" [class.ah-red]="justArrived.length">{{ justArrived.length }}</div>
+                <div class="ah-kpi-foot"><span class="ah-kpi-sub">ETA passed &mdash; clearance and delivery to follow</span></div>
+                <div class="ah-drill-link">See the jobs &rsaquo;</div>
+            </div>
+        </div>
+
+        <!-- ================= ROW 1a: 30 / 90 / 180 / 365 days, each against the period before ================= -->
+        <div class="ah-rowfull">
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="ah-kpi-ico ah-ico-blue ah-sec-ico"><i class="fa fa-exchange" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">Period comparison</h2>
+                    <span class="ah-head-sub">jobs opened in the last 30, 90, 180 and 365 days, each against the same number of days just before &middot; click a row to use it above</span>
+                </div>
+                <div class="x-tablewrap">
+                    <table class="x-table ih-compare">
+                        <thead>
+                            <tr>
+                                <th>PERIOD</th>
+                                <th class="x-num">JOBS</th>
+                                <th class="x-num">PERIOD BEFORE</th>
+                                <th class="x-num">CHANGE</th>
+                                <th class="ah-barcol"></th>
+                                <th class="x-num">SEA</th>
+                                <th class="x-num">AIR</th>
+                                <th class="x-num">GROSS WEIGHT</th>
+                                <th class="x-num">WEIGHT BEFORE</th>
+                                <th class="x-num">CHANGE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (c of compare; track c) {
+<tr class="ih-compare-row" [class.ih-compare-on]="sel === c.days" (click)="setPeriod(c.days)"
+                                [title]="'Last ' + c.days + ' days: ' + (c.from | date:'dd/MM/yyyy') + ' - today; before: ' + (c.prevFrom | date:'dd/MM/yyyy') + ' - ' + (c.prevTo | date:'dd/MM/yyyy')">
+                                <td class="ah-mode">Last {{ c.days }} days<div class="ah-pct">{{ c.from | date:'dd/MM/yy' }} &ndash; today</div></td>
+                                <td class="x-num ah-strong">{{ c.cur.jobs | number }}</td>
+                                <td class="x-num">{{ c.prev.jobs | number }}</td>
+                                <td class="x-num"><span class="ah-delta" [ngClass]="deltaClass(c.cur.jobs, c.prev.jobs)">{{ deltaText(c.cur.jobs, c.prev.jobs) }}</span></td>
+                                <td class="ah-barcol">
+                                    <div class="ah-cmp-row ih-mini"><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct(c.cur.jobs, c.prev.jobs)"></span></span></div>
+                                    <div class="ah-cmp-row ih-mini"><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct(c.prev.jobs, c.cur.jobs)"></span></span></div>
+                                </td>
+                                <td class="x-num">{{ c.cur.sea | number }} <span class="ah-pct">/ {{ c.prev.sea | number }}</span></td>
+                                <td class="x-num">{{ c.cur.air | number }} <span class="ah-pct">/ {{ c.prev.air | number }}</span></td>
+                                <td class="x-num ah-strong">{{ tonnes(c.cur.kg) }} t</td>
+                                <td class="x-num">{{ tonnes(c.prev.kg) }} t</td>
+                                <td class="x-num"><span class="ah-delta" [ngClass]="deltaClass(c.cur.kg, c.prev.kg)">{{ deltaText(c.cur.kg, c.prev.kg) }}</span></td>
+                            </tr>
+}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ROW 1b: work waiting, one highlighted line ================= -->
+        <div class="ah-rowfull">
+            <div class="x-card ah-pipe-card">
+                <div class="x-card-head">
+                    <span class="ah-kpi-ico ah-ico-blue ah-sec-ico"><i class="fa fa-tasks" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">Work waiting</h2>
+                    <span class="ah-head-sub">each box opens the jobs behind it</span>
+                </div>
+                <div class="x-card-body ah-pipe">
+                    <a class="ah-pipe-item" href="javascript:void(0)" (click)="openList('arrived')" [class.ih-on]="listKind === 'arrived'">
+                        <span class="ah-kpi-ico ah-ico-blue ah-pipe-ico"><i class="fa fa-anchor" aria-hidden="true"></i></span>
+                        <span class="ah-pipe-body"><span class="ah-pipe-k">Arrived, clearance to follow</span>
+                            <span class="ah-pipe-v">{{ justArrived.length }}</span>
+                            <span class="ah-pipe-s">ETA in the last 7 days@if (justArrived.length) {
+<span> &middot; latest {{ justArrived[0].importer }}</span>
+}</span></span>
+                    </a>
+                    <a class="ah-pipe-item" href="javascript:void(0)" (click)="openList('arriving')" [class.ih-on]="listKind === 'arriving'">
+                        <span class="ah-kpi-ico ah-ico-blue ah-pipe-ico"><i class="fa fa-ship" aria-hidden="true"></i></span>
+                        <span class="ah-pipe-body"><span class="ah-pipe-k">Arriving this week</span>
+                            <span class="ah-pipe-v">{{ arriving.length }} <span class="ah-pipe-amt">on {{ arrivingVessels }} vessel{{ arrivingVessels === 1 ? '' : 's' }}</span></span>
+                            <span class="ah-pipe-s">ETA today to 6 days ahead</span></span>
+                    </a>
+                    <a class="ah-pipe-item" href="javascript:void(0)" (click)="openList('noeta')" [class.ih-on]="listKind === 'noeta'">
+                        <span class="ah-kpi-ico ah-ico-blue ah-pipe-ico"><i class="fa fa-question" aria-hidden="true"></i></span>
+                        <span class="ah-pipe-body"><span class="ah-pipe-k">Sea jobs without a vessel ETA</span>
+                            <span class="ah-pipe-v">{{ noEta.length }}</span>
+                            <span class="ah-pipe-s">opened in the last 60 days</span></span>
+                    </a>
+                    <a class="ah-pipe-item" href="javascript:void(0)" (click)="openList('week')" [class.ih-on]="listKind === 'week'">
+                        <span class="ah-kpi-ico ah-ico-blue ah-pipe-ico"><i class="fa fa-folder-open-o" aria-hidden="true"></i></span>
+                        <span class="ah-pipe-body"><span class="ah-pipe-k">Opened in the last 7 days</span>
+                            <span class="ah-pipe-v">{{ openedWeek.length }}</span>
+                            <span class="ah-pipe-s">new import jobs this week</span></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- the list behind the selected box -->
+        @if (listKind) {
+<div class="ah-rowfull">
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="ah-kpi-ico ah-ico-blue ah-sec-ico"><i class="fa fa-list" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">{{ listTitle }}</h2>
+                    <span class="x-count">{{ listRows.length }}</span>
+                    <button type="button" class="x-btn x-btn-classic x-iconbtn ih-close" (click)="listKind = null" aria-label="Close"><i class="fa fa-times" aria-hidden="true"></i></button>
+                </div>
+                <div class="x-tablewrap">
+                    <table class="x-table">
+                        <thead><tr><th>IMPORT CODE</th><th>IMPORTER</th><th>VESSEL</th><th>GOODS</th><th class="x-num">GROSS KG</th><th class="x-num">WHEN</th></tr></thead>
+                        <tbody>
+                            @for (j of listRows; track trackByPk($index, j)) {
+<tr>
+                                <td class="ah-nowrap"><a class="ih-code" [routerLink]="link(j)">{{ j.code }}</a> <span class="x-pill" [class.x-pill-brand]="j.mode === 'sea'">{{ modeLabel(j) }}</span></td>
+                                <td class="ah-client">{{ j.importer }}</td>
+                                <td>{{ j.vessel || '-' }}@if (j.eta) {
+<span class="ah-pct"> &middot; ETA {{ j.eta | date:'dd/MM' }}</span>
+}</td>
+                                <td class="ah-client">{{ j.goods }}</td>
+                                <td class="x-num">{{ j.kg | number:'1.0-0' }}</td>
+                                <td class="x-num ah-nowrap">{{ whenText(j) }}</td>
+                            </tr>
+}
+                            @if (!listRows.length) {
+<tr><td colspan="6" class="x-empty">Nothing here.</td></tr>
+}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+}
+
+        <!-- ================= ROW 2: arrivals ahead, four tiles across ================= -->
+        <div class="ah-rowfull">
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="ah-kpi-ico ah-ico-blue ah-sec-ico"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">Arrivals ahead</h2>
+                    <span class="ah-head-sub">jobs by vessel ETA, counted from today &middot; {{ aheadTotal }} with an ETA still to come</span>
+                </div>
+                <div class="x-card-body">
+                    <div class="ah-ages">
+                        @for (a of ahead; track a) {
+<div class="ah-age" [ngClass]="a.cls">
+                            <div class="ah-age-line"><span class="ah-age-k">{{ a.label }}</span><span class="ah-age-v">{{ a.n }} job{{ a.n === 1 ? '' : 's' }}</span></div>
+                            <div class="ah-age-bar"><div class="ah-age-fill" [style.width.%]="a.pct"></div></div>
+                            <span class="ah-age-p">{{ a.pct }}% of jobs still to arrive</span>
+                        </div>
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ROW 3: jobs by mode + 30-day trend ================= -->
+        <div class="ah-row2">
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="ah-kpi-ico ah-ico-blue ah-sec-ico"><i class="fa fa-cubes" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">Jobs opened <h2 class="x-card-title">Jobs opened this month</h2>middot; {{ periodName }}</h2>
+                    <span class="x-count">{{ mtd.jobs }}</span>
+                    <span class="ah-head-sub">vs {{ pm.jobs }} in the period before</span>
+                </div>
+                <div class="x-tablewrap">
+                    <table class="x-table ah-modes">
+                        <thead><tr><th>MODE</th><th class="x-num">JOBS</th><th class="x-num">PERIOD BEFORE</th><th class="x-num">GROSS WEIGHT</th><th class="x-num">PACKAGES</th></tr></thead>
+                        <tbody>
+                            @for (m of modes; track m) {
+<tr>
+                                <td class="ah-mode"><span><i class="fa" [ngClass]="m.icon" aria-hidden="true"></i> {{ m.mode }}</span>
+                                    <div class="ah-bar ah-bar-under"><div class="ah-bar-fill" [style.width.%]="share(m.mtd, modes, 'mtd')"></div></div></td>
+                                <td class="x-num ah-strong">{{ m.mtd }}</td>
+                                <td class="x-num">{{ m.pm }}</td>
+                                <td class="x-num">{{ tonnes(m.kg) }} t</td>
+                                <td class="x-num">{{ m.pkgs | number:'1.0-0' }}</td>
+                            </tr>
+}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="ah-kpi-ico ah-ico-blue ah-sec-ico"><i class="fa fa-bar-chart" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">Jobs opened, 30 days</h2>
+                    <span class="ah-head-sub ah-nowrap">{{ trendTotal }} jobs &middot; blue sea, grey air</span>
+                </div>
+                <div class="x-card-body ah-chart">
+                    @if (trendOptions) {
+<div class="ah-chart-box">
+                        <canvas baseChart type="bar" [datasets]="trendData" [labels]="trendLabels"
+                                [options]="trendOptions" [legend]="false"></canvas>
+                    </div>
+}
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ROW 3b: recent jobs + top importers ================= -->
+        <div class="ah-rowwatch">
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="ah-kpi-ico ah-ico-blue ah-sec-ico"><i class="fa fa-search" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">Recent jobs</h2>
+                    <span class="x-count">{{ filtered.length }}</span>
+                    <span class="ah-head-sub">last two years, newest first</span>
+                </div>
+                <div class="ih-filters">
+                    <input type="text" class="form-control ih-search" [(ngModel)]="search" (ngModelChange)="page = 1" placeholder="Import code, importer, city, vessel or goods" aria-label="Search jobs">
+                    <div class="x-seg" role="group" aria-label="Mode">
+                        <label class="x-seg-btn" [class.active]="modeFilter === 'all'" (click)="setMode('all')">All</label>
+                        <label class="x-seg-btn" [class.active]="modeFilter === 'sea'" (click)="setMode('sea')">Sea</label>
+                        <label class="x-seg-btn" [class.active]="modeFilter === 'air'" (click)="setMode('air')">Air</label>
+                    </div>
+                    @if (hasFilters) {
+<button type="button" class="x-btn x-btn-classic" (click)="clearFilters()">Clear</button>
+}
+                </div>
+                <div class="x-tablewrap">
+                    <table class="x-table">
+                        <thead><tr><th>IMPORT CODE</th><th>IMPORTER</th><th>VESSEL &middot; ETA</th><th class="x-num">GROSS KG</th><th class="x-num">OPENED</th></tr></thead>
+                        <tbody>
+                            @for (j of pageRows; track trackByPk($index, j)) {
+<tr>
+                                <td class="ah-nowrap"><a class="ih-code" [routerLink]="link(j)">{{ j.code }}</a> <span class="x-pill" [class.x-pill-brand]="j.mode === 'sea'">{{ modeLabel(j) }}</span></td>
+                                <td class="ah-client" [title]="j.goods">{{ j.importer }}</td>
+                                <td>{{ j.vessel || '-' }}@if (j.eta) {
+<span class="ah-pct"> &middot; {{ j.eta | date:'dd/MM' }}</span>
+}</td>
+                                <td class="x-num">{{ j.kg | number:'1.0-0' }}</td>
+                                <td class="x-num ah-nowrap">{{ j.opened | date:'dd/MM/yyyy' }}</td>
+                            </tr>
+}
+                            @if (!filtered.length) {
+<tr><td colspan="5" class="x-empty">{{ hasFilters ? 'No job matches these filters.' : 'No import job opened.' }}</td></tr>
+}
+                        </tbody>
+                    </table>
+                </div>
+                @if (pageCount > 1) {
+<div class="ih-pager">
+                    <span class="ah-pct">{{ pageFrom }}&ndash;{{ pageTo }} of {{ filtered.length }}</span>
+                    <button type="button" class="x-btn x-btn-classic" (click)="goPage(page - 1)" [disabled]="page === 1" aria-label="Previous page">&lsaquo;</button>
+                    @for (p of pageLinks; track p) {
+
+                        @if (p === null) {
+<span>&hellip;</span>
+}
+                        @if (p !== null) {
+<button type="button" class="x-btn x-btn-classic" [class.ih-page-on]="p === page" (click)="goPage(p)">{{ p }}</button>
+}
+                    
+}
+                    <button type="button" class="x-btn x-btn-classic" (click)="goPage(page + 1)" [disabled]="page === pageCount" aria-label="Next page">&rsaquo;</button>
+                </div>
+}
+            </div>
+
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="ah-kpi-ico ah-ico-blue ah-sec-ico"><i class="fa fa-users" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">Top importers <h2 class="x-card-title">Top importers this month</h2>middot; {{ periodName }}</h2>
+                    @if (topImporters.length) {
+<span class="x-count">{{ topImporters.length }}</span>
+}
+                    <span class="ah-head-sub">by jobs opened; Share is their part of the period's jobs</span>
+                </div>
+                <div class="x-tablewrap">
+                    <table class="x-table">
+                        <thead><tr><th>IMPORTER</th><th class="ah-barcol"></th><th class="x-num">JOBS</th><th class="x-num">WEIGHT</th><th class="x-num">SHARE</th></tr></thead>
+                        <tbody>
+                            @for (c of topImporters; track c) {
+<tr>
+                                <td class="ah-client" [title]="c.name">{{ c.name }}</td>
+                                <td class="ah-barcol"><div class="ah-bar"><div class="ah-bar-fill ah-bar-slate" [style.width.%]="share(c.jobs, topImporters, 'jobs')"></div></div></td>
+                                <td class="x-num ah-strong">{{ c.jobs }}</td>
+                                <td class="x-num">{{ tonnes(c.kg) }} t</td>
+                                <td class="x-num">{{ c.share }}%</td>
+                            </tr>
+}
+                            @if (!topImporters.length) {
+<tr><td colspan="5" class="x-empty">No jobs opened in this period yet.</td></tr>
+}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ROW 5: quick links in one row ================= -->
+        <div class="ah-rowfull">
+            <div class="x-card">
+                <div class="x-card-head">
+                    <span class="ah-kpi-ico ah-ico-blue ah-sec-ico"><i class="fa fa-th-large" aria-hidden="true"></i></span>
+                    <h2 class="x-card-title">Quick links</h2>
+                </div>
+                <div class="x-card-body ah-links">
+                    @for (q of quickLinks; track q) {
+<a class="ah-link" [routerLink]="q.link">
+                        <span class="ah-link-ico"><i class="fa" [ngClass]="q.icon" aria-hidden="true"></i></span>
+                        <span class="ah-link-label">{{ q.label }}</span>
+                        <i class="fa fa-angle-right ah-link-go" aria-hidden="true"></i>
+                    </a>
+}
+                </div>
+            </div>
+        </div>
+
+        @if (cancelled) {
+<div class="ah-note">{{ cancelled }} cancelled job{{ cancelled === 1 ? ' is' : 's are' }} left out of every figure.</div>
+}
+    
+}
+
+    <!-- ================= HOW TO READ ================= -->
+    @if (helpOpen) {
+<div class="ah-modal-back" (click)="helpOpen = false">
+        <div class="x-card ah-help" (click)="$event.stopPropagation()" role="dialog" aria-label="How to read this page">
+            <div class="x-card-head">
+                <span class="ah-kpi-ico ah-ico-blue ah-sec-ico"><i class="fa fa-question" aria-hidden="true"></i></span>
+                <h2 class="x-card-title">How to read this page</h2>
+                <button type="button" class="x-btn x-btn-classic x-iconbtn ah-close" (click)="helpOpen = false" aria-label="Close"><i class="fa fa-times" aria-hidden="true"></i></button>
+            </div>
+            <div class="x-card-body ah-help-grid">
+                <div class="ah-help-item"><b>Month to date</b>Jobs whose Import Date is from the 1st of this month to today, compared with the same days last month &mdash; as on the Finance home.</div>
+                <div class="ah-help-item"><b>Where the numbers come from</b>The same list as the Sea and Air search screens, one row per import code. Cancelled jobs are left out.</div>
+                <div class="ah-help-item"><b>Arriving / just arrived</b>By the vessel ETA on the job: today to 6 days ahead, and the last 7 days.</div>
+                <div class="ah-help-item"><b>Work waiting</b>Each box opens the jobs behind it, right under the line. Click a job to open it.</div>
+                <div class="ah-help-item"><b>Arrivals ahead</b>Every job with an ETA still to come, in four bands from today.</div>
+                <div class="ah-help-item"><b>Sea jobs without a vessel ETA</b>Air jobs have no vessel, so only sea jobs are counted.</div>
+            </div>
+        </div>
+    </div>
+}
+</div>
+}

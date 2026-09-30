@@ -100,7 +100,9 @@ export class SinglejobnoReportComponent implements OnInit {
 
       this.Income = this.num(this.table4.GRAND_RECOVERYAMT);
       this.Expense = this.num(this.table4.GRAND_PAIDAMT);
-      this.Profit = this.num(this.table4.GRAND_DIFFAMT);
+      /* GRAND_DIFFAMT comes back unsigned - a loss is only marked in GRAND_REMARKS ('Less
+         Charged') - so a loss read as a profit. Income less expense is the profit, signed. */
+      this.Profit = this.Income - this.Expense;
       this.MarginPct = this.Income !== 0 ? (this.Profit / this.Income) * 100 : null;
       this.buildInsights();
     }, () => {
@@ -262,6 +264,8 @@ export class SinglejobnoReportComponent implements OnInit {
 
   /* the proc writes "Gain: 3750.00" / "Loss: 300.00" in REMARKS */
   isLoss(remarks: any): boolean { return (remarks || '').toString().toUpperCase().indexOf('LOSS') >= 0; }
+  /* signed difference for a totals row: recovered less paid */
+  rowDiff(r: any): number { return this.num(r && r.GRAND_RECOVERYAMT) - this.num(r && r.GRAND_PAIDAMT); }
   isGain(remarks: any): boolean { return (remarks || '').toString().toUpperCase().indexOf('GAIN') >= 0; }
   groupDiff(g: any): number { return this.num(g.RECOVERYAMT) - this.num(g.PAIDAMT); }
 

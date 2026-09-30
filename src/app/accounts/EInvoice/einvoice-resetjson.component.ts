@@ -23,12 +23,12 @@ import {Configuration}  from '../../app.constants'
     standalone: false
 })
   export class ResetJson implements OnInit {
+    checkbox: boolean = false;   // header box, bound in the template
     resetjsonlist: any = []
     newArray: any = [];
     rptdownloadurl:string;
     subheader:string="";
     JsonId:string="";
-    checkbox: boolean = false;
     constructor(
         private _router: Router,
         private _dataService: DataService,
@@ -94,10 +94,14 @@ import {Configuration}  from '../../app.constants'
           }
           console.log(this.newArray);
       }
-    checkAll(event: any) {
-        const checked = event.target.checked;
-        this.resetjsonlist.forEach((item: any) => item.Checked = checked);
-    }
+      /*  Header box on a Reset page. Only one JSON batch can be reset at a time (ticking a row
+          selects its whole batch and unticks the rest), so there is no "select all" here: the
+          box clears the selection and then unticks itself.                                  */
+      checkAll(event: any) {
+        this.newArray = [];
+        for (let i = 0; i < this.resetjsonlist.length; i++) { this.resetjsonlist[i].Checked = false; }
+        setTimeout(() => { this.checkbox = false; });
+      }
       getCheckboxValues(event: boolean, jsonid: string, id: string, invno: string, i: number) {
         this.newArray = this.newArray || [];
         this.JsonId = jsonid;

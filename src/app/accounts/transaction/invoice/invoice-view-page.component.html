@@ -1,0 +1,461 @@
+<!--  Invoice Audit Workspace.
+
+      Four stacked full-width sections: client and tax profile, the consolidated job list,
+      the financial strip, then the billing charges. The charges table takes whatever height
+      is left and is the only thing that scrolls.                                            -->
+<div class="iv-app">
+
+    <!-- ===================== COMMAND BAR ===================== -->
+    <header class="iv-top">
+        <div class="iv-top-l">
+            <div class="iv-logo"><i class="fa fa-file-text-o" aria-hidden="true"></i></div>
+
+            <span class="iv-eyebrow">Audit Workspace</span>
+            <span class="iv-dot">&bull;</span>
+
+            @if (header && header.INV_BILLTYPE) {
+<span class="iv-tag iv-tag-blue">{{header.INV_BILLTYPE}}</span>
+}
+            @if (header && header.SUPPLYTYPE) {
+<span class="iv-tag iv-tag-amber">{{header.SUPPLYTYPE}}</span>
+}
+
+            <span class="iv-sep">|</span>
+            <h1 class="iv-h1">
+                INV #{{invNo}}
+                <span class="iv-sep-sm">&middot;</span>
+                @if (header) {
+<span class="iv-h1-dt">{{header.INV_DATE}}</span>
+}
+            </h1>
+        </div>
+
+        <div class="iv-top-r">
+            @if (header) {
+<div class="iv-status">
+                <p class="iv-status-k">Authorisation</p>
+                <div class="iv-status-v" [class.done]="authComplete()" [class.warn]="authWithdrawn()"
+                     [title]="authDetail()">
+                    <span class="iv-led"></span>
+                    <span>{{authStatus()}}</span>
+                </div>
+            </div>
+}
+
+            @if (inPopup) {
+<button type="button" class="iv-switch" (click)="showOld()"
+                    title="Show the old Invoice Detail View for this invoice">
+                <i class="fa fa-exchange" aria-hidden="true"></i> Old view
+            </button>
+}
+
+            @if (embedded) {
+<button type="button" class="iv-ibtn" (click)="openInWindow()"
+                    title="Open in its own window (for printing / second screen)">
+                <i class="fa fa-external-link" aria-hidden="true"></i>
+            </button>
+}
+            @if (!embedded && !inPopup) {
+<button type="button" class="iv-ibtn" (click)="backToSearch()" title="Back to search">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            </button>
+}
+            <button type="button" class="iv-ibtn" (click)="printInvoice()" title="Print">
+                <i class="fa fa-print" aria-hidden="true"></i>
+            </button>
+
+            <!--  Not wired yet: nothing writes to the e-invoice queue, and a button that
+                  silently does nothing is worse than one that says so.                  -->
+            @if (showApprove) {
+<button type="button" class="iv-approve" disabled
+                    title="Not available yet - the queue endpoint is not built. Authorise from the Authorisation screen for now.">
+                <i class="fa fa-check-circle" aria-hidden="true"></i>
+                Approve
+            </button>
+}
+
+            @if (embedded) {
+<button type="button" class="iv-x" (click)="close()" title="Close (Esc)">&times;</button>
+}
+        </div>
+    </header>
+
+    @if (errorText) {
+<div class="iv-alert">
+        <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{errorText}}
+    </div>
+}
+
+    @if (header) {
+<main class="iv-body">
+
+        <!-- ============ 1. CLIENT & TAX PROFILE ============ -->
+        <section class="iv-sec iv-profile">
+            <div class="iv-profile-l">
+                <div class="iv-sec-head">
+                    <span class="iv-sec-n">1.</span>
+                    <i class="fa fa-building-o" aria-hidden="true"></i>
+                    <span class="iv-sec-t">Client &amp; tax profile</span>
+                    @if (header.SUPPLYTYPE) {
+<span class="iv-pill">{{header.SUPPLYTYPE}}</span>
+}
+                </div>
+                <h2 class="iv-client">{{header.CLIENTNAME}}</h2>
+                @if (!taxFieldsUnknown()) {
+<p class="iv-addr">{{addressOnly()}}</p>
+}
+                @if (taxFieldsUnknown()) {
+<p class="iv-addr" [innerHTML]="header.BILLTO_INVADDR"></p>
+}
+            </div>
+
+            <!--  GSTIN, place of supply and billing state are lifted out of the address block
+                  the proc returns. If they cannot be read, the block is shown whole on the
+                  left instead and this strip is hidden rather than showing blanks.        -->
+            @if (!taxFieldsUnknown()) {
+<div class="iv-profile-r">
+                <div class="iv-fact">
+                    <span class="iv-fact-k">GSTIN status</span>
+                    <span class="iv-fact-v"><span class="iv-gstin">{{gstin()}}</span></span>
+                </div>
+                <div class="iv-fact">
+                    <span class="iv-fact-k">Place of supply</span>
+                    <span class="iv-fact-v">{{posState()}}</span>
+                </div>
+                @if (billFrom()) {
+<div class="iv-fact">
+                    <span class="iv-fact-k">Billing from</span>
+                    <span class="iv-fact-v">{{billFrom()}}</span>
+                </div>
+}
+                <div class="iv-fact">
+                    <span class="iv-fact-k">Pay by date</span>
+                    <span class="iv-fact-v iv-mono">{{header.PAYBLEBYDT}}</span>
+                </div>
+                <div class="iv-fact">
+                    <!--  The old view shows the client name here; there is no separate field
+                          for it, so the same value is shown rather than a made-up one.   -->
+                    <span class="iv-fact-k">Document through</span>
+                    <span class="iv-fact-v iv-trunc" [title]="header.CLIENTNAME">{{header.CLIENTNAME}}</span>
+                </div>
+            </div>
+}
+        </section>
+
+        <!-- ============ 2. ASSOCIATED JOBS ============ -->
+        @if (jobs.length > 0) {
+<section class="iv-sec">
+            <div class="iv-sec-bar">
+                <div class="iv-sec-head">
+                    <span class="iv-sec-n">2.</span>
+                    <i class="fa fa-cubes" aria-hidden="true"></i>
+                    <span class="iv-sec-t">Associated jobs list</span>
+                    <span class="iv-count">{{jobs.length}} consolidated</span>
+                </div>
+
+                <!--  Carrier, HAWB, bill type and currency are recorded once for the invoice,
+                      not per job, so they sit on this bar rather than in the table.       -->
+                <div class="iv-barfacts">
+                    @if (header.INV_CARRIER) {
+<span><i class="iv-bk">Carrier:</i> <b>{{header.INV_CARRIER}}</b></span>
+}
+                    @if (header.INV_HAWBNO) {
+<span>
+                        <i class="iv-bk">House (A.W.B./B/L):</i>
+                        <b class="iv-mono iv-hawb">{{header.INV_HAWBNO}}</b>
+                        @if (header.INV_HAWBDT) {
+<span class="iv-dim">({{header.INV_HAWBDT}})</span>
+}
+                    </span>
+}
+                    <span><i class="iv-bk">Bill type:</i> <b>{{header.INV_BILLTYPE}}</b></span>
+                    <span><i class="iv-bk">Currency:</i> <b>{{header.CUR_NAME}}@if (header.INV_CURRATE) {
+<span> @ {{header.INV_CURRATE}}</span>
+}</b></span>
+                </div>
+            </div>
+
+            <div class="iv-jobwrap">
+                <table class="iv-table iv-jobtable">
+                    <thead>
+                        <tr>
+                            <th>Job no</th>
+                            <th class="iv-c">Packages</th>
+                            <th class="iv-r">Prop. weight</th>
+                            <th>Client reference</th>
+                            <th class="iv-c">Documents</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (j of jobs; track j) {
+<tr>
+                            <!-- Job P&L stays a popup for now: it is shared with other modules. -->
+                            <td class="iv-mono iv-jobno" (click)="jobProfit(j.inv_jobno)"
+                                title="Open the job P&amp;L statement">{{j.inv_jobno}}</td>
+                            <td class="iv-c iv-mono">{{j.inv_pkgs}}</td>
+                            <td class="iv-r iv-mono">{{j.inv_grwt}}</td>
+                            <!--  Pieces, volume, client reference and enclosures are recorded once
+                                  for the invoice, not per job, so they appear on the totals bar
+                                  below rather than being repeated here as though they differed. -->
+                            <td class="iv-dim">&mdash;</td>
+                            <td class="iv-c iv-dim">&mdash;</td>
+                        </tr>
+}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- CONSOLIDATED JOBS TOTAL
+                 Always shown, including when the job list above is folded: these are the
+                 figures being audited, and the list is only the breakdown behind them.
+                 Laid out on a grid so labels and values line up in columns.            -->
+            <div class="iv-jobtotbar">
+                <div class="iv-jobtot-head">
+                    <span class="iv-totchip">Consolidated jobs total</span>
+                    <span class="iv-dim">recorded once for the invoice</span>
+                </div>
+                <div class="iv-jobtot-grid">
+                    <div class="iv-tot">
+                        <span class="iv-tot-k">Total pkgs</span>
+                        <span class="iv-tot-v iv-mono">{{header.INV_PKGS}}@if (header.INV_TYPEOFPCS) {
+<span class="iv-unit"> {{header.INV_TYPEOFPCS}}</span>
+}</span>
+                    </div>
+                    <div class="iv-tot">
+                        <span class="iv-tot-k">Total pieces</span>
+                        <span class="iv-tot-v iv-mono">{{header.INV_NOOFPCS}}</span>
+                    </div>
+                    <div class="iv-tot">
+                        <span class="iv-tot-k">Total gross weight</span>
+                        <span class="iv-tot-v iv-mono iv-hi">{{header.INV_WT}}</span>
+                    </div>
+                    <div class="iv-tot">
+                        <span class="iv-tot-k">Total volume</span>
+                        <span class="iv-tot-v iv-mono">{{header.INV_VOL}}</span>
+                    </div>
+                    <div class="iv-tot">
+                        <span class="iv-tot-k">Client reference</span>
+                        <span class="iv-tot-v iv-trunc2" [title]="header.INV_CLIENTREF">{{header.INV_CLIENTREF}}</span>
+                    </div>
+                    <div class="iv-tot">
+                        <span class="iv-tot-k">Adv. received</span>
+                        <span class="iv-tot-v iv-mono iv-money iv-adv">&#8377;{{money(header.INV_ADVANCE)}}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+}
+
+        <!-- ============ 3. THE NUMBERS ============
+             Four cards rather than a line of text: these are what the eye should land on
+             first, and what everything below them adds up to.                          -->
+        <section class="iv-kpis">
+            <div class="iv-kpi">
+                <div class="iv-kpi-top">
+                    <span class="iv-kpi-k">Taxable base</span>
+                    <span class="iv-kpi-ico"><i class="fa fa-inr" aria-hidden="true"></i></span>
+                </div>
+                <p class="iv-kpi-v iv-mono">&#8377;{{money(total('TAXAMT'))}}</p>
+                <span class="iv-kpi-sub">{{charges.length}} charge lines</span>
+            </div>
+
+            <div class="iv-kpi iv-kpi-gst">
+                <div class="iv-kpi-top">
+                    <span class="iv-kpi-k">{{gstLabel()}}</span>
+                    <span class="iv-kpi-ico"><i class="fa fa-percent" aria-hidden="true"></i></span>
+                </div>
+                <p class="iv-kpi-v iv-mono">&#8377;{{money(gstAmount())}}</p>
+                <!--  one line per component, as printed: CGST 9% on 8,758.00 = 788.22 -->
+                @if (gstLines().length > 0) {
+<div class="iv-gst-lines">
+                    @for (l of gstLines(); track l) {
+<div class="iv-gst-line">
+                        <div class="iv-gst-top">
+                            <span class="iv-gst-name">{{l.name}} {{pct(l.rate)}}%</span>
+                            <span class="iv-gst-val">&#8377;{{money(l.amt)}}</span>
+                        </div>
+                        @if (l.base > 0) {
+<span class="iv-gst-on">on &#8377;{{money(l.base)}}</span>
+}
+                    </div>
+}
+                </div>
+}
+                <span class="iv-kpi-sub">@if (gstType()) {
+<span class="iv-flag">{{gstType()}}</span>
+}</span>
+            </div>
+
+            <div class="iv-kpi">
+                <div class="iv-kpi-top">
+                    <span class="iv-kpi-k">Non-taxable</span>
+                    <span class="iv-kpi-ico"><i class="fa fa-ban" aria-hidden="true"></i></span>
+                </div>
+                <p class="iv-kpi-v iv-mono iv-kpi-muted">&#8377;{{money(total('NONTAXABLEAMT'))}}</p>
+                <span class="iv-kpi-sub">outside GST</span>
+            </div>
+
+            <div class="iv-kpi iv-kpi-grand">
+                <div class="iv-kpi-top">
+                    <span class="iv-kpi-k">Grand total (INR)</span>
+                    <span class="iv-kpi-ico"><i class="fa fa-check-circle" aria-hidden="true"></i></span>
+                </div>
+                <p class="iv-kpi-v iv-mono">&#8377;{{money(total('TOTALAMT'))}}</p>
+                <span class="iv-kpi-sub">taxable + GST, rounded</span>
+            </div>
+        </section>
+
+        <!-- ============ 4. BILLING CHARGES ============ -->
+        <section class="iv-sec iv-charges">
+            <div class="iv-sec-bar">
+                <div class="iv-sec-head">
+                    <span class="iv-sec-n">3.</span>
+                    <i class="fa fa-inr" aria-hidden="true"></i>
+                    <span class="iv-sec-t">Billing charges &amp; GST ledger classification</span>
+                    <span class="iv-count">{{charges.length}} line items</span>
+                </div>
+                <div class="iv-barfacts">
+                    @if (taxCodes().length == 1) {
+<span><i class="iv-bk">Tax code:</i> <b>{{taxCodes()[0]}}</b></span>
+}
+                    <!--  Charges are stored against the invoice, not the job, so they are always
+                          consolidated. Said plainly rather than offering a filter that cannot
+                          work.                                                             -->
+                    <span><i class="iv-bk">Consolidated for:</i> <b>{{jobs.length > 1 ? 'All jobs' : 'This job'}}</b>
+                        @if (jobs.length > 0) {
+<span class="iv-dim">({{jobsShort()}})</span>
+}</span>
+                    @if (header.INV_CURRATE) {
+<span><i class="iv-bk">Ex. rate:</i> <b>{{header.INV_CURRATE}}</b> <span class="iv-dim">({{header.CUR_NAME}})</span></span>
+}
+                    @if (missingSac()) {
+<span class="iv-warn"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> SAC missing on one or more accounts</span>
+}
+                </div>
+            </div>
+
+            <div class="iv-tablewrap">
+                <table class="iv-table">
+                    <thead>
+                        <tr>
+                            <th class="iv-c iv-w-n">#</th>
+                            <th class="iv-w-sac">SAC / Ledger</th>
+                            <th>Service description</th>
+                            <th class="iv-c iv-w-tax">Tax</th>
+                            <th class="iv-r iv-w-qty">Qty / Unit</th>
+                            <th class="iv-r iv-w-rate">Unit rate</th>
+                            <th class="iv-c iv-w-cur">Cur.</th>
+                            <th class="iv-r iv-w-ex">Ex. rate</th>
+                            <th class="iv-r iv-w-amt">Taxable INR</th>
+                            <th class="iv-r iv-w-amt">Non-tax INR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (c of charges; track c; let i = $index) {
+<tr>
+                            <td class="iv-c iv-mono iv-idx">{{ (i < 9 ? '0' : '') + (i + 1) }}</td>
+                            <td>
+                                <!--  SAC from USP_ACC_INVOICE_SAC_LIST, charge code beneath it.
+                                      An account with no SAC set says so rather than showing a
+                                      blank that reads as "nothing to check here".          -->
+                                @if (sac(c)) {
+<span class="iv-sac">{{sac(c)}}</span>
+}
+                                @if (!sac(c)) {
+<span class="iv-sac iv-sac-none" title="No SAC code set on this account">No SAC</span>
+}
+                                <span class="iv-ledger">Code: {{c.INV_CHRGCODE}}</span>
+                            </td>
+                            <td>
+                                <div class="iv-svc">{{c.CHRG_DESC}}</div>
+                                <div class="iv-svc-sub">
+                                    <span>{{ledger(c)}}</span>
+                                    @if (c.INV_DESC) {
+<span class="iv-basis"> {{c.INV_DESC}}</span>
+}
+                                </div>
+                            </td>
+                            <td class="iv-c iv-mono">{{c.INV_TAXABLE}}</td>
+                            <td class="iv-r iv-mono">{{c.INV_QTY}}</td>
+                            <td class="iv-r iv-mono iv-rate">{{money(c.INV_RATE)}}</td>
+                            <td class="iv-c">{{c.INV_CURRENCYNAME}}</td>
+                            <td class="iv-r iv-mono iv-rate">{{c.INV_EXRATE}}</td>
+                            <td class="iv-r iv-mono iv-amt">{{money(c.TAXABLEAMTINR)}}</td>
+                            <td class="iv-r iv-mono iv-nontax">{{money(c.NONTAXABLEAMT_INR)}}</td>
+                        </tr>
+}
+                        @if (charges.length == 0) {
+<tr>
+                            <td colspan="11" class="iv-empty">No charge lines on this invoice.</td>
+                        </tr>
+}
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <!-- ============ 5. NARRATION + DOCUMENTS ============ -->
+        @if (header.NARRATION || enclosures.length > 0 || despatch.length > 0) {
+<footer class="iv-sec iv-foot"
+               >
+
+            @if (header.NARRATION) {
+<div class="iv-foot-narr">
+                <span class="iv-narr-k"><i class="fa fa-comment-o" aria-hidden="true"></i> Narration:</span>
+                <div class="iv-narr-box" [innerHTML]="header.NARRATION"></div>
+            </div>
+}
+
+            <!--  Enclosures and despatch share one panel: they are both "what went with the
+                  shipment", and tabs cost no height where two stacked tables would.      -->
+            @if (enclosures.length > 0 || despatch.length > 0) {
+<div class="iv-foot-docs">
+                @if (enclosures.length > 0) {
+<div class="iv-doclist">
+                    <span class="iv-doclabel"><i class="fa fa-paperclip" aria-hidden="true"></i> Enclosures ({{enclosures.length}})</span>
+                    <table class="iv-table iv-doctable">
+                        <thead>
+                            <tr><th>Code</th><th>Description</th><th class="iv-c">Numbers</th></tr>
+                        </thead>
+                        <tbody>
+                            @for (e of enclosures; track e) {
+<tr>
+                                <td class="iv-mono iv-code">{{e.inv_enclcode}}</td>
+                                <td>{{e.inv_desc}}</td>
+                                <td class="iv-c iv-mono iv-strong">{{e.inv_number}}</td>
+                            </tr>
+}
+                        </tbody>
+                    </table>
+                </div>
+}
+
+                @if (despatch.length > 0) {
+<div class="iv-doclist">
+                    <span class="iv-doclabel"><i class="fa fa-ship" aria-hidden="true"></i> Despatch ({{despatch.length}})</span>
+                    <table class="iv-table iv-doctable">
+                        <thead>
+                            <tr><th>Code</th><th>Despatch description</th><th class="iv-c">Numbers</th></tr>
+                        </thead>
+                        <tbody>
+                            @for (d of despatch; track d) {
+<tr>
+                                <td class="iv-mono iv-code iv-code-g">{{d.inv_despcode}}</td>
+                                <td>{{d.inv_desc}}</td>
+                                <td class="iv-c iv-mono iv-strong">{{d.inv_number}}</td>
+                            </tr>
+}
+                        </tbody>
+                    </table>
+                </div>
+}
+            </div>
+}
+
+        </footer>
+}
+
+    </main>
+}
+</div>

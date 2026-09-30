@@ -61,6 +61,8 @@ export class EntryAirImportComponent implements OnInit {
     BillTo: any = null;
     AirlineName: any = null;
     LinerAgent: any = null;
+    SalesPerson: any = null;           // Handler (fk_SubAgent)
+    SalesPersonList: Array<any> = [];
     BusinessAssociate: any = null;
     FlightNo: any = '';
     FlightDate: any = null;
@@ -295,6 +297,7 @@ export class EntryAirImportComponent implements OnInit {
                 this.TypeOfPackage2List = data.Table10;
                 this.BusinessAssociateList = data.Table11;
                 this.userdtls=data.Table13;
+                this.SalesPersonList = (data.Table14) ? data.Table14 : [];
                 this.populate(this.ImportId);
             });
     }
@@ -361,6 +364,7 @@ export class EntryAirImportComponent implements OnInit {
         let popObject = data[0];
         this.Importer = popObject.fk_Importer;
         this.BillTo = popObject.fk_BillTo;
+        this.SalesPerson = (popObject.fk_SubAgent) ? popObject.fk_SubAgent : null;
         this.AirlineName = (popObject.fk_ArilineId != "") ? Number(popObject.fk_ArilineId) : null;
         this.FlightNo = popObject.FightNo;
         this.FlightDate = (popObject.FightDate) ? this._dataService.stringdttoArry(popObject.FightDate) : null;
@@ -1447,6 +1451,7 @@ export class EntryAirImportComponent implements OnInit {
             fk_BillOfEntry: fk_BillOfEntry,
             MakerID: this._loginService.getLogin()[0].CMPID,
             MakerIP: this._loginService.getLogin()[0].MAKERIP,
+            fk_SubAgent: (this.SalesPerson) ? this.SalesPerson : "",
             Citycode1: this._loginService.getLogin()[0].CITYCODE1,
             CmpCode: this._loginService.getLogin()[0].CMPCODE,
             ArrivingDateAtICD: ArrivingDateAtICD,
@@ -1555,6 +1560,7 @@ export class EntryAirImportComponent implements OnInit {
         this.BillTo = null;
         this.AirlineName = null;
         this.LinerAgent = null;
+        this.SalesPerson = null;
         this.BusinessAssociate = null;
         this.MAWBNo = '';
         this.MAWBDate = null;

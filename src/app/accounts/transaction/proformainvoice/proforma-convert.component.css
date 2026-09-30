@@ -1,0 +1,240 @@
+@import './proforma-theme.css';
+
+/* Convert Proforma to Tax Invoice.
+
+   Screen-specific rules only. Everything shared - tokens, cards, tables, pills, buttons,
+   dark mode - comes from export-theme.css, the same sheet Export > View Consignment uses,
+   so this page reads as part of the application rather than a bolt-on. */
+
+.pc-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    align-items: start;
+    margin-bottom: 16px;
+}
+
+.pc-grid .x-card {
+    margin-bottom: 0;
+}
+
+@media (max-width: 1100px) {
+    .pc-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---- banners ------------------------------------------------------------- */
+
+.pc-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    border-left: 4px solid;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.pc-alert i {
+    font-size: 16px;
+    margin-top: 1px;
+}
+
+.pc-alert-danger {
+    background: #FDECEA;
+    border-left-color: #C0392B;
+    color: #8E2A20;
+}
+
+/* The rate-change warning is the one thing on this page that can quietly cost money:
+   the client is billed something other than the amount they approved. It is deliberately
+   louder than the surrounding cards. */
+.pc-alert-warn {
+    background: #FEF6E7;
+    border-left-color: #E08600;
+    color: #7A4A00;
+}
+
+.pc-row-warn td {
+    background: #FEF6E7;
+}
+
+/* ---- form fields --------------------------------------------------------- */
+
+.x-fields .form-control {
+    height: 32px;
+    font-size: 13px;
+    padding: 4px 10px;
+    border: 1px solid #D5DCE6;
+    border-radius: 6px;
+    width: 100%;
+    background: #fff;
+    color: #1F2733;
+}
+
+.x-fields .form-control:focus {
+    outline: none;
+    border-color: #2F80ED;
+    box-shadow: 0 0 0 3px rgba(47, 128, 237, .15);
+}
+
+/* Footer totals: heavier ground so the summed row reads as a conclusion, not another line. */
+.pc-total td {
+    background: #F4F7FB;
+    border-top: 2px solid #D5DCE6;
+}
+
+/* ---- compact, centred layout ---------------------------------------------
+   On a wide screen the cards used to stretch the full width and the five tables
+   pushed the Convert button several screens down. The page is capped and centred
+   so lines stay readable, and the detail tables fold away - the decision itself
+   (totals, dates, Convert) now fits without scrolling.                         */
+
+:host .x-page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding-bottom: 8px;
+}
+
+:host .x-card {
+    margin-bottom: 12px;
+}
+
+:host .x-card-body {
+    padding: 12px 16px;
+}
+
+:host .x-kv .x-k,
+:host .x-kv .x-v {
+    padding: 3px 0;
+}
+
+.pc-grid {
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+/* ---- totals strip --------------------------------------------------------- */
+
+.pc-sum {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.pc-sum-i {
+    flex: 1 1 0;
+    background: #fff;
+    border: 1px solid #E3E9F0;
+    border-radius: 8px;
+    padding: 10px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.pc-sum-k {
+    font-size: 11px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #6B7787;
+}
+
+.pc-sum-v {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1F2733;
+    font-variant-numeric: tabular-nums;
+}
+
+.pc-sum-grand {
+    background: #F0F6FF;
+    border-color: #BBD5F7;
+}
+
+.pc-sum-grand .pc-sum-v {
+    color: #1C6DD0;
+}
+
+@media (max-width: 780px) {
+    .pc-sum { flex-wrap: wrap; }
+    .pc-sum-i { flex: 1 1 100%; }
+}
+
+/* ---- collapsible sections ------------------------------------------------- */
+
+.pc-head-btn {
+    cursor: pointer;
+    user-select: none;
+}
+
+.pc-head-btn:hover {
+    background: #F7FAFD;
+}
+
+.pc-chev {
+    margin-left: auto;
+    color: #98A4B5;
+    font-size: 12px;
+}
+
+/*  A long charge list should scroll inside its own card rather than push the
+    Convert button off the page.                                              */
+:host .x-tablewrap {
+    max-height: 320px;
+    overflow: auto;
+}
+
+/* ---- action bar ----------------------------------------------------------- */
+
+/*  Kept in view so Convert is reachable whatever is expanded above it. */
+.pc-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    background: #fff;
+    border-top: 1px solid #E3E9F0;
+    padding: 10px 16px;
+    margin: 0 -4px;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0 -2px 8px rgba(31, 39, 51, .06);
+}
+
+/* ---- tax invoice dates ----------------------------------------------------
+   Two short date fields side by side rather than a stacked column of inputs -
+   the only thing entered on this page is the date, so it should not look like
+   a form.                                                                     */
+
+.pc-dates {
+    display: flex;
+    gap: 14px;
+}
+
+.pc-date {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.pc-date .x-lbl {
+    display: block;
+    margin-bottom: 4px;
+}
+
+@media (max-width: 620px) {
+    .pc-dates { flex-wrap: wrap; }
+    .pc-date  { flex: 1 1 100%; }
+}
+
+/*  Approval reference sits on its own line under the dates - it is free text and
+    needs the width, unlike the two short dates above it.                        */
+.pc-ref {
+    margin-top: 12px;
+}
+
+.pc-ref .x-lbl {
+    display: block;
+    margin-bottom: 4px;
+}

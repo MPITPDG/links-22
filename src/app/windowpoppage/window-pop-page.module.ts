@@ -32,6 +32,7 @@ import {srpiViewComponent} from './Account/srpi-view.component';
 import {ConsigneeViewComponent} from './Account/consign-view.component';
 import {QuotationPrintComponent } from './Account/Admin-Quotation-Print.component';
 import {ProformaInvoicePrintComponent} from './Account/proformainvoice-print.component';
+import {ProformaPrintComponent} from './Account/proforma-print.component';
 import {QuoteSeaPrintComponent} from './Quotation/quote-sea-print.component';
 import {SalesQuotationPrintComponent} from './Quotation/quotation-print.component';
 import {QuoteAirPrintComponent} from './Quotation/quote-air-print.component';
@@ -42,8 +43,9 @@ import {QuoteAirPrintComponent} from './Quotation/quote-air-print.component';
 // import { RemarkViewComponent } from './export/remark-view.component';
 // import { ContainerjobviewComponent } from './importfra/container-jobview.component'
 // import {CalCbmViewComponent } from './export/calculatecbm-view.component';
+import { InvoiceViewModule } from '../accounts/transaction/invoice/invoice-view.module';
 @NgModule({
-    imports: [CommonModule,
+    imports: [InvoiceViewModule, CommonModule,
         FormsModule,
         TabsModule,
         MyDatePickerModule,
@@ -65,7 +67,7 @@ import {QuoteAirPrintComponent} from './Quotation/quote-air-print.component';
         SinglejobnoReportComponent,JVPrintComponent,
         AdvanceFromClientPopUp,ActstatAdvancePrintComponent,JVViewComponent,
         PurchaseViewComponent,srpiViewComponent,ConsigneeViewComponent,QuotationPrintComponent,
-        ProformaInvoicePrintComponent,QuoteSeaPrintComponent,SalesQuotationPrintComponent,QuoteAirPrintComponent
+        ProformaInvoicePrintComponent,ProformaPrintComponent,QuoteSeaPrintComponent,SalesQuotationPrintComponent,QuoteAirPrintComponent
     ]
 })
 export class WindowPopPageModule { }

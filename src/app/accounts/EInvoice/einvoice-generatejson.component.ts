@@ -15,8 +15,8 @@ import {Configuration}  from '../../app.constants'
     standalone: false
 })
   export class GenerateJson implements OnInit {
+    checkbox: boolean = false;   // bound in the template; declared for the production (AOT) build
     EInvoiceListtbl: any = []
-    checkbox: boolean = false;
     ECreditNoteListtbl:any=[];
     newArray: any = [];
     rptdownloadurl:string;
@@ -62,10 +62,6 @@ import {Configuration}  from '../../app.constants'
             this._loaderService.display(false);
           })
       }
-    checkAll(event: any) {
-        const checked = event.target.checked;
-        this.EInvoiceListtbl.forEach((item: any) => item.Checked = checked);
-    }
     
       getCheckboxValues(event, data) {
         var index = this.newArray.findIndex(x => x.InvNo == data);
@@ -77,6 +73,17 @@ import {Configuration}  from '../../app.constants'
         }
         else {
           this.newArray.splice(index, 1);
+        }
+      }
+      /*  Header "select all" box: ticks or unticks every row and rebuilds the selection in one
+          go, so an invoice can never be listed twice. The template always called this; it was
+          missing, which only the production (AOT) build reports.                           */
+      checkAll(event: any) {
+        const on = !!(event && event.target && event.target.checked);
+        this.newArray = [];
+        for (let i = 0; i < this.EInvoiceListtbl.length; i++) {
+          this.EInvoiceListtbl[i].Checked = on;
+          if (on) { this.newArray.push({ InvNo: this.EInvoiceListtbl[i].INV_NO }); }
         }
       }
       GenerateEInvoice(){

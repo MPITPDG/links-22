@@ -54,6 +54,11 @@ const routes: Routes = [
       }  ,
   
       {
+        path: 'JobHandler',
+        loadChildren: () => import('./JobHandler/jobhandler.module').then(m => m.JobHandlerModule),
+        canActivate: [FinancialYearAuthGuard],
+      },
+      {
         path: 'ExJobSearch',
         loadChildren: () => import('./ExJobSearch/exjobsearch.module').then(m => m.ExJobSearchModule),
         canActivate: [FinancialYearAuthGuard],

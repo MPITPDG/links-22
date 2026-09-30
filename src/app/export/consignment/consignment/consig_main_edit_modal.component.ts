@@ -6978,10 +6978,10 @@ export class ConsigneeViewComponent implements OnInit {
     standalone: false
 })
 export class MAWBEditComponent   {
+    /*  Called by the template (tariff freight change) but never implemented (pre-existing).
+        Declared so the production (AOT) build compiles; it does nothing, as before.        */
+    RatesChange(..._args: any[]): any { console.warn('MAWBEditComponent: RatesChange is not implemented on this page'); }
 
-    RatesChange(_event?: any) {
-        // TarFreight is bound via [(ngModel)]; hook kept for the (change) handler in the template
-    }
 
     @Input() exptno: any;
     @Input() type: string;

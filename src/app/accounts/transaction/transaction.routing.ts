@@ -16,6 +16,11 @@ const routes: Routes = [
                 canActivate: [FinancialYearAuthGuard],
             },
             {
+                path: 'proformainvoice',
+                loadChildren: () => import('./proformainvoice/proformainvoice.module').then(m => m.ProformaInvoiceModule),
+                canActivate: [FinancialYearAuthGuard],
+            },
+            {
                 path: 'creditnote',
                 loadChildren: () => import('./CrtNote/credit-note.module').then(m => m.CreditNoteModule),
                 canActivate: [FinancialYearAuthGuard],

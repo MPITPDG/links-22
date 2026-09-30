@@ -16,6 +16,9 @@ import { ToasterConfig } from 'angular2-toaster';
     standalone: false
 })
 export class CreateAutoJobComponent implements OnInit {
+    /*  Called by the template (Incoterm change) but never implemented (pre-existing); the choice
+        is already held by ngModel. Declared so the production (AOT) build compiles.          */
+    changeIncoterm(..._args: any[]): any { }
     private baseUrl: string = 'Export/GetExportConsignmentNew';
 
      public myDatePickerOptions: IMyDpOptions = {
@@ -105,9 +108,6 @@ export class CreateAutoJobComponent implements OnInit {
         this.trSubAir = 'N';
         this.trSubSea = 'Y'
         this.City = this._loginService.getLogin()[0].CITYCODE;
-    }
-    changeIncoterm(_value?: any) {
-        // incoterm is bound via [(ngModel)]; hook kept for the (change) handler in the template
     }
 
     ngOnInit(): void {

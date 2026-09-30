@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { LoaderService } from '../../shared/service/loader.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LoginService } from '../../shared/service/loginService';
 @Component({
   selector: 'app-invoice-view',
@@ -47,7 +47,8 @@ export class InvoiceViewComponent implements OnInit {
        datatabl_9=[]
        datatabl_10=[]
   constructor( public _dataService: DataService,	
-    private _route: ActivatedRoute,public _loginService: LoginService,
+    private _route: ActivatedRoute,
+    private _router: Router,public _loginService: LoginService,
 		private loaderService: LoaderService) {}
 
   ngOnInit() {
@@ -104,6 +105,12 @@ export class InvoiceViewComponent implements OnInit {
        else{this.loaderService.display(false);}
       })
   }
+  /*  The same invoice in the new audit layout, kept alongside this one so the
+      two can be compared before anything is retired.                       */
+  showNew() {
+    this._router.navigate(['/popup/Account-Invoice-View-New/' + this.INV_NO]);
+  }
+
   jobprofitreport(jobno) {
 
     let theTop = (screen.height / 2) - (483 / 2);

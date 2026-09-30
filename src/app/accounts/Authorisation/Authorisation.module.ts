@@ -13,6 +13,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { CNAuth } from './CN-Auth.component';
 import { AuthfilterpipePipe } from './authfilterpipe.pipe';
+import { InvoiceViewModule } from '../transaction/invoice/invoice-view.module';
 
 @NgModule({
     imports: [AuthorisationRoutingModule,ModalModule,
@@ -21,7 +22,8 @@ import { AuthfilterpipePipe } from './authfilterpipe.pipe';
         TabsModule,
         MyDatePickerModule,
         NgSelectModule,OrderModule,FilterPipeModule,NgxPaginationModule,
-        SharedModule],
+        SharedModule,
+        InvoiceViewModule],
     declarations: [invoiceAuth,CNAuth, AuthfilterpipePipe
     ],
     providers: [

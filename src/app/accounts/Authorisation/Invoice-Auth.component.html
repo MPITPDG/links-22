@@ -1,86 +1,419 @@
-<div class="animated fadeIn">
-  <div class="row no-gutters">
-    <div class="col-sm-12">
-      <div class="card">
-        <div class="card-header formheading">
-          <strong>Authorise Printing Invoice List</strong>
+<div class="animated fadeIn x-page ia-page">
+
+    <!-- ================= HEADER ================= -->
+    <div class="x-toolbar">
+        <div class="x-mark">
+            <i class="fa fa-check-square-o" aria-hidden="true"></i>
         </div>
-      </div>
-    </div>
-  </div>
-  <div class="row no-gutters" >
-    <div class="col-md-1 col-lg-1 col-12" >
-    </div>
-    <div class="col-md-10 col-lg-10 col-12" >
-      <table >
-        <tr>
-          <td colspan="8">
-            <div class="input-group input-group-rounded"  style="float: right;width: 300px;font-family: verdana;font-size:11px;padding: 1px;">
-              <div class="input-group-prepend">
-                  <span class="input-group-text"><i class="fa fa-search"></i></span>
-              </div>
-              <input class="form-control" type="search" [(ngModel)]="searchString" autocomplete="off"
-                  placeholder="Search">
-          </div>
-          </td>
-        </tr>
-      </table>
-      <table class="table table-bordered table-sm-new " style="height:400px;"  >
-        <thead class="title-head formheading" >
-      
-          <tr  style="white-space:nowrap;">
-            <th class="col-form-span-label"  style="  background-color: #004980; color: white;"><input type="checkbox"  [(ngModel)]='checkbox' (change)="checkAll($event)" /> &nbsp; </th>
-            <th class="col-form-span-label"  style="  background-color: #004980; color: white;">Trans Type</th>
-            <th class="col-form-span-label"  style="  background-color: #004980;color: white;" [class.active]="order === 'INV_CRTNO'" (click)="setOrder('INV_CRTNO')">  Inv No <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
-            <th class="col-form-span-label"  style="  background-color: #004980; color: white;" [class.active]="order === 'INV_CRTDT'" (click)="setOrder('INV_CRTDT')">  Inv Date <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
-            <th class="col-form-span-label"  style="  background-color: #004980; color: white;" [class.active]="order === 'CREATEDBY'" (click)="setOrder('CREATEDBY')">  Prepared By <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span>  </th>
-            <th class="col-form-span-label"  style="  background-color: #004980; color: white;" [class.active]="order === 'INV_CRT_DAT'" (click)="setOrder('INV_CRT_DAT')">  Prepared On <span [hidden]="reverse">▼</span>   <span [hidden]="!reverse">▲</span> </th>
-            <th class="col-form-span-label"   style=" background-color:#004980; color: white;"[class.active]="order === 'CLIENTNAME'" (click)="setOrder('CLIENTNAME')">    Client <span [hidden]="reverse">▼</span> <span [hidden]="!reverse">▲</span>    </th>
-            <th class="col-form-span-label"   style=" background-color:#004980; color: white;"[class.active]="order === 'SUPPLYTYPE'" (click)="setOrder('SUPPLYTYPE')">    SupplyType <span [hidden]="reverse">▼</span> <span [hidden]="!reverse">▲</span>    </th>
-            <th class="col-form-span-label"   style=" background-color:#004980; color: white;"[class.active]="order === 'POS'" (click)="setOrder('POS')">    Pos <span [hidden]="reverse">▼</span> <span [hidden]="!reverse">▲</span>    </th>
-            <th class="col-form-span-label"  style="  background-color: #004980; color: white;" [class.active]="order === 'TOTAL_AMT'" (click)="setOrder('TOTAL_AMT')">     Amount <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span>  </th>
-          </tr>
-        </thead>
-        <tbody class="bgwhite">
-          @for (obj of invoicedata | authfilterpipe: searchString |orderBy: order:reverse:'case-insensitive'|paginate: { itemsPerPage:25, currentPage: PageActual }; track obj) {
-<tr
-             
-            >
-            <td class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.Checked"
-                (ngModelChange)="getCheckboxValues($event,obj.INV_CRTNO)"> &nbsp; </td>
-            <td class="col-form-span-label">{{obj.TRNS_TYPE}}</td>
-            <td class="col-form-span-label" (click)="invoiceviewdata(obj.INV_CRTNO,template)">{{obj.INV_CRTNO}}</td>
-            <td class="col-form-span-label">{{obj.INV_CRTDT}}</td>
-            <td class="col-form-span-label">{{obj.CREATEDBY}}</td>
-            <td class="col-form-span-label">{{obj.INV_CRT_DAT}}</td>
-            <td class="col-form-span-label" [innerHTML]="obj.CLIENTNAME"></td>
-            <td class="col-form-span-label" >{{obj.SUPPLYTYPE}}</td>
-            <td class="col-form-span-label" >{{obj.POS}}</td>
-            <td class="col-form-span-label" style="text-align: right;">{{obj.TOTAL_AMT|number:'2.2-4'}}</td>
-          </tr>
+        <div class="x-titlewrap">
+            <span class="x-eyebrow">Accounts</span>
+            <h1 class="x-title">Invoice Authorisation</h1>
+            <p class="x-sub">Invoices waiting to be authorised for printing</p>
+        </div>
+
+        @if (loadedAt) {
+<span class="ia-asof">{{loadedText()}}</span>
 }
-        </tbody>
-        <tr>
-          <td colspan="8" class="right-text pr-2">
-            <button class="btn btn-sm btn-success" type="submit" (click)="authorisedata()"> <span
-                class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Authorize</span></button>
-            <button class="btn btn-sm btn-danger" type="submit"  (click)="abortdata()"> 
-              <span class="col-form-span-label"><i class="fa fa-ban"></i>Abort</span></button>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="8">
-            <div class="row justify-content-center no-gutters"
-              style="font-family:verdana;font-size: 11px;padding: 1px;">
-              <pagination-controls (pageChange)="PageActual=$event" autoHide="true"></pagination-controls>
+        <button type="button" class="x-btn" (click)="getdataforauth()" [disabled]="busy" title="Reload the list">
+            <i class="fa fa-refresh" aria-hidden="true"></i> Refresh
+        </button>
+    </div>
+
+    @if (loadError) {
+<div class="ia-alert">
+        <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        <span>{{loadError}}</span>
+        <button type="button" class="x-btn" (click)="getdataforauth()">Try again</button>
+    </div>
+}
+
+    <!-- ================= QUEUE SUMMARY =================
+         Always the whole queue, whatever the filters below are set to. -->
+    @if (loaded && !loadError && rows.length > 0) {
+<div class="x-card ia-summary">
+        <div class="x-stats ia-stats">
+            <div class="x-stat">
+                <span class="x-stat-lbl">Waiting</span>
+                <span class="x-stat-val">{{stat.count}}<span class="x-stat-unit">{{stat.count == 1 ? 'invoice' : 'invoices'}}</span></span>
             </div>
-          </td>
-        </tr>
-      </table>
-
+            <div class="x-stat">
+                <span class="x-stat-lbl">Value</span>
+                <span class="x-stat-val"><span class="x-stat-unit ia-cur">&#8377;</span>{{rupees(stat.amount)}}</span>
+            </div>
+            <div class="x-stat">
+                <span class="x-stat-lbl">Clients</span>
+                <span class="x-stat-val">{{stat.clients}}</span>
+            </div>
+            <button type="button" class="x-stat ia-stat-btn" (click)="setAge('today')" [class.active]="fAge == 'today'"
+                    title="Show invoices prepared today">
+                <span class="x-stat-lbl">Prepared today</span>
+                <span class="x-stat-val">{{stat.today}}</span>
+            </button>
+            <button type="button" class="x-stat ia-stat-btn" (click)="setAge('over7')" [class.active]="fAge == 'over7'"
+                    [class.ia-stat-warn]="stat.overWeek > 0" title="Show invoices waiting more than a week">
+                <span class="x-stat-lbl">Waiting over 7 days</span>
+                <span class="x-stat-val">{{stat.overWeek}}</span>
+            </button>
+            <div class="x-stat" [class.ia-stat-danger]="stat.oldestAge > 30">
+                <span class="x-stat-lbl">Oldest</span>
+                <span class="x-stat-val">{{stat.oldestAge}}<span class="x-stat-unit">{{stat.oldestAge == 1 ? 'day' : 'days'}}</span></span>
+                <span class="ia-stat-sub">{{stat.oldestDate}}</span>
+            </div>
+        </div>
     </div>
-    <div class="col-md-1 col-lg-1 col-12">
-    </div>
+}
 
-  </div>
+    <!-- ================= NOTHING WAITING ================= -->
+    @if (loaded && !loadError && rows.length == 0) {
+<div class="x-card ia-done">
+        <i class="fa fa-check-circle" aria-hidden="true"></i>
+        <h2>Nothing waiting</h2>
+        <p>Every invoice has been authorised for printing.</p>
+    </div>
+}
+
+    <!-- ================= LIST ================= -->
+    @if (loaded && !loadError && rows.length > 0) {
+<div class="x-card ia-list">
+
+        <div class="ia-filters">
+            <div class="ia-search">
+                <i class="fa fa-search" aria-hidden="true"></i>
+                <input type="text" class="form-control" [(ngModel)]="searchString" (ngModelChange)="applyFilters()"
+                       placeholder="Invoice no, client, GSTIN, amount..." autocomplete="off" />
+                @if (searchString) {
+<i class="fa fa-times ia-x" (click)="searchString = ''; applyFilters()" title="Clear"></i>
+}
+            </div>
+
+            <div class="ia-f ia-f-client">
+                <ng-select [items]="clientOptions" bindLabel="label" bindValue="value" [(ngModel)]="fClient"
+                           (change)="applyFilters()" placeholder="All clients" [searchable]="true" [clearable]="true">
+                </ng-select>
+            </div>
+
+            <div class="ia-f">
+                <select class="form-control" [(ngModel)]="fPreparer" (ngModelChange)="applyFilters()" title="Prepared by">
+                    <option value="">Prepared by: anyone</option>
+                    @for (o of preparerOptions; track o) {
+<option [value]="o.value">{{o.value}} ({{o.count}})</option>
+}
+                </select>
+            </div>
+
+            @if (supplyOptions.length > 0) {
+<div class="ia-f">
+                <select class="form-control" [(ngModel)]="fSupply" (ngModelChange)="applyFilters()" title="Supply type">
+                    <option value="">All supply types</option>
+                    @for (o of supplyOptions; track o) {
+<option [value]="o.value">{{o.value}} ({{o.count}})</option>
+}
+                </select>
+            </div>
+}
+        </div>
+
+        <div class="ia-chips">
+            <span class="ia-chips-k">Waiting</span>
+            <button type="button" class="ia-chip" [class.active]="fAge == ''" (click)="setAge('')">
+                All <b>{{stat.count}}</b>
+            </button>
+            @for (a of ageOptions; track a) {
+<button type="button" class="ia-chip"
+                    [class.active]="fAge == a.key"
+                    [class.ia-chip-warn]="a.key == 'over7' && a.count > 0"
+                    [class.ia-chip-danger]="a.key == 'over30' && a.count > 0"
+                    [disabled]="a.count == 0 && fAge != a.key"
+                    (click)="setAge(a.key)">
+                {{a.label}} <b>{{a.count}}</b>
+            </button>
+}
+
+            <span class="ia-viewsum">
+                Showing <b>{{view.length}}</b> of {{rows.length}}
+                <span class="ia-dot">&middot;</span> &#8377; <b>{{money(viewAmount)}}</b>
+            </span>
+            @if (filtersActive()) {
+<a class="ia-link" (click)="clearFilters()">Clear filters</a>
+}
+        </div>
+
+        <!-- select-all-matching banner, Gmail style -->
+        @if (pageAllSelected() && view.length > pageRows().length) {
+<div class="ia-banner">
+            @if (!viewAllSelected()) {
+
+                All {{pageRows().length}} invoices on this page are selected.
+                <a class="ia-link" (click)="selectAllInView()">Select all {{view.length}} matching invoices</a>
+            
+}
+            @if (viewAllSelected()) {
+
+                All {{view.length}} matching invoices are selected.
+                <a class="ia-link" (click)="clearSelection()">Clear selection</a>
+            
+}
+        </div>
+}
+
+        <div class="x-tablewrap ia-tablewrap">
+            <table class="x-table ia-table">
+                <thead>
+                    <tr>
+                        <th class="ia-check">
+                            <input type="checkbox" title="Select every invoice on this page"
+                                   [checked]="pageAllSelected()" [indeterminate]="pageSomeSelected()"
+                                   [disabled]="view.length == 0" (change)="togglePage()" />
+                        </th>
+                        @if (hasTransTypes) {
+<th>Type</th>
+}
+                        <th class="ia-sort" [class.active]="order === 'no'" (click)="setOrder('no')">
+                            Invoice No <i class="fa" [ngClass]="order === 'no' ? (reverse ? 'fa-sort-desc' : 'fa-sort-asc') : 'fa-sort'"></i>
+                        </th>
+                        <th class="ia-sort" [class.active]="order === 'date'" (click)="setOrder('date')">
+                            Inv Date <i class="fa" [ngClass]="order === 'date' ? (reverse ? 'fa-sort-desc' : 'fa-sort-asc') : 'fa-sort'"></i>
+                        </th>
+                        <th class="ia-sort" [class.active]="order === 'client'" (click)="setOrder('client')">
+                            Client <i class="fa" [ngClass]="order === 'client' ? (reverse ? 'fa-sort-desc' : 'fa-sort-asc') : 'fa-sort'"></i>
+                        </th>
+                        @if (hasSupply) {
+<th class="ia-sort" [class.active]="order === 'supply'" (click)="setOrder('supply')">
+                            Supply <i class="fa" [ngClass]="order === 'supply' ? (reverse ? 'fa-sort-desc' : 'fa-sort-asc') : 'fa-sort'"></i>
+                        </th>
+}
+                        @if (hasPos) {
+<th class="ia-sort" [class.active]="order === 'pos'" (click)="setOrder('pos')">
+                            Place of supply <i class="fa" [ngClass]="order === 'pos' ? (reverse ? 'fa-sort-desc' : 'fa-sort-asc') : 'fa-sort'"></i>
+                        </th>
+}
+                        <th class="ia-sort" [class.active]="order === 'by'" (click)="setOrder('by')">
+                            Prepared <i class="fa" [ngClass]="order === 'by' ? (reverse ? 'fa-sort-desc' : 'fa-sort-asc') : 'fa-sort'"></i>
+                        </th>
+                        <th class="ia-sort" [class.active]="order === 'age'" (click)="setOrder('age')" title="Days since the invoice was prepared">
+                            Waiting <i class="fa" [ngClass]="order === 'age' ? (reverse ? 'fa-sort-desc' : 'fa-sort-asc') : 'fa-sort'"></i>
+                        </th>
+                        <th class="x-num ia-sort" [class.active]="order === 'amt'" (click)="setOrder('amt')">
+                            Amount (&#8377;) <i class="fa" [ngClass]="order === 'amt' ? (reverse ? 'fa-sort-desc' : 'fa-sort-asc') : 'fa-sort'"></i>
+                        </th>
+                        <th class="ia-act"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (r of view | paginate: { itemsPerPage: pageSize, currentPage: PageActual }; track trackNo($index, r)) {
+<tr
+                        [class.ia-sel]="selected[r._no]" [class.ia-open]="r._no == DrawerInvNo">
+                        <td class="ia-check" data-label="Select">
+                            <label class="ia-checkhit">
+                                <input type="checkbox" [checked]="!!selected[r._no]" (change)="toggleRow(r)" />
+                            </label>
+                        </td>
+                        @if (hasTransTypes) {
+<td data-label="Type">{{r.TRNS_TYPE}}</td>
+}
+                        <td data-label="Invoice No">
+                            <a class="ia-inv" (click)="invoiceviewdata(r._no)" title="Open the invoice">{{r._no}}</a>
+                        </td>
+                        <td data-label="Inv Date" class="ia-nowrap ia-mono">{{r.INV_CRTDT}}</td>
+                        <td data-label="Client" class="ia-clientcell">
+                            <div class="ia-client">{{r._client}}</div>
+                            @if (r._gstin) {
+<div class="ia-gstin">{{r._gstin}}</div>
+}
+                        </td>
+                        @if (hasSupply) {
+<td data-label="Supply">
+                            @if (r._supply) {
+<span class="ia-supply">{{r._supply}}</span>
+}
+                        </td>
+}
+                        @if (hasPos) {
+<td data-label="Place of supply" class="ia-pos">{{r._pos}}</td>
+}
+                        <td data-label="Prepared">
+                            <div class="ia-by">{{r._by}}</div>
+                            <div class="ia-when">{{r._prepText}}</div>
+                        </td>
+                        <td data-label="Waiting">
+                            <span class="ia-age" [class.ia-age-warn]="r._age > 7 && r._age <= 30"
+                                  [class.ia-age-danger]="r._age > 30">{{ageText(r)}}</span>
+                        </td>
+                        <td data-label="Amount (&#8377;)" class="x-num ia-amt">{{money(r._amt)}}</td>
+                        <td data-label="" class="ia-act">
+                            <button type="button" class="x-btn ia-view" (click)="invoiceviewdata(r._no)" title="Open the invoice">
+                                <i class="fa fa-eye" aria-hidden="true"></i> View
+                            </button>
+                        </td>
+                    </tr>
+}
+                    @if (view.length == 0) {
+<tr>
+                        <td colspan="11" class="x-empty">
+                            <i class="fa fa-filter" aria-hidden="true"></i>
+                            No invoice matches these filters.
+                            <a class="ia-link" (click)="clearFilters()">Clear filters</a>
+                        </td>
+                    </tr>
+}
+                </tbody>
+            </table>
+        </div>
+
+        @if (view.length > 0) {
+<div class="ia-foot">
+            <span class="ia-range">{{rangeText()}} of {{view.length}}</span>
+            <pagination-controls (pageChange)="PageActual = $event" autoHide="true"
+                                 previousLabel="Prev" nextLabel="Next"></pagination-controls>
+            <label class="ia-size">
+                Rows
+                <select class="form-control" [ngModel]="pageSize" (ngModelChange)="setPageSize($event)">
+                    @for (n of pageSizes; track n) {
+<option [ngValue]="n">{{n}}</option>
+}
+                </select>
+            </label>
+        </div>
+}
+    </div>
+}
+
+    <!-- ================= SELECTION BAR =================
+         States exactly what will be authorised before the button is pressed. -->
+    @if (selCount > 0 && !DrawerInvNo) {
+<div class="ia-bar">
+        <div class="ia-bar-l">
+            <span class="ia-bar-count">{{selCount}}</span>
+            <span>{{selCount == 1 ? 'invoice' : 'invoices'}} selected</span>
+            <span class="ia-dot">&middot;</span>
+            <span class="ia-bar-amt">&#8377; {{money(selAmount)}}</span>
+            @if (selHidden > 0) {
+<span class="ia-bar-note">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                {{selHidden}} not shown under the current filter
+            </span>
+}
+        </div>
+        <div class="ia-bar-r">
+            <button type="button" class="x-btn" (click)="clearSelection()" [disabled]="busy">Clear</button>
+            <button type="button" class="x-btn ia-btn-ok" (click)="openConfirm()" [disabled]="busy">
+                <i class="fa fa-check" aria-hidden="true"></i>
+                Authorise {{selCount}}
+            </button>
+        </div>
+    </div>
+}
+
+    <!-- ================= CONFIRM ================= -->
+    @if (confirmOpen) {
+<div class="ia-modal-back" (click)="closeConfirm()"></div>
+}
+    @if (confirmOpen) {
+<div class="ia-modal" role="dialog" aria-modal="true" aria-labelledby="iaConfirmTitle">
+        <div class="ia-modal-head">
+            <i class="fa fa-check-circle" aria-hidden="true"></i>
+            <h3 id="iaConfirmTitle">Authorise {{selCount}} {{selCount == 1 ? 'invoice' : 'invoices'}} for printing?</h3>
+        </div>
+
+        <div class="ia-modal-body">
+            <div class="ia-modal-total">
+                <span>Total value</span>
+                <b>&#8377; {{money(selAmount)}}</b>
+            </div>
+
+            @if (selHidden > 0) {
+<p class="ia-modal-note">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                {{selHidden}} of these {{selHidden == 1 ? 'is' : 'are'}} not shown under the current filter.
+            </p>
+}
+
+            <div class="ia-mini-wrap">
+                <table class="ia-mini">
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th class="x-num">Invoices</th>
+                            <th class="x-num">Amount (&#8377;)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (g of confirmGroups | slice:0:8; track g) {
+<tr>
+                            <td>{{g.name}}</td>
+                            <td class="x-num">{{g.count}}</td>
+                            <td class="x-num">{{money(g.amount)}}</td>
+                        </tr>
+}
+                        @if (confirmGroups.length > 8) {
+<tr>
+                            <td colspan="3" class="ia-more">and {{confirmGroups.length - 8}} more clients</td>
+                        </tr>
+}
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="ia-modal-hint">
+                Authorised invoices leave this list and can be printed. To reverse one, use UnAuthorisation.
+            </p>
+        </div>
+
+        <div class="ia-modal-foot">
+            <button type="button" class="x-btn" (click)="closeConfirm()" [disabled]="busy">Cancel</button>
+            <button type="button" class="x-btn ia-btn-ok" (click)="confirmAuthorise()" [disabled]="busy">
+                <i class="fa" [ngClass]="busy ? 'fa-spinner fa-spin' : 'fa-check'" aria-hidden="true"></i>
+                {{busy ? 'Authorising...' : 'Authorise'}}
+            </button>
+        </div>
+    </div>
+}
 </div>
+
+<!-- ========================= INVOICE DETAIL DRAWER =========================
+     Review one invoice at a time: Prev / Next walk the list as filtered and sorted, and
+     the drawer's own Authorise button authorises this invoice and moves to the next.   -->
+@if (DrawerInvNo) {
+<div class="iv-backdrop" (click)="CloseDrawer()"></div>
+}
+@if (DrawerInvNo) {
+<div class="iv-drawer">
+    <app-invoice-view-page [invNoInput]="DrawerInvNo" [embedded]="true" [showApprove]="false"
+                           (closed)="CloseDrawer()"></app-invoice-view-page>
+
+    @if (drawerRow(); as d) {
+<div class="ia-review">
+        <button type="button" class="ia-review-btn" (click)="drawerStep(-1)" [disabled]="drawerIndex() <= 0"
+                title="Previous invoice (Alt + Left)">
+            <i class="fa fa-chevron-left" aria-hidden="true"></i> Prev
+        </button>
+        <span class="ia-review-pos">{{drawerIndex() + 1}} of {{view.length}}</span>
+        <button type="button" class="ia-review-btn" (click)="drawerStep(1)" [disabled]="drawerIndex() >= view.length - 1"
+                title="Next invoice (Alt + Right)">
+            Next <i class="fa fa-chevron-right" aria-hidden="true"></i>
+        </button>
+
+        <span class="ia-review-info">
+            <span class="ia-review-client">{{d._client}}</span>
+            <span class="ia-dot">&middot;</span>
+            &#8377; {{money(d._amt)}}
+            <span class="ia-dot">&middot;</span>
+            {{d._age == 0 ? 'prepared today' : 'waiting ' + ageText(d)}}
+        </span>
+
+        <label class="ia-review-sel" title="Add to the selection for a bulk authorise">
+            <input type="checkbox" [checked]="!!selected[d._no]" (change)="toggleRow(d)" />
+            Selected
+            @if (selCount > 0) {
+<span>({{selCount}})</span>
+}
+        </label>
+
+        <button type="button" class="ia-review-ok" (click)="authoriseFromDrawer()" [disabled]="busy">
+            <i class="fa" [ngClass]="busy ? 'fa-spinner fa-spin' : 'fa-check'" aria-hidden="true"></i>
+            Authorise &amp; next
+        </button>
+    </div>
+}
+</div>
+}

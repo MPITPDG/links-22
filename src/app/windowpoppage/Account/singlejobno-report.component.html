@@ -152,8 +152,8 @@
                 </div>
                 <div class="jp-kpi-value">{{ Profit | number:'1.2-2' }}</div>
                 <div class="jp-kpi-sub">
-                    <span class="jp-pill jp-pill--sm" style="margin-left:0" [ngClass]="isLoss(table4.GRAND_REMARKS) ? 'jp-pill--loss' : 'jp-pill--gain'">
-                        {{ table4.GRAND_REMARKS || (Profit >= 0 ? 'Gain' : 'Loss') }}
+                    <span class="jp-pill jp-pill--sm" style="margin-left:0" [ngClass]="Profit < 0 ? 'jp-pill--loss' : 'jp-pill--gain'">
+                        {{ Profit < 0 ? 'Loss' : 'Gain' }}
                     </span>
                     @if (Status === 'PROVISIONAL') {
 <span class="jp-pill jp-pill--sm jp-pill--warn">provisional</span>
@@ -265,8 +265,8 @@
                             <td class="num">{{ table4.GRAND_RECOVERYAMT | number:'1.2-2' }}</td>
                         </tr>
                         <tr class="jp-result" [ngClass]="Profit >= 0 ? 'jp-result--pos' : 'jp-result--neg'">
-                            <td colspan="3">{{ table4.GRAND_REMARKS || (Profit >= 0 ? 'Gain' : 'Loss') }}</td>
-                            <td colspan="2" class="num">{{ table4.GRAND_DIFFAMT | number:'1.2-2' }}</td>
+                            <td colspan="3">{{ Profit < 0 ? 'Loss' : 'Gain' }}</td>
+                            <td colspan="2" class="num" [ngClass]="Profit < 0 ? 'jp-neg' : 'jp-pos'">{{ Profit | number:'1.2-2' }}</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -297,9 +297,9 @@
                             <td><b>{{ c.ACCTCODE }}</b></td>
                             <td class="num">{{ c.GRAND_PAIDAMT | number:'1.2-2' }}</td>
                             <td class="num">{{ c.GRAND_RECOVERYAMT | number:'1.2-2' }}</td>
-                            <td class="num" [ngClass]="num(c.GRAND_DIFFAMT) >= 0 ? 'jp-pos' : 'jp-neg'">{{ c.GRAND_DIFFAMT | number:'1.2-2' }}</td>
+                            <td class="num" [ngClass]="rowDiff(c) >= 0 ? 'jp-pos' : 'jp-neg'">{{ rowDiff(c) | number:'1.2-2' }}</td>
                             <td>
-                                <span class="jp-pill jp-pill--sm" [ngClass]="isLoss(c.GRAND_REMARKS) ? 'jp-pill--loss' : 'jp-pill--gain'">{{ c.GRAND_REMARKS }}</span>
+                                <span class="jp-pill jp-pill--sm" [ngClass]="rowDiff(c) < 0 ? 'jp-pill--loss' : 'jp-pill--gain'">{{ rowDiff(c) < 0 ? 'Loss' : 'Gain' }}</span>
                             </td>
                         </tr>
 }

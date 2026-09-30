@@ -1,0 +1,220 @@
+<div class="tdr-page">
+
+  <!-- ================= FILTERS ================= -->
+  <div class="tdr-card tdr-filter-card">
+    <div class="tdr-card-heading">
+      <i class="fa fa-book"></i> {{Header}}
+      @if (Compname) {
+<span class="tdr-meta">&middot; {{Compname}}</span>
+}
+    </div>
+
+    <div class="tdr-filter-row">
+      <div class="tdr-field">
+        <label>From Date <span class="tdr-req">*</span></label>
+        <my-date-picker name="FromDate" [options]="myDatePickerOptions" (dateChanged)="FromDateChanged($event)"
+                        class="form-control" [selDate]="FromDate"></my-date-picker>
+      </div>
+      <div class="tdr-field">
+        <label>To Date <span class="tdr-req">*</span></label>
+        <my-date-picker name="ToDate" [options]="myDatePickerOptions" (dateChanged)="ToDateChanged($event)"
+                        class="form-control" [selDate]="ToDate"></my-date-picker>
+      </div>
+      <div class="tdr-field tdr-field-branch">
+        <label>Branch <span class="tdr-req">*</span></label>
+        <select class="form-control" name="Branch" [(ngModel)]="Branch">
+          @for (b of BranchList; track b) {
+<option value="{{b.CITYCODE1}}">{{b.CITYNAME}}</option>
+}
+        </select>
+      </div>
+      <div class="tdr-field tdr-field-party">
+        <label>Party <span class="tdr-hint">(after Show; blank = all)</span></label>
+        <ng-select [items]="PartyList" bindLabel="PARTYNAME" bindValue="PARTYCODE"
+                   [(ngModel)]="Party" (ngModelChange)="onPartyChange()" [disabled]="!Searched"
+                   class="custom" placeholder="-- All Parties --">
+        </ng-select>
+      </div>
+      <div class="tdr-actions">
+        <button class="tdr-btn tdr-btn--primary" type="button" (click)="Showdata()">
+          <i class="fa fa-search"></i> Show
+        </button>
+        <button class="tdr-btn tdr-btn--ghost" type="button" (click)="Exporttoxl()" [disabled]="!Searched">
+          <i class="fa fa-file-excel-o"></i> Export
+        </button>
+        <button class="tdr-btn tdr-btn--ghost" type="button" (click)="clear()">
+          <i class="fa fa-ban"></i> Clear
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= RESULT ================= -->
+  @if (Searched) {
+
+
+    <div class="tdr-topbar">
+      <div class="tdr-topbar-left">
+        <span class="tdr-page-title">{{Header}}</span>
+        <span class="tdr-meta">{{status?.FROMDATE}} to {{status?.TODATE}} &middot; {{BranchLabel}}</span>
+      </div>
+      <div class="tdr-view-toggle">
+        <button class="toggle-btn" type="button" [class.active]="activeTab=='DETAIL'" (click)="activeTab='DETAIL'">
+          Detail <span class="toggle-count">{{rowCount}}</span>
+        </button>
+        <button class="toggle-btn" type="button" [class.active]="activeTab=='SUMMARY'" (click)="activeTab='SUMMARY'">
+          TDS Summary <span class="toggle-count">{{summary.length}}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="tdr-summary-strip">
+      <div class="tdr-stat">
+        <span class="tdr-stat-label">Parties</span>
+        <span class="tdr-stat-value">{{partyCount}}</span>
+      </div>
+      <div class="tdr-stat">
+        <span class="tdr-stat-label">TDS On</span>
+        <span class="tdr-stat-value">{{totTdsOn | number:'1.2-2'}}</span>
+      </div>
+      <div class="tdr-stat">
+        <span class="tdr-stat-label">Debit</span>
+        <span class="tdr-stat-value">{{totDr | number:'1.2-2'}}</span>
+      </div>
+      <div class="tdr-stat">
+        <span class="tdr-stat-label">Credit</span>
+        <span class="tdr-stat-value">{{totCr | number:'1.2-2'}}</span>
+      </div>
+      <div class="tdr-stat tdr-stat--accent">
+        <span class="tdr-stat-label">Net TDS</span>
+        <span class="tdr-stat-value">{{totBalText}}</span>
+      </div>
+    </div>
+
+    <!-- ---- DETAIL ---- -->
+    @if (activeTab=='DETAIL') {
+<div class="tdr-card tdr-table-card">
+      <div class="tdr-table-wrap">
+        <table class="tdr-table">
+          <thead>
+            <tr class="col-head">
+              <th class="ctr">Sr. No.</th>
+              <th>Voucher No.</th>
+              <th class="ctr">Voucher Date</th>
+              <th>Account Name</th>
+              <th class="num">TDS On</th>
+              <th class="num">TDS %</th>
+              <th class="num">Debit</th>
+              <th class="num">Credit</th>
+              <th class="num">Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (l of lines; track l) {
+
+              @if (l.KIND=='party') {
+<tr class="tdr-party">
+                <td colspan="9">
+                  {{l.PARTYNAME}}
+                  @if (l.PARTYPAN) {
+<span class="tdr-pan">PAN: {{l.PARTYPAN}}</span>
+}
+                </td>
+              </tr>
+}
+              @if (l.KIND=='head') {
+<tr class="tdr-head">
+                <td colspan="9">{{l.HEADNAME}}</td>
+              </tr>
+}
+              @if (l.KIND=='row') {
+<tr>
+                <td class="ctr">{{l.SRNO}}</td>
+                <td class="mono" [title]="l.BILLNO ? 'Bill / Ref: ' + l.BILLNO : ''">{{l.VNO}}-{{l.VTYPE}}</td>
+                <td class="ctr">{{l.VDATE}}</td>
+                <td [title]="l.NARRATION">{{l.HEADNAME}}</td>
+                <td class="num">{{l.TDSON | number:'1.2-2'}}</td>
+                <td class="num">{{l.TDSPCT | number:'1.2-2'}}</td>
+                <td class="num">{{l.DRAMT ? (l.DRAMT | number:'1.2-2') : ''}}</td>
+                <td class="num">{{l.CRAMT ? (l.CRAMT | number:'1.2-2') : ''}}</td>
+                <td class="num">{{l.BALTEXT}}</td>
+              </tr>
+}
+              @if (l.KIND=='subtotal') {
+<tr class="tdr-subtotal">
+                <td colspan="4"></td>
+                <td class="num">{{l.TDSON | number:'1.2-2'}}</td>
+                <td></td>
+                <td class="num">{{l.DRAMT | number:'1.2-2'}}</td>
+                <td class="num">{{l.CRAMT | number:'1.2-2'}}</td>
+                <td class="num">{{l.BALTEXT}}</td>
+              </tr>
+}
+            
+}
+          </tbody>
+          <tfoot>
+            <tr class="tdr-grand">
+              <td colspan="4">***  Total  ***</td>
+              <td class="num">{{totTdsOn | number:'1.2-2'}}</td>
+              <td></td>
+              <td class="num">{{totDr | number:'1.2-2'}}</td>
+              <td class="num">{{totCr | number:'1.2-2'}}</td>
+              <td class="num">{{totBalText}}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+}
+
+    <!-- ---- SUMMARY ---- -->
+    @if (activeTab=='SUMMARY') {
+<div class="tdr-card tdr-table-card">
+      <div class="tdr-table-wrap">
+        <table class="tdr-table tdr-table--summary">
+          <thead>
+            <tr class="col-head">
+              <th class="ctr">#</th>
+              <th>Account</th>
+              <th>PAN</th>
+              <th class="num">TDS On</th>
+              <th class="num">Debit</th>
+              <th class="num">Credit</th>
+              <th class="num">TDS Amount</th>
+              <th class="ctr">Lines</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of summary; track s; let i = $index) {
+<tr>
+              <td class="ctr">{{i + 1}}</td>
+              <td>{{s.PARTYNAME}}</td>
+              <td class="mono">{{s.PARTYPAN}}</td>
+              <td class="num">{{s.TDSON | number:'1.2-2'}}</td>
+              <td class="num">{{s.DRAMT | number:'1.2-2'}}</td>
+              <td class="num">{{s.CRAMT | number:'1.2-2'}}</td>
+              <td class="num">{{summaryAmtText(s)}}</td>
+              <td class="ctr">{{s.ROWCNT}}</td>
+            </tr>
+}
+          </tbody>
+          <tfoot>
+            <tr class="tdr-grand">
+              <td colspan="3">***  Total  ***</td>
+              <td class="num">{{totTdsOn | number:'1.2-2'}}</td>
+              <td class="num">{{totDr | number:'1.2-2'}}</td>
+              <td class="num">{{totCr | number:'1.2-2'}}</td>
+              <td class="num">{{totBalText}}</td>
+              <td class="ctr">{{rowCount}}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+}
+
+  
+}
+
+</div>

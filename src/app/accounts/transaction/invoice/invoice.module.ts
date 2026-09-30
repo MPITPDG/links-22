@@ -10,6 +10,7 @@ import { FilterPipeModule } from 'ngx-filter-pipe';
 import { InvoiceComponent } from './general-invoice.component';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { GeneralInvoiceSearchComponent } from './general-invoice-search.component';
+import { InvoiceViewModule } from './invoice-view.module';
 import { ProformaInvoicePrintList } from './proforma-invoice-list.component';
 import { OrderModule } from 'ngx-order-pipe'; 
 import { NgxPaginationModule } from 'ngx-pagination';
@@ -22,7 +23,8 @@ import{ProformaInvfilterpipe} from './proformainvfilterpipe.pipe';
         TabsModule,
         MyDatePickerModule,
         NgSelectModule,
-        SharedModule],
+        SharedModule,
+        InvoiceViewModule],
     declarations: [
         InvoiceComponent,
         GeneralInvoiceSearchComponent,

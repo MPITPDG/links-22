@@ -172,6 +172,11 @@
                         { menuid: "3.1.5", icon: "fa fa-search-plus", menuname: "Upload IRN", routerlink: "/accounts/EInvoice/UploadIRN", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                         { menuid: "3.1.6", icon: "fa fa-search-plus", menuname: "Reset Json", routerlink: "/accounts/EInvoice/ResetJson", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                     ]},
+
+                    {menuid: "3.1A", icon: "fa fa-file-text", menuname: "Proforma Invoice", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
+                        { menuid: "3.1A.1", icon: "fa fa-plus-circle", menuname: "Add", routerlink: "/accounts/transaction/proformainvoice/general/ ", ischild: 'n', parentid: 0, isactive: 1, data: [] },
+                        { menuid: "3.1A.2", icon: "fa fa-search-plus", menuname: "Search/Edit", routerlink: "/accounts/transaction/proformainvoice/proformasearch", ischild: 'n', parentid: 0, isactive: 1, data: [] },
+                    ]},
                     
                     // {menuid: "3.2", icon: "fa fa-file-text", menuname: "Air Freight", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
                     //     { menuid: "3.2.1", icon: "fa fa-plus-circle", menuname: "Generate", routerlink: "/accounts/transaction/airfrtinvoice/airfrtinvoiceList", ischild: 'n', parentid: 0, isactive: 1, data: [] },
@@ -295,8 +300,10 @@
                             { menuid: "12.1.6",   menuname: "Storage", routerlink: "/accounts/report/register/Regi/Storage", ischild: 'n', parentid: 0, isactive: 1, data: [] },    
                             { menuid: "12.1.7",   menuname: "CreditNote", routerlink: "/accounts/report/register/Regi/CreditNote", ischild: 'n', parentid: 0, isactive: 1, data: [] },      
                             { menuid: "12.1.8",   menuname: "Gst", routerlink: "/accounts/report/register/gst", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                            { menuid: "12.1.10",  menuname: "GSTR-3B", routerlink: "/accounts/report/register/gstr3b", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                            { menuid: "12.1.9",   menuname: "EXPWOP", routerlink: "/accounts/report/register/Regi/EXPWOP", ischild: 'n', parentid: 0, isactive: 1, data: [] },
+                            { menuid: "12.1.9",   menuname: "GSTR-3B", routerlink: "/accounts/report/register/gstr3b", ischild: 'n', parentid: 0, isactive: 1, data: [] },
+                            { menuid: "12.1.10",  menuname: "EXPWOP", routerlink: "/accounts/report/register/Regi/EXPWOP", ischild: 'n', parentid: 0, isactive: 1, data: [] },
+                            { menuid: "12.1.11",  menuname: "TDS Payable Register", routerlink: "/accounts/report/register/tdspayable", ischild: 'n', parentid: 0, isactive: 1, data: [] },
+                            { menuid: "12.1.12",  menuname: "TDS Receivable Register", routerlink: "/accounts/report/register/tdsreceivable", ischild: 'n', parentid: 0, isactive: 1, data: [] },
 
                         ] },
                         { menuid: "12.2", icon: "fa fa-file-text", menuname: "Receivables", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
@@ -375,6 +382,7 @@
 
                         ] },
                          { menuid: "13.10",   menuname: "Finance Dashboard", routerlink: "/accounts/MisReport/FinanceDashboard/dashboard", ischild: 'n', parentid: 0, isactive: 1, data: [  ] },
+                         { menuid: "13.11",   menuname: "Job Handler / Sales Person Register", routerlink: "/accounts/MisReport/JobHandler/register", ischild: 'n', parentid: 0, isactive: 1, data: [] },
 
                     ] },    
                    { menuid: "14",  icon: "fa fa-pencil" , menuname: "Client Edi", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [  

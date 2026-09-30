@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnChanges, ViewChild, ElementRef, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import{DataService} from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
 import { ToastCommonService } from '../../../shared/service/toastService';
@@ -86,17 +86,20 @@ import { BankReconcilAddEditExportService } from './bank-reconcil-addedit-export
     reconsillationstr1:string="";
     OpBalDr:string;
     OpBalCr:string;
-    BalanceDr:string;
-    BalanceCr:string;
+    BookBalDr:string;
+    BookBalCr:string;
     DrNotRef:string;
     CrNotRef:string;
-    DrRef:string;
-    CrRef:string;
     DrReflected:string;
     CrReflected:string;
-    closingcrref:string;
-    closingdrref:string;
+    BankBalDr:string;
+    BankBalCr:string;
     showResult = false;
+    @ViewChild('toggleRow', { static: false }) toggleRow: ElementRef;
+    @ViewChild('drTh', { static: false }) drTh: ElementRef;
+    @ViewChild('crTh', { static: false }) crTh: ElementRef;
+    drTotalLeft = 0; drTotalWidth = 0;
+    crTotalLeft = 0; crTotalWidth = 0;
     activeTab: string = 'UNCLEARED';
      constructor(private _dataService: DataService,
         private _toasterService: ToastCommonService,
@@ -179,26 +182,84 @@ import { BankReconcilAddEditExportService } from './bank-reconcil-addedit-export
 
         setActiveTab(tab: string) {
           this.activeTab = tab;
+          setTimeout(() => this.alignTotals());
         }
 
-        get differenceLabel(): string {
-          const book = this.toNumber(this.BalanceDr) - this.toNumber(this.BalanceCr);
-          const bank = this.toNumber(this.DrRef) - this.toNumber(this.CrRef);
-          const diff = book - bank;
-          if (diff === 0) {
-            return '0.00';
+        // Places the Debit/Credit totals exactly over their grid columns.
+        // Measured from the header cells, so it holds for any page width,
+        // horizontal scroll or vertical scrollbar.
+        @HostListener('window:resize')
+        alignTotals() {
+          if (!this.toggleRow || !this.drTh || !this.crTh) { return; }
+          const base = this.toggleRow.nativeElement.getBoundingClientRect().left;
+          const dr = this.drTh.nativeElement.getBoundingClientRect();
+          const cr = this.crTh.nativeElement.getBoundingClientRect();
+          this.drTotalLeft = dr.left - base; this.drTotalWidth = dr.width;
+          this.crTotalLeft = cr.left - base; this.crTotalWidth = cr.width;
+        }
+
+        // "dd/mm/yyyy" -> yyyymmdd number (0 when blank), for date comparisons.
+        private ymd(ddmmyyyy: any): number {
+          const p = ((ddmmyyyy || '') + '').split('/');
+          if (p.length !== 3) { return 0; }
+          return (+p[2]) * 10000 + (+p[1]) * 100 + (+p[0]);
+        }
+
+        private dateToYmd(d: Date): number {
+          return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+        }
+
+        // Signed amount -> Dr (positive) / Cr (negative) labels; blank when zero.
+        private toDrCr(amount: number): { dr: string, cr: string } {
+          const n = Math.round(amount * 100) / 100;
+          if (n > 0) { return { dr: this.formatAmt(n) + " Dr", cr: "" }; }
+          if (n < 0) { return { dr: "", cr: this.formatAmt(Math.abs(n)) + " Cr" }; }
+          return { dr: "", cr: "" };
+        }
+
+        private clearSummary() {
+          this.OpBalDr = ""; this.OpBalCr = "";
+          this.BookBalDr = ""; this.BookBalCr = "";
+          this.DrReflected = ""; this.CrReflected = "";
+          this.DrNotRef = ""; this.CrNotRef = "";
+          this.BankBalDr = ""; this.BankBalCr = "";
+        }
+
+        // Bank Reconciliation Statement as at the To date, worked out from the
+        // SP's rows (Table) and book opening (Table4.OPENINGBALANCE):
+        //   Company Book  = Opening + all Dr - all Cr in the period
+        //   Reflected     = rows cleared on or before the To date
+        //   Not Reflected = rows not cleared, or cleared after the To date
+        //   Bank Balance  = Company Book - Not Reflected Dr + Not Reflected Cr
+        // The SP's own CLOSING/CLOSING1/AMTREFLECTED are not used: they count
+        // rows cleared after the To date as reflected and leave uncleared rows
+        // out of the book balance.
+        private setSummary(rows: any[], opening: number) {
+          const toDt = this.ymd(this.ToDate);
+          let drAll = 0, crAll = 0, drRef = 0, crRef = 0, drNR = 0, crNR = 0;
+          for (const r of rows || []) {
+            const dr = parseFloat(r.DRAMT) || 0;
+            const cr = parseFloat(r.CRAMT) || 0;
+            const clr = this.ymd(r._clearStr);
+            drAll += dr; crAll += cr;
+            // 01/01/1900 = a blank date saved as '' — treated as not cleared, as the SP does
+            if (clr > 19000101 && clr <= toDt) { drRef += dr; crRef += cr; }
+            else { drNR += dr; crNR += cr; }
           }
-          return Math.abs(diff).toFixed(2) + (diff > 0 ? ' Dr' : ' Cr');
-        }
+          const book = opening + drAll - crAll;
+          const bank = book - drNR + crNR;
 
-        get isDifferenceZero(): boolean {
-          return this.differenceLabel === '0.00';
-        }
-
-        private toNumber(val: any): number {
-          if (!val) { return 0; }
-          const n = parseFloat((val + '').replace(/[^0-9.\-]/g, ''));
-          return isNaN(n) ? 0 : n;
+          this.clearSummary();
+          const op = this.toDrCr(opening);
+          this.OpBalDr = op.dr; this.OpBalCr = op.cr;
+          const bk = this.toDrCr(book);
+          this.BookBalDr = bk.dr; this.BookBalCr = bk.cr;
+          this.DrReflected = drRef ? this.formatAmt(drRef) + " Dr" : "";
+          this.CrReflected = crRef ? this.formatAmt(crRef) + " Cr" : "";
+          this.DrNotRef = drNR ? this.formatAmt(drNR) + " Dr" : "";
+          this.CrNotRef = crNR ? this.formatAmt(crNR) + " Cr" : "";
+          const bn = this.toDrCr(bank);
+          this.BankBalDr = bn.dr; this.BankBalCr = bn.cr;
         }
 
         // Adds thousand separators + 2 decimal places (e.g. 1438393.19 -> "1,438,393.19")
@@ -255,6 +316,19 @@ import { BankReconcilAddEditExportService } from './bank-reconcil-addedit-export
                 this._toasterService.toast('warning', 'warning', "To Date cannot be blank !.");
                 this.loaderService.display(false);
                 return false; }
+                if (this.ymd(this.FromDate) > this.ymd(this.ToDate)) {
+                  this._toasterService.toast('warning', 'warning', "From Date cannot be after To Date !.");
+                  this.loaderService.display(false);
+                  return false;
+                }
+                const fy = this._loginService.getLogin()[0].FINANCIAL_YEAR;
+                const fyStart = this.dateToYmd(new Date(fy.STARTDATE));
+                const fyEnd = this.dateToYmd(new Date(fy.ENDDATE));
+                if (this.ymd(this.FromDate) < fyStart || this.ymd(this.ToDate) > fyEnd) {
+                  this._toasterService.toast('warning', 'warning', "From Date and To Date must be within the current financial year !.");
+                  this.loaderService.display(false);
+                  return false;
+                }
                 const jsonData = {
                     _ourbank:(this.Bank==undefined)?"" :this.Bank,
                     _FromDt:this.FromDate,
@@ -270,66 +344,20 @@ import { BankReconcilAddEditExportService } from './bank-reconcil-addedit-export
                   this.bankreconcilList=data.Table;
                   this.activeTab = 'UNCLEARED';
                   for (let data of this.bankreconcilList) {
-                    data["CLEARANCEDATE"] = (data["CLEARANCEDATE"] != "") ? this._dataService.stringdttoArry(data["CLEARANCEDATE"]) : null;
+                    data["_clearStr"] = data["CLEARANCEDATE"] || "";
+                    data["CLEARANCEDATE"] = data["CLEARANCEDATE"] ? this._dataService.stringdttoArry(data["CLEARANCEDATE"]) : null;
                     data["_wasCleared"] = !!data["CLEARANCEDATE"];
-                    // console.log(this._dataService.convertFromdd_mm_yyyTodd_mmm_yyy(data["clearanceDate"]));
-                    // data["clearanceDate"]=this._dataService.convertFromdd_mm_yyyTodd_mmm_yyy(data["clearanceDate"]);
-                }
-                  if(data.Table1[0].BALANCE >0) {
-                    this.BalanceDr=this.formatAmt(data.Table1[0].BALANCE)  + " Dr";
                   }
-                  else{
-                    this.BalanceCr=(data.Table1[0].BALANCE=="0.00")?"" :this.formatAmt(Math.abs(data.Table1[0].BALANCE)) + " Cr";
-                    }
-                  if(data.Table2[0].CRAMTNOTREFLECTED >0)
-                    {
-                       this.CrNotRef=(data.Table2[0].CRAMTNOTREFLECTED=="0.00")?"" :this.formatAmt(Math.abs(data.Table2[0].CRAMTNOTREFLECTED)) + " Cr";
-                    }
-                  if(data.Table2[0].DRAMTNOTREFLECTED >0)
-                    {
-                      this.DrNotRef=(data.Table2[0].DRAMTNOTREFLECTED=="0.00")?"" :this.formatAmt(Math.abs(data.Table2[0].DRAMTNOTREFLECTED)) + " Dr";
-                    }
-                  if(data.Table3[0].AMTREFLECTED >0)
-                      {
-                         this.DrRef=this.formatAmt(data.Table3[0].AMTREFLECTED)  + " Dr";
-                      }
-                  else
-                      {
-                        this.CrRef=(data.Table3[0].AMTREFLECTED=="0.00")?"" :this.formatAmt(Math.abs(data.Table3[0].AMTREFLECTED)) + " Cr";
-                      }
-                       if(data.Table4[0].OPENINGBALANCE >0)
-                      {
-                         this.OpBalDr=this.formatAmt(data.Table4[0].OPENINGBALANCE)  + " Dr";
-                      }
-                  else
-                      {
-                        this.OpBalCr=(data.Table4[0].OPENINGBALANCE=="0.00")?"" :this.formatAmt(Math.abs(data.Table4[0].OPENINGBALANCE)) + " Cr";
-                      }
-                  // Amount Reflected In Bank — Table4.DRAMTREFLECTED / CRAMTREFLECTED,
-                  // shown as separate Dr and Cr totals (same pattern as Amount Not
-                  // Reflected), not netted like Table3.AMTREFLECTED (used for
-                  // Target Bank Balance).
-                  if(data.Table4[0].DRAMTREFLECTED >0)
-                      {
-                        this.DrReflected=(data.Table4[0].DRAMTREFLECTED=="0.00")?"" :this.formatAmt(Math.abs(data.Table4[0].DRAMTREFLECTED)) + " Dr";
-                      }
-                  if(data.Table4[0].CRAMTREFLECTED >0)
-                      {
-                        this.CrReflected=(data.Table4[0].CRAMTREFLECTED=="0.00")?"" :this.formatAmt(Math.abs(data.Table4[0].CRAMTREFLECTED)) + " Cr";
-                      }
-                        if(data.Table4[0].CLOSING > 0){
-                           this.closingdrref=(data.Table4[0].CLOSING=="0.00")?"" :this.formatAmt(Math.abs(data.Table4[0].CLOSING)) + " Dr";
-                         }
-                           if(data.Table4[0].CLOSING1 > 0){
-                           this.closingdrref=(data.Table4[0].CLOSING1=="0.00")?"" :this.formatAmt(Math.abs(data.Table4[0].CLOSING1)) + " Dr";
-                         }
-                         else {
-                           this.closingcrref=(data.Table4[0].CLOSING1=="0.00")?"" :this.formatAmt(Math.abs(data.Table4[0].CLOSING1)) + " Cr";
-                         }
-                  });
-                
+                  const opening = parseFloat(data.Table4 && data.Table4[0] ? data.Table4[0].OPENINGBALANCE : 0) || 0;
+                  this.setSummary(this.bankreconcilList, opening);
                   this.showResult = true;
                   this.loaderService.display(false);
+                  setTimeout(() => this.alignTotals());
+                  },
+                  (error) => {
+                    this.loaderService.display(false);
+                    this._toasterService.toast('error', 'error', 'Unable to load bank reconciliation data.');
+                  });
                 } 
                 FromDateChanged(ev){
                   this.FromDate=ev.formatted
@@ -607,14 +635,7 @@ BankRecUpdate() {
                     this.ToDate="";
                     this.bankreconcilList=[];
                     this.activeTab = 'UNCLEARED';
-                    this.BalanceCr="";
-                    this.BalanceDr="";
-                    this.CrNotRef="";
-                    this.DrNotRef="";
-                    this.DrRef="";
-                    this.CrRef="";
-                    this.DrReflected="";
-                    this.CrReflected="";
+                    this.clearSummary();
                 }
                 BackToSearch() {
   this.showResult = false;

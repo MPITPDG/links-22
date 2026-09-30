@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { FinancialYearAuthGuard } from 'src/app/shared/guard/finanacial-year-auth-guard.service';
-import { EInvoiceList } from './einvoice-list.component';
+// import { EInvoiceList } from './einvoice-list.component';   // unused, not in any route - left out of the production build
 import { UploadIRN  } from './einvoice-uploadirn.component';
 import { ResetJson  } from './einvoice-resetjson.component'; 
 import { GenerateJson } from './einvoice-generatejson.component';

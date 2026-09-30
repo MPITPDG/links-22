@@ -1,0 +1,331 @@
+<div class="animated fadeIn x-page">
+
+    <!-- ================= HEADER ================= -->
+    <div class="x-toolbar">
+        <div class="x-mark">
+            <i class="fa fa-search" aria-hidden="true"></i>
+        </div>
+        <div class="x-titlewrap">
+            <span class="x-eyebrow">Accounts</span>
+            <h1 class="x-title">Proforma Invoice Search</h1>
+        </div>
+    </div>
+
+    <!-- ================= SEARCH ================= -->
+    @if (Searchdata_list.length == 0) {
+<div class="x-card ps-searchcard">
+
+        <!-- mode: segmented control -->
+        <div class="x-seg ps-seg">
+            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == 'INVOICENO'">
+                <input type="radio" name="exampleRadios" value="INVOICENO" [(ngModel)]="exampleRadios1" /> Proforma No.
+            </label>
+            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == 'CLIENT'">
+                <input type="radio" name="exampleRadios" value="CLIENT" [(ngModel)]="exampleRadios1" /> Client Wise
+            </label>
+            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == 'JOBNO'">
+                <input type="radio" name="exampleRadios" value="JOBNO" [(ngModel)]="exampleRadios1" /> Job No.
+            </label>
+            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == 'AMOUNT'">
+                <input type="radio" name="exampleRadios" value="AMOUNT" [(ngModel)]="exampleRadios1" /> Amount
+            </label>
+            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == 'DATE'">
+                <input type="radio" name="exampleRadios" value="DATE" [(ngModel)]="exampleRadios1" /> Date Wise
+            </label>
+            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == '6'">
+                <input type="radio" name="exampleRadios" value="6" [(ngModel)]="exampleRadios1" /> Print All of a Day
+            </label>
+        </div>
+
+        <!-- ============ PROFORMA NO. ============ -->
+        @if (exampleRadios1 == 'INVOICENO') {
+<div class="ps-criteria">
+            <div class="ps-row">
+                <div class="ps-field">
+                    <label class="x-lbl">Proforma Invoice No.</label>
+                    <div class="ps-searchgroup">
+                        <i class="fa fa-search ps-searchicon" aria-hidden="true"></i>
+                        <input type="text" class="form-control" [maxlength]="15" [(ngModel)]="invoiceno"
+                               placeholder="15-digit Proforma Invoice No." (keyup.enter)="searchlist()" />
+                        <button type="button" class="ps-searchbtn" (click)="searchlist()">Search</button>
+                    </div>
+                </div>
+                <div class="ps-field ps-field-action">
+                    <button type="button" class="x-btn x-btn-primary" (click)="ProformaPrint(invoiceno)">
+                        <i class="fa fa-print" aria-hidden="true"></i> Print
+                    </button>
+                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
+                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+}
+
+        <!-- ============ CLIENT WISE ============ -->
+        @if (exampleRadios1 == 'CLIENT') {
+<div class="ps-criteria">
+            <div class="ps-row">
+                <div class="ps-field ps-field-wide">
+                    <label class="x-lbl">Client</label>
+                    <ng-select [items]="clientable" bindLabel="EXP_NAME_CITY" bindValue="EXP_CODE"
+                               [(ngModel)]="client" class="form-control"
+                               placeholder="Type to search client…" [searchable]="true" [clearable]="true">
+                    </ng-select>
+                </div>
+            </div>
+            <div class="ps-row">
+                <div class="ps-field ps-field-narrow">
+                    <label class="x-lbl">Start Date <span class="x-req">*</span></label>
+                    <my-date-picker name="ClientStartDate" [options]="myDatePickerOptions"
+                                    [(ngModel)]="client_startdate"></my-date-picker>
+                </div>
+                <div class="ps-field ps-field-narrow">
+                    <label class="x-lbl">End Date <span class="x-req">*</span></label>
+                    <my-date-picker name="ClientEndDate" [options]="myDatePickerOptions"
+                                    [(ngModel)]="client_enddate"></my-date-picker>
+                </div>
+                <div class="ps-field ps-field-action">
+                    <button type="button" class="ps-searchbtn ps-searchbtn-solo" (click)="searchlist()">
+                        <i class="fa fa-search" aria-hidden="true"></i> Search
+                    </button>
+                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
+                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+}
+
+        <!-- ============ JOB NO. ============ -->
+        @if (exampleRadios1 == 'JOBNO') {
+<div class="ps-criteria">
+            <div class="ps-row">
+                <div class="ps-field">
+                    <label class="x-lbl">Job No.</label>
+                    <div class="ps-searchgroup">
+                        <i class="fa fa-search ps-searchicon" aria-hidden="true"></i>
+                        <input type="text" class="form-control" [maxlength]="15" [OnlyNumber]="true"
+                               [(ngModel)]="jobno" placeholder="Job No." (keyup.enter)="searchlist()" />
+                        <button type="button" class="ps-searchbtn" (click)="searchlist()">Search</button>
+                    </div>
+                </div>
+                <div class="ps-field ps-field-action">
+                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
+                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+}
+
+        <!-- ============ AMOUNT ============ -->
+        @if (exampleRadios1 == 'AMOUNT') {
+<div class="ps-criteria">
+            <div class="ps-row">
+                <div class="ps-field">
+                    <label class="x-lbl">Amount</label>
+                    <div class="ps-searchgroup">
+                        <i class="fa fa-search ps-searchicon" aria-hidden="true"></i>
+                        <input type="text" class="form-control" [(ngModel)]="amount"
+                               placeholder="Exact invoice total" (keyup.enter)="searchlist()" />
+                        <button type="button" class="ps-searchbtn" (click)="searchlist()">Search</button>
+                    </div>
+                </div>
+                <div class="ps-field ps-field-action">
+                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
+                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+}
+
+        <!-- ============ DATE WISE ============ -->
+        @if (exampleRadios1 == 'DATE') {
+<div class="ps-criteria">
+            <div class="ps-row">
+                <div class="ps-field ps-field-narrow">
+                    <label class="x-lbl">Start Date <span class="x-req">*</span></label>
+                    <my-date-picker name="DateStartDate" [options]="myDatePickerOptions"
+                                    [(ngModel)]="datewise_startdate"></my-date-picker>
+                </div>
+                <div class="ps-field ps-field-narrow">
+                    <label class="x-lbl">End Date <span class="x-req">*</span></label>
+                    <my-date-picker name="DateEndDate" [options]="myDatePickerOptions"
+                                    [(ngModel)]="datewise_enddate"></my-date-picker>
+                </div>
+                <div class="ps-field ps-field-action">
+                    <button type="button" class="ps-searchbtn ps-searchbtn-solo" (click)="searchlist()">
+                        <i class="fa fa-search" aria-hidden="true"></i> Search
+                    </button>
+                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
+                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+}
+
+        <!-- ============ PRINT ALL OF A DAY ============ -->
+        @if (exampleRadios1 == '6') {
+<div class="ps-criteria">
+            <div class="ps-row">
+                <div class="ps-field ps-field-narrow">
+                    <label class="x-lbl">Date <span class="x-req">*</span></label>
+                    <my-date-picker name="PrintAllDate" [options]="myDatePickerOptions"
+                                    [(ngModel)]="printall_date"></my-date-picker>
+                </div>
+                <div class="ps-field ps-field-action">
+                    <button type="button" class="ps-searchbtn ps-searchbtn-solo" (click)="searchlist()">
+                        <i class="fa fa-search" aria-hidden="true"></i> Search
+                    </button>
+                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
+                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
+                    </button>
+                </div>
+            </div>
+            <p class="x-sub">
+                Lists every Proforma Invoice raised on that date so they can be selected and printed together.
+            </p>
+        </div>
+}
+
+    </div>
+}
+
+    <!-- ================= RESULTS ================= -->
+    @if (Searchdata_list.length > 0) {
+<div class="x-card">
+        <div class="x-card-head">
+            <i class="fa fa-table" aria-hidden="true"></i>
+            <h2 class="x-card-title">Proforma Invoices</h2>
+            <span class="x-count">{{ (Searchdata_list | filter: term).length }} of {{ Searchdata_list.length }}</span>
+
+            <div class="ps-search">
+                <i class="fa fa-search" aria-hidden="true"></i>
+                <input type="text" class="form-control"
+                       placeholder="Filter these results…" [(ngModel)]="term" />
+                @if (term) {
+<i class="fa fa-times ps-clear" (click)="term=''" title="Clear filter"></i>
+}
+            </div>
+
+            <button type="button" class="x-btn x-btn-classic" (click)="backToSearch()">
+                <i class="fa fa-arrow-circle-left" aria-hidden="true"></i> Back to Search
+            </button>
+            @if (exampleRadios1 == '6') {
+<button type="button" class="x-btn x-btn-primary" (click)="PrintInvoice()">
+                <i class="fa fa-print" aria-hidden="true"></i> Print Selected
+            </button>
+}
+        </div>
+
+        <div class="x-tablewrap ps-resultwrap">
+            <table class="x-table">
+                <thead>
+                    <tr>
+                        @if (exampleRadios1 == '6') {
+<th class="ps-checkcol">
+                            <input type="checkbox" [(ngModel)]="checkbox" (change)="checkAll($event)" />
+                        </th>
+}
+                        <th (click)="setOrder('INV_NO')">PROFORMA NO.</th>
+                        <th (click)="setOrder('INV_DATE')" [class.active]="order === 'INV_DATE'">INV DATE</th>
+                        <th (click)="setOrder('EXP_NAME')" [class.active]="order === 'EXP_NAME'">CLIENT</th>
+                        <th (click)="setOrder('INV_BILLTYPE')" [class.active]="order === 'INV_BILLTYPE'">BILL TYPE</th>
+                        @if (exampleRadios1 != '6') {
+<th (click)="setOrder('INVOICED_ON')"
+                            [class.active]="order === 'INVOICED_ON'">RAISED ON</th>
+}
+                        @if (exampleRadios1 != '6') {
+<th>CONVERTED TO</th>
+}
+                        @if (exampleRadios1 != '6') {
+<th>ACTION</th>
+}
+                        @if (exampleRadios1 == '6') {
+<th class="x-num" (click)="setOrder('TOTALAMT')"
+                            [class.active]="order === 'TOTALAMT'">TOTAL AMT</th>
+}
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (data of Searchdata_list | filter: term | orderBy: order:reverse:'case-insensitive'; track data) {
+<tr>
+                        @if (exampleRadios1 == '6') {
+<td class="ps-checkcol">
+                            <input type="checkbox" [(ngModel)]="data.Checked"
+                                   (ngModelChange)="getCheckboxValues($event, data.INV_NO)" />
+                        </td>
+}
+                        <td class="x-cell-key">
+                            <span class="ps-link" (click)="ListOnclick(data.INV_NO)">{{data.INV_NO}}</span>
+                        </td>
+                        <td>{{data.INV_DATE}}</td>
+                        <td>{{data.EXP_NAME}}</td>
+                        <td>{{data.INV_BILLTYPE}}</td>
+                        @if (exampleRadios1 != '6') {
+<td>{{data.INVOICED_ON}}</td>
+}
+                        @if (exampleRadios1 != '6') {
+<td>
+                            <!--  The converted number opens the real Tax Invoice in a drawer, so the
+                                  billing team can check what was produced without leaving the list. -->
+                            @if (data.CONVERTED_INV_NO) {
+<a class="x-pill x-pill-ok ps-convlink"
+                               (click)="ViewInvoice(data.CONVERTED_INV_NO)"
+                               title="View this Tax Invoice">{{data.CONVERTED_INV_NO}}</a>
+}
+                            @if (!data.CONVERTED_INV_NO) {
+<span class="x-sub">—</span>
+}
+                        </td>
+}
+                        @if (exampleRadios1 != '6') {
+<td class="ps-actioncol">
+                            @if (!data.CONVERTED_INV_NO || data.CONVERTED_INV_NO.trim() == '') {
+<button type="button" class="x-btn x-btn-primary"
+                                   
+                                    (click)="ConvertToInvoice(data.INV_NO)">
+                                <i class="fa fa-exchange" aria-hidden="true"></i> Convert to Invoice
+                            </button>
+}
+                            @if (data.CONVERTED_INV_NO && data.CONVERTED_INV_NO.trim() != '') {
+<button type="button" class="x-btn x-btn-classic"
+                                   
+                                    (click)="ViewInvoice(data.CONVERTED_INV_NO)">
+                                <i class="fa fa-eye" aria-hidden="true"></i> View Invoice
+                            </button>
+}
+                        </td>
+}
+                        @if (exampleRadios1 == '6') {
+<td class="x-num">{{data.TOTALAMT}}</td>
+}
+                    </tr>
+}
+                    @if ((Searchdata_list | filter: term).length == 0) {
+<tr>
+                        <td colspan="8" class="x-empty">No rows match “{{term}}”.</td>
+                    </tr>
+}
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+</div>
+
+<!--  Tax Invoice drawer, the same component and behaviour as the Invoice Search screen:
+      it slides over the list, and the list stays where it was.                        -->
+@if (DrawerInvNo) {
+<div class="iv-backdrop" (click)="CloseDrawer()"></div>
+}
+@if (DrawerInvNo) {
+<div class="iv-drawer">
+    <app-invoice-view-page [invNoInput]="DrawerInvNo" [embedded]="true"
+                           (closed)="CloseDrawer()"></app-invoice-view-page>
+</div>
+}

@@ -15,8 +15,8 @@ import {Configuration}  from '../../app.constants'
     standalone: false
 })
   export class EcreditNoteGenerateJson implements OnInit {
+    checkbox: boolean = false;   // header box, bound in the template
     EcreditnoteListtbl: any = []
-    checkbox: boolean = false;
     newArray: any = [];
     rptdownloadurl:string;
     subheader:string="";
@@ -53,10 +53,6 @@ import {Configuration}  from '../../app.constants'
             this._loaderService.display(false);
           })
       }
-    checkAll(event: any) {
-        const checked = event.target.checked;
-        this.EcreditnoteListtbl.forEach((item: any) => item.Checked = checked);
-    }
       getCheckboxValues(event, data) {
         var index = this.newArray.findIndex(x => x.InvNo == data);
         if (event) {
@@ -67,6 +63,16 @@ import {Configuration}  from '../../app.constants'
         }
         else {
           this.newArray.splice(index, 1);
+        }
+      }
+      /*  Header "select all" box: ticks or unticks every row and rebuilds the selection in one
+          go, so a document can never be listed twice. The template always called this.      */
+      checkAll(event: any) {
+        const on = !!(event && event.target && event.target.checked);
+        this.newArray = [];
+        for (let i = 0; i < this.EcreditnoteListtbl.length; i++) {
+          this.EcreditnoteListtbl[i].Checked = on;
+          if (on) { this.newArray.push({ InvNo: this.EcreditnoteListtbl[i].INV_NO }); }
         }
       }
       GenerateECreditNote(){

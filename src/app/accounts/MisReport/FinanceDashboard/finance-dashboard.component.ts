@@ -61,8 +61,27 @@ export class FinanceDashboardComponent implements OnInit {
     UnbilledAge: any[] = [];
     UnbilledJobs: any[] = [];
     Ageing: any[] = [];
-    Margin: any[] = [];
+    Margin: any[] = [];            // Table7: grouped by the party that was BILLED
+    MarginShipper: any[] = [];     // Table12: the same money grouped by the shipper
+
+    /*  Export freight is very often billed to the overseas agent rather than to the
+        shipper: on Links Mumbai FY2026-27 that is half the export revenue. The job
+        file names the shipper, the invoice names the payer, so grouping margin by the
+        job party left clients with real invoices showing an empty Margin tab. The
+        screen now carries both groupings and defaults to the billed party, which is
+        the one the ledger, Receivables and Outstanding all use.                      */
+    MarginBy: string = 'BILLED';   // 'BILLED' | 'SHIPPER'
+    SetMarginBy(mode: string) {
+        if (this.MarginBy === mode) { return; }
+        this.MarginBy = mode;
+        this.MarginOpen = {};      // open drills belong to the other grouping
+    }
+    MarginRows(): any[] { return (this.MarginBy === 'SHIPPER' ? this.MarginShipper : this.Margin) || []; }
+    /* the column a margin row is keyed on, and the job field that matches it */
+    MarginKey(): string { return this.MarginBy === 'SHIPPER' ? 'CLIENTCODE' : 'BILLCLIENT'; }
+    OtherLabel(): string { return this.MarginBy === 'SHIPPER' ? 'Billed to' : 'Cargo of'; }
     JobPL: any[] = [];             // Table8: job-wise income/expense/P&L (Job Profit grain)
+    JobSplit: any[] = [];          // Table13: each job's P&L split by the client billed (Billed-party view)
     UnbilledLines: any[] = [];     // Table9: voucher-level expense lines behind unbilled jobs
     Funnel: any[] = [];            // Table10: Jobs -> Invoiced -> Collected
     Coverage: any = null;          // Table11: billing coverage / invoicing lag
@@ -309,6 +328,8 @@ export class FinanceDashboardComponent implements OnInit {
                 this.UnbilledJobs = data.Table5 ? data.Table5 : [];
                 this.Ageing = data.Table6 ? data.Table6 : [];
                 this.Margin = data.Table7 ? data.Table7 : [];
+                this.MarginShipper = data.Table12 ? data.Table12 : [];
+                this.JobSplit = data.Table13 ? data.Table13 : [];
                 this.JobPL = data.Table8 ? data.Table8 : [];
                 this.UnbilledLines = data.Table9 ? data.Table9 : [];
                 this.Funnel = data.Table10 ? data.Table10 : [];
@@ -362,7 +383,7 @@ export class FinanceDashboardComponent implements OnInit {
     OpenDrill(row: any) {
         this.DrillClient = row;
         this.DrillAgeing = this.Ageing.find(a => a.CLIENTCODE === row.CLIENTCODE) || null;
-        this.DrillMargin = this.Margin.filter(m => m.CLIENTCODE === row.CLIENTCODE);
+        this.DrillMargin = this.MarginRows().filter(m => m.CLIENTCODE === row.CLIENTCODE);
         this.DrillJobs = this.UnbilledJobs.filter(j => j.CLIENTCODE === row.CLIENTCODE);
     }
     CloseDrill() { this.DrillClient = null; }
@@ -635,7 +656,7 @@ export class FinanceDashboardComponent implements OnInit {
     MarginSorted(): any[] {
         const k = this.MarginSortKey, d = this.MarginSortDir;
         const text = (k === 'CLIENTNAME' || k === 'SERVICE_TYPE' || k === 'LAST_BILLED_YMD');
-        return (this.Margin || []).slice().sort((a, b) => {
+        return this.MarginRows().slice().sort((a, b) => {
             let r: number;
             if (text) {
                 const av = (k === 'SERVICE_TYPE' ? this.svcLabel(a[k]) : (a[k] || '')).toString().toUpperCase();
@@ -689,7 +710,152 @@ export class FinanceDashboardComponent implements OnInit {
     }
 
     /* ======================= KPI explainers ======================= */
-    OpenExplain(key: string) { this.ExplainKey = key; }
+    /*  The Outstanding card used to print "Bills pending" and "Unapplied credit" next to
+        each other, and the two do not subtract to the headline - credit is netted PER
+        CLIENT in the proc, so a customer holding more credit than open bills cannot pay
+        off anybody else's bills. Split the credit into the part that actually knocked
+        bills off (this always reconciles: pending - applied = outstanding) and the part
+        left stranded. Computed here as well as in the proc, so the screen reads right
+        whichever order the build and the SQL are deployed in.                          */
+    /*  Outstanding is a position AS ON the To date, so it carries unpaid bills from
+        every year - on Links about 20cr of the 43cr pending was raised before the
+        current financial year. People read the date filter as "this period", so the
+        card splits Bills pending into what was raised inside the selected dates and
+        what is older. Hidden until the proc returns PENDING_PERIOD.                   */
+    HasPeriodSplit(): boolean {
+        const k: any = this.Kpi || {};
+        return k.PENDING_PERIOD !== undefined && k.PENDING_PERIOD !== null;
+    }
+    PendingPeriod(): number { return this.num((this.Kpi || {} as any).PENDING_PERIOD); }
+    PendingOlder(): number { return this.num((this.Kpi || {} as any).GROSS_PENDING) - this.PendingPeriod(); }
+    FromLabel(): string { return this.fmtDate(this.FromDate); }
+    /* the client holding the most credit beyond its open bills - named in the explainer */
+    BiggestLeftOver(): string {
+        let best: any = null, bestAmt = 0;
+        (this.Exposure || []).forEach((r: any) => {
+            const x = this.num(r.UNADJUSTED) - this.num(r.GROSS_PENDING);
+            if (x > bestAmt) { bestAmt = x; best = r; }
+        });
+        return best ? best.CLIENTNAME + ' ' + this.fmtShort(bestAmt) : '';
+    }
+
+    CreditApplied(): number {
+        const k: any = this.Kpi || {};
+        if (k.CREDIT_APPLIED !== undefined && k.CREDIT_APPLIED !== null) { return +k.CREDIT_APPLIED; }
+        return (+k.GROSS_PENDING || 0) - (+k.TOTAL_OUTSTANDING || 0);
+    }
+
+    CreditStranded(): number {
+        const k: any = this.Kpi || {};
+        if (k.CREDIT_STRANDED !== undefined && k.CREDIT_STRANDED !== null) { return +k.CREDIT_STRANDED; }
+        return (+k.UNADJUSTED_CREDITS || 0) - this.CreditApplied();
+    }
+
+    OpenExplain(key: string) { this.ExplainKey = key; this.EvidenceAll = false; }
+
+    /*  "Where does this number come from?" is answered twice over: the arithmetic
+        strip above, and THIS - the actual rows that add up to it, straight from the
+        result sets already on the page. No extra call, no new proc. A figure a person
+        can click through to a named client, a job number and an amount is a figure
+        they can check against their own register, which is the only way a dashboard
+        earns trust. Ten rows are shown; Export writes the full list to Excel.       */
+    EvidenceAll = false;
+    ToggleEvidenceAll() { this.EvidenceAll = !this.EvidenceAll; }
+
+    private evidenceDef(): any {
+        const k = this.ExplainKey;
+        const exposure = this.Exposure || [];
+        const by = (arr: any[], f: string) => arr.slice().sort((a, b) => this.num(b[f]) - this.num(a[f]));
+        switch (k) {
+            case 'EXPOSURE': return {
+                note: 'Every client with money at stake, biggest first. Outstanding is what is billed and unpaid; '
+                    + 'Unbilled is cost booked on jobs not yet invoiced. The two added together is the exposure on the card.',
+                cols: [{ k: 'CLIENTNAME', label: 'Client' },
+                       { k: 'OUTSTANDING', label: 'Outstanding', num: true },
+                       { k: 'UNBILLED', label: 'Unbilled', num: true },
+                       { k: 'TOTAL_EXPOSURE', label: 'Total exposure', num: true }],
+                rows: by(exposure, 'TOTAL_EXPOSURE'), totalKey: 'TOTAL_EXPOSURE', totalLabel: 'Total exposure',
+                file: 'Exposure'
+            };
+            case 'OUTSTANDING': return {
+                note: 'Bill-wise pending per client, less the on-account credit set against that same client. '
+                    + 'Credit is never moved from one client to another, which is why the column does not simply subtract across the page.',
+                cols: [{ k: 'CLIENTNAME', label: 'Client' },
+                       { k: 'PENDING_PERIOD', label: 'Raised in dates', num: true },
+                       { k: 'GROSS_PENDING', label: 'Bills pending', num: true },
+                       { k: 'UNADJUSTED', label: 'Credit on account', num: true },
+                       { k: 'OUTSTANDING', label: 'Outstanding', num: true },
+                       { k: 'OVERDUE', label: 'Overdue', num: true }],
+                rows: by(exposure, 'OUTSTANDING'), totalKey: 'OUTSTANDING', totalLabel: 'Outstanding',
+                file: 'Outstanding'
+            };
+            case 'RECOVERY': return {
+                note: 'How long each client actually takes to pay, against the credit period agreed with them. '
+                    + 'The card shows the value-weighted average, so a large slow client counts more than a small one.',
+                cols: [{ k: 'CLIENTNAME', label: 'Client' },
+                       { k: 'CREDIT_PERIOD', label: 'Credit days', num: true },
+                       { k: 'ACTUAL_DAYS_WTD', label: 'Actual days', num: true },
+                       { k: 'RECOVERY_GAP', label: 'Gap', num: true },
+                       { k: 'BILLED_AMT', label: 'Billed in period', num: true }],
+                rows: by(this.Recovery || [], 'BILLED_AMT'), totalKey: 'BILLED_AMT', totalLabel: 'Billed in period',
+                file: 'Recovery'
+            };
+            case 'BILLED': return {
+                note: 'Invoice value raised in the selected period, client by client. This is the bill value, '
+                    + 'not what has been collected - collection is on the Recovery card.',
+                cols: [{ k: 'CLIENTNAME', label: 'Client' },
+                       { k: 'BILLED_PERIOD', label: 'Billed in period', num: true },
+                       { k: 'OUTSTANDING', label: 'Still outstanding', num: true }],
+                rows: by(exposure, 'BILLED_PERIOD').filter(r => this.num(r.BILLED_PERIOD) > 0),
+                totalKey: 'BILLED_PERIOD', totalLabel: 'Billed in period', file: 'Billed'
+            };
+            case 'UNBILLED': return {
+                note: 'Each job that has cost booked against it but no invoice yet. Every rupee here is our money '
+                    + 'until the bill goes out. Open the Unbilled tab to see the voucher lines behind a job.',
+                cols: [{ k: 'JOBNO', label: 'Job no' },
+                       { k: 'CLIENTNAME', label: 'Client' },
+                       { k: 'JOB_DATE', label: 'Job date' },
+                       { k: 'AGE_DAYS', label: 'Age (days)', num: true },
+                       { k: 'TOTAL_COST', label: 'Cost booked', num: true }],
+                rows: by(this.UnbilledJobs || [], 'TOTAL_COST'), totalKey: 'TOTAL_COST', totalLabel: 'Cost booked',
+                file: 'Unbilled'
+            };
+            case 'MARGIN': return {
+                note: 'Income less job cost from the ledger, by client and type of work - the same rows as the Margin tab, '
+                    + 'grouped by ' + (this.MarginBy === 'SHIPPER' ? 'the shipper.' : 'the party that was billed.'),
+                cols: [{ k: 'CLIENTNAME', label: this.MarginBy === 'SHIPPER' ? 'Shipper' : 'Client (billed)' },
+                       { k: 'SERVICE_TYPE', label: 'Service' },
+                       { k: 'REVENUE', label: 'Income', num: true },
+                       { k: 'COST', label: 'Expense', num: true },
+                       { k: 'MARGIN', label: 'Margin', num: true }],
+                rows: by(this.MarginRows(), 'REVENUE'), totalKey: 'MARGIN', totalLabel: 'Margin',
+                file: 'Margin'
+            };
+            default: return null;
+        }
+    }
+
+    Evidence(): any {
+        const d = this.evidenceDef();
+        if (!d || !d.rows || d.rows.length === 0) { return null; }
+        d.count = d.rows.length;
+        d.total = d.rows.reduce((s: number, r: any) => s + this.num(r[d.totalKey]), 0);
+        d.shown = this.EvidenceAll ? d.rows : d.rows.slice(0, 10);
+        return d;
+    }
+
+    /* the full list, not the ten on screen */
+    ExportEvidence() {
+        const d = this.evidenceDef();
+        if (!d || !d.rows.length) { this._toasterService.toast('warning', 'warning', 'Nothing to export !'); return; }
+        const headers = d.cols.map((c: any) => c.label);
+        const rows = d.rows.map((r: any) => d.cols.map((c: any) => r[c.k]));
+        this.exportser.exportExceltry({
+            data: rows, headers: headers, pagetype: 'FinanceDashboard', title: this.cmpnyname,
+            subtitle: d.file + ' behind the ' + this.ExplainKey + ' figure - ' + this.BranchLabel + ' - '
+                + this.fmtDate(this.FromDate) + ' to ' + this.fmtDate(this.ToDate)
+        }, 'FinanceDashboard_' + d.file + '_');
+    }
     CloseExplain() { this.ExplainKey = null; }
 
     /* full-rupee figure for the arithmetic lines (the cards show the short form) */
@@ -722,18 +888,30 @@ export class FinanceDashboardComponent implements OnInit {
                 title: 'Outstanding (net)',
                 what: 'What customers still owe us today. We start from the bills that are not knocked off, then deduct the money '
                     + 'customers have paid on account (received, but never matched to a specific bill).',
-                steps: [
-                    { op: '',  label: 'Bills pending (bill value not yet knocked off)', value: this.fmtRs(k.GROSS_PENDING) },
-                    { op: '-', label: 'Unapplied credit (receipts not matched to any bill)', value: this.fmtRs(k.UNADJUSTED_CREDITS) }
-                ],
+                steps: (this.HasPeriodSplit() ? [
+                    { op: '',  label: 'Bills raised in the selected dates (' + period + '), still unpaid', value: this.fmtRs(this.PendingPeriod()) },
+                    { op: '+', label: 'Older bills raised before ' + this.FromLabel() + ', still unpaid', value: this.fmtRs(this.PendingOlder()) },
+                    { op: '=', label: 'Bills pending (bill value not yet knocked off)', value: this.fmtRs(k.GROSS_PENDING) }
+                ] : [
+                    { op: '',  label: 'Bills pending (bill value not yet knocked off)', value: this.fmtRs(k.GROSS_PENDING) }
+                ]).concat([
+                    { op: '-', label: 'Credit applied (on-account money set against open bills of the same client)', value: this.fmtRs(this.CreditApplied()) }
+                ]),
                 result: { label: 'Outstanding (net)', value: this.fmtRs(k.TOTAL_OUTSTANDING), short: this.fmtShort(k.TOTAL_OUTSTANDING) },
                 extra: [
+                    { label: 'Credit left over (clients holding more credit than open bills)'
+                        + (this.BiggestLeftOver() ? ' - largest: ' + this.BiggestLeftOver() : ''), value: this.fmtRs(this.CreditStranded()) },
                     { label: 'of which Overdue (past the due date)', value: this.fmtRs(k.OVERDUE_AMT) },
                     { label: 'Overdue share of Outstanding', value: this.pctOf(k.OVERDUE_AMT, k.TOTAL_OUTSTANDING).toFixed(0) + ' %' }
                 ],
                 source: 'A bill counts as paid when a receipt line is entered "Against Bill" (AB) with that bill number. '
                     + 'Receipts entered as GR / OA / AO name no bill, so they sit as unapplied credit and are deducted per client.',
-                notes: ['Calculated per client and floored at zero - one client\'s surplus credit never offsets another client\'s dues.',
+                notes: ['Includes the opening balance brought forward from before the ERP went live'
+                            + (this.num(k.OPENING_PENDING) > 0.5 ? ' (' + this.fmtRs(k.OPENING_PENDING) + ' still owed from ' + (k.OPENING_ASOF || 'go-live') + ')' : '')
+                            + ', less the receipts entered against it (AO), exactly like the OP. BALANCE line on the Billwise statement.',
+                        'Outstanding is what is owed ON the To date, so it includes unpaid bills from earlier years. '
+                            + 'The From date only splits it into "raised in the selected dates" and "older".',
+                        'Calculated per client and floored at zero - one client\'s surplus credit never offsets another client\'s dues.',
                         'Advances (AD) are kept separate and are not deducted here.',
                         'Due date = invoice date + credit period (see the Recovery card).']
             };
@@ -968,8 +1146,8 @@ export class FinanceDashboardComponent implements OnInit {
         /* children follow the parent: Last Billed newest first (or oldest first if the
            header arrow is flipped); never-billed jobs sink to the bottom, by job date */
         const dir = (this.MarginSortKey === 'LAST_BILLED_YMD') ? this.MarginSortDir : -1;
-        return this.JobPL.filter(j => j.CLIENTCODE === client
-            && (!t || (j.SERVICE_TYPE || '').toUpperCase().trim() === t))
+        return this.JobRowsFor(client)
+            .filter(j => !t || (j.SERVICE_TYPE || '').toUpperCase().trim() === t)
             .sort((a, b) => {
                 const ab = this.ymd(a.LAST_BILLED), bb = this.ymd(b.LAST_BILLED);
                 if (ab && !bb) { return -1; }
@@ -979,6 +1157,31 @@ export class FinanceDashboardComponent implements OnInit {
                          || (a.JOBNO || '').localeCompare(b.JOBNO || '');
             });
     }
+    /*  The jobs under a Margin row. In the Shipper view that is simply the job's own P&L.
+        In the Billed-party view a job billed to several parties shows THIS client's share:
+        its own invoices as income, and the cost of the charges it was billed for (Table13,
+        split in the procedure). SPLIT tells the row how many parties share the job.     */
+    private JobRowsFor(client: string): any[] {
+        if (this.MarginBy === 'SHIPPER' || !this.JobSplit.length) {
+            const key = this.MarginKey();
+            return this.JobPL.filter(j => (j[key] || j.CLIENTCODE) === client);
+        }
+        const jobs: any = {};
+        this.JobPL.forEach(j => { jobs[(j.JOBNO || '').toString().trim()] = j; });
+        return this.JobSplit
+            .filter(s => s.CLIENTCODE === client)
+            .map(s => {
+                const j = jobs[(s.JOBNO || '').toString().trim()] || {};
+                return Object.assign({}, j, {
+                    JOBNO: s.JOBNO,
+                    INCOME: s.INCOME, EXPENSE: s.EXPENSE, PROFIT: s.PROFIT, PROFIT_PCT: s.PROFIT_PCT,
+                    LAST_BILLED: s.LAST_BILLED || j.LAST_BILLED,
+                    SPLIT: this.num(s.CLIENTS_ON_JOB), UNMATCHED: this.num(s.UNMATCHED_COST),
+                    JOB_INCOME: j.INCOME, JOB_EXPENSE: j.EXPENSE
+                });
+            });
+    }
+
     /* dd/MM/yyyy -> yyyyMMdd so job dates sort chronologically */
     private ymd(d: string): string {
         const s = (d || '').toString();

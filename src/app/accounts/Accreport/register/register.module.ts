@@ -11,8 +11,9 @@ import { MyDatePickerModule } from 'mydatepicker';
 import { serviceTaxSupport } from './service-tax-support.component';
 import { GstRegisterComponent } from './gst-register.component';
 import { Gstr3bReportComponent } from './gstr3b-report.component';
+import { TdsRegisterComponent } from './tds-register.component';
 @NgModule({
-  declarations: [InvoiceRegisterComponent, RegisterComponent,serviceTaxSupport,GstRegisterComponent,Gstr3bReportComponent],
+  declarations: [InvoiceRegisterComponent, RegisterComponent,serviceTaxSupport,GstRegisterComponent,Gstr3bReportComponent,TdsRegisterComponent],
   imports: [
     CommonModule,
     RegisterRoutingModule,

@@ -18,6 +18,10 @@ export class EntryMiscJobMasterComponent implements OnInit {
     Narration: string = '';
 
     ClientList: Array<any> = [];
+    AgentList: Array<any> = [];
+    SalesPersonList: Array<any> = [];
+    AgentCode: any = null;      // Agent (SUPPLIER_MASTER, AGENT='Y')
+    SalesPerson: any = null;    // Handler / Sales Person (SUBAGENT_CODE)
     ErrorType: string = null;
     constructor(
         private _dataService: DataService,
@@ -60,6 +64,8 @@ export class EntryMiscJobMasterComponent implements OnInit {
             .subscribe((data: any) => {
                 this._loaderService.display(false);
                 this.ClientList = data.Table;
+                this.AgentList = (data.Table1) ? data.Table1 : [];
+                this.SalesPersonList = (data.Table2) ? data.Table2 : [];
             });
     }
 
@@ -78,6 +84,8 @@ export class EntryMiscJobMasterComponent implements OnInit {
                 this.ClientName = data.Table[0]["CLIENT_CODE"];
                 this.NoOfPkgs = data.Table[0]["NOOFPKGS"];
                 this.Narration = data.Table[0]["NARRATION"];
+                this.AgentCode = (data.Table[0]["AGENT_CODE"]) ? data.Table[0]["AGENT_CODE"] : null;
+                this.SalesPerson = (data.Table[0]["SUBAGENT_CODE"]) ? data.Table[0]["SUBAGENT_CODE"] : null;
             });
     }
 
@@ -91,6 +99,8 @@ export class EntryMiscJobMasterComponent implements OnInit {
             ClientName: this.ClientName,
             NoOfPkgs: this.NoOfPkgs,
             Narration: this.Narration,
+            AgentCode: (this.AgentCode) ? this.AgentCode : '',
+            SubAgentCode: (this.SalesPerson) ? this.SalesPerson : '',
             MakerIp: this._loginService.getLogin()[0].MAKERIP,
             MakerId: this._loginService.getLogin()[0].CMPID,
             CmpCode: this._loginService.getLogin()[0].CMPCODE,
@@ -123,6 +133,8 @@ export class EntryMiscJobMasterComponent implements OnInit {
         this.ClientName = "0";
         this.NoOfPkgs = "";
         this.Narration = "";
+        this.AgentCode = null;
+        this.SalesPerson = null;
     }
 
 }

@@ -60,6 +60,8 @@ export class EntrySeaImportComponent implements OnInit {
     BillTo: any = null;
     VesselName: any = null;
     LinerAgent: any = null;
+    SalesPerson: any = null;           // Handler (fk_SubAgent)
+    SalesPersonList: Array<any> = [];
     BusinessAssociate: any = null;
     MblNo: any = '';
     MblDate: any = null;
@@ -295,6 +297,7 @@ export class EntrySeaImportComponent implements OnInit {
                 this.BusinessAssociateList = data.Table16;
                 this.Arrivalportlist = data.Table17;
                 this.userdtls=data.Table18;
+                this.SalesPersonList = (data.Table19) ? data.Table19 : [];
                 this.populate(this.ImportId);
             });
     }
@@ -363,6 +366,7 @@ export class EntrySeaImportComponent implements OnInit {
         let popObject = data[0];
         this.Importer = popObject.fk_Importer;
         this.BillTo = popObject.fk_BillTo;
+        this.SalesPerson = (popObject.fk_SubAgent) ? popObject.fk_SubAgent : null;
         this.VesselName =popObject.fk_Vessel_Airline; //popObject.fk_Vessel_Airline;
         this.LinerAgent = popObject.fk_Agent_Name;
         this.MblNo = popObject.Mbl_Mabl_NO;
@@ -1577,6 +1581,7 @@ export class EntrySeaImportComponent implements OnInit {
             fk_BillOfEntry: fk_BillOfEntry,
             MakerID: this._loginService.getLogin()[0].CMPID,
             MakerIP: this._loginService.getLogin()[0].MAKERIP,
+            fk_SubAgent: (this.SalesPerson) ? this.SalesPerson : "",
             Citycode1: this._loginService.getLogin()[0].CITYCODE1,
             CmpCode: this._loginService.getLogin()[0].CMPCODE,
             ArrivingDateAtICD: ArrivingDateAtICD,
@@ -1686,6 +1691,7 @@ export class EntrySeaImportComponent implements OnInit {
         this.BillTo = null;
         this.VesselName = null;
         this.LinerAgent = null;
+        this.SalesPerson = null;
         this.BusinessAssociate = null;
         this.MblNo = '';
         this.MblDate = null;

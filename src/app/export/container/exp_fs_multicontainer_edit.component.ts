@@ -16,6 +16,9 @@ import { ThemeService } from 'ng2-charts';
     standalone: false
 })
 export class FSmulticontainerEdit implements OnInit {
+    /*  Called by the template (Generate button) but never implemented (pre-existing).
+        Declared so the production (AOT) build compiles; it does nothing, as before.   */
+    GenerateContainer(..._args: any[]): any { console.warn('FSmulticontainerEdit: GenerateContainer is not implemented on this page'); }
     latestEntryID: number | null = null;
     Add:string="Add";
     vslrotation: any = "";
@@ -105,9 +108,6 @@ selectedRowId: number | null = null;
         selectorHeight: '180px',
         selectorWidth: '200px'
     };
-    GenerateContainer() {
-        // Containers are generated on the create screen; the button stays disabled here.
-    }
 
     ngOnInit(): void {
         this.loaderService.display(true);  
