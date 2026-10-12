@@ -1,339 +1,483 @@
-<div class="animated fadeIn" >
-    <div class="row no-gutters"  >
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{Header}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="br-page">
+
+  <!-- ========================================================= -->
+  <!-- SEARCH                                                    -->
+  <!-- ========================================================= -->
+
+  @if (displayType=='SEARCH') {
+<div class="br-card search-card">
+
+    <div class="card-heading">
+      <i class="fa fa-search"></i> {{Header}}
     </div>
-    @if (displayType=='SEARCH') {
-<div class="row no-gutters" >
-        <div class="col-sm-12 col-md-3 col-lg-3">
+
+    <div class="clean-row-layout">
+
+      <div class="clean-field clean-bank">
+        <label>Bank Account <span class="br-req">*</span></label>
+        <ng-select
+          [items]="BankList"
+          bindLabel="acctname"
+          bindValue="acctcodename"
+          [(ngModel)]="ourbank"
+          [appendTo]="'body'"
+          placeholder="Select Bank Account">
+        </ng-select>
+      </div>
+
+      <div class="clean-field clean-date">
+        <label>From <span class="br-req">*</span></label>
+        <my-date-picker
+          name="FromDate"
+          (dateChanged)="FromDateChanged($event)"
+          [options]="myDatePickerOptions"
+          [selDate]="FromDate"
+          class="search-date-control">
+        </my-date-picker>
+      </div>
+
+      <div class="clean-field clean-date">
+        <label>To <span class="br-req">*</span></label>
+        <my-date-picker
+          name="ToDate"
+          (dateChanged)="ToDateChanged($event)"
+          [options]="myDatePickerOptions"
+          [selDate]="ToDate"
+          class="search-date-control">
+        </my-date-picker>
+      </div>
+
+      <div class="clean-actions">
+        <button class="br-btn br-btn--primary" type="button" (click)="search()">
+          <i class="fa fa-search"></i> Search
+        </button>
+        <button class="br-btn br-btn--ghost" type="button" (click)="reset()">
+          <i class="fa fa-undo"></i> Reset
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
+
+  <!-- ========================================================= -->
+  <!-- RESULT                                                    -->
+  <!-- ========================================================= -->
+
+  @if (displayType=='LIST') {
+
+
+    <div class="br-topbar">
+      <div class="br-topbar-left">
+        <span class="br-page-title">{{Header}}</span>
+        <span class="br-meta">{{Subheader}}</span>
+      </div>
+      <div class="br-topbar-right">
+        <span class="br-record-chip">{{lbltxt}} {{valuetxt}}</span>
+        <button class="br-btn br-btn--export" type="button" (click)="Exporttoxl();">
+          <i class="fa fa-file-excel-o"></i> Export to Excel
+        </button>
+        <button class="br-btn br-btn--ghost" type="button"
+                (click)="displayType='SEARCH';reconcildataList=[];unreconcildataList=[]">
+          <i class="fa fa-arrow-circle-left"></i> Back to search
+        </button>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="br-view-toggle">
+      <button class="toggle-btn" type="button"
+              [class.active]="activeTab=='Reconcil'"
+              (click)="changeTab('Reconcil')">
+        <i class="fa fa-check"></i> Reconcil
+        <span class="toggle-count">{{reconcilrecord}}</span>
+      </button>
+      <button class="toggle-btn" type="button"
+              [class.active]="activeTab=='UnReconcil'"
+              (click)="changeTab('UnReconcil')">
+        <i class="fa fa-exclamation-triangle"></i> UnReconcil
+        <span class="toggle-count">{{unreconcilrecord}}</span>
+      </button>
+      <button class="toggle-btn" type="button"
+              [class.active]="activeTab=='Our Bank Ledger'"
+              (click)="changeTab('Our Bank Ledger')">
+        <i class="fa fa-book"></i> Our Bank Ledger
+        <span class="toggle-count">{{ledgerdatarecord}}</span>
+      </button>
+      <button class="toggle-btn" type="button"
+              [class.active]="activeTab=='Mismatched Data'"
+              (click)="changeTab('Mismatched Data')">
+        <i class="fa fa-random"></i> Mismatched Data
+        <span class="toggle-count">{{mismatchedrecord}}</span>
+      </button>
+    </div>
+
+    <!-- ===================== TAB 1 : RECONCIL ===================== -->
+    @if (activeTab=='Reconcil') {
+<div class="br-card br-table-card">
+      <div class="br-table-wrap">
+        <table class="br-table grouped-head">
+          <thead>
+            <tr class="grp-head">
+              <th colspan="4">Bank Statement Data</th>
+              <th colspan="7" class="grp-start">Ledger Data</th>
+            </tr>
+            <tr class="col-head">
+              <th class="sortable" (click)="sortBy('reconcil', reconcildataList, 'BANKREFNO', 'str')">Bank Ref No <i class="fa" [ngClass]="sortIcon('reconcil','BANKREFNO')"></i></th>
+              <th class="num sortable" (click)="sortBy('reconcil', reconcildataList, 'DEPOSIT', 'num')">Deposit <i class="fa" [ngClass]="sortIcon('reconcil','DEPOSIT')"></i></th>
+              <th class="num sortable" (click)="sortBy('reconcil', reconcildataList, 'WITHDRAWAL', 'num')">Withdrawal <i class="fa" [ngClass]="sortIcon('reconcil','WITHDRAWAL')"></i></th>
+              <th class="ctr sortable" (click)="sortBy('reconcil', reconcildataList, 'CLEARANCEDT', 'date')">Clearance Dt <i class="fa" [ngClass]="sortIcon('reconcil','CLEARANCEDT')"></i></th>
+              <th class="grp-start sortable" (click)="sortBy('reconcil', reconcildataList, 'USERBANKREFNO', 'str')">Bank Ref No <i class="fa" [ngClass]="sortIcon('reconcil','USERBANKREFNO')"></i></th>
+              <th class="sortable" (click)="sortBy('reconcil', reconcildataList, 'ENTRYNO', 'str')">Entry No <i class="fa" [ngClass]="sortIcon('reconcil','ENTRYNO')"></i></th>
+              <th class="ctr sortable" (click)="sortBy('reconcil', reconcildataList, 'ENTRYDT', 'date')">Entry Date <i class="fa" [ngClass]="sortIcon('reconcil','ENTRYDT')"></i></th>
+              <th class="ctr sortable" (click)="sortBy('reconcil', reconcildataList, 'ENTRYTYPE', 'str')">Type <i class="fa" [ngClass]="sortIcon('reconcil','ENTRYTYPE')"></i></th>
+              <th class="num sortable" (click)="sortBy('reconcil', reconcildataList, 'AMOUNT', 'num')">Amount <i class="fa" [ngClass]="sortIcon('reconcil','AMOUNT')"></i></th>
+              <th class="num sortable" (click)="sortBy('reconcil', reconcildataList, 'DEDUCTION', 'num')">Deduction <i class="fa" [ngClass]="sortIcon('reconcil','DEDUCTION')"></i></th>
+              <th class="ctr sortable" (click)="sortBy('reconcil', reconcildataList, 'CLEARANCEDT', 'date')">Clearance Dt <i class="fa" [ngClass]="sortIcon('reconcil','CLEARANCEDT')"></i></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (data of reconcildataList; track data) {
+<tr>
+              <td class="mono">{{data.BANKREFNO || '—'}}</td>
+              <td class="num">
+                @if (data.DEPOSIT > 0) {
+<span class="cr-amt">{{data.DEPOSIT | number:'1.2-2'}}</span>
+}
+                @if (!(data.DEPOSIT > 0)) {
+<span class="muted">—</span>
+}
+              </td>
+              <td class="num">
+                @if (data.WITHDRAWAL > 0) {
+<span class="dr-amt">{{data.WITHDRAWAL | number:'1.2-2'}}</span>
+}
+                @if (!(data.WITHDRAWAL > 0)) {
+<span class="muted">—</span>
+}
+              </td>
+              <td class="ctr">{{data.CLEARANCEDT || '—'}}</td>
+              <td class="mono grp-start">{{data.USERBANKREFNO || '—'}}</td>
+              <td class="mono">{{data.ENTRYNO || '—'}}</td>
+              <td class="ctr">{{data.ENTRYDT || '—'}}</td>
+              <td class="ctr">
+                @if (data.ENTRYTYPE=='BR') {
+<span class="br-badge br-badge--br">BR</span>
+}
+                @if (data.ENTRYTYPE=='BP') {
+<span class="br-badge br-badge--bp">BP</span>
+}
+                @if (data.ENTRYTYPE!='BR' && data.ENTRYTYPE!='BP') {
+<span class="muted">—</span>
+}
+              </td>
+              <td class="num">
+                @if (data.AMOUNT) {
+<span>{{data.AMOUNT | number:'1.2-2'}}</span>
+}
+                @if (!data.AMOUNT) {
+<span class="muted">—</span>
+}
+              </td>
+              <td class="num">
+                @if (data.DEDUCTION) {
+<span>{{data.DEDUCTION | number:'2.2-4'}}</span>
+}
+                @if (!data.DEDUCTION) {
+<span class="muted">—</span>
+}
+              </td>
+              <td class="ctr">{{data.CLEARANCEDT || '—'}}</td>
+            </tr>
+}
+          </tbody>
+        </table>
+
+        @if (reconcildataList.length === 0) {
+<div class="br-empty">
+          <i class="fa fa-inbox"></i>
+          No reconciled items in this period.
         </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-
-                <tr>
-                    <td >
-                        <span  class="col-form-span-label"><b>Bank</b> </span><span
-                        class="col-form-span-error">*</span>
-                    </td>
-
-                            <td colspan="3" >
-                               <ng-select   [items]="BankList" bindLabel="acctname"
-                               bindValue="acctcodename"  [(ngModel)]="ourbank"
-                               class="custom" placeholder="--Select OurBank--">
-                                </ng-select>
-                            </td>
-                </tr>
-                <tr>
-
-                    <td><span class="col-form-span-label"><b>From</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                <td>
-                    <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)"  [options]="myDatePickerOptions"
-                     class="form-control"  [selDate]="FromDate"  ></my-date-picker>
-                </td>
-                    <td><span class="col-form-span-label"><b>To </b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td><my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)"  [options]="myDatePickerOptions"
-                            class="form-control"  [selDate]="ToDate"   ></my-date-picker>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td></td>
-                    <td colspan="3"  style="text-align: center;">
-                            <button align="center" class="btn btn-sm btn-success" type="submit" (click)="search()"><span
-                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Search</span></button>
-                            <button class="btn btn-sm btn-warning" type="reset"> <span class="col-form-span-label"
-                                (click)="reset();"><i class="fa fa-undo"></i> Reset</span></button>
-                    </td>
-                </tr>
-
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
+}
+      </div>
     </div>
 }
-    <!-- <div class="row no-gutters" *ngIf="displayType=='LIST'" style="overflow-y: auto; height:532px; ">
 
-        <div class="col-sm-12 col-md-12 col-lg-12">
-            <table class="table table-bordered table-sm-new bgwhite" >
-                <tr align="right" class="title-head formheading">
-                    <td colspan="13" >
-                  <a href="javascript:void(0);" (click)="displayType='SEARCH';reconcildataList=[];unreconcildataList=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
-                    </td>
-                </tr>
+    <!-- ===================== TAB 2 : UNRECONCIL ===================== -->
+    @if (activeTab=='UnReconcil') {
+<div class="br-card br-table-card">
 
-                <tr>
-                    <td colspan="13" class="centerlabel">
-                        <strong> Reconcilled List </strong>
-                    </td>
-                </tr>
-            </table>
-            <table class="table table-bordered table-sm-new " >
-                <tr>
-                    <td colspan="6" class="centerlabel">
-                        <strong>Bank Statement Data</strong>
-                    </td>
-                    <td colspan="7" class="centerlabel">
-                        <strong>Ledger Data</strong>
-                    </td>
-                </tr>
-                <thead>
-                    <tr class="title-head formheading table-primary">
-                        <th class="col-form-span-label" align="center">Bank Ref No</th>
-                        <th class="col-form-span-label" align="center">Deposit </th>
-                        <th class="col-form-span-label" align="center">Withdrawal</th>
-                        <th class="col-form-span-label" align="center">	Clearance Dt</th>
-                        <th class="col-form-span-label" align="center"></th>
-                        <th class="col-form-span-label" align="center">Bank Ref No</th>
-                        <th class="col-form-span-label" align="center">Entry No</th>
-                        <th class="col-form-span-label" align="center">Entry Date</th>
-                        <th class="col-form-span-label" align="center">Entry Type</th>
-                        <th class="col-form-span-label" align="center">Amount </th>
-                        <th class="col-form-span-label" align="center">Deduction </th>
-                        <th class="col-form-span-label" align="center">Clearance Dt</th>
+      <div class="br-tabletools">
+        <input type="text" [(ngModel)]="bankFilter" class="br-filter"
+               placeholder="Filter by Bank Ref No / Amount...">
+        <span class="br-hint">
+          Select a row here, then its match on <b>Our Bank Ledger</b>, to link them manually.
+        </span>
+      </div>
 
-                    </tr>
-                </thead>
-                <tbody *ngIf="reconcildataList.length > 0">
-                    <tr *ngFor="let data of reconcildataList" >
-                        <td  ><span  class="col-form-span-label" >{{data.BANKREFNO}}</span> </td>
-                         <td  ><span   class="col-form-span-label">{{data.DEPOSIT}}</span> </td>
-                         <td  ><span  class="col-form-span-label">{{data.WITHDRAWAL}}</span> </td>
-                         <td ><span  class="col-form-span-label">{{data.CLEARANCEDT}}</span> </td>
-                         <td style="width:20px;" ></td>
-                         <td  ><span  class="col-form-span-label">{{data.USERBANKREFNO}}</span> </td>
+      <div class="br-table-wrap">
+        <table class="br-table single-head">
+          <thead>
+            <tr class="col-head">
+              <th class="chk-col"></th>
+              <th class="sortable" (click)="sortBy('unreconcil', unreconcildataList, 'BANKREFNO', 'str')">Bank Ref No <i class="fa" [ngClass]="sortIcon('unreconcil','BANKREFNO')"></i></th>
+              <th class="num sortable" (click)="sortBy('unreconcil', unreconcildataList, 'DEPOSIT', 'num')">Deposit <i class="fa" [ngClass]="sortIcon('unreconcil','DEPOSIT')"></i></th>
+              <th class="num sortable" (click)="sortBy('unreconcil', unreconcildataList, 'WITHDRAWAL', 'num')">Withdrawal <i class="fa" [ngClass]="sortIcon('unreconcil','WITHDRAWAL')"></i></th>
+              <th class="ctr sortable" (click)="sortBy('unreconcil', unreconcildataList, 'CLEARANCEDT', 'date')">Clearance Date <i class="fa" [ngClass]="sortIcon('unreconcil','CLEARANCEDT')"></i></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (data of filteredUnreconcilList; track data) {
+<tr [class.row-selected]="data._linkSelected">
+              <td class="chk-col">
+                <input type="checkbox" [ngModel]="data._linkSelected" (ngModelChange)="selectBankRow(data)">
+              </td>
+              <td class="mono">{{data.BANKREFNO || '—'}}</td>
+              <td class="num">
+                @if (data.DEPOSIT > 0) {
+<span class="cr-amt">{{data.DEPOSIT | number:'1.2-2'}}</span>
+}
+                @if (!(data.DEPOSIT > 0)) {
+<span class="muted">—</span>
+}
+              </td>
+              <td class="num">
+                @if (data.WITHDRAWAL > 0) {
+<span class="dr-amt">{{data.WITHDRAWAL | number:'1.2-2'}}</span>
+}
+                @if (!(data.WITHDRAWAL > 0)) {
+<span class="muted">—</span>
+}
+              </td>
+              <td class="ctr">{{data.CLEARANCEDT || '—'}}</td>
+            </tr>
+}
+          </tbody>
+        </table>
 
-                         <td  ><span  class="col-form-span-label">{{data.ENTRYNO}}</span> </td>
-                         <td  ><span  class="col-form-span-label">{{data.ENTRYDT}}</span> </td>
-                         <td ><span  class="col-form-span-label">{{data.ENTRYTYPE}}</span> </td>
-                         <td><span  class="col-form-span-label">{{data.AMOUNT}}</span> </td>
-                         <td  ><span class="col-form-span-label">{{data.DEDUCTION|number:'2.2-4'}}</span>  </td>
-                        <td ><span class="col-form-span-label">{{data.CLEARANCEDT}}</span>  </td>
-                    </tr>
-                </tbody>
-            </table>
-            <table>
-                <tr>
-                    <td colspan="13" class="centerlabel">
-                        <strong> UnReconcilled List </strong>
-                    </td>
-                </tr>
-            </table>
-            <table class="table table-bordered table-sm-new table-striped table-hover" >
-                <tr>
-                    <td colspan="6" class="centerlabel">
-                        <strong>Bank Statement Data</strong>
-                    </td>
-                    <td colspan="7" class="centerlabel">
-                        <strong>Ledger Data</strong>
-                    </td>
-                </tr>
-                <thead>
-                    <tr class="title-head formheading table-primary">
-                        <th class="col-form-span-label" align="center">Bank Ref No</th>
-                        <th class="col-form-span-label" align="center">Deposit </th>
-                        <th class="col-form-span-label" align="center">Withdrawal</th>
-                        <th class="col-form-span-label" align="center">	Clearance Date</th>
-                        <th class="col-form-span-label" align="center"></th>
-                        <th class="col-form-span-label" align="center">Bank Ref No</th>
-                        <th class="col-form-span-label" align="center">Entry No</th>
-                        <th class="col-form-span-label" align="center">Entry Date</th>
-                        <th class="col-form-span-label" align="center">Entry Type</th>
-                        <th class="col-form-span-label" align="center">Amount </th>
-                        <th class="col-form-span-label" align="center">Deduction </th>
-                        <th class="col-form-span-label" align="center">Clearance Date </th>
-
-                    </tr>
-                </thead>
-                <tbody *ngIf="unreconcildataList.length > 0">
-                    <tr *ngFor="let data of unreconcildataList" >
-                        <td ><span  class="col-form-span-label" >{{data.BANKREFNO}}</span> </td>
-                         <td ><span   class="col-form-span-label ">{{data.DEPOSIT}}</span> </td>
-                         <td ><span  class="col-form-span-label">{{data.WITHDRAWAL}}</span> </td>
-                         <td ><span  class="col-form-span-label">{{data.CLEARANCEDT}}</span> </td>
-                         <td style="width:20px;"></td>
-                         <td ><span  class="col-form-span-label">{{data.USERBANKREFNO}}</span> </td>
-                         <td  ><span  class="col-form-span-label">{{data.ENTRYNO}}</span> </td>
-                         <td  ><span  class="col-form-span-label">{{data.ENTRYDT}}</span> </td>
-                         <td  ><span  class="col-form-span-label">{{data.ENTRYTYPE}}</span> </td>
-                         <td ><span  class="col-form-span-label">{{data.AMOUNT}}</span> </td>
-                         <td  ><span class="col-form-span-label">{{data.DEDUCTION|number:'2.2-4'}}</span>  </td>
-                        <td ><span class="col-form-span-label">{{data.CLEARANCEDT}}</span>  </td>
-                    </tr>
-                </tbody>
-            </table>
-
+        @if (filteredUnreconcilList.length === 0) {
+<div class="br-empty">
+          <i class="fa fa-check-circle"></i>
+          No matching records.
         </div>
-
-    </div> -->
-    @if (reconcildataList.length >= 1) {
-<main>
-        <div class="row no-gutters">
-
-            <!-- <div class="col-sm-12 col-md-1 col-lg-1"> </div> -->
-            <div class="col-sm-12 col-md-12 col-lg-12">
-
-                <div class="tab" role="tabpanel">
-                     <button class="btn btn-sm btn-success" style="float: right;" type="submit" (click)="Exporttoxl();" ><span
-                        class="col-form-span-label"><i class="fa fa-file-excel-o"></i> ExportToExcel</span></button>
-                    <button class="btn btn-sm btn-warning" style="float: right;" (click)="displayType='SEARCH';reconcildataList=[];unreconcildataList=[]"><span
-                            class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to
-                                search</u></span></button>
-                                <!-- <a href="javascript:void(0);" (click)="displayType='SEARCH';reconcildataList=[];unreconcildataList=[]"
-                                style="float: right;text-decoration: underline;color: red;">back to search</a>  -->
-
-                    <div class="bor">
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" id="zero-tab" data-toggle="tab" href="#zero">Reconcil</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="one-tab" data-toggle="tab" href="#one">UnReconcil</a>
-                            </li>
-
-                        </ul>
-                    </div>
-                    <div class="tab-content" style="height:450px; width: 100%;  ;overflow-y:auto">
-                        <div role="tabpanel" class="tab-pane active" id="zero" style="width:100%">
-                             <div class="row">
-                                <div class="col">
-                                    <table>
-                                        <tr>
-                                            <td colspan="13" class="centerlabel" >
-                                                <strong> Reconcilled Records: <span style="color: red;"> {{reconcilrecord}} </span>  </strong>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                    <table class="table table-bordered table-sm-new " >
-                                        <tr>
-                                            <td colspan="5" class="centerlabel"  style="background-color: #26a6d4;color: white;">
-                                                <strong>Bank Statement Data</strong>
-                                            </td>
-                                            <td colspan="7" class="centerlabel"  style="background-color: #26a6d4;color: white;">
-                                                <strong >Ledger Data</strong>
-                                            </td>
-                                        </tr>
-                                        <thead>
-                                            <tr class="title-head formheading table-primary">
-                                                <th class="col-form-span-label" align="center">Bank Ref No</th>
-                                                <th class="col-form-span-label" align="center">Deposit </th>
-                                                <th class="col-form-span-label" align="center">Withdrawal</th>
-                                                <th class="col-form-span-label" align="center">	Clearance Dt</th>
-                                                <th class="col-form-span-label" align="center"></th>
-                                                <th class="col-form-span-label" align="center">Bank Ref No</th>
-                                                <th class="col-form-span-label" align="center">Entry No</th>
-                                                <th class="col-form-span-label" align="center">Entry Date</th>
-                                                <th class="col-form-span-label" align="center">Entry Type</th>
-                                                <th class="col-form-span-label" align="center">Amount </th>
-                                                <th class="col-form-span-label" align="center">Deduction </th>
-                                                <th class="col-form-span-label" align="center">Clearance Dt</th>
-
-                                            </tr>
-                                        </thead>
-                                        @if (reconcildataList.length > 0) {
-<tbody>
-                                            @for (data of reconcildataList; track data) {
-<tr >
-                                                <td  ><span  class="col-form-span-label" >{{data.BANKREFNO}}</span> </td>
-                                                 <td  ><span   class="col-form-span-label">{{data.DEPOSIT}}</span> </td>
-                                                 <td  ><span  class="col-form-span-label">{{data.WITHDRAWAL}}</span> </td>
-                                                 <td ><span  class="col-form-span-label">{{data.CLEARANCEDT}}</span> </td>
-                                                 <td style="width:20px;" ></td>
-                                                 <td  ><span  class="col-form-span-label">{{data.USERBANKREFNO}}</span> </td>
-
-                                                 <td  ><span  class="col-form-span-label">{{data.ENTRYNO}}</span> </td>
-                                                 <td  ><span  class="col-form-span-label">{{data.ENTRYDT}}</span> </td>
-                                                 <td ><span  class="col-form-span-label">{{data.ENTRYTYPE}}</span> </td>
-                                                 <td><span  class="col-form-span-label">{{data.AMOUNT}}</span> </td>
-                                                 <td  ><span class="col-form-span-label">{{data.DEDUCTION|number:'2.2-4'}}</span>  </td>
-                                                <td ><span class="col-form-span-label">{{data.CLEARANCEDT}}</span>  </td>
-                                            </tr>
 }
-                                        </tbody>
+      </div>
+    </div>
 }
-                                    </table>
-                     </div>
-                  </div>
-                   </div>
-                   <div role="tabpanel" class="tab-pane" id="one" style="width:100%">
-                    <div class="row">
-                        <div class="col">
-                            <table>
-                                <tr>
-                                    <td colspan="13" class="centerlabel" >
-                                        <strong> UnReconcilled Records: <span style="color: red;"> {{unreconcilrecord}} </span>  </strong>
-                                    </td>
-                                </tr>
-                            </table>
-                            <table class="table table-bordered table-sm-new table-striped table-hover" >
-                                <tr>
-                                    <td colspan="5" class="centerlabel"  style="background-color: #26a6d4;">
-                                        <strong>Bank Statement Data</strong>
-                                    </td>
-                                    <td colspan="7" class="centerlabel"  style="background-color: #26a6d4;">
-                                        <strong>Ledger Data</strong>
-                                    </td>
-                                </tr>
-                                <thead>
-                                    <tr class="title-head formheading table-primary">
-                                        <th class="col-form-span-label" align="center">Bank Ref No</th>
-                                        <th class="col-form-span-label" align="center">Deposit </th>
-                                        <th class="col-form-span-label" align="center">Withdrawal</th>
-                                        <th class="col-form-span-label" align="center">	Clearance Date</th>
-                                        <th class="col-form-span-label" align="center"></th>
-                                        <th class="col-form-span-label" align="center">Bank Ref No</th>
-                                        <th class="col-form-span-label" align="center">Entry No</th>
-                                        <th class="col-form-span-label" align="center">Entry Date</th>
-                                        <th class="col-form-span-label" align="center">Entry Type</th>
-                                        <th class="col-form-span-label" align="center">Amount </th>
-                                        <th class="col-form-span-label" align="center">Deduction </th>
-                                        <th class="col-form-span-label" align="center">Clearance Date </th>
 
-                                    </tr>
-                                </thead>
-                                @if (unreconcildataList.length > 0) {
-<tbody>
-                                    @for (data of unreconcildataList; track data) {
-<tr >
-                                        <td ><span  class="col-form-span-label" >{{data.BANKREFNO}}</span> </td>
-                                         <td ><span   class="col-form-span-label ">{{data.DEPOSIT}}</span> </td>
-                                         <td ><span  class="col-form-span-label">{{data.WITHDRAWAL}}</span> </td>
-                                         <td ><span  class="col-form-span-label">{{data.CLEARANCEDT}}</span> </td>
-                                         <td style="width:20px;"></td>
-                                         <td ><span  class="col-form-span-label">{{data.USERBANKREFNO}}</span> </td>
-                                         <td  ><span  class="col-form-span-label">{{data.ENTRYNO}}</span> </td>
-                                         <td  ><span  class="col-form-span-label">{{data.ENTRYDT}}</span> </td>
-                                         <td  ><span  class="col-form-span-label">{{data.ENTRYTYPE}}</span> </td>
-                                         <td ><span  class="col-form-span-label">{{data.AMOUNT}}</span> </td>
-                                         <td  ><span class="col-form-span-label">{{data.DEDUCTION|number:'2.2-4'}}</span>  </td>
-                                        <td ><span class="col-form-span-label">{{data.CLEARANCEDT}}</span>  </td>
-                                    </tr>
-}
-                                </tbody>
-}
-                            </table>
-                        </div>
-                    </div>
-                </div>
+    <!-- ===================== TAB 3 : OUR BANK LEDGER ===================== -->
+    @if (activeTab=='Our Bank Ledger') {
+<div class="br-card br-table-card">
 
-                  </div>
-                </div>
-                <!-- <div class="col-sm-12 col-md-1 col-lg-1"> </div> -->
-            </div>
-           <!-- <div class="col-sm-12 col-md-1 col-lg-1"> </div> -->
+      <div class="br-tabletools">
+        <input type="text" [(ngModel)]="ledgerFilter" class="br-filter"
+               placeholder="Filter by Entry No / Bank Ref No / Amount...">
+        <span class="br-hint">
+          Select a row here to pair with your selection on <b>UnReconcil</b>.
+        </span>
+      </div>
+
+      <div class="br-table-wrap">
+        <table class="br-table single-head">
+          <thead>
+            <tr class="col-head">
+              <th class="chk-col"></th>
+              <th class="sortable" (click)="sortBy('ledger', ledgerdata_list, 'USERBANKREFNO', 'str')">Bank Ref No <i class="fa" [ngClass]="sortIcon('ledger','USERBANKREFNO')"></i></th>
+              <th class="sortable" (click)="sortBy('ledger', ledgerdata_list, 'ENTRYNO', 'str')">Entry No <i class="fa" [ngClass]="sortIcon('ledger','ENTRYNO')"></i></th>
+              <th class="ctr sortable" (click)="sortBy('ledger', ledgerdata_list, 'ENTRYDT', 'date')">Entry Date <i class="fa" [ngClass]="sortIcon('ledger','ENTRYDT')"></i></th>
+              <th class="ctr sortable" (click)="sortBy('ledger', ledgerdata_list, 'ENTRYTYPE', 'str')">Type <i class="fa" [ngClass]="sortIcon('ledger','ENTRYTYPE')"></i></th>
+              <th class="num sortable" (click)="sortBy('ledger', ledgerdata_list, 'AMOUNT', 'num')">Amount <i class="fa" [ngClass]="sortIcon('ledger','AMOUNT')"></i></th>
+              <th class="num sortable" (click)="sortBy('ledger', ledgerdata_list, 'DEDUCTION', 'num')">Deduction <i class="fa" [ngClass]="sortIcon('ledger','DEDUCTION')"></i></th>
+              <th class="ctr sortable" (click)="sortBy('ledger', ledgerdata_list, 'CLEARANCEDT', 'date')">Clearance Date <i class="fa" [ngClass]="sortIcon('ledger','CLEARANCEDT')"></i></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (data of filteredLedgerList; track data) {
+<tr [class.row-selected]="data._linkSelected">
+              <td class="chk-col">
+                <input type="checkbox" [ngModel]="data._linkSelected" (ngModelChange)="selectLedgerRow(data)">
+              </td>
+              <td class="mono">{{data.USERBANKREFNO || '—'}}</td>
+              <td class="mono">{{data.ENTRYNO || '—'}}</td>
+              <td class="ctr">{{data.ENTRYDT || '—'}}</td>
+              <td class="ctr">
+                @if (data.ENTRYTYPE=='BR') {
+<span class="br-badge br-badge--br">BR</span>
+}
+                @if (data.ENTRYTYPE=='BP') {
+<span class="br-badge br-badge--bp">BP</span>
+}
+                @if (data.ENTRYTYPE!='BR' && data.ENTRYTYPE!='BP') {
+<span class="muted">—</span>
+}
+              </td>
+              <td class="num">
+                @if (data.AMOUNT) {
+<span>{{data.AMOUNT | number:'1.2-2'}}</span>
+}
+                @if (!data.AMOUNT) {
+<span class="muted">—</span>
+}
+              </td>
+              <td class="num">
+                @if (data.DEDUCTION) {
+<span>{{data.DEDUCTION | number:'2.2-4'}}</span>
+}
+                @if (!data.DEDUCTION) {
+<span class="muted">—</span>
+}
+              </td>
+              <td class="ctr">{{data.CLEARANCEDT || '—'}}</td>
+            </tr>
+}
+          </tbody>
+        </table>
+
+        @if (filteredLedgerList.length === 0) {
+<div class="br-empty">
+          <i class="fa fa-book"></i>
+          No matching records.
         </div>
-
-    </main>
 }
+      </div>
+    </div>
+}
+
+    <!-- ===================== TAB 4 : MISMATCHED DATA ===================== -->
+    @if (activeTab=='Mismatched Data') {
+<div class="br-card br-table-card">
+      <div class="br-table-wrap">
+        <table class="br-table single-head">
+          <thead>
+            <tr class="col-head">
+              <th class="chk-col"></th>
+              <th class="ctr sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'DATE', 'date')">Bank Date <i class="fa" [ngClass]="sortIcon('mismatch','DATE')"></i></th>
+              <th class="sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'ENTRYNO', 'str')">Entry No <i class="fa" [ngClass]="sortIcon('mismatch','ENTRYNO')"></i></th>
+              <th class="ctr sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'ENTRYDT', 'date')">Entry Date <i class="fa" [ngClass]="sortIcon('mismatch','ENTRYDT')"></i></th>
+              <th class="num sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'ERPAMOUNT', 'num')">Erp Amt <i class="fa" [ngClass]="sortIcon('mismatch','ERPAMOUNT')"></i></th>
+              <th class="num sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'BANKAMOUNT', 'num')">Bank Amt <i class="fa" [ngClass]="sortIcon('mismatch','BANKAMOUNT')"></i></th>
+              <th class="sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'BANKREFNO', 'str')">Bank Ref No <i class="fa" [ngClass]="sortIcon('mismatch','BANKREFNO')"></i></th>
+              <th class="sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'ERPREFNO', 'str')">Erp Ref No <i class="fa" [ngClass]="sortIcon('mismatch','ERPREFNO')"></i></th>
+              <th class="ctr sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'STATUS', 'str')">Mismatch <i class="fa" [ngClass]="sortIcon('mismatch','STATUS')"></i></th>
+              <th class="ctr sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'CLEARANCEDATE', 'date')">Clearing Date <i class="fa" [ngClass]="sortIcon('mismatch','CLEARANCEDATE')"></i></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (data of mismatchupdate_list; track data) {
+<tr [class.disabled]="data.ENTRYNO === ''">
+              <td class="chk-col">
+                <input type="checkbox" [(ngModel)]="data.CHECKED"
+                       (ngModelChange)="getCheckboxValues($event,data.ENTRYNO,data.BANKREFNO,$safeNavigationMigration(data.CLEARANCEDATE?.formatted),data,data.ERPID)">
+              </td>
+              <td class="ctr">{{data.DATE || '—'}}</td>
+              <td class="mono">{{data.ENTRYNO || '—'}}</td>
+              <td class="ctr">{{data.ENTRYDT || '—'}}</td>
+              <td class="num">{{data.ERPAMOUNT | number:'2.2-4'}}</td>
+              <td class="num">{{data.BANKAMOUNT | number:'2.2-4'}}</td>
+              <td class="mono">{{data.BANKREFNO || '—'}}</td>
+              <td>
+                <input [(ngModel)]="data.ERPREFNO" disabled type="text" maxlength="40"
+                       class="br-inline-input">
+              </td>
+              <td class="ctr">
+                <span class="status-pill"
+                      [ngClass]="{'red': data.STATUS === 'MISMATCH REF NO',
+                                  'green': data.STATUS === 'MATCHED',
+                                  'blue': data.STATUS === 'MATCH BUT CLDT NOT UPDATED',
+                                  'grey': data.STATUS !== 'MISMATCH REF NO' && data.STATUS !== 'MATCHED' && data.STATUS !== 'MATCH BUT CLDT NOT UPDATED'}">
+                  {{data.STATUS}}
+                </span>
+              </td>
+              <td class="ctr">
+                <my-date-picker name="dtbld" [options]="myDatePickerOptions"
+                                [(ngModel)]="data.CLEARANCEDATE"
+                                (dateChanged)="onDateChanged($event, data)"
+                                class="cell-date-control">
+                </my-date-picker>
+              </td>
+            </tr>
+}
+          </tbody>
+        </table>
+
+        @if (mismatchupdate_list.length === 0) {
+<div class="br-empty">
+          <i class="fa fa-random"></i>
+          No mismatched entries.
+        </div>
+}
+      </div>
+    </div>
+}
+
+    <!-- ===================== MANUAL LINK PANEL ===================== -->
+    @if (selectedBankLink || selectedLedgerLink) {
+<div class="link-panel">
+
+      <div class="link-side">
+        <span class="link-side-label">Bank Statement Side</span>
+        @if (selectedBankLink) {
+<span class="link-side-val">
+          {{selectedBankLink.BANKREFNO}} &nbsp;·&nbsp;
+          {{(selectedBankLink.DEPOSIT > 0 ? selectedBankLink.DEPOSIT : selectedBankLink.WITHDRAWAL) | number:'1.2-2'}}
+        </span>
+}
+        @if (!selectedBankLink) {
+<span class="link-side-val empty">
+          select a row on “UnReconcil”
+        </span>
+}
+      </div>
+
+      <i class="fa fa-arrows-h link-arrow"></i>
+
+      <div class="link-side">
+        <span class="link-side-label">Ledger Side</span>
+        @if (selectedLedgerLink) {
+<span class="link-side-val">
+          {{selectedLedgerLink.ENTRYNO}} &nbsp;·&nbsp;
+          {{selectedLedgerLink.AMOUNT | number:'1.2-2'}}
+        </span>
+}
+        @if (!selectedLedgerLink) {
+<span class="link-side-val empty">
+          select a row on “Our Bank Ledger”
+        </span>
+}
+      </div>
+
+      <div class="link-actions">
+        @if (selectedBankLink && selectedLedgerLink) {
+
+          <label>Clearance Date</label>
+          <my-date-picker name="linkClearanceDate" [options]="myDatePickerOptions"
+                          [(ngModel)]="linkClearanceDate"
+                          (dateChanged)="onLinkDateChanged($event)"
+                          class="cell-date-control">
+          </my-date-picker>
+          <button class="br-btn br-btn--primary" type="button" (click)="confirmLink()">
+            <i class="fa fa-link"></i> Link These Two
+          </button>
+        
+}
+        <span class="link-clear" (click)="clearLinkSelection()">clear</span>
+      </div>
+
+    </div>
+}
+
+    <!-- ===================== FOOTER ===================== -->
+    <div class="br-footer">
+      <button class="br-btn br-btn--primary" type="button"
+              (click)="BankRecUpdate()" [disabled]="disablesubmitbtn">
+        <i class="fa fa-dot-circle-o"></i> Submit
+      </button>
+      <button class="br-btn br-btn--danger" type="button" (click)="Reset();">
+        <i class="fa fa-ban"></i> Reset
+      </button>
+    </div>
+
+  
+}
+
 </div>

@@ -256,6 +256,22 @@
   border-left: 2px solid #E5E7EB;
 }
 
+/* Difference / not-checked callout under the equation strip. Deliberately
+   full-width and amber rather than a subtle inline hint — an unreconciled
+   difference is the one thing on this screen that must not be missed. */
+.recon-diffline {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #FEF3C7;
+  color: #92400E;
+  font-size: 11px;
+  line-height: 1.5;
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
 /* ============================= */
 /* VIEW TOGGLE */
 /* ============================= */
@@ -294,6 +310,18 @@
 
 .toggle-btn.active .toggle-count {
   background: rgba(255,255,255,0.25);
+}
+
+/* A non-zero bank-only count means unbooked bank activity — flag it on the
+   inactive tab so it's noticed without having to open the tab. */
+.toggle-btn .toggle-count--alert {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+.toggle-btn.active .toggle-count--alert {
+  background: rgba(255,255,255,0.3);
+  color: #fff;
 }
 
 /* ============================= */
@@ -448,9 +476,33 @@
   width: 130px;
 }
 
+/* BANK-ONLY TABLE (4 columns) — the 10-column widths above must not apply:
+   they squeezed "Withdrawal" into 55px and centred headers over right-aligned figures. */
+.br-table.br-table--bankonly th:nth-child(1), .br-table.br-table--bankonly td:nth-child(1) {
+  width: 260px;
+  text-align: left;
+}
+
+.br-table.br-table--bankonly th:nth-child(2), .br-table.br-table--bankonly td:nth-child(2),
+.br-table.br-table--bankonly th:nth-child(3), .br-table.br-table--bankonly td:nth-child(3) {
+  width: 140px;
+  text-align: right;
+  padding-right: 14px !important;
+}
+
+.br-table.br-table--bankonly th:nth-child(4), .br-table.br-table--bankonly td:nth-child(4) {
+  width: auto;
+  text-align: left;
+  white-space: nowrap;
+}
+
 @media (max-width: 1200px) {
   .br-table {
     min-width: 1150px;
+  }
+
+  .br-table.br-table--bankonly {
+    min-width: 0;
   }
 }
 

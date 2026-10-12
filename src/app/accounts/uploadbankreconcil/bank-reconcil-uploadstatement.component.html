@@ -1,366 +1,243 @@
-<div class="animated fadeIn" >
-    <div class="row no-gutters"  >
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{Header}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="br-page">
+
+  <!-- ========================================================= -->
+  <!-- UPLOAD FORM                                               -->
+  <!-- ========================================================= -->
+
+  @if (displayType=='SEARCH') {
+<div class="br-card upload-card">
+
+    <div class="card-heading">
+      <i class="fa fa-cloud-upload"></i> {{Header}}
     </div>
-    @if (displayType=='SEARCH') {
-<div class="row no-gutters" >
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td class="col-form-span-heading" colspan="6"> <b>UPLOAD DETAILS</b> </td>
-                </tr>
-                <tr>
-                    <td >
-                        <span  class="col-form-span-label"><b>Bank</b> </span><span
-                        class="col-form-span-error">*</span>
-                    </td>
 
-                            <td colspan="3" >
-                               <ng-select   [items]="BankList" bindLabel="acctname"
-                               bindValue="acctcodename"  [(ngModel)]="ourbank"
-                               class="custom" placeholder="--Select OurBank--">
-                                </ng-select>
-                            </td>
-                </tr>
-              <tr>
-                <td><span class="col-form-span-label"><b>As On Date</b> </span><span
-                    class="col-form-span-error">*</span></td>
-                <td>
-                    <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)"  [options]="myDatePickerOptions"
-                     class="form-control"  [selDate]="ToDate"  ></my-date-picker>
-                </td>
-              </tr>
-                <!-- <tr>
+    <div class="clean-row-layout">
 
-                    <td><span class="col-form-span-label"><b>From</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                <td>
-                    <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)"  [options]="myDatePickerOptions"
-                     class="form-control"  [selDate]="FromDate"  ></my-date-picker>
-                </td>
-                    <td><span class="col-form-span-label"><b>To </b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td><my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)"  [options]="myDatePickerOptions"
-                            class="form-control"  [selDate]="ToDate"   ></my-date-picker>
-                    </td>
-                </tr> -->
-                 <tr>
-                    <td>
-                        <span class="col-form-span-label"><b>Select File</b> </span>
-                        <span class="col-form-span-error">*</span>
-                    </td>
-                <td colspan="2">
-                    <input  type="file" #inputFile  accept=".csv,.xls,.xlsx,.doc,.docx,.ppt,.pptx,.txt,.pdf,.png" (change)="onFileChange($event)" class="form-control width180">
-                     <!-- <input #fileUpload type="file" class="col-form-span-label" (change)="fileChangeEvent($event)" placeholder="Upload file..." multiple accept=".pdf" /> -->
-                   </td>
-                <td>
-                    <button class="btn btn-sm btn-success" type="submit" (click)="upload()"><span
-                        class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Upload</span></button>
-                </td>
-                </tr>
-                <!-- <tr>
-                    <td></td>
-                    <td colspan="3" style="text-align: center;">
+      <!-- BANK ACCOUNT -->
+      <div class="clean-field clean-bank">
+        <label>Bank Account <span class="br-req">*</span></label>
+        <ng-select
+          [items]="BankList"
+          bindLabel="acctname"
+          bindValue="acctcodename"
+          [(ngModel)]="ourbank"
+          [appendTo]="'body'"
+          placeholder="Select Bank Account">
+        </ng-select>
+      </div>
 
-                            <button class="btn btn-sm btn-success" type="submit" (click)="upload()"><span
-                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Upload</span></button>
-                    </td>
-                </tr> -->
+      <!-- STATEMENT FROM -->
+      <div class="clean-field clean-date">
+        <label>Statement From <span class="br-req">*</span></label>
+        <my-date-picker
+          name="FromDate"
+          (dateChanged)="FromDateChanged($event)"
+          [options]="myDatePickerOptions"
+          [selDate]="FromDate"
+          class="search-date-control">
+        </my-date-picker>
+      </div>
 
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
+      <!-- STATEMENT TO -->
+      <div class="clean-field clean-date">
+        <label>Statement To <span class="br-req">*</span></label>
+        <my-date-picker
+          name="ToDate"
+          (dateChanged)="ToDateChanged($event)"
+          [options]="myDatePickerOptions"
+          [selDate]="ToDate"
+          class="search-date-control">
+        </my-date-picker>
+      </div>
+
+      <!-- FILE -->
+      <div class="clean-field clean-file">
+        <label>Statement File <span class="br-req">*</span></label>
+        <input
+          type="file"
+          #inputFile
+          class="br-file"
+          accept=".csv,.xls,.xlsx"
+          (change)="onFileChange($event)">
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="clean-actions">
+        <button class="br-btn br-btn--primary" type="button" (click)="upload()">
+          <i class="fa fa-cloud-upload"></i> Upload
+        </button>
+        <button class="br-btn br-btn--ghost" type="button" (click)="back()">
+          <i class="fa fa-arrow-circle-left"></i> Back
+        </button>
+      </div>
+
+    </div>
+
+    <!-- selected file + the period detected inside it -->
+    @if (selfilename) {
+<div class="br-fileinfo">
+      <span class="br-chip">
+        <i class="fa fa-file-excel-o"></i> {{selfilename}}
+      </span>
+      @if (stmtPeriodText) {
+<span class="br-chip">
+        <i class="fa fa-calendar"></i> File period: {{stmtPeriodText}}
+      </span>
+}
+      @if (!stmtPeriodText) {
+<span class="br-hint">
+        No date column recognised in this file — the period check will be skipped.
+      </span>
+}
     </div>
 }
-    @if (reconcildataList.length >= 1) {
-<main>
-        <div class="row no-gutters">
 
-            <!-- <div class="col-sm-12 col-md-1 col-lg-1"> </div> -->
-            <div class="col-sm-12 col-md-12 col-lg-12">
-
-                <div class="tab" role="tabpanel">
-                     <button class="btn btn-sm btn-success" style="float: right;" type="submit" (click)="Exporttoxl();" ><span
-                        class="col-form-span-label"><i class="fa fa-file-excel-o"></i> ExportToExcel</span></button>
-                        <button class="btn btn-sm btn-warning" style="float: right;" (click)="back();"><span
-                            class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to
-                                search</u></span></button>
-
-                                <!-- <a href="javascript:void(0);" (click)="displayType='SEARCH';reconcildataList=[];unreconcildataList=[]"
-                                style="float: right;text-decoration: underline;color: red;">back to search</a>  -->
-
-                    <div class="bor">
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" id="zero-tab" data-toggle="tab" href="#zero">Reconcil</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="one-tab" data-toggle="tab" href="#one">UnReconcil</a>
-                            </li>
-
-                        </ul>
-                    </div>
-                    <div class="tab-content" style="height:450px; width: 100%;  ;overflow-y:auto">
-                        <div role="tabpanel" class="tab-pane active" id="zero" style="width:100%">
-                             <div class="row">
-                                <div class="col">
-                                    <table>
-                                        <tr>
-                                            <td colspan="13" class="centerlabel" >
-                                                <strong> Reconcilled Records: <span style="color: red;"> {{reconcilrecord}} </span>  </strong>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                    <table class="table table-bordered table-sm-new " >
-                                        <tr>
-                                            <td colspan="5" class="centerlabel"  style="background-color: #26a6d4;">
-                                                <strong>Bank Statement Data</strong>
-                                            </td>
-                                            <td colspan="7" class="centerlabel"  style="background-color: #26a6d4;">
-                                                <strong>Ledger Data</strong>
-                                            </td>
-                                        </tr>
-                                        <thead>
-                                            <tr class="title-head formheading table-primary">
-                                                <th class="col-form-span-label" align="center">Bank Ref No</th>
-                                                <th class="col-form-span-label" align="center">Deposit </th>
-                                                <th class="col-form-span-label" align="center">Withdrawal</th>
-                                                <th class="col-form-span-label" align="center">	Clearance Dt</th>
-                                                <th class="col-form-span-label" align="center"></th>
-                                                <th class="col-form-span-label" align="center">Bank Ref No</th>
-                                                <th class="col-form-span-label" align="center">Entry No</th>
-                                                <th class="col-form-span-label" align="center">Entry Date</th>
-                                                <th class="col-form-span-label" align="center">Entry Type</th>
-                                                <th class="col-form-span-label" align="center">Amount </th>
-                                                <th class="col-form-span-label" align="center">Deduction </th>
-                                                <th class="col-form-span-label" align="center">Clearance Dt</th>
-
-                                            </tr>
-                                        </thead>
-                                        @if (reconcildataList.length > 0) {
-<tbody>
-                                            @for (data of reconcildataList; track data) {
-<tr >
-                                                <td  ><span  class="col-form-span-label" >{{data.BANKREFNO}}</span> </td>
-                                                 <td  ><span   class="col-form-span-label">{{data.DEPOSIT}}</span> </td>
-                                                 <td  ><span  class="col-form-span-label">{{data.WITHDRAWAL}}</span> </td>
-                                                 <td ><span  class="col-form-span-label">{{data.CLEARANCEDT}}</span> </td>
-                                                 <td style="width:20px;" ></td>
-                                                 <td  ><span  class="col-form-span-label">{{data.USERBANKREFNO}}</span> </td>
-
-                                                 <td  ><span  class="col-form-span-label">{{data.ENTRYNO}}</span> </td>
-                                                 <td  ><span  class="col-form-span-label">{{data.ENTRYDT}}</span> </td>
-                                                 <td ><span  class="col-form-span-label">{{data.ENTRYTYPE}}</span> </td>
-                                                 <td><span  class="col-form-span-label">{{data.AMOUNT}}</span> </td>
-                                                 <td  ><span class="col-form-span-label">{{data.DEDUCTION|number:'2.2-4'}}</span>  </td>
-                                                <td ><span class="col-form-span-label">{{data.CLEARANCEDT}}</span>  </td>
-                                            </tr>
+  </div>
 }
-                                        </tbody>
-}
-                                    </table>
-                     </div>
-                  </div>
-                   </div>
-                   <div role="tabpanel" class="tab-pane" id="one" style="width:100%">
-                    <div class="row">
-                        <div class="col">
-                            <table>
-                                <tr>
-                                    <td colspan="13" class="centerlabel" >
-                                        <strong> UnReconcilled Records: <span style="color: red;"> {{unreconcilrecord}} </span>  </strong>
-                                    </td>
-                                </tr>
-                            </table>
-                            <table class="table table-bordered table-sm-new table-striped table-hover" >
-                                <tr>
-                                    <td colspan="5" class="centerlabel"  style="background-color: #26a6d4;">
-                                        <strong>Bank Statement Data</strong>
-                                    </td>
-                                    <td colspan="7" class="centerlabel"  style="background-color: #26a6d4;">
-                                        <strong>Ledger Data</strong>
-                                    </td>
-                                </tr>
-                                <thead>
-                                    <tr class="title-head formheading table-primary">
-                                        <th class="col-form-span-label" align="center">Bank Ref No</th>
-                                        <th class="col-form-span-label" align="center">Deposit </th>
-                                        <th class="col-form-span-label" align="center">Withdrawal</th>
-                                        <th class="col-form-span-label" align="center">	Clearance Date</th>
-                                        <th class="col-form-span-label" align="center"></th>
-                                        <th class="col-form-span-label" align="center">Bank Ref No</th>
-                                        <th class="col-form-span-label" align="center">Entry No</th>
-                                        <th class="col-form-span-label" align="center">Entry Date</th>
-                                        <th class="col-form-span-label" align="center">Entry Type</th>
-                                        <th class="col-form-span-label" align="center">Amount </th>
-                                        <th class="col-form-span-label" align="center">Deduction </th>
-                                        <th class="col-form-span-label" align="center">Clearance Date </th>
 
-                                    </tr>
-                                </thead>
-                                @if (unreconcildataList.length > 0) {
-<tbody>
-                                    @for (data of unreconcildataList; track data) {
-<tr >
-                                        <td ><span  class="col-form-span-label" >{{data.BANKREFNO}}</span> </td>
-                                         <td ><span   class="col-form-span-label ">{{data.DEPOSIT}}</span> </td>
-                                         <td ><span  class="col-form-span-label">{{data.WITHDRAWAL}}</span> </td>
-                                         <td ><span  class="col-form-span-label">{{data.CLEARANCEDT}}</span> </td>
-                                         <td style="width:20px;"></td>
-                                         <td ><span  class="col-form-span-label">{{data.USERBANKREFNO}}</span> </td>
-                                         <td  ><span  class="col-form-span-label">{{data.ENTRYNO}}</span> </td>
-                                         <td  ><span  class="col-form-span-label">{{data.ENTRYDT}}</span> </td>
-                                         <td  ><span  class="col-form-span-label">{{data.ENTRYTYPE}}</span> </td>
-                                         <td ><span  class="col-form-span-label">{{data.AMOUNT}}</span> </td>
-                                         <td  ><span class="col-form-span-label">{{data.DEDUCTION|number:'2.2-4'}}</span>  </td>
-                                        <td ><span class="col-form-span-label">{{data.CLEARANCEDT}}</span>  </td>
-                                    </tr>
-}
-                                </tbody>
-}
-                            </table>
-                        </div>
-                    </div>
-                </div>
+  <!-- ========================================================= -->
+  <!-- RESULT                                                    -->
+  <!-- ========================================================= -->
 
-                  </div>
-                </div>
-                <!-- <div class="col-sm-12 col-md-1 col-lg-1"> </div> -->
-            </div>
-           <!-- <div class="col-sm-12 col-md-1 col-lg-1"> </div> -->
+  @if (displayType=='LIST') {
+
+
+    <div class="br-topbar">
+      <div class="br-topbar-left">
+        <span class="br-page-title">Reconciliation Result</span>
+        @if (FromDate && ToDate) {
+<span class="br-meta">{{FromDate}} – {{ToDate}}</span>
+}
+      </div>
+      <div class="br-topbar-right">
+        <button class="br-btn br-btn--ghost" type="button" (click)="back()">
+          <i class="fa fa-arrow-circle-left"></i> Back to search
+        </button>
+      </div>
+    </div>
+
+    <div class="br-view-toggle">
+      <button
+        class="toggle-btn"
+        type="button"
+        [class.active]="activeTab=='REC'"
+        (click)="activeTab='REC'">
+        <i class="fa fa-check"></i> Reconciled
+        <span class="toggle-count">{{reconcilrecord}}</span>
+      </button>
+      <button
+        class="toggle-btn"
+        type="button"
+        [class.active]="activeTab=='UNREC'"
+        (click)="activeTab='UNREC'">
+        <i class="fa fa-exclamation-triangle"></i> Unreconciled
+        <span class="toggle-count">{{unreconcilrecord}}</span>
+      </button>
+    </div>
+
+    <div class="br-card br-table-card">
+      <div class="br-table-wrap">
+
+        <table class="br-table">
+          <thead>
+            <tr class="grp-head">
+              <th colspan="4">Bank Statement Data</th>
+              <th colspan="7" class="grp-start">Ledger Data</th>
+            </tr>
+            <tr class="col-head">
+              <th>Bank Ref No</th>
+              <th class="num">Deposit</th>
+              <th class="num">Withdrawal</th>
+              <th class="ctr">Clearance Dt</th>
+              <th class="grp-start">Bank Ref No</th>
+              <th>Entry No</th>
+              <th class="ctr">Entry Date</th>
+              <th class="ctr">Type</th>
+              <th class="num">Amount</th>
+              <th class="num">Deduction</th>
+              <th class="ctr">Clearance Dt</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (data of (activeTab=='REC' ? reconcildataList : unreconcildataList); track data) {
+<tr>
+
+              <!-- bank statement side -->
+              <td class="mono">{{data.BANKREFNO || '—'}}</td>
+              <td class="num">
+                @if (data.DEPOSIT > 0) {
+<span class="cr-amt">{{data.DEPOSIT | number:'1.2-2'}}</span>
+}
+                @if (!(data.DEPOSIT > 0)) {
+<span class="muted">—</span>
+}
+              </td>
+              <td class="num">
+                @if (data.WITHDRAWAL > 0) {
+<span class="dr-amt">{{data.WITHDRAWAL | number:'1.2-2'}}</span>
+}
+                @if (!(data.WITHDRAWAL > 0)) {
+<span class="muted">—</span>
+}
+              </td>
+              <td class="ctr">{{data.CLEARANCEDT || '—'}}</td>
+
+              <!-- ledger side -->
+              <td class="mono grp-start">{{data.USERBANKREFNO || '—'}}</td>
+              <td class="mono">{{data.ENTRYNO || '—'}}</td>
+              <td class="ctr">{{data.ENTRYDT || '—'}}</td>
+              <td class="ctr">
+                @if (data.ENTRYTYPE=='BR') {
+<span class="br-badge br-badge--br">BR</span>
+}
+                @if (data.ENTRYTYPE=='BP') {
+<span class="br-badge br-badge--bp">BP</span>
+}
+                @if (data.ENTRYTYPE!='BR' && data.ENTRYTYPE!='BP') {
+<span class="muted">—</span>
+}
+              </td>
+              <td class="num">
+                @if (data.AMOUNT) {
+<span>{{data.AMOUNT | number:'1.2-2'}}</span>
+}
+                @if (!data.AMOUNT) {
+<span class="muted">—</span>
+}
+              </td>
+              <td class="num">
+                @if (data.DEDUCTION) {
+<span>{{data.DEDUCTION | number:'1.2-2'}}</span>
+}
+                @if (!data.DEDUCTION) {
+<span class="muted">—</span>
+}
+              </td>
+              <td class="ctr">{{data.LCLEARANCEDT || '—'}}</td>
+
+            </tr>
+}
+          </tbody>
+        </table>
+
+        @if (activeTab=='REC' && reconcildataList.length === 0) {
+<div class="br-empty">
+          <i class="fa fa-inbox"></i>
+          Nothing reconciled in this upload. Every statement line is on the Unreconciled tab.
         </div>
-
-    </main>
 }
-    <!-- <div class="row no-gutters" *ngIf="displayType=='LIST'" style="overflow-y: auto; height:532px; ">
-        <div class="col-sm-12 col-md-1 col-lg-1">
+
+        @if (activeTab=='UNREC' && unreconcildataList.length === 0) {
+<div class="br-empty">
+          <i class="fa fa-check-circle"></i>
+          Nothing outstanding — every line matched.
         </div>
-        <div class="col-sm-12 col-md-10 col-lg-10">
-            <table class="table table-bordered table-sm-new bgwhite" >
-                <tr align="right" class="title-head formheading">
-                    <td colspan="13" >
-                  <a href="javascript:void(0);" (click)="displayType='SEARCH';reconcildataList=[];unreconcildataList=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
-                    </td>
-                </tr>
+}
 
-                <tr>
-                    <td colspan="13" class="centerlabel">
-                        <strong> Reconcilled List </strong>
-                    </td>
-                </tr>
-            </table>
-            <table class="table table-bordered table-sm-new " >
-                <tr>
-                    <td colspan="6" class="centerlabel">
-                        <strong>Bank Statement Data</strong>
-                    </td>
-                    <td colspan="7" class="centerlabel">
-                        <strong>Ledger Data</strong>
-                    </td>
-                </tr>
-                <thead>
-                    <tr class="title-head formheading table-primary">
-                        <th class="col-form-span-label" align="center">Bank Ref No</th>
-                        <th class="col-form-span-label" align="center">Deposit </th>
-                        <th class="col-form-span-label" align="center">Withdrawal</th>
-                        <th class="col-form-span-label" align="center">	Clearance Dt</th>
-                        <th class="col-form-span-label" align="center"></th>
-                        <th class="col-form-span-label" align="center">Bank Ref No</th>
-                        <th class="col-form-span-label" align="center">Entry No</th>
-                        <th class="col-form-span-label" align="center">Entry Date</th>
-                        <th class="col-form-span-label" align="center">Entry Type</th>
-                        <th class="col-form-span-label" align="center">Amount </th>
-                        <th class="col-form-span-label" align="center">Deduction </th>
-                        <th class="col-form-span-label" align="center">Clearance Dt</th>
+      </div>
+    </div>
 
-                    </tr>
-                </thead>
-                <tbody *ngIf="reconcildataList.length > 0">
-                    <tr *ngFor="let data of reconcildataList" >
-                        <td  ><span  class="col-form-span-label" >{{data.BANKREFNO}}</span> </td>
-                         <td  ><span   class="col-form-span-label">{{data.DEPOSIT}}</span> </td>
-                         <td  ><span  class="col-form-span-label">{{data.WITHDRAWAL}}</span> </td>
-                         <td ><span  class="col-form-span-label">{{data.CLEARANCEDT}}</span> </td>
-                         <td style="width:20px;" ></td>
-                         <td  ><span  class="col-form-span-label">{{data.USERBANKREFNO}}</span> </td>
+  
+}
 
-                         <td  ><span  class="col-form-span-label">{{data.ENTRYNO}}</span> </td>
-                         <td  ><span  class="col-form-span-label">{{data.ENTRYDT}}</span> </td>
-                         <td ><span  class="col-form-span-label">{{data.ENTRYTYPE}}</span> </td>
-                         <td><span  class="col-form-span-label">{{data.AMOUNT}}</span> </td>
-                         <td  ><span class="col-form-span-label">{{data.DEDUCTION|number:'2.2-4'}}</span>  </td>
-                        <td ><span class="col-form-span-label">{{data.CLEARANCEDT}}</span>  </td>
-                    </tr>
-                </tbody>
-            </table>
-            <table>
-                <tr>
-                    <td colspan="13" class="centerlabel">
-                        <strong> UnReconcilled List </strong>
-                    </td>
-                </tr>
-            </table>
-            <table class="table table-bordered table-sm-new table-striped table-hover" >
-                <tr>
-                    <td colspan="6" class="centerlabel">
-                        <strong>Bank Statement Data</strong>
-                    </td>
-                    <td colspan="7" class="centerlabel">
-                        <strong>Ledger Data</strong>
-                    </td>
-                </tr>
-                <thead>
-                    <tr class="title-head formheading table-primary">
-                        <th class="col-form-span-label" align="center">Bank Ref No</th>
-                        <th class="col-form-span-label" align="center">Deposit </th>
-                        <th class="col-form-span-label" align="center">Withdrawal</th>
-                        <th class="col-form-span-label" align="center">	Clearance Date</th>
-                        <th class="col-form-span-label" align="center"></th>
-                        <th class="col-form-span-label" align="center">Bank Ref No</th>
-                        <th class="col-form-span-label" align="center">Entry No</th>
-                        <th class="col-form-span-label" align="center">Entry Date</th>
-                        <th class="col-form-span-label" align="center">Entry Type</th>
-                        <th class="col-form-span-label" align="center">Amount </th>
-                        <th class="col-form-span-label" align="center">Deduction </th>
-                        <th class="col-form-span-label" align="center">Clearance Date </th>
-
-                    </tr>
-                </thead>
-                <tbody *ngIf="unreconcildataList.length > 0">
-                    <tr *ngFor="let data of unreconcildataList" >
-                        <td ><span  class="col-form-span-label" >{{data.BANKREFNO}}</span> </td>
-                         <td ><span   class="col-form-span-label ">{{data.DEPOSIT}}</span> </td>
-                         <td ><span  class="col-form-span-label">{{data.WITHDRAWAL}}</span> </td>
-                         <td ><span  class="col-form-span-label">{{data.CLEARANCEDT}}</span> </td>
-                         <td style="width:20px;"></td>
-                         <td ><span  class="col-form-span-label">{{data.USERBANKREFNO}}</span> </td>
-                         <td  ><span  class="col-form-span-label">{{data.ENTRYNO}}</span> </td>
-                         <td  ><span  class="col-form-span-label">{{data.ENTRYDT}}</span> </td>
-                         <td  ><span  class="col-form-span-label">{{data.ENTRYTYPE}}</span> </td>
-                         <td ><span  class="col-form-span-label">{{data.AMOUNT}}</span> </td>
-                         <td  ><span class="col-form-span-label">{{data.DEDUCTION|number:'2.2-4'}}</span>  </td>
-                        <td ><span class="col-form-span-label">{{data.CLEARANCEDT}}</span>  </td>
-                    </tr>
-                </tbody>
-            </table>
-
-        </div>
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-    </div> -->
 </div>
-
-

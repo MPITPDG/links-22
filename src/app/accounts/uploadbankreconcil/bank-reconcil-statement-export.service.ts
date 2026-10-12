@@ -45,21 +45,29 @@ export class BankReconcilStatementExportService {
     worksheet.getCell('F2').value = excelData.period || '';
     worksheet.getRow(2).font = { name: 'Arial', size: 10 };
 
-    // RECONCILIATION SCHEDULE (rows 4-8)
+    // RECONCILIATION SCHEDULE (rows 4-11)
+    // Two legs: the book leg (rows 6-7, entries the bank hasn't cleared) and the
+    // bank leg (rows 9-10, statement lines nobody has booked). Row 8 is labelled
+    // "Derived" deliberately -- it is Books ± outstanding, computed from the
+    // ledger alone, so it ties by construction and proves nothing about the
+    // bank. Only row 11 is a real closing balance.
     this.addScheduleRow(worksheet, 4, 'Opening Balance', excelData.openingBalance);
     this.addScheduleRow(worksheet, 5, 'Balance as per Books (Company Ledger)', excelData.booksBalance);
     this.addScheduleRow(worksheet, 6, excelData.addLabel, excelData.addValue);
     this.addScheduleRow(worksheet, 7, excelData.lessLabel, excelData.lessValue);
-    this.addScheduleRow(worksheet, 8, 'Balance as per Bank Statement', excelData.bankBalance, true, true);
+    this.addScheduleRow(worksheet, 8, 'Derived Balance (Books +/- Outstanding)', excelData.bankBalance, true, true);
+    this.addScheduleRow(worksheet, 9, excelData.bankAddLabel, excelData.bankAddValue);
+    this.addScheduleRow(worksheet, 10, excelData.bankLessLabel, excelData.bankLessValue);
+    this.addScheduleRow(worksheet, 11, 'Closing Balance as per Bank Statement', excelData.closingBalance, true, true);
 
     // SECTION TITLE (Outstanding Items / All Entries)
-    worksheet.mergeCells(10, 1, 10, this.COLS);
-    const sectionCell = worksheet.getCell('A10');
+    worksheet.mergeCells(13, 1, 13, this.COLS);
+    const sectionCell = worksheet.getCell('A13');
     sectionCell.value = excelData.sectionTitle;
     sectionCell.font = { name: 'Arial', size: 10, bold: true };
 
     // TABLE HEADER
-    const headerRow = worksheet.getRow(11);
+    const headerRow = worksheet.getRow(14);
     headerRow.values = excelData.headers;
     headerRow.eachCell((cell) => {
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '2563EB' }, bgColor: { argb: '' } };
@@ -71,7 +79,7 @@ export class BankReconcilStatementExportService {
     // TABLE DATA
     const debitIdx = excelData.headers.indexOf('Debit');
     const creditIdx = excelData.headers.indexOf('Credit');
-    let rowIdx = 12;
+    let rowIdx = 15;
     (excelData.data || []).forEach(d => {
       const row = worksheet.getRow(rowIdx);
       row.values = d;
@@ -101,6 +109,70 @@ export class BankReconcilStatementExportService {
         cell.alignment = { horizontal: 'right' };
       }
     });
+
+    // ===== BANK-ONLY SECTION =====
+    // The items that make this a two-way reconciliation. Rendered even when
+    // empty, because "no unmatched bank lines" is itself the result the
+    // accountant needs to see stated -- a missing section reads as untested.
+    rowIdx += 2;
+    worksheet.mergeCells(rowIdx, 1, rowIdx, this.COLS);
+    const bankTitleCell = worksheet.getCell(rowIdx, 1);
+    bankTitleCell.value = excelData.bankOnlyTitle || 'Items on Bank Statement Not in Books';
+    bankTitleCell.font = { name: 'Arial', size: 10, bold: true };
+    rowIdx++;
+
+    if (excelData.bankOnlyUnavailable) {
+      worksheet.mergeCells(rowIdx, 1, rowIdx, this.COLS);
+      const warnCell = worksheet.getCell(rowIdx, 1);
+      warnCell.value = 'Bank statement data could not be retrieved — the bank side of this reconciliation was NOT checked.';
+      warnCell.font = { name: 'Arial', size: 10, italic: true };
+    } else {
+      const bankHeaders = excelData.bankOnlyHeaders || ['Bank Ref No', 'Deposit', 'Withdrawal', 'Clearance Dt'];
+      const bankHeaderRow = worksheet.getRow(rowIdx);
+      bankHeaderRow.values = bankHeaders;
+      bankHeaderRow.eachCell((cell) => {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '2563EB' }, bgColor: { argb: '' } };
+        cell.font = { name: 'Arial', bold: true, color: { argb: 'FFFFFF' }, size: 10 };
+        cell.border = this.thinBorder;
+        cell.alignment = { vertical: 'middle', wrapText: true };
+      });
+      rowIdx++;
+
+      const bankRows = excelData.bankOnlyData || [];
+      if (bankRows.length === 0) {
+        worksheet.mergeCells(rowIdx, 1, rowIdx, 4);
+        const noneCell = worksheet.getCell(rowIdx, 1);
+        noneCell.value = 'None — every bank statement line is matched to a ledger entry.';
+        noneCell.font = { name: 'Arial', size: 10, italic: true };
+        noneCell.border = this.thinBorder;
+        rowIdx++;
+      } else {
+        bankRows.forEach(d => {
+          const row = worksheet.getRow(rowIdx);
+          row.values = d;
+          row.font = { name: 'Arial', size: 10, color: { argb: '00000000' } };
+          row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+            cell.border = this.thinBorder;
+            if (colNumber === 2 || colNumber === 3) {
+              cell.numFmt = '#,##0.00';
+              cell.alignment = { horizontal: 'right' };
+            }
+          });
+          rowIdx++;
+        });
+
+        const bankTotalRow = worksheet.getRow(rowIdx);
+        bankTotalRow.values = ['Total', excelData.bankOnlyDepositTotal, excelData.bankOnlyWithdrawalTotal, ''];
+        bankTotalRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+          cell.font = { name: 'Arial', size: 10, bold: true };
+          cell.border = { top: { style: 'thin' }, bottom: { style: 'double' } };
+          if (colNumber === 2 || colNumber === 3) {
+            cell.numFmt = '#,##0.00';
+            cell.alignment = { horizontal: 'right' };
+          }
+        });
+      }
+    }
 
     workbook.xlsx.writeBuffer().then((data) => {
       const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

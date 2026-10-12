@@ -148,6 +148,71 @@ GO
 
 
 /*=====================================================================================
+  1b. TBL_MST_JOB_COST_PAIRING - which income head a cost head is charged on.
+      Used to split a job's cost between the clients billed on it: OCEAN FREIGHT PAID goes
+      to whoever was billed OCEAN FREIGHT RECEIVED. Rows marked AUTO are rebuilt from the
+      head names every time this script runs (see the BASE name rule below).
+      Finance can add or correct a pairing with SOURCE = 'MANUAL'; those are never touched.
+=====================================================================================*/
+IF OBJECT_ID('dbo.TBL_MST_JOB_COST_PAIRING') IS NULL
+BEGIN
+    CREATE TABLE dbo.TBL_MST_JOB_COST_PAIRING
+    (
+        COSTHEAD   VARCHAR(10) NOT NULL,
+        INCHEAD    VARCHAR(10) NOT NULL,
+        SOURCE     VARCHAR(10) NOT NULL DEFAULT 'AUTO',     -- AUTO (name rule) | MANUAL (Finance)
+        UPDATED_ON DATETIME    NOT NULL DEFAULT GETDATE(),
+        -- one cost head may pair with several income heads: Links' chart carries both
+        -- 'OCEAN FREIGHT RECEIVED' and 'OCEAN FREIGHT - INCOME'
+        CONSTRAINT PK_TBL_MST_JOB_COST_PAIRING PRIMARY KEY (COSTHEAD, INCHEAD)
+    )
+END
+GO
+
+DELETE FROM dbo.TBL_MST_JOB_COST_PAIRING WHERE SOURCE = 'AUTO'
+
+-- A head's BASE name is its name without the words that only say which side it is on:
+--   Links    OCEAN FREIGHT PAID          / OCEAN FREIGHT RECEIVED       -> OCEAN FREIGHT
+--   Manilal  OCEAN FREIGHT - EXPENSE     / OCEAN FREIGHT - INCOME       -> OCEAN FREIGHT
+--            TRANSPORTATION CHARGES - EXPENSE / TRANSPORTATION CHGS-INCOME (TAXABLE)
+--            GODOWN RENT                 / GODOWN RENT - INCOME
+-- An income head is one whose name says RECEIVED / RECEIVABLE / INCOME; any other job head
+-- is paired with the income head that has the same base name.
+;WITH N0 AS (
+    SELECT LTRIM(RTRIM(acctcode)) AS CODE,
+           MAX(REPLACE(REPLACE(REPLACE(UPPER(LTRIM(RTRIM(acctname))), '/', ''), '.', ''), '  ', ' ')) AS N
+      FROM GENACCT_MASTER
+     WHERE ISJOBREPORT = 'Y' AND ISNULL(acctcode, '') <> ''
+     GROUP BY LTRIM(RTRIM(acctcode))
+),
+H AS (
+    SELECT CODE, N,
+           CASE WHEN N LIKE '%RECEIVED%' OR N LIKE '%RECEIVABLE%' OR N LIKE '%INCOME%' THEN 1 ELSE 0 END AS IS_INCOME,
+           LTRIM(RTRIM(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
+               N + ' ',
+               '(NON TAXABLE)', ''), '(NON-TAXABLE)', ''), '(TAXABLE)', ''),
+               '- EXPENSES', ''), '-EXPENSES', ''), '- EXPENSE', ''), '-EXPENSE', ''),
+               '- INCOME', ''), '-INCOME', ''),
+               ' PAID ', ' '), ' RECEIVED ', ' '), ' PAYABLE ', ' '), ' RECEIVABLE ', ' ')
+           )) AS B0
+      FROM N0
+),
+B AS (
+    SELECT CODE, IS_INCOME,
+           LTRIM(RTRIM(REPLACE(REPLACE(REPLACE(B0, ' CHGS', ' CHARGES'), '  ', ' '), '  ', ' '))) AS BASE
+      FROM H
+)
+INSERT INTO dbo.TBL_MST_JOB_COST_PAIRING (COSTHEAD, INCHEAD, SOURCE)
+SELECT DISTINCT c.CODE, i.CODE, 'AUTO'
+  FROM B c
+ INNER JOIN B i ON i.BASE = c.BASE AND i.IS_INCOME = 1 AND i.CODE <> c.CODE
+ WHERE c.IS_INCOME = 0
+   AND c.BASE <> ''
+   -- a cost head Finance has paired by hand keeps only its MANUAL pairings
+   AND NOT EXISTS (SELECT 1 FROM dbo.TBL_MST_JOB_COST_PAIRING m WHERE m.COSTHEAD = c.CODE)
+GO
+
+/*=====================================================================================
   2.  USP_ACC_RPT_FINANCE_DASHBOARD
 
   PARAMS (positional - the API passes them in this order)
@@ -266,7 +331,7 @@ BEGIN
     INSERT INTO #INV (INV_NO, INV_DT, CLIENTCODE, CITYCODE, BILLTYPE, INV_CUR, TOTALAMT, PAYBY,
                       CREDIT_PERIOD, HAS_TERMS, DUE_DT, IN_PERIOD)
     SELECT LTRIM(RTRIM(i.inv_no)),
-           CONVERT(DATETIME, SUBSTRING(i.inv_date,7,4)+SUBSTRING(i.inv_date,4,2)+SUBSTRING(i.inv_date,1,2), 112),
+           CASE WHEN ISDATE(SUBSTRING(i.inv_date,7,4)+SUBSTRING(i.inv_date,4,2)+SUBSTRING(i.inv_date,1,2)) = 1 THEN CONVERT(DATETIME, SUBSTRING(i.inv_date,7,4)+SUBSTRING(i.inv_date,4,2)+SUBSTRING(i.inv_date,1,2), 112) END,
            LTRIM(RTRIM(i.inv_client)),
            LTRIM(RTRIM(i.citycode)),
            LTRIM(RTRIM(ISNULL(i.inv_billtype, ''))),
@@ -282,12 +347,134 @@ BEGIN
        -- string date compare: ISDATE()/CONVERT guards are unreliable here because the
        -- optimizer may evaluate CONVERT before the guard and blow up on dirty rows
        AND LEN(ISNULL(i.inv_date, '')) = 10
+       /* rows whose date is not a real calendar date (Links had 85 junk rows such as
+          '30/58/2023', inv_no NULL) are skipped. The CASE in the SELECT list is what
+          makes the CONVERT safe; this line keeps such rows out of the population. */
+       AND ISDATE(SUBSTRING(i.inv_date,7,4)+SUBSTRING(i.inv_date,4,2)+SUBSTRING(i.inv_date,1,2)) = 1
        AND SUBSTRING(i.inv_date,7,4)+SUBSTRING(i.inv_date,4,2)+SUBSTRING(i.inv_date,1,2) <= @TO_YMD
        AND LTRIM(RTRIM(ISNULL(i.inv_client, ''))) LIKE 'E%'
        AND (@CLIENTCODE = '' OR LTRIM(RTRIM(i.inv_client)) = @CLIENTCODE)
 
     CREATE CLUSTERED INDEX IX_INV ON #INV (INV_NO)
     CREATE NONCLUSTERED INDEX IX_INV_CL ON #INV (CLIENTCODE)
+
+    -- Job cost counts only the heads the Job Profit statement counts: GENACCT_MASTER
+    -- ISJOBREPORT = 'Y' (USP_ACCT_RPT_JOB_PROFIT uses exactly this list). GST paid on
+    -- purchases - 'GST Central / State (Paid by us)' - is not on it: it is input tax
+    -- recovered, not a cost of the job, and counting it made the dashboard's expense
+    -- higher than the Job Profit statement for the same job.
+    CREATE TABLE #JOBHEAD (ACCTCODE VARCHAR(10) PRIMARY KEY)
+    INSERT INTO #JOBHEAD (ACCTCODE)
+    SELECT DISTINCT LTRIM(RTRIM(acctcode)) FROM GENACCT_MASTER
+     WHERE ISJOBREPORT = 'Y' AND ISNULL(acctcode, '') <> ''
+
+    ---------------------------------------------------------------------------------
+    -- 2b. Opening balance brought forward from before the ERP went live.
+    --     The Billwise Receivable statement starts a client with an "OP. BALANCE" line:
+    --     the client's balance in the first year table that carries client openings,
+    --     less the AO (against opening) receipts that settled it, i.e. AO lines that do
+    --     not name an invoice. Invoices only exist from go-live, so without this a client
+    --     still owing - or owed - from before then is missing from outstanding.
+    --        Manilal: TBL_MASTER_010420063103007_ALLGL (01/04/2006, company 01 columns)
+    --        Links:   tbl_Master_010420203103021_AllGL (01/04/2020, company 30 columns;
+    --                 the 2006 and 2019-20 tables carry nothing for company 30)
+    --     The table is found, not hard-coded: the earliest TBL_MASTER_<fy>_ALLGL with a
+    --     non-zero client balance in this company's branch columns (<cmp><citycode1>OP).
+    --     A net debit becomes one open bill dated at go-live (INV_NO 'OPBAL-<client>');
+    --     a net credit is money held on account (#UNADJ below).
+    ---------------------------------------------------------------------------------
+    CREATE TABLE #OPBASE (CLIENTCODE VARCHAR(10), OPAMT FLOAT)
+    DECLARE @OPTAB SYSNAME, @OPUSED SYSNAME, @OPEXPR NVARCHAR(MAX), @OPFOUND INT, @OPSQL NVARCHAR(MAX), @OPBASE_DT DATETIME
+    SET @OPUSED = NULL
+
+    DECLARE opc CURSOR LOCAL FAST_FORWARD FOR
+        SELECT t.name
+          FROM sys.tables t
+         WHERE t.name LIKE 'TBL[_]MASTER[_]%[_]ALLGL'
+           AND ISNUMERIC(SUBSTRING(t.name, 12, 8)) = 1
+         ORDER BY SUBSTRING(t.name, 16, 4)
+    OPEN opc
+    FETCH NEXT FROM opc INTO @OPTAB
+    WHILE @@FETCH_STATUS = 0 AND @OPUSED IS NULL
+    BEGIN
+        SET @OPEXPR = ''
+        SELECT @OPEXPR = @OPEXPR + N' + ISNULL([' + c.name + N'], 0)'
+          FROM sys.columns c
+         WHERE c.object_id = OBJECT_ID(N'dbo.' + QUOTENAME(@OPTAB))
+           AND c.name IN (SELECT @CMPCODE + LTRIM(RTRIM(cy.citycode1)) + 'OP'
+                            FROM CITY cy
+                           INNER JOIN #CITY ct ON ct.CITYCODE = LTRIM(RTRIM(cy.citycode)))
+        IF @OPEXPR <> ''
+        BEGIN
+            SET @OPFOUND = 0
+            SET @OPSQL = N'SELECT @n = COUNT(*) FROM dbo.' + QUOTENAME(@OPTAB)
+                       + N' WHERE LTRIM(RTRIM(REPLACE(REPLACE(Code, CHAR(13), ''''), CHAR(10), ''''))) LIKE ''E%'''
+                       + N' AND (0' + @OPEXPR + N') <> 0'
+            EXEC sp_executesql @OPSQL, N'@n INT OUTPUT', @n = @OPFOUND OUTPUT
+            IF @OPFOUND > 0
+            BEGIN
+                SET @OPUSED = @OPTAB
+                SET @OPSQL = N'INSERT INTO #OPBASE (CLIENTCODE, OPAMT)'
+                           + N' SELECT LTRIM(RTRIM(REPLACE(REPLACE(Code, CHAR(13), ''''), CHAR(10), ''''))), SUM(0' + @OPEXPR + N')'
+                           + N' FROM dbo.' + QUOTENAME(@OPTAB)
+                           + N' WHERE LTRIM(RTRIM(REPLACE(REPLACE(Code, CHAR(13), ''''), CHAR(10), ''''))) LIKE ''E%'''
+                           + N' AND (0' + @OPEXPR + N') <> 0'
+                           + N' GROUP BY LTRIM(RTRIM(REPLACE(REPLACE(Code, CHAR(13), ''''), CHAR(10), '''')))'
+                EXEC sp_executesql @OPSQL
+            END
+        END
+        FETCH NEXT FROM opc INTO @OPTAB
+    END
+    CLOSE opc
+    DEALLOCATE opc
+
+    -- the table name carries the year start: TBL_MASTER_ddMMyyyy...
+    SET @OPBASE_DT = CASE WHEN @OPUSED IS NOT NULL
+                          THEN CONVERT(DATETIME, SUBSTRING(@OPUSED, 16, 4) + SUBSTRING(@OPUSED, 14, 2) + SUBSTRING(@OPUSED, 12, 2), 112) END
+
+    -- AO receipts that do not name an invoice settle the opening balance. Staged first and
+    -- then thinned with a direct match on inv_no: a trimmed NOT EXISTS against acc_invoice
+    -- inside the bank-line query was evaluated far more often than the AO lines it was
+    -- meant for and took 345 of 368 seconds on Manilal.
+    CREATE TABLE #OPAO (CLIENTCODE VARCHAR(10), BILLNO VARCHAR(30), AMT FLOAT)
+    IF @OPUSED IS NOT NULL
+        INSERT INTO #OPAO (CLIENTCODE, BILLNO, AMT)
+        SELECT LTRIM(RTRIM(d.client)),
+               LTRIM(RTRIM(ISNULL(d.billno, ''))),
+               CONVERT(FLOAT, ISNULL(NULLIF(LTRIM(RTRIM(d.amount)), ''), '0'))
+          FROM acc_bankdtls d
+         INNER JOIN acc_bank b ON b.entryno = d.entryno
+         INNER JOIN #CITY ct ON ct.CITYCODE = LTRIM(RTRIM(b.citycode))
+         WHERE b.status IN ('BR', 'CR')
+           AND d.entrytype = 'AO'
+           AND LTRIM(RTRIM(ISNULL(d.client, ''))) LIKE 'E%'
+           AND SUBSTRING(d.entryno, 1, 2) = @CMPCODE
+           AND LEN(ISNULL(b.entrydt, '')) = 10
+           AND SUBSTRING(b.entrydt,7,4)+SUBSTRING(b.entrydt,4,2)+SUBSTRING(b.entrydt,1,2) <= @TO_YMD
+
+    -- an AO line naming a real invoice settles that invoice (section 4), not the opening
+    DELETE a
+      FROM #OPAO a
+     WHERE a.BILLNO <> ''
+       AND EXISTS (SELECT 1 FROM acc_invoice iv WHERE iv.inv_no = a.BILLNO)
+
+    CREATE TABLE #OPNET (CLIENTCODE VARCHAR(10), NETAMT FLOAT)
+    INSERT INTO #OPNET (CLIENTCODE, NETAMT)
+    SELECT X.CLIENTCODE, SUM(X.AMT)
+      FROM (
+            SELECT CLIENTCODE, OPAMT AS AMT FROM #OPBASE
+            UNION ALL
+            SELECT CLIENTCODE, -AMT FROM #OPAO
+           ) X
+     GROUP BY X.CLIENTCODE
+
+    INSERT INTO #INV (INV_NO, INV_DT, CLIENTCODE, CITYCODE, BILLTYPE, INV_CUR, TOTALAMT, PAYBY,
+                      CREDIT_PERIOD, HAS_TERMS, DUE_DT, IN_PERIOD)
+    SELECT 'OPBAL-' + n.CLIENTCODE, @OPBASE_DT, n.CLIENTCODE, (SELECT TOP 1 CITYCODE FROM #CITY),
+           'OPENING', 'CR115', n.NETAMT, NULL, NULL, 0, NULL, 0
+      FROM #OPNET n
+     WHERE n.NETAMT > 0.01
+       AND (@CLIENTCODE = '' OR n.CLIENTCODE = @CLIENTCODE)
 
     ---------------------------------------------------------------------------------
     -- 3. Credit period ladder
@@ -352,10 +539,14 @@ BEGIN
       FROM (
             SELECT LTRIM(RTRIM(d.billno)) AS BILLNO,
                    CONVERT(FLOAT, ISNULL(NULLIF(LTRIM(RTRIM(d.amount)), ''), '0')) AS AMT,
-                   CONVERT(DATETIME, SUBSTRING(b.entrydt,7,4)+SUBSTRING(b.entrydt,4,2)+SUBSTRING(b.entrydt,1,2), 112) AS DT
+                   CASE WHEN ISDATE(SUBSTRING(b.entrydt,7,4)+SUBSTRING(b.entrydt,4,2)+SUBSTRING(b.entrydt,1,2)) = 1 THEN CONVERT(DATETIME, SUBSTRING(b.entrydt,7,4)+SUBSTRING(b.entrydt,4,2)+SUBSTRING(b.entrydt,1,2), 112) END AS DT
               FROM acc_bankdtls d
              INNER JOIN acc_bank b ON b.entryno = d.entryno
-             WHERE d.entrytype = 'AB'
+             -- AB = against bill. AO = against opening: when an AO line names a real invoice
+             -- it settles that invoice exactly like AB (the Billwise Receivable statement does
+             -- the same); AO lines naming a pre-ERP or opening-balance reference fall out here
+             -- because the join below keeps only invoices in scope.
+             WHERE d.entrytype IN ('AB', 'AO')
                AND b.status IN ('BR', 'CR')
                AND ISNULL(d.billno, '') <> ''
                AND LEN(ISNULL(b.entrydt, '')) = 10
@@ -365,7 +556,7 @@ BEGIN
 
             SELECT LTRIM(RTRIM(jd.jv_InvoiceNo)),
                    CONVERT(FLOAT, ISNULL(NULLIF(LTRIM(RTRIM(jd.jv_credit)), ''), '0')),
-                   CONVERT(DATETIME, SUBSTRING(jh.jv_date,7,4)+SUBSTRING(jh.jv_date,4,2)+SUBSTRING(jh.jv_date,1,2), 112)
+                   CASE WHEN ISDATE(SUBSTRING(jh.jv_date,7,4)+SUBSTRING(jh.jv_date,4,2)+SUBSTRING(jh.jv_date,1,2)) = 1 THEN CONVERT(DATETIME, SUBSTRING(jh.jv_date,7,4)+SUBSTRING(jh.jv_date,4,2)+SUBSTRING(jh.jv_date,1,2), 112) END
               FROM acc_JournalVoucDtls jd
              INNER JOIN acc_JournalVouc jh ON jh.jvcode = jd.jvcode
              WHERE jd.entrytype = 'AB'
@@ -375,11 +566,23 @@ BEGIN
 
             UNION ALL
 
+            -- A credit note can never knock off more than the note itself is worth.
+            -- acc_crtinvoice sometimes carries the FULL INVOICE VALUE on the link row
+            -- instead of the amount credited (Links company 30: 64 notes linked for
+            -- 1.01cr more than their own value), which silently closed bills that the
+            -- Billwise Outstanding statement still shows as pending. The allocation is
+            -- therefore scaled down to the note's own total whenever the links exceed it.
             SELECT LTRIM(RTRIM(ci.crt_invno)),
-                   CONVERT(FLOAT, ISNULL(NULLIF(LTRIM(RTRIM(ci.crt_amount)), ''), '0')),
-                   CONVERT(DATETIME, SUBSTRING(cn.crt_date,7,4)+SUBSTRING(cn.crt_date,4,2)+SUBSTRING(cn.crt_date,1,2), 112)
+                   CONVERT(FLOAT, ISNULL(NULLIF(LTRIM(RTRIM(ci.crt_amount)), ''), '0'))
+                     * CASE WHEN lt.LINKED > CONVERT(FLOAT, ISNULL(cn.totalamt, 0)) AND lt.LINKED > 0
+                            THEN CONVERT(FLOAT, ISNULL(cn.totalamt, 0)) / lt.LINKED ELSE 1 END,
+                   CASE WHEN ISDATE(SUBSTRING(cn.crt_date,7,4)+SUBSTRING(cn.crt_date,4,2)+SUBSTRING(cn.crt_date,1,2)) = 1 THEN CONVERT(DATETIME, SUBSTRING(cn.crt_date,7,4)+SUBSTRING(cn.crt_date,4,2)+SUBSTRING(cn.crt_date,1,2), 112) END
               FROM acc_crtinvoice ci
              INNER JOIN acc_creditnote cn ON LTRIM(RTRIM(cn.crt_no)) = LTRIM(RTRIM(ci.crt_no))
+             INNER JOIN (SELECT LTRIM(RTRIM(crt_no)) AS CRT_NO,
+                                SUM(CONVERT(FLOAT, ISNULL(NULLIF(LTRIM(RTRIM(crt_amount)), ''), '0'))) AS LINKED
+                           FROM acc_crtinvoice
+                          GROUP BY LTRIM(RTRIM(crt_no))) lt ON lt.CRT_NO = LTRIM(RTRIM(ci.crt_no))
              WHERE ISNULL(ci.crt_invno, '') <> ''
                AND LEN(ISNULL(cn.crt_date, '')) = 10
                AND SUBSTRING(cn.crt_date,7,4)+SUBSTRING(cn.crt_date,4,2)+SUBSTRING(cn.crt_date,1,2) <= @TO_YMD
@@ -442,12 +645,26 @@ BEGIN
              INNER JOIN acc_bank b ON b.entryno = d.entryno
              INNER JOIN #CITY ct ON ct.CITYCODE = LTRIM(RTRIM(b.citycode))
              WHERE b.status IN ('BR', 'CR')
-               AND ISNULL(d.entrytype, '') <> 'AB'
+               -- 'PE' lines are supplier payments that happen to carry a client code;
+               -- they are money going OUT and must not be read as credit from a customer.
+               -- not money on account: AB and AO settle bills or the opening balance (the
+               -- Billwise statement folds opening-balance AO into its "OP. BALANCE" line, and
+               -- that opening is not part of these figures); PE and JB are payment lines
+               -- that happen to carry a client code
+               AND ISNULL(d.entrytype, '') NOT IN ('AB', 'PE', 'AO', 'JB')
                AND LTRIM(RTRIM(ISNULL(d.client, ''))) LIKE 'E%'
                AND SUBSTRING(d.entryno, 1, 2) = @CMPCODE
                AND LEN(ISNULL(b.entrydt, '')) = 10
                AND SUBSTRING(b.entrydt,7,4)+SUBSTRING(b.entrydt,4,2)+SUBSTRING(b.entrydt,1,2) <= @TO_YMD
                AND (@CLIENTCODE = '' OR LTRIM(RTRIM(d.client)) = @CLIENTCODE)
+
+            UNION ALL
+
+            -- opening balance brought forward that stands in the client's favour
+            SELECT n.CLIENTCODE, -n.NETAMT, 0
+              FROM #OPNET n
+             WHERE n.NETAMT < -0.01
+               AND (@CLIENTCODE = '' OR n.CLIENTCODE = @CLIENTCODE)
 
             UNION ALL
 
@@ -595,7 +812,13 @@ BEGIN
                                     -- EX = Exwork, FFD+CCLR = both legs, MISC, UNCLASS (UI expands them)
         SERVICE_SRC  VARCHAR(12),
         JOB_CLASS    VARCHAR(10),
-        IS_BILLED    BIT
+        IS_BILLED    BIT,
+        -- CLIENTCODE above is the party ON THE JOB FILE (bill-to, else exporter).
+        -- BILLCLIENT is who the invoice was actually raised on. On nomination /
+        -- freight-collect export work these differ: the shipper is one company and
+        -- the overseas agent pays. Receivables, the ledger and Outstanding all speak
+        -- of the BILLED party, so margin has to be able to speak of it too.
+        BILLCLIENT   VARCHAR(10)
     )
 
     -- exports: EXPT_MASTER, sea + air, excluding cancelled
@@ -603,7 +826,7 @@ BEGIN
     SELECT LTRIM(RTRIM(e.exptno)),
            CASE WHEN LOWER(LTRIM(RTRIM(ISNULL(e.expt_mode,'')))) = 'air' THEN 'AIR EXPORT' ELSE 'SEA EXPORT' END,
            LTRIM(RTRIM(ISNULL(NULLIF(LTRIM(RTRIM(ISNULL(e.expt_billto,''))), ''), e.expt_exporter))),
-           CONVERT(DATETIME, SUBSTRING(e.expt_docrecd,7,4)+SUBSTRING(e.expt_docrecd,4,2)+SUBSTRING(e.expt_docrecd,1,2), 112),
+           CASE WHEN ISDATE(SUBSTRING(e.expt_docrecd,7,4)+SUBSTRING(e.expt_docrecd,4,2)+SUBSTRING(e.expt_docrecd,1,2)) = 1 THEN CONVERT(DATETIME, SUBSTRING(e.expt_docrecd,7,4)+SUBSTRING(e.expt_docrecd,4,2)+SUBSTRING(e.expt_docrecd,1,2), 112) END,
            'UNCLASS', 'NONE', 'SHIPMENT', 0
       FROM EXPT_MASTER e
      INNER JOIN #CITY c ON c.CITYCODE = LTRIM(RTRIM(e.citycode))
@@ -646,7 +869,41 @@ BEGIN
        AND m.MAKER_Date >= @FROMDT
        AND m.MAKER_Date <  DATEADD(DAY, 1, @ASON)
 
-    DELETE FROM #JOBS WHERE @CLIENTCODE <> '' AND CLIENTCODE <> @CLIENTCODE
+    ---------------------------------------------------------------------------------
+    -- Who was actually billed for each job. A job can be invoiced to more than one
+    -- party (part charges to the shipper, freight to the agent); the party carrying
+    -- the largest invoice value wins, which is the one a person would name if asked
+    -- "who is this job billed to". Jobs with no invoice keep the job-file party.
+    ---------------------------------------------------------------------------------
+    CREATE TABLE #JOBBILL (JOBNO VARCHAR(25), CLIENTCODE VARCHAR(10))
+
+    INSERT INTO #JOBBILL (JOBNO, CLIENTCODE)
+    SELECT R.JOBNO, R.CLIENTCODE
+      FROM (
+            SELECT X.JOBNO, X.CLIENTCODE,
+                   ROW_NUMBER() OVER (PARTITION BY X.JOBNO ORDER BY X.AMT DESC, X.CLIENTCODE) AS RN
+              FROM (
+                    SELECT LTRIM(RTRIM(jn.inv_jobno))                             AS JOBNO,
+                           LTRIM(RTRIM(iv.inv_client))                            AS CLIENTCODE,
+                           SUM(CONVERT(FLOAT, ISNULL(iv.totalamt, 0)))            AS AMT
+                      FROM acc_invjobno jn
+                     INNER JOIN #JOBS j        ON j.JOBNO = LTRIM(RTRIM(jn.inv_jobno))
+                     INNER JOIN acc_invoice iv ON LTRIM(RTRIM(iv.inv_no)) = LTRIM(RTRIM(jn.inv_no))
+                     WHERE LTRIM(RTRIM(ISNULL(iv.inv_client, ''))) LIKE 'E%'
+                     GROUP BY LTRIM(RTRIM(jn.inv_jobno)), LTRIM(RTRIM(iv.inv_client))
+                   ) X
+           ) R
+     WHERE R.RN = 1
+
+    CREATE CLUSTERED INDEX IX_JOBBILL ON #JOBBILL (JOBNO)
+
+    UPDATE J SET BILLCLIENT = J.CLIENTCODE FROM #JOBS J
+    UPDATE J SET BILLCLIENT = B.CLIENTCODE FROM #JOBS J INNER JOIN #JOBBILL B ON B.JOBNO = J.JOBNO
+
+    -- a single-client drill keeps the job whether the client was billed for it or
+    -- shipped it, so neither view of that client comes back empty
+    DELETE FROM #JOBS
+     WHERE @CLIENTCODE <> '' AND CLIENTCODE <> @CLIENTCODE AND BILLCLIENT <> @CLIENTCODE
 
     CREATE CLUSTERED INDEX IX_JOBS ON #JOBS (JOBNO)
 
@@ -744,24 +1001,42 @@ BEGIN
     --     Anything backfilled is marked SERVICE_SRC='INFERRED' so the UI can badge it;
     --     an inference is never presented as recorded data.
     ---------------------------------------------------------------------------------
-    CREATE TABLE #SVCHEAD (JOBNO VARCHAR(25), HAS_AGENCY BIT, HAS_THC BIT)
+    --     LINKS uses its own chart of accounts, so the same two heads carry different
+    --     codes there, and its billing practice differs: agency + THC together almost
+    --     always means FORWARDING on Links (341 FFD v 28 CCLR), and ocean freight is
+    --     billed as its own head. Validated on the 3,850 Links sea-export jobs that
+    --     carry a recorded flag: fires on 97.1%, correct 96.8% (FFD 97.7%, CCLR 95.7%).
+    --     Links never records FFD+CCLR (6 jobs ever), so its rule never emits it.
+    --         Links:   G102094 AGENCY CHARGES RECEIVED
+    --                  G101614 TERMINAL HANDLING CHARGES RECEIVED
+    --                  G101610 OCEAN FREIGHT RECEIVED
+    --                  THC or ocean freight -> FFD;  agency only -> CCLR
+    ---------------------------------------------------------------------------------
+    DECLARE @SVC_LINKS BIT, @SVC_AGENCY VARCHAR(10), @SVC_THC VARCHAR(10), @SVC_OFRT VARCHAR(10)
+    SET @SVC_LINKS  = CASE WHEN UPPER(DB_NAME()) LIKE 'LINKS%' THEN 1 ELSE 0 END
+    SET @SVC_AGENCY = CASE WHEN @SVC_LINKS = 1 THEN 'G102094' ELSE 'G100243' END
+    SET @SVC_THC    = CASE WHEN @SVC_LINKS = 1 THEN 'G101614' ELSE 'G101608' END
+    SET @SVC_OFRT   = CASE WHEN @SVC_LINKS = 1 THEN 'G101610' ELSE '~none~' END
 
-    INSERT INTO #SVCHEAD (JOBNO, HAS_AGENCY, HAS_THC)
-    SELECT Z.JOBNO, MAX(Z.A), MAX(Z.T)
+    CREATE TABLE #SVCHEAD (JOBNO VARCHAR(25), HAS_AGENCY BIT, HAS_THC BIT, HAS_OFRT BIT)
+    INSERT INTO #SVCHEAD (JOBNO, HAS_AGENCY, HAS_THC, HAS_OFRT)
+    SELECT Z.JOBNO, MAX(Z.A), MAX(Z.T), MAX(Z.O)
       FROM (
             -- two separate GROUP BY legs (not a UNION-ALL derived table) so each charge
             -- table can be seeked on its inv_no index; inv_no is never padded, so it is
             -- deliberately NOT wrapped in LTRIM/RTRIM here
             SELECT ji.JOBNO,
-                   MAX(CASE WHEN LTRIM(RTRIM(ISNULL(ic.inv_account,''))) = 'G100243' THEN 1 ELSE 0 END) AS A,
-                   MAX(CASE WHEN LTRIM(RTRIM(ISNULL(ic.inv_account,''))) = 'G101608' THEN 1 ELSE 0 END) AS T
+                   MAX(CASE WHEN LTRIM(RTRIM(ISNULL(ic.inv_account,''))) = @SVC_AGENCY THEN 1 ELSE 0 END) AS A,
+                   MAX(CASE WHEN LTRIM(RTRIM(ISNULL(ic.inv_account,''))) = @SVC_THC    THEN 1 ELSE 0 END) AS T,
+                   MAX(CASE WHEN LTRIM(RTRIM(ISNULL(ic.inv_account,''))) = @SVC_OFRT   THEN 1 ELSE 0 END) AS O
               FROM #JOBINV ji
              INNER JOIN acc_invcharge ic ON ic.inv_no = ji.INV_NO
              GROUP BY ji.JOBNO
             UNION ALL
             SELECT ji.JOBNO,
-                   MAX(CASE WHEN LTRIM(RTRIM(ISNULL(ic.inv_account,''))) = 'G100243' THEN 1 ELSE 0 END),
-                   MAX(CASE WHEN LTRIM(RTRIM(ISNULL(ic.inv_account,''))) = 'G101608' THEN 1 ELSE 0 END)
+                   MAX(CASE WHEN LTRIM(RTRIM(ISNULL(ic.inv_account,''))) = @SVC_AGENCY THEN 1 ELSE 0 END),
+                   MAX(CASE WHEN LTRIM(RTRIM(ISNULL(ic.inv_account,''))) = @SVC_THC    THEN 1 ELSE 0 END),
+                   MAX(CASE WHEN LTRIM(RTRIM(ISNULL(ic.inv_account,''))) = @SVC_OFRT   THEN 1 ELSE 0 END)
               FROM #JOBINV ji
              INNER JOIN acc_invcharge1 ic ON ic.inv_no = ji.INV_NO
              GROUP BY ji.JOBNO
@@ -771,7 +1046,9 @@ BEGIN
     CREATE CLUSTERED INDEX IX_SVCHEAD ON #SVCHEAD (JOBNO)
 
     UPDATE J
-       SET SERVICE_TYPE = CASE WHEN h.HAS_AGENCY = 1 AND h.HAS_THC = 1 THEN 'FFD+CCLR'
+       SET SERVICE_TYPE = CASE WHEN @SVC_LINKS = 1 THEN
+                                    CASE WHEN h.HAS_THC = 1 OR h.HAS_OFRT = 1 THEN 'FFD' ELSE 'CCLR' END
+                               WHEN h.HAS_AGENCY = 1 AND h.HAS_THC = 1 THEN 'FFD+CCLR'
                                WHEN h.HAS_AGENCY = 1                   THEN 'CCLR'
                                ELSE 'FFD' END,
            SERVICE_SRC  = 'INFERRED'
@@ -779,7 +1056,7 @@ BEGIN
      INNER JOIN #SVCHEAD h ON h.JOBNO = J.JOBNO
      WHERE J.SERVICE_TYPE = 'UNCLASS'
        AND J.MODE_        = 'SEA EXPORT'
-       AND (h.HAS_AGENCY = 1 OR h.HAS_THC = 1)
+       AND (h.HAS_AGENCY = 1 OR h.HAS_THC = 1 OR h.HAS_OFRT = 1)
 
     CREATE TABLE #JOBEXP
     (
@@ -789,34 +1066,46 @@ BEGIN
         JV_EXP       FLOAT
     )
 
-    INSERT INTO #JOBEXP (JOBNO, PURCHASE_EXP, BANKCASH_EXP, JV_EXP)
-    SELECT X.JOBNO, SUM(X.P), SUM(X.B), SUM(X.V)
+    -- cost per job AND head: the client-wise split (9b) needs the head; #JOBEXP is its sum
+    CREATE TABLE #JEC (JOBNO VARCHAR(25), HEAD VARCHAR(10), P FLOAT, B FLOAT, V FLOAT)
+
+    INSERT INTO #JEC (JOBNO, HEAD, P, B, V)
+    SELECT X.JOBNO, X.HEAD, SUM(X.P), SUM(X.B), SUM(X.V)
       FROM (
             SELECT LTRIM(RTRIM(pd.pur_jobno)) AS JOBNO,
+                   LTRIM(RTRIM(pd.pur_account)) AS HEAD,
                    CONVERT(FLOAT, ISNULL(NULLIF(LTRIM(RTRIM(pd.pur_amount)), ''), '0')) AS P,
                    0 AS B, 0 AS V
               FROM acc_purchasedtls pd
              WHERE ISNULL(pd.pur_jobno, '') <> ''
+               AND LTRIM(RTRIM(pd.pur_account)) IN (SELECT ACCTCODE FROM #JOBHEAD)
 
             UNION ALL
 
-            SELECT LTRIM(RTRIM(d.jobno)), 0,
+            SELECT LTRIM(RTRIM(d.jobno)), LTRIM(RTRIM(d.client)), 0,
                    CONVERT(FLOAT, ISNULL(NULLIF(LTRIM(RTRIM(d.amount)), ''), '0')), 0
               FROM acc_bankdtls d
              INNER JOIN acc_bank b ON b.entryno = d.entryno
              WHERE ISNULL(d.jobno, '') <> ''
                AND d.entrytype = 'JB'
+               AND LTRIM(RTRIM(d.client)) IN (SELECT ACCTCODE FROM #JOBHEAD)
                AND b.status IN ('BP', 'CP', 'CE')
 
             UNION ALL
 
-            SELECT LTRIM(RTRIM(jd.jv_jobno)), 0, 0,
+            SELECT LTRIM(RTRIM(jd.jv_jobno)), LTRIM(RTRIM(jd.jv_account)), 0, 0,
                    CONVERT(FLOAT, ISNULL(NULLIF(LTRIM(RTRIM(jd.jv_debit)), ''), '0'))
               FROM acc_JournalVoucDtls jd
              WHERE ISNULL(jd.jv_jobno, '') <> ''
+               AND LTRIM(RTRIM(jd.jv_account)) IN (SELECT ACCTCODE FROM #JOBHEAD)
            ) X
      INNER JOIN #JOBS j ON j.JOBNO = X.JOBNO
-     GROUP BY X.JOBNO
+     GROUP BY X.JOBNO, X.HEAD
+
+    CREATE CLUSTERED INDEX IX_JEC ON #JEC (JOBNO, HEAD)
+
+    INSERT INTO #JOBEXP (JOBNO, PURCHASE_EXP, BANKCASH_EXP, JV_EXP)
+    SELECT JOBNO, SUM(P), SUM(B), SUM(V) FROM #JEC GROUP BY JOBNO
 
     CREATE CLUSTERED INDEX IX_JOBEXP ON #JOBEXP (JOBNO)
 
@@ -839,10 +1128,32 @@ BEGIN
      GROUP BY ji.INV_NO
     CREATE CLUSTERED INDEX IX_INVJOBCNT ON #INVJOBCNT (INV_NO)
 
+    -- Every invoice on the job up to @TODATE, whoever it was billed to. #INV cannot be
+    -- used here: on a single-client drill it holds only THAT client's invoices, so a
+    -- shipper's job whose freight was billed to an overseas agent kept its full cost
+    -- but lost the other party's income (David Pieris on Links: -30% margin that was
+    -- not a loss at all). Receivables still use #INV; job P&L uses this.
+    CREATE TABLE #JOBINVDT (INV_NO VARCHAR(15), INV_DT DATETIME, INV_CLIENT VARCHAR(10))
+
+    INSERT INTO #JOBINVDT (INV_NO, INV_DT, INV_CLIENT)
+    SELECT LTRIM(RTRIM(iv.inv_no)),
+           MAX(CASE WHEN ISDATE(SUBSTRING(iv.inv_date,7,4)+SUBSTRING(iv.inv_date,4,2)+SUBSTRING(iv.inv_date,1,2)) = 1
+                    THEN CONVERT(DATETIME, SUBSTRING(iv.inv_date,7,4)+SUBSTRING(iv.inv_date,4,2)+SUBSTRING(iv.inv_date,1,2), 112) END),
+           MAX(LTRIM(RTRIM(iv.inv_client)))
+      FROM (SELECT DISTINCT INV_NO FROM #JOBINV) ji
+     INNER JOIN acc_invoice iv ON LTRIM(RTRIM(iv.inv_no)) = ji.INV_NO
+     WHERE LTRIM(RTRIM(ISNULL(iv.cmpcode, ''))) = @CMPCODE
+       AND LEN(ISNULL(iv.inv_date, '')) = 10
+       AND ISDATE(SUBSTRING(iv.inv_date,7,4)+SUBSTRING(iv.inv_date,4,2)+SUBSTRING(iv.inv_date,1,2)) = 1
+       AND SUBSTRING(iv.inv_date,7,4)+SUBSTRING(iv.inv_date,4,2)+SUBSTRING(iv.inv_date,1,2) <= @TO_YMD
+     GROUP BY LTRIM(RTRIM(iv.inv_no))
+
+    CREATE CLUSTERED INDEX IX_JOBINVDT ON #JOBINVDT (INV_NO)
+
     CREATE TABLE #JOBINC (JOBNO VARCHAR(25), REVENUE FLOAT, GST_AMT FLOAT, LAST_INV_DT DATETIME)
     INSERT INTO #JOBINC (JOBNO, REVENUE, GST_AMT, LAST_INV_DT)
     SELECT Z.JOBNO, SUM(Z.REV), SUM(Z.GST),
-           (SELECT MAX(v2.INV_DT) FROM #JOBINV j2 INNER JOIN #INV v2 ON v2.INV_NO = j2.INV_NO WHERE j2.JOBNO = Z.JOBNO)
+           (SELECT MAX(v2.INV_DT) FROM #JOBINV j2 INNER JOIN #JOBINVDT v2 ON v2.INV_NO = j2.INV_NO WHERE j2.JOBNO = Z.JOBNO)
       FROM (
             SELECT ji.JOBNO,
                    SUM(CASE WHEN ISNULL(sc.CATEGORY, 'OTHER') NOT IN ('TAX', 'EXCL')
@@ -851,7 +1162,7 @@ BEGIN
                    SUM(ISNULL(ic.CGST_AMT, 0) + ISNULL(ic.SGST_AMT, 0) + ISNULL(ic.IGST_AMT, 0))
                        / CONVERT(FLOAT, CASE WHEN ISNULL(n.NJOBS, 0) < 1 THEN 1 ELSE n.NJOBS END) AS GST
               FROM #JOBINV ji
-             INNER JOIN #INV v ON v.INV_NO = ji.INV_NO          -- invoices up to @TODATE only
+             INNER JOIN #JOBINVDT v ON v.INV_NO = ji.INV_NO     -- every party's invoices up to @TODATE
              INNER JOIN acc_invcharge ic ON ic.inv_no = ji.INV_NO
               LEFT JOIN #INVJOBCNT n ON n.INV_NO = ji.INV_NO
               LEFT JOIN dbo.TBL_MST_FIN_SERVICE_CATEGORY sc ON sc.ACCTCODE = LTRIM(RTRIM(ISNULL(ic.inv_account, '')))
@@ -864,7 +1175,7 @@ BEGIN
                    SUM(ISNULL(ic.CGST_AMT, 0) + ISNULL(ic.SGST_AMT, 0) + ISNULL(ic.IGST_AMT, 0))
                        / CONVERT(FLOAT, CASE WHEN ISNULL(n.NJOBS, 0) < 1 THEN 1 ELSE n.NJOBS END)
               FROM #JOBINV ji
-             INNER JOIN #INV v ON v.INV_NO = ji.INV_NO          -- invoices up to @TODATE only
+             INNER JOIN #JOBINVDT v ON v.INV_NO = ji.INV_NO     -- every party's invoices up to @TODATE
              INNER JOIN acc_invcharge1 ic ON ic.inv_no = ji.INV_NO
               LEFT JOIN #INVJOBCNT n ON n.INV_NO = ji.INV_NO
               LEFT JOIN dbo.TBL_MST_FIN_SERVICE_CATEGORY sc ON sc.ACCTCODE = LTRIM(RTRIM(ISNULL(ic.inv_account, '')))
@@ -992,9 +1303,13 @@ BEGIN
     ---------------------------------------------------------------------------------
     CREATE TABLE #MARGIN
     (
-        CLIENTCODE    VARCHAR(10),
+        CLIENTCODE    VARCHAR(10),   -- shipper / job party
+        BILLCLIENT    VARCHAR(10),   -- who the invoice was raised on
         SERVICE_TYPE  VARCHAR(25),
         JOBS          INT,
+        JOBS_SHIP     INT,     -- each job counted once, for the shipper view (a split job has several rows)
+        INFERRED_SHIP INT,
+        UNMATCHED     FLOAT,   -- cost with no matching income head, shared by income
         INFERRED_JOBS INT,   -- how many of JOBS got their type from the GL backfill
         REVENUE       FLOAT,
         COST          FLOAT,
@@ -1006,24 +1321,158 @@ BEGIN
     -- LEDGER figures: income from the job's invoices (#JOBINC, net of GST), expense
     -- from purchases + JB payments + JV lines on the job (#JOBEXP). Duty columns are
     -- informational and still come from the summary table where a row exists.
-    INSERT INTO #MARGIN (CLIENTCODE, SERVICE_TYPE, JOBS, INFERRED_JOBS, REVENUE, COST, DUTY_PAID, DUTY_RECO, LAST_INV_DT)
+    ---------------------------------------------------------------------------------
+    -- 9b. CLIENT-WISE SPLIT of each job's P&L.
+    --     One job is often billed to several parties - the shipper for local charges, the
+    --     overseas agent for freight, a clearance client for customs - while its cost
+    --     arrives on one purchase voucher. Income goes to the client each invoice was
+    --     raised on. Each cost line follows the client billed for the MATCHING income
+    --     head (TBL_MST_JOB_COST_PAIRING: OCEAN FREIGHT PAID -> OCEAN FREIGHT RECEIVED),
+    --     split by what each client was billed for that head. Cost with no matching
+    --     income is shared by each client's share of the job's income and reported as
+    --     UNMATCHED. A job with no income yet keeps its cost on the job party. Job
+    --     totals do not change - only which client they sit under.
+    ---------------------------------------------------------------------------------
+    -- income per job, client and head: the same lines and split as #JOBINC
+    CREATE TABLE #JIC (JOBNO VARCHAR(25), CLIENTCODE VARCHAR(10), HEAD VARCHAR(10), AMT FLOAT, LAST_DT DATETIME)
+    INSERT INTO #JIC (JOBNO, CLIENTCODE, HEAD, AMT, LAST_DT)
+    SELECT Z.JOBNO, Z.CLIENTCODE, Z.HEAD, SUM(Z.AMT), MAX(Z.DT)
+      FROM (
+            SELECT ji.JOBNO, v.INV_CLIENT AS CLIENTCODE, LTRIM(RTRIM(ISNULL(ic.inv_account, ''))) AS HEAD,
+                   CONVERT(FLOAT, ISNULL(NULLIF(LTRIM(RTRIM(ic.inv_inramt)), ''), '0'))
+                       / CONVERT(FLOAT, CASE WHEN ISNULL(n.NJOBS, 0) < 1 THEN 1 ELSE n.NJOBS END) AS AMT,
+                   v.INV_DT AS DT
+              FROM #JOBINV ji
+             INNER JOIN #JOBINVDT v ON v.INV_NO = ji.INV_NO
+             INNER JOIN acc_invcharge ic ON ic.inv_no = ji.INV_NO
+              LEFT JOIN #INVJOBCNT n ON n.INV_NO = ji.INV_NO
+              LEFT JOIN dbo.TBL_MST_FIN_SERVICE_CATEGORY sc ON sc.ACCTCODE = LTRIM(RTRIM(ISNULL(ic.inv_account, '')))
+             WHERE ISNULL(sc.CATEGORY, 'OTHER') NOT IN ('TAX', 'EXCL')
+            UNION ALL
+            SELECT ji.JOBNO, v.INV_CLIENT, LTRIM(RTRIM(ISNULL(ic.inv_account, ''))),
+                   CONVERT(FLOAT, ISNULL(NULLIF(LTRIM(RTRIM(ic.inv_inramt)), ''), '0'))
+                       / CONVERT(FLOAT, CASE WHEN ISNULL(n.NJOBS, 0) < 1 THEN 1 ELSE n.NJOBS END),
+                   v.INV_DT
+              FROM #JOBINV ji
+             INNER JOIN #JOBINVDT v ON v.INV_NO = ji.INV_NO
+             INNER JOIN acc_invcharge1 ic ON ic.inv_no = ji.INV_NO
+              LEFT JOIN #INVJOBCNT n ON n.INV_NO = ji.INV_NO
+              LEFT JOIN dbo.TBL_MST_FIN_SERVICE_CATEGORY sc ON sc.ACCTCODE = LTRIM(RTRIM(ISNULL(ic.inv_account, '')))
+             WHERE ISNULL(sc.CATEGORY, 'OTHER') NOT IN ('TAX', 'EXCL')
+           ) Z
+     INNER JOIN #JOBS j ON j.JOBNO = Z.JOBNO
+     GROUP BY Z.JOBNO, Z.CLIENTCODE, Z.HEAD
+    CREATE CLUSTERED INDEX IX_JIC ON #JIC (JOBNO, CLIENTCODE, HEAD)
+
+    -- who was billed what on each job (positive amounts only drive the split)
+    CREATE TABLE #JCH (JOBNO VARCHAR(25), CLIENTCODE VARCHAR(10), HEAD VARCHAR(10), AMT FLOAT)
+    INSERT INTO #JCH (JOBNO, CLIENTCODE, HEAD, AMT)
+    SELECT JOBNO, CLIENTCODE, HEAD, SUM(AMT) FROM #JIC GROUP BY JOBNO, CLIENTCODE, HEAD HAVING SUM(AMT) > 0.01
+    CREATE CLUSTERED INDEX IX_JCH ON #JCH (JOBNO, HEAD)
+
+    CREATE TABLE #JC (JOBNO VARCHAR(25), CLIENTCODE VARCHAR(10), INC FLOAT)
+    INSERT INTO #JC (JOBNO, CLIENTCODE, INC)
+    SELECT JOBNO, CLIENTCODE, SUM(AMT) FROM #JIC GROUP BY JOBNO, CLIENTCODE HAVING SUM(AMT) > 0.01
+    CREATE CLUSTERED INDEX IX_JC ON #JC (JOBNO)
+
+    CREATE TABLE #JECP (JOBNO VARCHAR(25), HEAD VARCHAR(10), AMT FLOAT)
+    INSERT INTO #JECP (JOBNO, HEAD, AMT)
+    SELECT JOBNO, HEAD, ISNULL(P, 0) + ISNULL(B, 0) + ISNULL(V, 0) FROM #JEC
+    CREATE CLUSTERED INDEX IX_JECP ON #JECP (JOBNO, HEAD)
+
+    -- every income head a cost head is charged on: the pairing table, plus the head itself
+    -- (Manilal pays CUSTOM DUTY (SEA & AIR) on the client's behalf and bills it back under
+    -- the same code)
+    CREATE TABLE #PAIRS (COSTHEAD VARCHAR(10), INCHEAD VARCHAR(10))
+    INSERT INTO #PAIRS (COSTHEAD, INCHEAD)
+    SELECT DISTINCT LTRIM(RTRIM(COSTHEAD)), LTRIM(RTRIM(INCHEAD)) FROM dbo.TBL_MST_JOB_COST_PAIRING
+    INSERT INTO #PAIRS (COSTHEAD, INCHEAD)
+    SELECT DISTINCT e.HEAD, e.HEAD FROM #JECP e
+     WHERE NOT EXISTS (SELECT 1 FROM #PAIRS p WHERE p.COSTHEAD = e.HEAD AND p.INCHEAD = e.HEAD)
+    CREATE CLUSTERED INDEX IX_PAIRS ON #PAIRS (COSTHEAD, INCHEAD)
+
+    -- for each job and cost head: what each client was billed on its paired heads
+    CREATE TABLE #JECB (JOBNO VARCHAR(25), COSTHEAD VARCHAR(10), CLIENTCODE VARCHAR(10), BILLED FLOAT)
+    INSERT INTO #JECB (JOBNO, COSTHEAD, CLIENTCODE, BILLED)
+    SELECT e.JOBNO, e.HEAD, h.CLIENTCODE, SUM(h.AMT)
+      FROM (SELECT DISTINCT JOBNO, HEAD FROM #JECP) e
+     INNER JOIN #PAIRS p ON p.COSTHEAD = e.HEAD
+     INNER JOIN #JCH h ON h.JOBNO = e.JOBNO AND h.HEAD = p.INCHEAD
+     GROUP BY e.JOBNO, e.HEAD, h.CLIENTCODE
+    CREATE CLUSTERED INDEX IX_JECB ON #JECB (JOBNO, COSTHEAD)
+
+    CREATE TABLE #ALLOC (JOBNO VARCHAR(25), CLIENTCODE VARCHAR(10), COST FLOAT, UNMATCHED FLOAT)
+    -- (a) cost follows the client(s) billed for the matching charge, in proportion
+    INSERT INTO #ALLOC (JOBNO, CLIENTCODE, COST, UNMATCHED)
+    SELECT e.JOBNO, b.CLIENTCODE, e.AMT * b.BILLED / t.TOT, 0
+      FROM #JECP e
+     INNER JOIN #JECB b ON b.JOBNO = e.JOBNO AND b.COSTHEAD = e.HEAD
+     INNER JOIN (SELECT JOBNO, COSTHEAD, SUM(BILLED) AS TOT FROM #JECB GROUP BY JOBNO, COSTHEAD) t
+             ON t.JOBNO = e.JOBNO AND t.COSTHEAD = e.HEAD
+    -- (b) no matching charge billed: shared by each client's share of the job's income
+    INSERT INTO #ALLOC (JOBNO, CLIENTCODE, COST, UNMATCHED)
+    SELECT e.JOBNO, c.CLIENTCODE, e.AMT * c.INC / jt.TOT, e.AMT * c.INC / jt.TOT
+      FROM #JECP e
+     INNER JOIN #JC c ON c.JOBNO = e.JOBNO
+     INNER JOIN (SELECT JOBNO, SUM(INC) AS TOT FROM #JC GROUP BY JOBNO) jt ON jt.JOBNO = e.JOBNO
+     WHERE NOT EXISTS (SELECT 1 FROM #JECB b WHERE b.JOBNO = e.JOBNO AND b.COSTHEAD = e.HEAD)
+    -- (c) nothing billed on the job yet: the cost stays with the job party
+    INSERT INTO #ALLOC (JOBNO, CLIENTCODE, COST, UNMATCHED)
+    SELECT e.JOBNO, j.BILLCLIENT, e.AMT, 0
+      FROM #JECP e
+     INNER JOIN #JOBS j ON j.JOBNO = e.JOBNO
+     WHERE NOT EXISTS (SELECT 1 FROM #JECB b WHERE b.JOBNO = e.JOBNO AND b.COSTHEAD = e.HEAD)
+       AND NOT EXISTS (SELECT 1 FROM #JC c WHERE c.JOBNO = e.JOBNO)
+
+    CREATE CLUSTERED INDEX IX_ALLOC ON #ALLOC (JOBNO)
+
+    -- one row per job and client
+    CREATE TABLE #JCP (JOBNO VARCHAR(25), CLIENTCODE VARCHAR(10), REVENUE FLOAT, COST FLOAT, UNMATCHED FLOAT, LAST_DT DATETIME)
+    INSERT INTO #JCP (JOBNO, CLIENTCODE, REVENUE, COST, UNMATCHED, LAST_DT)
+    SELECT X.JOBNO, X.CLIENTCODE, SUM(X.R), SUM(X.C), SUM(X.U), MAX(X.D)
+      FROM (
+            SELECT JOBNO, CLIENTCODE, AMT AS R, 0 AS C, 0 AS U, LAST_DT AS D FROM #JIC
+            UNION ALL
+            SELECT JOBNO, CLIENTCODE, 0, COST, UNMATCHED, NULL FROM #ALLOC
+            UNION ALL
+            -- a shipment with nothing booked yet still counts as a job of its party
+            SELECT j.JOBNO, j.BILLCLIENT, 0, 0, 0, NULL
+              FROM #JOBS j
+             WHERE j.JOB_CLASS = 'SHIPMENT'
+               AND NOT EXISTS (SELECT 1 FROM #JIC i WHERE i.JOBNO = j.JOBNO)
+               AND NOT EXISTS (SELECT 1 FROM #ALLOC a WHERE a.JOBNO = j.JOBNO)
+           ) X
+     GROUP BY X.JOBNO, X.CLIENTCODE
+    CREATE CLUSTERED INDEX IX_JCP ON #JCP (JOBNO, CLIENTCODE)
+
+    -- LEDGER figures by client: RN = 1 marks the job's main party, which carries the job
+    -- count and duty for the shipper view so a split job is not counted twice there.
+    INSERT INTO #MARGIN (CLIENTCODE, BILLCLIENT, SERVICE_TYPE, JOBS, JOBS_SHIP, INFERRED_JOBS, INFERRED_SHIP,
+                         REVENUE, COST, UNMATCHED, DUTY_PAID, DUTY_RECO, LAST_INV_DT)
     SELECT j.CLIENTCODE,
+           r.CLIENTCODE,
            j.SERVICE_TYPE,
            COUNT(*),
+           SUM(CASE WHEN r.RN = 1 THEN 1 ELSE 0 END),
            SUM(CASE WHEN j.SERVICE_SRC = 'INFERRED' THEN 1 ELSE 0 END),
-           SUM(ISNULL(inc.REVENUE, 0)),
-           SUM(ISNULL(x.PURCHASE_EXP, 0) + ISNULL(x.BANKCASH_EXP, 0) + ISNULL(x.JV_EXP, 0)),
-           SUM(CONVERT(FLOAT, ISNULL(s.TOT_DUTY_PAID, 0))),
-           SUM(CONVERT(FLOAT, ISNULL(s.TOT_DUTY_RECO, 0))),
-           MAX(inc.LAST_INV_DT)
-      FROM #JOBS j
-      LEFT JOIN #JOBINC inc ON inc.JOBNO = j.JOBNO
-      LEFT JOIN #JOBEXP x   ON x.JOBNO   = j.JOBNO
+           SUM(CASE WHEN j.SERVICE_SRC = 'INFERRED' AND r.RN = 1 THEN 1 ELSE 0 END),
+           SUM(r.REVENUE),
+           SUM(r.COST),
+           SUM(r.UNMATCHED),
+           SUM(CASE WHEN r.RN = 1 THEN CONVERT(FLOAT, ISNULL(s.TOT_DUTY_PAID, 0)) ELSE 0 END),
+           SUM(CASE WHEN r.RN = 1 THEN CONVERT(FLOAT, ISNULL(s.TOT_DUTY_RECO, 0)) ELSE 0 END),
+           MAX(r.LAST_DT)
+      FROM (
+            SELECT p.JOBNO, p.CLIENTCODE, p.REVENUE, p.COST, p.UNMATCHED, p.LAST_DT,
+                   ROW_NUMBER() OVER (PARTITION BY p.JOBNO
+                                      ORDER BY CASE WHEN p.CLIENTCODE = jj.BILLCLIENT THEN 0 ELSE 1 END,
+                                               p.REVENUE DESC, p.CLIENTCODE) AS RN
+              FROM #JCP p
+             INNER JOIN #JOBS jj ON jj.JOBNO = p.JOBNO
+           ) r
+     INNER JOIN #JOBS j ON j.JOBNO = r.JOBNO
       LEFT JOIN TBL_SHIPMENT_SUMMARY_JOB s ON LTRIM(RTRIM(s.JOBNO)) = j.JOBNO
-     WHERE j.JOB_CLASS = 'SHIPMENT'
-        OR ISNULL(inc.REVENUE, 0) <> 0
-        OR ISNULL(x.PURCHASE_EXP, 0) + ISNULL(x.BANKCASH_EXP, 0) + ISNULL(x.JV_EXP, 0) <> 0
-     GROUP BY j.CLIENTCODE, j.SERVICE_TYPE
+     GROUP BY j.CLIENTCODE, r.CLIENTCODE, j.SERVICE_TYPE
     ---------------------------------------------------------------------------------
     -- 10. #CLIENT - one row per client: exposure, utilisation, risk
     ---------------------------------------------------------------------------------
@@ -1049,13 +1498,19 @@ BEGIN
         DAYS_SIMPLE     FLOAT,
         MIN_DAYS        INT,
         MAX_DAYS        INT,
-        SUGGESTED_LIMIT FLOAT
+        SUGGESTED_LIMIT FLOAT,
+        -- the part of GROSS_PENDING on bills raised between @FROMDATE and @TODATE.
+        -- Outstanding is a position as on @TODATE, so it carries bills from every
+        -- year; management reads the date filter as "this period", so the card
+        -- shows how much of the pending belongs to the period and how much is older.
+        PENDING_PERIOD  FLOAT
     )
 
     INSERT INTO #CLIENT (CLIENTCODE, CLIENTNAME, CLIENT_STATUS, CREDIT_PERIOD, HAS_TERMS,
                          GROSS_PENDING, UNADJUSTED, ADVANCE,
                          OUTSTANDING, OVERDUE, OVER_180, OVER_365, UNBILLED, UNBILLED_JOBS,
-                         BILLED_PERIOD, BILLED_90, DAYS_WTD, DAYS_SIMPLE, MIN_DAYS, MAX_DAYS, SUGGESTED_LIMIT)
+                         BILLED_PERIOD, BILLED_90, DAYS_WTD, DAYS_SIMPLE, MIN_DAYS, MAX_DAYS, SUGGESTED_LIMIT,
+                         PENDING_PERIOD)
     SELECT A.CLIENTCODE,
            LTRIM(RTRIM(ISNULL(e.exp_name, A.CLIENTCODE))),
            LTRIM(RTRIM(ISNULL(e.CLIENT_STATUS, ''))),
@@ -1075,12 +1530,15 @@ BEGIN
            ISNULL(U.UNBILLED, 0), ISNULL(U.UNBILLED_JOBS, 0),
            A.BILLED_PERIOD, A.BILLED_90,
            C.DAYS_WTD, C.DAYS_SIMPLE, C.MIN_DAYS, C.MAX_DAYS,
-           (A.BILLED_90 / 90.0) * A.CREDIT_PERIOD * 1.5
+           (A.BILLED_90 / 90.0) * A.CREDIT_PERIOD * 1.5,
+           A.PENDING_PERIOD
       FROM (
             SELECT v.CLIENTCODE,
                    MAX(v.CREDIT_PERIOD)                                            AS CREDIT_PERIOD,
                    MAX(CONVERT(INT, v.HAS_TERMS))                                  AS HAS_TERMS,
                    SUM(CASE WHEN o.PENDING IS NOT NULL THEN o.PENDING ELSE 0 END)  AS OUTSTANDING,
+                   SUM(CASE WHEN o.PENDING IS NOT NULL AND v.IN_PERIOD = 1
+                            THEN o.PENDING ELSE 0 END)                             AS PENDING_PERIOD,
                    SUM(CASE WHEN o.OVERDUE_DAYS > 0 THEN o.PENDING ELSE 0 END)     AS OVERDUE,
                    0                                                              AS OVER_180,
                    0                                                              AS OVER_365,
@@ -1199,7 +1657,22 @@ BEGIN
         CONVERT(DECIMAL(18,2), ISNULL(SUM(c.OUTSTANDING), 0))        AS TOTAL_OUTSTANDING,
         CONVERT(DECIMAL(18,2), ISNULL(SUM(c.OVERDUE), 0))            AS OVERDUE_AMT,
         CONVERT(DECIMAL(18,2), ISNULL(SUM(c.GROSS_PENDING), 0))      AS GROSS_PENDING,
+        CONVERT(DECIMAL(18,2), ISNULL(SUM(c.PENDING_PERIOD), 0))     AS PENDING_PERIOD,
+        -- the part of bills pending that is the opening balance brought forward
+        CONVERT(DECIMAL(18,2), (SELECT ISNULL(SUM(o.PENDING), 0) FROM #OPEN o WHERE o.INV_NO LIKE 'OPBAL-%')) AS OPENING_PENDING,
+        CONVERT(VARCHAR(10), @OPBASE_DT, 103)                        AS OPENING_ASOF,
         CONVERT(DECIMAL(18,2), ISNULL(SUM(c.UNADJUSTED), 0))         AS UNADJUSTED_CREDITS,
+        -- The card used to show pending and unadjusted side by side, and they do not
+        -- subtract to the headline: credit is netted PER CLIENT, so a customer sitting
+        -- on more credit than open bills cannot pay off anybody else's bills. Split the
+        -- credit into the part that actually knocked bills off and the part left over,
+        -- so that GROSS_PENDING - CREDIT_APPLIED = TOTAL_OUTSTANDING exactly.
+        CONVERT(DECIMAL(18,2), ISNULL(SUM(CASE WHEN c.UNADJUSTED < c.GROSS_PENDING
+                                               THEN c.UNADJUSTED ELSE c.GROSS_PENDING END), 0))
+                                                                     AS CREDIT_APPLIED,
+        CONVERT(DECIMAL(18,2), ISNULL(SUM(CASE WHEN c.UNADJUSTED > c.GROSS_PENDING
+                                               THEN c.UNADJUSTED - c.GROSS_PENDING ELSE 0 END), 0))
+                                                                     AS CREDIT_STRANDED,
         CONVERT(DECIMAL(18,2), ISNULL(SUM(c.ADVANCE), 0))            AS ADVANCE_HELD,
         CONVERT(DECIMAL(18,2), ISNULL(SUM(c.UNBILLED), 0))           AS UNBILLED_VALUE,
         ISNULL(SUM(c.UNBILLED_JOBS), 0)                              AS UNBILLED_JOBS,
@@ -1260,6 +1733,7 @@ BEGIN
            CONVERT(DECIMAL(18,2), c.OUTSTANDING)                AS OUTSTANDING,
            CONVERT(DECIMAL(18,2), c.OVERDUE)                    AS OVERDUE,
            CONVERT(DECIMAL(18,2), c.GROSS_PENDING)              AS GROSS_PENDING,
+           CONVERT(DECIMAL(18,2), ISNULL(c.PENDING_PERIOD, 0))  AS PENDING_PERIOD,
            CONVERT(DECIMAL(18,2), c.UNADJUSTED)                 AS UNADJUSTED,
            CONVERT(DECIMAL(18,2), c.ADVANCE)                    AS ADVANCE,
            CONVERT(DECIMAL(18,2), c.UNBILLED)                   AS UNBILLED,
@@ -1390,26 +1864,48 @@ BEGIN
     --   jobs carry no service flag, and burying that would overstate confidence in
     --   the split.  REVENUE is allocated equally across the jobs named on an invoice.
     ---------------------------------------------------------------------------------
-    SELECT m.CLIENTCODE,
-           LTRIM(RTRIM(ISNULL(e.exp_name, m.CLIENTCODE)))       AS CLIENTNAME,
-           m.SERVICE_TYPE,
-           SUM(m.JOBS)                                          AS JOBS,
-           SUM(m.INFERRED_JOBS)                                 AS INFERRED_JOBS,
-           CONVERT(DECIMAL(18,2), SUM(m.REVENUE))               AS REVENUE,
-           CONVERT(DECIMAL(18,2), SUM(m.COST))                  AS COST,
-           CONVERT(DECIMAL(18,2), SUM(m.REVENUE) - SUM(m.COST)) AS MARGIN,
+    ;WITH AGG AS (
+        SELECT m.BILLCLIENT AS CLIENTCODE, m.SERVICE_TYPE,
+               SUM(m.JOBS) AS JOBS, SUM(m.INFERRED_JOBS) AS INFERRED_JOBS,
+               SUM(m.REVENUE) AS REVENUE, SUM(m.COST) AS COST, SUM(m.UNMATCHED) AS UNMATCHED,
+               SUM(m.DUTY_PAID) AS DUTY_PAID, SUM(m.DUTY_RECO) AS DUTY_RECO,
+               MAX(m.LAST_INV_DT) AS LAST_INV_DT
+          FROM #MARGIN m
+         GROUP BY m.BILLCLIENT, m.SERVICE_TYPE
+    ),
+    OTH AS (
+        -- the counterpart party on the same rows, biggest first, plus how many there are
+        SELECT BILLCLIENT AS CLIENTCODE, SERVICE_TYPE, CLIENTCODE AS OTHERCODE,
+               ROW_NUMBER() OVER (PARTITION BY BILLCLIENT, SERVICE_TYPE ORDER BY SUM(REVENUE) DESC, CLIENTCODE) AS RN,
+               COUNT(*) OVER (PARTITION BY BILLCLIENT, SERVICE_TYPE) AS OTHER_COUNT
+          FROM #MARGIN
+         GROUP BY BILLCLIENT, SERVICE_TYPE, CLIENTCODE
+    )
+    SELECT a.CLIENTCODE,
+           LTRIM(RTRIM(ISNULL(e.exp_name, a.CLIENTCODE)))       AS CLIENTNAME,
+           a.SERVICE_TYPE,
+           a.JOBS                                               AS JOBS,
+           a.INFERRED_JOBS                                      AS INFERRED_JOBS,
+           CONVERT(DECIMAL(18,2), a.REVENUE)                    AS REVENUE,
+           CONVERT(DECIMAL(18,2), a.COST)                       AS COST,
+           CONVERT(DECIMAL(18,2), a.REVENUE - a.COST)           AS MARGIN,
            CONVERT(DECIMAL(18,2),
-               CASE WHEN SUM(m.REVENUE) > 0
-                    THEN (SUM(m.REVENUE) - SUM(m.COST)) / SUM(m.REVENUE) * 100.0 END) AS MARGIN_PCT,
-           CONVERT(DECIMAL(18,2), SUM(m.DUTY_PAID))             AS DUTY_PAID,
-           CONVERT(DECIMAL(18,2), SUM(m.DUTY_RECO))             AS DUTY_RECO,
-           CONVERT(VARCHAR(10), MAX(m.LAST_INV_DT), 103)        AS LAST_BILLED,      -- dd/MM/yyyy for display
-           CONVERT(VARCHAR(8),  MAX(m.LAST_INV_DT), 112)        AS LAST_BILLED_YMD   -- yyyyMMdd for sorting
-      FROM #MARGIN m
-      LEFT JOIN exp_master e ON LTRIM(RTRIM(e.exp_code)) = m.CLIENTCODE
-     GROUP BY m.CLIENTCODE, LTRIM(RTRIM(ISNULL(e.exp_name, m.CLIENTCODE))), m.SERVICE_TYPE
-    HAVING SUM(m.REVENUE) > 0.01 OR SUM(m.COST) > 0.01
-     ORDER BY SUM(m.REVENUE) DESC
+               CASE WHEN a.REVENUE > 0
+                    THEN (a.REVENUE - a.COST) / a.REVENUE * 100.0 END) AS MARGIN_PCT,
+           CONVERT(DECIMAL(18,2), a.DUTY_PAID)                  AS DUTY_PAID,
+           CONVERT(DECIMAL(18,2), a.DUTY_RECO)                  AS DUTY_RECO,
+           CONVERT(VARCHAR(10), a.LAST_INV_DT, 103)             AS LAST_BILLED,      -- dd/MM/yyyy for display
+           CONVERT(VARCHAR(8),  a.LAST_INV_DT, 112)             AS LAST_BILLED_YMD,  -- yyyyMMdd for sorting
+           ISNULL(o.OTHERCODE, '')                              AS OTHER_CODE,
+           LTRIM(RTRIM(ISNULL(o2.exp_name, ISNULL(o.OTHERCODE, '')))) AS OTHER_NAME,
+           ISNULL(o.OTHER_COUNT, 0)                             AS OTHER_COUNT,
+           CONVERT(DECIMAL(18,2), ISNULL(a.UNMATCHED, 0))       AS UNMATCHED_COST
+      FROM AGG a
+      LEFT JOIN OTH o ON o.CLIENTCODE = a.CLIENTCODE AND o.SERVICE_TYPE = a.SERVICE_TYPE AND o.RN = 1
+      LEFT JOIN exp_master e  ON LTRIM(RTRIM(e.exp_code))  = a.CLIENTCODE
+      LEFT JOIN exp_master o2 ON LTRIM(RTRIM(o2.exp_code)) = o.OTHERCODE
+     WHERE a.REVENUE > 0.01 OR a.COST > 0.01
+     ORDER BY a.REVENUE DESC
 
     ---------------------------------------------------------------------------------
     -- Table8 : JOB-WISE P&L detail (PERIOD) - the drill-down under the Margin view,
@@ -1424,6 +1920,8 @@ BEGIN
            j.JOB_CLASS,
            j.CLIENTCODE,
            LTRIM(RTRIM(ISNULL(e.exp_name, j.CLIENTCODE)))            AS CLIENTNAME,
+           j.BILLCLIENT,
+           LTRIM(RTRIM(ISNULL(b.exp_name, j.BILLCLIENT)))            AS BILLCLIENTNAME,
            CONVERT(VARCHAR(10), j.JOB_DT, 103)                       AS JOB_DATE,
            j.IS_BILLED,
            -- ledger income (invoices net of GST) and expense (booked job cost)
@@ -1443,6 +1941,7 @@ BEGIN
       FROM #JOBS j
       LEFT JOIN TBL_SHIPMENT_SUMMARY_JOB s ON LTRIM(RTRIM(s.JOBNO)) = j.JOBNO
       LEFT JOIN exp_master e ON LTRIM(RTRIM(e.exp_code)) = j.CLIENTCODE
+      LEFT JOIN exp_master b ON LTRIM(RTRIM(b.exp_code)) = j.BILLCLIENT
       LEFT JOIN #JOBEXP x ON x.JOBNO = j.JOBNO
       LEFT JOIN #JOBINC inc ON inc.JOBNO = j.JOBNO
      -- MISC jobs are absent from TBL_SHIPMENT_SUMMARY_JOB entirely (it carries only
@@ -1475,6 +1974,7 @@ BEGIN
                    CONVERT(FLOAT, ISNULL(NULLIF(LTRIM(RTRIM(pd.pur_amount)), ''), '0')) AS AMT
               FROM acc_purchasedtls pd
              INNER JOIN #JOBS j ON j.JOBNO = LTRIM(RTRIM(pd.pur_jobno)) AND j.IS_BILLED = 0
+             INNER JOIN #JOBHEAD jhx ON jhx.ACCTCODE = LTRIM(RTRIM(pd.pur_account))
               LEFT JOIN acc_purchase p ON LTRIM(RTRIM(p.pur_code)) = LTRIM(RTRIM(pd.pur_code))
 
             UNION ALL
@@ -1487,6 +1987,7 @@ BEGIN
               FROM acc_bankdtls d
              INNER JOIN acc_bank b ON b.entryno = d.entryno
              INNER JOIN #JOBS j ON j.JOBNO = LTRIM(RTRIM(d.jobno)) AND j.IS_BILLED = 0
+             INNER JOIN #JOBHEAD jhx ON jhx.ACCTCODE = LTRIM(RTRIM(d.client))
              WHERE d.entrytype = 'JB' AND b.status IN ('BP', 'CP', 'CE')
 
             UNION ALL
@@ -1499,6 +2000,7 @@ BEGIN
               FROM acc_JournalVoucDtls jd
              INNER JOIN acc_JournalVouc jh ON jh.jvcode = jd.jvcode
              INNER JOIN #JOBS j ON j.JOBNO = LTRIM(RTRIM(jd.jv_jobno)) AND j.IS_BILLED = 0
+             INNER JOIN #JOBHEAD jhx ON jhx.ACCTCODE = LTRIM(RTRIM(jd.jv_account))
            ) X
       LEFT JOIN GENACCT_MASTER g ON LTRIM(RTRIM(g.ACCTCODE)) = X.ACCTCODE
      WHERE X.AMT <> 0
@@ -1602,11 +2104,93 @@ BEGIN
            -- cannot appear in the margin view. Reported so the gap is visible.
            (SELECT COUNT(*) FROM #JOBS WHERE JOB_CLASS = 'MISC')                AS MISC_JOBS,
            (SELECT COUNT(*) FROM #JOBS WHERE JOB_CLASS = 'MISC' AND IS_BILLED = 1) AS MISC_BILLED_NO_PL
+
+    ---------------------------------------------------------------------------------
+    -- Table12 : the same margin grouped by SHIPPER (the party on the job file) instead
+    --           of the billed party. Identical column contract to Table7, so the
+    --           screen's "Show by" switch just swaps one array for the other. Totals
+    --           are the same in both; only the name the money sits under changes.
+    ---------------------------------------------------------------------------------
+    ;WITH AGG AS (
+        SELECT m.CLIENTCODE AS CLIENTCODE, m.SERVICE_TYPE,
+               SUM(m.JOBS_SHIP) AS JOBS, SUM(m.INFERRED_SHIP) AS INFERRED_JOBS,
+               SUM(m.REVENUE) AS REVENUE, SUM(m.COST) AS COST, SUM(m.UNMATCHED) AS UNMATCHED,
+               SUM(m.DUTY_PAID) AS DUTY_PAID, SUM(m.DUTY_RECO) AS DUTY_RECO,
+               MAX(m.LAST_INV_DT) AS LAST_INV_DT
+          FROM #MARGIN m
+         GROUP BY m.CLIENTCODE, m.SERVICE_TYPE
+    ),
+    OTH AS (
+        -- the counterpart party on the same rows, biggest first, plus how many there are
+        SELECT CLIENTCODE AS CLIENTCODE, SERVICE_TYPE, BILLCLIENT AS OTHERCODE,
+               ROW_NUMBER() OVER (PARTITION BY CLIENTCODE, SERVICE_TYPE ORDER BY SUM(REVENUE) DESC, BILLCLIENT) AS RN,
+               COUNT(*) OVER (PARTITION BY CLIENTCODE, SERVICE_TYPE) AS OTHER_COUNT
+          FROM #MARGIN
+         GROUP BY CLIENTCODE, SERVICE_TYPE, BILLCLIENT
+    )
+    SELECT a.CLIENTCODE,
+           LTRIM(RTRIM(ISNULL(e.exp_name, a.CLIENTCODE)))       AS CLIENTNAME,
+           a.SERVICE_TYPE,
+           a.JOBS                                               AS JOBS,
+           a.INFERRED_JOBS                                      AS INFERRED_JOBS,
+           CONVERT(DECIMAL(18,2), a.REVENUE)                    AS REVENUE,
+           CONVERT(DECIMAL(18,2), a.COST)                       AS COST,
+           CONVERT(DECIMAL(18,2), a.REVENUE - a.COST)           AS MARGIN,
+           CONVERT(DECIMAL(18,2),
+               CASE WHEN a.REVENUE > 0
+                    THEN (a.REVENUE - a.COST) / a.REVENUE * 100.0 END) AS MARGIN_PCT,
+           CONVERT(DECIMAL(18,2), a.DUTY_PAID)                  AS DUTY_PAID,
+           CONVERT(DECIMAL(18,2), a.DUTY_RECO)                  AS DUTY_RECO,
+           CONVERT(VARCHAR(10), a.LAST_INV_DT, 103)             AS LAST_BILLED,      -- dd/MM/yyyy for display
+           CONVERT(VARCHAR(8),  a.LAST_INV_DT, 112)             AS LAST_BILLED_YMD,  -- yyyyMMdd for sorting
+           ISNULL(o.OTHERCODE, '')                              AS OTHER_CODE,
+           LTRIM(RTRIM(ISNULL(o2.exp_name, ISNULL(o.OTHERCODE, '')))) AS OTHER_NAME,
+           ISNULL(o.OTHER_COUNT, 0)                             AS OTHER_COUNT,
+           CONVERT(DECIMAL(18,2), ISNULL(a.UNMATCHED, 0))       AS UNMATCHED_COST
+      FROM AGG a
+      LEFT JOIN OTH o ON o.CLIENTCODE = a.CLIENTCODE AND o.SERVICE_TYPE = a.SERVICE_TYPE AND o.RN = 1
+      LEFT JOIN exp_master e  ON LTRIM(RTRIM(e.exp_code))  = a.CLIENTCODE
+      LEFT JOIN exp_master o2 ON LTRIM(RTRIM(o2.exp_code)) = o.OTHERCODE
+     WHERE a.REVENUE > 0.01 OR a.COST > 0.01
+     ORDER BY a.REVENUE DESC
+
+    ---------------------------------------------------------------------------------
+    -- Table13 : each job's P&L split by client - the rows behind the Billed-party view.
+    --           CLIENTS_ON_JOB > 1 marks a job billed to several parties.
+    ---------------------------------------------------------------------------------
+    SELECT p.JOBNO,
+           p.CLIENTCODE,
+           LTRIM(RTRIM(ISNULL(e.exp_name, p.CLIENTCODE)))                      AS CLIENTNAME,
+           CONVERT(DECIMAL(18,2), p.REVENUE)                                   AS INCOME,
+           CONVERT(DECIMAL(18,2), p.COST)                                      AS EXPENSE,
+           CONVERT(DECIMAL(18,2), p.UNMATCHED)                                 AS UNMATCHED_COST,
+           CONVERT(DECIMAL(18,2), p.REVENUE - p.COST)                          AS PROFIT,
+           CONVERT(DECIMAL(18,2), CASE WHEN p.REVENUE <> 0
+                THEN (p.REVENUE - p.COST) / p.REVENUE * 100.0 END)             AS PROFIT_PCT,
+           CONVERT(VARCHAR(10), p.LAST_DT, 103)                                AS LAST_BILLED,
+           c.N                                                                 AS CLIENTS_ON_JOB
+      FROM #JCP p
+     INNER JOIN (SELECT JOBNO, COUNT(*) AS N FROM #JCP GROUP BY JOBNO) c ON c.JOBNO = p.JOBNO
+      LEFT JOIN exp_master e ON LTRIM(RTRIM(e.exp_code)) = p.CLIENTCODE
+     ORDER BY p.JOBNO, p.REVENUE DESC
     ---------------------------------------------------------------------------------
     -- cleanup
     ---------------------------------------------------------------------------------
     DROP TABLE #CITY
     DROP TABLE #INV
+    DROP TABLE #OPBASE
+    DROP TABLE #OPNET
+    DROP TABLE #OPAO
+    DROP TABLE #JOBHEAD
+    DROP TABLE #JEC
+    DROP TABLE #JIC
+    DROP TABLE #JCH
+    DROP TABLE #JC
+    DROP TABLE #JECP
+    DROP TABLE #PAIRS
+    DROP TABLE #JECB
+    DROP TABLE #ALLOC
+    DROP TABLE #JCP
     DROP TABLE #INVMODE
     DROP TABLE #UNADJ
     DROP TABLE #AGE
@@ -1619,6 +2203,7 @@ BEGIN
     DROP TABLE #JOBEXP
     DROP TABLE #INVJOBCNT
     DROP TABLE #JOBINC
+    DROP TABLE #JOBINVDT
     DROP TABLE #JOBINV
     DROP TABLE #SVCHEAD
     DROP TABLE #LAG

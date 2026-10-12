@@ -154,7 +154,7 @@
                     { menuid: "2.1", icon: "fa fa-plus-circle", menuname: "Bank Reconciliation", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
                         { menuid: "2.1.1", icon: "fa fa-search-plus", menuname: "Add/Edit", routerlink: "/accounts/Master/Reconcil/Add", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                         // { menuid: "2.1.2", icon: "fa fa-search-plus", menuname: "Statement", routerlink: "/accounts/Master/Reconcil/Statement", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                        { menuid: "2.1.2b", icon: "fa fa-search-plus", menuname: "Statement", routerlink: "/accounts/Master/Reconcil/StatementNew", ischild: 'n', parentid: 0, isactive: 1, data: [] },
+                        { menuid: "2.1.2b", icon: "fa fa-search-plus", menuname: "Statement(New)", routerlink: "/accounts/Master/Reconcil/StatementNew", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                         { menuid: "2.1.3", icon: "fa fa-search-plus", menuname: "Upload Statement", routerlink: "/accounts/uploadbankreconcil/uploadStatement", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                         { menuid: "2.1.4", icon: "fa fa-search-plus", menuname: "Upload Statement Search", routerlink: "/accounts/uploadbankreconcil/uploadStatementsearch", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                         { menuid: "2.1.6", icon: "fa fa-search-plus", menuname: "Reconciliation Statement", routerlink: "/accounts/uploadbankreconcil/reconciliationStatement", ischild: 'n', parentid: 0, isactive: 1, data: [] },

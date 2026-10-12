@@ -1,0 +1,511 @@
+/* Upload Bank Reconciliation Statement
+   Follows the same br-card / br-btn / br-table language as
+   bank-reconcil-statement.component.css so the two pages read as one product. */
+
+:host {
+  display: block;
+}
+
+.br-page {
+  display: flex;
+  flex-direction: column;
+  padding: 5px 10px !important;
+  gap: 6px !important;
+  box-sizing: border-box;
+}
+
+/* ============================= */
+/* CARD                          */
+/* ============================= */
+
+.br-card {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.br-req {
+  color: #DC2626;
+}
+
+/* ============================= */
+/* BUTTONS                       */
+/* ============================= */
+
+.br-btn {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.br-btn--primary {
+  background: #2563EB;
+  color: #fff;
+}
+
+.br-btn--primary:hover {
+  background: #1D4ED8;
+}
+
+.br-btn--ghost {
+  background: #fff;
+  border: 1px solid #D1D5DB;
+  color: #374151;
+}
+
+.br-btn--ghost:hover {
+  background: #F9FAFB;
+}
+
+.br-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================= */
+/* UPLOAD FORM                   */
+/* ============================= */
+
+.upload-card {
+  padding: 12px 18px !important;
+}
+
+.card-heading {
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.card-heading i {
+  color: #2563EB;
+}
+
+.clean-row-layout {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.clean-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.clean-field label {
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  color: #374151;
+}
+
+.clean-bank {
+  flex: 1 1 260px;
+  min-width: 240px;
+}
+
+.clean-date {
+  flex: 0 0 135px;
+  width: 135px;
+  min-width: 135px;
+}
+
+.clean-file {
+  flex: 1 1 250px;
+  min-width: 220px;
+}
+
+.clean-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  margin-bottom: 1px;
+  white-space: nowrap;
+}
+
+/* native file input, restyled to match the other controls */
+.br-file {
+  height: 32px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 12px;
+  padding: 4px 6px;
+  width: 100%;
+}
+
+.br-file::-webkit-file-upload-button {
+  height: 22px;
+  border: none;
+  border-radius: 4px;
+  background: #F3F4F6;
+  color: #374151;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 0 10px;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+/* detected file period + hints */
+.br-fileinfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.br-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #EEF2FF;
+  color: #4338CA;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.br-chip--warn {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.br-hint {
+  font-size: 10.5px;
+  color: #6B7280;
+}
+
+/* ============================= */
+/* RESULTS TOPBAR                */
+/* ============================= */
+
+.br-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.br-topbar-left {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.br-page-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.br-meta {
+  font-size: 10.5px;
+  color: #6B7280;
+  white-space: nowrap;
+}
+
+.br-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ============================= */
+/* TAB TOGGLE                    */
+/* ============================= */
+
+.br-view-toggle {
+  display: flex;
+  gap: 6px;
+}
+
+.toggle-btn {
+  border: 1px solid #D1D5DB;
+  background: #fff;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #374151;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toggle-btn.active {
+  background: #2563EB;
+  border-color: #2563EB;
+  color: #fff;
+}
+
+.toggle-btn .toggle-count {
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  padding: 1px 6px;
+  font-size: 10px;
+}
+
+.toggle-btn.active .toggle-count {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ============================= */
+/* TABLE                         */
+/* ============================= */
+
+.br-table-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.br-table-wrap {
+  max-height: 60vh;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+}
+
+.br-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  table-layout: fixed;
+  margin-bottom: 0;
+}
+
+/* grouped header: which side of the reconciliation a column belongs to */
+.br-table thead tr.grp-head th {
+  position: sticky;
+  top: 0;
+  z-index: 22;
+  background: #EFF6FF;
+  color: #1E40AF;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  text-align: center;
+  padding: 5px 8px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.br-table thead tr.col-head th {
+  position: sticky;
+  top: 25px;
+  z-index: 20;
+  background: #F9FAFB;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6B7280;
+  padding: 6px 8px;
+  border-bottom: 1px solid #E5E7EB;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Header alignment must match the body cell alignment, or the value lands at
+   one edge of the column while its header sits at the other. These override
+   the left-align default above (higher specificity: th.num vs th). */
+.br-table thead tr.col-head th.num { text-align: right; }
+.br-table thead tr.col-head th.ctr { text-align: center; }
+
+.br-table tbody td {
+  padding: 4px 8px;
+  border-bottom: 0.5px solid #F3F4F6;
+  color: #111827;
+  vertical-align: middle;
+  font-size: 11px;
+}
+
+.br-table tbody tr:hover td {
+  background: #F9FAFB;
+}
+
+/* vertical rule separating statement side from ledger side */
+.grp-start {
+  border-left: 2px solid #E5E7EB !important;
+}
+
+/* ============================= */
+/* CELL TREATMENTS               */
+/* ============================= */
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ctr {
+  text-align: center;
+}
+
+.mono {
+  font-family: monospace;
+  font-size: 10.5px;
+  color: #374151;
+}
+
+.cr-amt {
+  color: #059669;
+  font-weight: 700;
+}
+
+.dr-amt {
+  color: #DC2626;
+  font-weight: 700;
+}
+
+.muted {
+  color: #CBD5E1;
+}
+
+.br-badge {
+  display: inline-flex;
+  padding: 1px 7px;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.br-badge--br {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+.br-badge--bp {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+/* ============================= */
+/* EMPTY STATE                   */
+/* ============================= */
+
+.br-empty {
+  padding: 34px 12px;
+  text-align: center;
+  color: #9CA3AF;
+  font-size: 12px;
+}
+
+.br-empty i {
+  display: block;
+  font-size: 22px;
+  margin-bottom: 8px;
+  color: #D1D5DB;
+}
+
+/* ============================= */
+/* COLUMN WIDTHS (11 columns)    */
+/* 1-4 statement, 5-11 ledger    */
+/* ============================= */
+
+.br-table th:nth-child(1),  .br-table td:nth-child(1)  { width: 150px; }
+.br-table th:nth-child(2),  .br-table td:nth-child(2)  { width: 95px;  text-align: right; }
+.br-table th:nth-child(3),  .br-table td:nth-child(3)  { width: 95px;  text-align: right; }
+.br-table th:nth-child(4),  .br-table td:nth-child(4)  { width: 90px;  text-align: center; }
+.br-table th:nth-child(5),  .br-table td:nth-child(5)  { width: 150px; }
+.br-table th:nth-child(6),  .br-table td:nth-child(6)  { width: 140px; }
+.br-table th:nth-child(7),  .br-table td:nth-child(7)  { width: 90px;  text-align: center; }
+.br-table th:nth-child(8),  .br-table td:nth-child(8)  { width: 70px;  text-align: center; }
+.br-table th:nth-child(9),  .br-table td:nth-child(9)  { width: 95px;  text-align: right; }
+.br-table th:nth-child(10), .br-table td:nth-child(10) { width: 90px;  text-align: right; }
+.br-table th:nth-child(11), .br-table td:nth-child(11) { width: 90px;  text-align: center; }
+
+@media (max-width: 1400px) {
+  .br-table {
+    min-width: 1155px;
+  }
+}
+
+/* ============================= */
+/* THIRD-PARTY CONTROL OVERRIDES */
+/* (ng-select + mydatepicker)    */
+/* ============================= */
+
+.clean-bank ::ng-deep .ng-select-container {
+  height: 32px !important;
+  min-height: 32px !important;
+  border-radius: 4px !important;
+  border: 1px solid #ced4da !important;
+  box-shadow: none !important;
+}
+
+.clean-bank ::ng-deep .ng-value-container {
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding-left: 8px !important;
+  font-size: 13px !important;
+}
+
+::ng-deep .search-date-control .mydp {
+  width: 135px !important;
+  min-width: 135px !important;
+  display: block !important;
+}
+
+::ng-deep .search-date-control .selectiongroup {
+  height: 32px !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 4px !important;
+  background: #fff !important;
+  overflow: visible !important;
+}
+
+::ng-deep .search-date-control input {
+  height: 30px !important;
+  line-height: 30px !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  font-size: 12px !important;
+  padding-left: 6px !important;
+  background: transparent !important;
+}
+
+::ng-deep .search-date-control .btnpicker,
+::ng-deep .search-date-control .btnclear {
+  width: 24px !important;
+  min-width: 24px !important;
+  height: 30px !important;
+  padding: 0 !important;
+  border: none !important;
+  background: #f8fafc !important;
+}
+
+::ng-deep .search-date-control .btnpicker span,
+::ng-deep .search-date-control .btnclear span,
+::ng-deep .search-date-control .btnpicker i,
+::ng-deep .search-date-control .btnclear i {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+}

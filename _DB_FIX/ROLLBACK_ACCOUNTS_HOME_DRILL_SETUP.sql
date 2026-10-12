@@ -1,0 +1,4 @@
+/* Rollback for ACCOUNTS_HOME_DRILL_SETUP.sql - removes the drill-down procedure only. */
+IF OBJECT_ID('dbo.USP_ACC_RPT_ACCOUNTS_HOME_DRILL') IS NOT NULL
+    DROP PROCEDURE dbo.USP_ACC_RPT_ACCOUNTS_HOME_DRILL
+GO

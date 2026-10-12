@@ -102,11 +102,12 @@ BEGIN
            LTRIM(RTRIM(i.inv_client)),
            CONVERT(FLOAT, ISNULL(i.totalamt,0)),
            i.PAYBYDT,
-           CONVERT(DATETIME, SUBSTRING(i.inv_date,7,4)+SUBSTRING(i.inv_date,4,2)+SUBSTRING(i.inv_date,1,2), 112)
+           CASE WHEN ISDATE(SUBSTRING(i.inv_date,7,4)+SUBSTRING(i.inv_date,4,2)+SUBSTRING(i.inv_date,1,2)) = 1 THEN CONVERT(DATETIME, SUBSTRING(i.inv_date,7,4)+SUBSTRING(i.inv_date,4,2)+SUBSTRING(i.inv_date,1,2), 112) END
       FROM acc_invoice i
      INNER JOIN #CITY c ON c.CITYCODE = LTRIM(RTRIM(i.citycode))
      WHERE LTRIM(RTRIM(ISNULL(i.cmpcode,''))) = @CMPCODE
        AND LEN(ISNULL(i.inv_date,'')) = 10
+       AND ISDATE(SUBSTRING(i.inv_date,7,4)+SUBSTRING(i.inv_date,4,2)+SUBSTRING(i.inv_date,1,2)) = 1
        AND SUBSTRING(i.inv_date,7,4)+SUBSTRING(i.inv_date,4,2)+SUBSTRING(i.inv_date,1,2)
            BETWEEN @FROM_YMD AND @TO_YMD
        AND LTRIM(RTRIM(ISNULL(i.inv_client,''))) LIKE 'E%'

@@ -106,9 +106,13 @@
 
     <div
       class="br-card recon-schedule"
-      [title]="crossCheckOk
-        ? ('Verified against ' + outstandingCount + ' outstanding transaction(s) in the detail below.')
-        : 'Schedule total doesn\'t match the outstanding transaction detail below — please review.'">
+      [title]="!crossCheckOk
+        ? 'Schedule total doesn\'t match the outstanding transaction detail below — please review.'
+        : (bankOnlyUnavailable
+            ? ('Agrees with ' + outstandingCount + ' outstanding entr(ies) in the books, but the bank statement could not be loaded, so bank-side items were not checked.')
+            : (agreesWithBank
+                ? ('Agrees with ' + outstandingCount + ' outstanding entr(ies) in the books, and every bank statement line is matched.')
+                : (bankOnlyCount + ' bank statement line(s) have no ledger entry — see the Bank-Only Items tab.')))">
 
       <div class="recon-topline">
 
@@ -121,12 +125,30 @@
           <span class="recon-meta">Opening : {{ OpBalDr || OpBalCr || '—' }}</span>
         </div>
 
+        <!-- Two independent checks, deliberately not collapsed into one badge:
+             crossCheckOk only proves the detail rows agree with the summary
+             (both ledger-side). agreesWithBank is the one that proves the bank
+             statement holds nothing the books are missing. -->
         <span
           class="recon-check-badge"
-          [ngClass]="crossCheckOk ? 'ok' : 'warn'">
+          [ngClass]="!crossCheckOk ? 'warn' : (bankOnlyUnavailable ? 'warn' : (agreesWithBank ? 'ok' : 'warn'))">
 
-          <i class="fa" [ngClass]="crossCheckOk ? 'fa-check-circle' : 'fa-exclamation-triangle'"></i>
-          {{ crossCheckOk ? 'Verified' : 'Mismatch' }}
+          <i class="fa" [ngClass]="(crossCheckOk && agreesWithBank && !bankOnlyUnavailable) ? 'fa-check-circle' : 'fa-exclamation-triangle'"></i>
+
+          @if (!crossCheckOk) {
+Mismatch
+}
+          @if (crossCheckOk && bankOnlyUnavailable) {
+Bank side not checked
+}
+          @if (crossCheckOk && !bankOnlyUnavailable && !agreesWithBank) {
+
+            {{ bankOnlyCount }} bank item(s) not in books
+          
+}
+          @if (crossCheckOk && !bankOnlyUnavailable && agreesWithBank) {
+Reconciled
+}
 
         </span>
 
@@ -165,12 +187,67 @@
 
         <span class="recon-op">=</span>
 
+        <div class="recon-seg">
+          <span class="recon-seg-label">Derived Balance</span>
+          <span class="recon-seg-val">{{ DrRef || CrRef || 'Pending' }}</span>
+        </div>
+
+        <span class="recon-op">+</span>
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">
+            Credited by Bank, Not in Books
+          </span>
+          <span class="recon-seg-val add">
+            {{ bankOnlyDepositTotal ? (bankOnlyDepositTotal | number:'1.2-2') + ' Dr' : '—' }}
+          </span>
+        </div>
+
+        <span class="recon-op">−</span>
+
+        <div class="recon-seg">
+          <span class="recon-seg-label">
+            Debited by Bank, Not in Books
+          </span>
+          <span class="recon-seg-val less">
+            {{ bankOnlyWithdrawalTotal ? (bankOnlyWithdrawalTotal | number:'1.2-2') + ' Cr' : '—' }}
+          </span>
+        </div>
+
+        <span class="recon-op">=</span>
+
         <div class="recon-seg recon-seg--result">
-          <span class="recon-seg-label">Balance as per Bank</span>
-          <span class="recon-seg-val result">{{ DrRef || CrRef || 'Pending' }}</span>
+          <span class="recon-seg-label">Closing Balance as per Bank</span>
+          <span class="recon-seg-val result">
+            @if (!bankOnlyUnavailable) {
+{{ formatDrCr(bankClosingBalance) }}
+}
+            @if (bankOnlyUnavailable) {
+Not verified
+}
+          </span>
         </div>
 
       </div>
+
+      <!-- Only shown when it means something: the exact rupee value of bank
+           activity that has never been entered in the books. -->
+      @if (!bankOnlyUnavailable && !agreesWithBank) {
+<div class="recon-diffline">
+        <i class="fa fa-exclamation-triangle"></i>
+        Difference of <b>{{ formatDrCr(bankOnlyNet) }}</b> — {{ bankOnlyCount }} bank statement
+        line(s) have no matching ledger entry. Review them under
+        <b>Bank-Only Items</b> and pass the missing entries.
+      </div>
+}
+
+      @if (bankOnlyUnavailable) {
+<div class="recon-diffline">
+        <i class="fa fa-exclamation-triangle"></i>
+        Bank statement data could not be loaded, so the bank side of this
+        reconciliation has <b>not</b> been checked.
+      </div>
+}
 
     </div>
 
@@ -198,11 +275,24 @@
 
       </button>
 
+      <button
+        class="toggle-btn"
+        [class.active]="activeView === 'BANKONLY'"
+        (click)="setActiveView('BANKONLY')">
+
+        Bank-Only Items
+        <span class="toggle-count" [class.toggle-count--alert]="bankOnlyCount > 0">
+          {{ bankOnlyUnavailable ? '?' : bankOnlyCount }}
+        </span>
+
+      </button>
+
     </div>
 
     <!-- TABLE CARD -->
 
-    <div class="br-card br-table-card">
+    @if (activeView !== 'BANKONLY') {
+<div class="br-card br-table-card">
 
       <!-- TABLE -->
 
@@ -432,6 +522,94 @@ No entries found for this period
       </div>
 
     </div>
+}
+
+    <!-- BANK-ONLY ITEMS CARD -->
+    <!-- The bank leg of the reconciliation: statement lines with no ledger
+         counterpart. Columns mirror the UnReconcil tab on Search Upload
+         Statement, since both read Table2 of the same procedure. -->
+
+    @if (activeView === 'BANKONLY') {
+<div class="br-card br-table-card">
+
+      <div class="br-table-wrap">
+
+        <table class="br-table br-table--bankonly">
+
+          <thead>
+            <tr>
+              <th>Bank Ref No</th>
+              <th class="num">Deposit</th>
+              <th class="num">Withdrawal</th>
+              <th>Clearance Dt</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            @for (data of bankOnlyList; track data) {
+<tr>
+
+              <td class="mono">{{ data.BANKREFNO || '—' }}</td>
+
+              <td class="num dr-amt">
+                @if (data.DEPOSIT > 0) {
+<span>{{ data.DEPOSIT | number:'1.2-2' }}</span>
+}
+                @if (!(data.DEPOSIT > 0)) {
+<span class="muted">—</span>
+}
+              </td>
+
+              <td class="num cr-amt">
+                @if (data.WITHDRAWAL > 0) {
+<span>{{ data.WITHDRAWAL | number:'1.2-2' }}</span>
+}
+                @if (!(data.WITHDRAWAL > 0)) {
+<span class="muted">—</span>
+}
+              </td>
+
+              <td class="mono">{{ data.CLEARANCEDT || '—' }}</td>
+
+            </tr>
+}
+
+            @if (bankOnlyList.length === 0 && !bankOnlyUnavailable) {
+<tr>
+              <td colspan="4" class="text-center text-muted">
+                No unmatched bank statement lines — the bank agrees with the books
+              </td>
+            </tr>
+}
+
+            @if (bankOnlyUnavailable) {
+<tr>
+              <td colspan="4" class="text-center text-muted">
+                Bank statement data could not be loaded — the bank side was not checked
+              </td>
+            </tr>
+}
+
+          </tbody>
+
+          @if (bankOnlyList.length > 0) {
+<tfoot>
+            <tr>
+              <td class="totals-label">Total</td>
+              <td class="num">{{ bankOnlyDepositTotal | number:'1.2-2' }}</td>
+              <td class="num">{{ bankOnlyWithdrawalTotal | number:'1.2-2' }}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+}
+
+        </table>
+
+      </div>
+
+    </div>
+}
 
   </div>
 }

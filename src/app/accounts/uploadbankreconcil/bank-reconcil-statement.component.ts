@@ -41,6 +41,15 @@ import { IMyDpOptions } from 'mydatepicker';
     bankreconcilList: any = [];
     showResult = false;
 
+    // Lines present on the uploaded bank statement that never matched a ledger
+    // entry -- bank charges, interest, direct debits/credits. Without these the
+    // statement is one-directional: it can only ever show book entries the bank
+    // hasn't cleared, never bank activity nobody has booked.
+    bankOnlyList: any = [];
+    // Set when the bank-statement fetch fails, so the UI can say "couldn't
+    // check" rather than silently implying the bank side is clean.
+    bankOnlyUnavailable = false;
+
     activeView: string = 'OUTSTANDING';
 
     OpBalDr: string;
@@ -66,8 +75,14 @@ import { IMyDpOptions } from 'mydatepicker';
       this._loaderService.display(false);
     }
 
+    // Nil-value rows (cancelled / wrongly-entered vouchers) carry no debit or
+    // credit, so they can never be "outstanding" in any accounting sense -- they
+    // only inflated the count away from Payments Not Presented + Deposits In
+    // Transit. They remain visible under All Entries.
     get outstandingList() {
-      return (this.bankreconcilList || []).filter(d => !d.CLEARANCEDATE);
+      return (this.bankreconcilList || []).filter(d =>
+        !d.CLEARANCEDATE &&
+        ((parseFloat(d.DRAMT) || 0) > 0 || (parseFloat(d.CRAMT) || 0) > 0));
     }
 
     get outstandingCount(): number {
@@ -96,14 +111,67 @@ import { IMyDpOptions } from 'mydatepicker';
       return debitDiff < 0.01 && creditDiff < 0.01;
     }
 
+    // ===== Bank side: statement lines with no ledger counterpart =====
+
+    get bankOnlyCount(): number {
+      return (this.bankOnlyList || []).length;
+    }
+
+    // Money the bank credited that the books don't know about (e.g. interest).
+    get bankOnlyDepositTotal(): number {
+      return (this.bankOnlyList || [])
+        .reduce((total, d) => total + (parseFloat(d.DEPOSIT) || 0), 0);
+    }
+
+    // Money the bank debited that the books don't know about (e.g. charges).
+    get bankOnlyWithdrawalTotal(): number {
+      return (this.bankOnlyList || [])
+        .reduce((total, d) => total + (parseFloat(d.WITHDRAWAL) || 0), 0);
+    }
+
+    get bankOnlyNet(): number {
+      return this.bankOnlyDepositTotal - this.bankOnlyWithdrawalTotal;
+    }
+
+    // What the screen used to label "Balance as per Bank": Books ± outstanding.
+    // It is derived from the ledger alone, so it ties by construction.
+    get derivedBankBalance(): number {
+      const dr = this.toNumber(this.DrRef);
+      if (dr) { return dr; }
+      return -this.toNumber(this.CrRef);
+    }
+
+    // The figure that should actually equal the bank's closing balance.
+    get bankClosingBalance(): number {
+      return this.derivedBankBalance + this.bankOnlyNet;
+    }
+
+    // True only when nothing on the bank statement is missing from the books.
+    // This is the check the old "Verified" badge never performed.
+    get agreesWithBank(): boolean {
+      return Math.abs(this.bankOnlyNet) < 0.01;
+    }
+
+    // Formats a signed figure using the Dr/Cr convention the rest of the
+    // statement uses (positive = Dr), so the new lines read like the old ones.
+    formatDrCr(val: number): string {
+      if (!val || Math.abs(val) < 0.01) { return '0.00'; }
+      return Math.abs(val).toFixed(2) + (val > 0 ? ' Dr' : ' Cr');
+    }
+
     get selectedBankName(): string {
       const match = (this.BankList || []).find(b => b.acctcodename === this.Bank);
       return match ? match.acctname : '';
     }
 
+    // Book-entry rows only. The BANKONLY view renders from bankOnlyList instead,
+    // because bank statement lines have a different column shape.
     get displayList() {
       if (this.activeView === 'OUTSTANDING') {
         return this.outstandingList;
+      }
+      if (this.activeView === 'BANKONLY') {
+        return [];
       }
       return this.bankreconcilList || [];
     }
@@ -212,8 +280,34 @@ import { IMyDpOptions } from 'mydatepicker';
           }
 
           this.showResult = true;
+          this.LoadBankOnlyItems();
+        }, () => {
+          this._loaderService.display(false);
+        });
+    }
+
+    // Second leg of the reconciliation: the unmatched lines from the uploaded
+    // bank statement. Reuses the same procedure the "Search Upload Statement"
+    // screen reads (Table2 = UnReconcil), so both screens can never disagree.
+    // Nested rather than forkJoin to match the RxJS-5-compat style used here.
+    LoadBankOnlyItems() {
+      const jsonBank = {
+        OURBANK: this.Bank,
+        FROMDATE: this.FromDate,
+        TODATE: this.ToDate
+      };
+
+      this._dataService.getData("Accounts/ACC_BANKRECONCILLATION_UPLOAD_GETDATA", jsonBank)
+        .subscribe((data: any) => {
+          this.bankOnlyList = (data && data.Table2) ? data.Table2 : [];
+          this.bankOnlyUnavailable = false;
           this._loaderService.display(false);
         }, () => {
+          // Leave the ledger-side statement intact — losing the bank leg must
+          // not blank a statement the user can still read, but it must not be
+          // mistaken for "bank side is clean" either.
+          this.bankOnlyList = [];
+          this.bankOnlyUnavailable = true;
           this._loaderService.display(false);
         });
     }
@@ -223,6 +317,8 @@ import { IMyDpOptions } from 'mydatepicker';
       this.FromDate = "";
       this.ToDate = "";
       this.bankreconcilList = [];
+      this.bankOnlyList = [];
+      this.bankOnlyUnavailable = false;
       this.activeView = 'OUTSTANDING';
       this.OpBalDr = ""; this.OpBalCr = "";
       this.BalanceDr = ""; this.BalanceCr = "";
@@ -235,7 +331,7 @@ import { IMyDpOptions } from 'mydatepicker';
     }
 
     exportToExcel() {
-      if (!this.displayList.length) {
+      if (!this.displayList.length && !this.bankOnlyCount) {
         this._toasterService.toast('warning', 'warning', 'Nothing to export !');
         return;
       }
@@ -244,7 +340,12 @@ import { IMyDpOptions } from 'mydatepicker';
 
       const stripHtml = (val: any): string => (val || '').toString().replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
-      const rows = this.displayList.map(d => [
+      // On the bank-only tab displayList is empty by design, but the export is
+      // the whole statement — fall back to the outstanding items so the book
+      // leg is never silently dropped from the workbook.
+      const bookList = this.activeView === 'BANKONLY' ? this.outstandingList : this.displayList;
+
+      const rows = bookList.map(d => [
         d.ENTRYNO || '',
         d.ENTRYDT || '',
         d.STATUS || '',
@@ -270,13 +371,40 @@ import { IMyDpOptions } from 'mydatepicker';
           + (this.outstandingDebitCount ? ` (${this.outstandingDebitCount} items)` : ''),
         lessValue: this.DrNotRef || '-',
         bankBalance: this.DrRef || this.CrRef || 'Pending',
-        sectionTitle: this.activeView === 'OUTSTANDING'
-          ? `Outstanding Items (${this.outstandingCount})`
-          : `All Entries (${this.bankreconcilList.length})`,
+
+        // Bank leg of the reconciliation.
+        bankAddLabel: 'Add : Amounts credited by bank, not in books'
+          + (this.bankOnlyList.filter(d => parseFloat(d.DEPOSIT) > 0).length
+            ? ` (${this.bankOnlyList.filter(d => parseFloat(d.DEPOSIT) > 0).length} items)` : ''),
+        bankAddValue: this.bankOnlyDepositTotal
+          ? this.bankOnlyDepositTotal.toFixed(2) + ' Dr' : '-',
+        bankLessLabel: 'Less : Amounts debited by bank, not in books'
+          + (this.bankOnlyList.filter(d => parseFloat(d.WITHDRAWAL) > 0).length
+            ? ` (${this.bankOnlyList.filter(d => parseFloat(d.WITHDRAWAL) > 0).length} items)` : ''),
+        bankLessValue: this.bankOnlyWithdrawalTotal
+          ? this.bankOnlyWithdrawalTotal.toFixed(2) + ' Cr' : '-',
+        closingBalance: this.bankOnlyUnavailable
+          ? 'Not verified (bank statement unavailable)'
+          : this.formatDrCr(this.bankClosingBalance),
+        bankOnlyUnavailable: this.bankOnlyUnavailable,
+        bankOnlyHeaders: ['Bank Ref No', 'Deposit', 'Withdrawal', 'Clearance Dt'],
+        bankOnlyTitle: `Items on Bank Statement Not in Books (${this.bankOnlyCount})`,
+        bankOnlyData: (this.bankOnlyList || []).map(d => [
+          d.BANKREFNO || '',
+          d.DEPOSIT ? parseFloat(d.DEPOSIT) : '',
+          d.WITHDRAWAL ? parseFloat(d.WITHDRAWAL) : '',
+          d.CLEARANCEDT || ''
+        ]),
+        bankOnlyDepositTotal: this.bankOnlyDepositTotal,
+        bankOnlyWithdrawalTotal: this.bankOnlyWithdrawalTotal,
+
+        sectionTitle: this.activeView === 'ALL'
+          ? `All Entries (${this.bankreconcilList.length})`
+          : `Outstanding Items (${this.outstandingCount})`,
         headers: headers,
         data: rows,
-        debitTotal: this.displayDebitTotal,
-        creditTotal: this.displayCreditTotal
+        debitTotal: rows.reduce((t, r) => t + (parseFloat(r[7] as any) || 0), 0),
+        creditTotal: rows.reduce((t, r) => t + (parseFloat(r[8] as any) || 0), 0)
       };
 
       this._exportService.export(excelData, 'BankReconciliationStatement');
