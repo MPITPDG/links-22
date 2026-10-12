@@ -254,7 +254,9 @@ export class ReqBankpaymentComponent implements OnInit {
         this.PayeeName="SELF";
        }
        let supptds
-       supptds = this.SuppliertdsList.filter((code: any) => code.VALUEFIELD === this.AccountName.split("|")[0])[0].TEXTFIELD;
+       // Only suppliers appear in the TDS list; a client or other account has no entry and is treated as not TDS applicable.
+       const tdsEntry = this.SuppliertdsList.filter((code: any) => code.VALUEFIELD === this.AccountName.split("|")[0])[0];
+       supptds = tdsEntry ? tdsEntry.TEXTFIELD : "0";
        this.EnableDisableDtn(supptds);
   }
   GetDepartmentName(event) {
