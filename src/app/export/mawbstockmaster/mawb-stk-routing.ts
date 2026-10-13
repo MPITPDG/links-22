@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { MawbStockMasterComponent } from './stockmaster.component';
+import { MawbStockSearchComponent } from './stockmaster-search.component';
 
 
 const routes: Routes = [
@@ -11,7 +12,7 @@ const routes: Routes = [
         },
         children: [
              { path: 'Add', component: MawbStockMasterComponent, data: { title: 'Add' } },
-            // { path: 'Search', component: VesselSearchComponent, data: { title: 'Mawb Stock / Search' } },
+            { path: 'Search', component: MawbStockSearchComponent, data: { title: 'Search' } },
         ]
     }
 ];

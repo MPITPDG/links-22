@@ -14,7 +14,7 @@
                             {
                             menuid: "2.2", icon: "fa fa-ship", menuname: "Mawb Stock", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
                                 { menuid: "2.2.1", icon: "fa fa-caret-right", menuname: "Add", routerlink: "/export/mawbstock/Add", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                                { menuid: "2.2.2", icon: "fa fa-caret-right", menuname: "Search", routerlink: "/export/vessel/search", ischild: 'n', parentid: 0, isactive: 1, data: [] }
+                                { menuid: "2.2.2", icon: "fa fa-caret-right", menuname: "Search", routerlink: "/export/mawbstock/Search", ischild: 'n', parentid: 0, isactive: 1, data: [] }
                             ]
                         }
                     ]

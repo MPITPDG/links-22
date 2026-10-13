@@ -8,6 +8,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { NgSelectModule } from '@ng-select/ng-select';
 import {MawbStockRoutingModule } from './mawb-stk-routing';
 import { MawbStockMasterComponent } from './stockmaster.component';
+import { MawbStockSearchComponent } from './stockmaster-search.component';
 
 
 @NgModule({
@@ -19,7 +20,7 @@ import { MawbStockMasterComponent } from './stockmaster.component';
         MyDatePickerModule,
         NgSelectModule,
         SharedModule],
-    declarations: [MawbStockMasterComponent   ],
+    declarations: [MawbStockMasterComponent, MawbStockSearchComponent],
     providers: [],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
