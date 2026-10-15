@@ -1,438 +1,290 @@
-﻿<div class="animated fadeIn">
-	<div class="row">
-		<div class="col-sm-12">
-			<div class="card">
-				<div class="card-header formheading">
-					<strong>Search</strong>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-2">
-		</div>
-		<div class="col-sm-8">
-			<table class="table table-sm-new bgwhite">
-				<tr class="title-head formheading">
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="check" (click)="mainCheck('1')" [checked]="checkWise == '1'" />Number Wise</span>
-					</td>
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="check" (click)="mainCheck('2')" [checked]="checkWise == '2'" />Vessel Wise</span>
-					</td>
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="check" (click)="mainCheck('3')" [checked]="checkWise == '3'" />Shipper Wise</span>
-					</td>
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="check" (click)="mainCheck('4')" [checked]="checkWise == '4'" />Consignee Wise</span>
-					</td>
-					<td>
+﻿<!--
+  Export - consignment search (sidebar Export > Consignment > Search). Ported from
+  MPERPNG-20: recipe 1 on the page kit. "Search by" drives the existing checkWise switch
+  (Number / Vessel / Shipper / Consignee); every search() / getData() / setValue() path
+  is unchanged. On open the page lists the consignments this browser opened last, then
+  the server's recent list (Export/GetRecentConsignments, fails soft), ten a page. A job
+  saved a moment ago is pinned to the top with a "Saved just now" chip.
+-->
+<div class="im-page">
 
-					</td>
-				</tr>
-			</table>
-			<table class="table table-sm-new bgwhite">
-				@if (checkWise == '1') {
-<tr class="trbg">
-					<td class="width150" rowspan="3">
-						<span class="col-form-span-label">Title </span>
-					</td>
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="NumberWise" (click)="numberOption('Export No.','EXPORTNO')" [checked]="numberWise == 'EXPORTNO'"
-							/>Export No.</span>
-					</td>
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="NumberWise" (click)="numberOption('Invoice No.','INV_NO')" [checked]="numberWise == 'INV_NO'" />Invoice No.</span>
-					</td>
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="NumberWise" (click)="numberOption('FCR No.','FCR_NO')" [checked]="numberWise == 'FCR_NO'" />FCR No.</span>
-					</td>
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="NumberWise" (click)="numberOption('BL No.','BL_NO')" [checked]="numberWise == 'BL_NO'" />BL No.</span>
-					</td>
-				</tr>
-}
-				@if (checkWise == '1') {
-<tr class="trbg">
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="NumberWise" (click)="numberOption('HAWB No.','HAWB_NO')" [checked]="numberWise == 'HAWB_NO'" /> HAWB No.</span>
-					</td>
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="NumberWise" (click)="numberOption('MAWB No.','MAWB_NO')" [checked]="numberWise == 'MAWB_NO'" /> MAWB No.</span>
-					</td>
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="NumberWise" (click)="numberOption('GRI No.','GRI_NO')" [checked]="numberWise == 'GRI_NO'" />GRI No.</span>
-					</td>
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="NumberWise" (click)="numberOption('Shipping Bill No.','SHIP_BILL_NO')" [checked]="numberWise == 'SHIP_BILL_NO'"
-							/>Shipping Bill No.</span>
-					</td>
-				</tr>
-}
-				@if (checkWise == '1') {
-<tr class="trbg">
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="NumberWise" (click)="numberOption('Order No.','ORDER_NO')" [checked]="numberWise == 'ORDER_NO'"
-							/> Order No.</span>
-					</td>
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="NumberWise" (click)="numberOption('Ref. No.','REF_NO')" [checked]="numberWise == 'REF_NO'" />Ref. No.</span>
-					</td>
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="NumberWise" (click)="numberOption('No. of Pkgs','NO_OF_PKGS')" [checked]="numberWise == 'NO_OF_PKGS'"
-							/>No. of Pkgs</span>
-					</td>
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="NumberWise" (click)="numberOption('No. of Pcs','NO_OF_PCS')" [checked]="numberWise == 'NO_OF_PCS'"
-							/>No. of Pcs</span>
-					</td>
-				</tr>
-}
-				@if (checkWise == '1') {
-<tr class="trbg">
-					<td class="width75">
-						<span class="col-form-span-label">{{numberName}}</span>
-					</td>
-					<td colspan="4">
-						<input type="text" [(ngModel)]="numberText" class="form-control width130" />
-					</td>
-				</tr>
-}
-				@if (checkWise == '2') {
-<tr class="trbg">
-					<td class="width75">
-						<span class="col-form-span-label">Vessel Name </span>
-					</td>
-					<td>
-						<input type="text" [(ngModel)]="vesselname" class="form-control width100" />
-					</td>
-					<td class="width75">
-						<span class="col-form-span-label">Voyage No.</span>
-					</td>
-					<td>
-						<input type="text" [(ngModel)]="voyageno" class="form-control width100" />
-					</td>
-					<td class="width50">
-						<i class="fa fa-eye" aria-hidden="true" (click)="getVessel()"></i>
-					</td>
-				</tr>
-}
-				@if (checkWise == '2') {
-<tr class="trbg">
-					<td class="width150">
-						<span class="col-form-span-label">Vessel Name </span>
-					</td>
-					<td colspan="4">
-						<!-- <ng-select [items]="vesselList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" placeholder="--Select--" [(ngModel)]="searchby"
-						 class="form-control">
-						</ng-select> -->
-						<select class="form-control width450"  [(ngModel)]="searchby">
-							<option value="">Please select</option>
-							@for (d of vesselList; track d) {
-<option value={{d.VALUE_FIELD}}>{{d.TEXT_FIELD}}</option>
-}
-						</select> 
-					</td>
-				</tr>
-}
-				@if (checkWise == '3') {
-<tr class="trbg">
-					<td class="width150" rowspan="2">
-						<span class="col-form-span-label">Title </span>
-					</td>
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="Shipments" value="" (click)="changeShipmentType('SHIP_CUR')" [checked]="shipmentWise == 'SHIP_CUR'"
-							/>Shipper (current shipments)</span>
-					</td>
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="Shipments" (click)="changeShipmentType('SHIP_ALL')" [checked]="shipmentWise == 'SHIP_ALL'" />Shipper (all shipments) </span>
-					</td>
-					<td></td>
-					<td></td>
-				</tr>
-}
-				@if (checkWise == '3') {
-<tr class="trbg">
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="Shipments" (click)="changeShipmentType('BILL_CUR')" [checked]="shipmentWise == 'BILL_CUR'" />Bill To (current shipments)</span>
-					</td>
-					<td class="width250">
-						<span class="col-form-span-label">
-							<input type="radio" name="Shipments" (click)="changeShipmentType('BILL_ALL')" [checked]="shipmentWise == 'BILL_ALL'" />Bill To (all shipments)</span>
-					</td>
-					<td></td>
-					<td></td>
-				</tr>
-}
-				@if (checkWise == '3') {
-<tr class="trbg">
-					<td class="width150">
-						<span class="col-form-span-label">Search By</span>
-					</td>
-					<td colspan="4">
-						<ng-select [items]="[{VALUEFIELD: 'COUNTRY', TEXTFIELD: 'Of a Country'},{VALUEFIELD: 'CITY', TEXTFIELD: 'Of a City'},{VALUEFIELD: 'NAME', TEXTFIELD: 'By Name'},{VALUEFIELD: 'ALL', TEXTFIELD: 'All'}]"
-						 bindLabel="TEXTFIELD" bindValue="VALUEFIELD"   [(ngModel)]="shippersearchby" class="form-control width150">
-						</ng-select>
-					</td>
-				</tr>
-}
-				@if (checkWise == '3') {
-<tr class="trbg">
-					<td class="width150">
-						<span class="col-form-span-label">{{shippersearchby}}</span>
-					</td>
-					<td colspan="3">
-						@if (shippersearchby == 'COUNTRY') {
-<ng-select [items]="countryList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"  [(ngModel)]="shippercountry"
-						 class="form-control">
-						</ng-select>
-}
-						@if (shippersearchby == 'CITY') {
-<ng-select [items]="cityList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"   [(ngModel)]="shippercity"
-						 class="form-control">
-						</ng-select>
-}
-						@if (shippersearchby == 'NAME') {
-<input type="text" [(ngModel)]="shippername" class="form-control width150" />
-}
-					</td>
-					<td class="width50">
-						<i class="fa fa-eye" aria-hidden="true" (click)="getShipper()"></i>
-					</td>
-				</tr>
-}
-				@if (checkWise == '3') {
-<tr class="trbg">
-					<td class="width150 title-head">
-						<span class="col-form-span-label">Shipper</span>
-					</td>
-					<td colspan="4">
-						<ng-select [items]="shipperList" bindLabel="TEXT_FIELD" bindValue="VALUE_FIELD"   [(ngModel)]="shipper"
-						 class="form-control">
-						</ng-select>
-					</td>
-				</tr>
-}
-				@if (checkWise == '4') {
-<tr class="trbg">
-					<td class="width150">
-						<span class="col-form-span-label">Title </span>
-					</td>
-					<td class="width300">
-						<span class="col-form-span-label">
-							<input type="radio" name="Consingee" value="" (click)="changeConsigneeType('CON_CUR')" [checked]="consigneeWise == 'CON_CUR'"
-							/>Consignee(current shipements)</span>
-					</td>
-					<td class="width300">
-						<span class="col-form-span-label">
-							<input type="radio" name="Consingee" (click)="changeConsigneeType('CON_ALL')" [checked]="consigneeWise == 'CON_ALL'" />Consignee(all shipments)</span>
-					</td>
-					<td></td>
-					<td></td>
-				</tr>
-}
-				@if (checkWise == '4') {
-<tr class="trbg">
-					<td class="width150">
-						<span class="col-form-span-label">Search By</span>
-					</td>
-					<td colspan="4" class="width150">
-						<ng-select [items]="[{VALUEFIELD: 'COUNTRY', TEXTFIELD: 'Of a Country'},{VALUEFIELD: 'NAME', TEXTFIELD: 'By Name'},{VALUEFIELD: 'ALL', TEXTFIELD: 'All'}]"
-						 bindLabel="TEXTFIELD" bindValue="VALUEFIELD"   [(ngModel)]="consigneesearchby" class="form-control width150">
-						</ng-select>
-					</td>
-				</tr>
-}
-				@if (checkWise == '4') {
-<tr class="trbg">
-					<td class="width150">
-						<span class="col-form-span-label">{{consigneesearchby}}</span>
-					</td>
-					<td colspan="3">
-						@if (consigneesearchby == 'COUNTRY') {
-<ng-select [items]="countryList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"   [(ngModel)]="consigneecountry"
-						 class="form-control">
-						</ng-select>
-}
-						@if (consigneesearchby == 'NAME') {
-<input type="text" [(ngModel)]="consigneename" class="form-control width150" />
-}
-					</td>
-					<td class="width50">
-						<i class="fa fa-eye" aria-hidden="true" (click)="getConsignee()"></i>
-					</td>
-				</tr>
-}
-				@if (checkWise == '4') {
-<tr class="trbg">
-					<td class="width150 title-head">
-						<span class="col-form-span-label">Consignee </span>
-					</td>
-					<td colspan="4">
-						<ng-select [items]="consigneeList" bindLabel="TEXT_FIELD" bindValue="VALUE_FIELD"   [(ngModel)]="consignee"
-						 class="form-control">
-						</ng-select>
-					</td>
-				</tr>
-}
-				<tr class="trbg centerlabel">
-					<td colspan="5">
-						<button type="button" name="submitButton" uiBtn variant="default" size="sm" (click)="search();">
-							<span class="col-form-span-label">
-								<i class="fa fa-search"> Search</i></span>
-						</button>
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div class="col-sm-2">
-		</div>
-	</div>
-	<div class="row">
-		<br />
-	</div>
-	@if (searchList.length > 0) {
-<div class="row">
-		<div class="col-sm-12" style="height:300px;overflow-y: scroll;">
-			<table class="table table-sm-new bgwhite">
-				<thead>
-					<tr class="title-head formheading">
-						<th colspan="11">{{searchHeaderText}}</th>
-					</tr>
-				</thead>
-			</table>
-			@if (numberWise == 'MAWB_NO') {
-<table class="table table-sm-new bgwhite">
-				<thead>
-						<tr class="title-head formheading">
-								<th> MAWB NO.</th>
-								<th>DESTINATION </th>
-								<th> PKGS</th>
-								<th>GR. WT. </th>
-								<th>CHBL WT. </th>
-								<th>PLANNED FLIGHT DETAILS </th>
-								<th> ACTUAL FLIGHT DETAILS</th>
-								<th> ETA</th>
-						</tr>
-						<tr>
-							<td>
-								<span class="col-form-span-label">{{MAWBNO}}</span>
-							</td>
-							<td>
-									<span class="col-form-span-label">{{DESTINATION}}</span>
-							</td>
-							<td>
-								<span class="col-form-span-label">{{ PKGS}}</span>
-							</td>
-							<td>
-								<span class="col-form-span-label">{{ GRWT}}</span>
-							</td>
-							<td>
-								<span class="col-form-span-label">{{CHBLWT }}</span>
-							</td>
-							<td >
-								<span class="col-form-span-label">{{PLANNEDFLIGHT}}</span>
-							</td>
-							<td>
-								<span class="col-form-span-label">{{ACTUALFLIGHT}}</span>
-							</td>
-							<td>
-								<span class="col-form-span-label">{{ETA }}</span>
-							</td>
-						</tr>
-				</thead>
-				</table>
-}
-			<table class="table table-sm-new bgwhite">
-				<thead>
-					<tr class="title-head formheading">
-						<th></th>
-						<th>EXPTNO</th>
-						<th>INVOICE NO</th>
-						<th>SHIPPER</th>
-						<th>CONSIGNEE</th>
-						<th>GR. WT</th>
-						<th>VOL.</th>
-						<th>VOL.WT</th>
-						<th>CHBL WT</th>
-						<th>PKGS</th>
-						<th>HAWBNO</th>
-						<th>HAWBDT</th>
-						<th>ORDER_NO</th>
-						<th>FREIGHT</th>
-					</tr>
-				</thead>
-				<tbody>
-					@for (obj of searchList; track obj) {
-<tr>
-						<td class="centerlabel">
-							<i class="fa fa-pencil" aria-hidden="true" (click)="setValue(obj)"></i>
-						</td>
-						<td>
-							<span class="col-form-span-label">{{obj.EXPTNO}}</span>
-						</td>
-						<td>
-							<span class="col-form-span-label">{{obj.INVNO}}</span>
-						</td>
-						<td>
-							<span class="col-form-span-label">{{obj.SHIPPER}}</span>
-						</td>
-						<td>
-							<span class="col-form-span-label">{{obj.CONSIGNEE}}</span>
-						</td>
-						<td>
-							<span class="col-form-span-label">{{obj.GRWT}}</span>
-						</td>
-						<td>
-							<span class="col-form-span-label">{{obj.VOLUME}}</span>
-						</td>
-						<td>
-							<span class="col-form-span-label">{{obj.VOLWT}}</span>
-						</td>
-						<td>
-							<span class="col-form-span-label">{{obj.CHBLWT}}</span>
-						</td>
-						
-						<td>
-							<span class="col-form-span-label">{{obj.PKGS}}</span>
-						</td>
-						<td>
-							<span class="col-form-span-label">{{obj.HAWBNO}}</span>
-						</td>
-						<td>
-							<span class="col-form-span-label">{{obj.HAWBDT}}</span>
-						</td>
-						 
-						<td>
-							<span class="col-form-span-label" [innerHTML]="obj.ORDER_NO"></span>
-						</td>
-						<td><span class="col-form-span-label">{{obj.FREIGHT}}</span></td>
-					</tr>
-}
-				</tbody>
-			</table>
-		</div>
-	</div>
-}
+  <div class="ph">
+    <div>
+      <h1>Consignment search</h1>
+      <p>Find an export consignment by document number, vessel, shipper or consignee</p>
+    </div>
+    <div class="tools">
+      <button type="button" class="btn p" routerLink="/export/Consignment/start">+ New consignment</button>
+    </div>
+  </div>
+
+  <div class="card sec">
+
+    <!-- ================= criteria ================= -->
+    <div class="filters">
+      <div class="f">
+        <label for="selCheckWise">Search by</label>
+        <select id="selCheckWise" [ngModel]="checkWise" (ngModelChange)="mainCheck($event)">
+          <option value="1">Document number</option>
+          <option value="2">Vessel</option>
+          <option value="3">Shipper / bill to</option>
+          <option value="4">Consignee</option>
+        </select>
+      </div>
+
+      <!-- NUMBER WISE -->
+      @if (checkWise == '1') {
+        <div class="f">
+          <label for="selNumberWise">Document</label>
+          <select id="selNumberWise" [ngModel]="numberWise" (ngModelChange)="onNumberTypeChange($event)">
+            @for (o of numberOptions; track o.code) {
+              <option [value]="o.code">{{o.text}}</option>
+            }
+          </select>
+        </div>
+        <div class="f">
+          <label for="numberText">{{numberName}}</label>
+          <input id="numberText" type="text" [(ngModel)]="numberText"
+                 placeholder="Search {{numberName}}…"
+                 (ngModelChange)="onNumberInput()" (keyup.enter)="search()" />
+        </div>
+        <div class="f">
+          <button type="button" name="submitButton" class="btn p" (click)="search();">Search</button>
+        </div>
+      }
+
+      <!-- VESSEL WISE -->
+      @if (checkWise == '2') {
+        <div class="f">
+          <label for="vesselname">Vessel name</label>
+          <input id="vesselname" type="text" [(ngModel)]="vesselname" placeholder="Vessel name" (keyup.enter)="getVessel()" />
+        </div>
+        <div class="f">
+          <label for="voyageno">Voyage no.</label>
+          <input id="voyageno" type="text" [(ngModel)]="voyageno" (keyup.enter)="getVessel()" />
+        </div>
+        <div class="f">
+          <button type="button" class="btn g" title="Fetch vessels" (click)="getVessel()">Fetch vessels</button>
+        </div>
+        <div class="f f-wide">
+          <label>Vessel</label>
+          <ng-select [items]="vesselList" bindLabel="TEXT_FIELD" bindValue="VALUE_FIELD" [(ngModel)]="searchby"
+            class="custom" placeholder="Type to search vessel…" [searchable]="true" [clearable]="true" [virtualScroll]="true">
+          </ng-select>
+        </div>
+        <div class="f">
+          <button type="button" class="btn p" (click)="search();">Search</button>
+        </div>
+      }
+
+      <!-- SHIPPER WISE -->
+      @if (checkWise == '3') {
+        <div class="f">
+          <label for="selShipmentWise">Scope</label>
+          <select id="selShipmentWise" [ngModel]="shipmentWise" (ngModelChange)="changeShipmentType($event)">
+            <option value="SHIP_CUR">Shipper (current shipments)</option>
+            <option value="SHIP_ALL">Shipper (all shipments)</option>
+            <option value="BILL_CUR">Bill To (current shipments)</option>
+            <option value="BILL_ALL">Bill To (all shipments)</option>
+          </select>
+        </div>
+        <div class="f">
+          <label>Find shipper</label>
+          <ng-select [items]="[{VALUEFIELD: 'COUNTRY', TEXTFIELD: 'Of a Country'},{VALUEFIELD: 'CITY', TEXTFIELD: 'Of a City'},{VALUEFIELD: 'NAME', TEXTFIELD: 'By Name'},{VALUEFIELD: 'ALL', TEXTFIELD: 'All'}]"
+            bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="shippersearchby" class="custom">
+          </ng-select>
+        </div>
+        @if (shippersearchby == 'COUNTRY') {
+          <div class="f">
+            <label>Country</label>
+            <ng-select [items]="countryList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="shippercountry" class="custom"></ng-select>
+          </div>
+        }
+        @if (shippersearchby == 'CITY') {
+          <div class="f">
+            <label>City</label>
+            <ng-select [items]="cityList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="shippercity" class="custom"></ng-select>
+          </div>
+        }
+        @if (shippersearchby == 'NAME') {
+          <div class="f">
+            <label>Name</label>
+            <input type="text" [(ngModel)]="shippername" (keyup.enter)="getShipper()" />
+          </div>
+        }
+        <div class="f">
+          <button type="button" class="btn g" title="Fetch shippers" (click)="getShipper()">Fetch shippers</button>
+        </div>
+        <div class="f f-wide">
+          <label>Shipper</label>
+          <ng-select [items]="shipperList" bindLabel="TEXT_FIELD" bindValue="VALUE_FIELD" [(ngModel)]="shipper"
+            class="custom" placeholder="Type to search shipper…" [searchable]="true" [clearable]="true" [virtualScroll]="true">
+          </ng-select>
+        </div>
+        <div class="f">
+          <button type="button" class="btn p" (click)="search();">Search</button>
+        </div>
+      }
+
+      <!-- CONSIGNEE WISE -->
+      @if (checkWise == '4') {
+        <div class="f">
+          <label for="selConsigneeWise">Scope</label>
+          <select id="selConsigneeWise" [ngModel]="consigneeWise" (ngModelChange)="changeConsigneeType($event)">
+            <option value="CON_CUR">Consignee (current shipments)</option>
+            <option value="CON_ALL">Consignee (all shipments)</option>
+          </select>
+        </div>
+        <div class="f">
+          <label>Find consignee</label>
+          <ng-select [items]="[{VALUEFIELD: 'COUNTRY', TEXTFIELD: 'Of a Country'},{VALUEFIELD: 'NAME', TEXTFIELD: 'By Name'},{VALUEFIELD: 'ALL', TEXTFIELD: 'All'}]"
+            bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="consigneesearchby" class="custom">
+          </ng-select>
+        </div>
+        @if (consigneesearchby == 'COUNTRY') {
+          <div class="f">
+            <label>Country</label>
+            <ng-select [items]="countryList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="consigneecountry" class="custom"></ng-select>
+          </div>
+        }
+        @if (consigneesearchby == 'NAME') {
+          <div class="f">
+            <label>Name</label>
+            <input type="text" [(ngModel)]="consigneename" (keyup.enter)="getConsignee()" />
+          </div>
+        }
+        <div class="f">
+          <button type="button" class="btn g" title="Fetch consignees" (click)="getConsignee()">Fetch consignees</button>
+        </div>
+        <div class="f f-wide">
+          <label>Consignee</label>
+          <ng-select [items]="consigneeList" bindLabel="TEXT_FIELD" bindValue="VALUE_FIELD" [(ngModel)]="consignee"
+            class="custom" placeholder="Type to search consignee…" [searchable]="true" [clearable]="true" [virtualScroll]="true">
+          </ng-select>
+        </div>
+        <div class="f">
+          <button type="button" class="btn p" (click)="search();">Search</button>
+        </div>
+      }
+    </div>
+
+    @if (checkWise == '1' && (liveBusy || liveMessage)) {
+      <div class="es-live">{{ liveBusy ? 'Searching…' : liveMessage }}</div>
+    }
+
+    <!-- ================= MAWB summary ================= -->
+    @if (numberWise == 'MAWB_NO' && searchList.length > 0 && !showingRecent) {
+      <div class="es-kv">
+        <div class="kv"><span class="k">MAWB no.</span><span class="v mono">{{MAWBNO}}</span></div>
+        <div class="kv"><span class="k">Destination</span><span class="v">{{DESTINATION}}</span></div>
+        <div class="kv"><span class="k">Pkgs</span><span class="v mono">{{PKGS}}</span></div>
+        <div class="kv"><span class="k">Gr. wt.</span><span class="v mono">{{GRWT}}</span></div>
+        <div class="kv"><span class="k">Chbl wt.</span><span class="v mono">{{CHBLWT}}</span></div>
+        <div class="kv"><span class="k">Planned flight</span><span class="v">{{PLANNEDFLIGHT}}</span></div>
+        <div class="kv"><span class="k">Actual flight</span><span class="v">{{ACTUALFLIGHT}}</span></div>
+        <div class="kv"><span class="k">ETA</span><span class="v">{{ETA}}</span></div>
+      </div>
+    }
+
+    <!-- ================= toolbar ================= -->
+    <div class="toolbar">
+      <span>
+        <span class="count">{{ List.length }} {{ List.length === 1 ? 'consignment' : 'consignments' }}</span>
+        @if (showingRecent) {
+          <span class="sub-t"> &middot; {{ recentCaption || 'recently opened' }}</span>
+        } @else if (searchHeaderText) {
+          <span class="sub-t"> &middot; {{ searchHeaderText }}</span>
+        }
+      </span>
+      <span class="tb-r">
+        <input type="text" class="es-quick" [(ngModel)]="quickFilter" (ngModelChange)="page = 1" placeholder="Filter these rows…" />
+        <select class="es-quick-sel" [(ngModel)]="modeFilter" (ngModelChange)="page = 1" aria-label="Mode">
+          <option value="">All modes</option>
+          <option value="AIR">Air</option>
+          <option value="SEA">Sea</option>
+        </select>
+        <button class="btn g" type="button" (click)="clear()">Clear</button>
+        <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!List.length">Export CSV</button>
+      </span>
+    </div>
+
+    <!-- ================= results ================= -->
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Export no.</th>
+            <th>Status</th>
+            <th>Invoice no.</th>
+            <th>Shipper</th>
+            <th>Consignee</th>
+            <th class="num">Gr. wt</th>
+            <th class="num">Vol.</th>
+            <th class="num">Vol. wt</th>
+            <th class="num">Chbl wt</th>
+            <th class="num">Pkgs</th>
+            <th>HAWB no. / dt</th>
+            <th>Order no.</th>
+            <th>Freight</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (noRights) {
+            <tr><td class="empty" colspan="13">Your login does not have rights to this screen, so consignments are not loaded. Ask an admin to grant access.</td></tr>
+          } @else if ((liveBusy || recentBusy) && !List.length) {
+            <tr><td class="empty" colspan="13">Loading consignments…</td></tr>
+          } @else if (loadError) {
+            <tr><td class="empty" colspan="13">Could not load consignments. Try Search again.</td></tr>
+          } @else {
+            @for (obj of pageRows; track $index) {
+              <tr class="es-row" (click)="setValue(obj)" title="Open this consignment">
+                <td class="mono"><a class="lnk">{{obj.EXPTNO}}</a></td>
+                <td>
+                  @if (obj.EXPTCANCEL == 'Y') { <span class="chip dash">Cancelled</span> }
+                  @else if (obj.JOBEXIST && obj.JOBEXIST != 'NO') { <span class="chip solid">Job created</span> }
+                  @else { <span class="chip"><span class="dot"></span>Open</span> }
+                  @if (justSavedExptno && obj.EXPTNO == justSavedExptno) { <span class="chip solid">Saved just now</span> }
+                  @if (obj.EXPT_MODE) { <div class="sub-t">{{obj.EXPT_MODE}}{{ obj.ISDIFFAIR == '2' ? ' · sea-air' : '' }}</div> }
+                </td>
+                <td>{{obj.INVNO}}</td>
+                <td>{{obj.SHIPPER}}</td>
+                <td>{{obj.CONSIGNEE}}</td>
+                <td class="num mono">{{obj.GRWT}}</td>
+                <td class="num mono">{{obj.VOLUME}}</td>
+                <td class="num mono">{{obj.VOLWT}}</td>
+                <td class="num mono">{{obj.CHBLWT}}</td>
+                <td class="num mono">{{obj.PKGS}}</td>
+                <td>{{obj.HAWBNO}}@if (obj.HAWBDT) { <div class="sub-t">{{obj.HAWBDT}}</div> }</td>
+                <td [innerHTML]="obj.ORDER_NO"></td>
+                <td>{{obj.FREIGHT}}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="13">
+                @if (searchHeaderText || quickFilter || modeFilter) { No consignments match these filters. }
+                @else { No recently opened consignments yet. Choose what to search by and press Search. }
+              </td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ List.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="page <= 1" (click)="goPage(page - 1)" aria-label="Previous page">‹</button>
+        @for (p of pageList; track $index) {
+          @if (p === 0) {
+            <span class="gap">…</span>
+          } @else {
+            <button type="button" [class.on]="p === page" (click)="goPage(p)">{{ p }}</button>
+          }
+        }
+        <button type="button" [disabled]="page >= pageCount" (click)="goPage(page + 1)" aria-label="Next page">›</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <app-ok-modal #okModal> </app-ok-modal>

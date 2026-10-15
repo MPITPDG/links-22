@@ -266,7 +266,11 @@ export class PrintDocumentHawbUpdateComponent implements OnChanges {
         this._dataService.getData("Export/PrintDocumentAirHawbUpdatePageload", _jsonData)
             .subscribe((data: any) => {
 
-                this.currencyList = data.Table;
+                this.currencyList = (data && data.Table) ? data.Table : [];
+                if (!data || !data.Table1 || !data.Table1.length) {
+                    this._loaderService.display(false);
+                    return;
+                }
                 if (data.Table1[0].STATUS == 100) {
                     this.hawbnoList = data.Table1;
                     this.exptnos = data.Table1[0].EXPTSTRING;
@@ -285,7 +289,7 @@ export class PrintDocumentHawbUpdateComponent implements OnChanges {
                 }
                 else
                 {
-                    this._toasterService.toast('warning', 'warning',data.Table[0].STATUSTEXT);
+                    this._toasterService.toast('warning', 'warning', (data.Table && data.Table[0] && data.Table[0].STATUSTEXT) || data.Table1[0].STATUSTEXT || '');
                     this._loaderService.display(false);
                 }
 
@@ -368,7 +372,7 @@ export class PrintDocumentHawbComponent implements OnInit {
         this._dataService.getData("Export/PrintDocumentAirHawbList", _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                this.searchList = data.Table;
+                this.searchList = (data && data.Table) ? data.Table : [];
                 this.searchLength = (this.searchList.length > 0) ? 1 : -1;
                 for (let i = 0; i < this.searchList.length; i++) {
                     this.searchList[i]["Select"] = false;

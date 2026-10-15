@@ -1,917 +1,340 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-2">
+<!--
+  Export - consignment view (/export/Consignment/view/:expt_no). Ported from MPERPNG-20:
+  recipe 3 (console style) on the page kit - sticky header with the consignment's identity
+  chips and actions, a section nav, and always-visible ruled cards. The links switch
+  (M / I / C / R / CLP), every show() / showClpView() / openEdoc() call and all bindings
+  are unchanged. Links: no CSD chip (France-only), no packing-list upload / order-size
+  popup (not in the Links API; Links already had them switched off), E-Document opens
+  eDocument-Links.
+-->
+<div class="im-page cv-page">
+
+  <div class="cs-top">
+    <div class="ph">
+      <div>
+        <h1>Consignment {{viewData?.Table[0]?.EXPTNO || ExptNo}}</h1>
+        <p>{{viewData?.Table[0]?.EXP_NAME}}@if (viewData?.Table[0]?.CON_NAME) { &rarr; {{viewData?.Table[0]?.CON_NAME}} }</p>
+        <div class="cs-chips">
+          @if (viewData?.Table[0]?.EXPT_MODE) { <span class="chip solid">{{viewData?.Table[0]?.EXPT_MODE}}</span> }
+          @if (viewData?.Table[0]?.EXPTCANCEL == 'Y') { <span class="chip solid">Cancelled</span> }
+          @if (viewData && viewData?.Table[0]?.CLEARANCE == 'S') { <span class="chip dash">Clearance by shipper's agent</span> }
+          @if (viewData && viewData?.Table[0]?.CLEARANCE != 'S') { <span class="chip">Clearance by us</span> }
+          @if (viewData?.Table[0]?.ORIGIN || viewData?.Table[0]?.DEST_CITY) { <span class="chip">{{viewData?.Table[0]?.ORIGIN}} &rarr; {{viewData?.Table[0]?.DEST_CITY}}</span> }
+          @if (viewData?.Table[0]?.AEROBILLNO) { <span class="chip"><span class="k">MAWB</span> {{viewData?.Table[0]?.AEROBILLNO}}</span> }
+          @if (viewData?.Table[0]?.HOUSEBILLNO) { <span class="chip"><span class="k">HAWB</span> {{viewData?.Table[0]?.HOUSEBILLNO}}</span> }
+          @if (viewData?.Table[0]?.BL_NO) { <span class="chip"><span class="k">B/L</span> {{viewData?.Table[0]?.BL_NO}}</span> }
+          @if (viewData?.Table[0]?.ARRIVALDT) { <span class="chip"><span class="dot"></span>Arrived {{viewData?.Table[0]?.ARRIVALDT}}</span> }
         </div>
-        <div class="col-sm-8">
-            @if (links == 'L') {
-<div></div>
-}
-            @if (links == 'M') {
-<div>
-                <table class="table table-bordered table-sm-new bgwhite">
-                    <tbody>
-                        @if (viewData?.Table[0]?.EXPTCANCEL == 'Y') {
-<tr>
-                            <td colspan="4">
-                                <span class="col-form-span-label red">
-                                    <strong>CONSIGNMENT IS CANCELLED</strong>
-                                </span>
-                            </td>
-                        </tr>
-}
-                        @if (edocView == 1) {
-<tr>
-                            <th class="col-form-span-heading centerlabel  link-label" colspan="4">
-                                <span (click)="openEdoc()">E-Document - View/Upload File</span>
-                            </th>
-                        </tr>
-}
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">EXPORT NO </span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPTNO}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Mode Of Shipment</span>
-                            </td>
-                            <td colspan="2">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_MODE}}</span>
-                            </td>
-                            <td class="width130 centerlabel" rowspan="14">
-                                @if (viewData?.Table[0]?.CLEARANCE == 'S') {
-<span class="col-form-span-label">
-                                    <strong>SHIPMENT CLEARANCE BY SHIPPER'S AGENT</strong>
-                                </span>
-}
-                                @if (viewData?.Table[0]?.CLEARANCE != 'S') {
-<span class="col-form-span-label">
-                                    <strong>SHIPMENT CLEARANCE BY US</strong>
-                                </span>
-}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Exporter/Shipper </span>
-                            </td>
-                            <td colspan="2">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXP_NAME}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Bill To </span>
-                            </td>
-                            <td colspan="2">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.BILLTO_NAME}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Agent </span>
-                            </td>
-                            <td colspan="2">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.AGENT_NAME}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Consignee </span>
-                            </td>
-                            <td colspan="2">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.CON_NAME}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Sourcing Agent </span>
-                            </td>
-                            <td colspan="2">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.SRCAGT_NAME}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Consignee Bank </span>
-                            </td>
-                            <td colspan="2">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.BANK_NAME}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Buyer Name </span>
-                            </td>
-                            <td colspan="2">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.BUYER_NAME}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Loading Port </span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_LDGPORT}}</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">Origin City : {{viewData?.Table[0]?.ORIGIN}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Port Of Discharge </span>
-                            </td>
-                            <td colspan="2">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.PORT_OF_DISCHARGE}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">I / T </span>
-                            </td>
-                            <td colspan="2">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.IT}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Destination City </span>
-                            </td>
-                            <td colspan="2">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.DEST_CITY}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Destination Country </span>
-                            </td>
-                            <td colspan="2">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.DEST_COUNTRY}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Doc Recd. Date </span>
-                            </td>
-                            <td colspan="2">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_DOCRECD}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">No. of Packages </span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_NOOFPKGS}}</span>
-                            </td>
-                            <td class="width150">
-                                <span class="col-form-span-label">No. of Pieces </span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_NOOFPCS}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Gross Weight </span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_GRWT}}</span>
-                            </td>
-                            <td class="width150">
-                                <span class="col-form-span-label">Net Weight </span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_NETWT}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Volume(CBM) </span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_VOLUME}}</span>
-                            </td>
-                            <td class="width150">
-                                <span class="col-form-span-label">CHBL Weight </span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_CHBLWT}}</span>
-                            </td>
-                        </tr>
-                        <tbody>
-                </table>
-                <table class="table table-bordered table-sm-new bgwhite">
-                    <tbody>
-                        <tr>
-                            <td>
-                                <span class="col-form-span-label">
-                                    <strong>ORDER NO. DETAILS:</strong>
-                                </span>
-                            </td>
-                        </tr>
-                        <tbody>
-                </table>
-                <div class="row xscroll">
-                    <table class="table table-bordered table-sm-new bgwhite">
-                        <thead>
-                            <tr class="col-form-span-heading">
-                                <th class="centerlabel">
-                                    <span class="col-form-span-label">Order No.</span>
-                                </th>
-                                <th class="width100 centerlabel">
-                                    <span class="col-form-span-label">Reference No</span>
-                                </th>
-                                <th class="width100 centerlabel">
-                                    <span class="col-form-span-label">Pieces</span>
-                                </th>
-                                <th class="width100 centerlabel">
-                                    <span class="col-form-span-label">Type of Pieces</span>
-                                </th>
-                                <th class="width100 centerlabel">
-                                    <span class="col-form-span-label">Warehouse</span>
-                                </th>
-                                <th class="width100 centerlabel">
-                                    <span class="col-form-span-label">Item Description</span>
-                                </th>
-                                <th class="width100 centerlabel">
-                                    <span class="col-form-span-label">Pkgs</span>
-                                </th>
-                                <th class="width100 centerlabel">
-                                    <span class="col-form-span-label">Gr. Wt</span>
-                                </th>
-                                <th class="width100 centerlabel">
-                                    <span class="col-form-span-label">Net Wt</span>
-                                </th>
-                                <th class="width100 centerlabel">
-                                    <span class="col-form-span-label">Volume</span>
-                                </th>
-                                <th class="width100 centerlabel">
-                                    <span class="col-form-span-label">Chbl. Wt.</span>
-                                </th>
-                                <th class="width100 centerlabel">
-                                    <span class="col-form-span-label">LSD Date</span>
-                                </th>
-                                <th class="width100 centerlabel">
-                                    <span class="col-form-span-label">DRN Date</span>
-                                </th>
-                                <th class="width100 centerlabel">
-                                    <span class="col-form-span-label">FOB Value</span>
-                                </th>
-                                <th class="width100 centerlabel">
-                                    <span class="col-form-span-label">Currency </span>
-                                </th>
-                                <th class="width100 centerlabel">
-                                    <span class="col-form-span-label">Cnee Dept (Rayon)</span>
-                                </th>
-                                <th class="width100 centerlabel">
-                                    <span class="col-form-span-label">Container No</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (obj of viewData?.Table4; track obj) {
-<tr>
-                                <td class="centerlabel">
-                                    <span class="col-form-span-label">{{obj.ORDERNO}}</span>
-                                </td>  
-                                <!-- <td class="centerlabel">
-                                    <span class="col-form-span-label">
-                                        <a href="javascript:void(0);" *ngIf="viewData?.Table[0]?.GRPID=='1'" (click)="openWindow(obj.ORDERNO, obj.STYLENO, obj.CONCODE)">{{obj.ORDERNO}}</a>
-                                        </span>
-                                </td> -->
-                                <td class="width100">
-                                    <span class="col-form-span-label">{{obj.STYLENO}}</span>
-                                </td>
-                                <td class="width100">
-                                    <span class="col-form-span-label">{{obj.PIECES}}</span>
-                                </td>
-                                <td class="width100">
-                                    <span class="col-form-span-label">{{obj.TYPEOFPCS}}</span>
-                                </td>
-                                <td class="width100">
-                                    <span class="col-form-span-label">{{obj.WAREHOUSE}}</span>
-                                </td>
-                                <td class="width100">
-                                    <span class="col-form-span-label">{{obj.ITEMDESC}}</span>
-                                </td>
-                                <td class="width100">
-                                    <span class="col-form-span-label">{{obj.PKGS}}</span>
-                                </td>
-                                <td class="width100">
-                                    <span class="col-form-span-label">{{obj.GRWT}}</span>
-                                </td>
-                                <td class="width100">
-                                    <span class="col-form-span-label">{{obj.VOLUME}}</span>
-                                </td>
-                                <td class="width100">
-                                    <span class="col-form-span-label">{{obj.NETWT}}</span>
-                                </td>
-                                <td class="width100">
-                                    <span class="col-form-span-label">{{obj.CHBLWT}}</span>
-                                </td>
-                                <td class="width100">
-                                    <span class="col-form-span-label">{{obj.LSD}}</span>
-                                </td>
-                                <td class="width100">
-                                    <span class="col-form-span-label">{{obj.DRNDATE}}</span>
-                                </td>
-                                <td class="width100">
-                                    <span class="col-form-span-label">{{obj.FOBVALUE}}</span>
-                                </td>
-                                <td class="width100">
-                                    <span class="col-form-span-label">{{obj.CURENCY}}</span>
-                                </td>
-                                <td class="width100">
-                                    <span class="col-form-span-label">{{obj.CNEEDEPT}}</span>
-                                </td>
-                                <td class="width100">
-                                    <span class="col-form-span-label">{{obj.CONTAINERNO}}</span>
-                                </td>
-                            </tr>
-}
-                        </tbody>
-                    </table>
-                </div>
-                <br />
-                <table class="table table-bordered table-sm-new bgwhite">
-                    <tbody>
-                        <tr>
-                            <td>
-                                <span class="col-form-span-label">
-                                    <strong>PKG NO. DETAILS:</strong>
-                                </span>
-                            </td>
-                        </tr>
-                        <tbody>
-                </table>
-                <table class="table table-bordered table-sm-new bgwhite">
-                    <thead>
-                        <tr class="col-form-span-heading">
-                            <th class="width150 centerlabel">
-                                <span class="col-form-span-label">From.</span>
-                            </th>
-                            <th class="width150 centerlabel">
-                                <span class="col-form-span-label">To</span>
-                            </th>
-                            <th class="centerlabel">
-                                <span class="col-form-span-label">Alphabet</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (obj of viewData?.Table5; track obj) {
-<tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">{{obj.FROM}}</span>
-                            </td>
-                            <td class="width150">
-                                <span class="col-form-span-label">{{obj.TO}}</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{obj.ALPHABET}}</span>
-                            </td>
-                        </tr>
-}
-                    </tbody>
-                </table>
-                <br />
-                @if (viewData?.Table[0]?.EXPT_MODE == 'SEA') {
-<table class="table table-bordered table-sm-new bgwhite">
-                    <tbody>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Container No </span>
-                            </td>
-                            <td colspan="3">
-                                @for (obj of containerData; track obj) {
-<p class="col-form-span-label">
-                                    <span class="link-label" (click)="showClpView(obj.CONTAINERNO)">
-                                        <u>{{obj.CONTAINER}}</u>
-                                    </span>{{obj.CONTAINER_STATUS}}</p>
-}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">B/L No. </span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.BL_NO}}</span>
-                            </td>
-                            <td class="width150">
-                                <span class="col-form-span-label">B/L Date </span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.BL_DATE}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">HBL No.</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.HBL_NO}}</span>
-                            </td>
-                            <td class="width150">
-                                <span class="col-form-span-label">HBL Date</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.HBL_DATE}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Surrendered Date </span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.FCRSDT}}</span>
-                            </td>
-                            <td class="width150">
-                                <span class="col-form-span-label"></span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label"></span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Name of The Vessel </span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.VSL_NAME}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Rotation</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_VESSEL}}</span>
-                            </td>
-                            <td class="width150">
-                                <span class="col-form-span-label">Voyage Number </span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.VSL_VOYNO}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Shipping Line </span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.LINER_NAME}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Vessel Agent </span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.AGT_NAME}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">E.T.D. (SCHEDULED) </span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.ETD}}</span>
-                            </td>
-                        </tr>
-                        @if (viewData?.Table[0]?.SAILING == '') {
-<tr>
-                            <td colspan="4" class="bglightgreen red">
-                                <strong>
-                                    <span class="col-form-span-label">VESSEL DELAYED</span>
-                                </strong>
-                            </td>
-                        </tr>
-}
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">SAILED ON (ACTUAL) </span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.SAILING}}</span>
-                            </td>
-                        </tr>
-                        @if (viewData?.Table[0]?.EXPT_MODE == 'SEA') {
-<tr>
-                            <td class="width150">
-                                <span class="col-form-span-label"></span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">Direct </span>
-                            </td>
-                        </tr>
-}
-                    </tbody>
-                </table>
-}
-                @if (viewData?.Table[0]?.EXPT_MODE == 'SEA') {
-<table class="table table-bordered table-sm-new bgwhite">
-                    <tbody>
-                        <tr>
-                            <td colspan="4">
-                                <span class="col-form-span-label">
-                                    <strong>TRANSHIPMENT DETAILS - VESSEL #1</strong>
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Name of The Port</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table2[0]?.TRANSPORT1}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Name of The Vessel</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table2[0]?.VSL_NAME1}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Voyage # of vessel</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table2[0]?.VSL_VOYNO1}}</span>
-                            </td>
-                            <td class="width150">
-                                <span class="col-form-span-label">ETD of vessel</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table2[0]?.ETD1}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">ETA</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table2[0]?.ETA1}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                <span class="col-form-span-label">
-                                    <strong>TRANSHIPMENT DETAILS - VESSEL #2</strong>
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Name of The Port</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table2[0]?.TRANSPORT2}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Name of The Vessel</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table2[0]?.VSL_NAME2}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Voyage # of vessel</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table2[0]?.VSL_VOYNO2}}</span>
-                            </td>
-                            <td class="width150">
-                                <span class="col-form-span-label">ETD of vessel</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table2[0]?.ETD2}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">ETA</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table2[0]?.ETA2}}</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-}
-                @if (viewData?.Table[0]?.EXPT_MODE == 'SEA') {
-<table class="table table-bordered table-sm-new bgwhite">
-                    <tbody>
-                        <tr>
-                            <td colspan="4">
-                                <span class="col-form-span-label">
-                                    <strong>ONWARD TRANSPORTATION DETAILS</strong>
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">By</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table2[0]?.ONWARDTRANSBY}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">From</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table2[0]?.ONWARDTRANSPORT}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">To</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table2[0]?.DESTPORT}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">ETA</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table2[0]?.ETA3}}</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-}
-                <table class="table table-bordered table-sm-new bgwhite">
-                    <tbody>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Airline Name</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.AIRLINENAME}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Planned Flight No.</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.PLANFLIGHTNO}}</span>
-                            </td>
-                            <td class="width150">
-                                <span class="col-form-span-label">Planned Flight Date</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.PLANFLIGHTDT}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Actual Flight No.</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.ACTUALFLIGHTNO}}</span>
-                            </td>
-                            <td class="width150">
-                                <span class="col-form-span-label">Actual Flight Date</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.ACTUALFLIGHTDT}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">MAWB No.</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.AEROBILLNO}}</span>
-                                @if (viewData?.Table[0]?.AEROBILLNO != '') {
-<span class="col-form-span-label"> </span>
-}
-                            </td>
-                            <td class="width150">
-                                <span class="col-form-span-label">MAWB Date</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.AEROBILLDT}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">House AWB No.</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.HOUSEBILLNO}}</span>
-                                @if (viewData?.Table[0]?.HOUSEBILLNO != '') {
-<span class="col-form-span-label"> </span>
-}
-                            </td>
-                            <td class="width150">
-                                <span class="col-form-span-label">House AWB Date.</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.HOUSEBILLDT}}</span>
-                            </td>
-                        </tr>
-                        @if (viewData?.Table[0]?.EXPT_MODE == 'AIR') {
-<tr>
-                            <td class="width150">
-                                <span class="col-form-span-label"></span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">Direct </span>
-                            </td>
-                        </tr>
-}
-                    </tbody>
-                </table>
-                <table class="table table-bordered table-sm-new bgwhite">
-                    <tbody>
-                        <tr>
-                            <td colspan="4">
-                                <span class="col-form-span-label">
-                                    <strong>TRANSHIPMENT DETAILS</strong>
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Transhipment Port1</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.TRANSPORT1_CITYNAME}} </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Flight No.</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.FLIGHTNO1}}</span>
-                            </td>
-                            <td class="width150">
-                                <span class="col-form-span-label">ETD</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.ETDPORT1}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">ETA</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.ETAPORT1}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Transhipment Port2</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.TRANSPORT2_CITYNAME}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Flight No.</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.FLIGHTNO2}}</span>
-                            </td>
-                            <td class="width150">
-                                <span class="col-form-span-label">ETD</span>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.ETDPORT2}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">ETA</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.ETAPORT2}}</span>
-                            </td>
-                        </tr>
-                        @if (viewData?.Table2[0]?.DIRECTVSL == 'YES') {
-<tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">E.T.A</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.FCRSDT}}</span>
-                            </td>
-                        </tr>
-}
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">D/douane No.</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.FCRSDT}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">D/douane Date</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.FCRSDT}}</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <table class="table table-bordered table-sm-new bgwhite">
-                    <tbody>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Actual Arrival date </span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.ARRIVALDT}}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">Delivery given date </span>
-                            </td>
-                            <td colspan="3">
-                                <table class="table table-bordered table-sm-new bgwhite">
-                                    <tbody>
-                                        @for (obj of viewData?.Table3; track obj) {
-<tr>
-                                            <td class="width150">
-                                                <span class="col-form-span-label">{{obj.ACTUALDT}}</span>
-                                            </td>
-                                        </tr>
-}
-                                    </tbody>
-                                </table>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="width150">
-                                <span class="col-form-span-label">PSS</span>
-                            </td>
-                            <td colspan="3">
-                                <span class="col-form-span-label">{{viewData?.Table[0]?.EXPT_PSS}}</span>
-                            </td>
-                        </tr>
-                        <tbody>
-                </table>
-                <table class="table table-bordered table-sm-new bgwhite">
-                    <tbody>
-                        <tr>
-                            <td class="width200 centerlabel">
-                                <span class="col-form-span-label link-label" (click)="show('I', null)">EXPORTER'S INVOICE DETAILS </span>
-                            </td>
-                            <td class="width200 centerlabel">
-                                <span class="col-form-span-label link-label" (click)="show('C', null)">CHRONOLOGY </span>
-                            </td>
-                            <td class="width200 centerlabel">
-                                <span class="col-form-span-label link-label" (click)="show('R', null)">REMARK </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-}
-            @if (links == 'I') {
-<app-consignment-invoice-view [exptno]="ExptNo"></app-consignment-invoice-view>
-}
-            @if (links == 'C') {
-<app-consignment-chronology-view [exptno]="ExptNo" [deliveryData]="deliveryData" [loadTrans]="loadTrans"></app-consignment-chronology-view>
-}
-            @if (links == 'R') {
-<app-consignment-remark-view [exptno]="ExptNo" [remarkData]="remark"></app-consignment-remark-view>
-}
-            @if (links == 'CLP') {
-<app-consignment-clp-view [exptno]="ExptNo" [containerno]="containerno" [vessel]="vessel"></app-consignment-clp-view>
-}
-            <br />
-            @if (links=='I'||links=='C'||links=='R'||links=='CLP') {
-<div>
-                <button uiBtn variant="outline" size="sm" (click)="links='M'">
-                    <i class="fa fa-arrow-circle-o-left"></i>&nbsp;back to main</button>
-            </div>
-}
-        </div>
-        <div class="col-sm-2">
-        </div>
+      </div>
+      <div class="tools">
+        @if (edocView == 1) {
+          <button type="button" class="btn g" (click)="openEdoc()"><i class="fa fa-paperclip"></i> E-Document &middot; view / upload</button>
+        }
+        <button type="button" class="btn g" (click)="show('I', null)">Exporter's invoice details</button>
+        <button type="button" class="btn g" (click)="show('C', null)">Chronology</button>
+        <button type="button" class="btn g" (click)="show('R', null)">Remark</button>
+        <button type="button" class="btn" routerLink="/export/Consignment/search">Search</button>
+      </div>
     </div>
+    @if (links == 'M') {
+      <nav class="cs-nav" aria-label="Sections">
+        <button type="button" (click)="scrollToSection('mv-main')">Main</button>
+        <button type="button" (click)="scrollToSection('mv-order-no-details')">Orders<span class="n">{{viewData?.Table4?.length || 0}}</span></button>
+        <button type="button" (click)="scrollToSection('mv-pkg-no-details')">Packages<span class="n">{{viewData?.Table5?.length || 0}}</span></button>
+        @if (viewData?.Table[0]?.EXPT_MODE == 'SEA') {
+          <button type="button" (click)="scrollToSection('mv-vessel-details')">Vessel<span class="n">{{containerData?.length || 0}}</span></button>
+          <button type="button" (click)="scrollToSection('mv-transhipment-details-vessel-1')">Transhipment</button>
+          <button type="button" (click)="scrollToSection('mv-onward-transportation-details')">Onward</button>
+        }
+        <button type="button" (click)="scrollToSection('mv-air-shipment-details')">Air shipment</button>
+        <button type="button" (click)="scrollToSection('mv-transhipment-details')">Air transhipment</button>
+        <button type="button" (click)="scrollToSection('mv-arrival-and-delivery')">Arrival &amp; delivery<span class="n">{{viewData?.Table3?.length || 0}}</span></button>
+      </nav>
+    }
+  </div>
+
+  @if (links == 'L') {
+    <div></div>
+  }
+
+  @if (links == 'M') {
+    <div>
+
+      @if (viewData?.Table[0]?.EXPTCANCEL == 'Y') {
+        <div class="cs-note">CONSIGNMENT IS CANCELLED</div>
+      }
+
+      <!-- ================= main ================= -->
+      <div class="card sec cv-anchor" id="mv-main">
+        <div class="card-h"><h2>Main</h2></div>
+        <div class="kv4">
+        <div class="kv"><span class="k">Export No</span><span class="v">{{viewData?.Table[0]?.EXPTNO}}</span></div>
+        <div class="kv"><span class="k">Mode Of Shipment</span><span class="v">{{viewData?.Table[0]?.EXPT_MODE}}</span></div>
+        <div class="kv full"><span class="k">Clearance</span><span class="v">
+          @if (viewData?.Table[0]?.CLEARANCE == 'S') {
+            <b>SHIPMENT CLEARANCE BY SHIPPER'S AGENT</b>
+          }
+          @if (viewData?.Table[0]?.CLEARANCE != 'S') {
+            <b>SHIPMENT CLEARANCE BY US</b>
+          }
+        </span></div>
+        <div class="kv"><span class="k">Exporter/Shipper</span><span class="v">{{viewData?.Table[0]?.EXP_NAME}}</span></div>
+        <div class="kv"><span class="k">Bill To</span><span class="v">{{viewData?.Table[0]?.BILLTO_NAME}}</span></div>
+        <div class="kv"><span class="k">Agent</span><span class="v">{{viewData?.Table[0]?.AGENT_NAME}}</span></div>
+        <div class="kv"><span class="k">Consignee</span><span class="v">{{viewData?.Table[0]?.CON_NAME}}</span></div>
+        <div class="kv"><span class="k">Sourcing Agent</span><span class="v">{{viewData?.Table[0]?.SRCAGT_NAME}}</span></div>
+        <div class="kv"><span class="k">Consignee Bank</span><span class="v">{{viewData?.Table[0]?.BANK_NAME}}</span></div>
+        <div class="kv"><span class="k">Buyer Name</span><span class="v">{{viewData?.Table[0]?.BUYER_NAME}}</span></div>
+        <div class="kv"><span class="k">Loading Port</span><span class="v">{{viewData?.Table[0]?.EXPT_LDGPORT}}</span></div>
+        <div class="kv"><span class="k">Origin City</span><span class="v">{{viewData?.Table[0]?.ORIGIN}}</span></div>
+        <div class="kv"><span class="k">Port Of Discharge</span><span class="v">{{viewData?.Table[0]?.PORT_OF_DISCHARGE}}</span></div>
+        <div class="kv"><span class="k">I / T</span><span class="v">{{viewData?.Table[0]?.IT}}</span></div>
+        <div class="kv"><span class="k">Destination City</span><span class="v">{{viewData?.Table[0]?.DEST_CITY}}</span></div>
+        <div class="kv"><span class="k">Destination Country</span><span class="v">{{viewData?.Table[0]?.DEST_COUNTRY}}</span></div>
+        <div class="kv"><span class="k">Doc Recd. Date</span><span class="v">{{viewData?.Table[0]?.EXPT_DOCRECD}}</span></div>
+        <div class="kv"><span class="k">No. of Packages</span><span class="v">{{viewData?.Table[0]?.EXPT_NOOFPKGS}}</span></div>
+        <div class="kv"><span class="k">No. of Pieces</span><span class="v">{{viewData?.Table[0]?.EXPT_NOOFPCS}}</span></div>
+        <div class="kv"><span class="k">Gross Weight</span><span class="v">{{viewData?.Table[0]?.EXPT_GRWT}}</span></div>
+        <div class="kv"><span class="k">Net Weight</span><span class="v">{{viewData?.Table[0]?.EXPT_NETWT}}</span></div>
+        <div class="kv"><span class="k">Volume (CBM)</span><span class="v">{{viewData?.Table[0]?.EXPT_VOLUME}}</span></div>
+        <div class="kv"><span class="k">CHBL Weight</span><span class="v">{{viewData?.Table[0]?.EXPT_CHBLWT}}</span></div>
+      </div>
+      </div>
+
+      <!-- ================= order ================= -->
+      <div class="card sec cv-anchor" id="mv-order-no-details">
+        <div class="card-h"><h2>Order No. Details</h2></div>
+        <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Order No.</th>
+              <th>Reference No</th>
+              <th>Pieces</th>
+              <th>Type of Pieces</th>
+              <th>Warehouse</th>
+              <th>Item Description</th>
+              <th>Pkgs</th>
+              <th>Gr. Wt</th>
+              <th>Net Wt</th>
+              <th>Volume</th>
+              <th>Chbl. Wt.</th>
+              <th>LSD Date</th>
+              <th>DRN Date</th>
+              <th>FOB Value</th>
+              <th>Currency</th>
+              <th>Cnee Dept (Rayon)</th>
+              <th>Container No</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (obj of viewData?.Table4; track obj) {
+              <tr>
+                <td class="mono">{{obj.ORDERNO}}</td>
+                <td>{{obj.STYLENO}}</td>
+                <td class="num mono">{{obj.PIECES}}</td>
+                <td>{{obj.TYPEOFPCS}}</td>
+                <td>{{obj.WAREHOUSE}}</td>
+                <td>{{obj.ITEMDESC}}</td>
+                <td class="num mono">{{obj.PKGS}}</td>
+                <td class="num mono">{{obj.GRWT}}</td>
+                <td class="num mono">{{obj.NETWT}}</td>
+                <td class="num mono">{{obj.VOLUME}}</td>
+                <td class="num mono">{{obj.CHBLWT}}</td>
+                <td>{{obj.LSD}}</td>
+                <td>{{obj.DRNDATE}}</td>
+                <td class="num mono">{{obj.FOBVALUE}}</td>
+                <td>{{obj.CURENCY}}</td>
+                <td>{{obj.CNEEDEPT}}</td>
+                <td>{{obj.CONTAINERNO}}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="17">No order lines.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      </div>
+
+      <!-- ================= package / marks ================= -->
+      <div class="card sec cv-anchor" id="mv-pkg-no-details">
+        <div class="card-h"><h2>Pkg No. Details</h2></div>
+        <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>From</th>
+              <th>To</th>
+              <th>Alphabet</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (obj of viewData?.Table5; track obj) {
+              <tr>
+                <td>{{obj.FROM}}</td>
+                <td>{{obj.TO}}</td>
+                <td>{{obj.ALPHABET}}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="3">No package ranges.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      </div>
+
+      <!-- ================= vessel / port / goods ================= -->
+      @if (viewData?.Table[0]?.EXPT_MODE == 'SEA') {
+        <div class="card sec cv-anchor" id="mv-vessel-details">
+          <div class="card-h"><h2>Vessel Details</h2></div>
+          <div class="kv4">
+          <div class="kv full"><span class="k">Container no.</span><span class="v">
+              @for (obj of containerData; track obj) {
+                <span class="cs-line">
+                  <a class="lnk mono" (click)="showClpView(obj.CONTAINERNO)">{{obj.CONTAINER}}</a>
+                  {{obj.CONTAINER_STATUS}}
+                </span>
+              }
+          </span></div>
+          <div class="kv"><span class="k">B/L No.</span><span class="v">{{viewData?.Table[0]?.BL_NO}}</span></div>
+          <div class="kv"><span class="k">B/L Date</span><span class="v">{{viewData?.Table[0]?.BL_DATE}}</span></div>
+          <div class="kv"><span class="k">HBL No.</span><span class="v">{{viewData?.Table[0]?.HBL_NO}}</span></div>
+          <div class="kv"><span class="k">HBL Date</span><span class="v">{{viewData?.Table[0]?.HBL_DATE}}</span></div>
+          <div class="kv"><span class="k">Surrendered Date</span><span class="v">{{viewData?.Table[0]?.FCRSDT}}</span></div>
+          <div class="kv"><span class="k">Name of The Vessel</span><span class="v">{{viewData?.Table[0]?.VSL_NAME}}</span></div>
+          <div class="kv"><span class="k">Rotation</span><span class="v">{{viewData?.Table[0]?.EXPT_VESSEL}}</span></div>
+          <div class="kv"><span class="k">Voyage Number</span><span class="v">{{viewData?.Table[0]?.VSL_VOYNO}}</span></div>
+          <div class="kv"><span class="k">Shipping Line</span><span class="v">{{viewData?.Table[0]?.LINER_NAME}}</span></div>
+          <div class="kv"><span class="k">Vessel Agent</span><span class="v">{{viewData?.Table[0]?.AGT_NAME}}</span></div>
+          <div class="kv"><span class="k">E.T.D. (SCHEDULED)</span><span class="v">{{viewData?.Table[0]?.ETD}}</span></div>
+          @if (viewData?.Table[0]?.SAILING == '') {
+            <div class="kv full"><span class="k">Status</span><span class="v"><span class="chip solid">VESSEL DELAYED</span></span></div>
+          }
+          <div class="kv"><span class="k">SAILED ON (ACTUAL)</span><span class="v">{{viewData?.Table[0]?.SAILING}}</span></div>
+          @if (viewData?.Table[0]?.EXPT_MODE == 'SEA') {
+            <div class="kv"><span class="k"></span><span class="v">Direct</span></div>
+          }
+        </div>
+        </div>
+      }
+
+      @if (viewData?.Table[0]?.EXPT_MODE == 'SEA') {
+        <div class="card sec cv-anchor" id="mv-transhipment-details-vessel-1">
+          <div class="card-h"><h2>Transhipment Details - Vessel #1</h2></div>
+          <div class="kv4">
+          <div class="kv"><span class="k">Name of The Port</span><span class="v">{{viewData?.Table2[0]?.TRANSPORT1}}</span></div>
+          <div class="kv"><span class="k">Name of The Vessel</span><span class="v">{{viewData?.Table2[0]?.VSL_NAME1}}</span></div>
+          <div class="kv"><span class="k">Voyage # of vessel</span><span class="v">{{viewData?.Table2[0]?.VSL_VOYNO1}}</span></div>
+          <div class="kv"><span class="k">ETD of vessel</span><span class="v">{{viewData?.Table2[0]?.ETD1}}</span></div>
+          <div class="kv"><span class="k">ETA</span><span class="v">{{viewData?.Table2[0]?.ETA1}}</span></div>
+        </div>
+        </div>
+
+        <div class="card sec cv-anchor" id="mv-transhipment-details-vessel-2">
+          <div class="card-h"><h2>Transhipment Details - Vessel #2</h2></div>
+          <div class="kv4">
+          <div class="kv"><span class="k">Name of The Port</span><span class="v">{{viewData?.Table2[0]?.TRANSPORT2}}</span></div>
+          <div class="kv"><span class="k">Name of The Vessel</span><span class="v">{{viewData?.Table2[0]?.VSL_NAME2}}</span></div>
+          <div class="kv"><span class="k">Voyage # of vessel</span><span class="v">{{viewData?.Table2[0]?.VSL_VOYNO2}}</span></div>
+          <div class="kv"><span class="k">ETD of vessel</span><span class="v">{{viewData?.Table2[0]?.ETD2}}</span></div>
+          <div class="kv"><span class="k">ETA</span><span class="v">{{viewData?.Table2[0]?.ETA2}}</span></div>
+        </div>
+        </div>
+      }
+
+      @if (viewData?.Table[0]?.EXPT_MODE == 'SEA') {
+        <div class="card sec cv-anchor" id="mv-onward-transportation-details">
+          <div class="card-h"><h2>Onward Transportation Details</h2></div>
+          <div class="kv4">
+          <div class="kv"><span class="k">By</span><span class="v">{{viewData?.Table2[0]?.ONWARDTRANSBY}}</span></div>
+          <div class="kv"><span class="k">From</span><span class="v">{{viewData?.Table2[0]?.ONWARDTRANSPORT}}</span></div>
+          <div class="kv"><span class="k">To</span><span class="v">{{viewData?.Table2[0]?.DESTPORT}}</span></div>
+          <div class="kv"><span class="k">ETA</span><span class="v">{{viewData?.Table2[0]?.ETA3}}</span></div>
+        </div>
+        </div>
+      }
+
+      <!-- ================= air shipment ================= -->
+      <div class="card sec cv-anchor" id="mv-air-shipment-details">
+        <div class="card-h"><h2>Air Shipment Details</h2></div>
+        <div class="kv4">
+        <div class="kv"><span class="k">Airline Name</span><span class="v">{{viewData?.Table[0]?.AIRLINENAME}}</span></div>
+        <div class="kv"><span class="k">Planned Flight No.</span><span class="v">{{viewData?.Table[0]?.PLANFLIGHTNO}}</span></div>
+        <div class="kv"><span class="k">Planned Flight Date</span><span class="v">{{viewData?.Table[0]?.PLANFLIGHTDT}}</span></div>
+        <div class="kv"><span class="k">Actual Flight No.</span><span class="v">{{viewData?.Table[0]?.ACTUALFLIGHTNO}}</span></div>
+        <div class="kv"><span class="k">Actual Flight Date</span><span class="v">{{viewData?.Table[0]?.ACTUALFLIGHTDT}}</span></div>
+        <div class="kv"><span class="k">MAWB No.</span><span class="v">{{viewData?.Table[0]?.AEROBILLNO}}</span></div>
+        <div class="kv"><span class="k">MAWB Date</span><span class="v">{{viewData?.Table[0]?.AEROBILLDT}}</span></div>
+        <div class="kv"><span class="k">House AWB No.</span><span class="v">{{viewData?.Table[0]?.HOUSEBILLNO}}</span></div>
+        <div class="kv"><span class="k">House AWB Date.</span><span class="v">{{viewData?.Table[0]?.HOUSEBILLDT}}</span></div>
+        @if (viewData?.Table[0]?.EXPT_MODE == 'AIR') {
+          <div class="kv"><span class="k"></span><span class="v">Direct</span></div>
+        }
+      </div>
+      </div>
+
+      <div class="card sec cv-anchor" id="mv-transhipment-details">
+        <div class="card-h"><h2>Transhipment Details</h2></div>
+        <div class="kv4">
+        <div class="kv"><span class="k">Transhipment Port1</span><span class="v">{{viewData?.Table[0]?.TRANSPORT1_CITYNAME}}</span></div>
+        <div class="kv"><span class="k">Flight No.</span><span class="v">{{viewData?.Table[0]?.FLIGHTNO1}}</span></div>
+        <div class="kv"><span class="k">ETD</span><span class="v">{{viewData?.Table[0]?.ETDPORT1}}</span></div>
+        <div class="kv"><span class="k">ETA</span><span class="v">{{viewData?.Table[0]?.ETAPORT1}}</span></div>
+        <div class="kv"><span class="k">Transhipment Port2</span><span class="v">{{viewData?.Table[0]?.TRANSPORT2_CITYNAME}}</span></div>
+        <div class="kv"><span class="k">Flight No.</span><span class="v">{{viewData?.Table[0]?.FLIGHTNO2}}</span></div>
+        <div class="kv"><span class="k">ETD</span><span class="v">{{viewData?.Table[0]?.ETDPORT2}}</span></div>
+        <div class="kv"><span class="k">ETA</span><span class="v">{{viewData?.Table[0]?.ETAPORT2}}</span></div>
+        @if (viewData?.Table2[0]?.DIRECTVSL == 'YES') {
+          <div class="kv"><span class="k">E.T.A</span><span class="v">{{viewData?.Table[0]?.FCRSDT}}</span></div>
+        }
+        <div class="kv"><span class="k">D/douane No.</span><span class="v">{{viewData?.Table[0]?.FCRSDT}}</span></div>
+        <div class="kv"><span class="k">D/douane Date</span><span class="v">{{viewData?.Table[0]?.FCRSDT}}</span></div>
+      </div>
+      </div>
+
+      <!-- ================= arrival / delivery ================= -->
+      <div class="card sec cv-anchor" id="mv-arrival-and-delivery">
+        <div class="card-h"><h2>Arrival &amp; Delivery</h2></div>
+        <div class="kv4">
+        <div class="kv"><span class="k">Actual Arrival date</span><span class="v">{{viewData?.Table[0]?.ARRIVALDT}}</span></div>
+        <div class="kv full"><span class="k">Delivery given date</span>
+          <div class="v">
+            <table class="tbl cs-mini">
+              <tbody>
+                @for (obj of viewData?.Table3; track obj) {
+                  <tr>
+                    <td>{{obj.ACTUALDT}}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="kv"><span class="k">PSS</span><span class="v">{{viewData?.Table[0]?.EXPT_PSS}}</span></div>
+      </div>
+      </div>
+
+    </div>
+  }
+
+  @if (links == 'I') {
+    <app-consignment-invoice-view [exptno]="ExptNo"></app-consignment-invoice-view>
+  }
+  @if (links == 'C') {
+    <app-consignment-chronology-view [exptno]="ExptNo" [deliveryData]="deliveryData" [loadTrans]="loadTrans"></app-consignment-chronology-view>
+  }
+  @if (links == 'R') {
+    <app-consignment-remark-view [exptno]="ExptNo" [remarkData]="remark"></app-consignment-remark-view>
+  }
+  @if (links == 'CLP') {
+    <app-consignment-clp-view [exptno]="ExptNo" [containerno]="containerno" [vessel]="vessel"></app-consignment-clp-view>
+  }
+
+  @if (links=='I'||links=='C'||links=='R'||links=='CLP') {
+    <div class="bar">
+      <span class="note"></span>
+      <div class="r"><button type="button" class="btn" (click)="links='M'">Back to main</button></div>
+    </div>
+  }
+
 </div>

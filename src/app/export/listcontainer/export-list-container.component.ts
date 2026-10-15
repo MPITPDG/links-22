@@ -35,24 +35,26 @@ export class listcontainer implements OnInit {
         this.loaderService.display(true);
         if (this.Containerno === undefined || this.Containerno === null || this.Containerno === "") {
             this._toasterService.toast('error', 'Error', "Please enter Container no");
+            this.loaderService.display(false);
             return false;
         }
         const jsonExport = { ContainerID: this.Containerno};
         this._dataService.Common('Export/listcontainer', jsonExport)
         .subscribe((data: any) => {
 
-            if (data.Table[0].STATUS === "100") {
+            // Fail soft: a reply without a Table reads as "not found", never a crash.
+            if (data?.Table?.[0]?.STATUS === "100") {
                
                 this.Searchdata = data.Table;  
                this.vslRtno=this.Searchdata[0].EXPT_VESSEL;
                this.vslport=this.Searchdata[0].ORIGINCITY;
 
-                this.Exportdata=data.Table1;
-                this.Palletdata =data.Table2;              
+                this.Exportdata=data.Table1 ?? [];
+                this.Palletdata =data.Table2 ?? [];              
                 this.loaderService.display(false);  
             } else {
                 this.loaderService.display(false);
-                this._toasterService.toast('error', 'Error', data.Table[0].statusText);
+                this._toasterService.toast('error', 'Error', data?.Table?.[0]?.statusText ?? 'No record found');
             }
         });
    

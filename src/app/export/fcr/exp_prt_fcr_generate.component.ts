@@ -116,7 +116,8 @@ export class ExptFCRGenerate  implements OnInit {
         const jsonExport = { citycode: this._loginService.getLogin()[0].CITYCODE, EXPTNO: this.exJobno };
         this._dataService.Common(this.baseUrl, jsonExport)
             .subscribe((data: any) => {               
-                if (data.Table[0].STATUS == 100) {
+                const res = (data && data.Table && data.Table.length) ? data.Table[0] : null;
+                if (res && res.STATUS == 100) {
                     this.ISPRINT=data.Table[0].ISPRINT;
                     this.DRAFTPRINT=data.Table[0].DRAFTPRINT;
                     if(data.Table[0].FRMBL =="0")
@@ -128,7 +129,7 @@ export class ExptFCRGenerate  implements OnInit {
                         this.FRMBL=true;                        
                     }
                     this.buttonStatus = false;
-                    if (data.Table1.length>0)
+                    if (data.Table1 && data.Table1.length>0)
                     {
                         this.exptdt = data.Table1;                   
                         this.shippername = this.exptdt[0].EXPT_EXPORTER;
@@ -168,9 +169,9 @@ export class ExptFCRGenerate  implements OnInit {
                     }               
 
                     
-                    this.listBltype = data.Table2;
-                    this.listCurreny = data.Table3;
-                    this.listSupp = data.Table4;
+                    this.listBltype = data.Table2 || [];
+                    this.listCurreny = data.Table3 || [];
+                    this.listSupp = data.Table4 || [];
 
                   
                     this.loaderService.display(false);
@@ -178,7 +179,7 @@ export class ExptFCRGenerate  implements OnInit {
                 } else {
                     this.loaderService.display(false);
                     this.buttonStatus = false;
-                    this._toasterService.toast('error', 'Error', data.Table[0].STATUSTEXT);
+                    this._toasterService.toast('error', 'Error', (res && res.STATUSTEXT) || 'No record found for this job');
                 }
             },
             (error) => {

@@ -79,7 +79,8 @@ export class ExptMBLGenerate  implements OnInit  {
         const jsonExport = { CITY_CODE: this._loginService.getLogin()[0].CITYCODE, JOBNO: this.exJobno };
         this._dataService.Common('Export/exp_printdoc_mbl_listview', jsonExport)
             .subscribe((data: any) => {               
-                if (data.Table[0].STATUS == 100) {
+                const res = (data && data.Table && data.Table.length) ? data.Table[0] : null;
+                if (res && res.STATUS == 100 && data.Table1 && data.Table1.length) {
                     if(data.Table[0].JOBSELE =="0")
                     {
                         this.JOBSELE=false;
@@ -93,7 +94,7 @@ export class ExptMBLGenerate  implements OnInit  {
                      
                     this.VSL_NAME = this.exptdt[0].VSL_NAME;
                     this.VOYNO = this.exptdt[0].VOYNO;                     
-                    this.listCurreny = data.Table2;     
+                    this.listCurreny = data.Table2 || [];     
                     this.BLTYPE = (this.exptdt[0].BLTYPE == "") ? "-1": this.exptdt[0].BLTYPE;//this.exptdt[0].FRTYPE;
                     this.frttype = (this.exptdt[0].FRTTYPE == "") ? "-1": this.exptdt[0].FRTTYPE;//this.exptdt[0].FRTYPE;
                     this.currency = (this.exptdt[0].FRTCUR == "") ? "-1": this.exptdt[0].FRTCUR;//this.exptdt[0].FRTCURR;
@@ -104,9 +105,9 @@ export class ExptMBLGenerate  implements OnInit  {
                     this._toasterService.toast('info', 'Complete', 'Data filled successfully');
                 } else {
                     this.loaderService.display(false);
-                    this._toasterService.toast('error', 'Error', data.Table[0].statusText);
+                    this._toasterService.toast('error', 'Error', (res && res.STATUS != 100 && res.statusText) || 'No consignments found for this job');
                 }
-            });
+            }, () => { this.loaderService.display(false); });
              
         }  
     ResetAll()
@@ -161,7 +162,8 @@ export class ExptMBLGenerate  implements OnInit  {
         const jsonExport = {JOBNO: this.exJobno,MBLNO:this.mblno,MBLDT:mbldt,FRTYPE: this.frttype, FRTCURR: this.currency, FRTAMT: this.frtAmt, MAKERID: this._loginService.getLogin()[0].CMPID,BLTYPE: this.BLTYPE,  JOBSTR: this.jobnos ,  CITY_CODE: this._loginService.getLogin()[0].CITYCODE };
         this._dataService.Common('Export/exp_printdoc_mbl_iu', jsonExport)
             .subscribe((data: any) => {
-                if (data.Table[0].STATUS == 100) {     
+                const res = (data && data.Table && data.Table.length) ? data.Table[0] : null;
+                if (res && res.STATUS == 100) {     
                     this._mblsharedservice.jobnoshared=this.exJobno;
                     this._mblsharedservice.mblnoshared=this.mblno;
                     this.loaderService.display(false);
@@ -171,10 +173,10 @@ export class ExptMBLGenerate  implements OnInit  {
                 }
                 else {
                     this.loaderService.display(false);
-                    this._toasterService.toast('error', 'Error', data.Table[0].statusText);
+                    this._toasterService.toast('error', 'Error', (res && res.statusText) || 'The Master B/L could not be saved');
                      
                 }
-            })
+            }, () => { this.loaderService.display(false); })
     }   
 
     onprint()

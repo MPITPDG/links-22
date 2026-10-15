@@ -1,75 +1,72 @@
-﻿<table class="table table-bordered table-sm-new">
-	<tr class="trbg centerlabel">
-		<td colspan="8">
-			<span class="col-form-span-label"><b>VESSEL DETAILS</b></span>
-			<button uiBtn variant="outline" size="sm" style="float: right;" (click)="back();"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to search</u></span></button>
-		</td>
-	</tr>
-</table>
-<table class="table table-bordered table-sm-new">
-	<tr>
-		<td class="width150"><span class="col-form-span-label"><strong>Rotation No.</strong></span></td>
-		<td colspan="7"><span class="col-form-span-label">{{VesselDetail?.VSL_RTNO}}</span></td>
-	</tr>
-	<tr>
-		<td class="width150"><span class="col-form-span-label"><strong>Vessel Name </strong></span></td>
-		<td colspan="7"><span class="col-form-span-label">{{VesselDetail?.VSL_NAME}}</span></td>
-	</tr>
-	<tr>
-		<td class="width150"><span class="col-form-span-label"><strong>Voyage No. </strong></span></td>
-		<td colspan="7"><span class="col-form-span-label">{{VesselDetail?.VSL_VOYNO}}</span></td>
-	</tr>
-	<tr>
-		<td class="width150"><span class="col-form-span-label"><strong>Last Carting Date </strong></span></td>
-		<td colspan="7"><span class="col-form-span-label">{{VesselDetail?.CARTING}}</span></td>
-	</tr>
-	<tr>
-		<td class="width150"><span class="col-form-span-label"><strong>ETD </strong></span></td>
-		<td colspan="7"><span class="col-form-span-label">{{VesselDetail?.ETD}}</span></td>
-	</tr>
-	<tr>
-		<td class="width150"><span class="col-form-span-label"><strong>Actual Departure </strong></span></td>
-		<td colspan="7"><span class="col-form-span-label">{{VesselDetail?.SAILING}}</span></td>
-	</tr>
-</table>
-@if (ContainerList.length > 0) {
-<div class="xyscroll" style="height:300px">
-	<table class="table table-bordered table-sm-new">
-		<thead>
-			<tr class="col-form-span-heading" style="white-space:nowrap;">
-				<th class="centerlabel width20"></th>
-				@for ( key of keys; track  key; let i = $index) {
-
-					@if (i!=0&&i!=1&&i!=2) {
-<th class="centerlabel"><span class="col-form-span-label">{{key}}</span></th>
-}
-				
-}
-			</tr>
-		</thead>
-		<tbody class="bgwhite">
-			@for (obj of ContainerList; track obj) {
-<tr>
-				<td class="centerlabel width20"><i class="fa fa-edit" style="cursor: pointer;" (click)="edit(obj[keys[0]],obj[keys[1]],obj[keys[2]],obj[keys[3]])"></i></td>
-				@for ( key of keys; track  key; let i = $index) {
-
-					@if (i!=0&&i!=1&&i!=2) {
-<td><span class="col-form-span-label">{{obj[key]}}</span></td>
-}
-				
-}
-			</tr>
-}
-		</tbody>
-	</table>
+﻿<!-- Shipment progress - container loading confirmation, vessel containers. Kit cards; columns come from the API keys as before. -->
+<div class="card sec">
+  <div class="card-h">
+    <h2>Vessel</h2>
+    <button type="button" class="btn g" (click)="back();">Back to search</button>
+  </div>
+  <div class="sp-kv">
+    <div><span>Rotation no.</span><b>{{VesselDetail?.VSL_RTNO}}</b></div>
+    <div><span>Vessel name</span><b>{{VesselDetail?.VSL_NAME}}</b></div>
+    <div><span>Voyage no.</span><b>{{VesselDetail?.VSL_VOYNO}}</b></div>
+    <div><span>Last carting date</span><b>{{VesselDetail?.CARTING}}</b></div>
+    <div><span>ETD</span><b>{{VesselDetail?.ETD}}</b></div>
+    <div><span>Actual departure</span><b>{{VesselDetail?.SAILING}}</b></div>
+  </div>
 </div>
-}
+
+<div class="card sec">
+  <div class="card-h">
+    <h2>Containers</h2>
+    @if (VesselDetail?.SAILING) { <span class="chip solid">Sailed</span> } @else { <span class="chip"><span class="dot"></span>Not sailed</span> }
+  </div>
+
+  <div class="toolbar">
+    <span><span class="count">{{ ContainerList.length }} {{ ContainerList.length === 1 ? 'container' : 'containers' }}</span></span>
+    <span class="tb-r">
+      <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!ContainerList.length">Export</button>
+    </span>
+  </div>
+
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th></th>
+          @for ( key of keys; track  key; let i = $index) {
+            @if (i!=0&&i!=1&&i!=2) {
+              <th>{{key}}</th>
+            }
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (obj of pager.rows; track obj) {
+          <tr>
+            <td class="act" style="text-align:left"><button type="button" (click)="edit(obj[keys[0]],obj[keys[1]],obj[keys[2]],obj[keys[3]])">Edit</button></td>
+            @for ( key of keys; track  key; let i = $index) {
+              @if (i!=0&&i!=1&&i!=2) {
+                <td>{{obj[key]}}</td>
+              }
+            }
+          </tr>
+        } @empty {
+          <tr><td class="empty" [attr.colspan]="keys.length || 1">No containers on this vessel.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pager">
+    <span>Showing <b>{{ pager.rangeStart }}–{{ pager.rangeEnd }}</b> of <b>{{ pager.total }}</b></span>
+    <div class="pages">
+      <button type="button" [disabled]="pager.page <= 1" (click)="pager.go(pager.page - 1)" aria-label="Previous page">‹</button>
+      @for (p of pager.pageList; track $index) {
+        @if (p === 0) { <span class="gap">…</span> } @else { <button type="button" [class.on]="p === pager.page" (click)="pager.go(p)">{{ p }}</button> }
+      }
+      <button type="button" [disabled]="pager.page >= pager.pageCount" (click)="pager.go(pager.page + 1)" aria-label="Next page">›</button>
+    </div>
+  </div>
+</div>
 @if (ErrorMessage !== '') {
-<table class="table table-bordered table-sm-new">
-	<tr class="trbg centerlabel">
-		<td colspan="8">
-			<span class="error-text">{{ErrorMessage}}</span>
-		</td>
-	</tr>
-</table>
+  <div class="sp-note">{{ErrorMessage}}</div>
 }

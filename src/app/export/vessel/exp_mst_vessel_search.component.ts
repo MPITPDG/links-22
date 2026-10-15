@@ -10,6 +10,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-vessel-search',
     templateUrl: 'exp_mst_vessel_search.component.html',
+    styleUrls: ['./vessel-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -18,6 +19,8 @@ export class VesselSearchComponent implements OnInit {
     Searchlist: any=[];
     vslSname: any;
     vslSvoyno: any;
+    /** true once a search has come back, so the empty state can tell "not searched yet" from "nothing found" */
+    searched = false;
      
 
     private baseUrl: string  = "";
@@ -66,10 +69,15 @@ export class VesselSearchComponent implements OnInit {
         this._dataService.Common(this.baseUrl, jsonExport)
             .subscribe((data: any) => {
 
-                if (data.Table[0].STATUS === "100") {
-                    this.Searchlist = data.Table;                   
+                // Fail soft: a reply without a Table is an empty result, not a crash.
+                const rows = (data && Array.isArray(data.Table)) ? data.Table : [];
+                this.searched = true;
+                if (rows.length && rows[0].STATUS === "100") {
+                    this.Searchlist = rows;
+                } else if (rows.length) {
+                    this._toasterService.toast('error', 'Error', rows[0].MSG);
                 } else {
-                    this._toasterService.toast('error', 'Error', data.Table[0].MSG);
+                    this.Searchlist = [];
                 }
             },
             (error) => {

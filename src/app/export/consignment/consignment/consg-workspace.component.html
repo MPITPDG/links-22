@@ -1,0 +1,80 @@
+<!--
+  Export consignment workspace (sidebar Export Master -> /export/Consignment/start).
+  Ported from MPERPNG-20. Global page kit (import-page.css + consignment-page.css,
+  host class kit-consignment).
+
+  ONE page: a sticky header carrying the identity chips and the page actions, a
+  sticky section nav under it, and then every section of the consignment as an
+  always-visible ruled card. No tabs, no wizard, no page 1 / page 2.
+
+  <app-consg-start> holds the first three sections (Parties, Consignee & buyer,
+  Shipment) and stays mounted throughout; once Continue is pressed it is locked in
+  place instead of hidden. <app-consg-main> holds the other eight and is mounted
+  from the first second too, locked until Continue; its data load runs when
+  [locked] flips false. "Edit parties & shipment" bumps mainKey, which destroys and
+  rebuilds the master so the details typed into it are discarded.
+  (MP's "Prefill from invoice" drawer is not ported to Links.)
+-->
+<div class="im-page cs-page">
+
+  @if (draft) {
+    <div class="cs-draftband" role="status">
+      <i class="fa fa-floppy-o"></i>
+      <span>Unsaved draft from {{ draftWhen }}@if (draft.invoiceNo) { &middot; invoice {{ draft.invoiceNo }}}@if (draft.exporter) { &middot; {{ draft.exporter }}}</span>
+      <span class="r">
+        <button type="button" class="btn p" (click)="restoreDraft()">Restore</button>
+        <button type="button" class="btn g" (click)="discardDraft()">Discard</button>
+      </span>
+    </div>
+  }
+
+  <div class="cs-top">
+    <div class="ph">
+      <div>
+        <h1>{{ headline }}</h1>
+        <p>{{ started ? 'Every section is on this page. Nothing is saved until Submit.' : 'Start with the parties and the shipment, then Continue opens the consignment details below.' }}</p>
+        <div class="cs-chips">
+          @if (started) {
+            <span class="chip solid">Parties &amp; shipment locked</span>
+          } @else {
+            <span class="chip dash">Not opened yet</span>
+          }
+          @for (kv of summary; track kv.k) {
+            <span class="chip" [title]="kv.k"><span class="k">{{ kv.k }}</span> {{ kv.v }}</span>
+          }
+        </div>
+      </div>
+      <div class="tools">
+        <button type="button" class="btn g" routerLink="/export/Consignment/search">Search</button>
+        @if (started) {
+          <button type="button" class="btn" (click)="editParties()">Edit parties &amp; shipment</button>
+        }
+      </div>
+    </div>
+    <nav class="cs-nav" aria-label="Sections">
+      <button type="button" (click)="goAnchor('cst-parties')">Parties</button>
+      <button type="button" (click)="goAnchor('cst-consignee')">Consignee &amp; buyer</button>
+      <button type="button" (click)="goAnchor('cst-shipment')">Shipment</button>
+      @for (s of sections; track s.key) {
+        <button type="button" [class.on]="started && step === s.key" (click)="goSection(s.key)">{{ s.label }}</button>
+      }
+    </nav>
+  </div>
+
+  <!-- sections 1-3: always on the page; locked, never hidden, once Continue is pressed.
+       startKey is bumped only by Abort, which (as the old main -> start navigate did) gives a fresh page 1. -->
+  @for (sk of startKey; track sk) {
+    <app-consg-start [embedded]="true" [locked]="started" (continued)="onContinued()"></app-consg-start>
+  }
+
+  <!--
+    Sections 4-11. Always on the page - their real fields, never a placeholder -
+    but locked (every control disabled) until Continue is pressed. Bumping
+    mainKey destroys and rebuilds the master.
+  -->
+  @for (k of mainKey; track k) {
+    <app-consg-main [embedded]="true" [locked]="!started" [(step)]="step"
+      (keepDraft)="keepDraftAndLeave()" (beforeSave)="snapshotDraft(true)" (aborted)="onAborted()"></app-consg-main>
+  }
+
+</div>

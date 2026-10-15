@@ -11,6 +11,7 @@ import { ThemeService } from 'ng2-charts';
 @Component({
     selector: 'app-containerFS-iu',
     templateUrl: 'exp_sp_factoryStuff_ContainerIU_CLP.html',
+    styleUrls: ['./exp-sp-container-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -102,15 +103,15 @@ export class ExptSpContainerIUFS implements OnInit {
         const jsonPage = { userid:this._loginService.getLogin()[0].CMPID };
         this._dataService.getData("Export/ContainerFS_PAGELOAD", jsonPage)
             .subscribe((data: any) => {
-                if (data.Table[0].STATUS == "100") {
+                if (data?.Table?.[0]?.STATUS == "100") {
 
                 }
             });
         const jsonExport = { SEARCHMODE:"0", VSLNAME: this.vslName, VSL_VOY: this.vsl_voyno, CITYCODE:this._loginService.getLogin()[0].CITYCODE };
         this._dataService.Common("Export/Export_Vessel_List", jsonExport)
             .subscribe((data: any) => {
-                if (data.Table[0].STATUS == 100) {
-                    this.vessel = data.Table1;
+                if (data?.Table?.[0]?.STATUS == 100) {
+                    this.vessel = data.Table1 ?? [];
                     this.loaderService.display(false);      
                 }
                 else {
@@ -140,14 +141,14 @@ export class ExptSpContainerIUFS implements OnInit {
         const jsonExport = { vsl: rtnos, port: ports ,CMPCOD:this._loginService.getLogin()[0].CMPCODE,CITYCODE:this._loginService.getLogin()[0].CITYCODE,CMPID:this._loginService.getLogin()[0].CMPID};
             this._dataService.getData('Export/ContainerFS_Fill', jsonExport)
                 .subscribe((data: any) => {
-                    if (data.Table[0].STATUS == 100) {
+                    if (data?.Table?.[0]?.STATUS == 100) {
                         this.containerlist = data.Table;
                      //  this.vsldet = "VESSEL: " + this.containerlist[0].VSL_NAME + " - ROTATION: " + this.containerlist[0].VSL_RTNO + "  -  VOYAGE: " + this.containerlist[0].VSL_VOYNO + " -  ETD: " + this.containerlist[0].ETD;
                         this.vslrotation = this.containerlist[0].VSL_RTNO;
                         this.vslport = this.containerlist[0].PORT;
                       
-                        this.vslAgent = data.Table1;
-                        this.city = data.Table2;                    
+                        this.vslAgent = data.Table1 ?? [];
+                        this.city = data.Table2 ?? [];                    
                         this.shpline = data.Table3;
                         this.VSLExptNoList=data.Table4;
                       
@@ -172,6 +173,11 @@ export class ExptSpContainerIUFS implements OnInit {
         const jsonExport = { exptno: exjobno, userid: this._loginService.getLogin()[0].CMPID };
         this._dataService.getData('Export/ContainerFS_FillExptno', jsonExport)
             .subscribe((data: any) => {
+                // Fail soft: no totals for this expt no. leaves the row as it was.
+                if (!data?.Table?.length) {
+                    this.loaderService.display(false);
+                    return false;
+                }
                 if(data.Table[0].AVAI_PKGS ==0)
                 {
                     this._toasterService.toast('warning', 'warning', "Total Pkgs is used ");
@@ -322,14 +328,14 @@ export class ExptSpContainerIUFS implements OnInit {
         this._dataService.Common('Export/Export_containerFSTmp_IU', jsonExport)
         .subscribe((data: any) => {
 
-            if (data.Table[0].STATUS == "100") {
+            if (data?.Table?.[0]?.STATUS == "100") {
                 this._toasterService.toast('info', 'Success', data.Table[0].STATUSTEXT);
                 this.containerClp=data.Table;
                 this.childreset();
                 this.loaderService.display(false);                        
             }
             else {
-                this._toasterService.toast('error', 'Error', data.Table[0].STATUSTEXT);
+                this._toasterService.toast('error', 'Error', data?.Table?.[0]?.STATUSTEXT);
                 this.loaderService.display(false);
             }
         }); 
@@ -381,7 +387,7 @@ export class ExptSpContainerIUFS implements OnInit {
         const jsondelete = { ID:ID,userid:this._loginService.getLogin()[0].CMPID,vguid:this._loginService.getLogin()[0].GUID};
         this._dataService.getData("Export/ContainerFS_DELETE", jsondelete)
             .subscribe((data: any) => {
-                if (data.Table[0].STATUS == "100") {
+                if (data?.Table?.[0]?.STATUS == "100") {
                     this._toasterService.toast('info', 'Success', data.Table[0].STATUSTEXT);
                     this.containerClp=data.Table;
                    
@@ -451,14 +457,14 @@ export class ExptSpContainerIUFS implements OnInit {
         this._dataService.Common('Export/Export_containerFS_IU', jsonExport)
         .subscribe((data: any) => {
 
-            if (data.Table[0].STATUS == "100") {
+            if (data?.Table?.[0]?.STATUS == "100") {
                 this._toasterService.toast('info', 'Success', data.Table[0].STATUSTEXT);    
                 this.masterReset();     
                         
                 this.loaderService.display(false);                        
             }
             else {
-                this._toasterService.toast('error', 'Error', data.Table[0].STATUSTEXT);
+                this._toasterService.toast('error', 'Error', data?.Table?.[0]?.STATUSTEXT);
                 this.loaderService.display(false);
             }
         }); 
@@ -475,7 +481,7 @@ export class ExptSpContainerIUFS implements OnInit {
         const jsonPage = { userid:this._loginService.getLogin()[0].CMPID };
         this._dataService.getData("Export/ContainerFS_PAGELOAD", jsonPage)
             .subscribe((data: any) => {
-                if (data.Table[0].STATUS == "100") {
+                if (data?.Table?.[0]?.STATUS == "100") {
                     
                 }
             });

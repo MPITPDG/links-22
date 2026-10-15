@@ -23,6 +23,34 @@ import {
 } from './sp.component';
 import { CartingSea } from './carting-sea.sp.component';
 import { TransfervslCartingSea } from './carting-transfer-vessel.sp.component';
+import { BlUpdateComponent } from './bl-details-update.component';
+import { SpWorkspaceComponent } from './sp-workspace.component';
+
+/**
+ * The workspace hosts the existing update components on CHILD routes so they
+ * keep reading `:exptno` from the route exactly as they do at top level - the
+ * shared sp.component.ts only gained the drawer close / refresh hooks. Every
+ * old URL below still resolves; `workspace` and `blupdate` are added alongside
+ * them, they replace nothing.
+ */
+const workspaceChildren: Routes = [
+    { path: 'reciept-of-cargo/:exptno', component: ReceiptCargoShipmentProgressComponent, data: { title: 'Shipment-Progress / Receipt Cargo Update' } },
+    { path: 'approval-received/:exptno', component: ApprovalReceivedShipmentProgressComponent, data: { title: 'Shipment-Progress / Approval Received Update' } },
+    { path: 'carting-air/:exptno', component: CartingAirShipmentProgressComponent, data: { title: 'Shipment-Progress / Carting Air Update' } },
+    { path: 'ship-bill/:exptno', component: ShippingBillShipmentProgressComponent, data: { title: 'Shipment-Progress / Shipping Bill Update' } },
+    { path: 'bl-details/:exptno', component: BlDetailsShipmentProgressComponent, data: { title: 'Shipment-Progress / BL Details Update' } },
+    { path: 'Prepaid-freight-apprvd/:exptno', component: PrepaidfrtApprovShipmentProgressComponent, data: { title: 'Shipment-Progress / Prepaid Approved by Shipper' } },
+    { path: 'Dimension/:exptno', component: dimensionShipmentProgressComponent, data: { title: 'Shipment-Progress / Calculate CBM' } },
+    { path: 'measurement/:exptno', component: MeasurementShipmentProgressComponent, data: { title: 'Shipment-Progress / Measurement Update' } },
+    { path: 'out-of-charge/:exptno', component: OutOfChargeShipmentProgressComponent, data: { title: 'Shipment-Progress / Out of Charge Update' } },
+    { path: 'destination-document/:exptno', component: DestinationDocumentShipmentProgressComponent, data: { title: 'Shipment-Progress / Destination Document' } },
+    { path: 'prealert-sent-on/:exptno', component: PrealertSentOnShipmentProgressComponent, data: { title: 'Shipment-Progress / Prealert Sent On Update' } },
+    { path: 'transfer-sea-to-air/:exptno', component: SeaToAirShipmentProgressComponent, data: { title: 'Shipment-Progress / Transfer Sea To Air' } },
+    { path: 'vesselTransfer', component: TransfervslCartingSea, data: { title: 'shipment-progress/vesselTransfer' } },
+    { path: 'carting-sea', component: CartingSea, data: { title: 'shipment-progress/carting-sea' } },
+    { path: 'pending-shipment', component: PendingShipmentShipmentProgressComponent, data: { title: 'Shipment-Progress / Pending Shipment' } },
+];
+
 const routes: Routes = [
     {
         path: '',
@@ -30,6 +58,7 @@ const routes: Routes = [
             title: 'shipment-process'
         },
         children: [
+            { path: 'workspace', component: SpWorkspaceComponent, data: { title: 'Shipment-Progress / Workspace' }, children: workspaceChildren },
             { path: 'ship-bill-search', component: CommonSearchShipmentProgressComponent, data: { title: 'Shipment-Progress / Search' } },
             { path: 'receipt-cargo-with-job-no-search', component: CommonSearchShipmentProgressComponent, data: { title: 'Shipment-Progress / Search' } },
             { path: 'dimension-search', component: CommonSearchShipmentProgressComponent, data: { title: 'Shipment-Progress / Search' } },
@@ -62,7 +91,8 @@ const routes: Routes = [
             { path: 'Prepaid-freight-apprvd-search', component: CommonSearchShipmentProgressComponent, data: { title: 'Shipment-Progress / Search' } },
             { path: 'Prepaid-freight-apprvd/:exptno', component: PrepaidfrtApprovShipmentProgressComponent, data: { title: 'Shipment-Progress / Prepaid Approved by Shipper' } },
             { path: 'Dimension/:exptno', component: dimensionShipmentProgressComponent, data: { title: 'Shipment-Progress / Calculate CBM' } },
-          
+            { path: 'blupdate', component: BlUpdateComponent, data: { title: 'Shipment-Progress / BL Update' } },
+
         ]
     }
 ];

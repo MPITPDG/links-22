@@ -11,6 +11,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-container-iu',
     templateUrl: 'exp_sp_vessel_search.component.html',
+    styleUrls: ['./exp-sp-container-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -50,8 +51,8 @@ export class ExptSpVesselSearch implements OnInit {
         const jsonExport = { SEARCHMODE:"0", VSLNAME: this.vslName, VSL_VOY: this.vsl_voyno, CITYCODE:this._loginService.getLogin()[0].CITYCODE };
         this._dataService.Common(this.baseUrl, jsonExport)
             .subscribe((data: any) => {
-                if (data.Table[0].STATUS == 100) {
-                    this.vessel = data.Table1;
+                if (data?.Table?.[0]?.STATUS == 100) {
+                    this.vessel = data.Table1 ?? [];
                     this.loaderService.display(false);      
                 }
                 else {
@@ -90,8 +91,8 @@ export class ExptSpVesselSearch implements OnInit {
         const jsonExport = { SEARCHMODE: this.vsllist, VSLNAME: this.vslName, VSL_VOY: this.vsl_voyno, CITYCODE: this._loginService.getLogin()[0].CITYCODE };
         this._dataService.Common(this.baseUrl, jsonExport)
             .subscribe((data: any) => {
-                if (data.Table[0].STATUS == 100) {
-                    this.vesselSearch = data.Table1;
+                if (data?.Table?.[0]?.STATUS == 100) {
+                    this.vesselSearch = data.Table1 ?? [];
                     this.loaderService.display(false);
                     if (this.vesselSearch.length ==1)
                     {

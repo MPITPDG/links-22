@@ -6,6 +6,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-print-document-annexure-edit',
     templateUrl: 'edit-annexure.component.html',
+    styleUrls: ['./annexure-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -95,6 +96,8 @@ export class EditAnnexureComponent implements OnInit {
         this._dataService.getData("Export/AnnexureEditPopulateData", _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
+                data = data || {};
+                ['Table', 'Table1', 'Table2', 'Table3', 'Table4', 'Table5', 'Table6'].forEach(k => { if (!data[k]) { data[k] = []; } });
                 this.datasetTable = data.Table;
                 this.datasetTable1 = data.Table1;
                 this.datasetTable2 = data.Table2;
@@ -299,7 +302,7 @@ export class EditAnnexureComponent implements OnInit {
         this._dataService.Common("Export/AnnexureEditIU", _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                if(data.Table[0]["STATUS"]===100){
+                if(data && data.Table && data.Table[0] && data.Table[0]["STATUS"]===100){
                     alert("Annexure updated successfully");
                     this.result.emit({ exptno: this.exptno, view: 998});
                 }else{

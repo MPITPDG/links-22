@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 @Component({
     selector: 'app-print-document-annexure-edit-menu',
     templateUrl: 'edit-menu-annexure.component.html',
+    styleUrls: ['./annexure-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -29,7 +30,7 @@ export class EditMenuAnnexureComponent implements OnInit {
         this._dataService.getData("Export/AnnexureSearchList", _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                this.EditMenuList = this.displayMenu(data.Table1.length, 'EDIT');
+                this.EditMenuList = this.displayMenu((data && data.Table1) ? data.Table1.length : 0, 'EDIT');
             });
     }
 

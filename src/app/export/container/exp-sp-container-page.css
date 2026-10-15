@@ -1,0 +1,225 @@
+/* ----------------------------------------------------------------
+   Export container package (Doc Stuffing vessel search + vessel view,
+   container add / edit with CLP and pallets, Factory Stuffing CLP):
+   screen-level additions on top of the GLOBAL page kit
+   (src/styles/kit/import-page.css, root .im-page). Ported from MPERPNG-20
+   exp-sp-container-page.css; monochrome only, no new colours. Pulled in per
+   component through styleUrls (emulated encapsulation); the tabset rules use
+   ::ng-deep because ngx-bootstrap renders the tab strip itself.
+     1. .row2: several controls on one line inside a field cell.
+     2. ngx-bootstrap tabset -> the kit's segmented tab strip.
+     3. the Links my-date-picker shim host is inline-block, so it shrinks
+        inside a .fld cell; make it fill the cell like the other inputs.
+     4. textarea is not boxed by the kit; same box as the kit inputs.
+     5. tables: one line per row, inputs and selects inside a grid cell,
+        a grouped header row, and a nested detail table.
+     6. radios and checkboxes with their caption.
+   ---------------------------------------------------------------- */
+
+/* 1. inline field row */
+:host ::ng-deep .im-page .row2 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+:host ::ng-deep .im-page .row2 select,
+:host ::ng-deep .im-page .row2 input {
+    width: auto;
+    min-width: 0;
+    flex: 1 1 120px;
+}
+
+:host ::ng-deep .im-page .row2 select.sz {
+    flex: 0 0 84px;
+}
+
+:host ::ng-deep .im-page .row2 span {
+    font-size: 12.5px;
+    color: var(--faint);
+}
+
+/* 2. ngx-bootstrap tabset -> segmented strip */
+:host ::ng-deep .im-page .nav-tabs {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 10px 16px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+:host ::ng-deep .im-page .nav-tabs > li {
+    margin: 0;
+}
+
+:host ::ng-deep .im-page .nav-tabs > li > a {
+    display: block;
+    padding: 7px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--faint);
+    background: var(--band);
+    border: 1px solid var(--line);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+:host ::ng-deep .im-page .nav-tabs > li.active > a,
+:host ::ng-deep .im-page .nav-tabs > li.active > a:hover,
+:host ::ng-deep .im-page .nav-tabs > li.active > a:focus {
+    color: var(--ink);
+    background: var(--sheet);
+    border-color: var(--edge);
+}
+
+:host ::ng-deep .im-page .nav-tabs > li.disabled > a {
+    color: var(--faint);
+    background: var(--fill);
+    border-style: dashed;
+    cursor: default;
+}
+
+:host ::ng-deep .im-page .tab-content {
+    padding-top: 4px;
+}
+
+/* 3. date picker fills its field */
+.im-page my-date-picker {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
+/* 4. boxed textarea */
+.im-page textarea {
+    font: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    background: var(--mp-surface, #fff);
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    width: 100%;
+    min-height: 64px;
+    padding: 6px 10px;
+    margin: 0;
+    resize: vertical;
+    box-shadow: none;
+    display: block;
+}
+
+.im-page textarea:focus {
+    outline: 2px solid var(--mp-primary, var(--ink));
+    outline-offset: -1px;
+    border-color: var(--mp-primary, var(--ink));
+}
+
+.im-page .fld.top {
+    align-items: start;
+}
+
+.im-page .fld.top > label {
+    padding-top: 7px;
+}
+
+/* 5. tables */
+.im-page table.tbl.nowrap td {
+    white-space: nowrap;
+}
+
+.im-page table.tbl td input:not([type="checkbox"]):not([type="radio"]),
+.im-page table.tbl th input:not([type="checkbox"]):not([type="radio"]),
+.im-page table.tbl td select {
+    height: 28px;
+    min-width: 64px;
+    padding: 0 6px;
+}
+
+.im-page table.tbl th.grp {
+    text-align: center;
+    border-left: 1px solid var(--edge);
+}
+
+.im-page table.tbl td.sep,
+.im-page table.tbl th.sep {
+    border-left: 1px solid var(--edge);
+}
+
+.im-page table.tbl td.lbl,
+.im-page table.tbl th.lbl {
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--soft);
+    font-weight: 600;
+    background: var(--band);
+}
+
+/* a detail grid opened inside a row */
+.im-page table.tbl td.detail {
+    padding: 8px 12px 14px 40px;
+    background: var(--band);
+}
+
+.im-page table.tbl td.detail table.tbl {
+    min-width: 0;
+    background: var(--sheet);
+    border: 1px solid var(--line);
+}
+
+.im-page table.tbl tbody tr:hover td.detail {
+    background: var(--band);
+}
+
+/* expand / collapse toggle in a row */
+.im-page .act button.tgl {
+    width: 26px;
+    padding: 0;
+    margin-left: 0;
+    font-weight: 700;
+}
+
+/* 6. radios / checkboxes */
+.im-page .opt {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 32px;
+    font-weight: 500;
+    font-size: 13px;
+    margin: 0 18px 0 0;
+    cursor: pointer;
+}
+
+.im-page .f label.opt {
+    min-height: 0;
+    margin: 0 0 4px;
+}
+
+.im-page input[type="radio"],
+.im-page input[type="checkbox"] {
+    accent-color: var(--mp-primary, #0A0A0A);
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    cursor: pointer;
+}
+
+/* note under a field */
+.im-page .fld .note-t {
+    grid-column: 2;
+    color: var(--faint);
+    font-size: 11.5px;
+    margin: -4px 0 0;
+}
+
+/* an action bar that closes a card or tab rather than the page: same look and
+   stickiness as the kit .bar, but inside the card edges */
+.im-page .card .bar.in-card {
+    margin: 0;
+    padding: 10px 16px;
+    border-radius: 0 0 6px 6px;
+}

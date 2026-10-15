@@ -1,47 +1,52 @@
-﻿<br />
-<!-- <div class="row y350heightscroll" *ngIf="searchList.length > 0"> commented to remove height -->
-
-	@if (searchList.length > 0) {
-<div >
-	<table class="table table-bordered table-striped table-sm-new bgwhite">
-		<thead>
-			<tr class="title-head formheading">
-				<th>Select</th>
-				<th>EXPT NO</th>
-				<th>SHIPPER</th>
-				<th>CONSIGNEE</th>
-				<th>Pkgs</th>
-				<th>Grwt</th>
-				<th>Chrg.Wt</th>
-				<th>Pcs</th>
-				<th>Shipment Mode</th>
-			</tr>
-		</thead>
-		<tbody>
-			@for (obj of searchList; track obj) {
-<tr>
-				<td class="centerlabel">
-					<input type="checkbox" (checked)="obj.SELECT == true" [disabled]="obj.Disabled == true"   (click)="validate(obj.MODEOFSHIP,obj.EXPTNO)" />
-				</td>
-				<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
-				<td><span class="col-form-span-label">{{obj.SHIPPER}}</span></td>
-				<td><span class="col-form-span-label">{{obj.CONSIGNEE}}</span></td>
-				<td><span class="col-form-span-label">{{obj.PKGS}}</span></td>
-				<td><span class="col-form-span-label">{{obj.GRWT}}</span></td>
-				<td><span class="col-form-span-label">{{obj.CHBLWT}}</span></td>
-				<td><span class="col-form-span-label">{{obj.PCS}}</span></td>
-				<td><span class="col-form-span-label">{{obj.MODEOFSHIP}}</span></td>
-			</tr>
-}
-		</tbody>
-	</table>
-</div>
-}
-<div class="row">
-	<div class="col-sm-12 right-text">
-		<br />
-		<button type="button" name="submit" uiBtn variant="default" size="sm" (click)="submit();" >
-			<span class="col-form-span-label"><i class="fa fa-check-square-o"></i> Submit</span>
-		</button>
-	</div>
+﻿<!--
+  Export - print document - MAWB job list. Page kit recipe 1, ported from MPERPNG-20.
+  The host shell (mawb.component.html, Links' stock-driven MAWB generate / search) is
+  left as it is, so this child carries its own .im-page root.
+-->
+<div class="im-page">
+  <div class="card">
+    <div class="card-h"><h2>Export jobs for this MAWB</h2></div>
+    @if (searchList.length > 0) {
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Select</th>
+              <th>EXPT NO</th>
+              <th>Shipper</th>
+              <th>Consignee</th>
+              <th class="num">Pkgs</th>
+              <th class="num">Grwt</th>
+              <th class="num">Chrg.Wt</th>
+              <th class="num">Pcs</th>
+              <th>Shipment Mode</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (obj of searchList; track obj) {
+              <tr>
+                <td class="text-center">
+                  <input type="checkbox" (checked)="obj.SELECT == true" [disabled]="obj.Disabled == true" (click)="validate(obj.MODEOFSHIP,obj.EXPTNO)" />
+                </td>
+                <td class="mono">{{obj.EXPTNO}}</td>
+                <td>{{obj.SHIPPER}}</td>
+                <td>{{obj.CONSIGNEE}}</td>
+                <td class="num">{{obj.PKGS}}</td>
+                <td class="num">{{obj.GRWT}}</td>
+                <td class="num">{{obj.CHBLWT}}</td>
+                <td class="num">{{obj.PCS}}</td>
+                <td>{{obj.MODEOFSHIP}}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+    <div class="bar" style="margin:0;">
+      <span class="note"></span>
+      <span class="r">
+        <button type="button" class="btn p" name="submit" (click)="submit();">Submit</button>
+      </span>
+    </div>
+  </div>
 </div>

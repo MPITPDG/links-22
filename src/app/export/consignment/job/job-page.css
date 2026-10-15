@@ -1,0 +1,79 @@
+/* ----------------------------------------------------------------
+   Export job (Misc Add / Search-Edit, Warehouse Job), PSS and Branch Job
+   Transfer: screen-level additions on top of the GLOBAL page kit
+   (src/styles/kit/import-page.css, root .im-page). Ported from MPERPNG-20
+   job-page.css; pulled in per component through styleUrls (emulated
+   encapsulation), also by ../pss and ../branchjobtransfer.
+     1. textarea is not boxed by the kit; same box as the kit inputs.
+     2. a validation message under a field or filter: ink and weight, not colour.
+     3. a field cell holding an input with a message under it.
+   ---------------------------------------------------------------- */
+
+/* 1. boxed textarea */
+.im-page textarea {
+    font: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    background: var(--mp-surface, #fff);
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    width: 100%;
+    min-height: 64px;
+    padding: 6px 10px;
+    margin: 0;
+    resize: vertical;
+    box-shadow: none;
+    display: block;
+}
+
+.im-page textarea:focus {
+    outline: 2px solid var(--mp-primary, var(--ink));
+    outline-offset: -1px;
+    border-color: var(--mp-primary, var(--ink));
+}
+
+/* 2. validation message */
+.im-page .hint.err,
+.im-page .f .err {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.im-page .f .err {
+    display: block;
+    font-size: 11.5px;
+    margin-top: 4px;
+}
+
+/* 3. input + message in one cell */
+.im-page .fld .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.im-page .fld .stack .hint {
+    margin-top: 0;
+}
+
+/* label aligned to the top of a tall control (textarea) */
+.im-page .fld.top {
+    align-items: start;
+}
+
+.im-page .fld.top > label {
+    padding-top: 7px;
+}
+
+/* a short filter bar: one or two filters and the button */
+.im-page .filters.compact {
+    grid-template-columns: minmax(0, 320px) auto minmax(0, 1fr);
+    justify-content: start;
+}
+
+@media (max-width: 760px) {
+    .im-page .filters.compact {
+        grid-template-columns: 1fr;
+    }
+}

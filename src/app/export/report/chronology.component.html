@@ -1,74 +1,67 @@
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-header formheading">
-                <strong>Chronology Search</strong>
-            </div>
-        </div>
+<!--
+  Export -> Report -> Chronology (search-criteria form; Search downloads an
+  Excel workbook from Export/Generate_Chronology -- there is no browsable
+  on-screen result grid, so this page is the filter card only, on the Import
+  page kit).
+-->
+<div class="im-page erp-page">
+  <div class="ph">
+    <div>
+      <h1>Chronology</h1>
+      <p>Generate a shipment event-history report by mode, city and date range.</p>
     </div>
-</div>
-<div class="row">
-    <div class="col-sm-3">
-    </div>
-    <div class="col-sm-6">
-        <table class="table table-bordered table-sm-new bgwhite">
-            <tr>
-                <td>
-                    <span class="col-form-span-label"><b>Mode:</b></span>
-                </td>
-                <td colspan="3">
-                    <input type="radio" value="Sea" name="rbReportType" [(ngModel)]="ReportType" />
-                    <span class="col-form-span-label">Sea</span>
-                    <input type="radio" value="Air" name="rbReportType" [(ngModel)]="ReportType" />
-                    <span class="col-form-span-label">Air</span>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="col-form-span-label"><b>City :</b></span>
-                </td>
-                <td colspan="3">
-                    <ng-select [items]="CityList" bindLabel="cityname" bindValue="citycode1" placeholder="--Show All--" [(ngModel)]="City" class="form-control">
-                    </ng-select>
-                </td>
-            </tr>
-            <!-- <tr>
-                <td>
-                    <span class="col-form-span-label"><b>Shipper :</b></span>
-                </td>
-                <td colspan="3">
-                    <select class="form-control width180"   [(ngModel)]="Shipper" >
-                        <option value="-1">Please select</option>
-                        <option  *ngFor="let d of listShipper" value={{d.SHIPPER_CODE}}>{{d.SHIPPER_NAME}}</option>
-                    </select>
-                </td>
-            </tr> -->
-            <tr>
-                <td>
-                    <span class="col-form-span-label"><b>From Date:</b></span>
-                </td>
-                <td>
-                    <my-date-picker name="abcd" [options]="myDatePickerOptions" [(ngModel)]="FromDate"></my-date-picker>
-                </td>
-                <td>
-                    <span class="col-form-span-label"><b>To Date:</b></span>
-                </td>
-                <td>
-                    <my-date-picker name="abcd" [options]="myDatePickerOptions" [(ngModel)]="ToDate"></my-date-picker>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="4" class="centerlabel">
-                    <button uiBtn variant="default" size="sm" type="button" (click)="onSearch()">
-                        <span class="col-form-span-label">
-                            <i class="fa fa-search"></i>&nbsp; Search
-                        </span>
-                    </button>
-                </td>
+  </div>
 
-            </tr>
-        </table>
+  <div class="card">
+    <div class="card-h"><h2>Search criteria</h2></div>
+
+    <div class="filters erp-filters">
+      <div class="f full">
+        <label>Mode</label>
+        <div class="erp-opts">
+          <label class="erp-opt" [class.on]="ReportType === 'Sea'">
+            <input type="radio" value="Sea" name="rbReportType" [(ngModel)]="ReportType" />
+            Sea
+          </label>
+          <label class="erp-opt" [class.on]="ReportType === 'Air'">
+            <input type="radio" value="Air" name="rbReportType" [(ngModel)]="ReportType" />
+            Air
+          </label>
+        </div>
+      </div>
+
+      <div class="f">
+        <label for="chCity">City</label>
+        <ng-select id="chCity" class="custom" [items]="CityList" bindLabel="cityname" bindValue="citycode1"
+                   placeholder="--Show All--" [(ngModel)]="City">
+        </ng-select>
+      </div>
+
+      <div class="f full">
+        <label>Date range</label>
+        <div class="erp-presets">
+          <button type="button" (click)="setPreset(0)">This month</button>
+          <button type="button" (click)="setPreset(3)">Last 3 months</button>
+          <button type="button" (click)="setPreset(12)">Last 12 months</button>
+        </div>
+      </div>
+
+      <div class="f">
+        <label>From Date</label>
+        <my-date-picker name="abcd" [options]="myDatePickerOptions" [(ngModel)]="FromDate"></my-date-picker>
+      </div>
+
+      <div class="f">
+        <label>To Date</label>
+        <my-date-picker name="abcd" [options]="myDatePickerOptions" [(ngModel)]="ToDate"></my-date-picker>
+      </div>
     </div>
-    <div class="col-sm-3">
+
+    <div class="toolbar erp-actions">
+      <span class="sub-t">Search downloads an Excel workbook of the chronology events.</span>
+      <span class="tb-r">
+        <button class="btn p" type="button" (click)="onSearch()">Search</button>
+      </span>
     </div>
+  </div>
 </div>

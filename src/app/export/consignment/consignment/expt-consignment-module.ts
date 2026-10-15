@@ -12,6 +12,7 @@ import { ConsgMainComponent } from './consg_main.component';
 import { OrderBookingListComponent } from './order-booking-list.component';
 import { ExportMasterSearchComponent } from './expt-master-search.component';
 import { ConsgStartComponent } from './consg-start.component';
+import { ConsgWorkspaceComponent } from './consg-workspace.component';
 import { ExportMasterEditComponent } from './consig_main_edit.component';
 import { MainCalCbmAddComponent } from './consg_main_calccbm.component';
 import {
@@ -39,6 +40,7 @@ import {
 import { ConsigneeMainViewComponent } from './cong-main-view.component';
 
 import { EditActualFlightDateComponent } from './expt-master-edit-actual-flight-date';
+import { EditCo2Component } from './expt-master-edit-co2';
 import {CreateJobComponent} from './consign_create.component';
 import {CreateAutoJobComponent} from './consign_create_new.component';
 @NgModule({
@@ -51,7 +53,7 @@ import {CreateAutoJobComponent} from './consign_create_new.component';
         NgSelectModule,
         SharedModule],
     declarations: [ConsgMainComponent,OrderBookingListComponent,ExportMasterSearchComponent, 
-            ExportMasterEditComponent,ConsigneeMainViewComponent,EditActualFlightDateComponent,ConsgStartComponent,
+            ExportMasterEditComponent,ConsigneeMainViewComponent,EditActualFlightDateComponent,ConsgStartComponent,ConsgWorkspaceComponent,EditCo2Component,
             ConsignmentEditModalComponent, ConsigneeViewPageComponent, ShipmentClearanceEditComponent,
             MainEditComponent,PortEditComponent,InvoiceEditComponent,OrderNoEditComponent,OrderNoQualityCheckingComponent,
             ITCCodeEditComponent, MarksNumberEditComponent,QuotaEditComponent,PackageEditComponent,DocumentEditComponent,

@@ -8,6 +8,10 @@ import { LoginService } from '../../../shared/service/loginService';
 @Component({
     selector: 'app-consignment-edit-option',
     templateUrl: 'consig_main_edit.component.html',
+    // Page kit: global import-page.css + consignment-page.css (host class kit-consignment),
+    // plus the hub's own tile grid. Ported from MPERPNG-20.
+    styleUrls: ['consig_main_edit.component.css'],
+    host: { class: 'kit-consignment' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -81,6 +85,12 @@ export class ExportMasterEditComponent implements OnInit {
 
         }
         else { this.editModal.show(etype); }
+    }
+
+    // Section nav in the sticky header (presentation only, from MPERPNG-20).
+    scrollToSection(id: string) {
+        const el = document.getElementById(id);
+        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     }
 
     redirectTo(rtype) {

@@ -1574,6 +1574,10 @@ export class MAWBModelpopupcomponent  implements OnInit {
     `,
     // styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
     // encapsulation: ViewEncapsulation.None,
+    /* Same rating sheet as MP's consignment-drawer MAWB editor, still in the nested-table
+       markup. MP's export-rating.css (copied here as mawb-tarif-rating.css) styles that shape,
+       giving the popup the ruled, boxed monochrome look without touching the inline template. */
+    styleUrls: ['./mawb-tarif-rating.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

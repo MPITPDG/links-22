@@ -12,139 +12,153 @@ import { environment } from   '../../../environments/environment';
     selector: 'app-fcr-printview',
     // templateUrl: 'exp_prt_fcr_printview.component.html'
     template: `
-                    <table class="table table-bordered table-striped table-sm-new bgwhite">
-							<tr>
-								<td colspan="5">
-									<input type="text" name="bookingno" style="FONT-SIZE: 12px;font-family: Courier New;margin-left: 620px;" size="12" maxlength="10"   >
-									<input type="text" name="fcrno" style="FONT-SIZE: 12px;font-family: Courier New;" size="12" maxlength="15" [(ngModel)]="FCRNO"    readonly >
-								</td>
-							</tr>							
-							<tr>
-								<td colspan="3"> Shipper (Name & Full Address) <br>
-									<textarea name="shipper" style="FONT-SIZE: 12px;font-family: Courier New;"  rows="4" cols="40" [(ngModel)]="SHIPPER" > </textarea> 
-								</td>
-								<td  colspan="2"   >
-									 
-								</td>
-							</tr>
-							<tr>
-								<td colspan="3"> Consignee (Name & Full Address/Non-Negotiable)<br>
-									<textarea name="consignee" style="FONT-SIZE: 12px;font-family: Courier New; " rows="4" cols="40" [(ngModel)]="CONSIGNEE"> </textarea> 
-                                </td>
-                                <td  colspan="2"   >
-									 
-								</td>
-							</tr>
-							<tr>
-								<td colspan="3"> Notify Party/Intermediate Consignee (Name & Full Address/Non-Negotiable)<br>
-									<textarea name="notify" style="FONT-SIZE: 12px;font-family: Courier New;" rows="4" cols="40" [(ngModel)]="NOTIFYPARTY" > </textarea> 
-								</td>
-								<td colspan="2"> 
-									<textarea name="expno" style="FONT-SIZE: 12px;font-family: Courier New;" rows="2" cols="20" [(ngModel)]="EXPNO" > </textarea> 									
-								</td>
-							</tr>
-							<tr>
-								<td colspan="2"> Intial Carriage <br>
-									<input type="text" name="carriage" style="FONT-SIZE: 12px;font-family: Courier New; width:250px" size="10" id="carriage" [(ngModel)]="CARRIER"  maxlength="50">
-								</td>
-								<td colspan="1">  Place of Receipt<br>
-									<input type="text" name="receipt" style="FONT-SIZE: 12px;font-family: Courier New; width:250px" size="10" maxlength="50"  [(ngModel)]="RECPTPLACE" >
-								</td>
-								<td  colspan="2" rowspan="3">For Delivery Apply to<br>
-									<textarea name="applyto" style="FONT-SIZE: 12px;font-family: Courier New;" rows="5" cols="40"  [(ngModel)]="APPLYTO" > </textarea> 
-								</td>
-							</tr>
-							<tr>
-								<td colspan="2">  Export Carrier (Vessel Voyage)<br>
-									<input type="text" name="vessel" style="FONT-SIZE: 12px;font-family: Courier New;width:250px" size="10" maxlength="50" [(ngModel)]="VESSEL"   >
-								</td>
-								<td colspan="1">  Port Of Loading<br>
-									<input type="text" name="pol" style="FONT-SIZE: 12px;font-family: Courier New;width:250px" size="10" maxlength="50" [(ngModel)]="POL"  >
-								</td>								
-							</tr>
-							<tr>
-								<td colspan="2">  Port Of Discharge<br>
-									<input type="text" name="discharge" style="FONT-SIZE: 12px;font-family: Courier New;" size="10" maxlength="50" [(ngModel)]="POD" >
-								</td>
-								<td colspan="1">  Place Of Delivery<br>
-									<input type="text" name="delivery" style="FONT-SIZE: 12px;font-family: Courier New;" size="10" maxlength="50" [(ngModel)]="PODEL"  >    
-								</td>								
-							</tr>
-							<tr>
-								<td colspan="5">
-                                <table class="table table-bordered table-striped table-sm-new bgwhite"  >
-                                <tr>											
-                                    <td  >Marks & Numbers<br>Container No.  </td>
-                                    <td  >No.of Pkgs   </td>
-                                    <td  >Description pkgs and Goods </td>
-                                    <td  >Grows Weight Kg </td>
-                                    <td  >Measurment CMR </td>
-                                </tr>
-                                <tr>
-                                    <td  >
-                                        <textarea name="marks" style="FONT-SIZE: 12px;font-family: Courier New;" rows="16" cols="14" wrap="OFF" id="marks" [(ngModel)]="MARKSANDNOS" > </textarea>
-                                    </td>
-                                    <td  > 
-                                        <textarea name="pkgs" style="FONT-SIZE: 12px;font-family: Courier New; " rows="16" cols="9" wrap="OFF" [(ngModel)]="NOOFPKGS" > </textarea> 
-                                    </td>
-                                    <td  > 
-                                        <textarea name="desc" style="FONT-SIZE: 12px;font-family: Courier New;width:400px;" rows="16" cols="40" wrap="OFF"[(ngModel)]="ITCDESC"  > </textarea>
-                                    </td>
-                                    <td  > 
-                                        <textarea name="grwt" style="FONT-SIZE: 12px;font-family: Courier New; " rows="16" cols="9" wrap="OFF" [(ngModel)]="GRWT"  >  </textarea>  
-                                    </td>
-                                    <td  > 												
-                                        <textarea name="cbm" style="FONT-SIZE: 12px;font-family: Courier New " rows="16" cols="9" wrap="OFF" [(ngModel)]="VOL"  > </textarea>  
-                                    </td>
-                                </tr>
-										<tr>
-											<td colspan="2">Freight Rate Charges Weights and/orMeasurements(Subject to correction) 
-											</td>
-											<td >Prepaid
-											</td>
-											<td colspan="2" > Collect </td>											
-										</tr>										
-										<tr>
-											<td colspan="2"> 
-												<textarea name="freight" style="FONT-SIZE: 12px;font-family: Courier New;" rows="10" cols="28" wrap="OFF" [(ngModel)]="MISC" ></textarea>
-											</td>
-											<td  >
-												<textarea name="prepaid" style="FONT-SIZE: 12px;font-family: Courier New;" rows="10" cols="10" wrap="OFF" [(ngModel)]="PP" ></textarea> 
-											</td>
-											<td colspan="2"> 
-												<textarea name="collect" style="FONT-SIZE: 12px;font-family: Courier New;" rows="10" cols="10" wrap="OFF" [(ngModel)]="CC" ></textarea> 
-											</td>	
-										</tr>
-										<tr>
-											<td colspan="2"> Total Prepaid
-											</td>
-											<td>  
-												<input type="text" name="totpp" style="FONT-SIZE: 12px;font-family: Courier New;" size="12" maxlength="15" [(ngModel)]="TOTPP" >
-											</td>
-											<td></td>
-											<td rowspan="3">  
-												<input type="text" name="placedt" style="FONT-SIZE: 12px;font-family: Courier New;" size="28" maxlength="50"  [(ngModel)]="PLACEDATE"  >
-												<br>
-												Date & place Issued
-											</td>											
-											<tr>
-												<tr>
-													<td colspan="2"> Total Collect
-													</td>
-													<td>  
-													</td>
-													<td>  
-														<input type="text" name="totcc" style="FONT-SIZE: 12px;font-family: Courier New;" size="12" maxlength="15" [(ngModel)]="TOTCC"   >
-                                                        </td>
-                                                        <tr>
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                            </table>	
-    
+    @if (loadError) {
+      <div class="card sec">
+        <div class="state">
+          <h3>This document could not be loaded</h3>
+          <p>{{ loadError }}</p>
+        </div>
+      </div>
+    } @else if (!loaded) {
+      <div class="card sec">
+        <div class="state"><h3>Loading document...</h3><p>Fetching the House B/L details.</p></div>
+      </div>
+    } @else {
 
-             
-        `,
+      <div class="card sec">
+        <div class="card-h"><h2>Document</h2><span class="meta">Reference numbers</span></div>
+        <div class="fields">
+          <div class="fld">
+            <label for="fcrno">B/L / FCR no.</label>
+            <input type="text" id="fcrno" name="fcrno" class="mono" maxlength="15" [(ngModel)]="FCRNO" readonly>
+          </div>
+          <div class="fld">
+            <label for="bookingno">Booking no.</label>
+            <input type="text" id="bookingno" name="bookingno" maxlength="10">
+          </div>
+          <div class="fld full tall">
+            <label for="expno">Shipment ref / export no.</label>
+            <textarea id="expno" name="expno" rows="2" [(ngModel)]="EXPNO"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card sec">
+        <div class="card-h"><h2>Parties</h2><span class="meta">Names and full addresses</span></div>
+        <div class="fields">
+          <div class="fld full tall">
+            <label for="shipper">Shipper</label>
+            <textarea id="shipper" name="shipper" rows="4" [(ngModel)]="SHIPPER"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="consignee">Consignee</label>
+            <textarea id="consignee" name="consignee" rows="4" [(ngModel)]="CONSIGNEE"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="notify">Notify party</label>
+            <textarea id="notify" name="notify" rows="4" [(ngModel)]="NOTIFYPARTY"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="applyto">For delivery apply to</label>
+            <textarea id="applyto" name="applyto" rows="4" [(ngModel)]="APPLYTO"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card sec">
+        <div class="card-h"><h2>Routing</h2><span class="meta">Carriage, ports and places</span></div>
+        <div class="fields">
+          <div class="fld">
+            <label for="carriage">Initial carriage</label>
+            <input type="text" id="carriage" name="carriage" maxlength="50" [(ngModel)]="CARRIER">
+          </div>
+          <div class="fld">
+            <label for="receipt">Place of receipt</label>
+            <input type="text" id="receipt" name="receipt" maxlength="50" [(ngModel)]="RECPTPLACE">
+          </div>
+          <div class="fld">
+            <label for="vessel">Export carrier (vessel &amp; voyage)</label>
+            <input type="text" id="vessel" name="vessel" maxlength="50" [(ngModel)]="VESSEL">
+          </div>
+          <div class="fld">
+            <label for="pol">Port of loading</label>
+            <input type="text" id="pol" name="pol" maxlength="50" [(ngModel)]="POL">
+          </div>
+          <div class="fld">
+            <label for="discharge">Port of discharge</label>
+            <input type="text" id="discharge" name="discharge" maxlength="50" [(ngModel)]="POD">
+          </div>
+          <div class="fld">
+            <label for="delivery">Place of delivery</label>
+            <input type="text" id="delivery" name="delivery" maxlength="50" [(ngModel)]="PODEL">
+          </div>
+        </div>
+      </div>
+
+      <div class="card sec">
+        <div class="card-h"><h2>Cargo</h2><span class="meta">Printed as typed - columns stay aligned</span></div>
+        <div class="fields">
+          <div class="fld full tall">
+            <label for="marks">Marks &amp; numbers / container no.</label>
+            <textarea id="marks" name="marks" class="mono" rows="6" [(ngModel)]="MARKSANDNOS"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="pkgs">No. of packages</label>
+            <textarea id="pkgs" name="pkgs" class="mono" rows="4" [(ngModel)]="NOOFPKGS"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="desc">Description of packages and goods</label>
+            <textarea id="desc" name="desc" class="mono" rows="6" [(ngModel)]="ITCDESC"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="grwt">Gross weight (kg)</label>
+            <textarea id="grwt" name="grwt" class="mono" rows="4" [(ngModel)]="GRWT"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="cbm">Measurement (CBM)</label>
+            <textarea id="cbm" name="cbm" class="mono" rows="4" [(ngModel)]="VOL"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card sec">
+        <div class="card-h"><h2>Freight &amp; charges</h2><span class="meta">Subject to correction</span></div>
+        <div class="fields">
+          <div class="fld full tall">
+            <label for="freight">Freight rate, charges, weights and/or measurements</label>
+            <textarea id="freight" name="freight" class="mono" rows="4" [(ngModel)]="MISC"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="prepaid">Prepaid</label>
+            <textarea id="prepaid" name="prepaid" class="mono" rows="3" [(ngModel)]="PP"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="collect">Collect</label>
+            <textarea id="collect" name="collect" class="mono" rows="3" [(ngModel)]="CC"></textarea>
+          </div>
+          <div class="fld">
+            <label for="totpp">Total prepaid</label>
+            <input type="text" id="totpp" name="totpp" class="mono" maxlength="15" [(ngModel)]="TOTPP">
+          </div>
+          <div class="fld">
+            <label for="totcc">Total collect</label>
+            <input type="text" id="totcc" name="totcc" class="mono" maxlength="15" [(ngModel)]="TOTCC">
+          </div>
+        </div>
+      </div>
+
+      <div class="card sec">
+        <div class="card-h"><h2>Issue details</h2><span class="meta">Printed at the foot of the document</span></div>
+        <div class="fields">
+          <div class="fld full">
+            <label for="placedt">Place &amp; date of issue</label>
+            <input type="text" id="placedt" name="placedt" maxlength="50" [(ngModel)]="PLACEDATE">
+          </div>
+        </div>
+      </div>
+
+    }
+`,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -193,6 +207,10 @@ export class ExptFCRPrintview implements OnChanges {
      WaterMarkoption:boolean=false;
      watermarkval:string="0";
     public draftvisible  =true;
+    /** Presentation (from MPERPNG-20): true once Export_FCR_PRINTPREVIEW has filled the form */
+    loaded:boolean=false;
+    /** set when the record could not be loaded; shown instead of the form */
+    loadError:string="";
     constructor(
         private _router: Router,
         private _dataService: DataService,
@@ -207,12 +225,20 @@ export class ExptFCRPrintview implements OnChanges {
     }
     ngOnChanges()
     {
-        this.loaderService.display(true);       
+        this.loaded = false;
+        this.loadError = "";
+        if (!this._fcrsharedvataSerice.fcrsharedData) {
+            this.loadError = "No document number was carried over from the House B/L screen.";
+            this.loaderService.display(false);
+            return;
+        }
+        this.loaderService.display(true);
         console.log("FCR NO. "+this._fcrsharedvataSerice.fcrsharedData);
         const jsonExport = { FCRNO: this._fcrsharedvataSerice.fcrsharedData };//'GOA103180016'
         this._dataService.Common(this.baseUrl, jsonExport)
             .subscribe((data: any) => {
-                if (data.Table[0].STATUS == 100) {
+                const first = (data && data.Table && data.Table.length) ? data.Table[0] : null;
+                if (first && first.STATUS == 100) {
                     this.FCRDET = data.Table;
 
                     this.SHIPPER = this.FCRDET[0].SHIPPER;
@@ -256,15 +282,18 @@ export class ExptFCRPrintview implements OnChanges {
                         {  this.draftvisible= false ; }
                     }
                     this._fcrdraftvisible.fcrsharedData=this.draftvisible
+                    this.loaded = true;
                     this._toasterService.toast('info', 'Complete', 'Data filled successfully');
                     this.loaderService.display(false);       
                 } else {
-                    this._toasterService.toast('error', 'Error', data.Table[0].STATUSTEXT);
-                    this.loaderService.display(false);  
+                    this.loadError = (first && first.STATUSTEXT) || "The document could not be loaded.";
+                    this._toasterService.toast('error', 'Error', this.loadError);
+                    this.loaderService.display(false);
                 }
 
             },
             (error) => {
+                this.loadError = "The document could not be loaded (" + (error && error.status) + ").";
                 this._toasterService.toast('error', 'Error', error.status + '<br/>' + error.STATUSTEXT);
                 this.loaderService.display(false);  
             },
@@ -480,147 +509,152 @@ export class ExptFCRPrintview implements OnChanges {
     selector: 'app-mto-printview',
     // templateUrl: 'exp_prt_fcr_printview.component.html'
     template: `
+    @if (loadError) {
+      <div class="card sec">
+        <div class="state">
+          <h3>This document could not be loaded</h3>
+          <p>{{ loadError }}</p>
+        </div>
+      </div>
+    } @else if (!loaded) {
+      <div class="card sec">
+        <div class="state"><h3>Loading document...</h3><p>Fetching the MTO details.</p></div>
+      </div>
+    } @else {
 
-    <table class="table table-bordered table-striped table-sm-new bgwhite">
-    <tr>
-    </tr>
-							<tr>
-								<td colspan="5"> </td>
-                            </tr>
-                            
-                                <tr >
-                             
-                              
-                                <td  colspan="3" class="centerlabel"><span class="col-form-span-label" >{{IsSwitchtext}}
-                                    <a href="javascript:void(0);"   (click)="fcrrout(SwitchFCR);" ><b>{{SwitchFCR}}</b> </a>
-                                    </span>
-                                </td>
-                                <td colspan="2" ></td>                              
-                                
-                                </tr>
-                          
-                           
-							<tr>
-								<td colspan="3"> Shipper   <br>
-									<textarea name="shipper" style="FONT-SIZE: 12px;font-family: Courier New;"  rows="4" cols="40" [(ngModel)]="SHIPPER" > </textarea> 
-								</td>
-								<td colspan="2" >BL/MTD 
-									<input type="text" name="bookingno" style="FONT-SIZE: 12px;font-family: Courier New; margin-left: 54px;" size="12" maxlength="10"   >
-									<input type="text" name="fcrno" style="FONT-SIZE: 12px;font-family: Courier New;" size="12" maxlength="15" [(ngModel)]="FCRNO"    readonly >
-									<br>Shipment Ref No
-									<textarea name="sexptno" style="FONT-SIZE: 12px;font-family: Courier New;" rows="2" cols="20" [(ngModel)]="EXPNO" > </textarea> 
-								</td>
-							</tr>  
-							<tr>
-								<td colspan="3"> Consignee <br>
-									<textarea name="consignee" style="FONT-SIZE: 12px;font-family: Courier New; " rows="4" cols="40" [(ngModel)]="CONSIGNEE"> </textarea> 
-								</td>
-								<td  colspan="2"  >
-									 
-								</td>
-							</tr>
-							<tr>
-								<td colspan="3"> Notify Address<br>
-									<textarea name="notify" style="FONT-SIZE: 12px;font-family: Courier New;" rows="4" cols="40" [(ngModel)]="NOTIFYPARTY" > </textarea> 
-                                </td>	
-                                <td  colspan="2"  >
-									 
-								</td>							      
-							</tr>
-							<tr>
-								<td colspan="2"> Place of receipt  <br>
-									<input type="text" name="carriage" style="FONT-SIZE: 12px;font-family: Courier New; width: 250px;" size="10" id="carriage" [(ngModel)]="CARRIER"  maxlength="50">
-                                </td>
-                                <td colspan="2"> Place of loading <br>
-									<input type="text" name="receipt" style="FONT-SIZE: 12px;font-family: Courier New;  width: 250px;" size="10" id="receipt" [(ngModel)]="RECPTPLACE"  maxlength="50">
-								</td>
-															
-							</tr>
-							<tr>
-								<td colspan="2" >Port of Delivery<br>
-									<input type="text" name="discharge" style="FONT-SIZE: 12px;font-family: Courier New; width: 250px;" size="10" id="discharge" maxlength="50" [(ngModel)]="POD" >									
-								</td>
-								<td>Place of Delivery<br>
-									<input type="text" name="delivery" style="FONT-SIZE: 12px;font-family: Courier New;width:250px" size="10" maxlength="50" [(ngModel)]="PODEL"  >    									
-								</td>
-								<td>  Mode of Transport<br>
-									<input type="text" name="vessel" style="FONT-SIZE: 12px;font-family: Courier New; width: 250px;" size="10" maxlength="50" [(ngModel)]="VESSEL"   >
-								</td>
-								<td>  </td>
-							</tr>  
-							<tr>
-								<td colspan="5">
-                                <table class="table table-bordered table-striped table-sm-new bgwhite">
-										<tr>											
-											<td>Container No. 
-											</td>
-											<td>Marks & Numbers
-											</td>
-											<td>No of pkgs Kind of pkgs <br> general description of goods
-											</td>
-											<td>Grows Weight
-											</td>
-											<td>Measurement
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<textarea name="marks" style="FONT-SIZE: 12px;font-family: Courier New;" rows="16" cols="14" wrap="OFF" id="marks" [(ngModel)]="MARKSANDNOS"> </textarea>
-											</td>
-											<td> 
-												<textarea name="pkgs" style="FONT-SIZE: 12px;font-family: Courier New;" rows="16" cols="9" wrap="OFF" [(ngModel)]="NOOFPKGS"> </textarea> 
-											</td>
-											<td> 
-												<textarea name="desc" style="FONT-SIZE: 12px;font-family: Courier New;width:400px" rows="16" cols="40" wrap="OFF"[(ngModel)]="ITCDESC"> </textarea>
-											</td>
-											<td> 
-												<textarea name="grwt" style="FONT-SIZE: 12px;font-family: Courier New;" rows="16" cols="9"   id="grwt" [(ngModel)]="GRWT">  </textarea>  
-											</td>
-											<td> 												
-												<textarea name="cbm" style="FONT-SIZE: 12px;font-family: Courier New;" rows="16" cols="9"   id="cbm" [(ngModel)]="VOL"> </textarea>  
-											</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2"> Goods Description (Rider)
-                                            </td>
-                                            <td colspan="3">
-                                                <textarea name="rider" style="FONT-SIZE: 12px;font-family: Courier New;width:650px;" rows="4" cols="40" [(ngModel)]="Rider"  ></textarea>
-                                            </td>
-                                        </tr>
-										<tr>
-											<td  colspan="2" >Freight Amount </td>
-											<td >Freight Payable at </td>
-											<td>No of Original BL/MTD(s) </td>	
-											<td>Place and date of Issue </td>	
-										</tr>										
-										<tr>
-											<td colspan="2"> 
-												<textarea name="freight" style="FONT-SIZE: 12px;font-family: Courier New;height: 50px;" rows="10" cols="28" wrap="OFF" [(ngModel)]="MISC" ></textarea>
-											</td>
-											<td  >
-												<textarea name="prepaid" style="FONT-SIZE: 12px;font-family: Courier New;height: 50px;width: 230px;" rows="10" cols="10" wrap="OFF" [(ngModel)]="PP" ></textarea> 
-											</td>
-											<td  > 
-												<textarea name="collect" style="FONT-SIZE: 12px;font-family: Courier New;height: 30px;" rows="10" cols="10"  id="collect"  [(ngModel)]="CC" ></textarea> 
-											</td>	
-											<td  > 
-												<input type="text" name="placedt" style="FONT-SIZE: 12px;font-family: Courier New;height: 30px;" size="28" maxlength="50" [(ngModel)]="PLACEDATE" >
-											</td>	
-										</tr>										
-										<tr>
-											<td colspan="3"> Other Picture(if any)<br>
-												<textarea name="others" style="FONT-SIZE: 12px;font-family: Courier New;" rows="4" cols="40" [(ngModel)]="APPLYTO"  ></textarea>
-											</td>
-											<td colspan="2"> </td>
-										</tr>
-									</table> 									
-								</td>
-                            </tr> 
-                            <tr>
-                         
-						</table>  
-            
-        `,
+      <div class="card sec">
+        <div class="switch-note">
+          <span>{{IsSwitchtext}}</span>
+          <a href="javascript:void(0);" (click)="fcrrout(SwitchFCR);"><b>{{SwitchFCR}}</b></a>
+        </div>
+      </div>
+
+      <div class="card sec">
+        <div class="card-h"><h2>Document</h2><span class="meta">Reference numbers</span></div>
+        <div class="fields">
+          <div class="fld">
+            <label for="fcrno">BL / MTD no.</label>
+            <input type="text" id="fcrno" name="fcrno" class="mono" maxlength="15" [(ngModel)]="FCRNO" readonly>
+          </div>
+          <div class="fld">
+            <label for="bookingno">Booking no.</label>
+            <input type="text" id="bookingno" name="bookingno" maxlength="10">
+          </div>
+          <div class="fld full tall">
+            <label for="sexptno">Shipment ref no.</label>
+            <textarea id="sexptno" name="sexptno" rows="2" [(ngModel)]="EXPNO"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card sec">
+        <div class="card-h"><h2>Parties</h2><span class="meta">Names and full addresses</span></div>
+        <div class="fields">
+          <div class="fld full tall">
+            <label for="shipper">Shipper</label>
+            <textarea id="shipper" name="shipper" rows="4" [(ngModel)]="SHIPPER"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="consignee">Consignee</label>
+            <textarea id="consignee" name="consignee" rows="4" [(ngModel)]="CONSIGNEE"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="notify">Notify address</label>
+            <textarea id="notify" name="notify" rows="4" [(ngModel)]="NOTIFYPARTY"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card sec">
+        <div class="card-h"><h2>Routing</h2><span class="meta">Places and mode of transport</span></div>
+        <div class="fields">
+          <div class="fld">
+            <label for="carriage">Place of receipt</label>
+            <input type="text" id="carriage" name="carriage" maxlength="50" [(ngModel)]="CARRIER">
+          </div>
+          <div class="fld">
+            <label for="receipt">Place of loading</label>
+            <input type="text" id="receipt" name="receipt" maxlength="50" [(ngModel)]="RECPTPLACE">
+          </div>
+          <div class="fld">
+            <label for="discharge">Port of delivery</label>
+            <input type="text" id="discharge" name="discharge" maxlength="50" [(ngModel)]="POD">
+          </div>
+          <div class="fld">
+            <label for="delivery">Place of delivery</label>
+            <input type="text" id="delivery" name="delivery" maxlength="50" [(ngModel)]="PODEL">
+          </div>
+          <div class="fld full">
+            <label for="vessel">Mode of transport</label>
+            <input type="text" id="vessel" name="vessel" maxlength="50" [(ngModel)]="VESSEL">
+          </div>
+        </div>
+      </div>
+
+      <div class="card sec">
+        <div class="card-h"><h2>Cargo</h2><span class="meta">Printed as typed - columns stay aligned</span></div>
+        <div class="fields">
+          <div class="fld full tall">
+            <label for="marks">Container no.</label>
+            <textarea id="marks" name="marks" class="mono" rows="5" [(ngModel)]="MARKSANDNOS"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="pkgs">Marks &amp; numbers</label>
+            <textarea id="pkgs" name="pkgs" class="mono" rows="5" [(ngModel)]="NOOFPKGS"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="desc">No. and kind of packages, description of goods</label>
+            <textarea id="desc" name="desc" class="mono" rows="6" [(ngModel)]="ITCDESC"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="grwt">Gross weight</label>
+            <textarea id="grwt" name="grwt" class="mono" rows="4" [(ngModel)]="GRWT"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="cbm">Measurement</label>
+            <textarea id="cbm" name="cbm" class="mono" rows="4" [(ngModel)]="VOL"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="rider">Goods description (rider)</label>
+            <textarea id="rider" name="rider" class="mono" rows="4" [(ngModel)]="Rider"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card sec">
+        <div class="card-h"><h2>Freight &amp; charges</h2><span class="meta">Amounts and originals</span></div>
+        <div class="fields">
+          <div class="fld full tall">
+            <label for="freight">Freight amount</label>
+            <textarea id="freight" name="freight" class="mono" rows="3" [(ngModel)]="MISC"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="prepaid">Freight payable at</label>
+            <textarea id="prepaid" name="prepaid" class="mono" rows="3" [(ngModel)]="PP"></textarea>
+          </div>
+          <div class="fld full tall">
+            <label for="collect">No. of original BL / MTD(s)</label>
+            <textarea id="collect" name="collect" class="mono" rows="3" [(ngModel)]="CC"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card sec">
+        <div class="card-h"><h2>Issue details</h2><span class="meta">Printed at the foot of the document</span></div>
+        <div class="fields">
+          <div class="fld full">
+            <label for="placedt">Place &amp; date of issue</label>
+            <input type="text" id="placedt" name="placedt" maxlength="50" [(ngModel)]="PLACEDATE">
+          </div>
+          <div class="fld full tall">
+            <label for="others">Other particulars (if any)</label>
+            <textarea id="others" name="others" rows="4" [(ngModel)]="APPLYTO"></textarea>
+          </div>
+        </div>
+      </div>
+
+    }
+`,
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -672,6 +706,10 @@ export class ExptMTOprintview implements OnChanges {
    expressbillval:string=""
    WaterMarkoption:boolean=false;
    watermarkval:string="0";
+    /** Presentation (from MPERPNG-20): true once Export_FCR_PRINTPREVIEW has filled the form */
+    loaded:boolean=false;
+    /** set when the record could not be loaded; shown instead of the form */
+    loadError:string="";
     constructor(
         private _router: Router,
         private _dataService: DataService,
@@ -718,13 +756,20 @@ export class ExptMTOprintview implements OnChanges {
      }
     ngOnChanges()
     {
-        this.loaderService.display(true); 
+        this.loaded = false;
+        this.loadError = "";
+        if (!this._fcrsharedvataSerice.fcrsharedData) {
+            this.loadError = "No document number was carried over from the House B/L screen.";
+            this.loaderService.display(false);
+            return;
+        }
+        this.loaderService.display(true);
      //   console.log("MTO NO. "+this._fcrsharedvataSerice.fcrsharedData); 
         const jsonExport = { FCRNO: this._fcrsharedvataSerice.fcrsharedData };//'GOA106180004'
         this._dataService.Common("Export/Export_FCR_PRINTPREVIEW", jsonExport)
             .subscribe((data: any) => {
-               
-                if (data.Table[0].STATUS == 100) {
+                const first = (data && data.Table && data.Table.length) ? data.Table[0] : null;
+                if (first && first.STATUS == 100) {
                     this.FCRDET = data.Table;
 
                     this.SHIPPER = this.FCRDET[0].SHIPPER;
@@ -763,15 +808,21 @@ export class ExptMTOprintview implements OnChanges {
                         this.IsSwitchtext="Switch BL MTO NO.: ";
                     }
                     else{ this.IsSwitchtext="Original MTO No.: " ;               }
-                    
+
+                    this.loaded = true;
                     this._toasterService.toast('info', 'Complete', 'Data filled successfully');
-                    this.loaderService.display(false); 
+                    this.loaderService.display(false);
                 } else {
 
-                    this._toasterService.toast('error', 'Error', data.Table[0].STATUSTEXT);
-                    this.loaderService.display(false); 
+                    this.loadError = (first && first.STATUSTEXT) || "The document could not be loaded.";
+                    this._toasterService.toast('error', 'Error', this.loadError);
+                    this.loaderService.display(false);
                 }
 
+            },
+            (error) => {
+                this.loadError = "The document could not be loaded (" + (error && error.status) + ").";
+                this.loaderService.display(false);
             });
     }
    
@@ -1007,6 +1058,7 @@ export class ExptMTOprintview implements OnChanges {
 @Component({
     selector: 'app-printview',
     templateUrl: 'exp_prt_fcr_printview.component.html',
+    styleUrls: ['./fcr-form.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -1017,6 +1069,10 @@ export class ExptPrintview implements OnInit {
     ISPRINT :string="";
     WaterMarkoption:boolean=false;
     watermarkval:string="0";
+    /** Presentation (from MPERPNG-20): document number carried over from the House B/L screen - header only */
+    DocNo: string = "";
+    pageTitle: string = "House B/L";
+    typeLabel: string = "";
     @ViewChild(ExptFCRPrintview, {static: false}) public viewFCR: ExptFCRPrintview;
     @ViewChild(ExptMTOprintview, {static: false}) public viewMTO: ExptMTOprintview;
 
@@ -1033,6 +1089,21 @@ export class ExptPrintview implements OnInit {
     ngOnInit(): void {
         this.Type = this._fcrsharedvataSerice.fcrHbltypesharedData;//'M';
         this.ISPRINT= this._fcrhblprinttype.fcrhblprinttype;
+        this.DocNo = this._fcrsharedvataSerice.fcrsharedData ? String(this._fcrsharedvataSerice.fcrsharedData) : "";
+        if (this.Type == "M") { this.pageTitle = "MTO / Multimodal B/L"; this.typeLabel = "Multimodal"; }
+        else if (this.Type == "H") { this.pageTitle = "House B/L"; this.typeLabel = "House B/L"; }
+        else if (this.Type == "F") { this.pageTitle = "FCR / House B/L"; this.typeLabel = "FCR"; }
+        else { this.pageTitle = "House B/L print"; this.typeLabel = ""; }
+    }
+
+    /** Presentation: the action bar stays disabled until the editor below has loaded its record */
+    get docLoaded(): boolean {
+        return !!((this.viewFCR && this.viewFCR.loaded) || (this.viewMTO && this.viewMTO.loaded));
+    }
+
+    /** empty state: nothing was carried over from the House B/L screen */
+    goToForm() {
+        this._router.navigate(['/export/fcr/form']);
     }
 
     checkValue(event: any){

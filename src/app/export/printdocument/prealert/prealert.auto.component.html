@@ -1,100 +1,121 @@
-﻿<div class="row">
-	<div class="col-sm-12">
-		<div class="card">
-			<div class="card-header formheading centerlabel">
-			   <strong><u>CONSOLE PENDING LIST (AIR)</u></strong>
-			</div>
-		</div>
-	</div>
-</div>
-@if (searchListLength == 0) {
-<div class="row">
-	<div class="col-sm-12 centerlabel">
-		<img src="assets/img/loading.gif" />
-	</div>
-</div>
-}
-@if (searchListLength == -1) {
-<div class="row">
-	<div class="col-sm-12 centerlabel">
-		<span class="col-form-span-label">No Record Found!</span>
-	</div>
-</div>
-}
-<div class="row">
-	<div class="col-sm-12">
-		@if (searchList.length > 0) {
-<div class="row y350heightscroll">
-			<table class="table table-bordered table-striped table-sm-new bgwhite">
-				<thead>
-					<tr class="title-head formheading">
-						<th>View</th>
-						<th></th>
-						<th>MAWB No</th>
-						<th>MAWB DT.</th>
-						<th>ETD</th>
-						<th>ETA</th>
-						<th>HAWB No.</th>
-						<th>HAWB DT.</th>
-						<th>Ex-Jobno.</th>
-						<th>No of Pkgs</th>
-						<th>GRWT</th>
-						<th>CBM</th>
-						<th>Consignee</th>
-						<th>Flight Details</th>
-						<th>MAWB FRT</th>
-						<th>Invoice Type</th>
-						<th>MAWBDEST</th>
-					</tr>
-				</thead>
-				<tbody>
-					@for (obj of searchList; track obj) {
-<tr>
-						<td>
-							@if (obj.MAWBNO != '') {
-<button (click)="autoClick(obj.MAWBNO,obj.CITY)" uiBtn variant="default" size="sm">
-								<span class="col-form-span-label"><i class="fa fa-window-maximize"></i>&nbsp;Generate</span>
-							</button>
-}
-							<!-- <button uiBtn variant="outline" size="sm" *ngIf="obj.ISDISABLED == true" [disabled]="obj.ISDISABLED">
-								<span class="col-form-span-label"><i class="fa fa-download"></i>Processing..</span>
-							</button> -->
-						</td>
-						<td>
-							<!-- <ng-select [items]="[{VALUEFIELD: 'LIL', TEXTFIELD: 'LIL'},{VALUEFIELD: 'LIL', TEXTFIELD: 'PAR'}]"
-									   bindLabel="TEXTFIELD"
-									   bindValue="VALUEFIELD"
-									   placeholder="--Select--"
-									   [(ngModel)]="obj.CITY"
-									   class="form-control width120"
-									   >
-							</ng-select> -->
-							<select class="form-control width120"  [(ngModel)]="obj.CITY" >
-									<option value="null">--Select--</option>
-									<option value="LIL">LIL</option>
-									<option value="PAR">PAR</option>
-								</select>
-						</td>
-						<td><span class="col-form-span-label">{{obj.MAWBNO}}</span></td>
-						<td><span class="col-form-span-label">{{obj.AEROBILLDT}}</span></td>
-						<td><span class="col-form-span-label">{{obj.ETD}}</span></td>
-						<td><span class="col-form-span-label">{{obj.ETA}}</span></td>
-						<td><span class="col-form-span-label">{{obj.HOUSEBILLNO}}</span></td>
-						<td><span class="col-form-span-label">{{obj.HOUSEBILLDT}}</span></td>
-						<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
-						<td><span class="col-form-span-label">{{obj.EXPT_NOOFPGS}}</span></td>
-						<td><span class="col-form-span-label">{{obj.EXPT_GRWT}}</span></td>
-						<td><span class="col-form-span-label">{{obj.EXPT_VOLUME}}</span></td>
-						<td><span class="col-form-span-label">{{obj.CONS_NAME}}</span></td>
-						<td><span class="col-form-span-label">{{obj.FLIGHTDET}}</span></td>
-						<td><span class="col-form-span-label">{{obj.MAWBFRT}}</span></td>
-						<td><span class="col-form-span-label">{{obj.EXPT_INVTYPE}}</span></td>
-						<td><span class="col-form-span-label">{{obj.MAWBDEST}}</span></td>
-					</tr>
-}
-				</tbody>
-			</table>
-		</div>
-}
-	</div>
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Console Pending List (Air)</h1>
+      <p>Select a city and generate the pre-alert for each MAWB</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="filters" style="grid-template-columns: 1fr auto;">
+      <div class="f">
+        <label for="txtAutoFilter">Filter</label>
+        <input type="text" id="txtAutoFilter" name="txtAutoFilter" [(ngModel)]="filterText" placeholder="MAWB, HAWB, consignee…" />
+      </div>
+      <div class="f">
+        <button class="btn g" type="button" (click)="filterText = ''">Clear</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <span>
+        <span class="count">{{ filteredList.length }} {{ filteredList.length === 1 ? 'MAWB' : 'MAWBs' }} pending</span>
+        @if (filterText) {
+          <span class="sub-t"> matching “{{ filterText }}”</span>
+        }
+      </span>
+      <span class="tb-r">
+        <button class="btn g" type="button" (click)="exportAutoCsv()" [disabled]="!filteredList.length">Export</button>
+      </span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>View</th>
+            <th>City</th>
+            <th>MAWB No</th>
+            <th>MAWB DT.</th>
+            <th>ETD</th>
+            <th>ETA</th>
+            <th>HAWB No.</th>
+            <th>HAWB DT.</th>
+            <th>Ex-Jobno.</th>
+            <th class="num">No of Pkgs</th>
+            <th class="num">GRWT</th>
+            <th class="num">CBM</th>
+            <th>Consignee</th>
+            <th>Flight Details</th>
+            <th>MAWB FRT</th>
+            <th>Invoice Type</th>
+            <th>MAWBDEST</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (searchListLength == 0) {
+            <tr><td class="empty" colspan="17">Loading…</td></tr>
+          } @else if (searchListLength == -1) {
+            <tr><td class="empty" colspan="17">No Record Found!</td></tr>
+          } @else {
+            @for (obj of autoPageRows; track $index) {
+              <tr>
+                <td>
+                  @if (obj.MAWBNO != '') {
+                    <button class="btn g" type="button" (click)="autoClick(obj.MAWBNO, obj.CITY)">Generate</button>
+                  }
+                </td>
+                <td>
+                  @if (obj.MAWBNO != '') {
+                    <select [(ngModel)]="obj.CITY">
+                      <option value="null">--Select--</option>
+                      <option value="LIL">LIL</option>
+                      <option value="PAR">PAR</option>
+                    </select>
+                    @if (obj.CITY) {
+                      <div class="sub-t">Will send to {{ obj.CITY }}</div>
+                    }
+                  }
+                </td>
+                <td class="mono">{{ obj.MAWBNO }}</td>
+                <td>{{ obj.AEROBILLDT }}</td>
+                <td>{{ obj.ETD }}</td>
+                <td>{{ obj.ETA }}</td>
+                <td>{{ obj.HOUSEBILLNO }}</td>
+                <td>{{ obj.HOUSEBILLDT }}</td>
+                <td>{{ obj.EXPTNO }}</td>
+                <td class="num mono">{{ obj.EXPT_NOOFPGS }}</td>
+                <td class="num mono">{{ obj.EXPT_GRWT }}</td>
+                <td class="num mono">{{ obj.EXPT_VOLUME }}</td>
+                <td>{{ obj.CONS_NAME }}</td>
+                <td>{{ obj.FLIGHTDET }}</td>
+                <td>{{ obj.MAWBFRT }}</td>
+                <td>{{ obj.EXPT_INVTYPE }}</td>
+                <td>{{ obj.MAWBDEST }}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="17">No MAWBs match this filter.</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (searchList.length > 0) {
+      <div class="pager">
+        <span>Showing <b>{{ autoRangeStart }}–{{ autoRangeEnd }}</b> of <b>{{ filteredList.length }}</b></span>
+        <div class="pages">
+          <button type="button" [disabled]="autoPage <= 1" (click)="goAutoPage(autoPage - 1)" aria-label="Previous page">‹</button>
+          @for (p of autoPageList; track $index) {
+            @if (p === 0) {
+              <span class="gap">…</span>
+            } @else {
+              <button type="button" [class.on]="p === autoPage" (click)="goAutoPage(p)">{{ p }}</button>
+            }
+          }
+          <button type="button" [disabled]="autoPage >= autoPageCount" (click)="goAutoPage(autoPage + 1)" aria-label="Next page">›</button>
+        </div>
+      </div>
+    }
+  </div>
 </div>

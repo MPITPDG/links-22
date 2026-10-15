@@ -1,0 +1,109 @@
+/* ============================================================
+   Master B/L editor form kit.
+   Companion to import-page.css: turns the old printed-B/L grid editor into
+   an ordinary data-entry form (boxed inputs, auto-sizing textareas, label-left
+   .fld rows). Monochrome only - all colour comes from the import kit tokens.
+   Used by:
+     export/printdocument/sea/expt_prt_mbl_printprintview.component.*  (Master B/L)
+   ============================================================ */
+
+/* letterhead strip in the page header */
+:host ::ng-deep .im-page .letterhead {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+:host ::ng-deep .im-page .letterhead img {
+    height: 54px;
+    width: auto;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: #fff;
+    padding: 3px 6px;
+}
+
+/* textareas are not covered by the import kit - box them like inputs */
+:host ::ng-deep .im-page textarea {
+    font: inherit;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    padding: 6px 10px;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    box-shadow: none;
+    margin: 0;
+    resize: vertical;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+:host ::ng-deep .im-page textarea:focus {
+    outline: 2px solid var(--ink);
+    outline-offset: -1px;
+    border-color: var(--ink);
+    box-shadow: none;
+}
+
+:host ::ng-deep .im-page textarea[readonly],
+:host ::ng-deep .im-page textarea:disabled {
+    border-style: dashed;
+    background: var(--fill);
+    color: var(--soft);
+}
+
+/* a .fld holding a textarea: label sits at the top of the box */
+:host ::ng-deep .im-page .fld.tall {
+    align-items: start;
+}
+
+:host ::ng-deep .im-page .fld.tall > label {
+    padding-top: 7px;
+}
+
+/* the cargo block keeps a monospace face so the columns the operator types
+   line up the way they will on the printed document */
+:host ::ng-deep .im-page textarea.mono,
+:host ::ng-deep .im-page input.mono {
+    font-family: var(--num);
+    font-size: 12.5px;
+}
+
+/* empty / loading / error state inside a card */
+:host ::ng-deep .im-page .state {
+    padding: 42px 16px;
+    text-align: center;
+    color: var(--soft);
+}
+
+:host ::ng-deep .im-page .state h3 {
+    margin: 0 0 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+:host ::ng-deep .im-page .state p {
+    margin: 0 auto 14px;
+    max-width: 460px;
+    font-size: 12.5px;
+}
+
+/* page header chips row */
+:host ::ng-deep .im-page .ph .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+    :host ::ng-deep .im-page .letterhead img {
+        display: none;
+    }
+}

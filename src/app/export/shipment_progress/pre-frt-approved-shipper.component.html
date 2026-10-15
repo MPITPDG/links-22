@@ -1,37 +1,36 @@
-<div class="animated fadeIn">
-	<div class="row">
-		<div class="col-sm-2">
-		</div>
-		<div class="col-sm-8">
-			<app-shipment-progress-common-view [ExptNo]="ExptNo"></app-shipment-progress-common-view>
-			<table class="table table-bordered table-sm-new">
-				 
-				<tr>
-					<td class="width150"><span class="col-form-span-label">Prepaid freight approved by shipper date</span></td>
-					<td colspan="7">
-						<my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="frtApprdt"></my-date-picker>
-					</td>
-				</tr>
-				@if (ErrorMessage != '') {
-<tr class="trbg centerlabel">
-					<td colspan="8">
-						<span class="col-form-span-error">{{ErrorMessage}}</span>
-					</td>
-				</tr>
-}
-				<tr class="trbg centerlabel">
-					<td colspan="8">
-						<button type="button" name="submitButton" uiBtn variant="default" class="btn-l" (click)="submit();" [disabled]="ErrorMessage != ''" #submitButton>
-							<span class="col-form-span-label"><app-font-changer [fontIndex]="'14'"></app-font-changer> Submit</span>
-						</button>
-						<button type="button" name="abortButton" uiBtn variant="outline" class="btn-l" (click)="abort();">
-							<span class="col-form-span-label"><app-font-changer [fontIndex]="'7'"></app-font-changer> Abort</span>
-						</button>
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div class="col-sm-2">
-		</div>
-	</div>
+﻿<!-- Shipment progress - prepaid freight approved by shipper. Import page kit, compact form; bindings unchanged. -->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Prepaid freight approved</h1>
+      <p>Record the date the shipper approved the prepaid freight</p>
+    </div>
+    <div class="tools">
+      <span class="chip">{{ExptNo}}</span>
+    </div>
+  </div>
+
+  <app-shipment-progress-common-view [ExptNo]="ExptNo"></app-shipment-progress-common-view>
+
+  <div class="card sec">
+    <div class="card-h"><h2>Approval</h2><span class="meta"><b>*</b> required</span></div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Approved by shipper on <span class="req">*</span></label>
+        <my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="frtApprdt"></my-date-picker>
+      </div>
+    </div>
+  </div>
+
+  @if (ErrorMessage != '') {
+    <div class="sp-note">{{ErrorMessage}}</div>
+  }
+
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose Update.</span>
+    <div class="r">
+      <button type="button" name="abortButton" class="btn g" (click)="abort();"><app-font-changer [fontIndex]="'7'"></app-font-changer> Cancel</button>
+      <button type="button" name="submitButton" class="btn p" (click)="submit();" [disabled]="ErrorMessage != ''" #submitButton><app-font-changer [fontIndex]="'14'"></app-font-changer> Update</button>
+    </div>
+  </div>
 </div>

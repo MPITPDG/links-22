@@ -12,6 +12,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-epcopy-search',
     templateUrl: 'exp_epcopy_recvddt_search.component.html',
+    styleUrls: ['./epcopy-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -25,7 +26,10 @@ export class ExptEpcopyRecvddtSearch {
     SearchValue: any = '';
     ErrorMessage: string = '';
     headerType:string='Ep Copy Search'
-    
+    loading: boolean = false;
+    readonly pageSize = 10;
+    page: number = 1;
+
     constructor(
         private _router: Router,
         private _dataService: DataService,
@@ -50,29 +54,110 @@ export class ExptEpcopyRecvddtSearch {
             else if (this.checkType == 'ShippingBill') { this.ErrorMessage = "Please enter shiping bill No"; return false; }
         } else { this.ErrorMessage = ""; }
          this.loaderService.display(true);
-        const  jsonData = {             
+         this.loading = true;
+        const  jsonData = {
             CityCode: this._loginService.getLogin()[0].CITYCODE,
             Searchtype: this.checkType ,
-            SearchValue: this.SearchValue 
+            SearchValue: this.SearchValue
         };
-        this._dataService.getData('export/exp_EpCopySearch', jsonData)  
+        this._dataService.getData('export/exp_EpCopySearch', jsonData)
         .subscribe((data: any) => {
-             if(data.Table.length>1)
+             // Fail soft: a missing or empty Table is "no record", never a throw.
+             const rows: any[] = (data && data.Table) ? data.Table : [];
+             if(rows.length>1)
              {
-                if (data.Table[0].STATUS == 100) {
-                    this.searchList=data.Table;
+                if (rows[0].STATUS == 100) {
+                    this.searchList=rows;
                 } else {
-                
+
                     this._toasterService.toast('error', 'Error', 'No Record Found');
                 }
              }
-             else
+             else if (rows.length == 1 && rows[0].exptno)
               {
-                  let exptno= data.Table[0].exptno;
+                  let exptno= rows[0].exptno;
                  this._router.navigate(['export/shipment-progress/epcopy-recvddt',  exptno ]);
               }
+             else
+              {
+                 this._toasterService.toast('error', 'Error', 'No Record Found');
+              }
+             this.page = 1;
+             this.loading = false;
+             this.loaderService.display(false);
+        }, () => {
+             this.loading = false;
              this.loaderService.display(false);
         })
+    }
+
+    /** navigate to the detail screen for a result row, same target used for a single-match search */
+    rowClick(exptno: any) {
+        this._router.navigate(['export/shipment-progress/epcopy-recvddt', exptno]);
+    }
+
+    clear() {
+        this.SearchValue = '';
+        this.ErrorMessage = '';
+        this.searchList = [];
+        this.searchListLength = 0;
+        this.page = 1;
+    }
+
+    // ---------- pagination ----------
+    get pageCount(): number {
+        return Math.max(1, Math.ceil(this.searchList.length / this.pageSize));
+    }
+
+    get pageRows(): Array<any> {
+        const start = (this.page - 1) * this.pageSize;
+        return this.searchList.slice(start, start + this.pageSize);
+    }
+
+    get rangeStart(): number {
+        return this.searchList.length ? (this.page - 1) * this.pageSize + 1 : 0;
+    }
+
+    get rangeEnd(): number {
+        return Math.min(this.page * this.pageSize, this.searchList.length);
+    }
+
+    get pageList(): number[] {
+        const n = this.pageCount, p = this.page;
+        if (n <= 7) { return Array.from({ length: n }, (_, i) => i + 1); }
+        const out: number[] = [1];
+        const lo = Math.max(2, p - 1), hi = Math.min(n - 1, p + 1);
+        if (lo > 2) { out.push(0); }
+        for (let i = lo; i <= hi; i++) { out.push(i); }
+        if (hi < n - 1) { out.push(0); }
+        out.push(n);
+        return out;
+    }
+
+    goPage(p: number) {
+        if (p >= 1 && p <= this.pageCount) { this.page = p; }
+    }
+
+    // ---------- export ----------
+    exportCsv() {
+        const head = ['M.P.Reference', 'Shipper Name', 'Consignee Name', 'Total No. of Packages', 'Total No. of Pieces', 'Order No./Ref Details'];
+        const rows = this.searchList.map((r: any) => [r.exptno, r.exp_name, r.con_name, r.EXPT_NOOFPKGS, r.expt_noofpcs, r.Order_No_Style_Details]);
+        const q = (v: any) => {
+            const s = (v === null || v === undefined) ? '' : String(v);
+            return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+        };
+        const csv = [head, ...rows].map(line => line.map(q).join(',')).join('\r\n');
+        const d = new Date();
+        const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+        const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'epcopy-search-' + stamp + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 0);
     }
 
 
@@ -81,6 +166,7 @@ export class ExptEpcopyRecvddtSearch {
 @Component({
     selector: 'app-epcopy-recvddt',
     templateUrl: 'exp_epcopy_recvddt.component.html',
+    styleUrls: ['./epcopy-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -157,6 +243,8 @@ export class ExptEpcopyRecvddt {
         this._dataService.getData('export/exp_EpCopySearch', jsonData)  
         .subscribe((data: any) => {
             //  this.bldate = (this.exptdt[0].EXPT_HBLDT != "") ? this._dataService.stringdttoArry(this.exptdt[0].EXPT_HBLDT) : ""; 
+            // Fail soft: a missing or empty Table leaves the form blank instead of throwing.
+            if (!(data && data.Table && data.Table.length > 0)) { this.loaderService.display(false); return; }
             if (data.Table[0].STATUS == 100) {
                 this.Recddt=(data.Table[0].epcopydt != "") ? this._dataService.stringdttoArry(data.Table[0].epcopydt) : ""; ;
                 
@@ -181,10 +269,12 @@ export class ExptEpcopyRecvddt {
                 this.shipbldt=(data.Table[0].EP_CopyOfSBillDt != "") ? this._dataService.stringdttoArry(data.Table[0].EP_CopyOfSBillDt) : "";
 
                 this.exptdata=data.Table[0];
-                 
+
+                this.loaderService.display(false);
+            } else {
                 this.loaderService.display(false);
             }
-        })
+        }, () => { this.loaderService.display(false); })
     }
 
     updateRecddt()
@@ -246,20 +336,29 @@ export class ExptEpcopyRecvddt {
         };
         this._dataService.Common('export/exp_Epcopy_recvddt_Udate', jsonData)  
         .subscribe((data: any) => {
+            // Fail soft: no Table means the update did not report back - say so, keep the form.
+            if (!(data && data.Table && data.Table.length > 0)) {
+                this._toasterService.toast('error', 'Error', 'EP copy details could not be updated.');
+                this.loaderService.display(false);
+                return false;
+            }
             if (data.Table[0].STATUS == 100) {
                 this.loaderService.display(false);
-                this._toasterService.toast('success', 'success', 'Epcaopy received date updated successfully');   
+                this._toasterService.toast('success', 'success', 'Epcaopy received date updated successfully');
                 this.ResetAll()
-                this._router.navigate(['export/shipment-progress/epcopy-recvddt']);
+                this._router.navigate(['export/shipment-progress/epcopy']);   // back to the search; the bare epcopy-recvddt route does not exist
                 return false;
             }
             else
             {
                 this._toasterService.toast('error', 'Error', data.Table[0].STATUSTEXT);    
-                this.loaderService.display(false);        
+                this.loaderService.display(false);
                 return false;
-                
+
             }
+        }, () => {
+            this._toasterService.toast('error', 'Error', 'EP copy details could not be updated.');
+            this.loaderService.display(false);
         })
     }
     ResetAll()

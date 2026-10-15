@@ -1,59 +1,47 @@
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3"></div>
-                    <div class="col-md-6">
-                        <table class="table table-bordered table-sm-new">
-                            <tbody style='height:30px'>
-                                <tr>
-                                    <td>
-                                        <span class="col-form-span-label ">Mode of Shipment</span>
-                                    </td>
-                                    <td>
-
-                                        <span class="col-form-span-label">
-
-                                            <input type="radio" name="radiogroup1" value="1" [(ngModel)]="checkmode">&nbsp; Sea
-                                        </span>
-
-                                    </td>
-                                    <td>
-                                        <span class="col-form-span-label">
-                                            <input type="radio" name="radiogroup1" value="2" [(ngModel)]="checkmode" />&nbsp; Air
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="col-form-span-label centerlabel ">
-                                        Consignee
-                                    </td>
-                                    <td colspan="2">
-                                        <select class="form-control width250" [(ngModel)]="concode" [disabled]="condisable">
-                                            <option value="-1">Please select</option>
-                                            @for (d of listconcode; track d) {
-<option value={{d.CON_CODE}}>{{d.CON_NAME}}</option>
-}
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="3" class="centerlabel">
-                                        <button uiBtn variant="default" size="sm" type="button" (click)="onexcelGeneration()">
-                                            <span class="col-form-span-label">
-                                                <i class="fa fa-download"></i>&nbsp; Export To Excel
-                                            </span>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div>
-                <div class="col-md-3"></div>
-            </div>
-        </div>
+﻿<!--
+  Export -> Report -> Cargo On Hand.
+  Recipe 2 (form page): onexcelGeneration() downloads a server-generated
+  .xls, no on-screen result rows. Every ngModel / click handler kept.
+-->
+<div class="im-page xr-page">
+  <div class="ph">
+    <div>
+      <h1>Cargo On Hand</h1>
+      <p>Filter cargo on hand by mode of shipment and consignee.</p>
     </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h"><h2>Filters</h2></div>
+    <div class="fields">
+      <div class="fld">
+        <label>Mode of Shipment</label>
+        <div class="xr-radios">
+          <label class="xr-radio">
+            <input type="radio" name="radiogroup1" value="1" [(ngModel)]="checkmode" /> Sea
+          </label>
+          <label class="xr-radio">
+            <input type="radio" name="radiogroup1" value="2" [(ngModel)]="checkmode" /> Air
+          </label>
+        </div>
+      </div>
+
+      <div class="fld">
+        <label for="selConcode">Consignee</label>
+        <select id="selConcode" [(ngModel)]="concode" [disabled]="condisable">
+          <option value="-1">Please select</option>
+          @for (d of listconcode; track d) {
+            <option value={{d.CON_CODE}}>{{d.CON_NAME}}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">Downloads an .xls file.</span>
+    <div class="r">
+      <button class="btn p" type="button" (click)="onexcelGeneration()">Export To Excel</button>
+    </div>
+  </div>
 </div>

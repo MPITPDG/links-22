@@ -6,10 +6,12 @@ import { ToastCommonService } from '../../shared/service/toastService';
 import { IMyDpOptions } from 'mydatepicker';
 import { cartingVslAgnt } from '../export-share-data.service';
 import { LoaderService } from '../../shared/service/loader.service';
+import { SpPager, spExportCsv } from './sp-list';
 
 @Component({
     selector: 'app-search-carting-sea',
     templateUrl: 'search-carting-sea.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -108,6 +110,7 @@ export class SearchCartingSea implements OnInit, OnChanges {
 @Component({
     selector: 'app-list-carting-sea',
     templateUrl: 'List-carting-sea.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -121,6 +124,21 @@ export class ListCartingSea implements OnInit, OnChanges {
     buttondis: boolean = false;
     headerType: string = 'SHIPMENT PROGRESS - LIST JOB FOR CARTING'
     cartingjob: any = "";
+    pager: SpPager = new SpPager(() => this.CartingList);
+
+    get selectedCount(): number {
+        return (this.CartingList || []).filter((d: any) => d.SELEJOB == 1 || d.SELEJOB == true).length;
+    }
+
+    get cartedCount(): number {
+        return (this.CartingList || []).filter((d: any) => d.CARTID != 0).length;
+    }
+
+    exportCsv() {
+        spExportCsv('carting-sea', ['M.P ref. no', 'Shipper', 'Consignee', 'Tot. pkgs', 'Tot. pieces', 'Pkgs recvd', 'Order no.', 'Carted on', 'Pkgs', 'Remark'],
+            this.CartingList.map((d: any) => [d.EXPTNO, d.SHIPPER, d.CONSIGNEE, d.EXP_NOPKGS, d.EXP_NOPCS, d.RCVDPKGS, d.ORDERNO,
+                d.CARTEDON && d.CARTEDON.formatted ? d.CARTEDON.formatted : '', d.NOOFPKG, d.REMARK]));
+    }
     constructor(
         private _router: Router,
         private _dataService: DataService,
@@ -242,6 +260,7 @@ export class ListCartingSea implements OnInit, OnChanges {
 @Component({
     selector: 'app-manage-carting-sea',
     templateUrl: 'manage-carting-sea.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -278,6 +297,7 @@ export class manageCartingSea implements OnInit, OnChanges {
 
 @Component({
     templateUrl: 'carting-sea.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

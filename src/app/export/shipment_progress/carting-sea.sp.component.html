@@ -1,9 +1,29 @@
-﻿ <div class="animated fadeIn">
-     
-    @if (_viewType=='Search') {
-<app-search-carting-sea   (search)="SearchData($event)"></app-search-carting-sea>
-}
-    @if (_viewType=='List') {
-<app-list-carting-sea   [CartingList] ="searchList" [SearchHead]="header"  (searlist)="onlist($event)"></app-list-carting-sea>
-}	
+﻿<!--
+  Shipment progress - carting (sea). Import page kit.
+  Search picks the vessel and agent (the list needs a vessel, so the page opens on
+  the vessel picker); List is the vessel's jobs with the carting date, packages and
+  remark per ticked job, saved together.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Carting (sea)</h1>
+      <p>Record carting date and packages for the jobs on a vessel</p>
+    </div>
+    <div class="tools">
+      @if (_viewType!='Search') {
+        <button type="button" class="btn g" (click)="_viewType='Search'">Back to search</button>
+      }
+    </div>
+  </div>
+
+  @if (_viewType=='Search') {
+    <app-search-carting-sea   (search)="SearchData($event)"></app-search-carting-sea>
+  }
+  @if (_viewType=='List') {
+    <app-list-carting-sea   [CartingList] ="searchList" [SearchHead]="header"  (searlist)="onlist($event)"></app-list-carting-sea>
+  }
+  @if (_viewType=='data') {
+    <div class="card"><div class="sp-empty">Carting saved. Choose Back to search to pick another vessel.</div></div>
+  }
 </div>

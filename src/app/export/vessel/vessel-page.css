@@ -1,0 +1,60 @@
+/* ----------------------------------------------------------------
+   Export vessel master (add / edit + search): screen-level additions on
+   top of the GLOBAL page kit (src/styles/kit/import-page.css, root .im-page).
+   Only what the kit does not cover lives here, scoped under .im-page and
+   pulled in per component through styleUrls (emulated encapsulation).
+     1. the Links my-date-picker shim host is inline-block, so it shrinks
+        inside a .fld cell; make it fill the cell like the other inputs.
+     2. Delayed / Not called: two inline checkboxes in one field cell.
+     3. search results: the whole row opens the vessel.
+     4. table.tbl.nowrap: one line per row (dates, codes); .tbl-wrap scrolls
+        (same class name as import/master/master-page.css).
+   ---------------------------------------------------------------- */
+
+/* 1. date picker fills its field */
+.im-page my-date-picker {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
+/* 2. inline checkbox pair */
+.im-page .vs-checks {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 18px;
+    min-height: 32px;
+}
+
+.im-page .vs-checks label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 500;
+    font-size: 13px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.im-page .vs-checks input[type="checkbox"] {
+    accent-color: var(--mp-primary, #0A0A0A);
+    width: 14px;
+    height: 14px;
+    margin: 0;
+}
+
+/* 3. clickable result rows */
+.im-page table.tbl tr.vs-row {
+    cursor: pointer;
+}
+
+.im-page table.tbl tr.vs-row:focus-visible td {
+    outline: 2px solid var(--mp-primary, var(--ink));
+    outline-offset: -2px;
+}
+
+/* 4. dense one-line rows */
+.im-page table.tbl.nowrap td {
+    white-space: nowrap;
+}

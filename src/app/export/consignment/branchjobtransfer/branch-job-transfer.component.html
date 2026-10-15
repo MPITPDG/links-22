@@ -1,76 +1,45 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>TRANSFER JOB BRANCH</strong>
-                </div>
-            </div>
-        </div>
+<!--
+  Export - Transfer job branch. Page kit recipe 2 (src/styles/kit/import-page.css),
+  ported from MPERPNG-20. [(ngModel)] on OldJobNo / Branch / UserRemarks,
+  #submitButton (handed to ButtonService) and submit() / reset() are unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Transfer job branch</h1>
+      <p>Move an existing job to another branch, with a reason on the record.</p>
     </div>
-    <div class="row">
-        <div class="col-sm-3">
-        </div>
-        <div class="col-sm-6">
-            <table class="table table-sm-new bgwhite">
-                <tr class="trbg">
-                    <td colspan="2">
-                        <span class="col-form-span-label">
-                            <b>Genaral Details</b>
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width120">
-                        <span class="col-form-span-label">
-                            <b>Old Job No.<span class="col-form-span-error">*</span>
-                            </b>
-                        </span>
-                    </td>
-                    <td>
-                        <input type="text" [(ngModel)]="OldJobNo" [maxlength]="15" class="form-control width120" />
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width120">
-                        <span class="col-form-span-label">
-                            <b>BRANCH
-                                <span class="col-form-span-error">*</span>
-                            </b>
-                        </span>
-                    </td>
-                    <td>
-                        <ng-select [items]="BranchList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" placeholder="--Select Branch--" [(ngModel)]="Branch"
-                            class="form-control">
-                        </ng-select>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width120">
-                        <span class="col-form-span-label">
-                            <b>User Remarks<span class="col-form-span-error">*</span>
-                            </b>
-                        </span>
-                    </td>
-                    <td>
-                        <textarea [(ngModel)]="UserRemarks" class="form-control" rows="3"></textarea>
-                    </td>
-                </tr>
-                <tr class="trbg centerlabel">
-                    <td colspan="2">
-                        <button type="button" name="searchButton" uiBtn variant="default" size="sm" (click)="submit();" #submitButton>
-                            <span class="col-form-span-label">
-                                <i class="fa fa-send-o"></i>&nbsp;Submit</span>
-                        </button>
-                        <button type="button" name="searchButton" uiBtn variant="outline" size="sm" (click)="reset();">
-                            <span class="col-form-span-label">
-                                <i class="fa fa-undo"></i>&nbsp;Reset</span>
-                        </button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-3">
-        </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>General details</h2>
+      <span class="meta"><b>*</b> required</span>
     </div>
+    <div class="fields">
+      <div class="fld">
+        <label for="bjt-oldjobno">Old job no. <span class="req">*</span></label>
+        <input id="bjt-oldjobno" type="text" [(ngModel)]="OldJobNo" [maxlength]="15" />
+      </div>
+      <div class="fld">
+        <label for="bjt-branch">Branch <span class="req">*</span></label>
+        <ng-select labelForId="bjt-branch" class="custom" [items]="BranchList"
+          bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+          placeholder="--Select Branch--" [(ngModel)]="Branch">
+        </ng-select>
+      </div>
+      <div class="fld full top">
+        <label for="bjt-remarks">User remarks <span class="req">*</span></label>
+        <textarea id="bjt-remarks" rows="3" [(ngModel)]="UserRemarks"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">The job moves only after you confirm the transfer.</span>
+    <div class="r">
+      <button class="btn g" type="button" name="searchButton" (click)="reset();">Reset</button>
+      <button class="btn p" type="button" name="searchButton" (click)="submit();" #submitButton>Submit</button>
+    </div>
+  </div>
 </div>

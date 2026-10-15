@@ -1,73 +1,47 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>EXPORT - PSS</strong>
-                </div>
-            </div>
-        </div>
+<!--
+  Export PSS. Page kit recipe 2 (src/styles/kit/import-page.css), ported from
+  MPERPNG-20. Look up an export no., then record its PSS. [(ngModel)], IsDisabled
+  and search() / submit() / reset() are unchanged. The controls are shown and
+  hidden with [hidden], not @if: search() / submit() hand #searchButton and
+  #submitButton to ButtonService, and reset() can flip IsDisabled while a request
+  is in flight - @if would destroy the element the ViewChild points at.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>PSS</h1>
+      <p>Look up an export job, then record its PSS number.</p>
     </div>
-    <div class="row">
-        <div class="col-sm-3">
-        </div>
-        <div class="col-sm-6">
-            <table class="table table-sm-new bgwhite">
-                <tr class="trbg">
-                    <td colspan="3">
-                        <span class="col-form-span-label">
-                            <b>General Details</b>
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width80">
-                        <span class="col-form-span-label">
-                            <b>Export No.
-                                <span class="col-form-span-error">*</span>
-                            </b>
-                        </span>
-                    </td>
-                    <td>
-                        <input type="text" [(ngModel)]="ExptNo" [maxlength]="15" [disabled]="IsDisabled" class="form-control width120" />
-                    </td>
-                    <td>
-                        <span class="col-form-span-error">{{ErrorMessage}}</span>
-                    </td>
-                </tr>
-                <tr [hidden]="!IsDisabled">
-                    <td class="width90">
-                        <span class="col-form-span-label">
-                            <b>PSS
-                                <span class="col-form-span-error">*</span>
-                            </b>
-                        </span>
-                    </td>
-                    <td>
-                        <input type="text" [(ngModel)]="Pss" class="form-control width120" />
-                    </td>
-                    <td>
-                    </td>
-                </tr>
-                <tr class="trbg centerlabel">
-                    <td colspan="3">
-                        <button type="button" name="searchButton" uiBtn variant="outline" size="sm" (click)="search();" [hidden]="IsDisabled" #searchButton>
-                            <span class="col-form-span-label">
-                                <i class="fa fa-search"></i>&nbsp;Search</span>
-                        </button>
-                        <button type="button" name="searchButton" uiBtn variant="default" size="sm" (click)="submit();" [hidden]="!IsDisabled" #submitButton>
-                            <span class="col-form-span-label">
-                                <i class="fa fa-send-o"></i>&nbsp;Submit</span>
-                        </button>
-                        <button type="button" name="searchButton" uiBtn variant="outline" size="sm" (click)="reset();" [hidden]="!IsDisabled">
-                            <span class="col-form-span-label">
-                                <i class="fa fa-undo"></i>&nbsp;Reset</span>
-                        </button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-3">
-        </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>General details</h2>
+      <span class="meta"><b>*</b> required</span>
     </div>
+    <div class="fields">
+      <div class="fld">
+        <label for="pss-exptno">Export no. <span class="req">*</span></label>
+        <div class="stack">
+          <input id="pss-exptno" type="text" [(ngModel)]="ExptNo" [maxlength]="15" [disabled]="IsDisabled" (keyup.enter)="search()" />
+          @if (ErrorMessage) {
+            <span class="hint err">{{ ErrorMessage }}</span>
+          }
+        </div>
+      </div>
+      <div class="fld" [hidden]="!IsDisabled">
+        <label for="pss-value">PSS <span class="req">*</span></label>
+        <input id="pss-value" type="text" [(ngModel)]="Pss" />
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">{{ IsDisabled ? 'Nothing is saved until you choose Submit.' : 'Enter the 15-character export no. and choose Search.' }}</span>
+    <div class="r">
+      <button class="btn g" type="button" name="searchButton" (click)="reset();" [hidden]="!IsDisabled">Reset</button>
+      <button class="btn p" type="button" name="searchButton" (click)="search();" [hidden]="IsDisabled" #searchButton>Search</button>
+      <button class="btn p" type="button" name="searchButton" (click)="submit();" [hidden]="!IsDisabled" #submitButton>Submit</button>
+    </div>
+  </div>
 </div>

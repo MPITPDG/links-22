@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+﻿import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router } from '@angular/router';
@@ -8,14 +8,60 @@ import { SharedDataSerice } from '../../export-share-data.service';
 import { LoaderService } from '../../../shared/service/loader.service';
  
 @Component({
+    selector: 'app-consg-start',
     templateUrl: 'consg-start.component.html',
- //   styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    // encapsulation: ViewEncapsulation.None,
+    // Page kit is global (src/styles/kit); kit-consignment scopes consignment-page.css.
+    host: { class: 'kit-consignment' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ConsgStartComponent implements OnInit {
     private baseUrl: string = 'Export/GetExportConsignment';
+
+    /**
+     * Hosted in ConsgWorkspaceComponent instead of owning a page (ported from
+     * MPERPNG-20): the header is dropped. Nothing is written to the server here
+     * either way - the handoff is still SharedDataService, only the navigate is
+     * replaced by `continued`.
+     */
+    @Input() embedded: boolean = false;
+
+    /**
+     * True once Continue has been pressed and the consignment details are open
+     * below. The mode-of-shipment radios and the vessel are disabled and the
+     * Continue bar is gone until "Edit parties & shipment" unlocks them again.
+     * No validation, payload or handler changes.
+     */
+    @Input() locked: boolean = false;
+
+    @Output() continued = new EventEmitter<void>();
+
+    // ---- presentation (MP) -----------------------------------------------
+    readonly groups: { key: string; label: string; hint: string }[] = [
+        { key: 'parties', label: 'Parties', hint: 'Exporter / shipper, bill to, manufacturer, agents' },
+        { key: 'consignee', label: 'Consignee & buyer', hint: 'Consignee, buyer and the bank consigned to' },
+        { key: 'shipment', label: 'Shipment', hint: 'Mode of shipment and the vessel - locked after Continue' },
+    ];
+
+    /** Key of the group last opened; '' means none. Purely presentational. */
+    openSection: string = '';
+
+    private filled(v: any): boolean {
+        return v !== undefined && v !== null && String(v).trim() !== '';
+    }
+
+    groupFilled(key: string): boolean {
+        switch (key) {
+            case 'parties': return this.filled(this.txtshipper) || this.filled(this.txtexpt_billto);
+            case 'consignee': return this.filled(this.txtConsignee) || this.filled(this.txtBuyername);
+            case 'shipment': return this.rbstuff != null;
+            default: return false;
+        }
+    }
+
+    get filledCount(): number {
+        return this.groups.filter(g => this.groupFilled(g.key)).length;
+    }
 
     exporters:Array<any> = [];
     agents: Array<any> = [];
@@ -403,6 +449,7 @@ export class ConsgStartComponent implements OnInit {
         //        vesselname: null,
         //        pcs: 0
         //    };
+        if (this.embedded) { this.continued.emit(); return; }
         this._loaderService.display(true);
         this._router.navigate(['export/Consignment/main']);
        // if (this._loginService.getLogin()[0].CMPTYPE === 'FRT') {

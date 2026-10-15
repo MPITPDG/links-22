@@ -1,83 +1,107 @@
-﻿<div class="animated fadeIn">
-	<div class="row">
-		<div class="col-sm-2">
-		</div>
-		<div class="col-sm-8">
-			<table class="table table-bordered table-sm-new">
-				<tr class="trbg centerlabel">
-					<td colspan="8"><span class="col-form-span-label"><b>CONTAINER LOADING CONFIRMATION </b></span></td>
-				</tr>
-			</table>
-			@if (this.viewType == 'Search') {
-<table class="table table-bordered table-sm-new">
-				<tr>
-					<td class="width100"><span class="col-form-span-label">Vessel Name<span class="col-form-span-error"> *</span></span></td>
-					<td colspan="3">
-						<input type="text" [(ngModel)]="VesselName" class="form-control"/>
-					</td>
-					<td class="width100"><span class="col-form-span-label">Voyage No<span class="col-form-span-error"> *</span></span></td>
-					<td colspan="3">
-						<input type="text" [(ngModel)]="VoyageNo" class="form-control"/>
-					</td>
-				</tr>
-				<tr>
-					<td class="centerlabel" colspan="8">
-						<button type="button" uiBtn variant="default" size="sm" name="searchButton" (click)="Search()" #searchButton><span class="col-form-span-label"><i class="fa fa-search"></i>&nbsp;Search</span></button>
-					</td>
-				</tr>
-			</table>
-}
-			@if (this.viewType=='Search'&&searchList.length > 0) {
-<div class="row yscroll" style="height:300px">
-				<table class="table table-bordered table-sm-new">
-					<thead>
-						<tr class="col-form-span-heading" style="white-space:nowrap;">
-							<th class="centerlabel"><span class="col-form-span-label">Vessel Name</span></th>
-							<th class="centerlabel"><span class="col-form-span-label">Voyage No</span></th>
-							<th class="centerlabel"><span class="col-form-span-label">ETD</span></th>
-						</tr>
-					</thead>
-					<tbody class="bgwhite">
-						@for (obj of searchList; track obj) {
-<tr (click)="rowSearchSendClick(obj.VSL_RTNO, obj.VSL_NAME, obj.VSL_VOYNO, obj.ETD);" style="cursor: pointer;">
-							<td><span class="col-form-span-label">{{obj.VSL_NAME}}</span></td>
-							<td><span class="col-form-span-label">{{obj.VSL_VOYNO}}</span></td>
-							<td><span class="col-form-span-label">{{obj.ETD}}</span></td>
-						</tr>
-}
-					</tbody>
-				</table>
-			</div>
-}
-			@if (this.viewType=='Search'&&searchList.length > 0) {
-<table class="table table-bordered table-sm-new">
-				<tr class="trbg">
-					<td colspan="8">
-						<span class="error-text">{{searchList.length + ' Rows Found.'}}</span>
-					</td>
-				</tr>
-			</table>
-}
-			@if (this.viewType=='View') {
-<app-shipment-progress-container-loading-view [DataSet]="ContainerDataSet" (backtosearch)="back($event)" (editdata)="editdata($event)"></app-shipment-progress-container-loading-view>
-}
-			@if (this.viewType=='Update') {
-<app-shipment-progress-container-loading-update [DataSet]="UpdateDataSet" [EditData]="EditData" (updatedata)="reportdata($event)" (backtosearch)="back($event)"></app-shipment-progress-container-loading-update>
-}
-			@if (this.viewType=='Report') {
-<app-shipment-progress-container-loading-report [DataSet]="ReportDataSet" (backtosearch)="back($event)"></app-shipment-progress-container-loading-report>
-}
-			<table class="table table-bordered table-sm-new">
-				@if (ErrorMessage !== '') {
-<tr class="trbg centerlabel">
-					<td colspan="8">
-						<span class="error-text">{{ErrorMessage}}</span>
-					</td>
-				</tr>
-}
-			</table>
-		</div>
-		<div class="col-sm-2">
-		</div>
-	</div>
+﻿<!--
+  Shipment progress - container loading confirmation.
+  Import page kit list recipe. Search: vessels (listed on open, narrowed by name /
+  voyage). View / Update / Report are the existing child components, unchanged in
+  behaviour, rendered as kit cards below the page header.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Container loading confirmation</h1>
+      <p>
+        @switch (viewType) {
+          @case ('View') { Containers on {{VesselName}} - choose Edit to confirm loading and transhipment }
+          @case ('Update') { Confirm loading, transhipment and onward transport for one container }
+          @case ('Report') { Update result }
+          @default { Pick a vessel to confirm container loading }
+        }
+      </p>
+    </div>
+  </div>
+
+  @if (this.viewType == 'Search') {
+    <div class="card">
+      <div class="filters f2">
+        <div class="f">
+          <label for="spClcVessel">Vessel name</label>
+          <input type="text" id="spClcVessel" [(ngModel)]="VesselName" (keyup.enter)="Search()" placeholder="Any" />
+        </div>
+        <div class="f">
+          <label for="spClcVoyage">Voyage no.</label>
+          <input type="text" id="spClcVoyage" [(ngModel)]="VoyageNo" (keyup.enter)="Search()" placeholder="Any" />
+        </div>
+        <div class="f">
+          <label>&nbsp;</label>
+          <button type="button" class="btn p" name="searchButton" (click)="Search()" #searchButton>Search</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <span>
+          <span class="count">{{searchList.length + ' Rows Found.'}}</span>
+          <span class="sub-t"> {{ searchedVessel ? 'vessels matching the search' : 'vessels for this branch' }}</span>
+        </span>
+        <span class="tb-r">
+          <button class="btn g" type="button" (click)="clearVesselSearch()">Clear</button>
+          <button class="btn g" type="button" (click)="exportVessels()" [disabled]="!searchList.length">Export</button>
+        </span>
+      </div>
+
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Vessel name</th>
+              <th>Voyage no.</th>
+              <th>ETD</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (listLoading) {
+              <tr><td class="empty" colspan="4">Loading vessels…</td></tr>
+            } @else if (listError) {
+              <tr><td class="empty" colspan="4">{{ listError }}</td></tr>
+            } @else {
+              @for (obj of vesselPager.rows; track obj) {
+                <tr class="click" (click)="rowSearchSendClick(obj.VSL_RTNO, obj.VSL_NAME, obj.VSL_VOYNO, obj.ETD);">
+                  <td><a class="lnk">{{obj.VSL_NAME}}</a></td>
+                  <td class="mono">{{obj.VSL_VOYNO}}</td>
+                  <td>{{obj.ETD}}</td>
+                  <td class="act"><button type="button">View containers</button></td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="4">No vessels found. Enter a vessel name or voyage no. and choose Search.</td></tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pager">
+        <span>Showing <b>{{ vesselPager.rangeStart }}–{{ vesselPager.rangeEnd }}</b> of <b>{{ vesselPager.total }}</b></span>
+        <div class="pages">
+          <button type="button" [disabled]="vesselPager.page <= 1" (click)="vesselPager.go(vesselPager.page - 1)" aria-label="Previous page">‹</button>
+          @for (p of vesselPager.pageList; track $index) {
+            @if (p === 0) { <span class="gap">…</span> } @else { <button type="button" [class.on]="p === vesselPager.page" (click)="vesselPager.go(p)">{{ p }}</button> }
+          }
+          <button type="button" [disabled]="vesselPager.page >= vesselPager.pageCount" (click)="vesselPager.go(vesselPager.page + 1)" aria-label="Next page">›</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (this.viewType=='View') {
+    <app-shipment-progress-container-loading-view [DataSet]="ContainerDataSet" (backtosearch)="back($event)" (editdata)="editdata($event)"></app-shipment-progress-container-loading-view>
+  }
+  @if (this.viewType=='Update') {
+    <app-shipment-progress-container-loading-update [DataSet]="UpdateDataSet" [EditData]="EditData" (updatedata)="reportdata($event)" (backtosearch)="back($event)"></app-shipment-progress-container-loading-update>
+  }
+  @if (this.viewType=='Report') {
+    <app-shipment-progress-container-loading-report [DataSet]="ReportDataSet" (backtosearch)="back($event)"></app-shipment-progress-container-loading-report>
+  }
+
+  @if (ErrorMessage !== '') {
+    <div class="sp-note">{{ErrorMessage}}</div>
+  }
 </div>

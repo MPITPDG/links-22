@@ -8,7 +8,7 @@ import {
 
 @Component({
     templateUrl: 'branch-job-transfer.component.html' ,
-    encapsulation: ViewEncapsulation.None,
+    styleUrls: ['../job/job-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -44,7 +44,7 @@ export class BranchJobTransferComponent implements OnInit {
         };
         this._dataService.getData('Export/GetExportConsignmentBranchFillDropdown', jsonExport)
             .subscribe((data: any) => {
-                this.BranchList = data.Table;
+                this.BranchList = data?.Table ?? [];
             });
     }
 
@@ -58,7 +58,7 @@ export class BranchJobTransferComponent implements OnInit {
         }
         else {
             let Mode = (this.OldJobNo.substring(8, 7) == '1') ? 'Sea' : 'Air';
-            let BranchName = this.BranchList.filter((filterby) => filterby.VALUEFIELD == this.Branch)[0].TEXTFIELD;
+            let BranchName = this.BranchList.filter((filterby) => filterby.VALUEFIELD == this.Branch)[0]?.TEXTFIELD ?? this.Branch;
             if (confirm("Are you sure you want to Transfer " + Mode + " Job No. [" + this.OldJobNo + "] \n from [" + this._loginService.getLogin()[0].CITYNAME + "] to Selected Branch [" + BranchName + "] ?")) {
                 this._disable.disableButton(this.submitButton);
                 const jsonExport = {
@@ -73,7 +73,8 @@ export class BranchJobTransferComponent implements OnInit {
                 this._dataService.Common('Export/ExportConsignmentBranchJobTransferI', jsonExport)
                     .subscribe((data: any) => {
                         this._disable.enableButton(this.submitButton);
-                        if (data.Table.length > 0) {
+                        // Fail soft: a reply without a Table reads as "no record found".
+                        if (data?.Table?.length > 0) {
                             if (data.Table[0].STATUS == '100') {
                                 this.TransferJobList = data.Table1;
                                 this._toasterService.toast('success', 'Alert', data.Table[0].STATUMSG);

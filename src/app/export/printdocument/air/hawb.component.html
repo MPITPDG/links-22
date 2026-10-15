@@ -1,11 +1,25 @@
-﻿<div class="animated fadeIn">
-	@if (viewType == 'Search') {
-<app-print-air-hawb-search (searchoutput)="getSearchInputValue($event)"></app-print-air-hawb-search>
-}
-	@if (viewType == 'List') {
-<app-print-air-hawb-list [searchList]="searchList" [searchLength]="searchLength" (result)="getDataFromList($event)"></app-print-air-hawb-list>
-}
-	@if (viewType == 'Update') {
-<app-print-air-hawb-update [searchList]="searchList" [hawbno]="hawbno"  [hawbdate]="strHawbDate" [exptnos]="exptnos" (result)="getPrintData($event)"></app-print-air-hawb-update>
-}
+﻿<!--
+  Export - print document - Master HAWB No (search / list / update shell).
+  Page kit recipe 1 / 2 (.im-page, global kit src/styles/kit/import-page.css), ported from MPERPNG-20.
+  The three child views render inside the one card; bindings unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Master HAWB No</h1>
+      <p>Search, list or update export HAWBs.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    @if (viewType == 'Search') {
+      <app-print-air-hawb-search (searchoutput)="getSearchInputValue($event)"></app-print-air-hawb-search>
+    }
+    @if (viewType == 'List') {
+      <app-print-air-hawb-list [searchList]="searchList" [searchLength]="searchLength" (result)="getDataFromList($event)"></app-print-air-hawb-list>
+    }
+    @if (viewType == 'Update') {
+      <app-print-air-hawb-update [searchList]="searchList" [hawbno]="hawbno" [hawbdate]="strHawbDate" [exptnos]="exptnos" (result)="getPrintData($event)"></app-print-air-hawb-update>
+    }
+  </div>
 </div>

@@ -9,6 +9,8 @@ import { environment } from '../../../../environments/environment';
 @Component({
     selector: 'app-consignment-main-view',
     templateUrl: 'cong-main-view.component.html',
+    // Page kit is global (src/styles/kit); kit-consignment scopes consignment-page.css.
+    host: { class: 'kit-consignment' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -52,6 +54,9 @@ export class ConsigneeMainViewComponent implements OnChanges {
         };
         this._dataService.getData("Export/PageConsignmentView", _jsonData)
             .subscribe((data: any) => {
+                // fail soft: missing result tables are treated as empty
+                data = data || {};
+                ['Table', 'Table1', 'Table2', 'Table3', 'Table4', 'Table5', 'Table6'].forEach(t => { if (!Array.isArray(data[t])) { data[t] = []; } });
                 this.viewData = data;
                 this.containerData = data.Table1;
                 if (this._loginService.getLogin()[0].ROLETYPE == "SA") {
@@ -116,6 +121,12 @@ export class ConsigneeMainViewComponent implements OnChanges {
      
      }
      
+    /** Section nav (MP presentation): every section is on the page, so this scrolls to its card. */
+    scrollToSection(id: string) {
+        const el = document.getElementById(id);
+        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    }
+
     // openWindow(orderno, styleno, concode) {
     //     let theTop = (screen.height / 2) - (483 / 2);
     //     let theLeft = (screen.width / 2) - (780 / 2);

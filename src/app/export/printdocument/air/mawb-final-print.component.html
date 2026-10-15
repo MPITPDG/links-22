@@ -1,10 +1,21 @@
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-body">
-                <div class="col-md-8 mb-12" >				
-						<!-- <app-mbl-print></app-mbl-print>	 -->
-						<button name="btnPrint"   (click)="finalMawbPrint()">Print</button> <br>
+<!--
+  Export - print document - Print MAWB. Recipe 4: only the on-screen chrome is restyled
+  (page header + Print button, ported from MPERPNG-20). The printed element #divmawbno and
+  everything inside it are kept byte for byte; finalMawbPrint() copies its innerHTML unchanged.
+  The component deliberately has no styleUrls, so Angular adds no _ngcontent attributes to it.
+  The relative wrapper only anchors the absolutely positioned fields on screen.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Print MAWB</h1>
+      <p>Sends the completed MAWB layout to a print window.</p>
+    </div>
+    <div class="tools">
+      <button type="button" class="btn p" name="btnPrint" (click)="finalMawbPrint()">Print</button>
+    </div>
+  </div>
+  <div class="card" style="position:relative;min-height:1000px;overflow:auto;">
       <div id="divmawbno" #print>
 <p style="FONT-SIZE: 11px;font-family: Verdana;position:absolute;top:10px;left:40px;color:black;z-index:1;white-space: pre;"> {{this.shipper}}</p>
 <p style="FONT-SIZE: 11px;font-family: Verdana;position:absolute;top:120px;left:40px;color:black;z-index:1;white-space: pre;">{{this.consignee}}</p>
@@ -59,10 +70,6 @@
 <p style="FONT-SIZE: 11px;font-family: Verdana;position:absolute;top:920px;left:350px;color:black;z-index:1;white-space: pre;">{{this.bottom}}</p>
 <p style="FONT-SIZE: 11px;font-family: Verdana;position:absolute;top:730px;left:320px;color:black;z-index:1;white-space: pre;">{{this.othrchrg}}</p>
 <p style="FONT-SIZE: 11px;font-family: Verdana;position:absolute;top:960px;left:350px;color:black;z-index:1;white-space: pre;">{{this.totcollchrg}}</p>
-      </div>		 
-				</div>                 
-			</div>		
-			 
-		</div>
-	</div>
+      </div>
+  </div>
 </div>

@@ -1,41 +1,36 @@
-﻿<div class="animated fadeIn">
-	<div class="row">
-		<div class="col-sm-2">
-		</div>
-		<div class="col-sm-8">
-			<app-shipment-progress-common-view [ExptNo]="ExptNo"></app-shipment-progress-common-view>
-			<table class="table table-bordered table-sm-new">
-				<tr class="trbg">
-					<td colspan="8"><span class="col-form-span-label"><b>Measurement Detail </b></span></td>
-				</tr>
-				<tr>
-					<td class="width150"><span class="col-form-span-label">CBM</span></td>
-					<td colspan="7">
-						<span class="col-form-span-label">
-							<input type="text" [(ngModel)]="Cbm" class="form-control width150" [maxlength]="20" />
-						</span>
-					</td>
-				</tr>
-				@if (ErrorMessage != '') {
-<tr class="trbg centerlabel">
-					<td colspan="8">
-						<span class="col-form-span-error">{{ErrorMessage}}</span>
-					</td>
-				</tr>
-}
-				<tr class="trbg centerlabel">
-					<td colspan="8">
-						<button type="button" name="submitButton" uiBtn variant="default" class="btn-l" (click)="submit();" [disabled]="ErrorMessage != ''" #submitButton>
-							<span class="col-form-span-label"><app-font-changer [fontIndex]="'14'"></app-font-changer> Submit</span>
-						</button>
-						<button type="button" name="abortButton" uiBtn variant="outline" class="btn-l" (click)="abort();">
-							<span class="col-form-span-label"><app-font-changer [fontIndex]="'7'"></app-font-changer> Abort</span>
-						</button>
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div class="col-sm-2">
-		</div>
-	</div>
+<!-- Shipment progress - measurement (CBM) update. Import page kit, compact form; bindings unchanged. -->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Measurement</h1>
+      <p>Update the measurement (CBM) for this export job</p>
+    </div>
+    <div class="tools">
+      <span class="chip">{{ExptNo}}</span>
+    </div>
+  </div>
+
+  <app-shipment-progress-common-view [ExptNo]="ExptNo"></app-shipment-progress-common-view>
+
+  <div class="card sec">
+    <div class="card-h"><h2>Measurement</h2></div>
+    <div class="fields">
+      <div class="fld full">
+        <label>CBM</label>
+        <input type="text" [(ngModel)]="Cbm" [maxlength]="20" />
+      </div>
+    </div>
+  </div>
+
+  @if (ErrorMessage != '') {
+    <div class="sp-note">{{ErrorMessage}}</div>
+  }
+
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose Update.</span>
+    <div class="r">
+      <button type="button" name="abortButton" class="btn g" (click)="abort();"><app-font-changer [fontIndex]="'7'"></app-font-changer> Cancel</button>
+      <button type="button" name="submitButton" class="btn p" (click)="submit();" [disabled]="ErrorMessage != ''" #submitButton><app-font-changer [fontIndex]="'14'"></app-font-changer> Update</button>
+    </div>
+  </div>
 </div>

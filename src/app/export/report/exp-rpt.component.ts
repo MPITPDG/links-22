@@ -10,6 +10,7 @@ import { TabHeadingDirective } from 'ngx-bootstrap/tabs';
 @Component({
     selector: 'app-epcopy-exl-rpt',
     templateUrl: 'exp-rpt-epcopy-search.component.html',
+    styleUrls: ['./exp-rpt-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -79,12 +80,12 @@ export class ExptRptEpCopyExl implements OnInit{
         const jsonExport = { Cmpid: this._loginService.getLogin()[0].CMPID, Citycode: this._loginService.getLogin()[0].CITYCODE, Citycode1: this._loginService.getLogin()[0].CITYCODE1 };
         this._dataService.getData("Export/Fill_Exporter", jsonExport)
             .subscribe((data: any) => {
-                this.listExporter = data.Table;
+                this.listExporter = (data && data.Table) || [];
             });
 
         this._dataService.getAll("Export/Fill_City")
             .subscribe((data: any) => {
-                this.listCity = data.Table;
+                this.listCity = (data && data.Table) || [];
 
             });
     }
@@ -94,6 +95,7 @@ export class ExptRptEpCopyExl implements OnInit{
 @Component({
     selector: 'app-dsr-exl-rpt',
     templateUrl: 'exp-rpt-dsr.component.html',
+    styleUrls: ['./exp-rpt-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -151,9 +153,9 @@ export class ExptDSRExl implements OnInit {
 
         this._dataService.getAll("Export/Fill_dsr_PAGELOAD")
             .subscribe((data: any) => {
-                this.listconcode = data.Table;
-                this.listSAgent = data.Table1;
-                this.listShipper=data.Table3
+                this.listconcode = (data && data.Table) || [];
+                this.listSAgent = (data && data.Table1) || [];
+                this.listShipper= (data && data.Table3) || [];
             });
     }
     mainCheck(ctype) {
@@ -252,6 +254,7 @@ export class ExptDSRExl implements OnInit {
 @Component({
     selector: 'app-tonnage-exl-rpt',
     templateUrl: 'exp-rpt-tonnage-search.component.html',
+    styleUrls: ['./exp-rpt-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -353,19 +356,19 @@ export class ExptTonnage implements OnInit {
 
         this._dataService.getAll("Export/Fill_Tonnage_PAGELOAD")
             .subscribe((data: any) => {
-                this.listconcode = data.Table;
-                this.listAline = data.Table1;
-                this.listAgent = data.Table2;
+                this.listconcode = (data && data.Table) || [];
+                this.listAline = (data && data.Table1) || [];
+                this.listAgent = (data && data.Table2) || [];
             });
 
             this._dataService.getAll("Export/Fill_Tonnage_PAGELOAD_origin_India_Air")
             .subscribe((data: any) => {
-                this.listorigin = data.Table;                 
+                this.listorigin = (data && data.Table) || [];
             });
 
             this._dataService.getAll("Export/Fill_Tonnage_PAGELOAD_Dest_India_SeaAir")
             .subscribe((data: any) => {
-                this.listdetport = data.Table;                 
+                this.listdetport = (data && data.Table) || [];
             });
     }
     onexcelGeneration() {
@@ -458,6 +461,7 @@ export class ExptTonnage implements OnInit {
 @Component({
     selector: 'app-shipment-status',
     templateUrl: 'exp-rpt-shipment-status.html',
+    styleUrls: ['./exp-rpt-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -514,16 +518,16 @@ export class Exptshipmentstatus implements OnInit {
 
         this._dataService.getAll("Export/Fill_Tonnage_PAGELOAD")
             .subscribe((data: any) => {
-                this.listconcode = data.Table;
+                this.listconcode = (data && data.Table) || [];
             });
         this._dataService.getAll("Export/Fill_ship_status_source_agent")
             .subscribe((data: any) => {
-                this.listSAgent = data.Table;
+                this.listSAgent = (data && data.Table) || [];
             });
 
         this._dataService.getAll("Export/Fill_ship_status_business_associate")
             .subscribe((data: any) => {
-                this.listBusAss = data.Table;
+                this.listBusAss = (data && data.Table) || [];
             });
     }
     mainCheck(ctype) {
@@ -625,6 +629,7 @@ export class Exptshipmentstatus implements OnInit {
 @Component({
     selector: 'app-cargo-onhand',
     templateUrl: 'exp_rpt_cargo_onhand.component.html',
+    styleUrls: ['./exp-rpt-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -654,7 +659,7 @@ export class ExptRptCargoOnHand implements OnInit {
 
         this._dataService.getAll("Export/Fill_consignee_cargo_onhand")
             .subscribe((data: any) => {
-                this.listconcode = data.Table;
+                this.listconcode = (data && data.Table) || [];
             });
     }
     onexcelGeneration() {

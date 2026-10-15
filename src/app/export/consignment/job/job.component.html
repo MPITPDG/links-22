@@ -1,123 +1,81 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>EXPORT - {{Header}}</strong>
-                </div>
-            </div>
-        </div>
+<!--
+  Export job - Miscellaneous job Add (job/Add), Search / Edit (job/misc) and
+  Warehouse job (job/whs). Page kit (src/styles/kit/import-page.css), ported from
+  MPERPNG-20. Every [(ngModel)], #searchButton / #submitButton (handed to
+  ButtonService by the .ts) and (click) is unchanged. Only the Links fields are
+  shown: client, no. of packages and narration are what ExportConsignmentJobIU
+  takes here.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <!-- Header is 'MISCELLANEOUS JOBNO' or 'WAREHOUSE JOBNO' (set by the route in the .ts) -->
+      <h1>{{ Header == 'WAREHOUSE JOBNO' ? 'Warehouse job no.' : (Header ? 'Miscellaneous job no.' : 'Job') }}</h1>
+      <p>
+        @if (viewType==='MISC') {
+          Find a job by its 15-character job no. to edit it.
+        } @else {
+          Export job details: client, packages and narration.
+        }
+      </p>
     </div>
-    <div class="row">
-        <div class="col-sm-3">
+  </div>
+
+  @if (viewType==='MISC') {
+    <div class="card sec">
+      <div class="card-h">
+        <h2>Find a job</h2>
+        <span class="meta"><b>*</b> required</span>
+      </div>
+      <div class="filters compact">
+        <div class="f">
+          <label for="job-searchno">Job no. <span class="req">*</span></label>
+          <input id="job-searchno" type="text" [(ngModel)]="SearchJobNo" [maxlength]="15" (keyup.enter)="search()" />
+          @if (ErrorMessage) {
+            <span class="err">{{ ErrorMessage }}</span>
+          }
         </div>
-        <div class="col-sm-6">
-            @if (viewType==='MISC') {
-<table class="table table-sm-new bgwhite">
-                <tr class="trbg">
-                    <td colspan="3">
-                        <span class="col-form-span-label">
-                            <b>{{Header | titlecase}}</b>
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width80">
-                        <span class="col-form-span-label">
-                            <b>Job No.
-                                <span class="col-form-span-error">*</span>
-                            </b>
-                        </span>
-                    </td>
-                    <td>
-                        <input type="text" [(ngModel)]="SearchJobNo" [maxlength]="15" class="form-control width120" />
-                    </td>
-                    <td>
-                        <span class="col-form-span-error">{{ErrorMessage}}</span>
-                    </td>
-                </tr>
-                <tr class="trbg centerlabel">
-                    <td colspan="3">
-                        <button type="button" name="searchButton" uiBtn variant="outline" size="sm" (click)="search();" [hidden]="IsDisabled" #searchButton>
-                            <span class="col-form-span-label">
-                                <i class="fa fa-search"></i>&nbsp;Search</span>
-                        </button>
-                    </td>
-                </tr>
-            </table>
-}
-            @if (viewType==='WHS' || viewType==='Add') {
-<table class="table table-sm-new bgwhite">
-                <tr class="trbg">
-                    <td colspan="2">
-                        <span class="col-form-span-label">
-                            <b>{{Header | titlecase}}</b>
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width120">
-                        <span class="col-form-span-label">
-                            <b>Job No.
-                            </b>
-                        </span>
-                    </td>
-                    <td>
-                        <input type="text" [(ngModel)]="JobNo" [maxlength]="15" [disabled]="true" class="form-control width120" />
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width120">
-                        <span class="col-form-span-label">
-                            <b>Client Name
-                                <span class="col-form-span-error">*</span>
-                            </b>
-                        </span>
-                    </td>
-                    <td>
-                        <ng-select [items]="ClientNameList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" placeholder="--Select--" [(ngModel)]="ClientName"
-                            class="form-control">
-                        </ng-select>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width120">
-                        <span class="col-form-span-label">
-                            <b>No. of PKgs
-                            </b>
-                        </span>
-                    </td>
-                    <td>
-                        <input type="text" [(ngModel)]="NoOfPackages" [maxlength]="15" [OnlyNumber]="true" class="form-control width120" />
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width120">
-                        <span class="col-form-span-label">
-                            <b>Narration
-                            </b>
-                        </span>
-                    </td>
-                    <td>
-                        <textarea [(ngModel)]="Narration" class="form-control" rows="3"></textarea>
-                    </td>
-                </tr>
-                <tr class="trbg centerlabel">
-                    <td colspan="2">
-                        <button type="button" name="searchButton" uiBtn variant="default" size="sm" (click)="submit();" #submitButton>
-                            <span class="col-form-span-label">
-                                <i class="fa fa-send-o"></i>&nbsp;Submit</span>
-                        </button>
-                        <button type="button" name="searchButton" uiBtn variant="outline" size="sm" (click)="reset();">
-                            <span class="col-form-span-label">
-                                <i class="fa fa-undo"></i>&nbsp;Reset</span>
-                        </button>
-                    </td>
-                </tr>
-            </table>
-}
+        <div class="f">
+          <button class="btn p" type="button" name="searchButton" (click)="search();" [hidden]="IsDisabled" #searchButton>Search</button>
         </div>
-        <div class="col-sm-3">
-        </div>
+      </div>
     </div>
+  }
+
+  @if (viewType==='WHS' || viewType==='Add') {
+    <div class="card sec">
+      <div class="card-h">
+        <h2>Job details</h2>
+        <span class="meta"><b>*</b> required</span>
+      </div>
+      <div class="fields">
+        <div class="fld">
+          <label for="job-no">Job no.</label>
+          <input id="job-no" type="text" [(ngModel)]="JobNo" [maxlength]="15" [disabled]="true" placeholder="Assigned on save" />
+        </div>
+        <div class="fld">
+          <label>Client name <span class="req">*</span></label>
+          <ng-select class="custom" [items]="ClientNameList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+            placeholder="--Select--" [(ngModel)]="ClientName">
+          </ng-select>
+        </div>
+        <div class="fld">
+          <label for="job-pkgs">No. of pkgs</label>
+          <input id="job-pkgs" type="text" [(ngModel)]="NoOfPackages" [maxlength]="15" [OnlyNumber]="true" />
+        </div>
+        <div class="fld full top">
+          <label for="job-narration">Narration</label>
+          <textarea id="job-narration" rows="3" [(ngModel)]="Narration"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="bar">
+      <span class="note">Nothing is saved until you choose Submit.</span>
+      <div class="r">
+        <button class="btn g" type="button" name="searchButton" (click)="reset();">Reset</button>
+        <button class="btn p" type="button" name="searchButton" (click)="submit();" #submitButton>Submit</button>
+      </div>
+    </div>
+  }
 </div>

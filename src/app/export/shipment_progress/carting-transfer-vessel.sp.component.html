@@ -1,63 +1,47 @@
-﻿
-<div class="animated fadeIn">
-		<div class="row">
-			<div class="col-sm-12">
-				<div class="card">
-					<div class="card-header formheading">
-					   <strong><u>{{headerType}}</u></strong>
-					</div>
-				</div>
-			</div>
-		</div>
-<div class="row">	
-	<div class="col-sm-3">
-	</div>
-	<div class="col-sm-6">	 
-		<table class="table table-bordered table-sm-new">			
-			
-			<tr>
-				<td>
-					<span class="col-form-span-label ">Vessel Name</span>
-				</td>
-				<td  >
-					<select class="form-control width300"  [(ngModel)]="VslName" (change)="onAgentSelect($event.target.value)">
-						<option value="">Please select</option>
-						@for (d of vslnameList; track d) {
-<option value={{d.RTNOPRT}}>{{d.VSL_NAME}}</option>
-}
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<span class="col-form-span-label ">Vessel Agent</span>
-				</td>
-				<td  >
-					<select class="form-control width200"  [(ngModel)]="VslAgent"  >
-						<option value="">Please select</option>
-						@for (d of Agentlist; track d) {
-<option value={{d.agt_code}}>{{d.agt_name}}</option>
-}
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<span class="col-form-span-label ">Exptno</span>
-				</td>
-				<td  >
-					 <input type="Textbox" class="form-control width150" [(ngModel)]="Exptno" maxlength="15"    >
-				</td>
-			</tr>
-			<tr>				
-				<td colspan="2" class="centerlabel" >
-					<button uiBtn variant="default" size="sm" type="submit"  name="btnAgtAdd"  (click)="onTransfervsl()"> <span class="col-form-span-label "><i class="fa fa-search"></i> Transfer </span></button>
-				</td>
-				
-			</tr>
-		</table>
-	</div>
-		<div class="col-sm-3">            
-		</div>
-	</div>	
-</div>	
+<!-- Shipment progress - job vessel-to-vessel transfer. Import page kit, compact form; bindings unchanged. -->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Job vessel transfer</h1>
+      <p>Move a carted job to another vessel and agent</p>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Transfer</h2>
+      <span class="meta"><b>*</b> required</span>
+    </div>
+    <div class="fields">
+      <div class="fld">
+        <label for="spVtVessel">Vessel name <span class="req">*</span></label>
+        <select id="spVtVessel" [(ngModel)]="VslName" (change)="onAgentSelect($event.target.value)">
+          <option value="">Please select</option>
+          @for (d of vslnameList; track d) {
+            <option value={{d.RTNOPRT}}>{{d.VSL_NAME}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label for="spVtAgent">Vessel agent</label>
+        <select id="spVtAgent" [(ngModel)]="VslAgent">
+          <option value="">Please select</option>
+          @for (d of Agentlist; track d) {
+            <option value={{d.agt_code}}>{{d.agt_name}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld full">
+        <label for="spVtExptno">Export no. <span class="req">*</span></label>
+        <input type="Textbox" id="spVtExptno" [(ngModel)]="Exptno" maxlength="15" placeholder="15-character job no." />
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">The job moves as soon as you choose Transfer.</span>
+    <div class="r">
+      <button class="btn p" type="submit" name="btnAgtAdd" (click)="onTransfervsl()">Transfer</button>
+    </div>
+  </div>
+</div>

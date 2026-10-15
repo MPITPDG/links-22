@@ -8,9 +8,12 @@ import { IMyDpOptions } from 'mydatepicker';
 import {
     FontChangerComponent,
     ButtonService } from '../../shared/common-font-changer.directive';
+import { SpPager, spExportCsv, spMatches } from './sp-list';
+import { SpWorkspaceService } from './sp-workspace.service';
 
 @Component({
     templateUrl: 'common.search.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -42,11 +45,80 @@ export class CommonSearchShipmentProgressComponent implements OnInit {
     checkType: string = 'EXPORT_NO';
     SearchValue: any = '';
     ErrorMessage: string = '';
+
+    // ---- list presentation (additive) ----
+    /** 'checking' until verifyRights answers, then 'ok' or 'denied'. */
+    rightsState: string = 'checking';
+    loading: boolean = false;
+    loadError: string = '';
+    /** The value the current list was fetched with; '' for the list shown on open. */
+    SearchedValue: string = '';
+    Filter: string = '';
+    pager: SpPager = new SpPager(() => this.Filtered);
+
     constructor(
         private _router: Router,
         private _dataService: DataService,
         private _loginService: LoginService,
       ) { }
+
+    get stageTitle(): string {
+        const t = String(this.headerType || '').replace(/^SHIPMENT PROGRESS - /, '').replace(/ SEARCH$/, '').toLowerCase();
+        return t ? t.charAt(0).toUpperCase() + t.slice(1) : 'Shipment progress';
+    }
+
+    get checkTypeLabel(): string {
+        return this.checkType == 'ORDER_NO' ? 'Order no.' : (this.checkType == 'REF_NO' ? 'Ref no.' : 'Export no.');
+    }
+
+    get Filtered(): any[] {
+        return (this.searchList || []).filter((r: any) =>
+            spMatches(r, this.Filter, ['exptno_view', 'M.P.REFERENCE', 'SHIPPER NAME', 'CONSIGNEE NAME', 'ORDER NO./REF DETAILS']));
+    }
+
+    /**
+     * Never empty on open: the page's own Export/ShipmentCommonSearch with the
+     * selected search type and a blank value - the jobs the stage lists for
+     * this branch without narrowing by number.
+     */
+    loadDefault() {
+        const type = this.viewHeaderTypeList.find(item => item.id === this.viewIdType);
+        if (!type) { return; }
+        this.loading = true;
+        this.loadError = '';
+        const _jsonData = {
+            Type1: type.valuetype,
+            Type2: this.checkType,
+            Type3: '',
+            Type4: this._loginService.getLogin()[0].CITYCODE,
+            Type5: this._loginService.getLogin()[0].CMPCODE
+        };
+        this._dataService.getData("Export/ShipmentCommonSearch", _jsonData)
+            .subscribe((data: any) => {
+                this.loading = false;
+                this.SearchedValue = '';
+                this.searchList = (data && data.Table) ? data.Table : [];
+                this.searchListLength = (this.searchList.length == 0) ? 1 : -1;
+                this.pager.reset();
+            }, () => {
+                this.loading = false;
+                this.loadError = 'The list could not be loaded. Try Search again.';
+            });
+    }
+
+    clearSearch() {
+        this.SearchValue = '';
+        this.Filter = '';
+        this.ErrorMessage = '';
+        this.loadDefault();
+    }
+
+    exportCsv() {
+        spExportCsv('shipment-progress-' + this.stageTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+            ['Export no.', 'M.P. reference', 'Shipper', 'Consignee', 'Packages', 'Pieces', 'Order no. / ref'],
+            this.Filtered.map((r: any) => [r['exptno_view'], r['M.P.REFERENCE'], r['SHIPPER NAME'], r['CONSIGNEE NAME'],
+                r['TOTAL NO. OF PACKAGES'], r['TOTAL NO. OF PIECES'], r['ORDER NO./REF DETAILS']]));
+    }
 
     ngOnInit() {
      //   this.disableButton.changeFontwithDisableButton(1, this.searchButton);
@@ -114,7 +186,9 @@ export class CommonSearchShipmentProgressComponent implements OnInit {
         }
         this._loginService.verifyRights(this.rights, '')
             .subscribe((data: any) => {
-                this._loginService.checkVerify('View', data);  //For verify user access
+                const ok = this._loginService.checkVerify('View', data);  //For verify user access
+                this.rightsState = (ok === false) ? 'denied' : 'ok';
+                if (ok !== false) { this.loadDefault(); }
             });
     }
 
@@ -144,10 +218,19 @@ export class CommonSearchShipmentProgressComponent implements OnInit {
             Type4: this._loginService.getLogin()[0].CITYCODE,
             Type5: this._loginService.getLogin()[0].CMPCODE
         };
+        this.loading = true;
+        this.loadError = '';
         this._dataService.getData("Export/ShipmentCommonSearch", _jsonData)
             .subscribe((data: any) => {
-                this.searchList = data.Table;
-                this.searchListLength = (data.Table.length == 0) ? 1 : -1;                 
+                this.loading = false;
+                this.SearchedValue = valueType;
+                this.searchList = (data && data.Table) ? data.Table : [];
+                this.searchListLength = (this.searchList.length == 0) ? 1 : -1;                 
+                this.pager.reset();
+                this.disableButton.changeFontwithEnableButton(0, this.searchButton);
+            }, () => {
+                this.loading = false;
+                this.loadError = 'The search could not be completed. Try again.';
                 this.disableButton.changeFontwithEnableButton(0, this.searchButton);
             });
     }
@@ -196,6 +279,7 @@ export class CommonSearchShipmentProgressComponent implements OnInit {
 @Component({
     selector: 'app-shipment-progress-common-view',
     templateUrl: 'common.view.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -227,6 +311,7 @@ export class CommonViewShipmentProgressComponent implements OnInit, OnChanges {
 
 @Component({
     templateUrl: 'sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -240,6 +325,7 @@ export class ShipmentProgressComponent implements OnInit {
 @Component({
     selector: 'app-shipment-progress-shipping-bill',
     templateUrl: 'shipping-bill.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -277,6 +363,7 @@ export class ShippingBillShipmentProgressComponent implements OnInit, OnChanges 
     PkId: number = null;
     constructor(
         private _router: Router,
+        private _spWorkspace: SpWorkspaceService,
         private _dataService: DataService,
         private _loginService: LoginService,
         private _activatedRoute: ActivatedRoute,
@@ -297,6 +384,15 @@ export class ShippingBillShipmentProgressComponent implements OnInit, OnChanges 
         this.Remark = '';
     }
 	search(){}
+
+    /**
+     * Cancel. On the standalone route this screen never had one - the button was
+     * wired to the empty search() - so outside the workspace it still does
+     * nothing. Inside the drawer it closes it, like every other stage.
+     */
+    abort() {
+        this._spWorkspace.close();
+    }
 
     submit() {
         if (this.validation() == false) { return false; }
@@ -371,7 +467,7 @@ export class ShippingBillShipmentProgressComponent implements OnInit, OnChanges 
             .subscribe((data: any) => {
                 if (data.Table[0].STATUS != undefined) {
                     alert("Shipping Bill Details updated successfully!");
-                    this._router.navigate(['export/shipment-progress/ship-bill-search']);
+                    if (!this._spWorkspace.closeAndRefresh()) { this._router.navigate(['export/shipment-progress/ship-bill-search']); }
                 }
             });
     }
@@ -385,7 +481,7 @@ export class ShippingBillShipmentProgressComponent implements OnInit, OnChanges 
         };
         this._dataService.getData("Export/ShipmentProgressPopulate", _jsonData)
             .subscribe((data: any) => {
-                if (data.Table != undefined) {
+                if (data.Table != undefined && data.Table.length > 0) {
                     this.popData = data.Table;
                     this.PkId = this.popData[0].ID;
                     this.CustomDate = (this.popData[0].EXPT_SHIPBILLDT1 != "") ? this._dataService.stringdttoArry(this.popData[0].EXPT_SHIPBILLDT1) : null;
@@ -412,7 +508,7 @@ export class ShippingBillShipmentProgressComponent implements OnInit, OnChanges 
 @Component({
     selector: 'app-shipment-progress-receipt-cargo',
     templateUrl: 'receipt-cargo.sp.component.html',
-    encapsulation: ViewEncapsulation.None,
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -459,6 +555,7 @@ export class ReceiptCargoShipmentProgressComponent implements OnInit, OnChanges,
     RecdLocalMin: any = '00';
     constructor(
         private _router: Router,
+        private _spWorkspace: SpWorkspaceService,
         private _dataService: DataService,
         private _loginService: LoginService,
         private _activatedRoute: ActivatedRoute,
@@ -501,7 +598,7 @@ export class ReceiptCargoShipmentProgressComponent implements OnInit, OnChanges,
             .subscribe((data: any) => {
                 this.disable.enableButton(this.addButton);
                 this.disable.enableButton(this.submitButton);
-                if (data.Table != undefined) {
+                if (data.Table != undefined && data.Table.length > 0) {
                     this.Id = data.Table[0].ID;
                     this.TOTPKGS = data.Table[0].EXPT_NOOFPKGS;
                     this.cargoList = data.Table1;
@@ -625,7 +722,7 @@ export class ReceiptCargoShipmentProgressComponent implements OnInit, OnChanges,
                 if (data.Table != undefined) {
                     if (data.Table[0].STATUS == 100) {
                         alert("Receipt of Cargo details updated successfully!");
-                        this._router.navigate(['export/shipment-progress/receipt-cargo-with-job-no-search']);
+                        if (!this._spWorkspace.closeAndRefresh()) { this._router.navigate(['export/shipment-progress/receipt-cargo-with-job-no-search']); }
                     } else if (data.Table[0].STATUS == 102) {
                         alert('Error! Please contact System Administrator.');
                     }
@@ -634,6 +731,7 @@ export class ReceiptCargoShipmentProgressComponent implements OnInit, OnChanges,
     }
 
     abort() {
+        if (this._spWorkspace.close()) { return; }
         this._router.navigate(['export/shipment-progress/receipt-cargo-with-job-no-search']);
     }
 
@@ -671,6 +769,7 @@ export class ReceiptCargoShipmentProgressComponent implements OnInit, OnChanges,
 @Component({
     selector: 'app-shipment-progress-approval-received',
     templateUrl: 'approval-received.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -701,6 +800,7 @@ export class ApprovalReceivedShipmentProgressComponent implements OnInit, OnChan
     Remark: any = '';
     constructor(
         private _router: Router,
+        private _spWorkspace: SpWorkspaceService,
         private _dataService: DataService,
         private _loginService: LoginService,
         private _activatedRoute: ActivatedRoute,
@@ -730,7 +830,7 @@ export class ApprovalReceivedShipmentProgressComponent implements OnInit, OnChan
         this._dataService.getData("Export/ShipmentProgressPopulate", _jsonData)
             .subscribe((data: any) => {
                 this.disable.enableButton(this.submitButton);
-                if (data.Table != undefined) {
+                if (data.Table != undefined && data.Table.length > 0) {
                     this.Id = data.Table[0].ID;
                     this.ApprovalDate = (data.Table[0].EXPTAPPDT != "") ? this._dataService.stringdttoArry(data.Table[0].EXPTAPPDT) : null;
                     this.ByWhom = data.Table[0].EXPTAPPWM;
@@ -758,7 +858,7 @@ export class ApprovalReceivedShipmentProgressComponent implements OnInit, OnChan
                 if (data.Table != undefined) {
                     if (data.Table[0].STATUS == 100) {
                         alert("Approval Received details updated successfully!");
-                        this._router.navigate(['export/shipment-progress/approval-received-search']);
+                        if (!this._spWorkspace.closeAndRefresh()) { this._router.navigate(['export/shipment-progress/approval-received-search']); }
                     } else if (data.Table[0].STATUS == 102) {
                         alert('Error! Please contact System Administrator.');
                     }
@@ -767,6 +867,7 @@ export class ApprovalReceivedShipmentProgressComponent implements OnInit, OnChan
     }
 
     abort() {
+        if (this._spWorkspace.close()) { return; }
         this._router.navigate(['export/shipment-progress/approval-received-search']);
     }
 
@@ -775,6 +876,7 @@ export class ApprovalReceivedShipmentProgressComponent implements OnInit, OnChan
 @Component({
     selector: 'app-shipment-progress-measurement',
     templateUrl: 'measurement.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -787,6 +889,7 @@ export class MeasurementShipmentProgressComponent implements OnInit, OnChanges, 
     Cbm: any = '';
     constructor(
         private _router: Router,
+        private _spWorkspace: SpWorkspaceService,
         private _dataService: DataService,
         private _loginService: LoginService,
         private _activatedRoute: ActivatedRoute,
@@ -816,7 +919,7 @@ export class MeasurementShipmentProgressComponent implements OnInit, OnChanges, 
         this._dataService.getData("Export/ShipmentProgressPopulate", _jsonData)
             .subscribe((data: any) => {
                 this.disable.enableButton(this.submitButton);
-                if (data.Table != undefined) {
+                if (data.Table != undefined && data.Table.length > 0) {
                     this.Id = data.Table[0].ID;
                     this.Cbm = data.Table[0].EXPT_VOLUME;
                 } else {
@@ -840,7 +943,7 @@ export class MeasurementShipmentProgressComponent implements OnInit, OnChanges, 
                 if (data.Table != undefined) {
                     if (data.Table[0].STATUS == 100) {
                         alert("Measurement(CBM) details updated successfully!");
-                        this._router.navigate(['export/shipment-progress/measurement-search']);
+                        if (!this._spWorkspace.closeAndRefresh()) { this._router.navigate(['export/shipment-progress/measurement-search']); }
                     } else if (data.Table[0].STATUS == 102) {
                         alert('Error! Please contact System Administrator.');
                     }
@@ -849,6 +952,7 @@ export class MeasurementShipmentProgressComponent implements OnInit, OnChanges, 
     }
 
     abort() {
+        if (this._spWorkspace.close()) { return; }
         this._router.navigate(['export/shipment-progress/measurement-search']);
     }
 
@@ -858,6 +962,7 @@ export class MeasurementShipmentProgressComponent implements OnInit, OnChanges, 
 @Component({
     selector: 'app-shipment-progress-out-of-charge',
     templateUrl: 'out-of-charge.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -886,6 +991,7 @@ export class OutOfChargeShipmentProgressComponent implements OnInit, OnChanges, 
     Date: any = null;
     constructor(
         private _router: Router,
+        private _spWorkspace: SpWorkspaceService,
         private _dataService: DataService,
         private _loginService: LoginService,
         private _activatedRoute: ActivatedRoute,
@@ -915,7 +1021,7 @@ export class OutOfChargeShipmentProgressComponent implements OnInit, OnChanges, 
         this._dataService.getData("Export/ShipmentProgressPopulate", _jsonData)
             .subscribe((data: any) => {
                 this.disable.enableButton(this.submitButton);
-                if (data.Table != undefined) {
+                if (data.Table != undefined && data.Table.length > 0) {
                     this.Id = data.Table[0].ID;
                     this.Date = (data.Table[0].OUTCHARGEDT != "") ? this._dataService.stringdttoArry(data.Table[0].OUTCHARGEDT) : null;
                 } else {
@@ -939,7 +1045,7 @@ export class OutOfChargeShipmentProgressComponent implements OnInit, OnChanges, 
                 if (data.Table != undefined) {
                     if (data.Table[0].STATUS == 100) {
                         alert("Out of Charge details updated successfully!");
-                        this._router.navigate(['export/shipment-progress/out-of-charge-search']);
+                        if (!this._spWorkspace.closeAndRefresh()) { this._router.navigate(['export/shipment-progress/out-of-charge-search']); }
                     } else if (data.Table[0].STATUS == 102) {
                         alert('Error! Please contact System Administrator.');
                     }
@@ -948,6 +1054,7 @@ export class OutOfChargeShipmentProgressComponent implements OnInit, OnChanges, 
     }
 
     abort() {
+        if (this._spWorkspace.close()) { return; }
         this._router.navigate(['export/shipment-progress/out-of-charge-search']);
     }
 
@@ -956,6 +1063,7 @@ export class OutOfChargeShipmentProgressComponent implements OnInit, OnChanges, 
 @Component({
     selector: 'app-shipment-progress-bl-details',
     templateUrl: 'bl-details.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -990,6 +1098,7 @@ export class BlDetailsShipmentProgressComponent implements OnInit, OnChanges, Af
 
     constructor(
         private _router: Router,
+        private _spWorkspace: SpWorkspaceService,
         private _dataService: DataService,
         private _loginService: LoginService,
         private _activatedRoute: ActivatedRoute,
@@ -1019,7 +1128,7 @@ export class BlDetailsShipmentProgressComponent implements OnInit, OnChanges, Af
         this._dataService.getData("Export/ShipmentProgressPopulate", _jsonData)
             .subscribe((data: any) => {
                 this.disable.enableButton(this.submitButton);
-                if (data.Table != undefined) {
+                if (data.Table != undefined && data.Table.length > 0) {
                     this.Id = data.Table[0].ID;
                     this.BlType = (data.Table[0].EXPT_BLTYPE == "S") ? 'S' : 'M';
                     this.BLNo = data.Table[0].EXPT_BLNO;
@@ -1053,7 +1162,7 @@ export class BlDetailsShipmentProgressComponent implements OnInit, OnChanges, Af
                 if (data.Table != undefined) {
                     if (data.Table[0].STATUS == 100) {
                         alert("BL Details details updated successfully!");
-                        this._router.navigate(['export/shipment-progress/bl-details-search']);
+                        if (!this._spWorkspace.closeAndRefresh()) { this._router.navigate(['export/shipment-progress/bl-details-search']); }
                     } else if (data.Table[0].STATUS == 102) {
                         alert('Error! Please contact System Administrator.');
                     }
@@ -1062,6 +1171,7 @@ export class BlDetailsShipmentProgressComponent implements OnInit, OnChanges, Af
     }
 
     abort() {
+        if (this._spWorkspace.close()) { return; }
         this._router.navigate(['export/shipment-progress/bl-details-search']);
     }
 }
@@ -1069,6 +1179,7 @@ export class BlDetailsShipmentProgressComponent implements OnInit, OnChanges, Af
 @Component({
     selector: 'app-shipment-progress-carting-air',
     templateUrl: 'carting-air.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -1097,6 +1208,7 @@ export class CartingAirShipmentProgressComponent implements OnInit, OnChanges, A
     CartingDate: any = null;
     constructor(
         private _router: Router,
+        private _spWorkspace: SpWorkspaceService,
         private _dataService: DataService,
         private _loginService: LoginService,
         private _activatedRoute: ActivatedRoute,
@@ -1126,7 +1238,7 @@ export class CartingAirShipmentProgressComponent implements OnInit, OnChanges, A
         this._dataService.getData("Export/ShipmentProgressPopulate", _jsonData)
             .subscribe((data: any) => {
                 this.disable.enableButton(this.submitButton);
-                if (data.Table != undefined) {
+                if (data.Table != undefined && data.Table.length > 0) {
                     this.Id = data.Table[0].ID;
                     this.CartingDate = (data.Table[0].CARTEDDT != "") ? this._dataService.stringdttoArry(data.Table[0].CARTEDDT) : null;
                 } else {
@@ -1150,7 +1262,7 @@ export class CartingAirShipmentProgressComponent implements OnInit, OnChanges, A
                 if (data.Table != undefined) {
                     if (data.Table[0].STATUS == 100) {
                         alert("Carting Air Date updated successfully!");
-                        this._router.navigate(['export/shipment-progress/carting-air-search']);
+                        if (!this._spWorkspace.closeAndRefresh()) { this._router.navigate(['export/shipment-progress/carting-air-search']); }
                     } else if (data.Table[0].STATUS == 102) {
                         alert('Error! Please contact System Administrator.');
                     }
@@ -1159,6 +1271,7 @@ export class CartingAirShipmentProgressComponent implements OnInit, OnChanges, A
     }
 
     abort() {
+        if (this._spWorkspace.close()) { return; }
         this._router.navigate(['export/shipment-progress/carting-air-search']);
     }
 }
@@ -1166,6 +1279,7 @@ export class CartingAirShipmentProgressComponent implements OnInit, OnChanges, A
 @Component({
     selector: 'app-shipment-progress-prealert-sent-on',
     templateUrl: 'prealert-sent-on.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -1194,6 +1308,7 @@ export class PrealertSentOnShipmentProgressComponent implements OnInit, OnChange
     SentOnDate: any = null;
     constructor(
         private _router: Router,
+        private _spWorkspace: SpWorkspaceService,
         private _dataService: DataService,
         private _loginService: LoginService,
         private _activatedRoute: ActivatedRoute,
@@ -1223,7 +1338,7 @@ export class PrealertSentOnShipmentProgressComponent implements OnInit, OnChange
         this._dataService.getData("Export/ShipmentProgressPopulate", _jsonData)
             .subscribe((data: any) => {
                 this.disable.enableButton(this.submitButton);
-                if (data.Table != undefined) {
+                if (data.Table != undefined && data.Table.length > 0) {
                     this.Id = data.Table[0].ID;
                     this.SentOnDate = (data.Table[0].PREALERTDT != "") ? this._dataService.stringdttoArry(data.Table[0].PREALERTDT) : null;
                 } else {
@@ -1247,7 +1362,7 @@ export class PrealertSentOnShipmentProgressComponent implements OnInit, OnChange
                 if (data.Table != undefined) {
                     if (data.Table[0].STATUS == 100) {
                         alert("Prealert Date updated successfully!");
-                        this._router.navigate(['export/shipment-progress/prealert-sent-on-search']);
+                        if (!this._spWorkspace.closeAndRefresh()) { this._router.navigate(['export/shipment-progress/prealert-sent-on-search']); }
                     } else if (data.Table[0].STATUS == 102) {
                         alert('Error! Please contact System Administrator.');
                     }
@@ -1256,6 +1371,7 @@ export class PrealertSentOnShipmentProgressComponent implements OnInit, OnChange
     }
 
     abort() {
+        if (this._spWorkspace.close()) { return; }
         this._router.navigate(['export/shipment-progress/prealert-sent-on-search']);
     }
 }
@@ -1263,6 +1379,7 @@ export class PrealertSentOnShipmentProgressComponent implements OnInit, OnChange
 @Component({
     selector: 'app-shipment-progress-destination-document',
     templateUrl: 'destination-document-on.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -1301,6 +1418,7 @@ export class DestinationDocumentShipmentProgressComponent implements OnInit, OnC
 
     constructor(
         private _router: Router,
+        private _spWorkspace: SpWorkspaceService,
         private _dataService: DataService,
         private _loginService: LoginService,
         private _activatedRoute: ActivatedRoute,
@@ -1402,7 +1520,7 @@ export class DestinationDocumentShipmentProgressComponent implements OnInit, OnC
                 if (data.Table != undefined) {
                     if (data.Table[0].STATUS == 100) {
                         alert("Destination Document updated successfully!");
-                        this._router.navigate(['export/shipment-progress/destination-document-search']);
+                        if (!this._spWorkspace.closeAndRefresh()) { this._router.navigate(['export/shipment-progress/destination-document-search']); }
                     } else if (data.Table[0].STATUS == 102) {
                         alert('Error! Please contact System Administrator.');
                     }
@@ -1411,6 +1529,7 @@ export class DestinationDocumentShipmentProgressComponent implements OnInit, OnC
     }
 
     abort() {
+        if (this._spWorkspace.close()) { return; }
         this._router.navigate(['export/shipment-progress/destination-document-search']);
     }
 }
@@ -1418,7 +1537,7 @@ export class DestinationDocumentShipmentProgressComponent implements OnInit, OnC
 @Component({
     selector: 'app-shipment-progress-sea-to-air',
     templateUrl: 'transfer-sea-to-air.sp.component.html',
-    encapsulation: ViewEncapsulation.None,
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -1432,6 +1551,7 @@ export class SeaToAirShipmentProgressComponent implements OnInit, OnChanges, Aft
     Company: any = null;
     constructor(
         private _router: Router,
+        private _spWorkspace: SpWorkspaceService,
         private _dataService: DataService,
         private _loginService: LoginService,
         private _activatedRoute: ActivatedRoute,
@@ -1488,7 +1608,7 @@ export class SeaToAirShipmentProgressComponent implements OnInit, OnChanges, Aft
                 if (data.Table != undefined) {
                     if (data.Table[0].STATUS == 100) {
                         alert("Export details Transfered successfully!. Air Export No is : " + String(data.Table[0].EXPTNO));
-                        this._router.navigate(['export/shipment-progress/transfer-sea-to-air-search']);
+                        if (!this._spWorkspace.closeAndRefresh()) { this._router.navigate(['export/shipment-progress/transfer-sea-to-air-search']); }
                     } else if (data.Table[0].STATUS == 102) {
                         alert('Error! Please contact System Administrator.');
                     }
@@ -1497,6 +1617,7 @@ export class SeaToAirShipmentProgressComponent implements OnInit, OnChanges, Aft
     }
 
     abort() {
+        if (this._spWorkspace.close()) { return; }
         this._router.navigate(['export/shipment-progress/transfer-sea-to-air-search']);
     }
 
@@ -1506,7 +1627,7 @@ export class SeaToAirShipmentProgressComponent implements OnInit, OnChanges, Aft
 @Component({
     selector: 'app-shipment-progress-receipt-cargo-provision',
     templateUrl: 'receipt-cargo-provision.sp.component.html',
-    encapsulation: ViewEncapsulation.None,
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -1776,6 +1897,7 @@ export class ReceiptCargoProvisionShipmentProgressComponent implements OnInit, O
 @Component({
     selector: 'app-shipment-progress-scan-docs-sent',
     templateUrl: 'scan-docs-sent.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -1788,6 +1910,7 @@ export class ScanDocSentShipmentProgressComponent implements OnInit, OnChanges, 
     ContainerNo: any = '';
     searchList: any = [];
     ErrorMessage: string = '';
+    pager: SpPager = new SpPager(() => this.searchList);
     constructor(
         private _router: Router,
         private _dataService: DataService,
@@ -1829,6 +1952,7 @@ export class ScanDocSentShipmentProgressComponent implements OnInit, OnChanges, 
             .subscribe((data: any) => {
                 if (data.Table != undefined) {
                     this.searchList = data.Table;
+                    this.pager.reset();
                     if (this.searchList.length > 0) {
                         this.viewType = 'List';
                         for (let i = 0; i < this.searchList.length; i++) {
@@ -1846,6 +1970,16 @@ export class ScanDocSentShipmentProgressComponent implements OnInit, OnChanges, 
 
     getCount() {
         return this.searchList.filter((search: any) => search.SCANDOCS === 'NO').length;
+    }
+
+    get selectedCount(): number {
+        return this.searchList.filter((search: any) => search.SCANDOCS === 'NO' && search.Sent === true).length;
+    }
+
+    exportCsv() {
+        spExportCsv('scan-docs-sent-' + String(this.ContainerNo || '').toLowerCase(),
+            ['Container no.', 'Origin city', 'Rotation no.', 'Vessel name', 'Voyage no.', 'ETD', 'Agent name', 'Shpg line', 'Scan docs'],
+            this.searchList.map((r: any) => [this.ContainerNo, r.CITYCODE, r.EXPT_VESSEL, r.VSL_NAME, r.VSL_VOYNO, r.ETD, r.AGT_NAME, r.LINER, r.SCANDOCS]));
     }
 
     submit() {
@@ -1886,7 +2020,7 @@ export class ScanDocSentShipmentProgressComponent implements OnInit, OnChanges, 
 @Component({
     selector: 'app-shipment-progress-pending-shipment',
     templateUrl: 'pending-shipment.sp.component.html',
-    encapsulation: ViewEncapsulation.None,
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -1946,6 +2080,14 @@ export class PendingShipmentShipmentProgressComponent implements OnInit, OnChang
     ContainerLiner: any = null;
     ContainerLinerList: any = [];
 
+    // ---- list presentation (additive) ----
+    listLoading: boolean = false;
+    listError: string = '';
+    /** False while the list shown is the one loaded on open. */
+    searchedVessel: boolean = false;
+    vesselPager: SpPager = new SpPager(() => this.searchList);
+    exportPager: SpPager = new SpPager(() => this.ExportNoList);
+
     constructor(
         private _router: Router,
         private _dataService: DataService,
@@ -1960,10 +2102,56 @@ export class PendingShipmentShipmentProgressComponent implements OnInit, OnChang
         this._loginService.verifyRights(230, '')
             .subscribe((data: any) => {
                 this.RightsList = data;
-                this._loginService.checkVerify('Modify', this.RightsList);  //For verify user access
+                const ok = this._loginService.checkVerify('Modify', this.RightsList);  //For verify user access
                 //this.fillDropdown();
+                if (ok !== false) { this.loadDefaultVessels(); }
             });
 
+    }
+
+    /**
+     * Never empty on open: the same Export/PendingShipment_ShipmentProgressFill
+     * call Search makes, with blank vessel and voyage, so the branch's vessels
+     * are listed before anything is typed. No toast when it comes back empty.
+     */
+    loadDefaultVessels() {
+        this.listLoading = true;
+        this.listError = '';
+        const _jsonData = {
+            Type1: '',
+            Type2: '',
+            Type3: this._loginService.getLogin()[0].CITYCODE
+        };
+        this._dataService.Common("Export/PendingShipment_ShipmentProgressFill", _jsonData)
+            .subscribe((data: any) => {
+                this.listLoading = false;
+                this.searchedVessel = false;
+                this.searchList = (data && data.Table) ? data.Table : [];
+                this.vesselPager.reset();
+            }, () => {
+                this.listLoading = false;
+                this.listError = 'Vessels could not be loaded. Enter a vessel name or voyage no. and choose Search.';
+            });
+    }
+
+    clearVesselSearch() {
+        this.VesselName = '';
+        this.VoyageNo = '';
+        this.loadDefaultVessels();
+    }
+
+    get selectedExportCount(): number {
+        return this.ExportNoList.filter((r: any) => r.Check === true).length;
+    }
+
+    exportVessels() {
+        spExportCsv('pending-shipment-vessels', ['Vessel name', 'Voyage no.', 'ETD', 'Rotation no.'],
+            this.searchList.map((r: any) => [r.VSL_NAME, r.VSL_VOYNO, r.ETD, r.VSL_RTNO]));
+    }
+
+    exportPending() {
+        spExportCsv('pending-shipments', ['Export no.', 'Shipper', 'Consignee', 'Agent', 'Pkgs', 'Pcs', 'Order no.', 'Selected'],
+            this.ExportNoList.map((r: any) => [r.EXPTNO, r.EXP_NAME, r.CON_NAME, r.AGT_SNAME, r.EXPT_NOOFPKGS, r.EXPT_NOOFPCS, r.ORDERNO, r.Check ? 'Yes' : '']));
     }
     ngOnChanges() { }
 
@@ -1997,9 +2185,12 @@ export class PendingShipmentShipmentProgressComponent implements OnInit, OnChang
             Type3: this._loginService.getLogin()[0].CITYCODE
         };
         this._disabled.disableButton(this.searchButton);
+        this.searchedVessel = true;
+        this.listError = '';
         this._dataService.Common("Export/PendingShipment_ShipmentProgressFill", _jsonData)
             .subscribe((data: any) => {
                 this._disabled.enableButton(this.searchButton);
+                this.vesselPager.reset();
                 if (data.Table != undefined) {
                     if (data.Table.length > 0) {
                         this.searchList = data.Table;
@@ -2032,6 +2223,7 @@ export class PendingShipmentShipmentProgressComponent implements OnInit, OnChang
                 if (data.Table != undefined) {
                     if (data.Table.length > 0) {
                         this.ExportNoList = data.Table;
+                        this.exportPager.reset();
                         for (let i = 0; i < this.ExportNoList.length; i++) {
                             this.ExportNoList[i]["Check"] = false;
                         }
@@ -2222,6 +2414,7 @@ export class PendingShipmentShipmentProgressComponent implements OnInit, OnChang
 @Component({
     selector: 'app-shipment-progress-pending-shipment-report',
     templateUrl: 'pending-shipment-report.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -2274,7 +2467,7 @@ export class PendingShipReportShipmentProgressComponent implements OnInit, OnCha
 
 @Component({
     templateUrl: 'container-loading-confirmation.sp.component.html',
-    encapsulation: ViewEncapsulation.None,
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -2296,6 +2489,14 @@ export class ContainerLoadingShipmentProgressComponent implements OnInit, OnChan
     UpdateDataSet: any = [];
     ReportDataSet: any = [];
     EditData: any = {};
+
+    // ---- list presentation (additive) ----
+    listLoading: boolean = false;
+    listError: string = '';
+    /** False while the list shown is the one loaded on open. */
+    searchedVessel: boolean = false;
+    vesselPager: SpPager = new SpPager(() => this.searchList);
+
     constructor(
         private _router: Router,
         private _dataService: DataService,
@@ -2310,9 +2511,42 @@ export class ContainerLoadingShipmentProgressComponent implements OnInit, OnChan
         this._loginService.verifyRights('231', '')
             .subscribe((data: any) => {
                 this.RightsList = data;
-                this._loginService.checkVerify('Add', this.RightsList);  //For verify user access
+                const ok = this._loginService.checkVerify('Add', this.RightsList);  //For verify user access
+                if (ok !== false) { this.loadDefaultVessels(); }
             });
 
+    }
+
+    /** Never empty on open: Search's own call with blank vessel and voyage. */
+    loadDefaultVessels() {
+        this.listLoading = true;
+        this.listError = '';
+        const _jsonData = {
+            Type1: '',
+            Type2: '',
+            Type3: this._loginService.getLogin()[0].CITYCODE
+        };
+        this._dataService.Common("Export/PendingShipment_ShipmentProgressFill", _jsonData)
+            .subscribe((data: any) => {
+                this.listLoading = false;
+                this.searchedVessel = false;
+                this.searchList = (data && data.Table) ? data.Table : [];
+                this.vesselPager.reset();
+            }, () => {
+                this.listLoading = false;
+                this.listError = 'Vessels could not be loaded. Enter a vessel name or voyage no. and choose Search.';
+            });
+    }
+
+    clearVesselSearch() {
+        this.VesselName = '';
+        this.VoyageNo = '';
+        this.loadDefaultVessels();
+    }
+
+    exportVessels() {
+        spExportCsv('container-loading-vessels', ['Vessel name', 'Voyage no.', 'ETD', 'Rotation no.'],
+            this.searchList.map((r: any) => [r.VSL_NAME, r.VSL_VOYNO, r.ETD, r.VSL_RTNO]));
     }
     ngOnChanges() { }
 
@@ -2327,9 +2561,12 @@ export class ContainerLoadingShipmentProgressComponent implements OnInit, OnChan
             Type3: this._loginService.getLogin()[0].CITYCODE
         };
         this._disabled.disableButton(this.searchButton);
+        this.searchedVessel = true;
+        this.listError = '';
         this._dataService.Common("Export/PendingShipment_ShipmentProgressFill", _jsonData)
             .subscribe((data: any) => {
                 this._disabled.enableButton(this.searchButton);
+                this.vesselPager.reset();
                 if (data.Table != undefined) {
                     if (data.Table.length > 0) {
                         this.searchList = data.Table;
@@ -2398,6 +2635,7 @@ export class ContainerLoadingShipmentProgressComponent implements OnInit, OnChan
 @Component({
     selector: 'app-shipment-progress-container-loading-view',
     templateUrl: 'view-container-loading-confirmation.sp.component.html',
+    host: { class: 'kit-sp' },
     styles: ['.scroll::-webkit-scrollbar{width:10px}.scroll::-webkit-scrollbar-track{background:#f1f1f1}.scroll::-webkit-scrollbar-thumb{background:#888}.scroll::-webkit-scrollbar-thumb:hover{background:#555}'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
@@ -2413,7 +2651,14 @@ export class ViewContainerLoadingShipmentProgressComponent implements OnInit, On
     NewVessel: string = '';
     ErrorMessage: string = '';
     keys: string[] = [];
+    pager: SpPager = new SpPager(() => this.ContainerList);
     constructor() { }
+
+    exportCsv() {
+        const cols = this.keys.filter((k, i) => i != 0 && i != 1 && i != 2);
+        spExportCsv('container-loading-' + String((this.VesselDetail && this.VesselDetail.VSL_RTNO) || 'vessel').toLowerCase(),
+            cols, this.ContainerList.map((r: any) => cols.map(k => r[k])));
+    }
     ngOnInit() { }
 
     ngOnChanges() {
@@ -2437,7 +2682,7 @@ export class ViewContainerLoadingShipmentProgressComponent implements OnInit, On
 @Component({
     selector: 'app-shipment-progress-container-loading-update',
     templateUrl: 'update-container-loading-confirmation.sp.component.html',
-    encapsulation: ViewEncapsulation.None,
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -2549,9 +2794,9 @@ export class UpdateContainerLoadingShipmentProgressComponent implements OnInit, 
         if (this.DataSet.Table != undefined) {
             this.CityList = this.DataSet.Table1;
             this.ConnVesselList = this.DataSet.Table4;
-            this.PlcaRecptlist== this.DataSet.Table5;
+            this.PlcaRecptlist = this.DataSet.Table5;
             if (this.DataSet.Table5.length>0)
-            {this.pracarrieagedisable==false;}
+            {this.pracarrieagedisable = false;}
             else {this.pracarrieagedisable=true;}
 
             this.fillData(this.DataSet.Table[0]);
@@ -2832,6 +3077,7 @@ export class UpdateContainerLoadingShipmentProgressComponent implements OnInit, 
 @Component({
     selector: 'app-shipment-progress-container-loading-report',
     templateUrl: 'report-container-loading-confirmation.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -2891,6 +3137,7 @@ export class ReportContainerLoadingShipmentProgressComponent implements OnInit, 
 @Component({
     selector: 'app-shipment-progress-prepaid-frt',
     templateUrl: 'pre-frt-approved-shipper.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -2919,6 +3166,7 @@ export class PrepaidfrtApprovShipmentProgressComponent implements OnInit, OnChan
     frtApprdt: any = null;
     constructor(
         private _router: Router,
+        private _spWorkspace: SpWorkspaceService,
         private _dataService: DataService,
         private _loginService: LoginService,
         private _activatedRoute: ActivatedRoute,
@@ -2948,7 +3196,7 @@ export class PrepaidfrtApprovShipmentProgressComponent implements OnInit, OnChan
         this._dataService.getData("Export/ShipmentProgressPopulate", _jsonData)
             .subscribe((data: any) => {
                 this.disable.enableButton(this.submitButton);
-                if (data.Table != undefined) {
+                if (data.Table != undefined && data.Table.length > 0) {
                     this.Id = data.Table[0].ID;
                     this.frtApprdt = (data.Table[0].EXPT_PPFRTAPPDT != "") ? this._dataService.stringdttoArry(data.Table[0].EXPT_PPFRTAPPDT) : null;
                 } else {
@@ -2979,7 +3227,7 @@ export class PrepaidfrtApprovShipmentProgressComponent implements OnInit, OnChan
                 if (data.Table != undefined) {
                     if (data.Table[0].STATUS == 100) {
                         alert("Prepaid approved by shipper Date updated successfully!");
-                        this._router.navigate(['export/shipment-progress/Prepaid-freight-apprvd-search']);
+                        if (!this._spWorkspace.closeAndRefresh()) { this._router.navigate(['export/shipment-progress/Prepaid-freight-apprvd-search']); }
                     } else if (data.Table[0].STATUS == 102) {
                         alert('Error! Please contact System Administrator.');
                     }
@@ -2988,6 +3236,7 @@ export class PrepaidfrtApprovShipmentProgressComponent implements OnInit, OnChan
     }
 
     abort() {
+        if (this._spWorkspace.close()) { return; }
         this._router.navigate(['export/shipment-progress/Prepaid-freight-apprvd-search']);
     }
 }
@@ -2996,6 +3245,7 @@ export class PrepaidfrtApprovShipmentProgressComponent implements OnInit, OnChan
 @Component({
     selector: 'app-shipment-progress-dimension',
     templateUrl: 'dimension.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

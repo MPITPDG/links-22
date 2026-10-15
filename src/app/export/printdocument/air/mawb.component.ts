@@ -132,9 +132,10 @@ export class PrintDocumentMawbUpdateComponents implements OnChanges {
         this._dataService.getData("Export/PrintDocumentAirMawbUpdatePageload", _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                this.currencyList = data.Table;
-                this.destinationList = data.Table1;
-                this.mawbnoList = data.Table2;
+                this.currencyList = (data && data.Table) ? data.Table : [];
+                this.destinationList = (data && data.Table1) ? data.Table1 : [];
+                this.mawbnoList = (data && data.Table2) ? data.Table2 : [];
+                if (!this.mawbnoList.length) { return; }
                 if (this.mawbnoList.length > 0) {
                     for (let i=0; i < this.mawbnoList.length; i++) {
                         this.totalGrwt += this.mawbnoList[i].GRWT;
@@ -255,8 +256,8 @@ export class PrintDocumentMawbComponent implements OnInit {
             }
             this._dataService.getData("Export/EXP_MAWB_STOCK_PAGELOAD",_jsonData)
             .subscribe((data: any) => {
-                this.AirLineList=data.Table1;
-                this.AllMawbNoList=data.Table3
+                this.AirLineList=(data && data.Table1) ? data.Table1 : [];
+                this.AllMawbNoList=(data && data.Table3) ? data.Table3 : []
             });
 
             let pageType = /number/gi;
@@ -352,7 +353,7 @@ export class PrintDocumentMawbComponent implements OnInit {
         this._dataService.getData("Export/PrintDocumentAirMawbList", _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                if (data.Table.length > 0) {
+                if (data && data.Table && data.Table.length > 0) {
                     if (data.Table[0].STATUS == 100) {
                         this.viewType = 'List';
                         this.searchList = data.Table;
@@ -458,7 +459,7 @@ export class PrintDocumentMawbSearchComponent implements OnChanges {
             }
             this._dataService.getData("Export/EXP_MAWB_STOCK_PAGELOAD",_jsonData)
             .subscribe((data: any) => {
-                this.AirLineList=data.Table1;
+                this.AirLineList=(data && data.Table1) ? data.Table1 : [];
             });
     }
     ngOnChanges() { }
@@ -534,7 +535,7 @@ export class PrintDocumentMawbSearchComponent implements OnChanges {
         this._dataService.getData("Export/PrintDocumentAirMawbList", _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                if (data.Table.length > 0) {
+                if (data && data.Table && data.Table.length > 0) {
                     if (data.Table[0].STATUS == 100) {
                         this.viewType = 'List';
                         this.searchList = data.Table;

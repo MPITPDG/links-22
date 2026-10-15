@@ -1,65 +1,122 @@
-﻿<div class="animated fadeIn">
-	<div class="row">
-		<div class="col-sm-3">
-		</div>
-		<div class="col-sm-6">
-			<table class="table table-bordered table-sm-new">
-				<thead class="trbg">
-					<tr>
-						<th colspan="2" class="centerlabel"><span class="col-form-span-label">LIST OF ORDERS</span></th>
-					</tr>
-				</thead>
-				<tbody class="bgwhite">
-					<tr>
-						<td class="width150"><span class="col-form-span-label"><b>EXPORTER/SHIPPER</b></span></td>
-						<td><span class="col-form-span-label">{{ExporterName}}</span></td>
-					</tr>
-					<tr>
-						<td class="width150"><span class="col-form-span-label"><b>CONSIGNEE</b></span></td>
-						<td><span class="col-form-span-label">{{ConsigneeName}}</span></td>
-					</tr>
-				</tbody>
-			</table>
-			<table class="table table-bordered table-sm-new">
-				<thead class="trbg">
-					<tr>
-						<th></th>
-						<th><span class="col-form-span-label">ORDER NO</span></th>
-						<th><span class="col-form-span-label">STYLE NO</span></th>
-						<th><span class="col-form-span-label">PIECES</span></th>
-						<th><span class="col-form-span-label">TYPE OF PIECES</span></th>
-					</tr>
-				</thead>
-				<tbody class="bgwhite">
-					@if (OrderList.length==0) {
-<tr><td colspan="5" class="centerlabel"><img src="assets/img/loading.gif" /></td></tr>
-}
-					@for (obj of OrderList; track obj) {
-<tr>
-						<td class="centerlabel"><input type="checkbox" [(ngModel)]="obj.Check" (click)="setPieces(obj.ID, obj.Check)"/></td>
-						<td><span class="col-form-span-label">{{obj.ORDERNO}}</span></td>
-						<td><span class="col-form-span-label">{{obj.STYLENO}}</span></td>
-						<td>
-							<span class="col-form-span-label">
-								<input type="textbox" [(ngModel)]="obj.PCS" class="form-control width100" (keyup)="checkPieces(obj.ID, obj.PCS)" [OnlyNumber]="true" [disabled]="obj.Check==false"/>
-							</span>
-						</td>
-						<td><span class="col-form-span-label">{{obj.TYPEOFPCS}}</span></td>
-					</tr>
-}
-				</tbody>
-				<tfoot class="trbg">
-					<tr>
-						<th colspan="5" class="centerlabel">
-							<button type="button" uiBtn variant="default" size="sm" (click)="submit()" #submitButton>
-								<span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Submit</span>
-							</button>
-						</th>
-					</tr>
-				</tfoot>
-			</table>
-		</div>
-		<div class="col-sm-3">
-		</div>
-	</div>
+﻿<!--
+  Export - order booking list (opened from the new consignment flow). Ported from
+  MPERPNG-20: recipe 1 on the page kit - header, parties card, filter + toolbar, ruled
+  table, 10/page pager, pinned Submit. Ticks and pieces live on the OrderList rows
+  themselves, so paging or filtering never loses a selection; submit() still totals
+  every ticked order in OrderList, whatever page it is on.
+-->
+<div class="im-page">
+
+  <div class="ph">
+    <div>
+      <h1>List of orders</h1>
+      <p>Tick the orders to book, then set the pieces to draw from each.</p>
+    </div>
+  </div>
+
+  <!-- who the orders belong to -->
+  <div class="card sec">
+    <div class="card-h"><h2>Parties</h2></div>
+    <div class="es-kv es-kv2">
+      <div class="kv"><span class="k">Exporter / shipper</span><span class="v">{{ ExporterName || '—' }}</span></div>
+      <div class="kv"><span class="k">Consignee</span><span class="v">{{ ConsigneeName || '—' }}</span></div>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="filters">
+      <div class="f f-wide">
+        <label for="obFilter">Filter</label>
+        <input id="obFilter" type="text" [(ngModel)]="quickFilter" (ngModelChange)="page = 1" placeholder="Order no., style no. or type of pieces…" />
+      </div>
+      <div class="f">
+        <label for="obShow">Show</label>
+        <select id="obShow" [(ngModel)]="showFilter" (ngModelChange)="page = 1">
+          <option value="">All orders</option>
+          <option value="T">Ticked only</option>
+          <option value="U">Not ticked</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <span>
+        <span class="count">{{ filteredOrders.length }} {{ filteredOrders.length === 1 ? 'order' : 'orders' }}</span>
+        <span class="sub-t"> &middot; {{ selectedCount }} ticked &middot; {{ selectedPieces }} pcs (across all pages)</span>
+      </span>
+      <span class="tb-r">
+        <button class="btn g" type="button" (click)="clearFilters()">Clear</button>
+        <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!filteredOrders.length">Export CSV</button>
+      </span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th class="ob-chk"><span class="sr-only">Select</span></th>
+            <th>Order no.</th>
+            <th>Style no.</th>
+            <th class="num">Pieces</th>
+            <th>Type of pieces</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+            <tr><td class="empty" colspan="6">Loading orders…</td></tr>
+          } @else if (loadError) {
+            <tr><td class="empty" colspan="6">{{ loadError }}</td></tr>
+          } @else {
+            @for (obj of pageRows; track obj) {
+              <tr [class.ob-on]="obj.Check">
+                <td class="ob-chk">
+                  <input type="checkbox" [(ngModel)]="obj.Check" (click)="setPieces(obj.ID, obj.Check)" />
+                </td>
+                <td class="mono"><b>{{ obj.ORDERNO }}</b></td>
+                <td>{{ obj.STYLENO }}</td>
+                <td class="num">
+                  <input type="text" class="ob-pcs"
+                         [(ngModel)]="obj.PCS"
+                         (keyup)="checkPieces(obj.ID, obj.PCS)"
+                         [OnlyNumber]="true"
+                         [disabled]="obj.Check==false" />
+                </td>
+                <td>{{ obj.TYPEOFPCS }}</td>
+                <td>
+                  @if (obj.Check) { <span class="chip solid">Ticked</span> }
+                  @else { <span class="chip"><span class="dot"></span>Open</span> }
+                </td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="6">No orders match these filters.</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ filteredOrders.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="page <= 1" (click)="goPage(page - 1)" aria-label="Previous page">‹</button>
+        @for (p of pageList; track $index) {
+          @if (p === 0) {
+            <span class="gap">…</span>
+          } @else {
+            <button type="button" [class.on]="p === page" (click)="goPage(p)">{{ p }}</button>
+          }
+        }
+        <button type="button" [disabled]="page >= pageCount" (click)="goPage(page + 1)" aria-label="Next page">›</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">{{ selectedCount }} of {{ OrderList.length }} orders ticked &middot; {{ selectedPieces }} pcs go to the consignment</span>
+    <div class="r">
+      <button type="button" class="btn p" (click)="submit()" #submitButton>Submit</button>
+    </div>
+  </div>
+
 </div>

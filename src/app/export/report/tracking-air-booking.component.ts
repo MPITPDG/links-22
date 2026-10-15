@@ -5,6 +5,7 @@ import { LoginService } from '../../shared/service/loginService';
 import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     templateUrl: 'tracking-air-booking.component.html',
+    styleUrls: ['./export-air-report-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -38,7 +39,7 @@ export class TrackingAirBookingReportComponent implements OnInit {
         this._loaderService.display(true);
         this._dataService.getData("Common/getCityList", {})
             .subscribe((data: any) => {
-                data.Table.forEach((key) => {
+                ((data && data.Table) || []).forEach((key) => {
                     this.CityList.push({ citycode: key.citycode, citycode1: key.citycode1, cityname: key.cityname });
                 });
                 this.CityList = JSON.parse(JSON.stringify(this.CityList));
@@ -46,8 +47,8 @@ export class TrackingAirBookingReportComponent implements OnInit {
             });
         this._dataService.getData("Export/Fill_dsr_PAGELOAD", {})
             .subscribe((data: any) => {
-                this.ConsigneeList = data.Table;
-                this.SourcingAgentList = data.Table1;
+                this.ConsigneeList = (data && data.Table) || [];
+                this.SourcingAgentList = (data && data.Table1) || [];
                 this._loaderService.display(false);
             });
     }

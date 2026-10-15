@@ -1,0 +1,132 @@
+/* ----------------------------------------------------------------
+   Export > Booking > Approval: screen-level additions on top of the GLOBAL
+   page kit (src/styles/kit/import-page.css, root .im-page). Ported from
+   MPERPNG-20 booking-authorisation.component.css; monochrome only. Covers
+   what the kit does not: sort icons, selected / authorised rows, the
+   checkbox column and the confirmation dialog. The full-screen loading
+   overlay and the in-page toast were dropped: the table shows a loading
+   row and messages go through the app toaster, as on the sibling screens.
+   ---------------------------------------------------------------- */
+
+/* dense one-line rows (same class name as import/master/master-page.css) */
+.im-page table.tbl.nowrap td {
+    white-space: nowrap;
+}
+
+/* checkbox column */
+.im-page table.tbl .col-check {
+    width: 36px;
+    text-align: center;
+}
+
+.im-page table.tbl input[type="checkbox"] {
+    accent-color: var(--mp-primary, #0A0A0A);
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+/* sortable headers */
+.im-page table.tbl th.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.im-page .sort-icon {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 10px;
+    color: var(--faint);
+}
+
+.im-page .sort-icon::after  { content: '\21C5'; }
+.im-page .sort-asc::after   { content: '\25B2'; color: var(--ink); }
+.im-page .sort-desc::after  { content: '\25BC'; color: var(--ink); }
+
+/* row states: weight and fill, never hue */
+.im-page table.tbl tbody tr.selected td {
+    background: var(--band);
+}
+
+.im-page table.tbl tbody tr.authorised-row td {
+    background: var(--fill);
+    color: var(--soft);
+}
+
+.im-page .ba-retry {
+    margin-top: 8px;
+}
+
+/* confirmation dialog */
+.im-page .ba-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+}
+
+.im-page .ba-dialog {
+    background: var(--sheet);
+    border: 1px solid var(--edge);
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .18);
+    width: calc(100% - 32px);
+    max-width: 500px;
+    padding: 20px 24px;
+    animation: ba-in .2s ease-out;
+}
+
+.im-page .ba-dialog h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 8px;
+}
+
+.im-page .ba-dialog p {
+    font-size: 13px;
+    color: var(--soft);
+    line-height: 1.6;
+    margin: 0 0 12px;
+}
+
+.im-page .ba-list {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 4px 12px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--band);
+}
+
+.im-page .ba-list li {
+    padding: 5px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 12.5px;
+    color: var(--soft);
+}
+
+.im-page .ba-list li:last-child {
+    border-bottom: 0;
+}
+
+.im-page .ba-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+@keyframes ba-in {
+    from { transform: translateY(-12px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .im-page .ba-dialog { animation: none; }
+}

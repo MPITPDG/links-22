@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 import{ AddBookingComponent} from './add.booking.component';
 import {NewBookingComponent} from './new.booking.component'
+import { BookingAuthorisationComponent } from './booking-authorisation.component';
 const routes: Routes = [
     {
         path: '',
@@ -13,6 +14,7 @@ const routes: Routes = [
             { path: 'add', component: AddBookingComponent, data: { title: 'Booking / Add' } },
             { path: 'new-order-booking', component: NewBookingComponent, data: { title: 'Booking / Order / New' } },
             { path: 'new-order-booking/:edi_id/:order_no/:sr_mode', component: NewBookingComponent, data: { title: 'Booking / Order / New' } },
+            { path: 'authorisation', component: BookingAuthorisationComponent, data: { title: 'Authorisation' } },
              
         ]
     }

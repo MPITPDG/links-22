@@ -13,6 +13,7 @@ import { PreAlertComponent,
     PreAlertAutoComponent,
     PreAlertPrepareSendingThroughComponent
 } from './prealert.component';
+import { SendPrealertComponent } from './send-prealert.component';
 @NgModule({
     imports: [ExportPrealertRoutingModule,
         FormsModule,
@@ -22,7 +23,7 @@ import { PreAlertComponent,
         MyDatePickerModule,
         NgSelectModule,
         SharedModule],
-    declarations: [PreAlertComponent,  PreAlertPrepareComponent, PreAlertAutoComponent, PreAlertPrepareSendingThroughComponent],
+    declarations: [PreAlertComponent,  PreAlertPrepareComponent, PreAlertAutoComponent, PreAlertPrepareSendingThroughComponent, SendPrealertComponent],
     providers: [],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

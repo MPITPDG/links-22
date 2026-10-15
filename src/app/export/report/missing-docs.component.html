@@ -1,0 +1,169 @@
+<!--
+  Export report - missing shipping docs.
+  Monochrome page kit (import-page.css) + KPI tiles (import-home.css).
+  Calls Export/EXP_RPT_MISSING_DOCS; origin country options come from the loaded rows.
+  Links: ported from MPERPNG-20 (menu 7.13). Until the endpoint is deployed the
+  service returns an empty view and the note shows in the empty table row.
+-->
+<div class="im-page im-dash">
+  <div class="ph">
+    <div>
+      <h1>Missing shipping docs</h1>
+      <p>Bookings past CRD + 2 days whose shipping documents or DOC file have not followed</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="filters">
+      <div class="f">
+        <label for="mdConsignee">Client</label>
+        <ng-select id="mdConsignee" class="custom" [items]="ConsigneeList" bindLabel="con_name" bindValue="con_code"
+                   placeholder="--Show All--" [(ngModel)]="Consignee">
+        </ng-select>
+      </div>
+      <div class="f">
+        <label for="selCountry">Origin country</label>
+        <select id="selCountry" name="selCountry" [(ngModel)]="Country">
+          <option value="">All</option>
+          @for (c of CountryList; track c) {
+            <option [value]="c">{{ c }}</option>
+          }
+        </select>
+      </div>
+      <div class="f">
+        <label for="selMode">Mode</label>
+        <select id="selMode" name="selMode" [(ngModel)]="Mode">
+          <option value="">All</option>
+          <option value="AIR">AIR</option>
+          <option value="SEA">SEA</option>
+        </select>
+      </div>
+      <div class="f">
+        <label for="mdBranch">Branch</label>
+        <ng-select id="mdBranch" class="custom" [items]="CityList" bindLabel="cityname" bindValue="citycode"
+                   placeholder="--Show All--" [(ngModel)]="City">
+        </ng-select>
+      </div>
+      <div class="f">
+        <button class="btn p" type="submit" name="submitButton" (click)="search()">Search</button>
+      </div>
+      <div class="f">
+        <button class="btn g" type="button" (click)="clear()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="im-grid im-kpis md-kpis">
+    @if (loading) {
+      @for (k of [1, 2, 3, 4]; track k) {
+        <div class="im-card im-kpi"><div class="md-skel w40"></div><div class="md-skel h28 w60"></div></div>
+      }
+    } @else {
+      <div class="im-card im-kpi">
+        <div class="k">Total</div>
+        <div class="v">{{ view?.total ?? 0 }}</div>
+      </div>
+      <div class="im-card im-kpi">
+        <div class="k">Docs not received</div>
+        <div class="v">{{ view?.docsNotReceived ?? 0 }}</div>
+      </div>
+      <div class="im-card im-kpi">
+        <div class="k">DOC file not sent</div>
+        <div class="v">{{ view?.docNotSent ?? 0 }}</div>
+      </div>
+      <div class="im-card im-kpi">
+        <div class="k">Over 7 days</div>
+        <div class="v">{{ view?.over7Days ?? 0 }}</div>
+      </div>
+    }
+  </div>
+
+  <div class="card">
+    <div class="toolbar">
+      <span>
+        <span class="count">{{ Filtered.length }} {{ Filtered.length === 1 ? 'booking' : 'bookings' }}</span>
+      </span>
+      <span class="tb-r">
+        <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!Filtered.length">CSV export</button>
+      </span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Order No</th>
+            <th>Style No</th>
+            <th>Booking Ref</th>
+            <th>Origin City</th>
+            <th>Origin Country</th>
+            <th>Mode</th>
+            <th>Branch</th>
+            <th>Shipper</th>
+            <th>Agent</th>
+            <th>Announced CRD</th>
+            <th>Revised CRD</th>
+            <th class="num">Days Since CRD</th>
+            <th>Last C1 Sent</th>
+            <th>Job No</th>
+            <th>Doc Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+            @for (s of [1, 2, 3, 4, 5]; track s) {
+              <tr><td colspan="16"><div class="md-skel"></div></td></tr>
+            }
+          } @else if (error) {
+            <tr><td class="empty" colspan="16">{{ error }}</td></tr>
+          } @else {
+            @for (obj of pageRows; track $index) {
+              <tr>
+                <td>{{ obj.CLIENT }}</td>
+                <td class="mono">{{ obj.ORDERNO }}</td>
+                <td class="mono">{{ obj.STYLENO }}</td>
+                <td class="mono">{{ obj.BOOKING_REF }}</td>
+                <td>{{ obj.ORIGIN_CITY }}</td>
+                <td>{{ obj.ORIGIN_COUNTRY }}</td>
+                <td>{{ obj.MODE }}</td>
+                <td>{{ obj.BRANCH }}</td>
+                <td>{{ obj.SHIPPER }}</td>
+                <td>{{ obj.AGENT }}</td>
+                <td>{{ obj.ANNOUNCED_CRD }}</td>
+                <td>{{ obj.REVISED_CRD }}</td>
+                <td class="md-days">{{ obj.DAYS_SINCE_CRD }}</td>
+                <td>{{ obj.LAST_C1_SENT }}</td>
+                <td class="mono">{{ obj.JOBNO }}</td>
+                <td>
+                  @if (obj.DOC_STATUS === 'DOCS NOT RECEIVED') {
+                    <span class="chip solid">Docs not received</span>
+                  } @else {
+                    <span class="chip">DOC file not sent</span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="16">No bookings are waiting for documents</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ Filtered.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="page <= 1" (click)="goPage(page - 1)" aria-label="Previous page">‹</button>
+        @for (p of pageList; track $index) {
+          @if (p === 0) {
+            <span class="gap">…</span>
+          } @else {
+            <button type="button" [class.on]="p === page" (click)="goPage(p)">{{ p }}</button>
+          }
+        }
+        <button type="button" [disabled]="page >= pageCount" (click)="goPage(page + 1)" aria-label="Next page">›</button>
+      </div>
+    </div>
+  </div>
+</div>

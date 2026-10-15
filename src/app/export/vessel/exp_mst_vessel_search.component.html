@@ -1,67 +1,70 @@
-﻿<div class="animated fadeIn">
-	<div class="row">					
-		<div class="col-md-2">
-		</div>
-		<div class="col-md-8">
-			<table class="table table-bordered table-sm-new">
-				<tbody style='height:30px'>
-					<tr>
-						<td class="col-form-span-heading" colspan="2"  >
-							VESSEL SEARCH
-						</td>
-					</tr>
-					<tr class="bgwhite">
-						<td>
-							<span class="col-form-span-label ">Vessel Name</span>
-						</td>
-						<td>
-							<input [(ngModel)]="vslSname" type="text" id="txtvessel" name="txtvessel" class="form-control width150">
-						</td>
-					</tr>
-					<tr class="bgwhite">
-						<td>
-							<span class="col-form-span-label">Voyage No</span>
-						</td>
-						<td >
-							<input type="text" [(ngModel)]="vslSvoyno" id="txtvoyno" name="txtvoyno" class="form-control width150 " >
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2" class="centerlabel" >
-							<button uiBtn variant="default" size="sm" type="submit" id="btnAgtAdd" name="btnAgtAdd"  (click)="serchList()"><span class="col-form-span-label"><i class="fa fa-search"></i> Search</span></button>
-						</td>
-					</tr>
-					<tr>
-						@if (Searchlist.length>0) {
-<td colspan="2">
-							<div  class="row yscroll" style="max-height:300px">
-								<table class="table table-hover">
-									<thead>
-										<tr class="col-form-span-heading" style="white-space:nowrap;">
-											<th class="col-form-span-label">Rotation</th>
-											<th class="col-form-span-label">Vessel</th>
-											<th class="col-form-span-label">Voyage No</th>
-										</tr>
-									 </thead>
-									<tbody class="bgwhite">
-										@for (prtAgt of Searchlist; track prtAgt) {
-<tr>
-											<td><span class="col-form-span-label anchor-link" (click)="ListOnclick(prtAgt.VSL_RTNO)" style="cursor:pointer;">{{prtAgt.VSL_RTNO}}</span></td>
-											<td class="col-form-span-label">{{prtAgt.VSL_NAME}}</td>
-											<td class="col-form-span-label">{{prtAgt.VSL_VOYNO}}</td>                                             
-										</tr>
-}
-									</tbody>
-								</table>
-							</div>
-						</td>
-}
-					</tr>
-				</tbody>
-			</table>
-			 
-		</div>
-		<div class="col-md-2">
-		</div>
-	</div>
+﻿<!--
+  Export vessel master - search. Page kit recipe 1 (src/styles/kit/import-page.css),
+  ported from MPERPNG-20. [(ngModel)]="vslSname" / "vslSvoyno", serchList() and
+  ListOnclick(prtAgt.VSL_RTNO) are unchanged. ExportVslMst_Search needs both a
+  vessel name and a voyage no., so there is no list-all default: the page opens
+  on the empty state. Enter in either field searches; a whole row opens the vessel.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Vessels</h1>
+      <p>Search vessel calls by name and voyage no.</p>
+    </div>
+    <div class="tools">
+      <button class="btn p" type="button" routerLink="/export/vessel/form">+ New vessel</button>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="filters">
+      <div class="f">
+        <label for="txtvessel">Vessel name <span class="req">*</span></label>
+        <input type="text" id="txtvessel" name="txtvessel" [(ngModel)]="vslSname" placeholder="Vessel name" (keyup.enter)="serchList()" />
+      </div>
+      <div class="f">
+        <label for="txtvoyno">Voyage no. <span class="req">*</span></label>
+        <input type="text" id="txtvoyno" name="txtvoyno" [(ngModel)]="vslSvoyno" placeholder="Voyage no." (keyup.enter)="serchList()" />
+      </div>
+      <div class="f">
+        <button class="btn p" type="submit" id="btnAgtAdd" name="btnAgtAdd" (click)="serchList()">Search</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <span class="count">{{ Searchlist?.length || 0 }} vessel(s) found</span>
+      <span class="sub-t">Choose a row to open the vessel.</span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Rotation</th>
+            <th>Vessel</th>
+            <th>Voyage no.</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (prtAgt of Searchlist; track prtAgt) {
+            <tr class="vs-row" tabindex="0" (click)="ListOnclick(prtAgt.VSL_RTNO)" (keyup.enter)="ListOnclick(prtAgt.VSL_RTNO)">
+              <td class="mono"><a class="lnk">{{ prtAgt.VSL_RTNO }}</a></td>
+              <td>{{ prtAgt.VSL_NAME }}</td>
+              <td class="mono">{{ prtAgt.VSL_VOYNO }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td class="empty" colspan="3">
+                @if (searched) {
+                  No vessels listed for this vessel name and voyage no.
+                } @else {
+                  No vessels listed yet. Enter both a vessel name and a voyage no., then choose Search.
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>

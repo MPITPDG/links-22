@@ -1,115 +1,91 @@
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3"></div>
-                    <div class="col-md-6">
-                        <table class="table table-bordered table-sm-new">
-                            <tbody style='height:30px'>
-                                <tr>
-                                    <td class="col-form-span-heading  centerlabel " colspan="3">
-                                        EP-Copy-Coversheet
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="col-form-span-heading" colspan="3">
-                                        Report Type
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span class="col-form-span-label ">Search By</span>
-                                    </td>
-                                    <td>
+<!--
+  Export -> Report -> EP-Copy Coversheet.
+  Recipe 2 (form page): print() opens a printed .aspx page in a new tab, built
+  from a query string -- that printed page is out of scope (recipe 4), only
+  the on-screen form below is restyled. Every ngModel / click handler kept.
+-->
+<div class="im-page xr-page">
+  <div class="ph">
+    <div>
+      <h1>EP-Copy Coversheet</h1>
+      <p>Print the EP copy cover sheet for a shipment.</p>
+    </div>
+  </div>
 
-                                        <span class="col-form-span-label">
-                                            <!-- <input type="radio" name="check"  (click)="mainCheck('1')" [checked]="checkWise == '1'"/>Number Wise -->
-                                            <input type="radio" name="radiogroup" (click)="mainCheck('1')" [checked]="checkWise == '1'">&nbsp; Sea
-                                        </span>
-
-                                    </td>
-                                    <td>
-                                        <span class="col-form-span-label">
-                                            <input type="radio" name="radiogroup" (click)="mainCheck('2')" [checked]="checkWise == '2'" />&nbsp; Air
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="col-form-span-heading" colspan="3">
-                                        <input type="radio" name="radiogroupS" (click)="mainchkSearch('1')" [checked]="checkWiseS == '1'">&nbsp; Shipping Bill No
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span class="col-form-span-label ">Shipping Bill No</span>
-                                    </td>
-                                    <td colspan="2">
-
-                                        <textarea class="form-control width300" [(ngModel)]="shipbillno" [disabled]=shipdisable></textarea>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="col-form-span-heading" colspan="3">
-                                        <input type="radio" name="radiogroupS" (click)="mainchkSearch('2')" [checked]="checkWiseS == '2'">&nbsp; Export No
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span class="col-form-span-label ">Export No</span>
-                                    </td>
-                                    <td colspan="2">
-                                        <input type="text" [(ngModel)]="exptno" maxlength="15" [disabled]=exptnodisable class="form-control width150">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="col-form-span-heading" colspan="3">
-                                        Subject And Date
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span class="col-form-span-label ">Subject</span>
-                                    </td>
-                                    <td colspan="2">
-
-                                        <textarea class="form-control width300" [(ngModel)]="subject"></textarea>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <span class="col-form-span-label ">Print Date</span>
-                                    </td>
-                                    <td colspan="2">
-                                        <my-date-picker name="dtprint" [options]="myDatePickerOptions" [(ngModel)]="dtprint" required></my-date-picker>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span class="col-form-span-label ">Display Format</span>
-                                    </td>
-                                    <td>
-                                        <input type="radio" name="radiogroupF" (click)="mainCheckF('1')" [checked]="checkWiseF == '1'">&nbsp;
-                                        <span class="col-form-span-label ">Table Format</span>
-                                    </td>
-                                    <td>
-                                        <input type="radio" name="radiogroupF" (click)="mainCheckF('2')" [checked]="checkWiseF == '2'">&nbsp;
-                                        <span class="col-form-span-label "> Statement Format</span>
-                                    </td>
-                                </tr>
-                                <td colspan="3" class="centerlabel">
-                                    <button uiBtn variant="default" size="sm" type="Print" (click)="print()">
-                                        <span class="col-form-span-label">
-                                            <i class="fa fa-print"></i> Print
-                                        </span>
-                                    </button>
-                                </td>
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div>
-                <div class="col-md-3"></div>
-            </div>
+  <div class="card sec">
+    <div class="card-h"><h2>Report Type</h2></div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Search By</label>
+        <div class="xr-radios">
+          <label class="xr-radio">
+            <input type="radio" name="radiogroup" (click)="mainCheck('1')" [checked]="checkWise == '1'" />
+            Sea
+          </label>
+          <label class="xr-radio">
+            <input type="radio" name="radiogroup" (click)="mainCheck('2')" [checked]="checkWise == '2'" />
+            Air
+          </label>
         </div>
+      </div>
+
+      <div class="fld full">
+        <label class="xr-radio">
+          <input type="radio" name="radiogroupS" (click)="mainchkSearch('1')" [checked]="checkWiseS == '1'" />
+          Shipping Bill No
+        </label>
+      </div>
+
+      <div class="fld full">
+        <label for="txtShipBillNo">Shipping Bill No</label>
+        <textarea id="txtShipBillNo" [(ngModel)]="shipbillno" [disabled]="shipdisable"></textarea>
+      </div>
+
+      <div class="fld full">
+        <label class="xr-radio">
+          <input type="radio" name="radiogroupS" (click)="mainchkSearch('2')" [checked]="checkWiseS == '2'" />
+          Export No
+        </label>
+      </div>
+
+      <div class="fld">
+        <label for="txtExptNo">Export No</label>
+        <input type="text" id="txtExptNo" [(ngModel)]="exptno" maxlength="15" [disabled]="exptnodisable" />
+      </div>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h"><h2>Subject and Date</h2></div>
+    <div class="fields">
+      <div class="fld full">
+        <label for="txtSubject">Subject</label>
+        <textarea id="txtSubject" [(ngModel)]="subject"></textarea>
+      </div>
+      <div class="fld">
+        <label>Print Date</label>
+        <my-date-picker name="dtprint" [options]="myDatePickerOptions" [(ngModel)]="dtprint" required></my-date-picker>
+      </div>
+      <div class="fld full">
+        <label>Display Format</label>
+        <div class="xr-radios">
+          <label class="xr-radio">
+            <input type="radio" name="radiogroupF" (click)="mainCheckF('1')" [checked]="checkWiseF == '1'" />
+            Table Format
+          </label>
+          <label class="xr-radio">
+            <input type="radio" name="radiogroupF" (click)="mainCheckF('2')" [checked]="checkWiseF == '2'" />
+            Statement Format
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">Opens the printed cover sheet in a new tab.</span>
+    <div class="r">
+      <button class="btn p" type="Print" (click)="print()">Print</button>
+    </div>
+  </div>
+</div>

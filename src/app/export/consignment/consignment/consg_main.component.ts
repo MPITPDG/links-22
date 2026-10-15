@@ -1,4 +1,5 @@
-﻿import { Component, OnInit, Input, OnChanges, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+﻿import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { timeout, finalize } from 'rxjs/operators';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router } from '@angular/router';
@@ -8,16 +9,138 @@ import { IMyDpOptions } from 'mydatepicker';
 import { SharedDataSerice } from '../../export-share-data.service';
 import { LoaderService } from '../../../shared/service/loader.service';
 import { ModalDirective } from 'ngx-bootstrap/modal';
+import { UiStep } from '../../../shared/ui';
+import { ConsignmentDraftService } from './consignment-draft.service';
 @Component({
+    selector: 'app-consg-main',
     templateUrl: 'consg_main.component.html',
-    //styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
-   // encapsulation: ViewEncapsulation.None,
+    // Page kit is global (src/styles/kit); kit-consignment scopes consignment-page.css.
+    host: { class: 'kit-consignment' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ConsgMainComponent implements OnInit , OnChanges{
     private baseUrl: string = 'Export/GetMainConsignment';
     @ViewChild('CalculateCBM', {static: false}) public calcCBMmodel: ModalDirective;
+
+    // ==================================================================
+    // Presentation (ported from MPERPNG-20). Hosted inside
+    // ConsgWorkspaceComponent rather than owning a route: the component drops
+    // its own page header and the nine tabs became eight always-visible
+    // sections. Nothing about the data, the load or the submit payload changed.
+    // ==================================================================
+
+    @Input() embedded: boolean = false;
+
+    /**
+     * True while the workspace's page 1 (parties / consignee / shipment) has
+     * not been submitted yet. The eight sections are then drawn with their real
+     * fields but every control is disabled (a `fieldset[disabled]` around the
+     * whole master). It is also the trigger for the load that used to live in
+     * ngOnInit: `loadMaster()` holds the original ngOnInit body and runs on the
+     * true -> false transition of this input, i.e. exactly once per Continue.
+     */
+    @Input() locked: boolean = false;
+
+    @Input() step: string = 'main';
+    @Output() stepChange = new EventEmitter<string>();
+
+    /** The eight live sections, in the order the old tabset showed them. */
+    readonly steps: UiStep[] = [
+        { key: 'main', label: 'Main' },
+        { key: 'vessel', label: 'Transport, port & goods' },
+        { key: 'invoice', label: 'Invoice' },
+        { key: 'documents', label: 'Documents' },
+        { key: 'itc', label: 'ITC code' },
+        { key: 'order', label: 'Order no.' },
+        { key: 'package', label: 'Package no.' },
+        { key: 'marks', label: 'Marks & numbers' },
+    ];
+
+    get stepIndex(): number {
+        const i = this.steps.findIndex(s => s.key === this.step);
+        return i < 0 ? 0 : i;
+    }
+
+    goStep(key: string): void {
+        this.step = key;
+        this.stepChange.emit(key);
+    }
+
+    /** Key of the section last jumped to; '' means none. Purely presentational. */
+    openSection: string = '';
+
+    /** Has anything been entered in this section? Read-only - it touches no state. */
+    sectionFilled(key: string): boolean {
+        const has = (v: any) => v !== undefined && v !== null && String(v).trim() !== '';
+        switch (key) {
+            case 'main': return has(this.lblshipper);
+            case 'vessel': return has(this.vesselname) || has(this.airlinename);
+            case 'invoice': return has(this.expinvno);
+            case 'documents': return has(this.docactualreceived) && this.docactualreceived !== 'NO';
+            case 'itc': return (this.itclist || []).length > 0;
+            case 'order': return (this.orderlist || []).length > 0;
+            case 'package': return (this.packagelist || []).length > 0;
+            case 'marks': return has(this.marksandnumbers);
+            default: return false;
+        }
+    }
+
+    get filledCount(): number {
+        return this.steps.filter(s => this.sectionFilled(s.key)).length;
+    }
+
+    // ------------------------------------------------------------------
+    // Submit lock (MP T-000003). `saving` goes true only once every validation
+    // has passed and the save request is about to leave; while it is true a
+    // second Submit is ignored and Submit / Abort / Keep as draft are disabled.
+    // A failure (HTTP error, 120 s timeout, STATUS != 100) releases it and
+    // shows `saveError` above the save bar; success keeps it, as we navigate.
+    // ------------------------------------------------------------------
+    saving: boolean = false;
+    saveError: string = '';
+
+    /** "Keep as draft": the workspace snapshots the draft and leaves. */
+    @Output() keepDraft = new EventEmitter<void>();
+    /** Fired right before the save request leaves, so the host can take a last draft snapshot. */
+    @Output() beforeSave = new EventEmitter<void>();
+    /**
+     * Links: Abort used to navigate main -> start, i.e. to a fresh page 1. In the
+     * workspace that is the same URL (the router ignores it), so when embedded the
+     * workspace is told to rebuild both halves instead.
+     */
+    @Output() aborted = new EventEmitter<void>();
+
+    private repaint(): void {
+        try { this._cdr.markForCheck(); this._cdr.detectChanges(); } catch (e) { }
+    }
+
+    // ------------------------------------------------------------------
+    // Draft restore. The workspace hands the fields over on Continue; they are
+    // held until this screen's lists (Export/GetMainConsignment) have arrived,
+    // then assigned as they are.
+    // ------------------------------------------------------------------
+    private _pendingDraft: any = null;
+
+    applyDraft(fields: any): void {
+        if (!fields) { return; }
+        this._pendingDraft = fields;
+        if (this.commoncities && this.commoncities.length) { this.flushDraft(); }
+    }
+
+    private flushDraft(): void {
+        const f = this._pendingDraft;
+        if (!f) { return; }
+        this._pendingDraft = null;
+        this._draft.assign(this, f, Object.keys(f));
+        this.repaint();
+    }
+
+    /** Leave without saving and keep the draft (the workspace takes the snapshot). */
+    keepAsDraft(): void {
+        if (this.saving) { return; }
+        this.keepDraft.emit();
+    }
     public myDatePickerOptions: IMyDpOptions = {
         dateFormat: 'dd/mm/yyyy',
         inline: false,
@@ -327,16 +450,34 @@ export class ConsgMainComponent implements OnInit , OnChanges{
         private _toasterService: ToastCommonService,
         private _loginService: LoginService,
         private _sharedconsig: SharedDataSerice,
-        private _loaderService: LoaderService) {
+        private _loaderService: LoaderService,
+        private _cdr: ChangeDetectorRef,
+        private _draft: ConsignmentDraftService) {
         this.City = this._loginService.getLogin()[0].CITYCODE;
     }
 
+    /**
+     * Guarded: when the workspace mounts this component locked (page 1 not
+     * submitted yet) nothing happens here, and loadMaster() is run later from
+     * ngOnChanges. Used un-embedded / unlocked, this behaves exactly as before.
+     */
     ngOnInit() {
+        if (this.locked) { return; }
+        return this.loadMaster();
+    }
+
+    /** Guard so the load below can never run twice for one mounted master. */
+    private _loaded: boolean = false;
+
+    /** The original (Links) ngOnInit body, unchanged apart from fail-soft guards. */
+    private loadMaster() {
+        if (this._loaded) { return false; }
         if (this._sharedconsig.sharedData === undefined) {
             this._toasterService.toast('error', 'info', "Your data is lost due to page refresh.");
             this._router.navigate(['export/Consignment/start']);
             return false;
         }
+        this._loaded = true;
         this.tempSession = this._sharedconsig.sharedData;
         this.modetype = this.tempSession.modeofship;
         if (this.modetype=="AIR")
@@ -372,26 +513,38 @@ export class ConsgMainComponent implements OnInit , OnChanges{
         this._loaderService.display(true);
         this._dataService.Common('Export/GetMainConsignment', _jsonData)
             .subscribe((data: any) => {
-                this.sourcingagents = data.Table;
-                this.commoncities = data.Table1;
-                this.commoncurrencies = data.Table2;
-                this.documentlist = data.Table3;
+                data = data || {};
+                this.sourcingagents = data.Table || [];
+                this.commoncities = data.Table1 || [];
+                this.commoncurrencies = data.Table2 || [];
+                this.documentlist = data.Table3 || [];
                 //this.orderexistnolist = data.Table4;
-                this.agentsname = data.Table5;
+                this.agentsname = data.Table5 || [];
                 this.agentname = (data.Table5 != undefined) ? ((data.Table5.length > 0) ? data.Table5[0].VALUEFIELD : null) : null;
-                this.checkedigroup = (data.Table6.length > 0) ? data.Table6[0].FK_GRPID : '';
+                this.checkedigroup = (data.Table6 && data.Table6.length > 0) ? data.Table6[0].FK_GRPID : '';
                 if (this._loginService.getLogin()[0].CMPCODE == "01") {
                     this._loaderService.display(false);
                     this.disabledExistOrderNoList = true;
                 } else {
                     this.getOrderList(this.tempSession.consigneeid, this.tempSession.exporterid, this.tempSession.airshipmode, this.tempSession.modeofship);
                 }
-                this.Allportterminallist=data.Table7;
+                this.Allportterminallist = data.Table7 || [];
+                this.flushDraft();
+                this.repaint();
+            },
+            (error) => {
+                this._loaderService.display(false);
+                this._toasterService.toast('error', 'Error', (error && error.status) + '<br/>' + (error && error.statusText));
             });
     }
-    ngOnChanges() {
 
-      }
+    /** Continue pressed: locked flips true -> false, so run the load once. */
+    ngOnChanges(changes: SimpleChanges) {
+        const c = changes['locked'];
+        if (c && !c.firstChange && c.previousValue && !c.currentValue) {
+            this.loadMaster();
+        }
+    }
 
     getOrderList(concode, expcode, shipmode, mode) {
         const _jsonData = {
@@ -403,7 +556,8 @@ export class ConsgMainComponent implements OnInit , OnChanges{
         this._dataService.getData('Export/GetMainConsignmentOrderList', _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                this.orderexistnolist = data.Table;
+                this.orderexistnolist = (data && data.Table) ? data.Table : [];
+                if (!this.orderexistnolist.length) { return; }
                 if (data.Table[0].STATUS == '100') {
                     this.orderexistnolist = data.Table;
                     this.orderexistnolist.forEach(obj => {
@@ -414,7 +568,8 @@ export class ConsgMainComponent implements OnInit , OnChanges{
                 } else if (data.Table[0].STATUS == '103') {
                     alert(data.Table[0].STATUSTEXT);
                 }
-            });
+            },
+            () => { this._loaderService.display(false); });
     }
 
     //Air shipment
@@ -1012,6 +1167,7 @@ export class ConsgMainComponent implements OnInit , OnChanges{
     }
 
     submit() {
+        if (this.saving) { return false; }
         //Top validation
         if(this.chblwt==null){
             this._toasterService.toast('error', 'Error', "Please enter chargeble weight.");
@@ -1433,19 +1589,43 @@ export class ConsgMainComponent implements OnInit , OnChanges{
             FK_TERMINALID: (this.loadingportterminal.split("|")[0] != null) ? this.loadingportterminal.split("|")[0] : "",
 
         }
+        // Submit lock (MP): every validation passed, the request is about to leave.
+        this.saving = true;
+        this.saveError = '';
+        this.beforeSave.emit();
+        this.repaint();
         this._loaderService.display(true);
         this._dataService.Common("Export/Exp_Mst_Export_IU", _jsonFinal)
+            .pipe(
+                timeout(120000),
+                finalize(() => { this._loaderService.display(false); this.repaint(); })
+            )
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                if (data.Table[0].STATUS == "100") {
-                    alert("Export Consignment " + data.Table[0]["STATUSTEXT"] + " Gnererated Successfully!");
+                const row = (data && data.Table && data.Table.length) ? data.Table[0] : null;
+                if (row && row.STATUS == "100") {
+                    // saving stays true: we are leaving the page.
+                    this._draft.clear();
+                    // Hand the new export no. to the search page, which pins it to the top
+                    // of its recent list with a "Saved just now" chip (read once, cleared).
+                    this._sharedconsig.justSavedExptno = row["STATUSTEXT"] || '';
+                    alert("Export Consignment " + row["STATUSTEXT"] + " Gnererated Successfully!");
                     this._router.navigate(['export/Consignment/search']);
                 }
                 else
                 {
-                    this._toasterService.toast('error', 'Error',   data.Table[0].STATUSTEXT);
+                    const msg = (row && row.STATUSTEXT) ? String(row.STATUSTEXT) : 'The server did not save the consignment.';
+                    this.saving = false;
+                    this.saveError = msg;
+                    this._toasterService.toast('error', 'Error', msg);
+                    this.repaint();
                 }
-            } );
+            }, (error: any) => {
+                this.saving = false;
+                this.saveError = 'Could not reach the server. Nothing was saved. Your entries are kept, press Submit again.';
+                this._toasterService.toast('error', 'Error', 'Could not reach the server. Nothing was saved.');
+                this.repaint();
+            });
     }
 
     onTypeChange(type) {
@@ -1504,6 +1684,9 @@ export class ConsgMainComponent implements OnInit , OnChanges{
     }
 
     abort() {
+        if (this.saving) { return; }
+        // Abort throws the draft away too; "Keep as draft" is the way out that keeps it.
+        this._draft.clear();
         const _jsonData = {
             status: 'A',
             pagetype: 'MAIN',
@@ -1514,6 +1697,8 @@ export class ConsgMainComponent implements OnInit , OnChanges{
         this._dataService.Common('Export/ExportLogCompleted', _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
+                // Embedded, `start` is the page we are on: the workspace rebuilds a fresh page 1.
+                if (this.embedded) { this.aborted.emit(); return; }
                 this._router.navigate(['export/Consignment/start']);
             },
                 (error) => {

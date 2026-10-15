@@ -1,81 +1,70 @@
-﻿<div class="row">
-	<div class="col-sm-12">
-		<div class="card">
-			<div class="card-body"> 
-				<div class="row">
-					<div class="col-md-2"></div>
-					<div class="col-md-8">
-						
-						
-						<table class="table table-bordered table-sm-new">
-							 
-							<tr>
-								<td>
-									<label class="radio inline">
-										<input type="radio" value="1"   name="rlist" [(ngModel)]="vsllist" /><span class="col-form-span-label ">Vessel Name</span>
-									</label>
-								</td>
-								<td>
-									<input [(ngModel)]="vslName" type="text"  maxlength="15" class="form-control width150" [disabled]="vsllist != '1'"   maxlength="40"  >
-								</td>
-								<td>
-									<span class="col-form-span-label ">Voyage No</span>
-								</td>
-								<td>
-									<input [(ngModel)]="vsl_voyno" type="text"  maxlength="10" [disabled]="vsllist != '1'" class="form-control width150">
-								</td>
-							 
-							</tr>
-							<tr>
-								<td>
-								 	<label class="radio inline">
-										<input type="radio" value="2" [(ngModel)]="vsllist"     name="rlist"/><span class="col-form-span-label ">List Name</span>
-									</label>
-								</td>
-								<td colspan="3">								 
-									<select class="form-control width250" [(ngModel)]="vslcmpName" [disabled]="vsllist != '2'">
-										<option value="-1">Please select</option>
-										@for (d of vessel; track d) {
-<option value={{d.VALUEFILED}}>{{d.VSLNAME}}</option>
-}
-									</select>
-								</td>
-							</tr>
-							<tr>
-								<td colspan="4" class="centerlabel">
-									<button uiBtn variant="default" size="sm"  type="submit" id="btnAgtAdd" name="btnAgtAdd" [disabled]="buttonStatus" (click)="onSearch()" ><span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Search</span></button>
-									
-								</td>	
-							</tr>
-						</table>
-						@if (this.vesselSearch.length>1) {
-<table class="table table-bordered table-sm-new bgwhite">
-								<thead>
-									<tr class="col-form-span-heading" style="white-space:nowrap;">
-										<th class="col-form-span-label">Vessel det</th>
-										<th class="col-form-span-label">Port</th>
-										<th class="col-form-span-label">ETD</th>
-										
-									</tr>
-								</thead>
-								<tbody class="bgwhite">
-									@for (prtAgt of this.vesselSearch; track prtAgt) {
-<tr>
-										<td><span class="col-form-span-label anchor-link" (click)="ListOnclick(prtAgt.VSL_RTNO,prtAgt.PORT)"
-												style="cursor:pointer;">{{prtAgt.VSLNAME}}</span></td>
-				
-										<td class="col-form-span-label">{{prtAgt.PORT}}</td>
-										<td class="col-form-span-label">{{prtAgt.ETD}}</td>
-									   
-									</tr>
-}
-								</tbody>
-							</table>
-}
-						
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	</div>
+﻿<!--
+  Container (Doc Stuffing) - vessel search. Page kit recipe 1
+  (src/styles/kit/import-page.css), ported from MPERPNG-20. The two radio-driven
+  search modes, [(ngModel)] on vsllist / vslName / vsl_voyno / vslcmpName,
+  onSearch() and ListOnclick(VSL_RTNO, PORT) are unchanged. A single match opens
+  the vessel straight away (the .ts navigates), so the list shows two or more.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Vessel search</h1>
+      <p>Find a vessel and voyage to view and stuff its containers</p>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="filters">
+      <div class="f">
+        <label class="opt"><input type="radio" value="1" name="rlist" [(ngModel)]="vsllist" /> Vessel name</label>
+        <input type="text" [(ngModel)]="vslName" [maxlength]="40" [disabled]="vsllist != '1'" placeholder="Vessel name" (keyup.enter)="onSearch()" />
+      </div>
+      <div class="f">
+        <label>Voyage no.</label>
+        <input type="text" [(ngModel)]="vsl_voyno" [maxlength]="10" [disabled]="vsllist != '1'" placeholder="Voyage no." (keyup.enter)="onSearch()" />
+      </div>
+      <div class="f">
+        <label class="opt"><input type="radio" value="2" name="rlist" [(ngModel)]="vsllist" /> From the list</label>
+        <select [(ngModel)]="vslcmpName" [disabled]="vsllist != '2'">
+          <option value="-1">Please select</option>
+          @for (d of vessel; track d) {
+            <option value={{d.VALUEFILED}}>{{d.VSLNAME}}</option>
+          }
+        </select>
+      </div>
+      <div class="f">
+        <button class="btn p" type="submit" id="btnAgtAdd" name="btnAgtAdd" [disabled]="buttonStatus" (click)="onSearch()">Search</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <span class="count">{{ vesselSearch?.length > 1 ? vesselSearch.length : 0 }} vessel(s) found</span>
+      <span class="sub-t">Choose a vessel name to open its containers.</span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Vessel details</th>
+            <th>Port</th>
+            <th>ETD</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (vesselSearch?.length > 1) {
+            @for (prtAgt of vesselSearch; track prtAgt) {
+              <tr>
+                <td><a class="lnk" (click)="ListOnclick(prtAgt.VSL_RTNO,prtAgt.PORT)">{{ prtAgt.VSLNAME }}</a></td>
+                <td>{{ prtAgt.PORT }}</td>
+                <td class="mono">{{ prtAgt.ETD }}</td>
+              </tr>
+            }
+          } @else {
+            <tr><td class="empty" colspan="3">Search by vessel name and voyage no., or pick a vessel from the list.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

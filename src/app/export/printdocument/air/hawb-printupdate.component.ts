@@ -106,6 +106,7 @@ export class PrintDocumentHawbprintupdateComponent implements OnInit {
         };
         this._dataService.getData("Export/hawbnoprintload", _jsonData)
         .subscribe((data: any) => {
+            if (!data || !data.Table || !data.Table.length) { this._loaderService.display(false); return; }
             if (data.Table[0].STATUS == 100) {
                 this.hawbnoList=data.Table;
                 this.HAWBNO=	data.Table[0].HAWBNO  ;
@@ -195,6 +196,7 @@ export class PrintDocumentHawbprintupdateComponent implements OnInit {
         };
         this._dataService.Common("Export/hawbnoprintUpdate", _jsonData)
         .subscribe((data: any) => {
+            if (!data || !data.Table || !data.Table.length) { this._loaderService.display(false); return; }
             if (data.Table[0].STATUS == 100) {
                 //"HAWBNO Details updated successfully
                 this._toasterService.toast('info', 'Complete',`HAWBNO Details updated successfully`);

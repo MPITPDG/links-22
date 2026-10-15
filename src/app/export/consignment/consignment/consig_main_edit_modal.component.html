@@ -1,12 +1,34 @@
-﻿<div bsModal #ConsignmentEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" [config]="{backdrop: 'static'}" >
-  <div class="modal-dialog modal-lg">
-	<div class="modal-content">
-	  <div class="modal-header formheading">
-		<span class="modal-title pull-left">
-			<strong>{{title}}</strong>
+﻿<!--
+  Export consignment - edit drawer (opened from the edit hub). Ported from MPERPNG-20:
+  the bsModal is re-anchored to the right edge as a slide-in drawer; kit header with the
+  editor's icon, title and the Compact/Original rating-layout switch; pinned footer with
+  Abort / Update bottom right. The 17 editors below are unchanged: they keep their
+  Bootstrap table markup and are restyled in place through .x-legacy (recipe R3).
+-->
+<div bsModal #ConsignmentEditModal="bs-modal" class="modal fade cx-modal cx-drawer" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" [config]="{backdrop: 'static'}" >
+  <div class="modal-dialog modal-lg cx-dialog">
+	<div class="modal-content im-page dr-shell">
+	  <div class="dr-head">
+		<img class="dr-icon" [src]="moduleIcon()" alt="" />
+		<div class="dr-titlewrap">
+			<span class="dr-eyebrow">Edit consignment</span>
+			<span class="dr-title">{{title}}</span>
+		</div>
+		@if (isRatingSheet()) {
+		<span class="dr-layout">
+			<span class="dr-layoutnote">Layout: <strong>{{classicRating ? 'Original' : 'Compact'}}</strong></span>
+			<button type="button" class="btn g" (click)="toggleRatingView()">
+				Switch to {{classicRating ? 'Compact' : 'Original'}} layout
+			</button>
 		</span>
+		}
+		<button type="button" class="dr-close" (click)="hide()" aria-label="Close">
+			<i class="fa fa-times" aria-hidden="true"></i>
+		</button>
 	  </div>
-	  <div class="modal-body modal-fix-body">
+	  <!-- x-legacy is what export-legacy-content.css keys every editor's restyle on;
+	       without it the 17 editors below fall back to raw Bootstrap. -->
+	  <div class="dr-body x-legacy">
 			<app-consignment-view [exptno]="exptno" [type]="'VIEW'" [hidden]="(type == 'VIEW')? false : true" #View></app-consignment-view>
 			<app-consignment-main-edit [exptno]="exptno" [type]="'MAIN'" [hidden]="(type == 'MAIN')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #MainEdit></app-consignment-main-edit>
 			<app-consignment-port-edit [exptno]="exptno" [type]="'PORT'" [hidden]="(type == 'PORT')? false : true"  (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #PortEdit></app-consignment-port-edit>
@@ -19,18 +41,21 @@
 			<app-consignment-package-edit [exptno]="exptno" [type]="'PKG'" [hidden]="(type == 'PKG')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #PackageEdit></app-consignment-package-edit>
 			<app-consignment-document-edit [exptno]="exptno" [type]="'DOC'" [hidden]="(type == 'DOC')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #DocumentEdit></app-consignment-document-edit>
 			<app-consignment-consignree-remark-edit [exptno]="exptno" [type]="'CONREMARK'" [hidden]="(type == 'CONREMARK')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #ConsigneeRemarkEdit></app-consignment-consignree-remark-edit>
-			<app-consignment-mawb-edit [exptno]="exptno" [type]="'MAWB'" [hidden]="(type == 'MAWB')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #MawbEdit></app-consignment-mawb-edit>
-			<app-consignment-hawb-edit [exptno]="exptno" [type]="'HAWB'" [hidden]="(type == 'HAWB')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #HawbEdit></app-consignment-hawb-edit>
-			<app-consignment-job-edit [exptno]="exptno" [type]="'EXPJOB'" [hidden]="(type == 'EXPJOB')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #JobEdit></app-consignment-job-edit>
+			<app-consignment-mawb-edit [classicRating]="classicRating" [exptno]="exptno" [type]="'MAWB'" [hidden]="(type == 'MAWB')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #MawbEdit></app-consignment-mawb-edit>
+			<app-consignment-hawb-edit [classicRating]="classicRating" [exptno]="exptno" [type]="'HAWB'" [hidden]="(type == 'HAWB')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #HawbEdit></app-consignment-hawb-edit>
+			<app-consignment-job-edit [classicRating]="classicRating" [exptno]="exptno" [type]="'EXPJOB'" [hidden]="(type == 'EXPJOB' || type == 'JOB')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #JobEdit></app-consignment-job-edit>
 			<app-consignment-orderno-quality-checking-edit [exptno]="exptno" [type]="'QUALITYCHECKING'" [hidden]="(type == 'QUALITYCHECKING')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #QualityChecking></app-consignment-orderno-quality-checking-edit>
 			<app-consignment-cancel-shipemnt [exptno]="exptno" [type]="'CANCEL'" [hidden]="(type == 'CANCEL')? false : true" (result)="onSuccess($event)" (disabledBtn)="onDisabled($event)" #CANCEL ></app-consignment-cancel-shipemnt>
-	  </div>`
-	  <div class="modal-footer">
-		<div class="pull-left">
-		  @if (type != 'VIEW') {
-<button uiBtn variant="default" (click)="updateData()" name="updateButton" #updateButton><app-font-changer [fontIndex]="'4'"></app-font-changer> Update</button>
-}
-		  <button uiBtn variant="outline" (click)="hide()"><i class="fa fa-ban" aria-hidden="true"></i> Abort</button>
+	  </div>
+	  <div class="dr-foot">
+		@if (type != 'VIEW') {
+		<span class="note">Changes are saved to this consignment only when you press Update.</span>
+		}
+		<div class="r">
+			<button type="button" class="btn g" (click)="hide()">Abort</button>
+			@if (type != 'VIEW') {
+			<button type="button" class="btn p" (click)="updateData()" name="updateButton" #updateButton><app-font-changer [fontIndex]="'4'"></app-font-changer> Update</button>
+			}
 		</div>
 	  </div>
 	</div>

@@ -1,1194 +1,1094 @@
-﻿<div class="animated fadeIn">
-	<div class="row">
-      <div class="col-sm-12">
-         <div class="card">
-            <div class="card-header formheading">
-               <strong>{{formheader}}</strong>
-            </div>
-            <div class="card-body">
-				<div class="row">
-				<div class="col-sm-1">
+﻿<!--
+  Export consignment master (ported from MPERPNG-20). Hosted embedded in
+  ConsgWorkspaceComponent (/export/Consignment/start; /main redirects there).
+  Every field is a horizontal row - label in a fixed left column, control to its
+  right. The nine ngx-bootstrap tabs became eight sections (ids cs-main ... cs-marks)
+  all visible on the one page; the workspace section nav scrolls to them.
 
-				</div>
-               <div class="col-sm-10">
-			   <table class="table table-bordered table-striped table-sm-new">
-					<tr>
-						<td  class="col-form-span-label bgyellow" colspan="4">
-							<input type="checkbox" class="col-form-span-label"  name="ExWork" [(ngModel)]="exwork" (ngModelChange)="onTypeChange('E')">
-							EX-WORKS
-						</td>
-						<td  class="col-form-span-label bgyellow" colspan="4">
-							<input type="checkbox" class="col-form-span-label"  name="CustomClr" [(ngModel)]="customclr" (ngModelChange)="onTypeChange('C')">
-							CUSTOMS CLEARANCE
-						</td>
-						<td  class="col-form-span-label bgyellow" colspan="4">
-							<input type="checkbox" class="col-form-span-label"  name="Freightfrd" [(ngModel)]="freightfrd" (ngModelChange)="onTypeChange('F')">
-							FREIGHT FORWARDING
-						</td>
-					</tr>
-					<tr class="title-head">
-						<td colspan="2">
-							<span class="col-form-span-label">Exporter/Shipper </span>
-						</td>
-						<td colspan="10">
-							<span class="col-form-span-label">{{shipper}}</span>
-						</td>
-					</tr>
-					<tr class="title-head">
-						<td colspan="2">
-							<span class="col-form-span-label">Consignee </span>
-						</td>
-						<td colspan="10">
-							<span class="col-form-span-label">{{consignee}}</span>
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2">
-							<span class="col-form-span-label">No.of Packages </span>	<span class="col-form-span-error">*</span>
-						</td>
-						<td colspan="1" class="width60">
-							<input type="text" class="form-control" [(ngModel)]="noofpackages" OnlyNumber="true"/>
-						</td>
-						<td colspan="2">
-							<span class="col-form-span-label">Type of Packages </span>
-						</td>
-						<td colspan="1" class="form-control width100">
-							<ng-select [items]="[{VALUEFIELD: 'PKG', TEXTFIELD: 'PKG'},{VALUEFIELD: 'BUNDLES', TEXTFIELD: 'BUNDLES'},{VALUEFIELD: 'CARTONS', TEXTFIELD: 'CARTONS'},{VALUEFIELD: 'BOXES', TEXTFIELD: 'BOXES'},{VALUEFIELD: 'BASES', TEXTFIELD: 'BASES'},{VALUEFIELD: 'CASES', TEXTFIELD: 'CASES'},{VALUEFIELD: 'PALLETS', TEXTFIELD: 'PALLETS'},{VALUEFIELD: 'ROLL', TEXTFIELD: 'ROLL'},{VALUEFIELD: 'BALES', TEXTFIELD: 'BALES'},{VALUEFIELD: 'DRUMS', TEXTFIELD: 'DRUMS'},{VALUEFIELD: 'CABLE', TEXTFIELD: 'CABLE'},{VALUEFIELD: 'PACKS', TEXTFIELD: 'PACKS'},{VALUEFIELD: 'NOS', TEXTFIELD: 'NOS'},{VALUEFIELD: 'CRATES', TEXTFIELD: 'CRATES'},{VALUEFIELD: 'BAGS', TEXTFIELD: 'BAGS'},{VALUEFIELD: 'TANKS', TEXTFIELD: 'TANKS'}]"
-									   bindLabel="TEXTFIELD"
-									   bindValue="VALUEFIELD"
+  Links-only kept: Calculate CBM button + modal (CalcbmModal / changevolume),
+  Volume (CBM) locked unless SEA, gross weight without the CHBL blur, the
+  hard-coded incoterm list (FOB / CIF / C&F / C&I), freight select not locked by
+  incoterm, Sub Agent row. Links hides Gri No / Gri Date, DEEC book, Exp/Imp book,
+  exempted material, group code, SION, duty and cess (commented out in Links), so
+  they stay hidden here.
+-->
+<div class="cs-main">
 
-									   [(ngModel)]="typeofpackages"
-
-									   >
-							</ng-select>
-						</td>
-						<td colspan="2">
-							<span class="col-form-span-label">No.of Pieces </span>	<span class="col-form-span-error">*</span>
-						</td>
-						<td colspan="1" class="width60">
-							<input type="text" class="form-control" [(ngModel)]="noofpieces" OnlyNumber="true"/>
-						</td>
-						<td colspan="2">
-							<span class="col-form-span-label">Type of Pieces </span>
-						</td>
-						<td colspan="1" class="width100">
-							<ng-select [items]="[{VALUEFIELD: 'PIECES', TEXTFIELD: 'PIECES'},{VALUEFIELD: 'SETS', TEXTFIELD: 'SETS'},{VALUEFIELD: 'DOZENS', TEXTFIELD: 'DOZENS'},{VALUEFIELD: 'PAIRS', TEXTFIELD: 'PAIRS'},{VALUEFIELD: 'BOXES', TEXTFIELD: 'BOXES'},{VALUEFIELD: 'NOS', TEXTFIELD: 'NOS'},{VALUEFIELD: 'UNIT', TEXTFIELD: 'UNIT'},{VALUEFIELD: 'LOTS', TEXTFIELD: 'LOTS'},{VALUEFIELD: 'MTR', TEXTFIELD: 'MTR'},{VALUEFIELD: 'PACK', TEXTFIELD: 'PACK'},{VALUEFIELD: 'KGS', TEXTFIELD: 'KGS'},{VALUEFIELD: 'KGS/MTRS', TEXTFIELD: 'KGS/MTRS'},{VALUEFIELD: 'PCS/PAIR', TEXTFIELD: 'PCS/PAIR'},{VALUEFIELD: 'SQ.MTRS', TEXTFIELD: 'SQ.MTRS'},{VALUEFIELD: 'PCS/SETS', TEXTFIELD: 'PCS/SETS'},{VALUEFIELD: 'EA', TEXTFIELD: 'EA'},{VALUEFIELD: 'PCS/PAIR/KGS', TEXTFIELD: 'PCS/PAIR/KGS'},{VALUEFIELD: 'AMPOULES', TEXTFIELD: 'AMPOULES'},{VALUEFIELD: 'MT', TEXTFIELD: 'MT'},{VALUEFIELD: 'MATS', TEXTFIELD: 'MATS'},{VALUEFIELD: 'CASES', TEXTFIELD: 'CASES'}]"
-									   bindLabel="TEXTFIELD"
-									   bindValue="VALUEFIELD"
-
-									   [(ngModel)]="typeofpieces"
-									   class="form-control"
-									   >
-							</ng-select>
-						</td>
-					</tr>
-					<tr>
-						<td colspan="12">
-
-						</td>
-					</tr>
-					<tr>
-						<td colspan="12">
-
-						</td>
-					</tr>
-					<tr>
-						<td colspan="12">
-						</td>
-					</tr>
-				</table>
-                  <!-- Nav tabs -->
-                  <tabset>
-                     <tab customClass="ngx-tab-style">
-                        <ng-template tabHeading><span class="title-head"><u>#Main</u></span></ng-template>
-                        <table class="table table-bordered table-sm-new">
-                           <tr>
-                              <td class="col-form-span-heading" colspan="4">
-                                 EXPORTER DETAILS
-                              </td>
-                           </tr>
-                           <tr>
-                              <td class="width180">
-                                 <span class="col-form-span-label">Exporter/Shipper</span>
-                              </td>
-                              <td colspan="3">
-                                  <span class="col-form-span-label">{{lblshipper}}</span>
-                              </td>
-                           </tr>
-                           <tr>
-                              <td class="width180">
-                                 <span class="col-form-span-label">Bill To</span>
-                              </td>
-                              <td  colspan="3">
-                                 <span class="col-form-span-label">{{lblbillto}}</span>
-                              </td>
-                           </tr>
-                           <tr>
-                              <td class="width180">
-                                 <span class="col-form-span-label">Manufacturer</span>
-                              </td>
-                              <td colspan="3">
-                                  <span class="col-form-span-label">{{lblmanufacturer}}</span>
-                              </td>
-                           </tr>
-						   <tr>
-                              <td class="width180">
-                                 <span class="col-form-span-label">Agent</span>
-                              </td>
-                              <td colspan="3">
-                                  <span class="col-form-span-label">{{lblagent}}</span>
-                              </td>
-                           </tr>
-						   <!-- <tr *ngIf="City=='DAC'">
-                              <td class="width180">
-                                 <span class="col-form-span-label">Sub Agent</span>
-                              </td>
-                              <td colspan="3">
-                                  <span class="col-form-span-label">{{lblsubagent}}</span>
-                              </td>
-						   </tr> -->
-						     <tr>
-                              <td class="width180">
-                                 <span class="col-form-span-label">Sub Agent</span>
-                              </td>
-                              <td colspan="3">
-                                  <span class="col-form-span-label">{{lblsubagent}}</span>
-                              </td>
-                           </tr>
-                           <tr>
-                              <td class="width180">
-                                 <span class="col-form-span-label">Consignee</span>
-                              </td>
-                              <td colspan="3">
-                                  <span class="col-form-span-label">{{lblconsignee}}</span>
-                              </td>
-                           </tr>
-                           <tr>
-                              <td class="width180">
-                                 <span class="col-form-span-label">If consigned to bank</span>
-                              </td>
-                              <td colspan="3">
-                                  <span class="col-form-span-label">{{lblifcontobank}}</span>
-                              </td>
-                           </tr>
-                           <tr>
-                              <td class="width180">
-                                 <span class="col-form-span-label">Buyer Name</span>
-                              </td>
-                              <td colspan="3">
-                                  <span class="col-form-span-label">{{lblbuyername}}</span>
-                              </td>
-                           </tr>
-                           <tr>
-                              <td class="width180">
-                                 <span class="col-form-span-label">Sourcing Agent</span>
-                              </td>
-                              <td colspan="3">
-								  <ng-select [items]="sourcingagents"
-											   bindLabel="TEXTFIELD"
-											   bindValue="VALUEFIELD"
-
-											   [(ngModel)]="lblsourceagent"
-											   class="form-control"
-											   >
-									</ng-select>
-                              </td>
-									</tr>
-
-                        </table>
-                     </tab>
-                     <tab customClass="ngx-tab-style">
-                        <ng-template tabHeading>
-							@if (isvisiblevessel != null) {
-<span class="title-head"><u>#Vessel/Port/Goods</u></span>
-}
-							@if (isvisiblevessel == null) {
-<span class="title-head"><u>#Air/Port/Goods</u></span>
-}
-						</ng-template>
-                        @if (isvisiblevessel != null) {
-<table class="table table-bordered table-sm-new">
-                           <tbody>
-							  <tr>
-                                 <td class="col-form-span-heading" colspan="4">VESSEL DETAILS
-								</td>
-                              </tr>
-							  <tr class="title-head">
-                                 <td class="width150"><span class="col-form-span-label">Vessel Name </span> </td>
-                                 <td colspan="2"><span class="col-form-span-label">{{vesselname}}</span></td>
-                                 <td class="width200"></td>
-                              </tr>
-							  <tr>
-                                 <td class="width150"><span class="col-form-span-label">Agent Name </span><span class="col-form-span-error">*</span> </td>
-                                 <td  colspan="2">
-									<ng-select [items]="agentsname"
-											   bindLabel="TEXTFIELD"
-											   bindValue="VALUEFIELD"
-
-											   [(ngModel)]="agentname"
-											   class="form-control"
-											   >
-									</ng-select>
-								</td>
-                                 <td class="width200"></td>
-                              </tr>
-							</tbody>
-						</table>
-}
-						@if (isvisiblevessel == null) {
-<table class="table table-bordered table-sm-new">
-                           <tbody>
-                              <tr>
-                                 <td class="col-form-span-heading" colspan="4">AIR SHIPMENT DETAILS</td>
-                              </tr>
-                              <tr>
-                                 <td class="width150"><span class="col-form-span-label">Carting Date</span> </td>
-                                 <td><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="cartingdt" [disabled]="true"></my-date-picker></td>
-                                 <td class="width150"><span class="col-form-span-label">Prealert Sent On.</span> </td>
-                                 <td><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="prealertsentdt" [disabled]="true"></my-date-picker></td>
-                              </tr>
-							  <tr>
-                                 <td class="width150"><span class="col-form-span-label">Airline Name</span> </td>
-                                 <td colspan="3"><input type="text" [(ngModel)]="airlinename" class="form-control"/></td>
-                              </tr>
-							  <tr>
-                                 <td class="width150"><span class="col-form-span-label">Planned Flight No.</span> </td>
-                                 <td><input type="text" [(ngModel)]="plannedfltno" class="form-control"/></td>
-                                 <td class="width150"><span class="col-form-span-label">Date</span> </td>
-                                 <td><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="plannedfltdt"></my-date-picker></td>
-                              </tr>
-							  <tr>
-                                 <td class="width150"><span class="col-form-span-label">Actual Flight No.</span> </td>
-                                 <td><input type="text" [(ngModel)]="actualfltno" class="form-control"/></td>
-                                 <td class="width150"><span class="col-form-span-label">Date</span> </td>
-                                 <td><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="actualfltdt"></my-date-picker></td>
-                              </tr>
-							  <tr>
-                                 <td class="width150"><span class="col-form-span-label">MAWB No.</span> </td>
-                                 <td><input type="text" [(ngModel)]="mawbno" class="form-control" [disabled]="true"/></td>
-                                 <td class="width150"><span class="col-form-span-label">MAWB Date</span> </td>
-                                 <td><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="mawbdt"  [disabled]="true"></my-date-picker></td>
-                              </tr>
-							  <tr>
-                                 <td class="width150"><span class="col-form-span-label">MAWB Destination</span></td>
-                                 <td class="width230">
-									<ng-select [items]="commoncities"
-											   bindLabel="CITY_COUNTRY"
-											   bindValue="CITY_CODE"
-
-											   [(ngModel)]="mawbdest"
-											   class="form-control"
-											   >
-									</ng-select>
-								 </td>
-                                 <td class="width150"><span class="col-form-span-label">MAWB Freight</span> </td>
-                                 <td class="width230">
-									<ng-select [items]="[{VALUEFIELD: 'PP', TEXTFIELD: 'PP'},{VALUEFIELD: 'CC', TEXTFIELD: 'CC'}]"
-											   bindLabel="TEXTFIELD"
-											   bindValue="VALUEFIELD"
-
-											   [(ngModel)]="mawbfreight"
-											   class="form-control"
-											   >
-									</ng-select>
-								 </td>
-                              </tr>
-							  <tr>
-                                 <td class="width150"><span class="col-form-span-label">House AWB No.</span> </td>
-                                 <td><input type="text" [(ngModel)]="houseawbno" class="form-control" [disabled]="true"/></td>
-                                 <td class="width150"><span class="col-form-span-label">Date</span> </td>
-                                 <td><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="houseawbdt" [disabled]="true"></my-date-picker></td>
-                              </tr>
-							  <tr>
-                                 <td class="width150"></td>
-                                 <td colspan="3" class="width150">
-									<input type="radio" name="TransType" [checked]="transtype == 'Direct'" value="Direct"  (click)="transType('Direct')"/><span class="col-form-span-label">Direct</span>
-									<input type="radio" name="TransType" [checked]="transtype == 'Trans'" value="Trans" (click)="transType('Trans')"/><span class="col-form-span-label">Transhipment</span>
-								</td>
-                              </tr>
-							  <tr>
-                                 <td class="width150"><span class="col-form-span-label">Transhipment Port1</span>   </td>
-                                 <td>
-									<ng-select [items]="commoncities"
-											   bindLabel="CITY_COUNTRY"
-											   bindValue="CITY_CODE"
-
-											   [(ngModel)]="transportone"
-											   class="form-control"
-											   [disabled]="transtype == 'Direct'"
-											   >
-									</ng-select>
-								 </td>
-                                 <td class="width150"><span class="col-form-span-label">Transhipment Port2</span> </td>
-                                 <td>
-									<ng-select [items]="commoncities"
-											   bindLabel="CITY_COUNTRY"
-											   bindValue="CITY_CODE"
-
-											   [(ngModel)]="transporttwo"
-											   class="form-control"
-											   [disabled]="transtype == 'Direct'"
-											   >
-									</ng-select>
-								 </td>
-                              </tr>
-							  <tr>
-                                 <td class="width150"><span class="col-form-span-label">Flight No.</span> </td>
-                                 <td><input type="text" [(ngModel)]="fltno1" class="form-control"/></td>
-                                 <td class="width150"><span class="col-form-span-label">Flight No.</span> </td>
-                                 <td><input type="text" [(ngModel)]="fltno2" class="form-control"/></td>
-                              </tr>
-							  <tr>
-                                 <td class="width150"><span class="col-form-span-label">ETD</span></td>
-                                 <td><my-date-picker name="etdonedt" [options]="myDatePickerOptions" [(ngModel)]="etdonedt" [disabled]="transtype == 'Direct'"></my-date-picker></td>
-                                 <td class="width150"><span class="col-form-span-label">ETD</span></td>
-                                 <td><my-date-picker name="etdtwodt" [options]="myDatePickerOptions" [(ngModel)]="etdtwodt" [disabled]="transtype == 'Direct'"></my-date-picker></td>
-                              </tr>
-							  <tr>
-                                 <td class="width150"><span class="col-form-span-label">ETA</span></td>
-                                 <td><my-date-picker name="etaonedt" [options]="myDatePickerOptions" [(ngModel)]="etaonedt"></my-date-picker></td>
-                                 <td class="width150"><span class="col-form-span-label">ETA</span></td>
-                                 <td><my-date-picker name="etatwodt" [options]="myDatePickerOptions" [(ngModel)]="etatwodt" [disabled]="transtype == 'Direct'"></my-date-picker></td>
-                              </tr>
-							</tbody>
-						</table>
-}
-						<table class="table table-bordered table-sm-new">
-                           <tbody>
-							  <tr>
-                                 <td class="col-form-span-heading" colspan="4">PORT DETAILS </td>
-                              </tr>
-							  <tr>
-                                 <td class="width100"><span class="col-form-span-label">Loading Port</span> </td>
-                                 <!-- <td><input type="text" [(ngModel)]="loadingport" class="form-control"/></td> -->
-								 <td>
-									<ng-select [items]="commoncities"
-											   bindLabel="CITY_NAME"
-											   bindValue="CITY_CODE"
-											   [(ngModel)]="loadingport"
-											   class="form-control"
-											   (change)="GetTerminal(loadingport)"
-											   >
-									</ng-select>
-								 </td>
-                                 <td class="width100"><span class="col-form-span-label">Terminal</span> </td>
-                                 <td>
-									<ng-select [items]="portterminal"
-											   bindLabel="TERMINAL"
-											   bindValue="ID"
-											   [(ngModel)]="loadingportterminal"
-											   class="form-control"
-
-											   >
-									</ng-select>
-								 </td>
-                              </tr>
-							  <tr>
-								<td class="width150"><span class="col-form-span-label">Carting Place</span> </td>
-								<td colspan="3"><input type="text" [(ngModel)]="cartingplace" class="form-control"/></td>
-
-							  </tr>
-							  <tr>
-                                 <td class="width150"><span class="col-form-span-label">Port of Discharge</span>  </td>
-                                 <td>
-									<ng-select [items]="commoncities"
-											   bindLabel="CITY_NAME"
-											   bindValue="CITY_CODE"
-
-											   [(ngModel)]="podchrg"
-											   class="form-control"
-											   (change)="chgPortDischarge(podchrg)"
-											   >
-									</ng-select>
-								 </td>
-                                 <td class="width150"><span class="col-form-span-label">I / T</span> </td>
-                                 <td>
-									<ng-select [items]="[{VALUEFIELD:'I/T', TEXTFIELD:'I/T'}]"
-											   bindLabel="TEXTFIELD"
-											   bindValue="VALUEFIELD"
-
-											   [(ngModel)]="portit"
-											   class="form-control"
-											   >
-									</ng-select>
-								 </td>
-                              </tr>
-							  <tr>
-                                 <td class="width150"><span class="col-form-span-label">Dest. City/Country</span></td>
-								 <td colspan="3">
-									<ng-select [items]="commoncities"
-											   bindLabel="CITY_COUNTRY"
-											   bindValue="CITY_CODE"
-
-											   [(ngModel)]="destcity"
-											   class="form-control"
-											   >
-									</ng-select>
-								 </td>
-                              </tr>
-							</tbody>
-						</table>
-						<table class="table table-bordered table-sm-new">
-                           <tbody>
-							  <tr>
-								 <td class="col-form-span-heading" colspan="3">GOODS DETAILS </td>
-								 <td >
-									<button type="button" align="right" uiBtn variant="default" size="sm"  [disabled]='disablecalcbmbtn' (click)="CalcbmModal()"><span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Calculate CBM</span></button>
-									</td>
-                              </tr>
-							  <tr>
-                                 <td class="width150"><span class="col-form-span-label">Shipper Gross Weight</span><span class="col-form-span-error">*</span></td>
-								 <td><input type="text" [(ngModel)]="shprgrosswt" class="form-control" OnlyNumber="true"/></td>
-								 <td class="width150"><span class="col-form-span-label">Gross Weight</span><span class="col-form-span-error">*</span></td>
-								 <!-- <td><input type="text" [(ngModel)]="grosswt" class="form-control" OnlyNumber="true" (blur)="calculateCHBL(grosswt)"/></td> -->
-								 <td><input type="text" [(ngModel)]="grosswt" class="form-control" OnlyNumber="true" /></td>
-
-                              </tr>
-							  <tr>
-                                <td class="width150"><span class="col-form-span-label">Shipper Volume</span> </td>
-								 <td><input type="text" [(ngModel)]="shprvolume" class="form-control" OnlyNumber="true"/></td>
-								 <td class="width150"><span class="col-form-span-label">Net Weight</span><span class="col-form-span-error">*</span></td>
-								 <td><input type="text" [(ngModel)]="netwt" class="form-control" OnlyNumber="true"/></td>
-
-
-                              </tr>
-							  <tr>
-								<td class="width150"><span class="col-form-span-label">Volume(CBM)</span><span class="col-form-span-error">*</span></td>
-								<td><input type="text" [disabled]="modetype!='SEA'" [(ngModel)]="volume" class="form-control" OnlyNumber="true"  (blur)="calculateCHBL(grosswt)"/></td> 
-								<!-- <td><input type="text" disabled [(ngModel)]="volume" class="form-control" OnlyNumber="true" /></td> -->
-
-								 <td class="width150"><span class="col-form-span-label">CHBL Weight</span> </td>
-                                 <td><input type="text" disabled [(ngModel)]="chblwt" class="form-control" OnlyNumber="true" disabled/></td>
-                              </tr>
-							  <!-- <tr>
-                                 <td class="width150"><span class="col-form-span-label">Freight</span> </td>
-                                 <td>
-									<ng-select [items]="[{VALUEFIELD: 'PP', TEXTFIELD: 'PP'},{VALUEFIELD: 'CC', TEXTFIELD: 'CC'}]"
-											   bindLabel="TEXTFIELD"
-											   bindValue="VALUEFIELD"
-											   placeholder="--Select--"
-											   [(ngModel)]="frieght"
-											   class="form-control"
-											   >
-									</ng-select>
-								 </td>
-
-                              </tr> -->
-							  <tr>
-                                 <td class="width150"><span class="col-form-span-label">Remarks</span> </td>
-                                 <td colspan="3"><textarea rows="2" class="form-control" [(ngModel)]="goodsremark"></textarea></td>
-                              </tr>
-                           </tbody>
-                        </table>
-                     </tab>
-                     <tab customClass="ngx-tab-style">
-                        <ng-template tabHeading><span class="title-head"><u>#Invoice</u></span></ng-template>
-							<table class="table table-bordered table-sm-new">
-							   <tbody>
-								  <tr>
-									 <td class="col-form-span-heading" colspan="6">EXPORTER'S INVOICE DETAIL</td>
-								  </tr>
-								  <tr>
-									 <td class="width150"><span class="col-form-span-label">Doc Recd. Date <span class="col-form-span-error">*</span></span> </td>
-									 <td colspan="2"><my-date-picker name="mydate3" [options]="myDocPickerOptions" [(ngModel)]="docrecdt" ></my-date-picker></td>
-									 <td class="width150"><span class="col-form-span-label"></span> </td>
-									 <td colspan="2"></td>
-								  </tr>
-							<!-- <tr>
-									 <td class="width150"><span class="col-form-span-label">Gri No </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="grino" class="form-control"/></td>
-									 <td class="width150"><span class="col-form-span-label">Gri Date </span> </td>
-									 <td colspan="2"><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="gridt" required></my-date-picker></td>
-								  </tr> -->
-								   <tr>
-									 <td class="width150"><span class="col-form-span-label">Exporter Inv no.<span class="col-form-span-error">*</span></span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="expinvno" class="form-control"/></td>
-									 <td class="width150"><span class="col-form-span-label">Inv Date<span class="col-form-span-error">*</span></span> </td>
-									 <td colspan="2"><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="exptinvdt" required></my-date-picker></td>
-								  </tr>
-								   <tr>
-
-									 <td class="width150"><span class="col-form-span-label">Currency  </span> </td>
-									 <td colspan="2">
-										<!-- <ng-select [items]="commoncurrencies"
-												   bindLabel="TEXTFIELD"
-												   bindValue="VALUEFIELD"
-												   placeholder="--Select--"
-												   [(ngModel)]="currency"
-												   class="form-control"
-												   (change)="changeCurrency(currency)"
-												   >
-										</ng-select> -->
-
-									<select class="form-control width150"   [(ngModel)]="currency"  (change)="changeCurrency(currency)">
-											<option value="0">Please select</option>
-											@for (d of commoncurrencies; track d) {
-<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
-}
-										</select>
-									 </td>
-									 <td class="width150"><span class="col-form-span-label">Currency Rate  </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="currencyrate" OnlyNumber="true" class="form-control" [disabled]="currency== 'CR115'"/></td>
-
-									 <!--  -->
-								  </tr>
-								   <tr>
-									  <td class="width150"><span class="col-form-span-label">INR Rate </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="inrrate" OnlyNumber="true"  class="form-control" [disabled]="currency== 'CR115'"/></td>
-									 <td class="width150"><span class="col-form-span-label"></span> </td>
-									 <td colspan="2"></td>
-								  </tr>
-								   <tr>
-									    <td class="width150"><span class="col-form-span-label">Incoterm </span> </td>
-									 <td colspan="2">
-										<ng-select [items]="[{VALUEFIELD: 'FOB', TEXTFIELD: 'FOB'},{VALUEFIELD: 'CIF', TEXTFIELD: 'CIF'},{VALUEFIELD: 'C&F', TEXTFIELD: 'C&F'},{VALUEFIELD: 'C&I', TEXTFIELD: 'C&I'}]"
-												   bindLabel="TEXTFIELD"
-												   bindValue="VALUEFIELD"
-
-												   [(ngModel)]="incoterm"
-												   class="form-control"
-												   (change)="changeIncoterm(incoterm)"
-												   >
-										</ng-select>
-									</td>
-										<td class="width150"><span class="col-form-span-label">Freight</span> </td>
-										<td colspan="2">
-										   <select class="form-control width150"  [(ngModel)]="frieght"  (change)="changefreight(frieght)" >
-												<option value="PP">PP</option>
-												<option value="CC">CC</option>
-											</select>
-										</td>
-
-
-								  </tr>
-								   <tr>
-									    <td class="width150"><span class="col-form-span-label">Invoice Amount<span class="col-form-span-error">*</span></span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="invamt" OnlyNumber="true"  class="form-control" (keyup)="calculateFOBMarket()"/></td>
-									 <td class="width150"><span class="col-form-span-label">Frieght Charges </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="frtchrgs" OnlyNumber="true" (keyup)="calculateFOBMarket()" class="form-control" [disabled]="incoterm== 'FOB' || incoterm== 'C&I'"/></td>
-
-								  </tr>
-								   <tr>
-									 <td class="width150"><span class="col-form-span-label">Insurance Amount </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="insuramt" OnlyNumber="true" (keyup)="calculateFOBMarket()" class="form-control" [disabled]="incoterm== 'FOB' || incoterm== 'C&F'"/></td>
-									 <td class="width150"><span class="col-form-span-label">Discount </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="discount" OnlyNumber="true" class="form-control"/></td>
-
-								  </tr>
-								   <tr>
-									<td class="width150"><span class="col-form-span-label">Packing & Others </span> </td>
-									<td colspan="2"><input type="text" [(ngModel)]="pkgothrs" OnlyNumber="true" class="form-control"/></td>
-									 <td class="width150"><span class="col-form-span-label">Commission </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="commission" OnlyNumber="true" class="form-control"/></td>
-								  </tr>
-								   <tr>
-									 <td class="width150"><span class="col-form-span-label">Commission Paid to </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="commissionpaidto" class="form-control"/></td>
-									 <td class="width150"><span class="col-form-span-label">Address1 </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="addrsone" class="form-control"/></td>
-
-								  </tr>
-								   <tr>
-									<td class="width150"><span class="col-form-span-label">Address2 </span> </td>
-									<td colspan="2"><input type="text" [(ngModel)]="addrstwo" class="form-control"/></td>
-									 <td class="width150"><span class="col-form-span-label">Nature of Payment </span> </td>
-									 <td colspan="2">
-										<ng-select [items]="[{VALUEFIELD: '(LC)Letter of credit', TEXTFIELD: '(LC)Letter of credit'},{VALUEFIELD: '(DA)Delivery against acceptance', TEXTFIELD: '(DA)Delivery against acceptance'},{VALUEFIELD: '(DP)Delivery against payment', TEXTFIELD: '(DP)Delivery against payment'},{VALUEFIELD: '(AP)Advance payment', TEXTFIELD: '(AP)Advance payment'},{VALUEFIELD: '(NA)Not applicable', TEXTFIELD: '(NA)Not applicable'}]"
-												   bindLabel="TEXTFIELD"
-												   bindValue="VALUEFIELD"
-
-												   [(ngModel)]="natureofpayment"
-												   class="form-control"
-												   >
-										</ng-select>
-									 </td>
-									 <!-- <td class="width150"><span class="col-form-span-label"></span> </td>
-									 <td colspan="2"></td> -->
-								  </tr>
-								   <tr>
-									 <td class="width150"><span class="col-form-span-label">Other Deduction </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="othrdeduction" OnlyNumber="true" class="form-control"/></td>
-									 <td class="width150"><span class="col-form-span-label">Remark </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="remark" class="form-control"/></td>
-								  </tr>
-								  <tr>
-									<td class="col-form-span-heading" colspan="6">&nbsp;</td>
-								   </tr>
-								   <tr>
-									 <td class="width150"><span class="col-form-span-label">FOB INR </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="fobinr" class="form-control" OnlyNumber="true" disabled/></td>
-									 <td class="width150"><span class="col-form-span-label">Market Value </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="marketval" class="form-control" OnlyNumber="true" disabled/></td>
-								  </tr>
-								   <tr>
-									 <td class="width150"><span class="col-form-span-label">Type of Shipping Bill </span> </td>
-									 <td colspan="5">
-										<ng-select [items]="[{VALUEFIELD: 'FREE', TEXTFIELD: 'FREE'},{VALUEFIELD: 'DEEC', TEXTFIELD: 'DEEC'},{VALUEFIELD: 'DEPB', TEXTFIELD: 'DEPB'},{VALUEFIELD: 'DBK', TEXTFIELD: 'DBK'},{VALUEFIELD: 'DEEC DBK', TEXTFIELD: 'DEEC DBK'},{VALUEFIELD: 'DUTY', TEXTFIELD: 'DUTY'},{VALUEFIELD: 'EOU/EX.BOND', TEXTFIELD: 'EOU/EX.BOND'},{VALUEFIELD: 'DFRC', TEXTFIELD: 'DFRC'},{VALUEFIELD: 'DFRC DEPB', TEXTFIELD: 'DFRC DEPB'},{VALUEFIELD: 'DFRC DRAWBACK', TEXTFIELD: 'DFRC DRAWBACK'},{VALUEFIELD: 'DEPB CUM DRAWBACK', TEXTFIELD: 'DEPB CUM DRAWBACK'}]"
-												   bindLabel="TEXTFIELD"
-												   bindValue="VALUEFIELD"
-
-												   [(ngModel)]="typeshpnbill"
-												   class="form-control"
-												   (change)="changeddInvoiceShipType(typeshpnbill)"
-												   >
-										</ng-select>
-									 </td>
-								  </tr>
-								  <tr>
-									 <td class="width150"><span class="col-form-span-label">Value Addition % </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="valueaddition" class="form-control" OnlyNumber="true" [disabled]="typeshpnbill != 'EOU/EX.BOND'"/></td>
-									 <td class="width150"><span class="col-form-span-label">Amount </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="valueamt" class="form-control" OnlyNumber="true" [disabled]="typeshpnbill != 'EOU/EX.BOND'"/></td>
-								  </tr>
-								   <tr>
-									 <td class="width150" colspan="6">
-										<span class="col-form-span-label">
-											<input type="radio" name="InvShipType" [checked]="invshiptype == 'Provisional'" value="Provisional" (click)="changerbInvoiceShipType('Provisional')" [disabled]="typeshpnbill == 'FREE' || typeshpnbill == 'DBK' || typeshpnbill == 'DUTY' || typeshpnbill == 'EOU/EX.BOND' || typeshpnbill == 'DFRC' || typeshpnbill == 'DFRC DEPB' || typeshpnbill == 'DFRC DRAWBACK' || typeshpnbill == 'DEPB CUM DRAWBACK'"/>Provisional
-										</span>
-									</td>
-								  </tr>
-								   <tr>
-									 <td class="width150"><span class="col-form-span-label">Receipt No. </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="receiptno" class="form-control" [disabled]="invshiptype != 'Provisional'"/></td>
-									 <td class="width150"><span class="col-form-span-label">Date </span> </td>
-									 <td colspan="2"><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="receiptdt" [disabled]="invshiptype != 'Provisional'"></my-date-picker></td>
-								  </tr>
-								   <!-- <tr>
-									 <td class="width150" colspan="6"><span class="col-form-span-label"><input type="radio" name="InvShipType" [checked]="invshiptype == 'DEEC'" value="DEEC" (click)="changerbInvoiceShipType('DEEC')" [disabled]="typeshpnbill == 'FREE' || typeshpnbill == 'DBK' || typeshpnbill == 'DUTY' || typeshpnbill == 'EOU/EX.BOND' || typeshpnbill == 'DFRC' || typeshpnbill == 'DFRC DEPB' || typeshpnbill == 'DFRC DRAWBACK' || typeshpnbill == 'DEPB CUM DRAWBACK'"/>DEEC Book  </span> </td>
-								  </tr>
-								   <tr>
-									 <td class="width150"><span class="col-form-span-label">Book No. </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="bookno" class="form-control" [disabled]="invshiptype != 'DEEC'"/></td>
-									 <td class="width150"><span class="col-form-span-label">Date </span> </td>
-									 <td colspan="2"><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="bookdt" [disabled]="invshiptype != 'DEEC'"></my-date-picker></td>
-								  </tr>
-								   <tr>
-									 <td class="width150"><span class="col-form-span-label">Advance Licence No  </span> </td>
-									 <td colspan="5"><input type="text" [(ngModel)]="advlicenceno" class="form-control" [disabled]="invshiptype != 'DEEC'"/></td>
-								  </tr>
-								   <tr>
-									 <td class="width150" colspan="6"><span class="col-form-span-label"><input type="radio" name="InvShipType" [checked]="invshiptype == 'Book'" value="Book" (click)="changerbInvoiceShipType('Book')" [disabled]="typeshpnbill == 'FREE' || typeshpnbill == 'DBK' || typeshpnbill == 'DUTY' || typeshpnbill == 'EOU/EX.BOND' || typeshpnbill == 'DFRC' || typeshpnbill == 'DFRC DEPB' || typeshpnbill == 'DFRC DRAWBACK' || typeshpnbill == 'DEPB CUM DRAWBACK'"/>Exp/Imp Book  </span> </td>
-								  </tr>
-								   <tr>
-									 <td class="width150"><span class="col-form-span-label">Passbook No. </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="passbookno" class="form-control" [disabled]="invshiptype != 'Book'"/></td>
-									 <td class="width150"><span class="col-form-span-label">Date </span> </td>
-									 <td colspan="2"><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="passbookdt"  [disabled]="invshiptype != 'Book'"></my-date-picker></td>
-								  </tr>
-								   <tr>
-									 <td class="width150"><span class="col-form-span-label">Exempted Material Value </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="emvone" class="form-control" OnlyNumber="true" [disabled]="typeshpnbill == 'FREE' || typeshpnbill == 'DBK' || typeshpnbill == 'DUTY' || typeshpnbill == 'EOU/EX.BOND' || typeshpnbill == 'DFRC' || typeshpnbill == 'DFRC DEPB' || typeshpnbill == 'DFRC DRAWBACK' || typeshpnbill == 'DEPB CUM DRAWBACK'"/></td>
-									 <td class="width150"><input type="text" [(ngModel)]="emvtwo" class="form-control" OnlyNumber="true" [disabled]="typeshpnbill == 'FREE' || typeshpnbill == 'DBK' || typeshpnbill == 'DUTY' || typeshpnbill == 'EOU/EX.BOND' || typeshpnbill == 'DFRC' || typeshpnbill == 'DFRC DEPB' || typeshpnbill == 'DFRC DRAWBACK' || typeshpnbill == 'DEPB CUM DRAWBACK'"/></td>
-									 <td colspan="2"><input type="text" [(ngModel)]="emvthree" class="form-control" OnlyNumber="true" [disabled]="typeshpnbill == 'FREE' || typeshpnbill == 'DBK' || typeshpnbill == 'DUTY' || typeshpnbill == 'EOU/EX.BOND' || typeshpnbill == 'DFRC' || typeshpnbill == 'DFRC DEPB' || typeshpnbill == 'DFRC DRAWBACK' || typeshpnbill == 'DEPB CUM DRAWBACK'"/></td>
-								  </tr>
-								   <tr>
-									 <td class="width150"><span class="col-form-span-label">Group Code </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="groupcode" class="form-control" [disabled]="typeshpnbill != 'DEPB'"/></td>
-									 <td class="width150"><span class="col-form-span-label">SION No. </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="sionno" class="form-control" [disabled]="typeshpnbill != 'DEPB'"/></td>
-								  </tr>
-								   <tr>
-									 <td class="width150"><span class="col-form-span-label">Duty % </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="dutyper" class="form-control" OnlyNumber="true" [disabled]="typeshpnbill != 'DUTY'"/></td>
-									 <td class="width150"><span class="col-form-span-label">Duty Amount </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="dutyamt" class="form-control" OnlyNumber="true" [disabled]="typeshpnbill != 'DUTY'"/></td>
-								  </tr>
-								   <tr>
-									 <td class="width150"><span class="col-form-span-label">Cess % </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="cssper" class="form-control" OnlyNumber="true" [disabled]="typeshpnbill != 'DUTY'"/></td>
-									 <td class="width150"></td>
-									 <td colspan="2"></td>
-								  </tr> -->
-								   <tr>
-									 <td class="width150" colspan="6"><span class="col-form-span-label"><input type="checkbox" class="col-form-span-label"  name="checkbox1" [(ngModel)]="imptlbluse">Import Lable Used </span> </td>
-								  </tr>
-								   <tr>
-									 <td class="width150"><span class="col-form-span-label">Bill of Entry No. </span> </td>
-									 <td colspan="2"><input type="text" [(ngModel)]="billentryno" class="form-control"/></td>
-									 <td class="width150"><span class="col-form-span-label">Date </span> </td>
-									 <td colspan="2"><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="billentrydt" required></my-date-picker></td>
-								  </tr>
-								  <!-- <tr class="col-form-span-heading">
-									 <th><span class="col-form-span-label"></span> </th>
-									 <th><span class="col-form-span-label">AR4 Form No </span></th>
-									 <th><span class="col-form-span-label">Date</span> </th>
-									 <th><span class="col-form-span-label">Commission Rate </span></th>
-									 <th><span class="col-form-span-label">Division </span> </th>
-									 <th><span class="col-form-span-label">Rate </span></th>
-								  </tr>
-								  <tr>
-									 <td><span class="col-form-span-label">AR4 Form 1 </span> </td>
-									 <td><input type="text" [(ngModel)]="arformnoone" class="form-control"/></td>
-									 <td class="width100"><my-date-picker name="mydate" [options]="myDatePickerOptions" [(ngModel)]="arformdtone" required></my-date-picker></td>
-									 <td><input type="text" [(ngModel)]="arformcommone" class="form-control"/></td>
-									 <td><input type="text" [(ngModel)]="arformdivone" class="form-control"/></td>
-									 <td><input type="text" [(ngModel)]="arformrateone" class="form-control" OnlyNumber="true"/></td>
-								  </tr>
-								  <tr>
-									 <td><span class="col-form-span-label">AR4 Form 2 </span> </td>
-									 <td><input type="text" [(ngModel)]="arformnotwo" class="form-control"/></td>
-									 <td><my-date-picker name="mydate1" [options]="myDatePickerOptions" [(ngModel)]="arformdttwo" required></my-date-picker></td>
-									 <td><input type="text" [(ngModel)]="arformcommtwo" class="form-control"/></td>
-									 <td><input type="text" [(ngModel)]="arformdivtwo" class="form-control"/></td>
-									 <td><input type="text" [(ngModel)]="arformratetwo" class="form-control" OnlyNumber="true"/></td>
-								  </tr>
-								  <tr>
-									 <td><span class="col-form-span-label">AR4 Form 3 </span> </td>
-									 <td><input type="text" [(ngModel)]="arformnothree" class="form-control"/></td>
-									 <td><my-date-picker name="mydate2" [options]="myDatePickerOptions" [(ngModel)]="arformdtthree" required></my-date-picker></td>
-									 <td><input type="text" [(ngModel)]="arformcommthree" class="form-control"/></td>
-									 <td><input type="text" [(ngModel)]="arformdivthree" class="form-control"/></td>
-									 <td><input type="text" [(ngModel)]="arformratethree" class="form-control" OnlyNumber="true"/></td>
-								  </tr>
-								  <tr>
-									 <td><span class="col-form-span-label">AR4 Form 4 </span> </td>
-									 <td><input type="text" [(ngModel)]="arformnofour" class="form-control"/></td>
-									 <td><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="arformdtfour" required></my-date-picker></td>
-									 <td><input type="text" [(ngModel)]="arformcommfour" class="form-control"/></td>
-									 <td><input type="text" [(ngModel)]="arformdivfour" class="form-control"/></td>
-									 <td><input type="text" [(ngModel)]="arformratefour" class="form-control" OnlyNumber="true"/></td>
-								  </tr> -->
-								</tbody>
-							</table>
-                     </tab>
-                     <tab customClass="ngx-tab-style">
-                        <ng-template tabHeading><span class="title-head"><u>#Documents</u></span></ng-template>
-                        <table class="table table-bordered table-sm-new">
-						   <thead>
-							  <tr>
-                                 <td class="col-form-span-heading" colspan="5">DOCUMENTS DETAILS </td>
-                              </tr>
-                              <tr class="col-form-span-heading">
-                                 <th class="width75 centerlabel"><span class="col-form-span-label">SR. NO.</span></th>
-                                 <th class="centerlabel"><span class="col-form-span-label">List of Documents</span></th>
-                                 <th class="width75 centerlabel"><span class="col-form-span-label">RECD</span></th>
-                                 <th class="width75 centerlabel"><span class="col-form-span-label">CALL FOR</span></th>
-								 <th class="width75 centerlabel"><span class="col-form-span-label">N.A.</span></th>
-                              </tr>
-						   </thead>
-                           <tbody>
-							  @for (doc of documentlist; track doc) {
-<tr>
-                                 <td class="width150"><span class="col-form-span-label">{{doc.DOCCODE}}</span></td>
-                                 <td><span class="col-form-span-label">{{doc.DOCUMENT}}</span></td>
-                                 <td class="width75 centerlabel"><input type="radio" name="{{doc.DOCCODE}}" value="{{'R'+doc.DOCCODE}}" [(ngModel)]="doc.RECD" (click)="changeDocumentList(doc.DOCCODE, 'R')"/></td><!-- [checked]="doc.DOCCODE < 103" -->
-                                 <td class="width75 centerlabel"><input type="radio" name="{{doc.DOCCODE}}" value="{{'C'+doc.DOCCODE}}" [(ngModel)]="doc.CALL" (click)="changeDocumentList(doc.DOCCODE, 'C')"/></td>
-								 <td class="width75 centerlabel"><input type="radio" name="{{doc.DOCCODE}}" value="{{'N'+doc.DOCCODE}}" [(ngModel)]="doc.NA" (click)="changeDocumentList(doc.DOCCODE, 'N')"/></td><!--  [checked]="doc.DOCCODE > 102"  -->
-							  </tr>
-}
-							  <tr class="trbg">
-								  <td><span class="col-form-span-label"><b>Actual Doc Received</b></span></td>
-								  <td colspan="4">
-									  <input type="radio" name="rbDocActualReceived" value="YES" [(ngModel)]="docactualreceived"/>&nbsp;<span class="col-form-span-label">Yes</span>&nbsp;&nbsp;
-									  <input type="radio" name="rbDocActualReceived" value="NO" [(ngModel)]="docactualreceived"/>&nbsp;<span class="col-form-span-label">No</span>
-								  </td>
-							  </tr>
-							</tbody>
-						</table>
-                     </tab>
-                     <tab customClass="ngx-tab-style">
-                        <ng-template tabHeading><span class="title-head"><u>#ITC Code</u></span></ng-template>
-							<table class="table table-bordered table-sm-new">
-							   <tbody>
-								  <tr>
-									 <td class="col-form-span-heading" colspan="6">ITC CODE DETAILS  </td>
-								  </tr>
-								  <tr>
-									 <td class="width150"><span class="col-form-span-label">ITC Code </span> </td>
-									 <td><input type="text" [(ngModel)]="itccode" class="form-control" [maxlength]="9"/></td>
-									 <td class="width150"><span class="col-form-span-label">FOB INR </span> </td>
-									 <td><input type="text" [(ngModel)]="itcfobinr" OnlyNumber="true" class="form-control"/></td>
-									 <td class="width150"><span class="col-form-span-label">Drawback Sub Sr.No</span> </td>
-									 <td><input type="text" [(ngModel)]="itcsrno" class="form-control"/></td>
-								  </tr>
-								  <tr>
-									 <td class="width150"><span class="col-form-span-label">Unit1 </span> </td>
-									 <td><input type="text" [(ngModel)]="itcunitone" class="form-control" OnlyNumber="true"/></td>
-									 <td class="width150"><span class="col-form-span-label">Type1  </span> </td>
-									 <td><input type="text" [(ngModel)]="itctypeone" class="form-control"/></td>
-									 <td class="width150"><span class="col-form-span-label">Group Code </span> </td>
-									 <td><input type="text" [(ngModel)]="itcgroupcode" class="form-control"/></td>
-								  </tr>
-								  <tr>
-									 <td class="width150"><span class="col-form-span-label">Condition No. </span> </td>
-									 <td><input type="text" [(ngModel)]="itcconditionno" class="form-control"/></td>
-									 <td class="width150"><span class="col-form-span-label">Unit2 </span> </td>
-									 <td><input type="text" [(ngModel)]="itcunittwo" class="form-control" OnlyNumber="true"/></td>
-									 <td class="width150"><span class="col-form-span-label">Type2 </span> </td>
-									 <td><input type="text" [(ngModel)]="itctypetwo" class="form-control"/></td>
-								  </tr>
-								  <tr>
-									 <td class="width150"><span class="col-form-span-label">Appendix of public notice </span> </td>
-									 <td><input type="text" [(ngModel)]="itcnotice" class="form-control"/></td>
-									 <td class="width150"><input type="radio" name="rbITC" [checked]="rbitc == 'Percent'" (click)="changePercentUnit('Percent')" [disabled]="typeshpnbill == 'FREE'"/><span class="col-form-span-label">% of Drawback </span> </td>
-									 <td><input type="text" [(ngModel)]="itcpercent" class="form-control" OnlyNumber="true" [disabled]="typeshpnbill == 'FREE' || rbitc != 'Percent'"/></td>
-									 <td class="width150"><input type="radio" name="rbITC" [checked]="rbitc == 'PerUnit'" (click)="changePercentUnit('PerUnit')"  [disabled]="typeshpnbill == 'FREE'"/><span class="col-form-span-label">Rate per Unit</span> </td>
-									 <td><input type="text" [(ngModel)]="itcperunit" OnlyNumber="true" class="form-control" [disabled]="typeshpnbill == 'FREE' || rbitc != 'PerUnit'"/></td>
-								  </tr>
-								  <tr>
-									 <td class="width150"><span class="col-form-span-label">Description </span> </td>
-									 <td colspan="5"><textarea rows="3" cols="20" class="form-control" OnlyCharacter="true" [maxlength]="380" [(ngModel)]="itcdescription"></textarea></td>
-								  </tr>
-								  <tr class="centerlabel">
-									 <td colspan="6">
-										@if (this.hditcid == '0') {
-<button type="button" uiBtn variant="default" size="sm" (click)="addEditITCDtls()"><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
-}
-										@if (this.hditcid != '0') {
-<button type="button" uiBtn variant="default" size="sm" (click)="addEditITCDtls()"><span class="col-form-span-label"><i class="fa fa-refresh"></i>&nbsp;Update</span></button>
-}
-										<button type="button" uiBtn variant="outline" size="sm" (click)="resetITC()"><span class="col-form-span-label"><i class="fa fa-undo"></i>&nbsp;Reset</span></button>
-									 </td>
-								  </tr>
-								  @if (itclist.length > 0) {
-<tr>
-									 <td colspan="8">
-										<table>
-											<thead>
-												<tr class="col-form-span-heading">
-													<th class="width50 centerlabel"><span class="col-form-span-label"></span></th>
-													<th class="width100 centerlabel"><span class="col-form-span-label">ITC Code</span></th>
-													<th class="width100 centerlabel"><span class="col-form-span-label">FOB INR</span></th>
-													<th class="width100 centerlabel"><span class="col-form-span-label">Drawback Sub Sr.No</span></th>
-													<th class="width100 centerlabel"><span class="col-form-span-label">Unit1</span></th>
-													<th class="width100 centerlabel"><span class="col-form-span-label">Type1</span></th>
-													<th class="width100 centerlabel"><span class="col-form-span-label">Group Code</span></th>
-													<th class="width100 centerlabel"><span class="col-form-span-label">Appendix of public notice</span></th>
-													<th class="width100 centerlabel"><span class="col-form-span-label">Condition No.</span></th>
-													<th class="width100 centerlabel"><span class="col-form-span-label">Unit2</span></th>
-													<th class="width100 centerlabel"><span class="col-form-span-label">Type2</span></th>
-													<th class="width100 centerlabel"><span class="col-form-span-label">% of Drawback</span></th>
-													<th class="width100 centerlabel"><span class="col-form-span-label">Rate per Unit</span></th>
-													<th class="width100 centerlabel"><span class="col-form-span-label">Description</span></th>
-												 </tr>
-											</thead>
-											<tbody>
-												@for (obj of itclist; track obj) {
-<tr>
-													<td class="centerlabel">
-														<i class="fa fa-pencil" (click)="editITC(obj.TBL_INDEXID,obj.ITCCODEID,obj.ITCCODE,obj.EXPTNO)"></i>
-														&nbsp;
-														<i class="fa fa-trash" (click)="deleteConfirm(obj.TBL_INDEXID,obj.ITCCODEID,obj.ITCCODE,obj.EXPTNO)"></i>
-													</td>
-													<td><span class="col-form-span-label">{{obj.ITCCODE}}</span></td>
-													<td><span class="col-form-span-label">{{obj.FOBINR}}</span></td>
-													<td><span class="col-form-span-label">{{obj.DBKSUBSRNO}}</span></td>
-													<td><span class="col-form-span-label">{{obj.UNIT}}</span></td>
-													<td><span class="col-form-span-label">{{obj.TPE}}</span></td>
-													<td><span class="col-form-span-label">{{obj.EXP_ITCGROUPCODE}}</span></td>
-													<td><span class="col-form-span-label">{{obj.APPENDIXNO}}</span></td>
-													<td><span class="col-form-span-label">{{obj.CONDITIONNO}}</span></td>
-													<td><span class="col-form-span-label">{{obj.UNITA}}</span></td>
-													<td><span class="col-form-span-label">{{obj.TPEA}}</span></td>
-													<td><span class="col-form-span-label">{{obj.DBKPERCENT}}</span></td>
-													<td><span class="col-form-span-label">{{obj.RATEPERUNIT}}</span></td>
-													<td><span class="col-form-span-label">{{obj.DESCRIPTION}}</span></td>
-												 </tr>
-}</tbody>
-											<tbody>
-										</table>
-									 </td>
-								  </tr>
-}
-								</tbody>
-							</table>
-                     </tab>
-                     <tab customClass="ngx-tab-style">
-                        <ng-template tabHeading><span class="title-head"><u>#Order No</u></span></ng-template>
-                        <table class="table table-bordered table-sm-new">
-                           <tbody>
-							  <tr>
-                                 <td class="width130"><span class="col-form-span-label">Export Contract No.</span> </td>
-                                 <td><input type="text" class="form-control" [(ngModel)]="ordercontractno" /></td>
-                                 <td class="width130"><span class="col-form-span-label">Period of Payment </span> </td>
-                                 <td><input type="text" class="form-control" OnlyNumber="true" [(ngModel)]="orderpayment" /></td>
-								 <td colspan="2"></td>
-                              </tr>
-                              <tr>
-                                 <td class="col-form-span-heading" colspan="6">ORDER NO DETAILS </td>
-                              </tr>
-                              <tr>
-                                 <td class="width130"><span class="col-form-span-label">Exists Order No. </span> </td>
-                                 <td colspan="5">
-									<ng-select [items]="orderexistnolist"
-											   bindLabel="TEXTFIELD"
-											   bindValue="VALUEFIELD"
-
-											   [(ngModel)]="orderexistno"
-											   class="form-control"
-											   (change)="changeExistOrderNo(orderexistno)"
-											   [disabled]="disabledExistOrderNoList"
-											   style="width: 750px;">
-									</ng-select>
-									<!-- <select class="form-control width150"  [(ngModel)]="orderexistno" (change)="changeExistOrderNo(orderexistno)">
-										<option value="-1">Please select</option>
-										 <option *ngFor="let d of orderexistnolist" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
-									</select> -->
-								 </td>
-                              </tr>
-							  <tr>
-                                 <td class="width130"><span class="col-form-span-label">Order No. </span><span class="col-form-span-error">*</span></td>
-                                 <td class="width130"><input type="text" class="form-control" OnlyCharacter="true" [(ngModel)]="orderno" /></td>
-                                 <td class="width130"><span class="col-form-span-label">Reference No. </span> </td>
-                                 <td colspan="3"><input type="text" class="form-control" OnlyCharacter="true" [(ngModel)]="orderreferenceno" /></td>
-
-										</tr>
-										<tr>
-											<td class="width130"><span class="col-form-span-label">Item Description </span> </td>
-                                 <td colspan="5"><input type="text" class="form-control" OnlyCharacter="true" [(ngModel)]="orderitemdesc" maxlength="50" /></td>
-										</tr>
-							  <tr>
-                                 <td class="width130"><span class="col-form-span-label">Pieces </span><span class="col-form-span-error">*</span> </td>
-                                 <td class="width130"><input type="text" class="form-control" [(ngModel)]="orderpiece" OnlyNumber="true"/></td>
-                                 <td class="width130"><span class="col-form-span-label">Type of Pieces </span> </td>
-                                 <td><input type="text" class="form-control" [(ngModel)]="ordertypeofpiece" /></td>
-								 			<td class="width130"><span class="col-form-span-label">Pkgs </span> </td>
-                                 <td><input type="text" class="form-control" [(ngModel)]="orderpackage"  OnlyNumber="true"/></td>
-                              </tr>
-							  <tr>
-                                 <td class="width130"><span class="col-form-span-label">Warehouse </span> </td>
-                                 <td class="width130"><input type="text" class="form-control" OnlyCharacter="true" [(ngModel)]="orderwarehouse" /></td>
-                                 <td class="width130"><span class="col-form-span-label">LSD Date  </span> </td>
-                                 <td><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="orderlsddt" required></my-date-picker></td>
-								 <td class="width130"><span class="col-form-span-label">DRN Date </span> </td>
-                                 <td><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="orderdrndt" required></my-date-picker></td>
-                              </tr>
-							  <tr>
-                                 <td class="width130"><span class="col-form-span-label">Gr. Wt </span> </td>
-                                 <td class="width130"><input type="text" class="form-control" [(ngModel)]="ordergrwt"  OnlyNumber="true"/></td>
-                                 <td class="width130"><span class="col-form-span-label">Net Wts </span> </td>
-                                 <td><input type="text" class="form-control" [(ngModel)]="ordernetwt"  OnlyNumber="true"/></td>
-								 <td class="width130"><span class="col-form-span-label">Volume(CBM) </span> </td>
-                                 <td><input type="text" class="form-control" [(ngModel)]="ordervolume"  OnlyNumber="true"/></td>
-                              </tr>
-							  <tr>
-                                 <td class="width130"><span class="col-form-span-label">Chbl. Wt </span></td>
-                                 <td class="width130"><input type="text" class="form-control" [(ngModel)]="orderchblwt"  OnlyNumber="true"/></td>
-                                 <td class="width130"><span class="col-form-span-label">FOB Value </span> </td>
-                                 <td><input type="text" class="form-control" [(ngModel)]="orderfobval"  OnlyNumber="true"/></td>
-								 <td class="width130"><span class="col-form-span-label">Currency </span> </td>
-                                 <td><input type="text" class="form-control" [(ngModel)]="ordercurrency" /></td>
-                              </tr>
-							  <tr>
-                                 <td class="width130"><span class="col-form-span-label">Cnee Dept (Rayon)</span></td>
-                                 <td class="width130" colspan="2"><input type="text" class="form-control" [(ngModel)]="ordercneedept" /></td>
-                                 <td class="width130"><span class="col-form-span-label">Container No</span> </td>
-                                 <td colspan="2"><input type="text" class="form-control" [(ngModel)]="ordercontainerno" /></td>
-                              </tr>
-							  <tr>
-                                 <td class="width130"><span class="col-form-span-label">ICS HS Code</span></td>
-                                 <td class="width130" colspan="2"><input type="text" class="form-control" [(ngModel)]="ordericshscode"/></td>
-                                 <td class="width130"><span class="col-form-span-label">ICS HS Description</span> </td>
-                                 <td colspan="2"><input type="text" class="form-control" [(ngModel)]="ordericshsdescription"/></td>
-                              </tr>
-							  <tr class="centerlabel">
-                                 <td colspan="6">
-									@if (this.hdordernoid == '0') {
-<button type="button" uiBtn variant="default" size="sm" (click)="addEditOrderDtls()"><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
-}
-									@if (this.hdordernoid != '0') {
-<button type="button" uiBtn variant="default" size="sm" (click)="addEditOrderDtls()"><span class="col-form-span-label"><i class="fa fa-refresh"></i>&nbsp;Update</span></button>
-}
-									<button type="button" uiBtn variant="outline" size="sm" (click)="resetOrder()"><span class="col-form-span-label"><i class="fa fa-undo"></i>&nbsp;Reset</span></button>
-								 </td>
-							  </tr>
-							  </tbody>
-							</table>
-							@if (orderlist.length > 0) {
-<div class="row xyscroll">
-								<table class="table table-responsive-sm table-bordered">
-									<thead>
-										<tr class="col-form-span-heading">
-											<th class="width50 centerlabel"><span class="col-form-span-label"></span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">Order No.</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">Reference No</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">Pieces</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">Type of Pieces</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">Warehouse</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">Item Description</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">Pkgs</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">Gr. Wt</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">Net Wt</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">Volume</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">Chbl. Wt.</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">LSD Date</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">DRN Date</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">FOB Value</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">Currency</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">Cnee Dept (Rayon)</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">Container No</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">ICS HS Code</span></th>
-											<th class="width100 centerlabel"><span class="col-form-span-label">ICS HS Description</span></th>
-										</tr>
-									</thead>
-									<tbody>
-										@for (obj of orderlist; track obj) {
-<tr>
-											<td class="centerlabel">
-												<i class="fa fa-pencil" (click)="editOrder(obj.TBL_INDEXID,obj.ORDERID,obj.EXPTNO,obj.ORDERNO)"></i>
-												&nbsp;
-												<i class="fa fa-trash" (click)="deleteOrder(obj.TBL_INDEXID,obj.ORDERID,obj.EXPTNO,obj.ORDERNO)"></i>
-											</td>
-											<td><span class="col-form-span-label">{{obj.ORDERNO}}</span></td>
-											<td><span class="col-form-span-label">{{obj.STYLENO}}</span></td>
-											<td><span class="col-form-span-label">{{obj.PIECES}}</span></td>
-											<td><span class="col-form-span-label">{{obj.TYPEOFPCS}}</span></td>
-											<td><span class="col-form-span-label">{{obj.WAREHOUSE}}</span></td>
-											<td><span class="col-form-span-label">{{obj.ITEMDESC}}</span></td>
-											<td><span class="col-form-span-label">{{obj.PKGS}}</span></td>
-											<td><span class="col-form-span-label">{{obj.GRWT}}</span></td>
-											<td><span class="col-form-span-label">{{obj.NETWT}}</span></td>
-											<td><span class="col-form-span-label">{{obj.VOLUME}}</span></td>
-											<td><span class="col-form-span-label">{{obj.CHBLWT}}</span></td>
-											<td><span class="col-form-span-label">{{obj.LSD}}</span></td>
-											<td><span class="col-form-span-label">{{obj.DRNDATE}}</span></td>
-											<td><span class="col-form-span-label">{{obj.FOBVALUE}}</span></td>
-											<td><span class="col-form-span-label">{{obj.CURENCY}}</span></td>
-											<td><span class="col-form-span-label">{{obj.CneeDept}}</span></td>
-											<td><span class="col-form-span-label">{{obj.ContainerNo}}</span></td>
-											<td><span class="col-form-span-label">{{obj.ICSHSCode}}</span></td>
-											<td><span class="col-form-span-label">{{obj.ICSHSDescription}}</span></td>
-										</tr>
-}
-									<tbody>
-								</table>
-							</div>
-}
-                     </tab>
-                     <tab customClass="ngx-tab-style">
-                        <ng-template tabHeading><span class="title-head"><u>#Package No</u></span></ng-template>
-							<table class="table table-bordered table-sm-new">
-							   <tbody>
-								  <tr>
-									 <td class="col-form-span-heading" colspan="8">PACKAGE NO - DETAILS </td>
-								  </tr>
-								  <tr>
-									 <td class="width75"><span class="col-form-span-label">From </span><span class="col-form-span-error">*</span> </td>
-									 <td class="width200"><input type="text" class="form-control" [(ngModel)]="packagefrom" OnlyNumber="true" /></td>
-									 <td class="width75"><span class="col-form-span-label">To </span> <span class="col-form-span-error">*</span></td>
-									 <td class="width200"><input type="text" class="form-control" [(ngModel)]="packageto" OnlyNumber="true" /></td>
-									 <td class="width75"><span class="col-form-span-label">Alphabet </span> </td>
-									 <td class="width200"><input type="text" class="form-control" [(ngModel)]="packagealphabet" OnlyCharacter="true" /></td>
-									 <td>
-										@if (this.hdpkgindexid == '0') {
-<button type="button" uiBtn variant="default" size="sm" (click)="addEditPkgDtls()"><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
-}
-										@if (this.hdpkgindexid != '0') {
-<button type="button" uiBtn variant="default" size="sm" (click)="addEditPkgDtls()"><span class="col-form-span-refresh"><i class="fa fa-plus"></i>&nbsp;Update</span></button>
-}
-									</td>
-									<td>
-										<button type="button" uiBtn variant="outline" size="sm" (click)="resetPackage()"><span class="col-form-span-label"><i class="fa fa-undo"></i>&nbsp;Reset</span></button>
-									</td>
-								  </tr>
-								  @if (packagelist.length > 0) {
-<tr>
-									 <td colspan="8">
-										<table>
-											<thead>
-												<tr class="col-form-span-heading">
-													<th class="width50 centerlabel"><span class="col-form-span-label"></span></th>
-													<th colspan="2" class="width250 centerlabel"><span class="col-form-span-label">From</span></th>
-													<th colspan="2" class="width250 centerlabel"><span class="col-form-span-label">To</span></th>
-													<th colspan="3" class="width300 centerlabel"><span class="col-form-span-label">Alphabet</span></th>
-												 </tr>
-											</thead>
-											<tbody>
-												@for (pl of packagelist; track pl) {
-<tr>
-													<td class="centerlabel">
-														<i class="fa fa-pencil" (click)="editPackage(pl.TBL_INDEXID,pl.PKGNOID,pl.EXPTNO)"></i>
-														&nbsp;&nbsp;
-														<i class="fa fa-trash" (click)="deletePackage(pl.TBL_INDEXID,pl.PKGNOID,pl.EXPTNO)"></i>
-													</td>
-													<td colspan="2"><span class="col-form-span-label">{{pl.FROM}}</span></td>
-													<td colspan="2"><span class="col-form-span-label">{{pl.TO}}</span></td>
-													<td colspan="3"><span class="col-form-span-label">{{pl.ALPHABET}}</span></td>
-												 </tr>
-}
-											<tbody>
-										</table>
-									 </td>
-								  </tr>
-}
-								</tbody>
-							</table>
-                     </tab>
-                     <tab customClass="ngx-tab-style">
-                        <ng-template tabHeading><span class="title-head"><u>#Marks & Numbers</u></span></ng-template>
-                        <table class="table table-bordered table-sm-new">
-                           <tbody>
-                              <tr>
-                                 <td class="col-form-span-heading" colspan="4">MASRKS & NUMBERS - DETAILS </td>
-                              </tr>
-                              <tr>
-                                 <td class="width150"><span class="col-form-span-label">Marks & Numbers </span> </td>
-                                 <td><textarea rows="15" cols="25" class="form-control" OnlyCharacter="true" [(ngModel)]="marksandnumbers"></textarea></td>
-                                 <td colspan="2" class="width150"></td>
-                              </tr>
-							</tbody>
-						</table>
-                     </tab>
-                     <!-- <tab customClass="ngx-tab-style">
-                        <ng-template tabHeading><span class="title-head"><u>#Quota</u></span></ng-template>
-							<table class="table table-bordered table-sm-new">
-							   <tbody>
-								  <tr>
-									 <td class="col-form-span-heading" colspan="6">QUOTA DETAILS </td>
-								  </tr>
-								  <tr>
-									 <td class="width100"><span class="col-form-span-label">Certificate No.1 </span> </td>
-									 <td><input type="text" class="form-control" [(ngModel)]="quotacertnoone"  OnlyCharacter="true"/></td>
-									 <td class="width100"><span class="col-form-span-label">Certificate No.2 </span> </td>
-									 <td><input type="text" class="form-control" [(ngModel)]="quotacertnotwo"  OnlyCharacter="true"/></td>
-									 <td class="width100"><span class="col-form-span-label">Certificate No. </span> </td>
-									 <td><input type="text" class="form-control" [(ngModel)]="quotacertnothree"  OnlyCharacter="true"/></td>
-								  </tr>
-								  <tr>
-									 <td class="width100"><span class="col-form-span-label">Validate Date </span> </td>
-									 <td><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="quotavalidatedt"></my-date-picker></td>
-									 <td class="width100"><span class="col-form-span-label">Obtain Date </span> </td>
-									 <td><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="quotaobtaindt"></my-date-picker></td>
-									 <td class="width100"><span class="col-form-span-label">Expiry Date  </span> </td>
-									 <td><my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="quotaexpirydt"></my-date-picker></td>
-								  </tr>
-								</tbody>
-							</table>
-                     </tab> -->
-                  </tabset>
-
-
-			   </div>
-			   <div class="col-sm-1">
-				</div>
-			  </div>
-            </div>
-            <div class="card-footer">
-               <button type="button" uiBtn variant="default" size="sm" (click)="submit()"><span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Submit</span></button>
-               <button type="button" uiBtn variant="outline" size="sm" (click)="abort()"><span class="col-form-span-label"><i class="fa fa-ban"></i> Abort</span></button>
-            </div>
-         </div>
-      </div>
-	</div>
-	<div>
-
-</div>
-</div>
-
-<div bsModal #CalculateCBM="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" [config]="{backdrop: 'static'}">
-	<div class="modal-dialog modal-md" >
-	  <div class="modal-content" style="width:530px;">
-		<div class="modal-header">
-		  <span class="modal-title pull-left">
-			  <strong>Calculate CBM</strong>
-		  </span>
-		</div>
-		<div class="modal-body modal-fix-body" style="height:400px;width:530px;">
-	  <app-main-consignment-calcbm-add (result)="changevolume($event)" [grosswt]="grosswt" [noofpkgs]="noofpackages" [exptno]="hdexptno"></app-main-consignment-calcbm-add>
-		</div>
+  @if (!embedded) {
+  <div class="ph">
+    <div>
+      <h1>{{formheader}}</h1>
+      <p>Consignment master: parties, transport, invoice, documents and order lines.</p>
+    </div>
   </div>
- </div>
+  }
+
+    <!--
+      Everything from here to the pinned save bar sits inside one fieldset. While
+      page 1 has not been submitted the workspace passes [locked]="true" and the
+      browser disables every descendant control natively.
+    -->
+    <fieldset class="cs-fs" [disabled]="locked">
+
+    <!-- ================= service scope ================= -->
+    <div class="card sec cs-card">
+      <div class="card-h"><h2>Service scope</h2></div>
+      <div class="fields">
+      <div class="fld full">
+        <label>Services</label>
+        <div class="cs-opts">
+          <label class="cs-opt">
+            <input type="checkbox" name="ExWork" [(ngModel)]="exwork" (ngModelChange)="onTypeChange('E')">
+            EX-WORKS
+          </label>
+          <label class="cs-opt">
+            <input type="checkbox" name="CustomClr" [(ngModel)]="customclr" (ngModelChange)="onTypeChange('C')">
+            CUSTOMS CLEARANCE
+          </label>
+          <label class="cs-opt">
+            <input type="checkbox" name="Freightfrd" [(ngModel)]="freightfrd" (ngModelChange)="onTypeChange('F')">
+            FREIGHT FORWARDING
+          </label>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- ================= consignment summary ================= -->
+    <div class="card sec cs-card">
+      <div class="card-h"><h2>Consignment</h2></div>
+      <div class="fields">
+
+      <div class="fld full">
+        <label>Exporter/Shipper</label>
+        <span class="lockv">{{shipper}}</span>
+      </div>
+      <div class="fld full">
+        <label>Consignee</label>
+        <span class="lockv">{{consignee}}</span>
+      </div>
+
+      <div class="fld">
+        <label>No. of Packages <span class="req">*</span></label>
+        <input type="text" [(ngModel)]="noofpackages" OnlyNumber="true"/>
+      </div>
+      <div class="fld">
+        <label>Type of Packages</label>
+        <ng-select [items]="[{VALUEFIELD: 'PKG', TEXTFIELD: 'PKG'},{VALUEFIELD: 'BUNDLES', TEXTFIELD: 'BUNDLES'},{VALUEFIELD: 'CARTONS', TEXTFIELD: 'CARTONS'},{VALUEFIELD: 'BOXES', TEXTFIELD: 'BOXES'},{VALUEFIELD: 'BASES', TEXTFIELD: 'BASES'},{VALUEFIELD: 'CASES', TEXTFIELD: 'CASES'},{VALUEFIELD: 'PALLETS', TEXTFIELD: 'PALLETS'},{VALUEFIELD: 'ROLL', TEXTFIELD: 'ROLL'},{VALUEFIELD: 'BALES', TEXTFIELD: 'BALES'},{VALUEFIELD: 'DRUMS', TEXTFIELD: 'DRUMS'},{VALUEFIELD: 'CABLE', TEXTFIELD: 'CABLE'},{VALUEFIELD: 'PACKS', TEXTFIELD: 'PACKS'},{VALUEFIELD: 'NOS', TEXTFIELD: 'NOS'},{VALUEFIELD: 'CRATES', TEXTFIELD: 'CRATES'},{VALUEFIELD: 'BAGS', TEXTFIELD: 'BAGS'},{VALUEFIELD: 'TANKS', TEXTFIELD: 'TANKS'}]"
+          bindLabel="TEXTFIELD"
+          bindValue="VALUEFIELD"
+          class="custom"
+          [(ngModel)]="typeofpackages"
+          placeholder="--Select--"
+          >
+        </ng-select>
+      </div>
+      <div class="fld">
+        <label>No. of Pieces <span class="req">*</span></label>
+        <input type="text" [(ngModel)]="noofpieces" OnlyNumber="true"/>
+      </div>
+      <div class="fld">
+        <label>Type of Pieces</label>
+        <ng-select [items]="[{VALUEFIELD: 'PIECES', TEXTFIELD: 'PIECES'},{VALUEFIELD: 'SETS', TEXTFIELD: 'SETS'},{VALUEFIELD: 'DOZENS', TEXTFIELD: 'DOZENS'},{VALUEFIELD: 'PAIRS', TEXTFIELD: 'PAIRS'},{VALUEFIELD: 'BOXES', TEXTFIELD: 'BOXES'},{VALUEFIELD: 'NOS', TEXTFIELD: 'NOS'},{VALUEFIELD: 'UNIT', TEXTFIELD: 'UNIT'},{VALUEFIELD: 'LOTS', TEXTFIELD: 'LOTS'},{VALUEFIELD: 'MTR', TEXTFIELD: 'MTR'},{VALUEFIELD: 'PACK', TEXTFIELD: 'PACK'},{VALUEFIELD: 'KGS', TEXTFIELD: 'KGS'},{VALUEFIELD: 'KGS/MTRS', TEXTFIELD: 'KGS/MTRS'},{VALUEFIELD: 'PCS/PAIR', TEXTFIELD: 'PCS/PAIR'},{VALUEFIELD: 'SQ.MTRS', TEXTFIELD: 'SQ.MTRS'},{VALUEFIELD: 'PCS/SETS', TEXTFIELD: 'PCS/SETS'},{VALUEFIELD: 'EA', TEXTFIELD: 'EA'},{VALUEFIELD: 'PCS/PAIR/KGS', TEXTFIELD: 'PCS/PAIR/KGS'},{VALUEFIELD: 'AMPOULES', TEXTFIELD: 'AMPOULES'},{VALUEFIELD: 'MT', TEXTFIELD: 'MT'},{VALUEFIELD: 'MATS', TEXTFIELD: 'MATS'},{VALUEFIELD: 'CASES', TEXTFIELD: 'CASES'}]"
+          bindLabel="TEXTFIELD"
+          bindValue="VALUEFIELD"
+          class="custom"
+          [(ngModel)]="typeofpieces"
+          placeholder="--Select--"
+          >
+        </ng-select>
+      </div>
+
+    </div>
+    </div>
+
+    <!-- ================= the eight consignment sections ================= -->
+    <div class="cs-sections">
+        <section class="cs-anchor" id="cs-main" data-section="main" [class.cs-open]="openSection === 'main'">
+          <div class="cs-sech">Main@if (locked) {<span class="cs-lockhint">Opens once parties and shipment are saved</span>}</div>
+          <!-- ---------------- #Main ---------------- -->
+
+          <div class="card sec cs-card">
+            <div class="card-h"><h2>Exporter details</h2></div>
+            <div class="fields">
+            <div class="fld">
+              <label>Exporter/Shipper</label>
+              <span class="lockv">{{lblshipper}}</span>
+            </div>
+            <div class="fld">
+              <label>Bill To</label>
+              <span class="lockv">{{lblbillto}}</span>
+            </div>
+            <div class="fld">
+              <label>Manufacturer</label>
+              <span class="lockv">{{lblmanufacturer}}</span>
+            </div>
+            <div class="fld">
+              <label>Agent</label>
+              <span class="lockv">{{lblagent}}</span>
+            </div>
+            <div class="fld">
+              <label>Sub Agent</label>
+              <span class="lockv">{{lblsubagent}}</span>
+            </div>
+            <div class="fld">
+              <label>Consignee</label>
+              <span class="lockv">{{lblconsignee}}</span>
+            </div>
+            <div class="fld">
+              <label>If consigned to bank</label>
+              <span class="lockv">{{lblifcontobank}}</span>
+            </div>
+            <div class="fld">
+              <label>Buyer Name</label>
+              <span class="lockv">{{lblbuyername}}</span>
+            </div>
+            <div class="fld">
+              <label>Sourcing Agent</label>
+              <ng-select [items]="sourcingagents"
+                bindLabel="TEXTFIELD"
+                bindValue="VALUEFIELD"
+                class="custom"
+                [(ngModel)]="lblsourceagent"
+                placeholder="--Select--"
+                >
+              </ng-select>
+            </div>
+          </div>
+          </div>
+        </section>
+        <section class="cs-anchor" id="cs-vessel" data-section="vessel" [class.cs-open]="openSection === 'vessel'">
+          <div class="cs-sech">Transport, port &amp; goods@if (locked) {<span class="cs-lockhint">Opens once parties and shipment are saved</span>}</div>
+          <!-- ---------------- #Vessel / Air / Port / Goods ---------------- -->
+
+          @if (isvisiblevessel != null) {
+            <div class="card sec cs-card">
+              <div class="card-h"><h2>Vessel details</h2></div>
+              <div class="fields">
+              <div class="fld">
+                <label>Vessel Name</label>
+                <span class="lockv">{{vesselname}}</span>
+              </div>
+              <div class="fld">
+                <label>Agent Name <span class="req">*</span></label>
+                <ng-select [items]="agentsname"
+                  bindLabel="TEXTFIELD"
+                  bindValue="VALUEFIELD"
+                  [(ngModel)]="agentname"
+                  class="custom"
+                  placeholder="--Select--"
+                  >
+                </ng-select>
+              </div>
+            </div>
+            </div>
+          }
+
+          @if (isvisiblevessel == null) {
+            <div class="card sec cs-card">
+              <div class="card-h"><h2>Air shipment details</h2></div>
+              <div class="fields">
+
+              <div class="fld">
+                <label>Carting Date</label>
+                <my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="cartingdt" [disabled]="true"></my-date-picker>
+              </div>
+              <div class="fld">
+                <label>Prealert Sent On.</label>
+                <my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="prealertsentdt" [disabled]="true"></my-date-picker>
+              </div>
+              <div class="fld">
+                <label>Airline Name</label>
+                <input type="text" [(ngModel)]="airlinename"/>
+              </div>
+              <div class="fld">
+                <label>Planned Flight No.</label>
+                <input type="text" [(ngModel)]="plannedfltno"/>
+              </div>
+              <div class="fld">
+                <label>Date</label>
+                <my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="plannedfltdt"></my-date-picker>
+              </div>
+              <div class="fld">
+                <label>Actual Flight No.</label>
+                <input type="text" [(ngModel)]="actualfltno"/>
+              </div>
+              <div class="fld">
+                <label>Date</label>
+                <my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="actualfltdt"></my-date-picker>
+              </div>
+              <div class="fld">
+                <label>MAWB No.</label>
+                <input type="text" [(ngModel)]="mawbno" [disabled]="true"/>
+              </div>
+              <div class="fld">
+                <label>MAWB Date</label>
+                <my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="mawbdt"  [disabled]="true"></my-date-picker>
+              </div>
+              <div class="fld">
+                <label>MAWB Destination</label>
+                <ng-select [items]="commoncities"
+                  bindLabel="CITY_COUNTRY"
+                  bindValue="CITY_CODE"
+                  [(ngModel)]="mawbdest"
+                  class="custom"
+                  placeholder="--Select--"
+                  >
+                </ng-select>
+              </div>
+              <div class="fld">
+                <label>MAWB Freight</label>
+                <ng-select [items]="[{VALUEFIELD: 'PP', TEXTFIELD: 'PP'},{VALUEFIELD: 'CC', TEXTFIELD: 'CC'}]"
+                  bindLabel="TEXTFIELD"
+                  bindValue="VALUEFIELD"
+                  [(ngModel)]="mawbfreight"
+                  class="custom"
+                  placeholder="--Select--"
+                  >
+                </ng-select>
+              </div>
+              <div class="fld">
+                <label>House AWB No.</label>
+                <input type="text" [(ngModel)]="houseawbno" [disabled]="true"/>
+              </div>
+              <div class="fld">
+                <label>Date</label>
+                <my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="houseawbdt" [disabled]="true"></my-date-picker>
+              </div>
+
+              <div class="fld full">
+                <label>Routing</label>
+                <div class="cs-opts">
+                  <label class="cs-opt">
+                    <input type="radio" name="TransType" [checked]="transtype == 'Direct'" value="Direct"  (click)="transType('Direct')"/>Direct
+                  </label>
+                  <label class="cs-opt">
+                    <input type="radio" name="TransType" [checked]="transtype == 'Trans'" value="Trans" (click)="transType('Trans')"/>Transhipment
+                  </label>
+                </div>
+              </div>
+
+              <div class="fld">
+                <label>Transhipment Port1</label>
+                <ng-select [items]="commoncities"
+                  bindLabel="CITY_COUNTRY"
+                  bindValue="CITY_CODE"
+                  [(ngModel)]="transportone"
+                  [disabled]="transtype == 'Direct'"
+                  class="custom"
+                  placeholder="--Select--"
+                  >
+                </ng-select>
+              </div>
+              <div class="fld">
+                <label>Transhipment Port2</label>
+                <ng-select [items]="commoncities"
+                  bindLabel="CITY_COUNTRY"
+                  bindValue="CITY_CODE"
+                  [(ngModel)]="transporttwo"
+                  [disabled]="transtype == 'Direct'"
+                  class="custom"
+                  placeholder="--Select--"
+                  >
+                </ng-select>
+              </div>
+              <div class="fld">
+                <label>Flight No.</label>
+                <input type="text" [(ngModel)]="fltno1"/>
+              </div>
+              <div class="fld">
+                <label>Flight No.</label>
+                <input type="text" [(ngModel)]="fltno2"/>
+              </div>
+              <div class="fld">
+                <label>ETD</label>
+                <my-date-picker name="etdonedt" [options]="myDatePickerOptions" [(ngModel)]="etdonedt" [disabled]="transtype == 'Direct'"></my-date-picker>
+              </div>
+              <div class="fld">
+                <label>ETD</label>
+                <my-date-picker name="etdtwodt" [options]="myDatePickerOptions" [(ngModel)]="etdtwodt" [disabled]="transtype == 'Direct'"></my-date-picker>
+              </div>
+              <div class="fld">
+                <label>ETA</label>
+                <my-date-picker name="etaonedt" [options]="myDatePickerOptions" [(ngModel)]="etaonedt"></my-date-picker>
+              </div>
+              <div class="fld">
+                <label>ETA</label>
+                <my-date-picker name="etatwodt" [options]="myDatePickerOptions" [(ngModel)]="etatwodt" [disabled]="transtype == 'Direct'"></my-date-picker>
+              </div>
+
+            </div>
+            </div>
+          }
+
+          <div class="card sec cs-card">
+            <div class="card-h"><h2>Port details</h2></div>
+            <div class="fields">
+            <div class="fld">
+              <label>Loading Port</label>
+              <ng-select [items]="commoncities"
+                bindLabel="CITY_NAME"
+                bindValue="CITY_CODE"
+                [(ngModel)]="loadingport"
+                class="custom"
+                (change)="GetTerminal(loadingport)"
+                placeholder="--Select--"
+                >
+              </ng-select>
+            </div>
+            <div class="fld">
+              <label>Terminal</label>
+              <ng-select [items]="portterminal"
+                bindLabel="TERMINAL"
+                bindValue="ID"
+                [(ngModel)]="loadingportterminal"
+                class="custom"
+                placeholder="--Select--"
+                >
+              </ng-select>
+            </div>
+            <div class="fld full">
+              <label>Carting Place</label>
+              <input type="text" [(ngModel)]="cartingplace"/>
+            </div>
+            <div class="fld">
+              <label>Port of Discharge</label>
+              <ng-select [items]="commoncities"
+                bindLabel="CITY_NAME"
+                bindValue="CITY_CODE"
+                [(ngModel)]="podchrg"
+                (change)="chgPortDischarge(podchrg)"
+                class="custom"
+                placeholder="--Select--"
+                >
+              </ng-select>
+            </div>
+            <div class="fld">
+              <label>I / T</label>
+              <ng-select [items]="[{VALUEFIELD:'I/T', TEXTFIELD:'I/T'}]"
+                bindLabel="TEXTFIELD"
+                bindValue="VALUEFIELD"
+                [(ngModel)]="portit"
+                class="custom"
+                placeholder="--Select--"
+                >
+              </ng-select>
+            </div>
+            <div class="fld full">
+              <label>Dest. City/Country</label>
+              <ng-select [items]="commoncities"
+                bindLabel="CITY_COUNTRY"
+                bindValue="CITY_CODE"
+                [(ngModel)]="destcity"
+                class="custom"
+                placeholder="--Select--"
+                >
+              </ng-select>
+            </div>
+          </div>
+          </div>
+
+          <div class="card sec cs-card">
+            <div class="card-h">
+              <h2>Goods details</h2>
+              <!-- Links-only: CBM calculator (disabled for SEA, as before) -->
+              <button type="button" class="btn sm" [disabled]="disablecalcbmbtn" (click)="CalcbmModal()">Calculate CBM</button>
+            </div>
+            <div class="fields">
+            <div class="fld">
+              <label>Shipper Gross Weight <span class="req">*</span></label>
+              <input type="text" [(ngModel)]="shprgrosswt" OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Gross Weight <span class="req">*</span></label>
+              <input type="text" [(ngModel)]="grosswt" OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Shipper Volume</label>
+              <input type="text" [(ngModel)]="shprvolume" OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Net Weight <span class="req">*</span></label>
+              <input type="text" [(ngModel)]="netwt" OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Volume (CBM) <span class="req">*</span></label>
+              <input type="text" [disabled]="modetype!='SEA'" [(ngModel)]="volume" OnlyNumber="true" (blur)="calculateCHBL(grosswt)"/>
+            </div>
+            <div class="fld">
+              <label>CHBL Weight</label>
+              <input type="text" [(ngModel)]="chblwt" OnlyNumber="true" disabled />
+            </div>
+            <div class="fld full top">
+              <label>Remarks</label>
+              <textarea rows="2" class="form-control" [(ngModel)]="goodsremark"></textarea>
+            </div>
+          </div>
+          </div>
+        </section>
+        <section class="cs-anchor" id="cs-invoice" data-section="invoice" [class.cs-open]="openSection === 'invoice'">
+          <div class="cs-sech">Invoice@if (locked) {<span class="cs-lockhint">Opens once parties and shipment are saved</span>}</div>
+          <!-- ---------------- #Invoice ---------------- -->
+
+          <div class="card sec cs-card">
+            <div class="card-h"><h2>Exporter's invoice detail</h2></div>
+            <div class="fields">
+
+            <div class="fld">
+              <label>Doc Recd. Date <span class="req">*</span></label>
+              <my-date-picker name="mydate3" [options]="myDocPickerOptions" [(ngModel)]="docrecdt" ></my-date-picker>
+            </div>
+            <div class="fld">
+              <label>Exporter Inv no. <span class="req">*</span></label>
+              <input type="text" [(ngModel)]="expinvno"/>
+            </div>
+            <div class="fld">
+              <label>Inv Date <span class="req">*</span></label>
+              <my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="exptinvdt" required></my-date-picker>
+            </div>
+
+            <div class="fld">
+              <label>Currency</label>
+              <select [(ngModel)]="currency"  (change)="changeCurrency(currency)">
+                <option value="0">Please select</option>
+                @for (d of commoncurrencies; track d) {
+                  <option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+                }
+              </select>
+            </div>
+            <div class="fld">
+              <label>Currency Rate</label>
+              <input type="text" [(ngModel)]="currencyrate" OnlyNumber="true" [disabled]="currency== 'CR115'"/>
+            </div>
+            <div class="fld">
+              <label>INR Rate</label>
+              <input type="text" [(ngModel)]="inrrate" OnlyNumber="true" [disabled]="currency== 'CR115'"/>
+            </div>
+
+            <div class="fld">
+              <label>Incoterm</label>
+              <ng-select [items]="[{VALUEFIELD: 'FOB', TEXTFIELD: 'FOB'},{VALUEFIELD: 'CIF', TEXTFIELD: 'CIF'},{VALUEFIELD: 'C&F', TEXTFIELD: 'C&F'},{VALUEFIELD: 'C&I', TEXTFIELD: 'C&I'}]"
+                bindLabel="TEXTFIELD"
+                bindValue="VALUEFIELD"
+                [(ngModel)]="incoterm"
+                (change)="changeIncoterm(incoterm)"
+                class="custom"
+                placeholder="--Select--"
+                >
+              </ng-select>
+            </div>
+            <div class="fld">
+              <label>Freight</label>
+              <select [(ngModel)]="frieght" (change)="changefreight(frieght)" >
+                <option value="PP">PP</option>
+                <option value="CC">CC</option>
+              </select>
+            </div>
+
+            <div class="fld">
+              <label>Invoice Amount <span class="req">*</span></label>
+              <input type="text" [(ngModel)]="invamt" OnlyNumber="true" (keyup)="calculateFOBMarket()"/>
+            </div>
+            <div class="fld">
+              <label>Frieght Charges</label>
+              <input type="text" [(ngModel)]="frtchrgs" OnlyNumber="true" (keyup)="calculateFOBMarket()" [disabled]="incoterm== 'FOB' || incoterm== 'C&I'"/>
+            </div>
+            <div class="fld">
+              <label>Insurance Amount</label>
+              <input type="text" [(ngModel)]="insuramt" OnlyNumber="true" (keyup)="calculateFOBMarket()" [disabled]="incoterm== 'FOB' || incoterm== 'C&F'"/>
+            </div>
+            <div class="fld">
+              <label>Discount</label>
+              <input type="text" [(ngModel)]="discount" OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Packing &amp; Others</label>
+              <input type="text" [(ngModel)]="pkgothrs" OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Commission</label>
+              <input type="text" [(ngModel)]="commission" OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Commission Paid to</label>
+              <input type="text" [(ngModel)]="commissionpaidto"/>
+            </div>
+            <div class="fld">
+              <label>Address1</label>
+              <input type="text" [(ngModel)]="addrsone"/>
+            </div>
+            <div class="fld">
+              <label>Address2</label>
+              <input type="text" [(ngModel)]="addrstwo"/>
+            </div>
+            <div class="fld">
+              <label>Nature of Payment</label>
+              <ng-select [items]="[{VALUEFIELD: '(LC)Letter of credit', TEXTFIELD: '(LC)Letter of credit'},{VALUEFIELD: '(DA)Delivery against acceptance', TEXTFIELD: '(DA)Delivery against acceptance'},{VALUEFIELD: '(DP)Delivery against payment', TEXTFIELD: '(DP)Delivery against payment'},{VALUEFIELD: '(AP)Advance payment', TEXTFIELD: '(AP)Advance payment'},{VALUEFIELD: '(NA)Not applicable', TEXTFIELD: '(NA)Not applicable'}]"
+                bindLabel="TEXTFIELD"
+                bindValue="VALUEFIELD"
+                [(ngModel)]="natureofpayment"
+                class="custom"
+                placeholder="--Select--"
+                >
+              </ng-select>
+            </div>
+            <div class="fld">
+              <label>Other Deduction</label>
+              <input type="text" [(ngModel)]="othrdeduction" OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Remark</label>
+              <input type="text" [(ngModel)]="remark"/>
+            </div>
+          </div>
+          </div>
+
+          <div class="card sec cs-card">
+            <div class="card-h"><h2>Valuation</h2></div>
+            <div class="fields">
+            <div class="fld">
+              <label>FOB INR</label>
+              <input type="text" [(ngModel)]="fobinr" OnlyNumber="true" disabled/>
+            </div>
+            <div class="fld">
+              <label>Market Value</label>
+              <input type="text" [(ngModel)]="marketval" OnlyNumber="true" disabled/>
+            </div>
+            <div class="fld full">
+              <label>Type of Shipping Bill</label>
+              <ng-select [items]="[{VALUEFIELD: 'FREE', TEXTFIELD: 'FREE'},{VALUEFIELD: 'DEEC', TEXTFIELD: 'DEEC'},{VALUEFIELD: 'DEPB', TEXTFIELD: 'DEPB'},{VALUEFIELD: 'DBK', TEXTFIELD: 'DBK'},{VALUEFIELD: 'DEEC DBK', TEXTFIELD: 'DEEC DBK'},{VALUEFIELD: 'DUTY', TEXTFIELD: 'DUTY'},{VALUEFIELD: 'EOU/EX.BOND', TEXTFIELD: 'EOU/EX.BOND'},{VALUEFIELD: 'DFRC', TEXTFIELD: 'DFRC'},{VALUEFIELD: 'DFRC DEPB', TEXTFIELD: 'DFRC DEPB'},{VALUEFIELD: 'DFRC DRAWBACK', TEXTFIELD: 'DFRC DRAWBACK'},{VALUEFIELD: 'DEPB CUM DRAWBACK', TEXTFIELD: 'DEPB CUM DRAWBACK'}]"
+                bindLabel="TEXTFIELD"
+                bindValue="VALUEFIELD"
+                [(ngModel)]="typeshpnbill"
+                (change)="changeddInvoiceShipType(typeshpnbill)"
+                class="custom"
+                placeholder="--Select--"
+                >
+              </ng-select>
+            </div>
+            <div class="fld">
+              <label>Value Addition %</label>
+              <input type="text" [(ngModel)]="valueaddition" OnlyNumber="true" [disabled]="typeshpnbill != 'EOU/EX.BOND'"/>
+            </div>
+            <div class="fld">
+              <label>Amount</label>
+              <input type="text" [(ngModel)]="valueamt" OnlyNumber="true" [disabled]="typeshpnbill != 'EOU/EX.BOND'"/>
+            </div>
+          </div>
+          </div>
+
+          <div class="card sec cs-card">
+            <div class="card-h"><h2>Provisional &amp; bill of entry</h2></div>
+            <div class="fields">
+            <div class="fld full">
+              <label>Scheme</label>
+              <label class="cs-opt">
+                <input type="radio" name="InvShipType" [checked]="invshiptype == 'Provisional'" value="Provisional" (click)="changerbInvoiceShipType('Provisional')" [disabled]="typeshpnbill == 'FREE' || typeshpnbill == 'DBK' || typeshpnbill == 'DUTY' || typeshpnbill == 'EOU/EX.BOND' || typeshpnbill == 'DFRC' || typeshpnbill == 'DFRC DEPB' || typeshpnbill == 'DFRC DRAWBACK' || typeshpnbill == 'DEPB CUM DRAWBACK'"/>Provisional
+              </label>
+            </div>
+            <div class="fld">
+              <label>Receipt No.</label>
+              <input type="text" [(ngModel)]="receiptno" [disabled]="invshiptype != 'Provisional'"/>
+            </div>
+            <div class="fld">
+              <label>Date</label>
+              <my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="receiptdt" [disabled]="invshiptype != 'Provisional'"></my-date-picker>
+            </div>
+
+            <div class="fld full">
+              <label>Import label</label>
+              <label class="cs-opt">
+                <input type="checkbox"  name="checkbox1" [(ngModel)]="imptlbluse">Import Lable Used
+              </label>
+            </div>
+            <div class="fld">
+              <label>Bill of Entry No.</label>
+              <input type="text" [(ngModel)]="billentryno"/>
+            </div>
+            <div class="fld">
+              <label>Date</label>
+              <my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="billentrydt" required></my-date-picker>
+            </div>
+          </div>
+          </div>
+        </section>
+        <section class="cs-anchor" id="cs-documents" data-section="documents" [class.cs-open]="openSection === 'documents'">
+          <div class="cs-sech">Documents@if (locked) {<span class="cs-lockhint">Opens once parties and shipment are saved</span>}</div>
+          <!-- ---------------- #Documents ---------------- -->
+
+          <div class="card sec cs-card">
+            <div class="card-h"><h2>Documents details</h2></div>
+            <div class="fields">
+            <div class="tbl-wrap cs-full">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>SR. NO.</th>
+                    <th>List of Documents</th>
+                    <th>RECD</th>
+                    <th>CALL FOR</th>
+                    <th>N.A.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (doc of documentlist; track doc) {
+                    <tr>
+                      <td>{{doc.DOCCODE}}</td>
+                      <td>{{doc.DOCUMENT}}</td>
+                      <td><input type="radio" name="{{doc.DOCCODE}}" value="{{'R'+doc.DOCCODE}}" [(ngModel)]="doc.RECD" (click)="changeDocumentList(doc.DOCCODE, 'R')"/></td>
+                      <td><input type="radio" name="{{doc.DOCCODE}}" value="{{'C'+doc.DOCCODE}}" [(ngModel)]="doc.CALL" (click)="changeDocumentList(doc.DOCCODE, 'C')"/></td>
+                      <td><input type="radio" name="{{doc.DOCCODE}}" value="{{'N'+doc.DOCCODE}}" [(ngModel)]="doc.NA" (click)="changeDocumentList(doc.DOCCODE, 'N')"/></td>
+                    </tr>
+                  } @empty {
+                    <tr class="cs-none"><td colspan="5">No document list yet - it loads once the parties and shipment are saved.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <div class="fld full">
+              <label>Actual Doc Received</label>
+              <div class="cs-opts">
+                <label class="cs-opt">
+                  <input type="radio" name="rbDocActualReceived" value="YES" [(ngModel)]="docactualreceived"/>Yes
+                </label>
+                <label class="cs-opt">
+                  <input type="radio" name="rbDocActualReceived" value="NO" [(ngModel)]="docactualreceived"/>No
+                </label>
+              </div>
+            </div>
+          </div>
+          </div>
+        </section>
+        <section class="cs-anchor" id="cs-itc" data-section="itc" [class.cs-open]="openSection === 'itc'">
+          <div class="cs-sech">ITC code@if (locked) {<span class="cs-lockhint">Opens once parties and shipment are saved</span>}</div>
+          <!-- ---------------- #ITC Code ---------------- -->
+
+          <div class="card sec cs-card">
+            <div class="card-h"><h2>ITC code details</h2></div>
+            <div class="fields">
+
+            <div class="fld">
+              <label>ITC Code</label>
+              <input type="text" [(ngModel)]="itccode" [maxlength]="9"/>
+            </div>
+            <div class="fld">
+              <label>FOB INR</label>
+              <input type="text" [(ngModel)]="itcfobinr" OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Drawback Sub Sr.No</label>
+              <input type="text" [(ngModel)]="itcsrno"/>
+            </div>
+            <div class="fld">
+              <label>Unit1</label>
+              <input type="text" [(ngModel)]="itcunitone" OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Type1</label>
+              <input type="text" [(ngModel)]="itctypeone"/>
+            </div>
+            <div class="fld">
+              <label>Group Code</label>
+              <input type="text" [(ngModel)]="itcgroupcode"/>
+            </div>
+            <div class="fld">
+              <label>Condition No.</label>
+              <input type="text" [(ngModel)]="itcconditionno"/>
+            </div>
+            <div class="fld">
+              <label>Unit2</label>
+              <input type="text" [(ngModel)]="itcunittwo" OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Type2</label>
+              <input type="text" [(ngModel)]="itctypetwo"/>
+            </div>
+            <div class="fld">
+              <label>Appendix of public notice</label>
+              <input type="text" [(ngModel)]="itcnotice"/>
+            </div>
+            <div class="fld">
+              <label class="cs-opt">
+                <input type="radio" name="rbITC" [checked]="rbitc == 'Percent'" (click)="changePercentUnit('Percent')" [disabled]="typeshpnbill == 'FREE'"/>% of Drawback
+              </label>
+              <input type="text" [(ngModel)]="itcpercent" OnlyNumber="true" [disabled]="typeshpnbill == 'FREE' || rbitc != 'Percent'"/>
+            </div>
+            <div class="fld">
+              <label class="cs-opt">
+                <input type="radio" name="rbITC" [checked]="rbitc == 'PerUnit'" (click)="changePercentUnit('PerUnit')"  [disabled]="typeshpnbill == 'FREE'"/>Rate per Unit
+              </label>
+              <input type="text" [(ngModel)]="itcperunit" OnlyNumber="true" [disabled]="typeshpnbill == 'FREE' || rbitc != 'PerUnit'"/>
+            </div>
+            <div class="fld full top">
+              <label>Description</label>
+              <textarea rows="3" class="form-control" OnlyCharacter="true" [maxlength]="380" [(ngModel)]="itcdescription"></textarea>
+            </div>
+
+            <div class="cs-actions cs-full">
+              @if (this.hditcid == '0') {
+                <button type="button" class="btn p" (click)="addEditITCDtls()">Add</button>
+              }
+              @if (this.hditcid != '0') {
+                <button type="button" class="btn p" (click)="addEditITCDtls()">Update</button>
+              }
+              <button type="button" class="btn g" (click)="resetITC()">Reset</button>
+            </div>
+
+              <div class="tbl-wrap cs-full">
+                <table class="tbl">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>ITC Code</th>
+                      <th>FOB INR</th>
+                      <th>Drawback Sub Sr.No</th>
+                      <th>Unit1</th>
+                      <th>Type1</th>
+                      <th>Group Code</th>
+                      <th>Appendix of public notice</th>
+                      <th>Condition No.</th>
+                      <th>Unit2</th>
+                      <th>Type2</th>
+                      <th>% of Drawback</th>
+                      <th>Rate per Unit</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (obj of itclist; track obj) {
+                      <tr>
+                        <td>
+                          <i class="fa fa-pencil cs-ic" (click)="editITC(obj.TBL_INDEXID,obj.ITCCODEID,obj.ITCCODE,obj.EXPTNO)"></i>
+                          &nbsp;
+                          <i class="fa fa-trash cs-ic" (click)="deleteConfirm(obj.TBL_INDEXID,obj.ITCCODEID,obj.ITCCODE,obj.EXPTNO)"></i>
+                        </td>
+                        <td>{{obj.ITCCODE}}</td>
+                        <td>{{obj.FOBINR}}</td>
+                        <td>{{obj.DBKSUBSRNO}}</td>
+                        <td>{{obj.UNIT}}</td>
+                        <td>{{obj.TPE}}</td>
+                        <td>{{obj.EXP_ITCGROUPCODE}}</td>
+                        <td>{{obj.APPENDIXNO}}</td>
+                        <td>{{obj.CONDITIONNO}}</td>
+                        <td>{{obj.UNITA}}</td>
+                        <td>{{obj.TPEA}}</td>
+                        <td>{{obj.DBKPERCENT}}</td>
+                        <td>{{obj.RATEPERUNIT}}</td>
+                        <td>{{obj.DESCRIPTION}}</td>
+                      </tr>
+                    } @empty {
+                      <tr class="cs-none"><td colspan="14">No ITC code lines yet.</td></tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+          </div>
+          </div>
+        </section>
+        <section class="cs-anchor" id="cs-order" data-section="order" [class.cs-open]="openSection === 'order'">
+          <div class="cs-sech">Order no.@if (locked) {<span class="cs-lockhint">Opens once parties and shipment are saved</span>}</div>
+          <!-- ---------------- #Order No ---------------- -->
+
+          <div class="card sec cs-card">
+            <div class="card-h"><h2>Contract</h2></div>
+            <div class="fields">
+            <div class="fld">
+              <label>Export Contract No.</label>
+              <input type="text" [(ngModel)]="ordercontractno" />
+            </div>
+            <div class="fld">
+              <label>Period of Payment</label>
+              <input type="text" OnlyNumber="true" [(ngModel)]="orderpayment" />
+            </div>
+          </div>
+          </div>
+
+          <div class="card sec cs-card">
+            <div class="card-h"><h2>Order no details</h2></div>
+            <div class="fields">
+
+            <div class="fld full">
+              <label>Exists Order No.</label>
+              <ng-select [items]="orderexistnolist"
+                bindLabel="TEXTFIELD"
+                bindValue="VALUEFIELD"
+                [(ngModel)]="orderexistno"
+                (change)="changeExistOrderNo(orderexistno)"
+                [disabled]="disabledExistOrderNoList"
+                class="custom"
+                placeholder="--Select--">
+              </ng-select>
+            </div>
+
+            <div class="fld">
+              <label>Order No. <span class="req">*</span></label>
+              <input type="text" OnlyCharacter="true" [(ngModel)]="orderno" />
+            </div>
+            <div class="fld">
+              <label>Reference No.</label>
+              <input type="text" OnlyCharacter="true" [(ngModel)]="orderreferenceno" />
+            </div>
+            <div class="fld full">
+              <label>Item Description</label>
+              <input type="text" OnlyCharacter="true" [(ngModel)]="orderitemdesc" maxlength="50" />
+            </div>
+            <div class="fld">
+              <label>Pieces <span class="req">*</span></label>
+              <input type="text" [(ngModel)]="orderpiece" OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Type of Pieces</label>
+              <input type="text" [(ngModel)]="ordertypeofpiece" />
+            </div>
+            <div class="fld">
+              <label>Pkgs</label>
+              <input type="text" [(ngModel)]="orderpackage"  OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Warehouse</label>
+              <input type="text" OnlyCharacter="true" [(ngModel)]="orderwarehouse" />
+            </div>
+            <div class="fld">
+              <label>LSD Date</label>
+              <my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="orderlsddt" required></my-date-picker>
+            </div>
+            <div class="fld">
+              <label>DRN Date</label>
+              <my-date-picker name="mydate3" [options]="myDatePickerOptions" [(ngModel)]="orderdrndt" required></my-date-picker>
+            </div>
+            <div class="fld">
+              <label>Gr. Wt</label>
+              <input type="text" [(ngModel)]="ordergrwt"  OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Net Wts</label>
+              <input type="text" [(ngModel)]="ordernetwt"  OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Volume (CBM)</label>
+              <input type="text" [(ngModel)]="ordervolume"  OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Chbl. Wt</label>
+              <input type="text" [(ngModel)]="orderchblwt"  OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>FOB Value</label>
+              <input type="text" [(ngModel)]="orderfobval"  OnlyNumber="true"/>
+            </div>
+            <div class="fld">
+              <label>Currency</label>
+              <input type="text" [(ngModel)]="ordercurrency" />
+            </div>
+            <div class="fld">
+              <label>Cnee Dept (Rayon)</label>
+              <input type="text" [(ngModel)]="ordercneedept" />
+            </div>
+            <div class="fld">
+              <label>Container No</label>
+              <input type="text" [(ngModel)]="ordercontainerno" />
+            </div>
+            <div class="fld">
+              <label>ICS HS Code</label>
+              <input type="text" [(ngModel)]="ordericshscode"/>
+            </div>
+            <div class="fld">
+              <label>ICS HS Description</label>
+              <input type="text" [(ngModel)]="ordericshsdescription"/>
+            </div>
+
+            <div class="cs-actions cs-full">
+              @if (this.hdordernoid == '0') {
+                <button type="button" class="btn p" (click)="addEditOrderDtls()">Add</button>
+              }
+              @if (this.hdordernoid != '0') {
+                <button type="button" class="btn p" (click)="addEditOrderDtls()">Update</button>
+              }
+              <button type="button" class="btn g" (click)="resetOrder()">Reset</button>
+            </div>
+
+              <div class="tbl-wrap cs-full">
+                <table class="tbl">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Order No.</th>
+                      <th>Reference No</th>
+                      <th>Pieces</th>
+                      <th>Type of Pieces</th>
+                      <th>Warehouse</th>
+                      <th>Item Description</th>
+                      <th>Pkgs</th>
+                      <th>Gr. Wt</th>
+                      <th>Net Wt</th>
+                      <th>Volume</th>
+                      <th>Chbl. Wt.</th>
+                      <th>LSD Date</th>
+                      <th>DRN Date</th>
+                      <th>FOB Value</th>
+                      <th>Currency</th>
+                      <th>Cnee Dept (Rayon)</th>
+                      <th>Container No</th>
+                      <th>ICS HS Code</th>
+                      <th>ICS HS Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (obj of orderlist; track obj) {
+                      <tr>
+                        <td>
+                          <i class="fa fa-pencil cs-ic" (click)="editOrder(obj.TBL_INDEXID,obj.ORDERID,obj.EXPTNO,obj.ORDERNO)"></i>
+                          &nbsp;
+                          <i class="fa fa-trash cs-ic" (click)="deleteOrder(obj.TBL_INDEXID,obj.ORDERID,obj.EXPTNO,obj.ORDERNO)"></i>
+                        </td>
+                        <td>{{obj.ORDERNO}}</td>
+                        <td>{{obj.STYLENO}}</td>
+                        <td>{{obj.PIECES}}</td>
+                        <td>{{obj.TYPEOFPCS}}</td>
+                        <td>{{obj.WAREHOUSE}}</td>
+                        <td>{{obj.ITEMDESC}}</td>
+                        <td>{{obj.PKGS}}</td>
+                        <td>{{obj.GRWT}}</td>
+                        <td>{{obj.NETWT}}</td>
+                        <td>{{obj.VOLUME}}</td>
+                        <td>{{obj.CHBLWT}}</td>
+                        <td>{{obj.LSD}}</td>
+                        <td>{{obj.DRNDATE}}</td>
+                        <td>{{obj.FOBVALUE}}</td>
+                        <td>{{obj.CURENCY}}</td>
+                        <td>{{obj.CneeDept}}</td>
+                        <td>{{obj.ContainerNo}}</td>
+                        <td>{{obj.ICSHSCode}}</td>
+                        <td>{{obj.ICSHSDescription}}</td>
+                      </tr>
+                    } @empty {
+                      <tr class="cs-none"><td colspan="20">No order no. lines yet.</td></tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+          </div>
+          </div>
+        </section>
+        <section class="cs-anchor" id="cs-package" data-section="package" [class.cs-open]="openSection === 'package'">
+          <div class="cs-sech">Package no.@if (locked) {<span class="cs-lockhint">Opens once parties and shipment are saved</span>}</div>
+          <!-- ---------------- #Package No ---------------- -->
+
+          <div class="card sec cs-card">
+            <div class="card-h"><h2>Package no - details</h2></div>
+            <div class="fields">
+
+            <div class="fld">
+              <label>From <span class="req">*</span></label>
+              <input type="text" [(ngModel)]="packagefrom" OnlyNumber="true" />
+            </div>
+            <div class="fld">
+              <label>To <span class="req">*</span></label>
+              <input type="text" [(ngModel)]="packageto" OnlyNumber="true" />
+            </div>
+            <div class="fld">
+              <label>Alphabet</label>
+              <input type="text" [(ngModel)]="packagealphabet" OnlyCharacter="true" />
+            </div>
+
+            <div class="cs-actions cs-full">
+              @if (this.hdpkgindexid == '0') {
+                <button type="button" class="btn p" (click)="addEditPkgDtls()">Add</button>
+              }
+              @if (this.hdpkgindexid != '0') {
+                <button type="button" class="btn p" (click)="addEditPkgDtls()">Update</button>
+              }
+              <button type="button" class="btn g" (click)="resetPackage()">Reset</button>
+            </div>
+
+              <div class="tbl-wrap cs-full">
+                <table class="tbl">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>From</th>
+                      <th>To</th>
+                      <th>Alphabet</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (pl of packagelist; track pl) {
+                      <tr>
+                        <td>
+                          <i class="fa fa-pencil cs-ic" (click)="editPackage(pl.TBL_INDEXID,pl.PKGNOID,pl.EXPTNO)"></i>
+                          &nbsp;&nbsp;
+                          <i class="fa fa-trash cs-ic" (click)="deletePackage(pl.TBL_INDEXID,pl.PKGNOID,pl.EXPTNO)"></i>
+                        </td>
+                        <td>{{pl.FROM}}</td>
+                        <td>{{pl.TO}}</td>
+                        <td>{{pl.ALPHABET}}</td>
+                      </tr>
+                    } @empty {
+                      <tr class="cs-none"><td colspan="4">No package no. lines yet.</td></tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+          </div>
+          </div>
+        </section>
+        <section class="cs-anchor" id="cs-marks" data-section="marks" [class.cs-open]="openSection === 'marks'">
+          <div class="cs-sech">Marks &amp; numbers@if (locked) {<span class="cs-lockhint">Opens once parties and shipment are saved</span>}</div>
+          <!-- ---------------- #Marks & Numbers ---------------- -->
+
+          <div class="card sec cs-card">
+            <div class="card-h"><h2>Marks &amp; numbers - details</h2></div>
+            <div class="fields">
+            <div class="fld full top">
+              <label>Marks &amp; Numbers</label>
+              <textarea rows="15" class="form-control" OnlyCharacter="true" [(ngModel)]="marksandnumbers"></textarea>
+            </div>
+          </div>
+          </div>
+        </section>
+    </div>
+
+    </fieldset>
+
+    <!-- pinned save bar: Abort / Submit stay bottom right -->
+    @if (saveError) {
+      <div class="cs-errband" role="alert">
+        <i class="fa fa-exclamation-circle"></i>
+        <span>{{ saveError }}</span>
+        <button type="button" class="x" (click)="saveError = ''" aria-label="Dismiss">&times;</button>
+      </div>
+    }
+    <div class="bar">
+      <span class="note">Nothing is saved until Submit. Sections: Main &middot; Transport &middot; Invoice &middot; Documents &middot; ITC &middot; Order &middot; Package &middot; Marks</span>
+      <div class="r">
+        @if (embedded) {
+          <button type="button" class="btn g" [disabled]="locked || saving" (click)="keepAsDraft()" title="Leave this page and keep what is entered as a draft in this browser">Keep as draft</button>
+        }
+        <button type="button" class="btn g" [disabled]="saving" (click)="abort()" title="Abort also discards the saved draft">Abort</button>
+        <button type="button" class="btn p" [disabled]="locked || saving" (click)="submit()">
+          @if (saving) { <span class="cs-spin" aria-hidden="true"></span>&nbsp;Saving&hellip; } @else { Submit }
+        </button>
+      </div>
+    </div>
+
 </div>
 
-
-
+<!-- Links-only: Calculate CBM modal (legacy calculator content restyled in place) -->
+<div bsModal #CalculateCBM="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" [config]="{backdrop: 'static'}">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content" style="width:530px;">
+      <div class="modal-header">
+        <span class="modal-title pull-left">
+          <strong>Calculate CBM</strong>
+        </span>
+      </div>
+      <div class="modal-body modal-fix-body x-legacy" style="height:400px;width:530px;">
+        <app-main-consignment-calcbm-add (result)="changevolume($event)" [grosswt]="grosswt" [noofpkgs]="noofpackages" [exptno]="hdexptno"></app-main-consignment-calcbm-add>
+      </div>
+    </div>
+  </div>
+</div>

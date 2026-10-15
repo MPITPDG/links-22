@@ -1,0 +1,195 @@
+﻿<!--
+  Shipment Progress workspace - Import page kit (import-page.css) + sp-page.css.
+
+    left    the job: type, one number, Search - plus the matches when an
+            order/ref search turned up more than one job
+    right   KPI tiles and the milestone table: every stage this user may open,
+            with a status chip derived from the stage searches
+    drawer  the open stage, rendered by the existing update component through
+            the child outlet; its own sticky Cancel / Update bar stays pinned
+            bottom-right inside the drawer
+-->
+<div class="im-page sp-ws">
+
+  <div class="ph">
+    <div>
+      <h1>Shipment progress</h1>
+      <p>{{ mode === 'vessel' ? 'Vessel-keyed stages - each screen picks its own vessel.' : 'Enter the job once; every stage it is eligible for is listed on the right.' }}</p>
+    </div>
+    <div class="tools">
+      <div class="sp-seg" role="tablist" aria-label="Keyed by">
+        <button type="button" [class.on]="mode === 'number'" (click)="setMode('number')">By export number</button>
+        <button type="button" [class.on]="mode === 'vessel'" (click)="setMode('vessel')">By vessel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sp-grid">
+
+    <!-- ── left: the job ─────────────────────────────────────────────────── -->
+    <div class="sp-side">
+
+      <div class="card">
+        <div class="card-h">
+          <h2>Job</h2>
+          @if (mode === 'number' && current) {
+            <span class="chip solid">Selected</span>
+          } @else if (mode === 'number') {
+            <span class="chip dash">None</span>
+          }
+        </div>
+
+        @if (mode === 'number') {
+          <div class="sp-job">
+            <div class="f">
+              <label>Search by</label>
+              <div class="sp-radios">
+                <label><input type="radio" name="spwsType" (click)="changeType('EXPORT_NO')" [checked]="checkType == 'EXPORT_NO'" />Export</label>
+                <label><input type="radio" name="spwsType" (click)="changeType('ORDER_NO')" [checked]="checkType == 'ORDER_NO'" />Order</label>
+                <label><input type="radio" name="spwsType" (click)="changeType('REF_NO')" [checked]="checkType == 'REF_NO'" />Ref</label>
+              </div>
+            </div>
+            <div class="f">
+              <label for="spwsValue">Value</label>
+              <input type="text" id="spwsValue" [(ngModel)]="SearchValue" (keyup.enter)="search()" placeholder="Number" />
+              @if (ErrorMessage) {
+                <span class="err">{{ ErrorMessage }}</span>
+              }
+            </div>
+            <div class="acts">
+              <button type="button" class="btn p" [disabled]="searching" (click)="search()">{{ searching ? 'Searching…' : 'Search' }}</button>
+              @if (current || searched) {
+                <button type="button" class="btn g" (click)="reset()">Clear</button>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="sp-note">Pick a stage on the right - the vessel is chosen inside the screen.</div>
+        }
+      </div>
+
+      @if (mode === 'number' && current) {
+        <div class="card aside">
+          <div class="card-h"><h2>Selected job</h2></div>
+          <div class="row"><span>Export no.</span><b>{{ current.view || current.exptno }}</b></div>
+          <div class="row"><span>Shipper</span><b>{{ current.shipper || '—' }}</b></div>
+          <div class="row"><span>Consignee</span><b>{{ current.consignee || '—' }}</b></div>
+        </div>
+      }
+
+      @if (mode === 'number' && hits.length > 1) {
+        <!-- an order/ref search can match several jobs; pick one -->
+        <div class="card">
+          <div class="card-h">
+            <h2>Matches</h2>
+            <span class="meta">{{ hits.length }} jobs</span>
+          </div>
+          <div class="sp-hits">
+            @for (hit of hits; track hit.exptno) {
+              <button type="button" (click)="pick(hit)" [class.on]="current && current.exptno === hit.exptno">
+                <b>{{ hit.view || hit.exptno }}</b>
+                <span>{{ hit.shipper }}</span>
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      @if (mode === 'number' && searched && hits.length === 0) {
+        <div class="card"><div class="sp-empty">No record found for “{{ SearchValue }}”.</div></div>
+      }
+
+    </div>
+
+    <!-- ── right: milestone overview ─────────────────────────────────────── -->
+    <div class="card">
+      <div class="card-h">
+        <h2>Milestones</h2>
+        <span class="meta">{{ mode === 'vessel' ? 'Keyed by vessel' : (current ? (current.view || current.exptno) : 'No job selected') }}</span>
+      </div>
+
+      @if (mode === 'number') {
+        <div class="sp-kpis">
+          <div><b>{{ stages.length }}</b><span>Stages you can open</span></div>
+          <div><b>{{ current ? listedCount : '—' }}</b><span>Listed for this job</span></div>
+          <div><b>{{ current ? stages.length - listedCount : '—' }}</b><span>Not listed</span></div>
+          <div>
+            <b>{{ current && stages.length ? percentListed + '%' : '—' }}</b>
+            <span>Coverage</span>
+            <div class="sp-meter"><i [style.width.%]="current ? percentListed : 0"></i></div>
+          </div>
+        </div>
+      }
+
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Milestone</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (!rightsResolved && stages.length === 0) {
+              <tr><td class="empty" colspan="4">Checking your access…</td></tr>
+            } @else {
+              @for (s of stages; track s.key; let i = $index) {
+                <tr class="click" [class.on]="s.key === step" [class.locked]="railLocked" (click)="railLocked ? null : onStep(s.key)">
+                  <td class="step">{{ i + 1 }}</td>
+                  <td>
+                    <b>{{ s.label }}</b>
+                    <div class="sub-t">{{ s.mode === 'vessel' ? 'Vessel is picked inside the screen' : 'Keyed by export number' }}</div>
+                  </td>
+                  <td>
+                    @switch (stageState(s)) {
+                      @case ('open') { <span class="chip solid">Open</span> }
+                      @case ('listed') { <span class="chip"><span class="dot"></span>Listed</span> }
+                      @case ('vessel') { <span class="chip">By vessel</span> }
+                      @case ('search') { <span class="chip dash">Search first</span> }
+                      @default { <span class="chip dash">Not listed</span> }
+                    }
+                  </td>
+                  <td class="act">
+                    <button type="button" [disabled]="railLocked" (click)="$event.stopPropagation(); onStep(s.key)">{{ s.key === step ? 'Opened' : 'Update' }}</button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="4">You have no rights to any shipment progress stage.</td></tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!--
+    The outlet is always in the DOM; the drawer is shown and hidden with a
+    class rather than @if. A stage click navigates to a child route and,
+    because shouldReuseRoute is false, rebuilds this component - the child
+    activates during that same pass, so an outlet behind @if would not exist
+    yet when the router looks for it.
+  -->
+  <div class="sp-scrim" [class.shut]="!step" (click)="closeDrawer()"></div>
+  <aside class="sp-drawer" [class.shut]="!step" role="dialog" aria-label="Stage">
+    <div class="sp-drawer-h">
+      <div>
+        <h2>{{ openLabel || 'Stage' }}</h2>
+        <p>{{ mode === 'vessel' ? 'Vessel-keyed stage' : (current ? (current.view || current.exptno) + (current.shipper ? ' · ' + current.shipper : '') : '') }}</p>
+      </div>
+      <div class="tools">
+        @if (mode === 'number' && current) {
+          <span class="chip">{{ current.view || current.exptno }}</span>
+        }
+        <button type="button" class="btn g" (click)="closeDrawer()">Close</button>
+      </div>
+    </div>
+    <div class="sp-drawer-b">
+      <router-outlet></router-outlet>
+    </div>
+  </aside>
+
+</div>

@@ -9,6 +9,7 @@ import { ShipmentProgressReportComponent } from './shipment-progress.component';
 import { AirCargoStatusReportComponent } from './air-cargo-status.component';
 import { TrackingAirBookingReportComponent } from './tracking-air-booking.component';
 import { TrackingAirShipmentReportComponent } from './tracking-air-shipment.component';
+import { MissingDocsReportComponent } from './missing-docs.component';
 
 const routes: Routes = [
     {
@@ -29,6 +30,7 @@ const routes: Routes = [
             { path: 'air-cargo-status', component: AirCargoStatusReportComponent, data: { title: 'Air Cargo Status' } },
             { path: 'tracking-air-booking', component: TrackingAirBookingReportComponent, data: { title: 'Tracking Air Booking' } },
             { path: 'tracking-air-shipment', component: TrackingAirShipmentReportComponent, data: { title: 'Tracking Air Shipment' } },
+            { path: 'missing-docs', component: MissingDocsReportComponent, data: { title: 'Missing Shipping Docs' } },
         ]
     }
 ];

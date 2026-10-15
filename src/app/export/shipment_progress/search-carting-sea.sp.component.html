@@ -1,55 +1,35 @@
-﻿<div class="row">	
-	<div class="col-sm-3">
-	</div>
-	<div class="col-sm-6">	 
-		<table class="table table-bordered table-sm-new">			
-			
-			<tr>
-				<td>
-					<span class="col-form-span-label ">Vessel Name</span>
-				</td>
-				<td  >
-					<select class="form-control width300"  [(ngModel)]="VslName" (change)="onAgentSelect($event.target.value)">
-						<option value="">Please select</option>
-                        @for (d of vslnameList; track d) {
-<option value={{d.RTNOPRT}}>
-                            {{d.VSL_NAME}}
-                        </option>
-}
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<span class="col-form-span-label ">Vessel Agent</span>
-				</td>
-				<td  >
-					<select class="form-control width200"  [(ngModel)]="VslAgent"  >
-						<option value="">Please select</option>
-						@for (d of Agentlist; track d) {
-<option value={{d.agt_code}}>{{d.agt_name}}</option>
-}
-					</select>
-				</td>
-			</tr>
-			<tr>				
-				<td colspan="2" class="centerlabel" >
-					<button uiBtn variant="default" size="sm" type="submit"  name="btnAgtAdd" (click)="onsearch()" #searchButton> 
-						<span class="col-form-span-label">
-							@if (!loading) {
-<i class="fa fa-search"></i>
-}
-							@if (loading) {
-<i class="fa fa-spinner fa-spin"></i>
-}
-							Search 
-						</span>
-					</button>
-				</td>
-				
-			</tr>
-		</table>
-	</div>
-		<div class="col-sm-3">            
-		</div>
-	</div>			
+﻿<!-- Shipment progress - carting (sea) search. Kit filter card; bindings unchanged. -->
+<div class="card">
+  <div class="card-h">
+    <h2>Vessel</h2>
+    <span class="meta">{{ vslnameList.length }} vessels open for carting</span>
+  </div>
+  <div class="filters f2">
+    <div class="f">
+      <label for="spCsVessel">Vessel name</label>
+      <select id="spCsVessel" [(ngModel)]="VslName" (change)="onAgentSelect($event.target.value)">
+        <option value="">Please select</option>
+        @for (d of vslnameList; track d) {
+          <option value={{d.RTNOPRT}}>
+            {{d.VSL_NAME}}
+          </option>
+        }
+      </select>
+    </div>
+    <div class="f">
+      <label for="spCsAgent">Vessel agent</label>
+      <select id="spCsAgent" [(ngModel)]="VslAgent">
+        <option value="">Please select</option>
+        @for (d of Agentlist; track d) {
+          <option value={{d.agt_code}}>{{d.agt_name}}</option>
+        }
+      </select>
+    </div>
+    <div class="f">
+      <label>&nbsp;</label>
+      <button class="btn p" type="submit" name="btnAgtAdd" (click)="onsearch()" #searchButton [disabled]="loading">
+        @if (loading) { Searching&hellip; } @else { Search }
+      </button>
+    </div>
+  </div>
+</div>

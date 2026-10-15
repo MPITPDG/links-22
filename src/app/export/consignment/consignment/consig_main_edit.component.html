@@ -1,289 +1,284 @@
-﻿<div class="animated fadeIn">
-   <div class="row">
-      <div class="col-sm-12">
-		<div class="row">
-			<div class="col-sm-12">
-				<div class="card">
-					<div class="card-header formheading">
-						<div class="row">
-							<div class="col-sm-6"><strong>EDIT CONSIGNMENT </strong></div>
-							<div class="col-sm-6 right-text">
-								<button uiBtn variant="default" (click)="redirectTo('N')">
-									<span class="col-form-span-label"><i class="fa fa-plus"></i> Add New</span>
-								</button>
-								<button uiBtn variant="default" (click)="redirectTo('S')">
-									<!-- <span class="col-form-span-label"><i class="fa fa-arrow-left"></i> Back to Search</span> -->
-										@if (jobtype=='M') {
-<span class="col-form-span-label"><i class="fa fa-arrow-left"></i> Back to Search</span>
-}
-									@if (jobtype=='A') {
-<span class="col-form-span-label"><i class="fa fa-arrow-left"></i> Back to Auto Job list</span>
-}
-								</button>
-							</div>
-						</div>
-					</div>
+﻿<!--
+  Export consignment - edit hub (/export/Consignment/edit, opened from Consignment search
+  or the auto-job list). Ported from MPERPNG-20 (recipe W: workspace hub + drawer).
+  Page kit: global import-page.css + consignment-page.css (host class kit-consignment)
+  + consig_main_edit.component.css. Sticky header with the consignment's identity chips
+  and a section nav; ruled cards whose tiles open the editors in the right-hand drawer.
+  Every edit('...') call, the gates on jobno / IS_EDITABLE / ISDIFFAIR / mode and the
+  Links-only jobtype back link are unchanged from the previous Links template.
+-->
+<div class="im-page ce-page">
+
+	<div class="cs-top">
+		<div class="ph">
+			<div>
+				<h1>Edit consignment</h1>
+				<p class="mono">{{exportHeader}}</p>
+				<div class="cs-chips">
+					@if (mode) {
+						<span class="chip solid">{{mode}}{{ ISDIFFAIR == '2' ? ' · sea-air' : (ISDIFFAIR == '1' ? ' · differed air' : '') }}</span>
+					}
+					@if (editList.SHIPPER) {
+						<span class="chip"><span class="k">Shipper</span> {{editList.SHIPPER}}</span>
+					}
+					@if (editList.CONSIGNEE) {
+						<span class="chip"><span class="k">Consignee</span> {{editList.CONSIGNEE}}</span>
+					}
+					@if (editList.MAWBNO) {
+						<span class="chip"><span class="k">MAWB</span> {{editList.MAWBNO}}</span>
+					}
+					@if (editList.HAWBNO) {
+						<span class="chip"><span class="k">HAWB</span> {{editList.HAWBNO}}</span>
+					}
+					@if (jobno != '') {
+						<span class="chip solid">Job {{jobno}}</span>
+					}
+					@if (editList.IS_EDITABLE == 'NO') {
+						<span class="chip dash">Containerised &middot; pkgs/weights locked</span>
+					}
+					@if (arrivaldt) {
+						<span class="chip"><span class="dot"></span>Arrived {{arrivaldt}}</span>
+					}
 				</div>
+			</div>
+			<div class="tools">
+				<button type="button" class="btn g" (click)="redirectTo('S')">
+					@if (jobtype=='M') {Back to search}
+					@if (jobtype=='A') {Back to auto job list}
+				</button>
+				<button type="button" class="btn p" (click)="redirectTo('N')">+ Add new</button>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-sm-2">
-			</div>
-			<div class="col-sm-8">
-			  <div class="card">
-				<div class="card-header centerlabel formheading">
-					<strong>{{exportHeader}}</strong>
-				</div>
-				<div class="card-body">
-					<div class="row">
-						<div class="col-sm-12">
-							@if ( jobno != ''  ) {
-<table>
-								<tr>
-									<td class="width30 align-top" ><img src="assets/icon/buy.jpg" class="normal-icon"></td>
-									<td class="width300"><span class="link-label" (click)="edit('VIEW')">Consignment View</span></td>
-									 
-										<td class="width30 align-top"  ><img src="assets/icon/registeruser16.jpg" class="normal-icon"></td>
-										<td class="width300"><span class="link-label" (click)="edit('Airshipment')">EDIT AIR SHIPMENT</span></td>
-									 
-								</tr>
-								<tr> 
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-								</tr>
-									 
-								<tr>
-									<td class="width30 align-top" rowspan="2"><img src="assets/icon/company.png" class="normal-icon"></td>
-									<td class="width300"><span class="link-label" (click)="edit('MAWB')">Edit MAWB Freight Rate</span></td>
-									<td class="width30 align-top"  ><img src="assets/icon/contact.jpg" class="normal-icon"></td>
-									<td class="width300"><span class="link-label" (click)="edit('HAWB')">Edit HAWB Freight Rate</span></td>								
-								</tr>
-								<tr> 
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-									</tr>
-								<tr>
-									<td class="width30 align-top" rowspan="2"><img src="assets/icon/company.png" class="normal-icon"></td>
-									<td class="width300" colspan="3"><span class="link-label" (click)="edit('JOB')">Edit Job Freight Rate</span></td>
-								</tr>
-							</table>
-} @else {
-
-                            <table class="table-sm-new bgwhite">
-								<tr>
-										<td class="width30 align-top" rowspan="2"><img src="assets/icon/buy.jpg" class="normal-icon"></td>
-										<td class="width300"><span class="link-label" (click)="edit('VIEW')">Consignment View</span></td>
-										<td class="width30 align-top" rowspan="2" ><img src="assets/icon/registeruser16.jpg" class="normal-icon"></td>
-										<td class="width300"><span  class="link-label" (click)="edit('SHIPCLEAR')">SHIPMENT CLEARANCE BY US</span></td>
-									 
-								</tr>
-									<tr>
-											<td>&nbsp;</td>
-											<td colspan="5"><span class="col-form-span-label">Click here to change </span></td>
-										</tr>
-									<tr>
-										<td>&nbsp;</td>
-										<td>&nbsp;</td>
-									</tr>
-							 
-								<tr>
-									<td>&nbsp;</td>
-									<td>&nbsp;</td>
-									<td>&nbsp;</td>
-									<td>&nbsp;</td>
-								</tr>
-							</table>
-						
-}
-							
-						</div>
-					</div>
-					<div class="row">
-					</div>
-					
-					<div class="row">
-						<div class="col-sm-12">
-                            @if (jobno =='') {
-<table class="table-sm-new bgwhite"  >
-								<tr>
-									<td class="width30 align-top" rowspan="3"><img src="assets/icon/1265187760.png" class="normal-icon"></td>
-									<td class="width300"><span class="link-label" (click)="edit('MAIN')">Shipper / BillTo / Manufature / Consignee / Consignee Bank / Buyer / Source Agent</span></td>
-									<td class="width30 align-top" rowspan="3">@if (editList.IS_EDITABLE != 'NO') {
-<img src="assets/icon/1262723459.png" class="normal-icon">
-}</td>
-									<td class="width300">
-										@if (editList.IS_EDITABLE != 'NO') {
-<span class="link-label" (click)="edit('PORT')">Edit Shipment Details / Origin / Destination / Pkgs / Pcs / GrWt / NetWt / Cbm Etc</span>
-}
-										@if (editList.IS_EDITABLE == 'NO' && ISDIFFAIR == '1') {
-<span class="link-label">Edit Vessel/Shipment Details / Origin / Destination / Pkgs / Pcs / GrWt / NetWt / Cbm Etc</span>
-}
-										@if (editList.IS_EDITABLE == 'NO' && ISDIFFAIR == '2') {
-<span class="link-label" (click)="edit('PORT')">Edit Shipment Details/Shipment Details / Origin / Destination / Pkgs / Pcs / GrWt / NetWt / Cbm Etc</span>
-}
-									</td>
-								</tr>
-								<tr>
-									<td><span class="col-form-span-label">Edit Shipper, BillTo, Manufature, Consignee, Consignee Bank, Buyer, Source Agent, Etc...</span></td>
-									<td>
-										@if (editList.IS_EDITABLE != 'NO') {
-<span class="col-form-span-label">Edit Shipment Details, Origin, Destination, Pkgs, Pcs, GrWt, NetWt, Cbm, Etc...</span>
-}
-										@if (editList.IS_EDITABLE == 'NO' ) {
-<span class="col-form-span-label red"><strong>Consignment is already containerised, hence you can not change the pkgs,pcs,grwt,netwt,cbm etc.</strong></span>
-}
-										@if (editList.IS_EDITABLE == 'NO' && ISDIFFAIR == '2') {
-<span class="col-form-span-label ">Edit Shipment Details, Origin, Destination, Pkgs, Pcs, GrWt, NetWt, Cbm, Etc...</span>
-}
-									</td>
-								</tr>
-								<tr>
-									<td>&nbsp;</td>
-									<td>&nbsp;</td>
-								</tr>
-							</table>
-}
-						</div>
-					</div>
-					<div class="row">
-					</div>
-					<div class="row">
-						<div class="col-sm-12">
-                            @if (jobno =='') {
-<table class="table-sm-new bgwhite">
-								<tr>
-									<td class="width30 align-top"  rowspan="2"><img src="assets/icon/home-features_why.gif" class="normal-icon"></td>
-									<td class="width300" ><span class="link-label"  (click)="edit('INVOICE')">Invoice Details</span></td>
-									<td class="width30 align-top" rowspan="2"><img src="assets/icon/1265187760.png" class="normal-icon"></td>
-									<td class="width300"><span class="link-label"  (click)="edit('ITC')">ITC Code Details</span></td>
-								</tr>
-								<tr>
-									<td>&nbsp;</td>
-									<td>&nbsp;</td>
-								</tr>
-							</table>
-}
-						</div>
-					</div>
-					<div class="row">
-					</div>
-					<div class="row">
-						<div class="col-sm-12">
-                            @if (jobno =='') {
-<table class="table-sm-new bgwhite">
-								<tr>
-									<td class="width30 align-top" rowspan="2"><img src="assets/icon/1264378617.png" class="normal-icon"></td>
-									<td class="width300"><span class="link-label" (click)="edit('ORDER')">Order No. Details</span></td>
-									<td class="width30 align-top" rowspan="2"><img src="assets/icon/1265278270.png" class="normal-icon"></td>
-									<td class="width300"><span class="link-label" (click)="edit('PKG')">Package No. Details</span></td>
-								</tr>
-								<tr>
-									<td>&nbsp;</td>
-									<td>&nbsp;</td>
-								</tr>
-							</table>
-}
-						</div>
-					</div>
-					<div class="row">
-					</div>
-					<div class="row">
-						<div class="col-sm-12">
-                            @if (jobno =='') {
-<table class="table-sm-new bgwhite">
-								<tr>
-									<td class="width30 align-top" rowspan="2"><img src="assets/icon/1265194537.png" class="normal-icon"></td>
-									<td class="width300"><span class="link-label" (click)="edit('MARKS_NUMBERS')">Marks & Numbers Details</span></td>
-									<!-- <td class="width30 align-top" rowspan="2"><img src="assets/icon/00.png" class="normal-icon"></td>
-									<td class="width300">
-										<span class="link-label" (click)="edit('QUOTA')">Quota Details</span>
-									</td> -->
-									<td class="width30 align-top" rowspan="2"><img src="assets/icon/company.png" class="normal-icon"></td>
-									<td class="width300"><span class="link-label" (click)="edit('DOC')">Edit Documents</span></td>
-								</tr>
-								<tr>
-									<td>&nbsp;</td>
-									<td>&nbsp;</td>
-								</tr>
-							</table>
-}
-						</div>
-					</div>
-					<div class="row">
-					</div>
-					<div class="row">
-						<div class="col-sm-12">
-               @if (jobno =='') {
-<table class="table-sm-new bgwhite">
-								<tr>
-									<td class="width30 align-top" rowspan="2"><img src="assets/icon/contact.jpg" class="normal-icon"></td>
-									<td class="width300"><span class="link-label" (click)="edit('CONREMARK')">Consignee Remark Details</span></td>
-									@if ( mode ==='AIR' || ISDIFFAIR=='2') {
-<div>
-										<td class="width30 align-top" rowspan="2"><img src="assets/icon/company.png" class="normal-icon"></td>
-										<td class="width300"><span class="link-label" (click)="edit('MAWB')">Edit MAWB Freight Rate</span></td>
-									</div>
-} @else {
-
-											<td> &nbsp;</td>
-											<td>&nbsp;</td>
-									
-}
-									
-									
-								</tr>
-								<tr>
-									<td>&nbsp;</td>
-									<td>&nbsp;</td>
-								</tr>
-							</table>
-}
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-12">
-              @if (jobno =='') {
-<table class="table-sm-new bgwhite" >
-								<tr>
-									@if ( mode ==='AIR' || ISDIFFAIR=='2') {
-<div  >
-										<td class="width30 align-top" rowspan="2"><img src="assets/icon/company.png" class="normal-icon"></td>
-										<td class="width300"><span class="link-label" (click)="edit('HAWB')">Edit HAWB Freight Rate</span></td>
-										<td class="width30 align-top" rowspan="2"><img src="assets/icon/company.png" class="normal-icon"></td>
-										<td class="width300"><span class="link-label" (click)="edit('JOB')">Edit Job Freight Rate</span></td>
-									</div>
-}
-								</tr>
-								<tr>
-									<td>&nbsp;</td>
-									<td>&nbsp;</td>
-								</tr>
-								<tr >
-										@if (jobno =='') {
-<div >
-									<td class="width30 align-top" rowspan="2"><img src="assets/icon/1265194537.png" class="normal-icon"></td>
-									<td class="width300"><span class="link-label" (click)="edit('CANCEL')">Cancel Shipment</span></td>
-									<td>&nbsp;</td>
-									<td>&nbsp;</td>
-									</div>
-}
-								</tr>
-							</table>
-}
-						</div>
-					</div>
-				
-				</div>
-			  </div>
-			</div>
-			<div class="col-sm-2">
-			</div>
-		</div>
-	  </div>
+		<nav class="cs-nav" aria-label="Sections">
+			<button type="button" (click)="scrollToSection('ce-shipment')">Shipment</button>
+			@if (jobno =='') {
+				<button type="button" (click)="scrollToSection('ce-details')">Consignment details</button>
+			}
+			@if (jobno =='' && (mode ==='AIR' || ISDIFFAIR=='2')) {
+				<button type="button" (click)="scrollToSection('ce-rating')">Freight rating</button>
+			}
+			@if (jobno =='') {
+				<button type="button" (click)="scrollToSection('ce-danger')">Cancel shipment</button>
+			}
+		</nav>
 	</div>
+
+	@if (jobno != '') {
+		<!-- ============ JOB MODE ============ -->
+		<div class="card sec cs-anchor" id="ce-shipment">
+			<div class="card-h"><h2>Shipment</h2><span class="meta">Job {{jobno}}</span></div>
+			<div class="ce-grid">
+				<button type="button" class="ce-tile" (click)="edit('VIEW')">
+					<img src="assets/icon/buy.jpg" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">Consignment view</span>
+						<span class="ce-tile-sub">View the full consignment details</span>
+					</span>
+				</button>
+				<button type="button" class="ce-tile" (click)="edit('Airshipment')">
+					<img src="assets/icon/registeruser16.jpg" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">Edit air shipment</span>
+						<span class="ce-tile-sub">Actual flight number and date</span>
+					</span>
+				</button>
+				<button type="button" class="ce-tile" (click)="edit('MAWB')">
+					<img src="assets/icon/company.png" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">Edit MAWB freight rate</span>
+						<span class="ce-tile-sub">Master airway bill rating</span>
+					</span>
+				</button>
+				<button type="button" class="ce-tile" (click)="edit('HAWB')">
+					<img src="assets/icon/contact.jpg" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">Edit HAWB freight rate</span>
+						<span class="ce-tile-sub">House airway bill rating</span>
+					</span>
+				</button>
+				<button type="button" class="ce-tile" (click)="edit('JOB')">
+					<img src="assets/icon/company.png" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">Edit job freight rate</span>
+						<span class="ce-tile-sub">Job level freight rating</span>
+					</span>
+				</button>
+			</div>
+		</div>
+	} @else {
+		<!-- ============ NON-JOB MODE ============ -->
+		<div class="card sec cs-anchor" id="ce-shipment">
+			<div class="card-h"><h2>Shipment</h2></div>
+			<div class="ce-grid">
+				<button type="button" class="ce-tile" (click)="edit('VIEW')">
+					<img src="assets/icon/buy.jpg" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">Consignment view</span>
+						<span class="ce-tile-sub">View the full consignment details</span>
+					</span>
+				</button>
+				<button type="button" class="ce-tile" (click)="edit('SHIPCLEAR')">
+					<img src="assets/icon/registeruser16.jpg" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">Shipment clearance by us</span>
+						<span class="ce-tile-sub">Click here to change</span>
+					</span>
+				</button>
+			</div>
+		</div>
+	}
+
+	@if (jobno =='') {
+		<!-- ============ CONSIGNMENT DETAILS ============ -->
+		<div class="card sec cs-anchor" id="ce-details">
+			<div class="card-h"><h2>Consignment details</h2><span class="meta">Each tile opens its editor in the drawer</span></div>
+			<div class="ce-grid">
+
+				<button type="button" class="ce-tile" (click)="edit('MAIN')">
+					<img src="assets/icon/1265187760.png" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">Parties</span>
+						<span class="ce-tile-sub">Shipper, bill to, manufacturer, consignee, consignee bank, buyer, source agent</span>
+					</span>
+				</button>
+
+				@if (editList.IS_EDITABLE != 'NO') {
+					<button type="button" class="ce-tile" (click)="edit('PORT')">
+						<img src="assets/icon/1262723459.png" alt="">
+						<span class="ce-tile-body">
+							<span class="ce-tile-title">Shipment, port &amp; goods</span>
+							<span class="ce-tile-sub">Origin, destination, pkgs, pcs, gross / net weight, CBM</span>
+						</span>
+					</button>
+				}
+
+				<!-- Containerised and not sea-air: nothing to open, the warning alone (as before). -->
+				@if (editList.IS_EDITABLE == 'NO' && ISDIFFAIR != '2') {
+					<div class="ce-tile ce-tile-static">
+						<img src="assets/icon/1262723459.png" alt="">
+						<span class="ce-tile-body">
+							<span class="ce-tile-title">{{ ISDIFFAIR == '1' ? 'Vessel / shipment, port & goods' : 'Shipment, port & goods' }}</span>
+							<span class="ce-tile-warn">Consignment is already containerised, hence you can not change the pkgs, pcs, grwt, netwt, cbm etc.</span>
+						</span>
+					</div>
+				}
+
+				@if (editList.IS_EDITABLE == 'NO' && ISDIFFAIR == '2') {
+					<button type="button" class="ce-tile" (click)="edit('PORT')">
+						<img src="assets/icon/1262723459.png" alt="">
+						<span class="ce-tile-body">
+							<span class="ce-tile-title">Shipment, port &amp; goods</span>
+							<span class="ce-tile-warn">Consignment is already containerised, hence you can not change the pkgs, pcs, grwt, netwt, cbm etc.</span>
+							<span class="ce-tile-sub">Origin, destination, pkgs, pcs, gross / net weight, CBM</span>
+						</span>
+					</button>
+				}
+
+				<button type="button" class="ce-tile" (click)="edit('INVOICE')">
+					<img src="assets/icon/home-features_why.gif" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">Invoice details</span>
+						<span class="ce-tile-sub">Exporter's invoice entries</span>
+					</span>
+				</button>
+
+				<button type="button" class="ce-tile" (click)="edit('ITC')">
+					<img src="assets/icon/1265187760.png" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">ITC code details</span>
+						<span class="ce-tile-sub">ITC HS codes for the shipment</span>
+					</span>
+				</button>
+
+				<button type="button" class="ce-tile" (click)="edit('ORDER')">
+					<img src="assets/icon/1264378617.png" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">Order no. details</span>
+						<span class="ce-tile-sub">Orders, styles, pieces and weights</span>
+					</span>
+				</button>
+
+				<button type="button" class="ce-tile" (click)="edit('PKG')">
+					<img src="assets/icon/1265278270.png" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">Package no. details</span>
+						<span class="ce-tile-sub">Package number ranges</span>
+					</span>
+				</button>
+
+				<button type="button" class="ce-tile" (click)="edit('MARKS_NUMBERS')">
+					<img src="assets/icon/1265194537.png" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">Marks &amp; numbers</span>
+						<span class="ce-tile-sub">Shipping marks on the packages</span>
+					</span>
+				</button>
+
+				<button type="button" class="ce-tile" (click)="edit('DOC')">
+					<img src="assets/icon/company.png" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">Documents</span>
+						<span class="ce-tile-sub">Document checklist for the shipment</span>
+					</span>
+				</button>
+
+				<button type="button" class="ce-tile" (click)="edit('CONREMARK')">
+					<img src="assets/icon/contact.jpg" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">Consignee remark</span>
+						<span class="ce-tile-sub">Remarks shown to the consignee</span>
+					</span>
+				</button>
+			</div>
+		</div>
+	}
+
+	@if (jobno =='' && (mode ==='AIR' || ISDIFFAIR=='2')) {
+		<!-- ============ FREIGHT RATING (AIR / SEA-AIR) ============ -->
+		<div class="card sec cs-anchor" id="ce-rating">
+			<div class="card-h"><h2>Freight rating</h2><span class="meta">Compact / Original layout switch in the drawer header</span></div>
+			<div class="ce-grid">
+				<button type="button" class="ce-tile" (click)="edit('MAWB')">
+					<img src="assets/icon/company.png" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">MAWB freight rate</span>
+						<span class="ce-tile-sub">Master airway bill rating</span>
+					</span>
+				</button>
+				<button type="button" class="ce-tile" (click)="edit('HAWB')">
+					<img src="assets/icon/company.png" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">HAWB freight rate</span>
+						<span class="ce-tile-sub">House airway bill rating</span>
+					</span>
+				</button>
+				<button type="button" class="ce-tile" (click)="edit('JOB')">
+					<img src="assets/icon/company.png" alt="">
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">Job freight rate</span>
+						<span class="ce-tile-sub">Job level freight rating</span>
+					</span>
+				</button>
+			</div>
+		</div>
+	}
+
+	@if (jobno =='') {
+		<!-- ============ CANCEL ============ -->
+		<div class="card sec cs-anchor" id="ce-danger">
+			<div class="card-h"><h2>Cancel shipment</h2><span class="meta">Irreversible</span></div>
+			<div class="ce-grid">
+				<button type="button" class="ce-tile ce-tile-danger" (click)="edit('CANCEL')">
+					<i class="fa fa-ban ce-tile-icon" aria-hidden="true"></i>
+					<span class="ce-tile-body">
+						<span class="ce-tile-title">Cancel shipment</span>
+						<span class="ce-tile-sub">Marks this consignment as cancelled</span>
+					</span>
+				</button>
+			</div>
+		</div>
+	}
+
 </div>
+
 <app-consignment-edit-modal #ConsignmentEditModal></app-consignment-edit-modal>

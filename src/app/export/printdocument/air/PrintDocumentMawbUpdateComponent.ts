@@ -50,9 +50,10 @@ export class PrintDocumentMawbUpdateComponent implements OnChanges {
         this._dataService.getData("Export/PrintDocumentAirMawbUpdatePageload", _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                this.currencyList = data.Table;
-                this.destinationList = data.Table1;
-                this.mawbnoList = data.Table2;
+                this.currencyList = (data && data.Table) ? data.Table : [];
+                this.destinationList = (data && data.Table1) ? data.Table1 : [];
+                this.mawbnoList = (data && data.Table2) ? data.Table2 : [];
+                if (!this.mawbnoList.length) { return; }
                 if (this.mawbnoList.length > 0) {
                     for (let i = 0; i < this.mawbnoList.length; i++) {
                         this.totalGrwt += this.mawbnoList[i].GRWT;

@@ -10,6 +10,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-mbl-printview',
     templateUrl: 'expt_prt_mbl_printprintview.component.html',
+    styleUrls: ['./mbl-form.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -42,6 +43,12 @@ export class Exptmblprintview implements OnInit {
     APPLYTO: any = "";
 
     buttonStatus: boolean = false;
+    /** Presentation (from MPERPNG-20): true once exp_printdoc_mb_printload has filled the form */
+    loaded: boolean = false;
+    /** set when the record could not be loaded; shown instead of the form */
+    loadError: string = "";
+    /** true when the screen was opened without a Master B/L carried over */
+    noDocument: boolean = false;
     constructor(
         private _router: Router,
         private _dataService: DataService,
@@ -53,13 +60,19 @@ export class Exptmblprintview implements OnInit {
     }
 
     ngOnInit(): void {
+        if (!this._mblsharedservice.mblnoshared && !this._mblsharedservice.jobnoshared) {
+            this.noDocument = true;
+            this.loaderService.display(false);
+            return;
+        }
         this.loaderService.display(true);
         const jsonExport = { JOBNO: this._mblsharedservice.jobnoshared, MBLNO: this._mblsharedservice.mblnoshared };//'GOA103180016'
         this._dataService.Common('export/exp_printdoc_mb_printload', jsonExport)
 
             .subscribe((data: any) => {
 
-                if (data.Table[0].STATUS == 100) {
+                const first = (data && data.Table && data.Table.length) ? data.Table[0] : null;
+                if (first && first.STATUS == 100) {
                     this.MBLdet = data.Table;
                     this.SHIPPER = this.MBLdet[0].SHIPPER;
                     this.CONSIGNEE = this.MBLdet[0].CONSIGNEE;
@@ -84,21 +97,34 @@ export class Exptmblprintview implements OnInit {
                     this.APPLYTO = this.MBLdet[0].APPLYTO;
                     this.EXPNO = this.MBLdet[0].EXPNO;
                     this.exptno = this.MBLdet[0].EXPTNO;
+                    this.loaded = true;
                     this.loaderService.display(false);
                 }
-                else{ this.loaderService.display(false);}
+                else{
+                    this.loadError = (first && first.STATUSTEXT) || "The Master B/L could not be loaded.";
+                    this.loaderService.display(false);
+                }
+            },
+            (error) => {
+                this.loadError = "The Master B/L could not be loaded (" + (error && error.status) + ").";
+                this.loaderService.display(false);
             });
+    }
+
+    goToForm() {
+        this._router.navigate(['export/print-document/sea/mbl/number']);
     }
     printUpdate() {
         const jsonExport = { jobno: this._mblsharedservice.jobnoshared, shipper: this.SHIPPER, consignee: this.CONSIGNEE, notify: this.NOTIFY, expno: this.EXPNO, blno: this._mblsharedservice.mblnoshared, Carriage: this.CARRIAGE, RecptPlce: this.RECPTPLCE, Vessel: this.VESSEL, POL: this.POL, POD: this.POD, PODEL: this.PODEL, FrtPaidAt: this.FRTPAIDAT, MARKSANDNOS: this.MARKSANDNOS, NOOFPKGS: this.NOOFPKGS, ITCDESC: this.ITCDESC, GRWT: this.GRWT, VOL: this.VOL, PLACEDATE: this.PLACEDATE  ,MISC: this.MISC };
         this._dataService.Common('Export/exp_printdoc_mb_print_update', jsonExport)
             .subscribe((data: any) => {
-                if (data.Table[0].STATUS == 100) {   
+                const res = (data && data.Table && data.Table.length) ? data.Table[0] : null;
+                if (res && res.STATUS == 100) {   
                     this._toasterService.toast('alert', 'Alert', "Update Successfully"); 
                 }
              else {
 
-                this._toasterService.toast('error', 'Error', data.Table[0].STATUSTEXT);
+                this._toasterService.toast('error', 'Error', (res && res.STATUSTEXT) || "The Master B/L could not be updated.");
                 this.loaderService.display(false); 
             }
             })

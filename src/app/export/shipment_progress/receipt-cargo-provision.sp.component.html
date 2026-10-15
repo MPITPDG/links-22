@@ -1,195 +1,195 @@
-﻿<div class="animated fadeIn">
-	<div class="row">
-		<div class="col-sm-2">
-		</div>
-		<div class="col-sm-8">
-			<table class="table table-bordered table-sm-new">
-				<tr class="trbg">
-					<td colspan="6"><span class="col-form-span-label"><b>RECEIPT OF CARGO (WITHOUT JOBNO) DETAILS</b></span></td>
-					<td colspan="2">
-						@if (viewType=='Add') {
-<span class="col-form-span-label">
-							<u><a href="javascript:void(0);" (click)="viewType='Search'"><i class="fa fa-arrow-left"></i> Back To Search</a></u>
-						</span>
-}
-					</td>
-				</tr>
-			</table>
-			@if (viewType=='Search') {
-<table class="table table-bordered table-sm-new">
-				<tr>
-					<td class="width150"><span class="col-form-span-label">Shipper<span class="col-form-span-error"> *</span></span></td>
-					<td colspan="7">
-						<ng-select [items]="ShipperList"
-								   bindLabel="TEXTFIELD"
-								   bindValue="VALUEFIELD"
-								   placeholder="-- Select --"
-								   [(ngModel)]="Shipper"
-								   class="form-control"
-								   >
-						</ng-select>
-					</td>
-				</tr>
-				<tr>
-					<td class="width150"><span class="col-form-span-label">Consignee<span class="col-form-span-error"> *</span></span></td>
-					<td colspan="7">
-						<ng-select [items]="ConsigneeList"
-								   bindLabel="CON_NAME"
-								   bindValue="CON_CODE"
-								   placeholder="-- Select --"
-								   [(ngModel)]="Consignee"
-								   class="form-control"
-								   >
-						</ng-select>
-					</td>
-				</tr>
-				<tr class="trbg centerlabel">
-					<td colspan="8">
-						<button type="button" uiBtn variant="default" size="sm" name="searchButton" (click)="Search()"  #searchButton><span class="col-form-span-label"><i class="fa fa-search"></i>&nbsp;Search</span></button>
-					</td>
-				</tr>
-			</table>
-}
-			@if (viewType=='Add') {
-<table class="table table-bordered table-sm-new">
-				<tr>
-					<td class="width150"><span class="col-form-span-label">Shipper</span></td>
-					<td colspan="7"></td>
-				</tr>
-				<tr>
-					<td class="width150"><span class="col-form-span-label">Consignee</span></td>
-					<td colspan="7"></td>
-				</tr>
-				<tr>
-					<td class="width150"><span class="col-form-span-label">Order No </span></td>
-					<td colspan="3"><input type="text" [(ngModel)]="OrderNo" class="form-control width100"/></td>
-					<td class="width150"><span class="col-form-span-label">Style No </span></td>
-					<td colspan="3"><input type="text" [(ngModel)]="StyleNo" class="form-control width100"/></td>
-				</tr>
-				<tr>
-					<td class="width150"><span class="col-form-span-label">Gross Weight </span></td>
-					<td colspan="3"><input type="text" [(ngModel)]="GrossWgt" class="form-control width100" OnlyNumber="true"/></td>
-					<td class="width150"><span class="col-form-span-label">Volume </span></td>
-					<td colspan="3"><input type="text" [(ngModel)]="Volume" class="form-control width100" OnlyNumber="true"/></td>
-				</tr>
-				<tr class="trbg">
-					<td colspan="8"><span class="col-form-span-label"><strong>PACKAGE DETAILS</strong></span></td>
-				</tr>
-				<tr>
-					<td class="width150"><span class="col-form-span-label">No Of Pkgs</span></td>
-					<td colspan="3"><span class="col-form-span-label">Recd Date</span></td>
-					<td class="width150"><span class="col-form-span-label">Recd Where</span></td>
-					<td colspan="3"><span class="col-form-span-label">Recd Locally</span></td>
-				</tr>
-				<tr>
-					<td class="width150"><input type="text" [(ngModel)]="NoOfPkgs" class="form-control width80" [maxlength]="20" /></td>
-					<td><my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="RecdDate"></my-date-picker></td>
-					<td>
-						<ng-select [items]="[{VALUE: '00'},{VALUE: '01'},{VALUE: '02'},{VALUE: '03'},{VALUE: '04'},{VALUE: '05'},{VALUE: '06'},{VALUE: '07'},{VALUE: '08'},{VALUE: '09'},{VALUE: '10'},{VALUE: '11'},{VALUE: '12'},{VALUE: '13'},{VALUE: '14'},{VALUE: '15'},{VALUE: '16'},{VALUE: '17'},{VALUE: '18'},{VALUE: '19'},{VALUE: '20'},{VALUE: '21'},{VALUE: '22'},{VALUE: '23'}]"
-								   bindLabel="VALUE"
-								   bindValue="VALUE"
-								   placeholder="--"
-								   [(ngModel)]="RecdTime"
-								   class="form-control width70"
-								   >
-						</ng-select>
-					</td>
-					<td>
-						<ng-select [items]="[{VALUE: '00'},{VALUE: '15'},{VALUE: '30'},{VALUE: '45'}]"
-								   bindLabel="VALUE"
-								   bindValue="VALUE"
-								   placeholder="--"
-								   [(ngModel)]="RecdMin"
-								   class="form-control width70"
-								   >
-						</ng-select>
-					</td>
-					<td><input type="text" [(ngModel)]="RecdWhere" class="form-control width150" [maxlength]="20" /></td>
-					<td><my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="RecdLocal"></my-date-picker></td>
-					<td>
-						<ng-select [items]="[{VALUE: '00'},{VALUE: '01'},{VALUE: '02'},{VALUE: '03'},{VALUE: '04'},{VALUE: '05'},{VALUE: '06'},{VALUE: '07'},{VALUE: '08'},{VALUE: '09'},{VALUE: '10'},{VALUE: '11'},{VALUE: '12'},{VALUE: '13'},{VALUE: '14'},{VALUE: '15'},{VALUE: '16'},{VALUE: '17'},{VALUE: '18'},{VALUE: '19'},{VALUE: '20'},{VALUE: '21'},{VALUE: '22'},{VALUE: '23'}]"
-								   bindLabel="VALUE"
-								   bindValue="VALUE"
-								   placeholder="--"
-								   [(ngModel)]="RecdLocalTime"
-								   class="form-control width70"
-								   >
-						</ng-select>
-					</td>
-					<td>
-						<ng-select [items]="[{VALUE: '00'},{VALUE: '15'},{VALUE: '30'},{VALUE: '45'}]"
-								   bindLabel="VALUE"
-								   bindValue="VALUE"
-								   placeholder="--"
-								   [(ngModel)]="RecdLocalMin"
-								   class="form-control width70"
-								   >
-						</ng-select>
-					</td>
-				</tr>
-				<tr class="trbg centerlabel">
-					<td colspan="8">
-						@if (Type == 'A') {
-<button type="button" uiBtn variant="default" size="sm" name="addButton" (click)="addUpdate()"  #addButton><span class="col-form-span-label"><i class="fa fa-plus"></i>&nbsp;Add</span></button>
-}
-						@if (Type == 'E') {
-<button type="button" uiBtn variant="default" size="sm" name="updateButton" (click)="addUpdate()"  #updateButton><span class="col-form-span-label"><i class="fa fa-refresh"></i>&nbsp;Update</span></button>
-}
-						<button type="button" uiBtn variant="outline" size="sm" (click)="reset()"><span class="col-form-span-label"><i class="fa fa-undo"></i>&nbsp;Reset</span></button>
-					</td>
-				</tr>
-			</table>
-}
-			<div class="row yscroll" style="height:150px">
-				<table class="table table-bordered table-striped table-sm-new">
-					<thead>
-						<tr class="col-form-span-heading">
-							<th class="width75"></th>
-							<th class="centerlabel"><span class="col-form-span-label">No Of Pkgs</span></th>
-							<th class="centerlabel"><span class="col-form-span-label">Recd Date</span></th>
-							<th class="centerlabel"><span class="col-form-span-label">Recd Where</span></th>
-							<th class="centerlabel"><span class="col-form-span-label">Recd Locally</span></th>
-						</tr>
-					</thead>
-					<tbody>
-						@for (obj of cargoList; track obj) {
-<tr>
-							<td class="width75">
-								<span class="col-form-span-label">
-									<i class="fa fa-pencil fa-1x" (click)="populate('E',obj.TBL_INDEXID,obj.CARGOID, obj.GUID, obj.EXPTNO, obj.NOOFPKGS, obj.RECDDATE, obj.RECDTIME, obj.RECDWHERE, obj.RECDLOCAL, obj.RECDLOCALTIME)"></i>&nbsp;&nbsp;
-									<i class="fa fa-trash fa-1x red" (click)="delete()"></i>
-								</span>
-							</td>
-							<td><span class="col-form-span-label">{{obj.NOOFPKGS}}</span></td>
-							<td><span class="col-form-span-label">{{obj.RECDDATE + ' ' + obj.RECDTIME}}</span></td>
-							<td><span class="col-form-span-label">{{obj.RECDWHERE}}</span></td>
-							<td><span class="col-form-span-label">{{obj.RECDLOCAL + ' ' + obj.RECDLOCALTIME}}</span></td>
-						</tr>
-}
-					</tbody>
-				</table>
-			</div>
-			<table class="table table-bordered table-sm-new">
-				@if (ErrorMessage != '') {
-<tr class="trbg centerlabel">
-					<td colspan="8">
-						<span class="col-form-span-error">{{ErrorMessage}}</span>
-					</td>
-				</tr>
-}
-				<tr class="trbg right-text">
-					<td colspan="8">
-						<button type="button" name="submitButton" uiBtn variant="default" size="sm" (click)="submit();" [disabled]="ErrorMessage != ''" #submitButton>
-							<span class="col-form-span-label"><app-font-changer [fontIndex]="'14'"></app-font-changer> Submit</span>
-						</button>
-						<button type="button" name="abortButton" uiBtn variant="outline" size="sm" (click)="abort();">
-							<span class="col-form-span-label"><app-font-changer [fontIndex]="'7'"></app-font-changer> Abort</span>
-						</button>
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div class="col-sm-2">
-		</div>
-	</div>
+﻿<!--
+  Shipment progress - receipt of cargo without a job no. (provision).
+  Import page kit: pick shipper + consignee, then add package rows and Update.
+  Every binding, #ref and handler is unchanged from the previous template.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Receipt of cargo (without job no.)</h1>
+      <p>{{ viewType == 'Add' ? 'Add the packages received for this shipper and consignee' : 'Choose the shipper and consignee the cargo arrived for' }}</p>
+    </div>
+    <div class="tools">
+      @if (viewType=='Add') {
+        <button type="button" class="btn g" (click)="viewType='Search'">Back to search</button>
+      }
+    </div>
+  </div>
+
+  @if (viewType=='Search') {
+    <div class="card sec">
+      <div class="card-h"><h2>Party</h2><span class="meta"><b>*</b> required</span></div>
+      <div class="filters f2">
+        <div class="f">
+          <label>Shipper <span class="req">*</span></label>
+          <ng-select [items]="ShipperList"
+            bindLabel="TEXTFIELD"
+            bindValue="VALUEFIELD"
+            placeholder="-- Select --"
+            [(ngModel)]="Shipper"
+            class="custom">
+          </ng-select>
+        </div>
+        <div class="f">
+          <label>Consignee <span class="req">*</span></label>
+          <ng-select [items]="ConsigneeList"
+            bindLabel="CON_NAME"
+            bindValue="CON_CODE"
+            placeholder="-- Select --"
+            [(ngModel)]="Consignee"
+            class="custom">
+          </ng-select>
+        </div>
+        <div class="f">
+          <label>&nbsp;</label>
+          <button type="button" class="btn p" name="searchButton" (click)="Search()" #searchButton>Continue</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (viewType=='Add') {
+    <div class="card sec">
+      <div class="card-h">
+        <h2>{{ Type == 'E' ? 'Edit package row' : 'Package details' }}</h2>
+        <span class="meta">dates as dd/mm/yyyy</span>
+      </div>
+      <div class="fields">
+        <div class="fld">
+          <label>Order no.</label>
+          <input type="text" [(ngModel)]="OrderNo" />
+        </div>
+        <div class="fld">
+          <label>Style no.</label>
+          <input type="text" [(ngModel)]="StyleNo" />
+        </div>
+        <div class="fld">
+          <label>Gross weight</label>
+          <input type="text" [(ngModel)]="GrossWgt" OnlyNumber="true" />
+        </div>
+        <div class="fld">
+          <label>Volume</label>
+          <input type="text" [(ngModel)]="Volume" OnlyNumber="true" />
+        </div>
+        <div class="fld">
+          <label>No. of pkgs</label>
+          <input type="text" [(ngModel)]="NoOfPkgs" [maxlength]="20" />
+        </div>
+        <div class="fld">
+          <label>Recd date</label>
+          <my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="RecdDate"></my-date-picker>
+        </div>
+        <div class="fld">
+          <label>Recd time</label>
+          <div class="sp-inline">
+            <ng-select [items]="[{VALUE: '00'},{VALUE: '01'},{VALUE: '02'},{VALUE: '03'},{VALUE: '04'},{VALUE: '05'},{VALUE: '06'},{VALUE: '07'},{VALUE: '08'},{VALUE: '09'},{VALUE: '10'},{VALUE: '11'},{VALUE: '12'},{VALUE: '13'},{VALUE: '14'},{VALUE: '15'},{VALUE: '16'},{VALUE: '17'},{VALUE: '18'},{VALUE: '19'},{VALUE: '20'},{VALUE: '21'},{VALUE: '22'},{VALUE: '23'}]"
+              bindLabel="VALUE"
+              bindValue="VALUE"
+              placeholder="--"
+              [(ngModel)]="RecdTime"
+              class="custom">
+            </ng-select>
+            <span class="u">h</span>
+            <ng-select [items]="[{VALUE: '00'},{VALUE: '15'},{VALUE: '30'},{VALUE: '45'}]"
+              bindLabel="VALUE"
+              bindValue="VALUE"
+              placeholder="--"
+              [(ngModel)]="RecdMin"
+              class="custom">
+            </ng-select>
+            <span class="u">min</span>
+          </div>
+        </div>
+        <div class="fld">
+          <label>Recd where</label>
+          <input type="text" [(ngModel)]="RecdWhere" [maxlength]="20" />
+        </div>
+        <div class="fld">
+          <label>Recd locally</label>
+          <my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="RecdLocal"></my-date-picker>
+        </div>
+        <div class="fld">
+          <label>Recd locally time</label>
+          <div class="sp-inline">
+            <ng-select [items]="[{VALUE: '00'},{VALUE: '01'},{VALUE: '02'},{VALUE: '03'},{VALUE: '04'},{VALUE: '05'},{VALUE: '06'},{VALUE: '07'},{VALUE: '08'},{VALUE: '09'},{VALUE: '10'},{VALUE: '11'},{VALUE: '12'},{VALUE: '13'},{VALUE: '14'},{VALUE: '15'},{VALUE: '16'},{VALUE: '17'},{VALUE: '18'},{VALUE: '19'},{VALUE: '20'},{VALUE: '21'},{VALUE: '22'},{VALUE: '23'}]"
+              bindLabel="VALUE"
+              bindValue="VALUE"
+              placeholder="--"
+              [(ngModel)]="RecdLocalTime"
+              class="custom">
+            </ng-select>
+            <span class="u">h</span>
+            <ng-select [items]="[{VALUE: '00'},{VALUE: '15'},{VALUE: '30'},{VALUE: '45'}]"
+              bindLabel="VALUE"
+              bindValue="VALUE"
+              placeholder="--"
+              [(ngModel)]="RecdLocalMin"
+              class="custom">
+            </ng-select>
+            <span class="u">min</span>
+          </div>
+        </div>
+      </div>
+      <div class="sp-foot">
+        <span class="sub-t">Add puts the row in the grid below; Update saves the receipt.</span>
+        <div class="r">
+          <button type="button" class="btn g" (click)="reset()">Reset</button>
+          @if (Type == 'A') {
+            <button type="button" class="btn" name="addButton" (click)="addUpdate()" #addButton>Add</button>
+          }
+          @if (Type == 'E') {
+            <button type="button" class="btn" name="updateButton" (click)="addUpdate()" #updateButton>Update row</button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Receipts</h2>
+      <span class="meta">{{cargoList?.length || 0}} {{ cargoList?.length === 1 ? 'row' : 'rows' }}</span>
+    </div>
+    <div class="tbl-wrap tall">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th class="num">No. of pkgs</th>
+            <th>Recd date</th>
+            <th>Recd where</th>
+            <th>Recd locally</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (obj of cargoList; track obj) {
+            <tr>
+              <td class="num">{{obj.NOOFPKGS}}</td>
+              <td>{{obj.RECDDATE + ' ' + obj.RECDTIME}}</td>
+              <td>{{obj.RECDWHERE}}</td>
+              <td>{{obj.RECDLOCAL + ' ' + obj.RECDLOCALTIME}}</td>
+              <td class="act">
+                <button type="button" (click)="populate('E',obj.TBL_INDEXID,obj.CARGOID, obj.GUID, obj.EXPTNO, obj.NOOFPKGS, obj.RECDDATE, obj.RECDTIME, obj.RECDWHERE, obj.RECDLOCAL, obj.RECDLOCALTIME)">Edit</button>
+                <button type="button" (click)="delete()">Delete</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td class="empty" colspan="5">{{ viewType == 'Add' ? 'No package rows added yet.' : 'Choose a shipper and consignee to start.' }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  @if (ErrorMessage != '') {
+    <div class="sp-note">{{ErrorMessage}}</div>
+  }
+
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose Update.</span>
+    <div class="r">
+      <button type="button" name="abortButton" class="btn g" (click)="abort();"><app-font-changer [fontIndex]="'7'"></app-font-changer> Cancel</button>
+      <button type="button" name="submitButton" class="btn p" (click)="submit();" [disabled]="ErrorMessage != ''" #submitButton><app-font-changer [fontIndex]="'14'"></app-font-changer> Update</button>
+    </div>
+  </div>
 </div>

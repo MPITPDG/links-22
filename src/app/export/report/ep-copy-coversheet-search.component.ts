@@ -12,6 +12,7 @@ import { environment } from '../../../environments/environment';
 @Component({
     selector: 'app-epcopy-rpt',
     templateUrl: 'ep-copy-coversheet-search.component.html',
+    styleUrls: ['./exp-rpt-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

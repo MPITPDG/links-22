@@ -114,6 +114,7 @@ export class PrintDocumentMawbprintupdateComponent implements OnInit {
         };
         this._dataService.getData("Export/PrintDocumentAirMawbPrint", _jsonData)
         .subscribe((data: any) => {
+            if (!data || !data.Table || !data.Table.length) { this._loaderService.display(false); return; }
             if (data.Table[0].STATUS == 100) {
                 this.hawbnoList=data.Table;
                 this.MAWBNO=	data.Table[0].MAWBNO  ;
@@ -208,6 +209,7 @@ export class PrintDocumentMawbprintupdateComponent implements OnInit {
         };
         this._dataService.Common("Export/MawbnoprintUpdate", _jsonData)
         .subscribe((data: any) => {
+            if (!data || !data.Table || !data.Table.length) { this._loaderService.display(false); return; }
             if (data.Table[0].STATUS == 100) {
                 //"HAWBNO Details updated successfully
                 this._toasterService.toast('info', 'Complete',`MAWBNO Details updated successfully`);
@@ -265,6 +267,7 @@ mawbrate() {
     this._dataService.Common("Export/ConsignmentEditSearchView", _jsonData)
         .subscribe((data: any) => {
             this._loaderService.display(false);
+            if (!data || !data.Table || !data.Table.length) { return; }
             this._sharedconsig.exportEditData = data.Table[0];
             this._loaderService.display(false);
            this.editModal.show("MawbTarif");

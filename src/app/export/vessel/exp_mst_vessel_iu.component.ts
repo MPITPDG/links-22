@@ -12,6 +12,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-vessel-iu',
     templateUrl: 'exp_mst_vessel_iu.component.html',
+    styleUrls: ['./vessel-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -103,13 +104,13 @@ export class VesselMstComponent implements OnInit {
             const jsonExport = { cmpid:this._loginService.getLogin()[0].CMPID  };
             this._dataService.Common(this.baseUrl, jsonExport)
                 .subscribe((data: any) => {
-                    if (data.Table[0].STATUS == 100) {
+                    if (data?.Table?.[0]?.STATUS == 100) {
                         this.ports = data.Table1;
                         this.Agents = data.Table2;
                         this.Liners = data.Table3;
                         this._toasterService.toast('info', 'Complete', 'Data filled successfully');                                       
                     } else {
-                        this._toasterService.toast('error', 'Error', data.Table[0].STATUSTEXT);                   
+                        this._toasterService.toast('error', 'Error', data?.Table?.[0]?.STATUSTEXT);                   
                     }
                 })
             this.baseUrl = 'Export/ExportVslMst_Populate';
@@ -117,7 +118,7 @@ export class VesselMstComponent implements OnInit {
             this._dataService.Common(this.baseUrl, jsonvessel)
                 .subscribe((data: any) => {
                     // console.log(data.Table);
-                    if (data.Table[0].STATUS == 100) {
+                    if (data?.Table?.[0]?.STATUS == 100) {
                         this.vessel = data.Table;
 
                         this.Pkid = this.vessel[0].ID;
@@ -130,7 +131,7 @@ export class VesselMstComponent implements OnInit {
                         this.loaderService.display(false);
                     } else {
 
-                        this._toasterService.toast('error', 'Error', data.Table[0].STATUS);
+                        this._toasterService.toast('error', 'Error', data?.Table?.[0]?.STATUS);
                         this.loaderService.display(false);
                     }
                
@@ -151,14 +152,14 @@ export class VesselMstComponent implements OnInit {
             const jsonExport = { cmpid:this._loginService.getLogin()[0].CMPID  };
             this._dataService.Common(this.baseUrl, jsonExport)
                 .subscribe((data: any) => {
-                    if (data.Table[0].STATUS == 100) {
+                    if (data?.Table?.[0]?.STATUS == 100) {
                         this.ports = data.Table1;
                         this.Agents = data.Table2;
                         this.Liners = data.Table3;
                         this._toasterService.toast('info', 'Complete', 'Data filled successfully'); 
                         this.loaderService.display(false);                                
                     } else {
-                        this._toasterService.toast('error', 'Error', data.Table[0].STATUSTEXT);  
+                        this._toasterService.toast('error', 'Error', data?.Table?.[0]?.STATUSTEXT);  
                         this.loaderService.display(false);                 
                     }
                 })
@@ -168,7 +169,9 @@ export class VesselMstComponent implements OnInit {
     onAgentSelect(AgtCode) {
         this.Arrliner = [];
         //console.log(this.Arrliner);
-        this.Agentslist = this.Agents.filter((linerlist: any) => linerlist.AGT_CODE == AgtCode);
+        this.Agentslist = (this.Agents || []).filter((linerlist: any) => linerlist.AGT_CODE == AgtCode);
+        // Clearing the agent picker (or an agent missing from the list) leaves no liners to offer.
+        if (!this.Agentslist.length) { return; }
         const Agtself = this.Agentslist[0].AGT_LINER1;// this.Agents.filter((linerlist: any) => linerlist.AGT_LINER1;
         // console.log(this.Agentslist);
         if (Agtself == "SELF" || Agtself == "") {
@@ -319,14 +322,14 @@ export class VesselMstComponent implements OnInit {
         this._dataService.Common(this.baseUrl, jsonExport)
             .subscribe((data: any) => {
 
-                if (data.Table[0].STATUS == "100") {
+                if (data?.Table?.[0]?.STATUS == "100") {
                     this.SavPrtAgt = data.Table1;
-                    this._toasterService.toast('info', 'Complete', data.Table[0].STA_MSG);
+                    this._toasterService.toast('info', 'Complete', data?.Table?.[0]?.STA_MSG);
                     this.Clear_childRcd();
                     this.loaderService.display(false);
                 } else {
 
-                    this._toasterService.toast('error', 'Error', data.Table[0].STATUSTEXT);
+                    this._toasterService.toast('error', 'Error', data?.Table?.[0]?.STATUSTEXT);
                     this.loaderService.display(false);
                 }
             });
@@ -344,11 +347,11 @@ export class VesselMstComponent implements OnInit {
             const jsonExport = { TBL_INDEXID: this.EditPrtAgtList[0].TBL_INDEXID, PK_PORTID: this.EditPrtAgtList[0].ID, VSL_RTNO: this.EditPrtAgtList[0].VSL_RTNO, PORT: this.EditPrtAgtList[0].PORT, cmpid: this._loginService.getLogin()[0].CMPID, GUID: this._loginService.getLogin()[0].GUID, TBL_INDEXIDAGT: this.EditPrtAgtList[0].TBL_INDEXID_AGT, PK_AGTID: this.EditPrtAgtList[0].AGTID };
             this._dataService.Common(this.baseUrl, jsonExport)
                 .subscribe((data: any) => {
-                    if (data.Table[0].STATUS == "100") {
+                    if (data?.Table?.[0]?.STATUS == "100") {
                         this.SavPrtAgt = data.Table1;
-                        this._toasterService.toast('info', 'Complete', data.Table[0].STA_MSG);
+                        this._toasterService.toast('info', 'Complete', data?.Table?.[0]?.STA_MSG);
                     } else {
-                        this._toasterService.toast('error', 'Error', data.Table[0].STA_MSG);
+                        this._toasterService.toast('error', 'Error', data?.Table?.[0]?.STA_MSG);
                     }
                 },
                 (error) => {
@@ -439,8 +442,8 @@ export class VesselMstComponent implements OnInit {
         this._dataService.Common(this.baseUrl, jsonExport)
             .subscribe((data: any) => {
 
-                if (data.Table[0].STATUS == "100") {
-                    this._toasterService.toast('info', 'success', data.Table[0].STA_MSG);
+                if (data?.Table?.[0]?.STATUS == "100") {
+                    this._toasterService.toast('info', 'success', data?.Table?.[0]?.STA_MSG);
                     this.ports = [];
                     this.Agents = [];
                     this.Liners =[];
@@ -454,7 +457,7 @@ export class VesselMstComponent implements OnInit {
                     this.loaderService.display(false);
                 } else {
 
-                    this._toasterService.toast('error', 'Error', data.Table[0].STATUSTEXT);
+                    this._toasterService.toast('error', 'Error', data?.Table?.[0]?.STATUSTEXT);
                     this.loaderService.display(false);
                 }
 

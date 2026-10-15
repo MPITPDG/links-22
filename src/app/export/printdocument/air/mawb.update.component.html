@@ -1,158 +1,114 @@
-﻿<table class="table table-bordered table-sm-new bgwhite">
-	<tr class="title-head trbg">
-		<td class="width150">
-			<span class="col-form-span-label">MAWB No.</span><span class="col-form-span-error">*</span>
-		</td>
-		<td colspan="2">
-			<span class="col-form-span-label">{{mawbno}}</span>
-		</td>
-		<td class="width150">
-			<span class="col-form-span-label">MAWB Date.</span><span class="col-form-span-error">*</span>
-		</td>
-		<td colspan="2">
-			<span class="col-form-span-label">{{mawbdate}}</span>
-		</td>
-	</tr>
-	<tr class="title-head trbg">
-		<td class="width150">
-			<span class="col-form-span-label">Freight Type</span><span class="col-form-span-error">*</span>
-		</td>
-		<td colspan="2">
-			<!-- <ng-select [items]="[{VALUEFIELD: 'PP', TEXTFIELD: 'PP'},{VALUEFIELD: 'CC', TEXTFIELD: 'CC'}]"
-					   bindLabel="TEXTFIELD"
-					   bindValue="VALUEFIELD"
-					   placeholder="--Select--"
-					   [(ngModel)]="FreightType"
-					   class="form-control width120"
-					   >
-			</ng-select> -->
-			<select class="form-control width120"   [(ngModel)]="FreightType">
-				<option value="-1">select</option>
-				<option value="CC">CC</option>
-				<option value="PP">PP</option>
-			</select>
-		</td>
-		<td class="width150">
-			<span class="col-form-span-label">Freight Currency</span><span class="col-form-span-error">*</span>
-		</td>
-		<td colspan="2">
-			<!-- <ng-select [items]="currencyList"
-					   bindLabel="CUR_NAME"
-					   bindValue="CUR_CODE"
-					   placeholder="--Select--"
-					   [(ngModel)]="Fcurrency"
-					   class="form-control width300"
-					   >
-			</ng-select> -->
+﻿<!--
+  Export - print document - MAWB update. Page kit recipe 2, ported from MPERPNG-20.
+  Used by PrintDocumentMawbUpdateComponents (mawb.component.ts) and PrintDocumentMawbUpdateComponent
+  (PrintDocumentMawbUpdateComponent.ts). The host shell is Links' stock-driven MAWB screen and is
+  left as it is, so this child carries its own .im-page root. Bindings unchanged.
+-->
+<div class="im-page">
+  <div class="card">
+    <div class="card-h"><h2>MAWB No. details</h2></div>
 
-			<select class="form-control width120"   [(ngModel)]="Fcurrency">
-				<option value="-1">Please select</option>
-				@for (d of currencyList; track d) {
-<option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
-}
-			
-			</select>
-			 
-		</td>
-	</tr>
-	<tr class="title-head trbg">
-		<td class="width150">
-			<span class="col-form-span-label">Freight Amount</span><span class="col-form-span-error">*</span>
-		</td>
-		<td colspan="5">
-			<input type="text" [(ngModel)]="FreightAmount" class="form-control width120" [OnlyNumber]="true" [maxlength]="11" />
-		</td>
-	</tr>
-	<tr class="title-head trbg">
-		<td class="width150">
-			<span class="col-form-span-label">Shipment Type</span><span class="col-form-span-error">*</span>
-		</td>
-		<td colspan="2">
-			<!-- <ng-select [items]="[{VALUEFIELD: '0', TEXTFIELD: 'Normal'},{VALUEFIELD: '1', TEXTFIELD: 'DDX'}]"
-					   bindLabel="TEXTFIELD"
-					   bindValue="VALUEFIELD"
-					   placeholder="--Select--"
-					   [(ngModel)]="ShipType"
-					   class="form-control width120"
-					   (change)="ddx_Onchange(ShipType)"
-					   >
-			</ng-select> -->
-			<select class="form-control width120"   [(ngModel)]="ShipType"  (change)="ddx_Onchange(ShipType)">
-				<option value="-1"> select</option>
-				<option value="0">Normal</option>
-				<option value="1">DDX</option>
-			</select>
-		</td>
-		<td class="width150">
-			<span class="col-form-span-label">Dest.Warehouse</span><span class="col-form-span-error">*</span>
-		</td>
-		<td colspan="2">
-			<!-- <ng-select [items]="destinationList"
-					   bindLabel="DDX_DESTINATION"
-					   bindValue="PK_ID"
-					   placeholder="--Select--"
-					   [(ngModel)]="ShipDest"
-					   class="form-control width300"
-					   [disabled]="ShipType == '0' || ShipType == null"
-					   >
-			</ng-select> -->
-			<select class="form-control width300"   [(ngModel)]="ShipDest" [disabled]="ShipType == '0' || ShipType == null">
-				<option value="0">Please select</option>
-				@for (d of destinationList; track d) {
-<option value={{d.PK_ID}}>{{d.DDX_DESTINATION}}</option>
-}
-			
-			</select>
-		</td>
-	</tr>
-</table>
-<table class="table table-bordered table-sm-new bgwhite">
-	<thead>
-			<tr class="title-head formheading">
-				<th>EXPT NO</th>
-				<th>SHIPPER</th>
-				<th>CONSIGNEE</th>
-				<th>Pkgs</th>
-				<th>Grwt</th>
-				<th>Chrg.Wt</th>
-				<th>Pcs</th>
-			</tr>
-		</thead>
-		<tbody>
-			@for (obj of mawbnoList; track obj) {
-<tr>
-				<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
-				<td><span class="col-form-span-label">{{obj.SHIPPER}}</span></td>
-				<td><span class="col-form-span-label">{{obj.CONSIGNEE}}</span></td>
-				<td><span class="col-form-span-label">{{obj.PKGS}}</span></td>
-				<td><span class="col-form-span-label">{{obj.GRWT}}</span></td>
-				<td><span class="col-form-span-label">{{obj.CHBLWT}}</span></td>
-				<td><span class="col-form-span-label">{{obj.PCS}}</span></td>
-			</tr>
-}
-			<tr class="trbg">
-				<td><span class="col-form-span-label"></span></td>
-				<td><span class="col-form-span-label"></span></td>
-				<td><span class="col-form-span-label"></span></td>
-				<td><span class="col-form-span-label"></span></td>
-				<td><input type="text" [(ngModel)]="totalGrwt" class="form-control width75" [OnlyNumber]="true"/></td>
-				<td><input type="text" [(ngModel)]="totalChblwt" class="form-control width75" [OnlyNumber]="true"/></td>
-				<td><span class="col-form-span-label"></span></td>
-			</tr>
-		</tbody>
-</table>
-<table class="table table-bordered table-sm-new bgwhite">
-</table>
-<table class="table table-bordered table-sm-new bgwhite">
-	<tr class="title-head trbg">
-		<td colspan="6" class="centerlabel">
-			<button type="button" name="submit" uiBtn variant="default" size="sm" (click)="submit();">
-				<span class="col-form-span-label"><i class="fa fa-save"></i> Submit</span>
-			</button>
-			<button type="button" name="cancelButton" uiBtn variant="outline" size="sm" (click)="cancel();">
-				<span class="col-form-span-label"><i class="fa fa-remove"></i> Cancel</span>
-			</button>
-		</td>
-	</tr>
-</table>
-	
+    <div class="fields" style="padding:14px 16px;">
+
+      <div class="fld">
+        <label>MAWB No. <span class="req">*</span></label>
+        <span>{{mawbno}}</span>
+      </div>
+
+      <div class="fld">
+        <label>MAWB Date. <span class="req">*</span></label>
+        <span>{{mawbdate}}</span>
+      </div>
+
+      <div class="fld">
+        <label>Freight Type <span class="req">*</span></label>
+        <select [(ngModel)]="FreightType">
+          <option value="-1">select</option>
+          <option value="CC">CC</option>
+          <option value="PP">PP</option>
+        </select>
+      </div>
+
+      <div class="fld">
+        <label>Freight Currency <span class="req">*</span></label>
+        <select [(ngModel)]="Fcurrency">
+          <option value="-1">Please select</option>
+          @for (d of currencyList; track d) {
+            <option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+          }
+        </select>
+      </div>
+
+      <div class="fld">
+        <label>Freight Amount <span class="req">*</span></label>
+        <input type="text" [(ngModel)]="FreightAmount" [OnlyNumber]="true" [maxlength]="11" />
+      </div>
+
+      <div class="fld">
+        <label>Shipment Type <span class="req">*</span></label>
+        <select [(ngModel)]="ShipType" (change)="ddx_Onchange(ShipType)">
+          <option value="-1"> select</option>
+          <option value="0">Normal</option>
+          <option value="1">DDX</option>
+        </select>
+      </div>
+
+      <div class="fld">
+        <label>Dest.Warehouse <span class="req">*</span></label>
+        <select [(ngModel)]="ShipDest" [disabled]="ShipType == '0' || ShipType == null">
+          <option value="0">Please select</option>
+          @for (d of destinationList; track d) {
+            <option value={{d.PK_ID}}>{{d.DDX_DESTINATION}}</option>
+          }
+        </select>
+      </div>
+
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>EXPT NO</th>
+            <th>Shipper</th>
+            <th>Consignee</th>
+            <th class="num">Pkgs</th>
+            <th class="num">Grwt</th>
+            <th class="num">Chrg.Wt</th>
+            <th class="num">Pcs</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (obj of mawbnoList; track obj) {
+            <tr>
+              <td class="mono">{{obj.EXPTNO}}</td>
+              <td>{{obj.SHIPPER}}</td>
+              <td>{{obj.CONSIGNEE}}</td>
+              <td class="num">{{obj.PKGS}}</td>
+              <td class="num">{{obj.GRWT}}</td>
+              <td class="num">{{obj.CHBLWT}}</td>
+              <td class="num">{{obj.PCS}}</td>
+            </tr>
+          }
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="num"><input type="text" style="height:26px;" [(ngModel)]="totalGrwt" [OnlyNumber]="true" /></td>
+            <td class="num"><input type="text" style="height:26px;" [(ngModel)]="totalChblwt" [OnlyNumber]="true" /></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="bar" style="margin:0;">
+      <span class="note"></span>
+      <span class="r">
+        <button type="button" class="btn g" name="cancelButton" (click)="cancel();">Cancel</button>
+        <button type="button" class="btn p" name="submit" (click)="submit();">Submit</button>
+      </span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,94 @@
+/* ============================================================
+   Export report search pages (Chronology / Delivery Status / Shipment
+   Progress) -- additions on top of import-page.css. These three pages are
+   pure search-criteria forms: each Search click downloads an Excel workbook
+   from the existing Export/Generate_* proc (no browsable on-screen result
+   grid exists), so this file only covers the header, filter card, option
+   pills and action row -- no chart/table/pager classes are needed here.
+   ============================================================ */
+:host ::ng-deep .im-page.erp-page .erp-filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+:host ::ng-deep .im-page.erp-page .f.full {
+    grid-column: 1 / -1;
+}
+
+:host ::ng-deep .im-page.erp-page .erp-opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+:host ::ng-deep .im-page.erp-page .erp-opts.stack {
+    flex-direction: column;
+    gap: 6px;
+}
+
+:host ::ng-deep .im-page.erp-page .erp-opt {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    color: var(--ink);
+    border: 1px solid var(--edge);
+    border-radius: 999px;
+    padding: 5px 12px;
+    cursor: pointer;
+    background: var(--mp-surface, #fff);
+    line-height: 1.3;
+    user-select: none;
+}
+
+:host ::ng-deep .im-page.erp-page .erp-opt input {
+    accent-color: var(--mp-primary, var(--ink));
+    margin: 0;
+    width: auto;
+    height: auto;
+}
+
+:host ::ng-deep .im-page.erp-page .erp-opt.on {
+    background: var(--mp-primary, var(--ink));
+    color: var(--mp-primary-fg, #fff);
+    border-color: var(--mp-primary, var(--ink));
+}
+
+:host ::ng-deep .im-page.erp-page .erp-actions {
+    justify-content: space-between;
+}
+
+:host ::ng-deep .im-page.erp-page .erp-presets {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+:host ::ng-deep .im-page.erp-page .erp-presets button {
+    font: inherit;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ink);
+    border: 1px solid var(--edge);
+    background: var(--mp-surface, #fff);
+    border-radius: 4px;
+    height: 24px;
+    padding: 0 9px;
+    cursor: pointer;
+}
+
+:host ::ng-deep .im-page.erp-page .erp-presets button:hover {
+    border-color: var(--mp-primary, var(--ink));
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 1100px) {
+    :host ::ng-deep .im-page.erp-page .erp-filters {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    :host ::ng-deep .im-page.erp-page .erp-filters {
+        grid-template-columns: 1fr;
+    }
+}
