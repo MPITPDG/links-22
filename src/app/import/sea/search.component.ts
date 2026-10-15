@@ -52,6 +52,19 @@ export class SeaSearchComponent implements OnInit {
     AgentType: string = 'All';
     GlFromDate: any = null;
     GlToDate: any = null;
+
+    // ---------- page kit (MPERPNG-20 redesign): results list state ----------
+    readonly pageSize = 10;
+    /** de-duplicated, decorated rows on screen (the default 30-day load or an explicit search) */
+    List: Array<any> = [];
+    page: number = 1;
+    loading: boolean = false;
+    loadError: boolean = false;
+    /** the rights check failed, so nothing is loaded */
+    noRights: boolean = false;
+    /** true once the default (last 30 days) load has completed, so the toolbar/empty text can say so */
+    defaultLoaded: boolean = false;
+
     constructor(
         private _dataService: DataService,
         private _loginService: LoginService,
@@ -69,7 +82,7 @@ export class SeaSearchComponent implements OnInit {
             .subscribe((data: any) => {
                 if (this._loginService.checkVerify(userMode, data)) {
                     this.fillCommonDropdownList();
-                } else { this._loaderService.display(false); }
+                } else { this._loaderService.display(false); this.noRights = true; }
             });
     }
 
@@ -84,6 +97,46 @@ export class SeaSearchComponent implements OnInit {
                 this.BillToList = data.Table;
                 this.VesselList = data.Table1;
                 this.AgentList = data.Table;
+                // list the last 30 days so the page is never empty on open
+                this.loadDefault();
+            });
+    }
+
+    /** last-30-days date-wise search (SearchType '2'): same proc and payload shape as the Search button, listed rather than auto-navigated */
+    loadDefault() {
+        const to = new Date();
+        const from = new Date(to.getTime() - 30 * 86400000);
+        const us = (d: Date) => ('0' + (d.getMonth() + 1)).slice(-2) + '/' + ('0' + d.getDate()).slice(-2) + '/' + d.getFullYear();
+        const _jsonData = {
+            Mode: this.Mode,
+            ImportCode: '',
+            ImportFromDate: us(from),
+            ImportToDate: us(to),
+            Importer: '',
+            ImporterType: 'All',
+            BillTo: '',
+            BillToType: 'All',
+            Vessel: '',
+            VesselType: 'All',
+            Agent: '',
+            AgentType: 'All',
+            GlFromDate: '',
+            GlToDate: '',
+            SearchType: '2',
+            CityCode1: this._loginService.getLogin()[0].CITYCODE1,
+            CmpCode: this._loginService.getLogin()[0].CMPCODE,
+        };
+        this.loading = true;
+        this.loadError = false;
+        this._dataService.Common("Import/Report_Search", _jsonData)
+            .subscribe((data: any) => {
+                this.loading = false;
+                this.defaultLoaded = true;
+                this.List = this.dedupeAndDecorate(data);
+                this.page = 1;
+            }, () => {
+                this.loading = false;
+                this.loadError = true;
             });
     }
 
@@ -198,25 +251,175 @@ export class SeaSearchComponent implements OnInit {
             CmpCode: this._loginService.getLogin()[0].CMPCODE,
         };
         this._loaderService.display(true);
+        this.loading = true;
+        this.loadError = false;
         this._dataService.Common("Import/Report_Search", _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
+                this.loading = false;
                // console.log(data);
-                if (data.Table.length == 0) {
+                // a response with no result set (the API answers {}) is "no results", not an error
+                const table = (data && data.Table) || [];
+                if (table.length == 0) {
                     this._toasterService.toast("warning", "Alert", "No record found");
-                }
-                else if (data.Table.length == 1) {
-                    this._router.navigate(["./import/sea/update-data/", data.Table[0].pk_ImpoterId]);
-                }
-                else if (data.Table.length > 1) {
                     this.displayType = 'LIST';
-                    this.searchList = data.Table;
+                    this.searchList = [];
+                    this.List = [];
+                    this.page = 1;
                 }
+                else if (table.length == 1) {
+                    this._router.navigate(["./import/sea/update-data/", table[0].pk_ImpoterId]);
+                }
+                else if (table.length > 1) {
+                    this.displayType = 'LIST';
+                    this.searchList = table;
+                    this.List = this.dedupeAndDecorate(data);
+                    this.page = 1;
+                }
+            }, () => {
+                this._loaderService.display(false);
+                this.loading = false;
+                this.loadError = true;
             });
     }
 
     redirectToEdit(pkid) {
         this._router.navigate(["./import/sea/update-data/", pkid]);
+    }
+
+    /** was the "back to search" link on the old LIST view: leave the result list and show the default 30 days again */
+    backToSearch() {
+        this.displayType = 'SEARCH';
+        this.searchList = [];
+        this.List = [];
+        this.page = 1;
+        // the default list is only loaded once the rights check has passed, as on open
+        if (!this.noRights) { this.loadDefault(); }
+    }
+
+    clear() {
+        this.Type = 'CODE';
+        this.ImportCode = '';
+        this.ImportFromDate = null;
+        this.ImportToDate = null;
+        this.Importer = null;
+        this.ImporterType = 'All';
+        this.BillTo = null;
+        this.BillToType = 'All';
+        this.Vessel = null;
+        this.VesselType = 'All';
+        this.Agent = null;
+        this.AgentType = 'All';
+        this.GlFromDate = null;
+        this.GlToDate = null;
+        this.backToSearch();
+    }
+
+    /** the All / Under clearance choice bound to whichever *Type field the current Search-by selection uses */
+    get ClearanceType(): string {
+        switch (this.Type) {
+            case 'IMPORTER': return this.ImporterType;
+            case 'BILLTO': return this.BillToType;
+            case 'VESSEL': return this.VesselType;
+            case 'AGENT': return this.AgentType;
+            default: return 'All';
+        }
+    }
+    set ClearanceType(v: string) {
+        switch (this.Type) {
+            case 'IMPORTER': this.ImporterType = v; break;
+            case 'BILLTO': this.BillToType = v; break;
+            case 'VESSEL': this.VesselType = v; break;
+            case 'AGENT': this.AgentType = v; break;
+        }
+    }
+
+    // ---------- pagination ----------
+    get pageCount(): number {
+        return Math.max(1, Math.ceil(this.List.length / this.pageSize));
+    }
+
+    get pageRows(): Array<any> {
+        const start = (this.page - 1) * this.pageSize;
+        return this.List.slice(start, start + this.pageSize);
+    }
+
+    get rangeStart(): number {
+        return this.List.length ? (this.page - 1) * this.pageSize + 1 : 0;
+    }
+
+    get rangeEnd(): number {
+        return Math.min(this.page * this.pageSize, this.List.length);
+    }
+
+    get pageList(): number[] {
+        const n = this.pageCount, p = this.page;
+        if (n <= 7) { return Array.from({ length: n }, (_, i) => i + 1); }
+        const out: number[] = [1];
+        const lo = Math.max(2, p - 1), hi = Math.min(n - 1, p + 1);
+        if (lo > 2) { out.push(0); }
+        for (let i = lo; i <= hi; i++) { out.push(i); }
+        if (hi < n - 1) { out.push(0); }
+        out.push(n);
+        return out;
+    }
+
+    goPage(p: number) {
+        if (p >= 1 && p <= this.pageCount) { this.page = p; }
+    }
+
+    // ---------- export ----------
+    exportCsv() {
+        const head = ['Import code', 'Import date', 'Importer', 'Vessel', 'Agent', 'Desc of goods', 'No. of pkgs', 'Gross weight'];
+        const rows = this.List.map(r => [r['Import Code'], r['Import Date'], r['Importer'], r['Vessel'], r['Agent'], r['Desc of Goods'], r['No. of Pkgs.'], r['Gross Weight']]);
+        const q = (v: any) => {
+            const s = (v === null || v === undefined) ? '' : String(v);
+            return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+        };
+        const csv = [head, ...rows].map(line => line.map(q).join(',')).join('\r\n');
+        const d = new Date();
+        const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+        const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'import-sea-' + stamp + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
+
+    // ---------- row helpers ----------
+    /** the proc returns one row per container: keep one per job. A missing Table (API answered {}) is no rows; an error row ({STATUS, STATUSTEXT}) is a load error */
+    private dedupeAndDecorate(data: any): any[] {
+        const table = (data && data.Table) || [];
+        if (table.length && table[0].STATUS && !table[0].pk_ImpoterId) { this.loadError = true; return []; }
+        const seen = new Set();
+        return table
+            .filter((r: any) => !seen.has(r.pk_ImpoterId) && seen.add(r.pk_ImpoterId))
+            .map((r: any) => this.decorate(r));
+    }
+
+    private decorate(r: any): any {
+        const importerRaw: string = r['Importer'] || '';
+        const [importerName, importerCity] = importerRaw.split('|').map((s: string) => (s || '').trim());
+        const vessel = this.parseVessel(r['Vessel']);
+        return Object.assign({}, r, {
+            _importerName: importerName || importerRaw,
+            _importerCity: importerCity || '',
+            _vesselName: vessel ? vessel.name : '',
+            _vesselEta: vessel ? vessel.eta : ''
+        });
+    }
+
+    private parseVessel(raw: string): { name: string; eta: string } | null {
+        if (!raw) { return null; }
+        const parts = String(raw).split('|').map(p => p.trim());
+        const dateMatch = /(\d{1,2}\/\d{1,2}\/\d{4})/.exec(raw);
+        const name = parts.find(p => p && !/^ETA\b/i.test(p) && !/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(p));
+        if (!name) { return null; }
+        return { name, eta: dateMatch ? dateMatch[1] : '' };
     }
 
 }

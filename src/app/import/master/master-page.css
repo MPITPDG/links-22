@@ -1,0 +1,153 @@
+/* ----------------------------------------------------------------
+   Import master screens (airline, exchange rate, misc job, vessel):
+   screen-level additions on top of the GLOBAL page kit
+   (src/styles/kit/import-page.css, root class .im-page).
+   Only what the kit does not cover lives here; every rule is scoped
+   under .im-page and pulled in per component through styleUrls.
+   Kit gaps covered:
+     1. textarea is not boxed by the kit (only input / select / .form-control,
+        and .form-control forces a 32px height).
+     2. the Links my-date-picker shim host is inline-block and ignores the
+        width option, so it shrinks inside a filter cell.
+     3. .fields drops the bottom rule of its last two children, which leaves
+        a half rule when the last row is a single full-width field; split such
+        rows into a second .fields block and rule between the blocks.
+     4. validation messages: .hint is faint grey; .hint.err reads as an error.
+     5. a boxed, scrolling checkbox list (exchange rate branches).
+     6. a compact filter bar for searches with only one or two filters.
+     7. a fixed-width code part beside a free part (airline code 3 + 4).
+     8. .fld.top: label aligned to the top of a tall control (textarea, list).
+     9. table.tbl.nowrap: one line per row (dates, codes); .tbl-wrap scrolls.
+   ---------------------------------------------------------------- */
+
+/* 1. boxed textarea, same box as the kit inputs */
+.im-page textarea {
+    font: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    background: var(--mp-surface, #fff);
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    width: 100%;
+    min-height: 64px;
+    padding: 6px 10px;
+    margin: 0;
+    resize: vertical;
+    box-shadow: none;
+    display: block;
+}
+
+.im-page textarea:focus {
+    outline: 2px solid var(--mp-primary, var(--ink));
+    outline-offset: -1px;
+    border-color: var(--mp-primary, var(--ink));
+}
+
+/* 2. date picker fills its field / filter cell */
+.im-page my-date-picker {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
+/* 3. a second .fields block in the same card starts with a rule */
+.im-page .fields + .fields {
+    border-top: 1px solid var(--line);
+}
+
+/* 4. validation message under a field or filter */
+.im-page .hint.err,
+.im-page .f .err {
+    color: var(--mp-danger, #C62828);
+    font-size: 11.5px;
+}
+
+.im-page .f .err {
+    display: block;
+    line-height: 32px;
+}
+
+/* 5. boxed checkbox list */
+.im-page .chk-list {
+    max-height: 190px;
+    overflow-y: auto;
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    background: var(--mp-surface, #fff);
+}
+
+.im-page .chk-list label.chk {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 6px 10px;
+    font-weight: 400;
+    font-size: 13px;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+}
+
+.im-page .chk-list label.chk:last-child {
+    border-bottom: 0;
+}
+
+.im-page .chk-list .chk-empty {
+    display: block;
+    padding: 8px 10px;
+    color: var(--faint);
+}
+
+.im-page .chk-list input[type="checkbox"] {
+    accent-color: var(--mp-primary, #0A0A0A);
+    margin: 0;
+}
+
+/* 6. compact filter bar: fixed-width filters, button, then free space */
+.im-page .filters.compact {
+    grid-template-columns: minmax(0, 360px) minmax(0, 220px) auto;
+    justify-content: start;
+}
+
+/* one filter + button + a message cell */
+.im-page .filters.compact.one {
+    grid-template-columns: minmax(0, 360px) auto minmax(0, 1fr);
+}
+
+/* 7. code part + free part on one line */
+.im-page .pair {
+    display: flex;
+    gap: 6px;
+    min-width: 0;
+}
+
+.im-page .pair .code {
+    flex: 0 0 72px;
+    width: 72px;
+}
+
+/* 8. label at the top of a tall control */
+.im-page .fld.top {
+    align-items: start;
+}
+
+.im-page .fld.top > label {
+    padding-top: 7px;
+}
+
+/* 9. dense one-line rows */
+.im-page table.tbl.nowrap td {
+    white-space: nowrap;
+}
+
+/* the one free-text column that may wrap so the row fits */
+.im-page table.tbl.nowrap td.wrap {
+    white-space: normal;
+}
+
+@media (max-width: 760px) {
+    .im-page .filters.compact,
+    .im-page .filters.compact.one {
+        grid-template-columns: 1fr;
+    }
+}

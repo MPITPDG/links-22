@@ -6,6 +6,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-consignment-import-master-misc-job-data-entry',
     templateUrl: 'data-entry.component.html',
+    styleUrls: ['../master-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -23,6 +24,11 @@ export class EntryMiscJobMasterComponent implements OnInit {
     AgentCode: any = null;      // Agent (SUPPLIER_MASTER, AGENT='Y')
     SalesPerson: any = null;    // Handler / Sales Person (SUBAGENT_CODE)
     ErrorType: string = null;
+
+    /** read-only context shown in the Record aside */
+    BranchName: string = "";
+    CreatedBy: string = "";
+
     constructor(
         private _dataService: DataService,
         private _loginService: LoginService,
@@ -31,6 +37,11 @@ export class EntryMiscJobMasterComponent implements OnInit {
         private _loaderService: LoaderService) { }
 
     ngOnInit() {
+        const login = this._loginService.getLogin();
+        if (login && login[0]) {
+            this.BranchName = login[0].CITYNAME || "";
+            this.CreatedBy = login[0].CMP_USERNAME || "";
+        }
         this._route.params.subscribe(params => {
             if (params["param"]) {
                 this.JobNo = params["param"];
@@ -63,9 +74,9 @@ export class EntryMiscJobMasterComponent implements OnInit {
         this._dataService.getData("Import/GetClient", { citycode: this._loginService.getLogin()[0].CITYCODE })
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                this.ClientList = data.Table;
-                this.AgentList = (data.Table1) ? data.Table1 : [];
-                this.SalesPersonList = (data.Table2) ? data.Table2 : [];
+                this.ClientList = (data && Array.isArray(data.Table)) ? data.Table : [];
+                this.AgentList = (data && data.Table1) ? data.Table1 : [];
+                this.SalesPersonList = (data && data.Table2) ? data.Table2 : [];
             });
     }
 
@@ -79,6 +90,7 @@ export class EntryMiscJobMasterComponent implements OnInit {
         this._dataService.getData("Import/MiscellaneousDetails", _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
+                if (!data || !Array.isArray(data.Table) || data.Table.length == 0) { return; }
                 this.Id = data.Table[0]["PK_ID"];
                 this.JobNo = data.Table[0]["JOBNO"];
                 this.ClientName = data.Table[0]["CLIENT_CODE"];

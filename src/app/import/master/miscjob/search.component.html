@@ -1,53 +1,49 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>MISCELLANEOUS IMPORT JOBNO - SEARCH</strong>
-                </div>
-            </div>
-        </div>
+<!--
+  Import miscellaneous job master - search. Page kit recipe 1 (src/styles/kit/import-page.css),
+  ported from MPERPNG-20. Import/MiscellaneousDetails looks up one job by its exact
+  15-digit job no. and opens it for editing - there is no listing endpoint, so this
+  stays a lookup and the table only carries the empty state.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Miscellaneous import jobs</h1>
+      <p>Look up a miscellaneous import job by its job no.</p>
     </div>
-    <div class="row">
-        <div class="col-sm-3">
-        </div>
-        <div class="col-sm-6">
-            <table class="table table-sm-new bgwhite">
-                <tr class="trbg">
-                    <td colspan="3">
-                        <span class="col-form-span-label"><b>Miscellaneous Job</b></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width90">
-                        <span class="col-form-span-label">Job No.
-                            <span class="col-form-span-error">*</span>
-                        </span>
-                    </td>
-                    <td class="width130">
-                        <input type="text" [(ngModel)]="Input" class="form-control width120"
-                            [maxlength]="15" [OnlyNumber]="true" />
-                    </td>
-                    <td>
-                        @if (Input.trim().length==1) {
-<span class="col-form-span-error">Please enter job no</span>
-}
-                        @if (Input.trim().length>1&&Input.trim().length<=14) {
-<span class="col-form-span-error">Please enter valid job no</span>
-}
-                    </td>
-                </tr>
-                <tr class="trbg centerlabel">
-                    <td colspan="3">
-                        <button type="button" name="submitButton" uiBtn variant="default" size="sm" (click)="search();" [disabled]="Input.trim().length!=15">
-                            <span class="col-form-span-label">
-                                <i class="fa fa-search"></i>&nbsp;Search</span>
-                        </button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-3">
-        </div>
+    <div class="tools">
+      <button class="btn p" type="button" routerLink="/import/master/misc-job/data-entry">+ New job</button>
     </div>
+  </div>
+
+  <div class="card sec">
+    <div class="filters compact one">
+      <div class="f">
+        <label for="txtJobNo">Job no. <span class="req">*</span></label>
+        <input type="text" id="txtJobNo" name="txtJobNo" [(ngModel)]="Input" [maxlength]="15" [OnlyNumber]="true" placeholder="15-digit job no." />
+      </div>
+      <div class="f">
+        <button class="btn p" type="button" name="submitButton" (click)="search();" [disabled]="Input.trim().length!=15">Search</button>
+      </div>
+      <div class="f">
+        @if (Input.trim().length==1) {
+          <span class="err">Please enter job no</span>
+        }
+        @if (Input.trim().length>1&&Input.trim().length<=14) {
+          <span class="err">Please enter valid job no</span>
+        }
+      </div>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <tbody>
+          @if (loading) {
+            <tr><td class="empty">Looking up job {{ Input }}…</td></tr>
+          } @else {
+            <tr><td class="empty">Enter the full 15-digit job no. and choose Search; a matching job opens for editing.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>

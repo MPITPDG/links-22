@@ -7,6 +7,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-consignment-import-master-vessel-data-entry',
     templateUrl: 'data-entry.component.html',
+    styleUrls: ['../master-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -14,10 +15,10 @@ export class EntryVesselMasterComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {
         dateFormat: 'dd-mmm-yyyy',
         inline: false,
-        height: '16px',
-        width: '120px',
+        height: '30px',
+        width: '100%',
         componentDisabled: false,
-        selectionTxtFontSize: '12px',
+        selectionTxtFontSize: '13px',
         editableDateField: false,
         sunHighlight: true,
         satHighlight: true,
@@ -39,6 +40,13 @@ export class EntryVesselMasterComponent implements OnInit {
     ActualArrivalDate: any = null;
 
     ArrivalList: Array<any> = [];
+
+    /** rotation number from VesselDetails when editing; assigned by the API on save */
+    Rotation: string = "";
+    /** read-only context shown in the Record aside */
+    BranchName: string = "";
+    CreatedBy: string = "";
+
     constructor(
         private _dataService: DataService,
         private _loginService: LoginService,
@@ -47,6 +55,11 @@ export class EntryVesselMasterComponent implements OnInit {
         private _loaderService: LoaderService) { }
 
     ngOnInit() {
+        const login = this._loginService.getLogin();
+        if (login && login[0]) {
+            this.BranchName = login[0].CITYNAME || "";
+            this.CreatedBy = login[0].CMP_USERNAME || "";
+        }
         this._activatedRoute.params.subscribe(params => {
             if (params["param"]) {
                 this.Id = params["param"];
@@ -75,7 +88,7 @@ export class EntryVesselMasterComponent implements OnInit {
         this._dataService.getData("Import/GetArrivalPort", {})
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                this.ArrivalList = data.Table;
+                this.ArrivalList = (data && Array.isArray(data.Table)) ? data.Table : [];
             });
     }
 
@@ -84,6 +97,7 @@ export class EntryVesselMasterComponent implements OnInit {
         this._dataService.getData("Import/VesselDetails", { vessel_id: id })
             .subscribe((data: any) => {
                 this._loaderService.display(false);
+                if (!data || !Array.isArray(data.Table) || data.Table.length == 0) { return; }
                 this.Id = data.Table[0]["pk_vsl_id"];
                 this.Name = data.Table[0]["vsl_name"];
                 this.VoyageNo = data.Table[0]["vsl_voyageno"];
@@ -92,6 +106,7 @@ export class EntryVesselMasterComponent implements OnInit {
                 this.BerthNo = data.Table[0]["vsl_Berthno"];
                 this.ExpectedArrivalDate = (data.Table[0]["vsl_ExpectedDt"].trim() != "") ? this._dataService.stringdttoArry(this._dataService.returnMonthMMFromMMM(data.Table[0]["vsl_ExpectedDt"])) : null;
                 this.ActualArrivalDate = (data.Table[0]["vsl_ActualDt"].trim() != "") ? this._dataService.stringdttoArry(this._dataService.returnMonthMMFromMMM(data.Table[0]["vsl_ActualDt"])) : null;
+                this.Rotation = data.Table[0]["vsl_rotation"] || data.Table[0]["vsl_Rotation"] || "";
             });
     }
 
@@ -152,6 +167,7 @@ export class EntryVesselMasterComponent implements OnInit {
         this.BerthNo = "";
         this.ExpectedArrivalDate = null;
         this.ActualArrivalDate = null;
+        this.Rotation = "";
     }
 
 }

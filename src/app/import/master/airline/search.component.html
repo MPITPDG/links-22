@@ -1,61 +1,87 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>Airline - SEARCH</strong>
-                </div>
-            </div>
-        </div>
+<!--
+  Import airline master - search. Page kit recipe 1 (src/styles/kit/import-page.css),
+  ported from MPERPNG-20. Name search calls Import/Imp_Airline_Search exactly as before;
+  the airline code filters the result client-side.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Airlines</h1>
+      <p>Airline codes and names used across import jobs</p>
     </div>
-    <div class="row">
-        <div class="col-sm-3">
-        </div>
-        <div class="col-sm-6">
-            <table class="table table-sm-new bgwhite">
-                <tr>
-                    <td class="width90">
-                        <span class="col-form-span-label">Airline Name:
-                            <span class="col-form-span-error">*</span>
-                        </span>
-                    </td>
-                    <td>
-                        <input type="text" [(ngModel)]="Input" class="form-control" />
-                    </td>
-                    <td class="width100">
-                        <button type="button" name="submitButton" uiBtn variant="default" size="sm" (click)="search();">
-                            <span class="col-form-span-label">
-                                <i class="fa fa-search"></i>&nbsp;Search</span>
-                        </button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-3">
-        </div>
-    </div><br/>
-    @if (List.length > 0) {
-<div class="row">
-        <div class="col-sm-2">
-        </div>
-        <div class="col-sm-8">
-            <div class="yscroll" style="max-height: 250px">
-                <table class="table table-bordered table-sm-new bgwhite">
-                    <tr class="col-form-span-heading">
-                        <th class="width100"><span class="col-form-span-label">Airline Code</span></th>
-                        <th><span class="col-form-span-label">Airline Name</span> </th>
-                    </tr>
-                    @for (obj of List; track obj) {
-<tr class="tr-hover" (click)="goTo(obj.pk_ArilineId)" style="cursor:pointer;">
-                        <td class="width150"><span class="col-form-span-label">{{obj["Airline Code"]}}</span></td>
-                        <td><span class="col-form-span-label">{{obj["Airline Name"]}}</span> </td>
-                    </tr>
-}
-                </table>
-            </div>
-        </div>
-        <div class="col-sm-2">
-        </div>
+    <div class="tools">
+      <button class="btn p" type="button" routerLink="/import/master/airline/data-entry">+ New airline</button>
     </div>
-}
+  </div>
+
+  <div class="card sec">
+    <div class="filters compact">
+      <div class="f">
+        <label for="txtAirlineName">Airline name</label>
+        <input type="text" id="txtAirlineName" name="txtAirlineName" [(ngModel)]="Input" placeholder="Any" (keyup.enter)="search()" />
+      </div>
+      <div class="f">
+        <label for="txtAirlineCode">Airline code</label>
+        <input type="text" id="txtAirlineCode" name="txtAirlineCode" [(ngModel)]="Code" placeholder="Any" (keyup.enter)="applyFilters()" />
+      </div>
+      <div class="f">
+        <button class="btn p" type="button" name="submitButton" (click)="search();">Search</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <span>
+        <span class="count">{{ Filtered.length }} {{ Filtered.length === 1 ? 'airline' : 'airlines' }}</span>
+        @if (SearchedName) {
+          <span class="sub-t"> matching “{{ SearchedName }}”</span>
+        }
+      </span>
+      <span class="tb-r">
+        <button class="btn g" type="button" (click)="clear()">Clear</button>
+        <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!Filtered.length">Export</button>
+      </span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Airline code</th>
+            <th>Airline name</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+            <tr><td class="empty" colspan="3">Loading airlines…</td></tr>
+          } @else {
+            @for (obj of pageRows; track $index) {
+              <tr (click)="goTo(obj.pk_ArilineId)" style="cursor: pointer;">
+                <td class="mono"><a class="lnk">{{ obj["Airline Code"] }}</a></td>
+                <td>{{ obj["Airline Name"] }}</td>
+                <td class="act"><button type="button">Edit</button></td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="3">No airlines match these filters.</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ Filtered.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="page <= 1" (click)="goPage(page - 1)" aria-label="Previous page">‹</button>
+        @for (p of pageList; track $index) {
+          @if (p === 0) {
+            <span class="gap">…</span>
+          } @else {
+            <button type="button" [class.on]="p === page" (click)="goPage(p)">{{ p }}</button>
+          }
+        }
+        <button type="button" [disabled]="page >= pageCount" (click)="goPage(page + 1)" aria-label="Next page">›</button>
+      </div>
+    </div>
+  </div>
 </div>

@@ -7,7 +7,7 @@ const routes: Routes = [
     {
         path: '',
         data: {
-            title: 'Vessel'
+            title: 'Exchange Rate'
         },
         children: [
             { path: '', component: ExchangeRateMasterImportComponent, data: { title: 'Home' } },

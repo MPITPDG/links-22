@@ -1,118 +1,125 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>SEARCH CURRENCY EXCHANGE RATE</strong>
-                </div>
-            </div>
-        </div>
+<!--
+  Import exchange rate master - search. Page kit recipe 1 (src/styles/kit/import-page.css),
+  ported from MPERPNG-20. Currency / branch / date filters go to Imp_Currency_Search
+  exactly as before; status (Current / Upcoming / Expired) is derived client-side.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Exchange rates</h1>
+      <p>Currency exchange rates by branch and validity period</p>
     </div>
-    <div class="row">
-        <div class="col-sm-4">
-        </div>
-        <div class="col-sm-4">
-            <table class="table table-sm-new bgwhite">
-                <tr class="trbg">
-                    <td colspan="2">
-                        <span class="col-form-span-label"><b>SEARCH CURRENCY EXCHANGE RATE</b></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width150">
-                        <span class="col-form-span-label">Currency Type</span>
-                    </td>
-                    <td>
-                        <select class="form-control" [(ngModel)]="CurrencyType">
-                            <option value="0">-- Select --</option>
-                            @for (item of CurrencyList; track item) {
-
-                                <option value="{{item.DATAVALUEFIELD}}">{{item.DATATEXTFIELD}}</option>
-                            
-}
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width150">
-                        <span class="col-form-span-label">Branch Name</span>
-                    </td>
-                    <td>
-                        <select class="form-control" [(ngModel)]="BranchName">
-                            <option value="0">-- Select --</option>
-                            @for (item of BranchList; track item) {
-
-                                <option value="{{item.DATAVALUEFIELD}}">{{item.DATATEXTFIELD}}</option>
-                            
-}
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width150">
-                        <span class="col-form-span-label">From Date</span>
-                    </td>
-                    <td>
-                        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate"></my-date-picker>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width150">
-                        <span class="col-form-span-label">To Date</span>
-                    </td>
-                    <td>
-                        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate"></my-date-picker>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width90">
-                        <span class="col-form-span-label">Exchange Rate </span>
-                    </td>
-                    <td>
-                        <input type="text" [(ngModel)]="Input" class="form-control" />
-                    </td>
-                </tr>
-                <tr class="trbg centerlabel">
-                    <td colspan="2">
-                        <button type="button" name="submitButton" uiBtn variant="default" size="sm" (click)="search();">
-                            <span class="col-form-span-label">
-                                <i class="fa fa-search"></i>&nbsp;Search</span>
-                        </button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-4">
-        </div>
-    </div><br />
-    @if (DisplayList.length > 0) {
-<div class="row">
-        <div class="col-sm-2">
-        </div>
-        <div class="col-sm-8">
-            <div class="yscroll" style="max-height: 250px">
-                <table class="table table-bordered table-sm-new bgwhite">
-                    <tr class="col-form-span-heading">
-                        <th class="width100"><span class="col-form-span-label">CURRENCY TYPE</span></th>
-                        <th><span class="col-form-span-label">BRANCH NAME</span> </th>
-                        <th class="width100"><span class="col-form-span-label">FROM</span></th>
-                        <th><span class="col-form-span-label">TO</span> </th>
-                        <th><span class="col-form-span-label">EXCHANGE RATE</span> </th>
-                    </tr>
-                    @for (obj of DisplayList; track obj) {
-<tr class="tr-hover" (click)="goTo(obj.pk_ExchangeRateId)" style="cursor:pointer;">
-                        <td class="width150"><span class="col-form-span-label">{{obj["CURRENCY TYPE"]}}</span></td>
-                        <td><span class="col-form-span-label">{{obj["BRANCH NAME"]}}</span> </td>
-                        <td class="width150"><span class="col-form-span-label">{{obj["FROM"]}}</span></td>
-                        <td><span class="col-form-span-label">{{obj["TO"]}}</span> </td>
-                        <td class="width150"><span class="col-form-span-label">{{obj["EXCHANGE RATE"]}}</span></td>
-                    </tr>
-}
-                </table>
-            </div>
-        </div>
-        <div class="col-sm-2">
-        </div>
+    <div class="tools">
+      <button class="btn p" type="button" routerLink="/import/master/exchange-rate/data-entry">+ New exchange rate</button>
     </div>
-}
+  </div>
+
+  <div class="card sec">
+    <div class="filters">
+      <div class="f">
+        <label for="selCurrencyType">Currency type</label>
+        <select id="selCurrencyType" name="selCurrencyType" [(ngModel)]="CurrencyType">
+          <option value="0">-- Select --</option>
+          @for (item of CurrencyList; track item) {
+            <option value="{{item.DATAVALUEFIELD}}">{{item.DATATEXTFIELD}}</option>
+          }
+        </select>
+      </div>
+      <div class="f">
+        <label for="selBranchName">Branch name</label>
+        <select id="selBranchName" name="selBranchName" [(ngModel)]="BranchName">
+          <option value="0">-- Select --</option>
+          @for (item of BranchList; track item) {
+            <option value="{{item.DATAVALUEFIELD}}">{{item.DATATEXTFIELD}}</option>
+          }
+        </select>
+      </div>
+      <div class="f">
+        <label>From date</label>
+        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate"></my-date-picker>
+      </div>
+      <div class="f">
+        <label>To date</label>
+        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate"></my-date-picker>
+      </div>
+      <div class="f">
+        <label for="txtRate">Exchange rate</label>
+        <input type="text" id="txtRate" name="txtRate" [(ngModel)]="ExchangeRate" placeholder="Any" (keyup.enter)="search()" />
+      </div>
+      <div class="f">
+        <button class="btn p" type="button" name="submitButton" (click)="search();">Search</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <span>
+        <span class="count">{{ Filtered.length }} {{ Filtered.length === 1 ? 'rate' : 'rates' }}</span>
+        @if (Searched) {
+          <span class="sub-t"> matching current filters</span>
+        }
+      </span>
+      <span class="tb-r">
+        <button class="btn g" type="button" (click)="clear()">Clear</button>
+        <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!Filtered.length">Export</button>
+      </span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl nowrap">
+        <thead>
+          <tr>
+            <th>Currency type</th>
+            <th>Branch name</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Exchange rate</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+            <tr><td class="empty" colspan="7">Loading exchange rates…</td></tr>
+          } @else if (!Searched) {
+            <tr><td class="empty" colspan="7">Choose filters and Search to list exchange rates.</td></tr>
+          } @else {
+            @for (obj of pageRows; track $index) {
+              <tr (click)="goTo(obj.pk_ExchangeRateId)" style="cursor: pointer;">
+                <td><a class="lnk">{{ obj["CURRENCY TYPE"] }}</a></td>
+                <td>{{ obj["BRANCH NAME"] }}</td>
+                <td class="mono">{{ obj["FROM"] }}</td>
+                <td class="mono">{{ obj["TO"] }}</td>
+                <td class="num">{{ obj["EXCHANGE RATE"] }}</td>
+                <td>
+                  @switch (obj._status) {
+                    @case ('Current') { <span class="chip solid">Current</span> }
+                    @case ('Upcoming') { <span class="chip"><span class="dot"></span>Upcoming</span> }
+                    @default { <span class="chip dash">Expired</span> }
+                  }
+                </td>
+                <td class="act"><button type="button">Edit</button></td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="7">No exchange rates match these filters.</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ Filtered.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="page <= 1" (click)="goPage(page - 1)" aria-label="Previous page">‹</button>
+        @for (p of pageList; track $index) {
+          @if (p === 0) {
+            <span class="gap">…</span>
+          } @else {
+            <button type="button" [class.on]="p === page" (click)="goPage(p)">{{ p }}</button>
+          }
+        }
+        <button type="button" [disabled]="page >= pageCount" (click)="goPage(page + 1)" aria-label="Next page">›</button>
+      </div>
+    </div>
+  </div>
 </div>

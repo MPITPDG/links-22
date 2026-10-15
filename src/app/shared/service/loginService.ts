@@ -314,6 +314,9 @@ export class LoginService {
             }
             return true;
         }
+        // SA has every right. This used to fall through and return undefined, so callers
+        // that gate on the result (e.g. Import searches) never loaded anything for SA.
+        return true;
     }
 
     checkVerifyWithMessage(mode, vdata) {

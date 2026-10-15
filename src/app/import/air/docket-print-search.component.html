@@ -1,39 +1,81 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>Search</strong>
-                </div>
-            </div>
-        </div>
+<!--
+  Import air - docket print search. Page kit recipe 1 (.im-page, global kit
+  src/styles/kit/import-page.css), mirrored from MPERPNG-20
+  src/app/import/air/docket-print-search.component.html.
+  search() validates the typed code then opens the docket in a new tab (unchanged); the
+  recent-jobs table lets a code be picked instead of typed, calling the same print action per
+  row. A response without a Table reads as "no results".
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Docket print</h1>
+      <p>Print the air import docket for a given import code</p>
     </div>
-    <div class="row">
-        <div class="col-sm-4">
-        </div>
-        <div class="col-sm-4">
-            <table class="table table-sm-new bgwhite">
-                <tr class="trbg">
-                    <td>
-                        <span class="col-form-span-label">
-                        Import Code
-                    </span>
-                    </td>
-                    <td>
-                        <input type="text" [(ngModel)]="inputValue" class="form-control" [maxlength]="15" [OnlyNumber]="true" />
-                    </td>
-                </tr>
-                <tr class="trbg centerlabel">
-                    <td colspan="3">
-                        <button type="button" name="submitButton" uiBtn variant="default" size="sm" (click)="search();">
-                            <span class="col-form-span-label">
-                                <i class="fa fa-search"></i> Search</span>
-                        </button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-4">
-        </div>
+  </div>
+
+  <div class="card sec">
+    <div class="filters">
+      <div class="f">
+        <label for="txtInputValue">Import code</label>
+        <input type="text" id="txtInputValue" name="txtInputValue" [(ngModel)]="inputValue" [maxlength]="15" [OnlyNumber]="true" placeholder="15-digit code" (keyup.enter)="search()" />
+      </div>
+      <div class="f">
+        <button class="btn p" type="button" name="submitButton" (click)="search()"><i class="fa fa-print" aria-hidden="true"></i> Print docket</button>
+      </div>
     </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Recent imports</h2>
+      <span class="meta">Last 30 days</span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Import code</th>
+            <th>Import date</th>
+            <th>Importer</th>
+            <th>Agent</th>
+            <th>Desc of goods</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+            <tr><td class="empty" colspan="6">Loading imports…</td></tr>
+          } @else if (loadError) {
+            <tr><td class="empty" colspan="6">Could not load recent imports. A code can still be typed above.</td></tr>
+          } @else {
+            @for (obj of pageRows; track $index) {
+              <tr>
+                <td class="mono">{{ obj["Import Code"] }}</td>
+                <td>{{ obj["Import Date"] }}</td>
+                <td>
+                  {{ obj._importerName }}
+                  @if (obj._importerCity) { <div class="sub-t">{{ obj._importerCity }}</div> }
+                </td>
+                <td>{{ obj["Agent"] }}</td>
+                <td>{{ obj["Desc of Goods"] }}</td>
+                <td class="act"><button type="button" (click)="printCode(obj['Import Code'])">Print docket</button></td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="6">No imports in the last 30 days. A code can still be typed above.</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ List.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="page <= 1" (click)="goPage(page - 1)" aria-label="Previous page">‹</button>
+        <button type="button" [disabled]="page >= pageCount" (click)="goPage(page + 1)" aria-label="Next page">›</button>
+      </div>
+    </div>
+  </div>
 </div>

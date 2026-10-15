@@ -1,85 +1,86 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>{{Header}}</strong>
-                </div>
+<!--
+  Import airline master - add / edit. Page kit recipe 2 (src/styles/kit/import-page.css),
+  ported from MPERPNG-20. Every [(ngModel)], the ErrorType messages and
+  submit() / cancel() are unchanged; AirlineCodeI (3) + AirlineCodeII (4) still
+  concatenate into AirlineCode on save.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Id == '0' ? 'New airline' : 'Edit airline' }}</h1>
+      <p>{{ Id == '0' ? 'Add an airline code and name for use in import jobs' : 'Update the airline code and name' }}</p>
+    </div>
+    <div class="tools">
+      <button class="btn g" type="button" routerLink="/import/master/airline/search">Back to airlines</button>
+    </div>
+  </div>
+
+  <div class="form-layout">
+    <div>
+      <div class="card sec">
+        <div class="card-h">
+          <h2>Airline details</h2>
+          <span class="meta"><b>*</b> required</span>
+        </div>
+        <div class="fields">
+          <div class="fld">
+            <label for="txtCodeI">Airline code <span class="req">*</span></label>
+            <div class="pair">
+              <input type="text" id="txtCodeI" name="txtCodeI" class="code" [(ngModel)]="AirlineCodeI" [maxlength]="3" [OnlyNumber]="true" placeholder="125" />
+              <input type="text" id="txtCodeII" name="txtCodeII" [(ngModel)]="AirlineCodeII" [maxlength]="4" placeholder="AAAA" />
             </div>
+            @if (ErrorType=='1') {
+              <span class="hint err">Please Enter first input</span>
+            }
+            @if (ErrorType=='1.1') {
+              <span class="hint err">First input must be 3 characters in numeric</span>
+            }
+            @if (ErrorType=='2') {
+              <span class="hint err">Please Enter second input</span>
+            }
+            @if (ErrorType=='2.1') {
+              <span class="hint err">Second input must be 4 characters in numeric</span>
+            }
+          </div>
+          <div class="fld">
+            <label for="txtAirlineName">Airline name <span class="req">*</span></label>
+            <input type="text" id="txtAirlineName" name="txtAirlineName" [(ngModel)]="AirlineName" [maxlength]="100" />
+            @if (ErrorType=='3') {
+              <span class="hint err">Please enter AirLine Name.</span>
+            }
+          </div>
         </div>
+      </div>
     </div>
-    <div class="row">
-        <div class="col-sm-3">
+
+    <aside class="aside">
+      <div class="card sec">
+        <div class="card-h">
+          <h2>Record</h2>
+          @if (Id == '0') {
+            <span class="chip dash">Draft</span>
+          } @else {
+            <span class="chip solid">Saved</span>
+          }
         </div>
-        <div class="col-sm-6">
-            <table class="table table-sm-new bgwhite">
-                <tr class="trbg">
-                    <td colspan="4">
-                        <span class="col-form-span-label"><b>AIRLINE DETAILS</b></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width100">
-                        <span class="col-form-span-label">Airline Code
-                            <span class="col-form-span-error">*</span>
-                        </span>
-                    </td>
-                    <td class="width50">
-                        <input type="text" [(ngModel)]="AirlineCodeI" class="form-control " [maxlength]="3"
-                            [OnlyNumber]="true" />
-                    </td>
-                    <td>
-                        <input type="text" [(ngModel)]="AirlineCodeII" class="form-control width70" [maxlength]="4"/>
-                    </td>
-                    <td>
-                        @if (ErrorType=='1') {
-<span class="col-form-span-error">Please Enter first input</span>
-}
-                        @if (ErrorType=='1.1') {
-<span class="col-form-span-error">First input must be 3 characters in numeric</span>
-}
-                        @if (ErrorType=='2') {
-<span class="col-form-span-error">Please Enter second input</span>
-}
-                        @if (ErrorType=='2.1') {
-<span class="col-form-span-error">Second input must be 4 characters in numeric</span>
-}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="col-form-span-label">Airline Name
-                            <span class="col-form-span-error">*</span>
-                        </span>
-                    </td>
-                    <td colspan="3">
-                        <input type="text" [(ngModel)]="AirlineName" class="form-control" [maxlength]="100" />
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td colspan="3">
-                        @if (ErrorType=='3') {
-<span class="col-form-span-error">Please enter AirLine Name.</span>
-}
-                    </td>
-                </tr>
-                <tr class="trbg centerlabel">
-                    <td colspan="4">
-                        <button type="button" name="submitButton" uiBtn variant="default" size="sm" (click)="submit();">
-                            <span class="col-form-span-label">
-                                <i class="{{(Id=='0')? 'fa fa-save' : 'fa fa-refresh'}}"></i> {{ (Id=='0')? 'Save' :
-                                'Update'}}</span>
-                        </button>&nbsp;
-                        <button type="button" name="cancelButton" uiBtn variant="outline" size="sm" (click)="cancel();">
-                            <span class="col-form-span-label">
-                                <i class="fa fa-times-circle"></i> Cancel</span>
-                        </button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-3">
-        </div>
+        <div class="row"><span>Branch</span><b>{{ BranchName || '—' }}</b></div>
+        <div class="row"><span>User</span><b>{{ CreatedBy || '—' }}</b></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Before you save</h2></div>
+        <ul>
+          <li>Airline code is a 3-digit first part and a 4-character second part.</li>
+          <li>Airline name is required.</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose {{ Id == '0' ? 'Save' : 'Update' }}.</span>
+    <div class="r">
+      <button class="btn g" type="button" name="cancelButton" (click)="cancel();">Cancel</button>
+      <button class="btn p" type="button" name="submitButton" (click)="submit();">{{ Id == '0' ? 'Save' : 'Update' }}</button>
     </div>
+  </div>
 </div>

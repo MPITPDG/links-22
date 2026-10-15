@@ -1,114 +1,106 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>{{Header}}</strong>
-                </div>
-            </div>
-        </div>
+<!--
+  Import miscellaneous job master - add / edit. Page kit recipe 2 (src/styles/kit/import-page.css),
+  ported from MPERPNG-20. Every [(ngModel)], the ErrorType messages, the Links
+  ng-select pickers for Agent / Sales person and submit() / cancel() are unchanged.
+  Job no. is system-assigned and locked.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Id == '0' ? 'New miscellaneous job' : 'Edit miscellaneous job' }}</h1>
+      <p>{{ Id == '0' ? 'Add a miscellaneous import job' : 'Update the miscellaneous import job details' }}</p>
     </div>
-    <div class="row">
-        <div class="col-sm-2">
-        </div>
-        <div class="col-sm-8">
-            <table class="table table-sm-new bgwhite">
-                <tr class="trbg">
-                    <td colspan="3">
-                        <span class="col-form-span-label"><b>Miscellaneous Job</b></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width90">
-                        <span class="col-form-span-label">Job No.</span>
-                    </td>
-                    <td colspan="2">
-                        <input type="text" [(ngModel)]="JobNo" [disabled]="true" class="form-control width120"
-                            [maxlength]="15" [OnlyNumber]="true" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="col-form-span-label">Client Name
-                            <span class="col-form-span-error">*</span>
-                        </span>
-                    </td>
-                    <td>
-                        <select class="form-control" [(ngModel)]="ClientName">
-                            <option value="0">-- Select --</option>
-                            @for (item of ClientList; track item) {
+    <div class="tools">
+      <button class="btn g" type="button" routerLink="/import/master/misc-job/search">Back to miscellaneous jobs</button>
+    </div>
+  </div>
 
-                                <option value="{{item.DATAVALUEFIELD}}">{{item.DATATEXTFIELD}}</option>
-                            
-}
-                        </select>
-                    </td>
-                    <td class="width200">
-                        @if (ErrorType=='1') {
-<span class="col-form-span-error">Please enter client name.</span>
-}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="col-form-span-label">Agent</span>
-                    </td>
-                    <td colspan="2">
-                        <ng-select [items]="AgentList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--"
-                            [(ngModel)]="AgentCode" class="form-control">
-                        </ng-select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="col-form-span-label">Sales Person</span>
-                    </td>
-                    <td colspan="2">
-                        <ng-select [items]="SalesPersonList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--"
-                            [(ngModel)]="SalesPerson" class="form-control">
-                        </ng-select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="col-form-span-label">No. of PKgs
-                            <span class="col-form-span-error">*</span>
-                        </span>
-                    </td>
-                    <td>
-                        <input type="text" [(ngModel)]="NoOfPkgs" class="form-control width120" [maxlength]="10"
-                            [OnlyNumber]="true" />
-                    </td>
-                    <td>
-                        @if (ErrorType=='2') {
-<span class="col-form-span-error">Please enter no. of pkgs.</span>
-}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="col-form-span-label">Narration</span>
-                    </td>
-                    <td colspan="2">
-                        <textarea class="form-control" [(ngModel)]="Narration" rows="15"></textarea>
-                    </td>
-                </tr>
-                <tr class="trbg centerlabel">
-                    <td colspan="3">
-                        <button type="button" name="submitButton" uiBtn variant="default" size="sm" (click)="submit();">
-                            <span class="col-form-span-label">
-                                <i class="{{(Id=='0')? 'fa fa-save' : 'fa fa-refresh'}}"></i> {{ (Id=='0')? 'Save' :
-                                'Update'}}</span>
-                        </button>&nbsp;
-                        <button type="button" name="cancelButton" uiBtn variant="outline" size="sm" (click)="cancel();">
-                            <span class="col-form-span-label">
-                                <i class="fa fa-times-circle"></i> Cancel</span>
-                        </button>
-                    </td>
-                </tr>
-            </table>
+  <div class="form-layout">
+    <div>
+      <div class="card sec">
+        <div class="card-h">
+          <h2>Miscellaneous job</h2>
+          <span class="meta"><b>*</b> required</span>
         </div>
-        <div class="col-sm-2">
+        <div class="fields">
+          <div class="fld">
+            <label for="txtJobNo">Job no.</label>
+            <input type="text" id="txtJobNo" name="txtJobNo" [(ngModel)]="JobNo" [disabled]="true" class="lock" [maxlength]="15" [OnlyNumber]="true" placeholder="Assigned on save" />
+          </div>
+          <div class="fld">
+            <label for="txtNoOfPkgs">No. of pkgs <span class="req">*</span></label>
+            <input type="text" id="txtNoOfPkgs" name="txtNoOfPkgs" [(ngModel)]="NoOfPkgs" [maxlength]="10" [OnlyNumber]="true" />
+            @if (ErrorType=='2') {
+              <span class="hint err">Please enter no. of pkgs.</span>
+            }
+          </div>
         </div>
+        <div class="fields">
+          <div class="fld full">
+            <label for="selClientName">Client name <span class="req">*</span></label>
+            <select id="selClientName" name="selClientName" [(ngModel)]="ClientName">
+              <option value="0">-- Select --</option>
+              @for (item of ClientList; track item) {
+                <option value="{{item.DATAVALUEFIELD}}">{{item.DATATEXTFIELD}}</option>
+              }
+            </select>
+            @if (ErrorType=='1') {
+              <span class="hint err">Please enter client name.</span>
+            }
+          </div>
+        </div>
+        <div class="fields">
+          <div class="fld">
+            <label>Agent</label>
+            <ng-select [items]="AgentList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--"
+              [(ngModel)]="AgentCode">
+            </ng-select>
+          </div>
+          <div class="fld">
+            <label>Sales person</label>
+            <ng-select [items]="SalesPersonList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--"
+              [(ngModel)]="SalesPerson">
+            </ng-select>
+          </div>
+        </div>
+        <div class="fields">
+          <div class="fld full top">
+            <label for="txtNarration">Narration</label>
+            <textarea id="txtNarration" name="txtNarration" [(ngModel)]="Narration" rows="6"></textarea>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <aside class="aside">
+      <div class="card sec">
+        <div class="card-h">
+          <h2>Record</h2>
+          @if (Id == '0') {
+            <span class="chip dash">Draft</span>
+          } @else {
+            <span class="chip solid">Saved</span>
+          }
+        </div>
+        <div class="row"><span>Job no.</span><b>{{ (Id != '0' && JobNo) ? JobNo : 'Assigned on save' }}</b></div>
+        <div class="row"><span>Branch</span><b>{{ BranchName || '—' }}</b></div>
+        <div class="row"><span>User</span><b>{{ CreatedBy || '—' }}</b></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Before you save</h2></div>
+        <ul>
+          <li>Client name and no. of pkgs are required.</li>
+          <li>Job no. is assigned automatically once saved.</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose {{ Id == '0' ? 'Save' : 'Update' }}.</span>
+    <div class="r">
+      <button class="btn g" type="button" name="cancelButton" (click)="cancel();">Cancel</button>
+      <button class="btn p" type="button" name="submitButton" (click)="submit();">{{ Id == '0' ? 'Save' : 'Update' }}</button>
+    </div>
+  </div>
 </div>

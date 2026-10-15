@@ -7,6 +7,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-consignment-import-master-airline-data-entry',
     templateUrl: 'data-entry.component.html',
+    styleUrls: ['../master-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -17,6 +18,11 @@ export class EntryAirlineMasterComponent implements OnInit {
     AirlineCodeII: string = '';
     AirlineName: string = '';
     ErrorType: string = '0';
+
+    /** read-only context shown in the Record aside */
+    BranchName: string = "";
+    CreatedBy: string = "";
+
     constructor(
         private _dataService: DataService,
         private _loginService: LoginService,
@@ -26,11 +32,19 @@ export class EntryAirlineMasterComponent implements OnInit {
         private _loaderService: LoaderService) { }
 
     ngOnInit() {
+        const login = this._loginService.getLogin();
+        if (login && login[0]) {
+            this.BranchName = login[0].CITYNAME || "";
+            this.CreatedBy = login[0].CMP_USERNAME || "";
+        }
         this._activatedRoute.params.subscribe(params => {
             if (params["param"]) {
                 this.Id = params["param"];
                 this.Header = 'AIRLINE MASTER - UPDATE';
                 //this.verifyPermission(121, "Modify");
+                // The rights check above is disabled in Links, and it was also the only thing
+                // that loaded the record, so editing showed an empty form. Load it directly.
+                this.populateForEdit(this.Id);
             }
             else {
                 this.Header = 'AIRLINE MASTER - ADD';
@@ -57,6 +71,7 @@ export class EntryAirlineMasterComponent implements OnInit {
         this._dataService.getData("Import/AirlineDetails", { id: id })
             .subscribe((data: any) => {
                 this._loaderService.display(false);
+                if (!data || !Array.isArray(data.Table) || data.Table.length == 0) { return; }
                 this.Id = data.Table[0]["pk_ArilineId"];
                 this.AirlineCodeI = data.Table[0]["Airline_Code"].substring(0, 3);
                 this.AirlineCodeII = data.Table[0]["Airline_Code"].substring(3);

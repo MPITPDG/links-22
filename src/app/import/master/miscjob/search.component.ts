@@ -6,11 +6,14 @@ import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-consignment-import-master-misc-job-search',
     templateUrl: 'search.component.html',
+    styleUrls: ['../master-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class SearchMiscJobMasterComponent implements OnInit {
     Input: string = '';
+    /** presentation: lookup in flight (empty-state text) */
+    loading: boolean = false;
     constructor(
         private _dataService: DataService,
         private _loginService: LoginService,
@@ -36,6 +39,7 @@ export class SearchMiscJobMasterComponent implements OnInit {
 
     populateForEdit(jobno) {
         this._loaderService.display(true);
+        this.loading = true;
         let _jsonData = {
             JobNo: jobno,
             CmpCode: this._loginService.getLogin()[0].CMPCODE,
@@ -44,11 +48,15 @@ export class SearchMiscJobMasterComponent implements OnInit {
         this._dataService.getData("Import/MiscellaneousDetails", _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                if(data.Table.length > 0){
+                this.loading = false;
+                if(data && Array.isArray(data.Table) && data.Table.length > 0){
                     this._router.navigate(["./import/master/misc-job/update-entry", jobno]);
                 }else{
                     alert("No job found!!!!!");
                 }
+            }, () => {
+                this._loaderService.display(false);
+                this.loading = false;
             });
     }
 }

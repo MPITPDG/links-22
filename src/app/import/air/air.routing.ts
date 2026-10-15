@@ -8,7 +8,7 @@ const routes: Routes = [
     {
         path: '',
         data: {
-            title: 'Import'
+            title: 'Air'
         },
         children: [
             { path: '', component: AirImportComponent, data: { title: 'Home' } },
