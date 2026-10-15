@@ -1,69 +1,48 @@
-<div class="animated fadeIn" >  
-    <div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{Header}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Accounts -> MIS -> Account finalization -> Client / supplier account-wise list.
+  Download-only: ExportData() -> ACC_RPT_CLIENT_OUTSTANDING_ALLCITY_ACCOUNT_WISE, workbook built
+  client-side (ExportexcelService). Nothing is listed on screen.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Header }}</h1>
+      <p>Account-wise statement for one client across every city &middot; downloads an Excel workbook</p>
     </div>
-    <div class="row no-gutters" >
-        <div class="col-sm-12 col-md-3 col-lg-3">
+  </div>
+
+  <div class="card sec">
+    <div class="card-h"><h2>Client and period</h2><span class="meta"><b>*</b> required</span></div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Client <span class="req">*</span></label>
+        <ng-select [items]="ClientList" bindLabel="acctname" bindValue="acctcodename" [(ngModel)]="Client" (ngModelChange)="GetAccountName($event)"
+          class="custom" placeholder="--Please Select--"></ng-select>
+      </div>
+      <div class="fld full">
+        <label>Quick period</label>
+        <div class="fk-seg">
+          @for (p of periods; track p.key) {
+            <button type="button" [class.on]="period === p.key" (click)="setPeriod(p.key)">{{ p.label }}</button>
+          }
         </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-
-                <tr>
-                    <td class="col-form-span-heading" colspan="6"> <b>Client Supplier Account Wise List</b> </td>
-           </tr>
-                           <tr>
-                    <td >
-                        <span  class="col-form-span-label"><b>Client </b> </span><span
-                        class="col-form-span-error">*</span>
-                    </td>
-
-                            <td colspan="4" >
-                               <ng-select   [items]="ClientList" bindLabel="acctname"
-                               bindValue="acctcodename"  [(ngModel)]="Client" (ngModelChange)="GetAccountName($event)"
-                               class="custom" placeholder="--Please Select--">
-                                </ng-select>
-                            </td>
-                </tr>
-                <tr>
-
-                    <td><span class="col-form-span-label"><b>From</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                <td>
-                    <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)"  [options]="myDatePickerOptions"
-                        class="form-control"  [selDate]="FromDate"    ></my-date-picker>
-                </td>
-                    <td><span class="col-form-span-label"><b>To </b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td><my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)"  [options]="myDatePickerOptions"
-                            class="form-control"  [selDate]="ToDate"   ></my-date-picker>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="6" class="centerlabel">
-                        <button uiBtn variant="default" size="sm" type="submit" (click)="ExportData()" > <span
-                                class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
-                                Export To Excel </span></button>&nbsp;
-                    </td>
-                </tr>
-              
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-
-
+      </div>
+      <div class="fld">
+        <label>From <span class="req">*</span></label>
+        <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event); period = ''" [options]="myDatePickerOptions" [selDate]="FromDate"></my-date-picker>
+      </div>
+      <div class="fld">
+        <label>To <span class="req">*</span></label>
+        <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event); period = ''" [options]="myDatePickerOptions" [selDate]="ToDate"></my-date-picker>
+      </div>
     </div>
+    <div class="fk-note">The statement downloads as an Excel file with opening, current total, closing and advance balances.</div>
+  </div>
 
- 
+  <div class="bar">
+    <span class="note">The output is an Excel file; nothing is listed on this screen.</span>
+    <div class="r">
+      <button class="btn p" type="submit" (click)="ExportData()">Export to Excel</button>
+    </div>
+  </div>
 </div>
-

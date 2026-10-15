@@ -1,0 +1,42 @@
+/* Finance view popups (invoice / credit note / JV / purchase / SRPI / request BP views,
+   France invoice / console / recovery views, France purchase view).
+   Page shell on top of import-page.css; legacy table content restyled in place by
+   import-entry.css (.x-legacy) + consign-popup.css (.cp-page). Monochrome only. */
+
+/* ---- France purchase view (kit markup) ---- */
+:host ::ng-deep .im-page.fpv { padding-top: 16px; padding-bottom: 32px; background: var(--ground); min-height: 100vh; }
+:host ::ng-deep .im-page .fpv-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+:host ::ng-deep .im-page .fpv-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+:host ::ng-deep .im-page .fpv-kpi { background: var(--sheet); border: 1px solid var(--edge); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+:host ::ng-deep .im-page .fpv-kpi .k { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); font-weight: 600; }
+:host ::ng-deep .im-page .fpv-kpi .v { font-size: 18px; font-weight: 600; }
+:host ::ng-deep .im-page .fpv-kpi .v.num { font-family: var(--num); text-align: right; }
+:host ::ng-deep .im-page .fpv-kpi .v.mono { font-family: var(--num); }
+:host ::ng-deep .im-page .fpv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+:host ::ng-deep .im-page .fpv-grid .card { margin-bottom: 0; }
+:host ::ng-deep .im-page .fpv-kv { display: grid; grid-template-columns: 180px 1fr; gap: 8px 16px; padding: 14px 16px; align-items: center; }
+:host ::ng-deep .im-page .fpv-kv .k { color: var(--soft); }
+:host ::ng-deep .im-page .fpv-kv .v { font-weight: 600; }
+:host ::ng-deep .im-page .fpv-kv .v.num { font-family: var(--num); text-align: right; font-weight: 500; }
+:host ::ng-deep .im-page .fpv-kv .v.num.b { font-weight: 700; }
+:host ::ng-deep .im-page .fpv-net { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 16px; border-top: 1px solid var(--edge); background: var(--band); }
+:host ::ng-deep .im-page .fpv-net .num { font-family: var(--num); font-size: 22px; font-weight: 700; }
+@media (max-width: 900px) {
+    :host ::ng-deep .im-page .fpv-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    :host ::ng-deep .im-page .fpv-grid { grid-template-columns: 1fr; }
+}
+
+/* ---- legacy view popups wrapped in the page shell ---- */
+:host ::ng-deep .cp-page .modal-body { padding: 0; }
+:host ::ng-deep .cp-page .anchor-link { color: var(--ink) !important; text-decoration: underline; text-underline-offset: 2px; font-weight: 600; cursor: pointer; }
+:host ::ng-deep .cp-page hr { border-color: var(--edge) !important; }
+:host ::ng-deep .cp-page td.num, :host ::ng-deep .cp-page th.num { text-align: right; font-family: var(--num); }
+:host ::ng-deep .cp-page .btn-success, :host ::ng-deep .cp-page .btn-primary,
+:host ::ng-deep .cp-page .btn-info, :host ::ng-deep .cp-page .btn-danger, :host ::ng-deep .cp-page .btn-warning {
+    background: var(--ink) !important; border-color: var(--ink) !important; color: #fff !important;
+}
+:host ::ng-deep .cp-page .badge { background: transparent !important; color: var(--ink) !important; border: 1px solid var(--ink); border-radius: 999px; font-weight: 600; }
+:host ::ng-deep .cp-page .text-primary, :host ::ng-deep .cp-page .text-success, :host ::ng-deep .cp-page .text-danger,
+:host ::ng-deep .cp-page .text-info, :host ::ng-deep .cp-page .text-warning { color: var(--ink) !important; }
+:host ::ng-deep .cp-page .bg-primary, :host ::ng-deep .cp-page .bg-success, :host ::ng-deep .cp-page .bg-danger,
+:host ::ng-deep .cp-page .bg-info, :host ::ng-deep .cp-page .bg-warning { background: var(--band) !important; color: var(--ink) !important; }

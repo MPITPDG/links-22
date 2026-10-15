@@ -11,10 +11,11 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 
 
 
+import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, finAmt, finByMonth } from '../fin-kit';
 @Component({
     selector: 'app-SpecialLedger-search',
     templateUrl: './specialledger.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -216,9 +217,10 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
           this.AdvCrAmt=(data.Table2[0].ADVTOTALCR=="0.00")?"" :Math.abs(data.Table2[0].ADVTOTALCR) ;
           this.rptadvtotcr=(data.Table2[0].ADVTOTALCR=="0.00")?"" :Math.abs(data.Table2[0].ADVTOTALCR) ;
         } 
-        this.searchHeaderText="Account Statement From " + this.FromDate + " To " + this.ToDate
+                this.searchHeaderText="Account Statement From " + this.FromDate + " To " + this.ToDate
         this._loaderService.display(false);
-      })
+        this.failed = false; this.buildView();
+      }, () => { this._loaderService.display(false); this.failed = true; })
   } 
   FromDateChanged(ev){
     this.FromDate=ev.formatted
@@ -228,7 +230,7 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
   }
   GetAccountName(icode){
       let updateItem = this.AccountList.find(item => item.ACCTCODENAME === icode);
-      this.AccountName=updateItem.ACCTNAME;
+            this.AccountName=updateItem?.ACCTNAME; // guarded: clearing the select passed undefined
   }
   Exportstatement(){
     
@@ -393,4 +395,25 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
          }
       }
           
+
+    // ---- redesign: period presets, pager, monthly chart (display only) ----
+    failed = false;
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    pager = new FinPager<any>(10);
+    chart: FinChart | null = null;
+    fmt = finAmt;
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.FromDate = this._dataService.datechnge1(r.from);
+        this.ToDate = this._dataService.datechnge1(r.to);
+    }
+    buildView() {
+        const rows = this.StatementList || [];
+        this.pager.set(rows);
+        const items = finByMonth(rows, r => r.TRANSDATE, r => finNum(r.DRAMT) - finNum(r.CRAMT));
+        this.chart = items.length ? finBars(items) : null;
+    }
 }

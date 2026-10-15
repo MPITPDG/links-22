@@ -1,597 +1,383 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>PURCHASE</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  India Accounts - general purchase entry (recipe 2).
+  Kit: global .im-page kit (src/styles/kit) + purchase-page.css. Every [(ngModel)], handler, disabled flag,
+  amount/total binding and the MAWB / TDS modals are unchanged from the legacy template.
+  Links port: Links-only bits kept - purchase date [disabled]='disablepurchasedate', the narration
+  textarea (#autoresizing, TextareaValueChange), job no. maxlength 40.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Purchase</h1>
+      <p>Supplier invoice with account lines, TDS and GST</p>
     </div>
-    <div class="row no-gutters" >
-        <div class="col-sm-12 col-md-2 col-lg-2"  >
-        </div>
-        <div class="col-sm-12 col-md-8 col-lg-8 "style="overflow-y: auto; height:500px; " >
-            <table class="table table-bordered table-sm-new bgwhite"   >
-                <tr>
-                    <td class="col-form-span-heading" colspan="4">
-                        <b> General Details</b>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Purchase No</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td> <input [(ngModel)]="PurchaseNo" type="text" class="form-control width150" maxlength="40"
-                            [disabled]="true"> </td>
-                    <td><span class="col-form-span-label"><b>Purchase Date</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td style="text-align: left;">
-                        <my-date-picker name="PurchaseDate" [options]="myDatePickerOptionsInv" [disabled]='disablepurchasedate'
-                            class="width170" (dateChanged)="PurchaseDateChanged($event)" [selDate]="PurchaseDate" ></my-date-picker>
-                    </td>
-                </tr>
-                <!-- <tr>
-                    <td><span class="col-form-span-label"><b>Narration</b> </span></td>
-                    <td colspan="3"> <input [(ngModel)]="Narration" type="text" aria-multiline="true" class="form-control width250"
-                        [maxlength]="4000" > </td>
-                </tr> -->
-                <tr>
-                    <td><span class="col-form-span-label"><b>Narration</b> </span></td>
-                    <td colspan="3">
-                         <!-- <input [(ngModel)]="Narration" type="text" aria-multiline="true" class="form-control width500"
-                        [maxlength]="4000" > -->
+    <div class="tools">
+      @if (PurchaseNo) {
+        <span class="chip solid">{{ PurchaseNo }}</span>
+      } @else {
+        <span class="chip dash">New purchase</span>
+      }
+    </div>
+  </div>
 
-                        <textarea class="form-control" id="autoresizing" (change)="TextareaValueChange($event)"
-                        placeholder="text" cols="50" rows="3" [innerHTML]="Narration"></textarea>
-                    </td>
+  <div class="card sec">
+    <div class="card-h">
+      <h2>General</h2>
+      <span class="meta"><b>*</b> required</span>
+    </div>
+    <div class="fields">
+      <div class="fld">
+        <label>Purchase no. <span class="req">*</span></label>
+        <input [(ngModel)]="PurchaseNo" type="text" maxlength="40" [disabled]="true">
+      </div>
+      <div class="fld">
+        <label>Purchase date <span class="req">*</span></label>
+        <my-date-picker name="PurchaseDate" [options]="myDatePickerOptionsInv" [disabled]='disablepurchasedate'
+          (dateChanged)="PurchaseDateChanged($event)" [selDate]="PurchaseDate"></my-date-picker>
+      </div>
+      <div class="fld full">
+        <label>Narration</label>
+        <textarea id="autoresizing" (change)="TextareaValueChange($event)"
+          placeholder="text" cols="50" rows="3" [innerHTML]="Narration"></textarea>
+      </div>
+    </div>
+  </div>
 
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Supplier and invoice</h2>
+    </div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Supplier <span class="req">*</span></label>
+        <ng-select [items]="supplierlist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [disabled]='disablesupplier'
+          [(ngModel)]="suppliername" (ngModelChange)="GetSupplierName($event)" class="custom"
+          placeholder="--Select--">
+        </ng-select>
+      </div>
+      <div class="fld full">
+        <label>Bill to address <span class="req">*</span></label>
+        <select [(ngModel)]="billaddress" [disabled]='disablesupplieraddr'>
+          <option value="">Please select</option>
+          @for (d of billaddressfilter; track d) {
+            <option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}
+            </option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Invoice no. <span class="req">*</span></label>
+        <input [(ngModel)]="InvNo" type="text" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Invoice date <span class="req">*</span></label>
+        <my-date-picker name="InvDate" [options]="myDatePickerOptions" [(ngModel)]="InvDate"></my-date-picker>
+      </div>
+      <div class="fld">
+        <label>Bill received on <span class="req">*</span></label>
+        <my-date-picker name="BillReceive" [options]="myDatePickerOptions" [(ngModel)]="BillReceive"></my-date-picker>
+      </div>
+      <div class="fld">
+        <label>Due date <span class="req">*</span></label>
+        <my-date-picker name="DueDate" [options]="myDatePickerOptions" [(ngModel)]="DueDate"></my-date-picker>
+      </div>
+    </div>
+  </div>
 
-
-                </tr>
-                <tr>
-                    <td class="col-form-span-heading" colspan="4">
-                        <b>Supplier Details</b>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Supplier Name</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td colspan="3">
-                        <!-- <select class="form-control width350"  [(ngModel)]="staff">
-                            <option value="">Please select</option>
-                            <option *ngFor="let d of Stafflist" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
-                        </select> -->
-                        <ng-select [items]="supplierlist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [disabled]='disablesupplier'
-                            [(ngModel)]="suppliername" (ngModelChange)="GetSupplierName($event)" class="custom "
-                            placeholder="--Select--">
-                        </ng-select>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Bill To Address</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td colspan="3">
-                        <select class="form-control" [(ngModel)]="billaddress" [disabled]='disablesupplieraddr'>
-                            <option value="">Please select</option>
-                            @for (d of billaddressfilter; track d) {
-<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}
-                            </option>
-}
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-
-                    <td><span class="col-form-span-label"><b>Inv No</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td> <input [(ngModel)]="InvNo" type="text"  class="form-control width150"
-                            maxlength="40"> </td>
-                    <td><span class="col-form-span-label"><b>Inv Date</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td style="text-align: left;">
-                        <my-date-picker name="InvDate" [options]="myDatePickerOptions" class="width170"
-                            [(ngModel)]="InvDate"></my-date-picker>
-                    </td>
-                </tr>
-                <tr>
-
-                    <td><span class="col-form-span-label"><b>Bill Received On</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td style="text-align: left;">
-                        <my-date-picker name="BillReceive" [options]="myDatePickerOptions" class="width170"
-                            [(ngModel)]="BillReceive"></my-date-picker>
-                    </td>
-                    <td><span class="col-form-span-label"><b>Due Date</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td style="text-align: left;">
-                        <my-date-picker name="DueDate" [options]="myDatePickerOptions" class="form-control width170"
-                            [(ngModel)]="DueDate"></my-date-picker>
-                    </td>
-                </tr>
-                <!-- <tr>
-                    <td class="col-form-span-heading" colspan="2">
-                        <b> Passing Details</b>
-                    </td>
-                    <td class="col-form-span-heading" colspan="2">
-
-                        <div style="display: flex;">
-                            <span class="col-form-span-label"><b>Passed&nbsp;&nbsp;</b> </span>
-                            <span class="col-form-span-label"> <input type="checkbox" [(ngModel)]="IsPassed"
-                                    (change)="changeEvent($event)" /> </span>
-                        </div>
-                    </td>
-
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Passed By</b> </span></td>
-                    <td>
-                        <select class="form-control width150" [(ngModel)]="passedby" [disabled]='togglepassedby'>
-                            <option value="">Please select</option>
-                            <option *ngFor="let d of PassedBylist" value={{d.CMPID}}>{{d.CMP_USERNAME}}</option>
-                        </select>
-                    </td>
-                    <td><span class="col-form-span-label"><b>Passed Amount</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td> <input [(ngModel)]="PassedAmount" OnlyNumber="true" type="text" [disabled]='togglepamount'
-                            class="form-control width150" maxlength="40"> </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Invoice Amount</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td> <input [(ngModel)]="InvoiceAmount" OnlyNumber="true" type="text" [disabled]='toggleinvamount'
-                            class="form-control width150" maxlength="40"> </td>
-                    <td><span class="col-form-span-label"><b>Voucher No</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td> <input [(ngModel)]="VoucherNo" OnlyNumber="true" type="text" [disabled]='togglevno'
-                            class="form-control width150" maxlength="40"> </td>
-
-                </tr> -->
-                <tr>
-                    <td class="col-form-span-heading" colspan="2">
-                        <b>Accounts Details</b>
-                    </td>
-                    <td  class="col-form-span-heading" colspan="2">
-
-                        <div style="display: flex;float: left;" >
-                            <span class="col-form-span-label" style="color: crimson;"><b>{{chktdslbl}}</b> </span>
-                            <span class="col-form-span-label"> <input type="checkbox"
-                                  [(ngModel)]="chkIsTDS"  [disabled]='disablecheckbox'
-                                    /> </span>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Account Name</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                    <td colspan="3">
-                        <!-- <select class="form-control width500"  [(ngModel)]="AccountName" (change)="GetActName($event.target.value)">
-                            <option value="">Please select</option>
-                            <option *ngFor="let d of AccountNameList" value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
-                        </select> -->
-                        <ng-select [items]="AccountNameList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
-                            (ngModelChange)="GetActName($event)" [(ngModel)]="AccountName" class="custom "
-                            placeholder="--Select--">
-                        </ng-select>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Item</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                    <td colspan="3">
-                        <!-- <select class="form-control width500"  [(ngModel)]="Item">
-                            <option value="">Please select</option>
-                            <option *ngFor="let d of ItemList" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
-                        </select> -->
-                        <ng-select [items]="Itemslist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Item"
-                            class="custom " placeholder="--Select--">
-                        </ng-select>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b> TDS Applicable</b> </span><span
-                            class="col-form-span-error">*</span>
-                    </td>
-                    <td style=" display: flex; ">
-                        <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
-                            <select class="form-control width150"  [(ngModel)]="TDSApplicable"   >
-                            <option value="">--Please select--</option>
-                            <option value="Y">Y</option>
-                            <option value="N">N</option>
-                           </select>
-
-                </td>
-                    <td><span class="col-form-span-label"><b>GST Applicable</b> </span></td>
-                    <td style=" display: flex; ">
-                        <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
-                            <select class="form-control width150"  [(ngModel)]="GSTApplicable"   >
-                                <option  value="" >-- Please Select --</option>
-                                <option value="1">Y</option>
-                                <option value="0" >N</option>
-                                <option value="2" >RCM</option>
-                           </select>
-                    </td>
-
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b> Amount</b> </span><span
-                            class="col-form-span-error">*</span>
-                    </td>
-                    <td> <input [(ngModel)]="Amount" OnlyNumber="true" type="text" class="form-control width150"
-                            maxlength="40"> </td>
-                    <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
-                    <td> <input [(ngModel)]="Deduction" type="text" OnlyNumber="true" class="form-control width150"
-                            maxlength="40"> </td>
-
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b> Job No</b> </span><span
-                            class="col-form-span-error">*</span>
-                    </td>
-                    <td> <input [(ngModel)]="JobNo" type="text" (change)="fn_JobValidation()" OnlyNumber="true" class="form-control width150"
-                            maxlength="40"> </td>
-                    <td><span class="col-form-span-label"><b>Pass Amount</b> </span></td>
-                    <td> <input [(ngModel)]="actpassedamount" type="text" OnlyNumber="true"
-                            class="form-control width150" maxlength="40">
-                    </td>
-
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Narration</b> </span></td>
-                    <td colspan="3">
-                        <input [(ngModel)]="ActNarration" type="text" class="form-control width500" [maxlength]="30" >
-                    </td>
-                </tr>
-
-                <tr>
-                    <td colspan="4" class="centerlabel">
-                        <button uiBtn variant="default" size="sm" type="submit" (click)="Addchildrcrd()" [disabled]='disablechildaddbtn'> <span
-                                class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>
-                                {{txtchild}}</span></button>
-                        <button uiBtn variant="outline" size="sm" type="reset" [disabled]='disablechildresetbtn'> <span class="col-form-span-label"
-                                (click)="Resetchildrcrd();"><i class="fa fa-ban"></i> Reset</span></button>
-                                <button uiBtn variant="default" size="sm" type="submit" [disabled]='disabletdsbtn'> <span class="col-form-span-label"
-                                       (click)="!disabletdsbtn && OpenTdsModal();"><i class="fa fa-dot-circle-o"></i> Cal TDS</span></button>
-                                       <button uiBtn variant="outline" size="sm" type="reset"  [disabled]='disableresetbtn'> <span class="col-form-span-label"
-                                        (click)="!disableresetbtn && ResetTDS()"><i class="fa fa-ban"></i> Reset TDS</span></button>
-                    </td>
-                </tr>
-                 <tr>
-
-                    <td><span class="col-form-span-heading"><b> Net Total</b> </span></td>
-                    <td> <input [(ngModel)]="NetAmt" disabled="disabled" type="text" class="form-control width150"
-                            maxlength="40"> </td>
-                    <td colspan="2"></td>
-                </tr>
-
-                <tr>
-                    <td><span class="col-form-span-label"><b> Amount</b> </span></td>
-                    <td> <input [(ngModel)]="NetAmount" OnlyNumber="true" disabled="disabled" type="text"
-                            class="form-control width150" maxlength="40"> </td>
-                    <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
-                    <td> <input [(ngModel)]="Netdeduction" OnlyNumber="true" disabled="disabled" type="text"
-                            class="form-control width150" maxlength="40"> </td>
-                </tr>
-                <tr style="height: 150px;">
-                    <td colspan="4">
-                        <div class="row xyscroll" style="overflow-y: auto; width:720px">
-                            @if (Accountlist.length>0) {
-<table class="table table-responsive-sm table-bordered">
-                                <thead>
-                                    <tr class="bakgrdliteBlue">
-                                        <th class="col-form-span-label"></th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">Account Name</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">Amount</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">Deduction</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">TDS</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">GST</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">Pass Amt</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">Item</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">Job No</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">Narration</th>
-
-                                    </tr>
-                                </thead>
-                                @if (Accountlist.length>0) {
-<tbody>
-                                    @for (obj of Accountlist; track obj) {
-<tr>
-                                        <td class="centerlabel">
-                                            <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)"></i>
-                                            &nbsp;
-                                            <i class="fa fa-trash" (click)="deletechildrecd(obj.ID,obj.IS_NOT_EDIT_ABLE)"></i>
-                                        </td>
-                                        <!-- <td><span class="col-form-span-label" [innerHtml]="obj.ACCOUNT_NAME"> </span>
-                                        </td> -->
-                                        <td style="width:200px; " class="col-form-span-label">
-                                            <p    style="white-space: pre-wrap;width: 200px; " > {{obj.ACCOUNT_NAME}}</p>
-                                        </td>
-                                        <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>
-                                        <td><span class="col-form-span-label">{{obj.DEDUCTION}}</span></td>
-                                        <td><span class="col-form-span-label">{{obj.PUR_TDS}}</span></td>
-                                        <td><span class="col-form-span-label">{{obj.GST}}</span></td>
-                                        <td><span class="col-form-span-label">{{obj.SRPIPASSAMOUNT}}</span></td>
-                                        <td><span class="col-form-span-label">{{obj.ITEM}}</span></td>
-                                        <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
-                                        <td>@if (obj.CLIENT=='G100741') {
-<span class="col-form-span-label" [innerHtml]="obj.NARRATION"></span>
-}
-                                            @if (obj.CLIENT!='G100741') {
-<span class="col-form-span-label">{{obj.NARRATION}}</span>
-}</td>
-
-                                      <!--   <td style="width:200px; " class="col-form-span-label">
-                                            <p    style="white-space: pre-wrap;width: 200px; " > {{obj.NARRATION}}</p>
-                                        </td> -->
-                                    </tr>
-}
-                                </tbody>
-}
-                            </table>
-}
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="4" class="centerlabel">
-                        <button uiBtn variant="default" size="sm" type="submit" (click)="supplier_validation()" > <span
-                                class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> {{text}}</span></button>
-                        <button uiBtn variant="outline" size="sm" type="reset" > <span class="col-form-span-label"
-                                (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
-                    </td>
-                </tr>
-
-
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-2 col-lg-2">
-        </div>
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Account lines</h2>
+      <label class="pu-flag">
+        <span>{{chktdslbl}}</span>
+        <input type="checkbox" [(ngModel)]="chkIsTDS" [disabled]='disablecheckbox' />
+      </label>
+    </div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Account <span class="req">*</span></label>
+        <ng-select [items]="AccountNameList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
+          (ngModelChange)="GetActName($event)" [(ngModel)]="AccountName" class="custom"
+          placeholder="--Select--">
+        </ng-select>
+      </div>
+      <div class="fld full">
+        <label>Item <span class="req">*</span></label>
+        <ng-select [items]="Itemslist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Item"
+          class="custom" placeholder="--Select--">
+        </ng-select>
+      </div>
+      <div class="fld">
+        <label>TDS applicable <span class="req">*</span></label>
+        <select [(ngModel)]="TDSApplicable">
+          <option value="">--Please select--</option>
+          <option value="Y">Y</option>
+          <option value="N">N</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label>GST applicable</label>
+        <select [(ngModel)]="GSTApplicable">
+          <option value="">-- Please Select --</option>
+          <option value="1">Y</option>
+          <option value="0">N</option>
+          <option value="2">RCM</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label>Amount <span class="req">*</span></label>
+        <input [(ngModel)]="Amount" OnlyNumber="true" type="text" class="num" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Deduction</label>
+        <input [(ngModel)]="Deduction" type="text" OnlyNumber="true" class="num" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Job no. <span class="req">*</span></label>
+        <input [(ngModel)]="JobNo" type="text" (change)="fn_JobValidation()" OnlyNumber="true" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Pass amount</label>
+        <input [(ngModel)]="actpassedamount" type="text" OnlyNumber="true" class="num" maxlength="40">
+      </div>
+      <div class="fld full">
+        <label>Line narration</label>
+        <input [(ngModel)]="ActNarration" type="text" [maxlength]="30">
+      </div>
+    </div>
+    <div class="pu-add">
+      <button class="btn p" type="button" (click)="Addchildrcrd()" [disabled]='disablechildaddbtn'>{{txtchild}}</button>
+      <button class="btn g" type="button" [disabled]='disablechildresetbtn' (click)="Resetchildrcrd();">Reset line</button>
+      <button class="btn" type="button" [disabled]='disabletdsbtn' (click)="!disabletdsbtn && OpenTdsModal();">Calculate TDS</button>
+      <button class="btn g" type="button" [disabled]='disableresetbtn' (click)="!disableresetbtn && ResetTDS()">Reset TDS</button>
     </div>
 
-</div>
-<div class="modal" [style.display]="showModal_MAWB ? 'block' : 'none'" style="margin: 0 auto;">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header formheading">
-                <span style="font-family: Verdana;font-weight: bold;">MAWB Purchase</span>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <table>
-                            <tr>
-                                <th>
-                                    <span class="col-form-span-label">
-                                        <input type="radio" name="check" value="1" [(ngModel)]="SerchTypeMawb" />&nbsp;List</span>
-                                </th>
-                            </tr>
-                        </table>
-                        <br>
-                        <div class="row xyscroll" style="height:350px;">
-                            <table class="table table-bordered table-sm-new bgwhite ">
-                        <!-- <main  >
-                            <div id="content">
-                                <div class="table-wrapper">
-                                    <table>  -->
-                                        <thead style="text-align: center;">
-                                            <tr>
-                                                <th style="position: sticky;top: 0;" ><span class="col-form-span-label"></span></th>
-                                                <th style="position: sticky;top: 0;"><span class="col-form-span-label">MAWB No.</span></th>
-                                                <th style="position: sticky;top: 0;"><span class="col-form-span-label">Grwt</span></th>
-                                                <th style="position: sticky;top: 0;"><span class="col-form-span-label">Chblwt</span></th>
-                                                <th style="position: sticky;top: 0;"><span class="col-form-span-label">Netwt</span></th>
-                                                <th style="position: sticky;top: 0;"><span class="col-form-span-label">Volumn</span></th>
-                                                <th style="position: sticky;top: 0;"><span class="col-form-span-label">Freight Amt</span></th>
-                                                <th style="position: sticky;top: 0;"><span class="col-form-span-label">Air Freight Commission</span></th>
-                                                <th style="position: sticky;top: 0;"><span class="col-form-span-label"> Freight Rebate</span></th>
-                                                <th style="position: sticky;top: 0;"><span class="col-form-span-label">Surcharges</span></th>
-                                                <th style="position: sticky;top: 0;" ><span class="col-form-span-label">Documentation Charge</span></th>
-                                                <th style="position: sticky;top: 0;"><span class="col-form-span-label">AMS / ENS Charge </span></th>
-                                                <th style="position: sticky;top: 0;"><span class="col-form-span-label">Misc. Charges</span></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @for (obj of MAWABlist; track obj; let i = $index) {
-<tr>
-                                                <td class="centerlabel">
-                                                    <input type="checkbox" (checked)="obj.Select == true" [disabled]="obj.Disabled == true"
-                                                    (click)="validate(obj.AEROBILLNO)" />
-                                                    <!-- <input type="checkbox" class="productlist"
-                                                    [id]="i" [value]="i"
-                                                                (click)="getCheckboxValues($event,i)"> -->
-                                                </td>
-                                                <td><span class="col-form-span-label">{{obj.AEROBILLNO}} </span>  </td>
-                                                <td><span class="col-form-span-label">{{obj.EXPT_GRWT |number:'2.3-5'}}</span></td>
-                                                <td><span class="col-form-span-label">{{obj.EXPT_CHBLWT |number:'2.3-5'}}</span></td>
-                                                <td><span class="col-form-span-label">{{obj.EXPT_NETWT |number:'2.3-5'}}</span></td>
-                                                <td><span class="col-form-span-label">{{obj.EXPT_VOLUME |number:'2.3-5'}}</span></td>
-
-                                                <td> <input [(ngModel)]="obj.FRIEGHTAMT"  type="text" class="form-control"
-                                                    [disabled]="obj.Disabled == true" OnlyNumber="true"> </td>
-                                            <td> <input [(ngModel)]="obj.AIRFRIGHTCOMM" type="text" class="form-control"
-                                                [disabled]="obj.Disabled == true" OnlyNumber="true"> </td>
-                                                    <td> <input [(ngModel)]="obj.FRIGHTREBATE" type="text" class="form-control"
-                                                        [disabled]="obj.Disabled == true" OnlyNumber="true"> </td>
-                                            <td> <input [(ngModel)]="obj.SURCHARGE" type="text" class="form-control"
-                                                [disabled]="obj.Disabled == true" OnlyNumber="true"> </td>
-                                                <td> <input [(ngModel)]="obj.DOCUMENTCHARGE" type="text" class="form-control"
-                                                    [disabled]="obj.Disabled == true" OnlyNumber="true"> </td>
-                                            <td> <input [(ngModel)]="obj.AMS_ENSCHARGE" type="text" class="form-control"
-                                                [disabled]="obj.Disabled == true" OnlyNumber="true"> </td>
-                                            <td> <input [(ngModel)]="obj.MISCHARGE" type="text" class="form-control"
-                                                [disabled]="obj.Disabled == true" OnlyNumber="true"> </td>
-                                            </tr>
-}
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                        <table>
-                            <tr>
-                                <th>
-                                    <span class="col-form-span-label">
-                                        <input type="radio" name="check" value="2"
-                                            [(ngModel)]="SerchTypeMawb"/>&nbsp;Search</span>
-                                </th>
-                            </tr>
-                        </table>
-                        <br>
-
-                        <table class="table table-bordered table-sm-new bgwhite">
-                            <thead>
-                                <tr>
-                                    <th><span class="col-form-span-label">MAWB No.</span></th>
-                                    <th><span class="col-form-span-label">Freight Amt</span></th>
-                                    <th><span class="col-form-span-label">Air Freight Commission</span></th>
-                                    <th><span class="col-form-span-label"> Freight Rebate</span></th>
-
-                                    <th><span class="col-form-span-label">Surcharges</span></th>
-                                    <th><span class="col-form-span-label">Documentation Charge</span></th>
-                                    <th><span class="col-form-span-label">AMS / ENS Charge </span></th>
-                                    <th><span class="col-form-span-label">Misc. Charges</span></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td> <input [(ngModel)]="mawbno" type="text" class="form-control" maxlength="20"
-                                            [disabled]="SerchTypeMawb=='1'" OnlyNumber="true"> </td>
-                                    <td> <input [(ngModel)]="frieghtamt" type="text" class="form-control"
-                                        [disabled]="SerchTypeMawb=='1'" OnlyNumber="true"> </td>
-                                    <td> <input [(ngModel)]="airfrightcomm" type="text" class="form-control"
-                                        [disabled]="SerchTypeMawb=='1'" OnlyNumber="true"> </td>
-                                            <td> <input [(ngModel)]="frightrebate" type="text" class="form-control"
-                                                [disabled]="SerchTypeMawb=='1'" OnlyNumber="true"> </td>
-                                    <td> <input [(ngModel)]="surcharge" type="text" class="form-control"
-                                        [disabled]="SerchTypeMawb=='1'" OnlyNumber="true"> </td>
-                                        <td> <input [(ngModel)]="documentcharge" type="text" class="form-control"
-                                            [disabled]="SerchTypeMawb=='1'" OnlyNumber="true"> </td>
-                                    <td> <input [(ngModel)]="ams_enscharge" type="text" class="form-control"
-                                        [disabled]="SerchTypeMawb=='1'" OnlyNumber="true"> </td>
-                                    <td> <input [(ngModel)]="mischarge" type="text" class="form-control"
-                                        [disabled]="SerchTypeMawb=='1'" OnlyNumber="true"> </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                    </div>
-                </div>
-                <br>
-                <div align="center">
-                    <button uiBtn variant="default" size="sm" type="submit" (click)="mawb_submit()"> <span
-                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Submit</span></button>
-                    <button uiBtn variant="outline" size="sm" type="reset"> <span class="col-form-span-label"
-                            (click)="close()"><i class="fa fa-ban"></i>
-                            Close</span></button>
-                </div>
-            </div>
-        </div>
+    <div class="toolbar">
+      <span class="count">{{ Accountlist.length }} {{ Accountlist.length === 1 ? 'line' : 'lines' }}</span>
     </div>
-</div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Account</th>
+            <th class="num">Amount</th>
+            <th class="num">Deduction</th>
+            <th class="num">TDS</th>
+            <th class="num">GST</th>
+            <th class="num">Pass amt</th>
+            <th>Item</th>
+            <th>Job no.</th>
+            <th>Narration</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (obj of Accountlist; track obj) {
+            <tr>
+              <td class="wrap">{{obj.ACCOUNT_NAME}}</td>
+              <td class="num">{{obj.AMOUNT}}</td>
+              <td class="num">{{obj.DEDUCTION}}</td>
+              <td class="num">{{obj.PUR_TDS}}</td>
+              <td class="num">{{obj.GST}}</td>
+              <td class="num">{{obj.SRPIPASSAMOUNT}}</td>
+              <td>{{obj.ITEM}}</td>
+              <td class="mono">{{obj.JOBNO}}</td>
+              <td>@if (obj.CLIENT=='G100741') {
+                <span [innerHtml]="obj.NARRATION"></span>
+              }
+              @if (obj.CLIENT!='G100741') {
+                <span>{{obj.NARRATION}}</span>
+              }</td>
+              <td class="act">
+                <button type="button" (click)="Editchildrecd(obj.ID)">Edit</button>
+                <button type="button" (click)="deletechildrecd(obj.ID,obj.IS_NOT_EDIT_ABLE)">Remove</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td class="empty" colspan="10">No account lines yet. Fill the fields above and add a line.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pu-totals">
+      <div class="t"><span>Amount</span><input [(ngModel)]="NetAmount" OnlyNumber="true" disabled="disabled" type="text" class="num" maxlength="40"></div>
+      <div class="t"><span>Deduction</span><input [(ngModel)]="Netdeduction" OnlyNumber="true" disabled="disabled" type="text" class="num" maxlength="40"></div>
+      <div class="t grand"><span>Net total</span><input [(ngModel)]="NetAmt" disabled="disabled" type="text" class="num" maxlength="40"></div>
+    </div>
+  </div>
 
-<div class="modal" [style.display]="showModal_TDS ? 'block' : 'none' "  >
-    <div class="modal-dialog modal-lg" role="document" style="width: 700px;">
-        <div class="modal-content">
-            <div class="card-header formheading">
-                <!-- <h5 class="modal-title">TDS Details</h5> -->
-                <strong>TDS Details</strong>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col" style="height:400px;overflow-y: auto; ">
-                        <table class="table table-bordered table-sm-new bgwhite">
-                            <tr>
-                                <td colspan="6">
-                                    <!-- <input type="text" [(ngModel)]="term"
-                                        style="float: right;width: 200px;font-family: verdana;font-size:11px;padding: 1px;"
-                                        placeholder="Search by Job Number"> -->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <thead style="text-align: center;">
-                                        <tr>
-                                            <th class="col-form-span-label"></th>
-                                            <th class="col-form-span-label">Acct Name.</th>
-                                            <th class="col-form-span-label">Section</th>
-                                            <th class="col-form-span-label">LDC Limit</th>
-                                            <th class="col-form-span-label">Utilized Amt</th>
-                                            <th class="col-form-span-label">LDC Rate %</th>
-                                            <th class="col-form-span-label">Base Rate %</th>
-                                            <th class="col-form-span-label">PI Amt</th>
-                                            <th class="col-form-span-label">TDS Amount</th>
-                                            <th class="col-form-span-label">Remarks</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                           @for (obj of TDSList ; track obj) {
-<tr>
-                                            <td class="col-form-span-label">
-                                                <input type="checkbox" [(ngModel)]="obj.Checked" [id]="i" [value]="i" [disabled]="obj.Disabled"
-                                                     (ngModelChange)="getCheckedTDSData($event,obj.TDSACCTID,obj.RATE,obj.TDSAMOUNT,obj.AMOUNT,obj.ITEMCODE,obj.NARRATION,obj.RATETYPE,obj.LDCRATE,obj.ACCTID,obj.OFFLAG)">
-                                                &nbsp;
-                                            </td>
-                                            <td class="col-form-span-label">{{obj.ACCTNAME}}</td>
-                                            <td class="col-form-span-label">{{obj.SECTIONNAME}}</td>
-                                            <td class="col-form-span-label">{{obj.TDS_LIMIT_AMT}}</td>
-                                            <td class="col-form-span-label">{{obj.UTIAMT}}</td>
-                                            <td class="col-form-span-label">{{obj.LDCRATE}}</td>
-                                            <td class="col-form-span-label">{{obj.RATE}}</td>
-                                            <td class="col-form-span-label">{{obj.AMOUNT}}</td>
-                                            <td class="col-form-span-label">{{obj.TDSAMOUNT}}</td>
-                                            <td class="col-form-span-label">{{obj.NARRATION}}</td>
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose {{text}}.</span>
+    <div class="r">
+      <button class="btn g" type="button" (click)="Reset();">Reset</button>
+      <button class="btn p" type="button" (click)="supplier_validation()">{{text}}</button>
+    </div>
+  </div>
 
-
-                                        </tr>
-}
-
-
-                        </tbody>
-                    </td>
+  <div class="modal pu-modal" [style.display]="showModal_MAWB ? 'block' : 'none'" style="margin: 0 auto;">
+    <div class="modal-dialog modal-lg pu-wide" role="document">
+      <div class="modal-content">
+        <div class="card-h"><h2>MAWB purchase</h2></div>
+        <label class="pu-radio"><input type="radio" name="check" value="1" [(ngModel)]="SerchTypeMawb" /> List</label>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th></th>
+                <th>MAWB no.</th>
+                <th class="num">Grwt</th>
+                <th class="num">Chblwt</th>
+                <th class="num">Netwt</th>
+                <th class="num">Volume</th>
+                <th class="num">Freight amt</th>
+                <th class="num">Air freight commission</th>
+                <th class="num">Freight rebate</th>
+                <th class="num">Surcharges</th>
+                <th class="num">Documentation charge</th>
+                <th class="num">AMS / ENS charge</th>
+                <th class="num">Misc. charges</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (obj of MAWABlist; track obj; let i = $index) {
+                <tr>
+                  <td>
+                    <input type="checkbox" (checked)="obj.Select == true" [disabled]="obj.Disabled == true"
+                      (click)="validate(obj.AEROBILLNO)" />
+                    <!-- <input type="checkbox" class="productlist"
+                    [id]="i" [value]="i"
+                                (click)="getCheckboxValues($event,i)"> -->
+                  </td>
+                  <td class="mono">{{obj.AEROBILLNO}}</td>
+                  <td class="num">{{obj.EXPT_GRWT |number:'2.3-5'}}</td>
+                  <td class="num">{{obj.EXPT_CHBLWT |number:'2.3-5'}}</td>
+                  <td class="num">{{obj.EXPT_NETWT |number:'2.3-5'}}</td>
+                  <td class="num">{{obj.EXPT_VOLUME |number:'2.3-5'}}</td>
+                  <td class="num"><input [(ngModel)]="obj.FRIEGHTAMT" type="text" [disabled]="obj.Disabled == true" OnlyNumber="true"></td>
+                  <td class="num"><input [(ngModel)]="obj.AIRFRIGHTCOMM" type="text" [disabled]="obj.Disabled == true" OnlyNumber="true"></td>
+                  <td class="num"><input [(ngModel)]="obj.FRIGHTREBATE" type="text" [disabled]="obj.Disabled == true" OnlyNumber="true"></td>
+                  <td class="num"><input [(ngModel)]="obj.SURCHARGE" type="text" [disabled]="obj.Disabled == true" OnlyNumber="true"></td>
+                  <td class="num"><input [(ngModel)]="obj.DOCUMENTCHARGE" type="text" [disabled]="obj.Disabled == true" OnlyNumber="true"></td>
+                  <td class="num"><input [(ngModel)]="obj.AMS_ENSCHARGE" type="text" [disabled]="obj.Disabled == true" OnlyNumber="true"></td>
+                  <td class="num"><input [(ngModel)]="obj.MISCHARGE" type="text" [disabled]="obj.Disabled == true" OnlyNumber="true"></td>
                 </tr>
-                        </table>
-                         <table class="table table-bordered table-sm-new bgwhite">
-                            <td colspan="9" align="center">
-                                <tr >
-                                    <td colspan="5"><span class="col-form-span-label">Total PI Amount :  </span>
-                                        <span class="col-form-span-label"><b>{{totpiamt}}</b> </span>
-                                    </td>
-                                    <td align="right" colspan="4"><span class="col-form-span-label">Selected Amount  :  </span>
-                                        <span class="col-form-span-label"><b>{{seltaxableamt}}</b> </span>
-                                    </td>
-                                    <td>
-                                        <thead style="text-align: center;">
-                                            <tr>
-                                              <th class="col-form-span-label">Section</th>
-                                              <th class="col-form-span-label">Total Tds Amount</th>
-                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            @for (obj of TotalTDSList ; track obj) {
-<tr>
-                                             <td class="col-form-span-label"><b>{{obj.SECTIONNAME}}</b></td>
-                                             <td class="col-form-span-label"><b>{{obj.TOTTDSAMOUNT}}</b></td>
-                                         </tr>
-}
-                                         </tbody>
-                                    </td>
-                                </tr>
-
-                            </td>
-                         </table>
-                    </div>
-                </div>
-                <div class="card-header formheading" style="height:25px" >
-                    <button uiBtn variant="outline" size="sm" style="float: right;" type="reset"> <span class="col-form-span-label"
-                        (click)="closeTdsModal()"><i class="fa fa-ban"></i>
-                        Close</span></button>
-                    <button uiBtn variant="default" size="sm" style="float: right;" type="submit" (click)="AddtdsDetails()"> <span
-                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Add</span></button>
-
-                </div>
-            </div>
+              } @empty {
+                <tr><td class="empty" colspan="13">No MAWBs to list.</td></tr>
+              }
+            </tbody>
+          </table>
         </div>
+
+        <label class="pu-radio"><input type="radio" name="check" value="2" [(ngModel)]="SerchTypeMawb"/> Search</label>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>MAWB no.</th>
+                <th class="num">Freight amt</th>
+                <th class="num">Air freight commission</th>
+                <th class="num">Freight rebate</th>
+                <th class="num">Surcharges</th>
+                <th class="num">Documentation charge</th>
+                <th class="num">AMS / ENS charge</th>
+                <th class="num">Misc. charges</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input [(ngModel)]="mawbno" type="text" maxlength="20" [disabled]="SerchTypeMawb=='1'" OnlyNumber="true"></td>
+                <td class="num"><input [(ngModel)]="frieghtamt" type="text" [disabled]="SerchTypeMawb=='1'" OnlyNumber="true"></td>
+                <td class="num"><input [(ngModel)]="airfrightcomm" type="text" [disabled]="SerchTypeMawb=='1'" OnlyNumber="true"></td>
+                <td class="num"><input [(ngModel)]="frightrebate" type="text" [disabled]="SerchTypeMawb=='1'" OnlyNumber="true"></td>
+                <td class="num"><input [(ngModel)]="surcharge" type="text" [disabled]="SerchTypeMawb=='1'" OnlyNumber="true"></td>
+                <td class="num"><input [(ngModel)]="documentcharge" type="text" [disabled]="SerchTypeMawb=='1'" OnlyNumber="true"></td>
+                <td class="num"><input [(ngModel)]="ams_enscharge" type="text" [disabled]="SerchTypeMawb=='1'" OnlyNumber="true"></td>
+                <td class="num"><input [(ngModel)]="mischarge" type="text" [disabled]="SerchTypeMawb=='1'" OnlyNumber="true"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="bar">
+          <div class="r">
+            <button class="btn g" type="button" (click)="close()">Close</button>
+            <button class="btn p" type="button" (click)="mawb_submit()">Submit</button>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <div class="modal pu-modal" [style.display]="showModal_TDS ? 'block' : 'none' ">
+    <div class="modal-dialog modal-lg pu-wide" role="document">
+      <div class="modal-content">
+        <div class="card-h"><h2>TDS details</h2></div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Account</th>
+                <th>Section</th>
+                <th class="num">LDC limit</th>
+                <th class="num">Utilized amt</th>
+                <th class="num">LDC rate %</th>
+                <th class="num">Base rate %</th>
+                <th class="num">PI amt</th>
+                <th class="num">TDS amount</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (obj of TDSList ; track obj) {
+                <tr>
+                  <td>
+                    <input type="checkbox" [(ngModel)]="obj.Checked" [id]="i" [value]="i" [disabled]="obj.Disabled"
+                      (ngModelChange)="getCheckedTDSData($event,obj.TDSACCTID,obj.RATE,obj.TDSAMOUNT,obj.AMOUNT,obj.ITEMCODE,obj.NARRATION,obj.RATETYPE,obj.LDCRATE,obj.ACCTID,obj.OFFLAG)">
+                  </td>
+                  <td>{{obj.ACCTNAME}}</td>
+                  <td>{{obj.SECTIONNAME}}</td>
+                  <td class="num">{{obj.TDS_LIMIT_AMT}}</td>
+                  <td class="num">{{obj.UTIAMT}}</td>
+                  <td class="num">{{obj.LDCRATE}}</td>
+                  <td class="num">{{obj.RATE}}</td>
+                  <td class="num">{{obj.AMOUNT}}</td>
+                  <td class="num">{{obj.TDSAMOUNT}}</td>
+                  <td>{{obj.NARRATION}}</td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="10">No TDS rows.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="pu-sum">
+          <span><span class="k">Total PI amount </span><b>{{totpiamt}}</b></span>
+          <span><span class="k">Selected amount </span><b>{{seltaxableamt}}</b></span>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Section</th>
+                <th class="num">Total TDS amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (obj of TotalTDSList ; track obj) {
+                <tr>
+                  <td><b>{{obj.SECTIONNAME}}</b></td>
+                  <td class="num"><b>{{obj.TOTTDSAMOUNT}}</b></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="bar">
+          <div class="r">
+            <button class="btn g" type="button" (click)="closeTdsModal()">Close</button>
+            <button class="btn p" type="button" (click)="AddtdsDetails()">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

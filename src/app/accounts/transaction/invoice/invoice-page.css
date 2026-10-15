@@ -1,0 +1,206 @@
+/* India accounts - invoice / proforma invoice forms. Additions on top of
+   import/import-page.css (monochrome). Shared by transaction/invoice and
+   transaction/proformainvoice. */
+:host ::ng-deep .im-page .inv-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+/* Bootstrap nav-tabs (kept for the .ts $('.nav a').tab('show') call) drawn as the
+   kit's segmented tab bar. */
+:host ::ng-deep .im-page .inv-tabs {
+    display: inline-flex;
+    flex-wrap: wrap;
+    border: 1px solid var(--edge);
+    border-radius: 6px;
+    background: var(--mp-surface, #fff);
+    padding: 2px;
+    gap: 2px;
+    margin: 0 0 16px;
+    max-width: 100%;
+    list-style: none;
+}
+
+:host ::ng-deep .im-page .inv-tabs .nav-item {
+    margin: 0;
+}
+
+:host ::ng-deep .im-page .inv-tabs .nav-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--soft);
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    height: 30px;
+    padding: 0 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    margin: 0;
+}
+
+:host ::ng-deep .im-page .inv-tabs .nav-link:hover {
+    color: var(--ink);
+    background: var(--line);
+}
+
+:host ::ng-deep .im-page .inv-tabs .nav-link.active,
+:host ::ng-deep .im-page .inv-tabs .nav-link.active:hover {
+    background: var(--mp-primary, var(--ink));
+    color: var(--mp-primary-fg, #fff);
+}
+
+:host ::ng-deep .im-page .inv-tabs .inv-n {
+    font-size: 11px;
+    font-weight: 500;
+    opacity: .7;
+}
+
+:host ::ng-deep .im-page .inv-tabs-wrap .tab-content {
+    border: 0;
+    padding: 0;
+    background: transparent;
+}
+
+/* add / reset row under an entry block */
+:host ::ng-deep .im-page .inv-addrow {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: var(--ground);
+}
+
+:host ::ng-deep .im-page .inv-pair {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1fr);
+    gap: 6px;
+}
+
+:host ::ng-deep .im-page input.inv-numin {
+    font-family: var(--num);
+    text-align: right;
+}
+
+:host ::ng-deep .im-page .fld.inv-top {
+    align-items: start;
+}
+
+:host ::ng-deep .im-page textarea.form-control {
+    font: inherit;
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    box-shadow: none;
+    width: 100%;
+}
+
+:host ::ng-deep .im-page table.tbl.inv-entry td {
+    padding: 8px 6px;
+    min-width: 96px;
+}
+
+:host ::ng-deep .im-page .inv-act {
+    width: 1%;
+    text-align: left;
+}
+
+:host ::ng-deep .im-page .inv-act button:first-child {
+    margin-left: 0;
+}
+
+:host ::ng-deep .im-page .inv-link {
+    display: inline-block;
+}
+
+:host ::ng-deep .im-page .inv-link p {
+    margin: 0;
+}
+
+/* lookup / confirm dialogs: kit card, grey header band, scrollable body, footer bar */
+:host ::ng-deep .im-page .inv-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    background: rgba(10, 10, 10, .35);
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+}
+
+:host ::ng-deep .im-page .inv-dlg {
+    width: 100%;
+    max-width: 860px;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+:host ::ng-deep .im-page .inv-dlg.inv-dlg-sm {
+    max-width: 420px;
+}
+
+:host ::ng-deep .im-page .inv-dlg-h {
+    background: var(--band);
+    border-bottom: 1px solid var(--edge);
+}
+
+:host ::ng-deep .im-page .inv-dlg-search {
+    max-width: 240px;
+}
+
+:host ::ng-deep .im-page .inv-dlg-b {
+    overflow: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+:host ::ng-deep .im-page .inv-dlg-b table.tbl {
+    min-width: 640px;
+}
+
+:host ::ng-deep .im-page .inv-dlg-msg {
+    padding: 16px;
+}
+
+:host ::ng-deep .im-page .inv-dlg-msg p {
+    margin: 0;
+}
+
+:host ::ng-deep .im-page .inv-dlg-f {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--edge);
+    background: var(--sheet);
+}
+
+@media (max-width: 760px) {
+    :host ::ng-deep .im-page .inv-tabs {
+        display: flex;
+    }
+
+    :host ::ng-deep .im-page .inv-tabs .nav-link {
+        padding: 0 10px;
+    }
+}
+
+/* ---- invoice search (general-invoice-search) ---- */
+:host ::ng-deep .im-page .gis-radio { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+:host ::ng-deep .im-page .gis-inline { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+:host ::ng-deep .im-page .gis-w { max-width: 220px; }
+:host ::ng-deep .im-page .gis-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--line); }
+:host ::ng-deep .im-page th.gis-sort { cursor: pointer; user-select: none; }
+:host ::ng-deep .im-page th.gis-sort.active { color: var(--ink); }
+
+/* ---- Links additions (not in MPERPNG-20): the quick filter over loaded search results and
+   the empty converted-number cell on the proforma search. ---- */
+:host ::ng-deep .im-page .toolbar .gis-filter { width: 220px; max-width: 100%; }
+:host ::ng-deep .im-page .gis-dim { color: var(--faint); }

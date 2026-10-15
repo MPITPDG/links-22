@@ -9,10 +9,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 import { DatePipe } from '@angular/common';
 
+import { FinPager } from '../../Accreport/fin-kit';
 @Component({
     selector: 'app-ExJobSearch',
     templateUrl: './exportJob.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' }, // Links: import-page + accreport-page are global (src/styles/kit)
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -44,7 +45,7 @@ import { DatePipe } from '@angular/common';
         { 
           if(this.rdbtype=="EXPORTNO")
           { 
-            if(this.ExportNo.length<15)
+            if((this.ExportNo || '').length<15) // guarded: ExportNo is undefined until typed; .length threw
             { 
               this._toasterService.toast("warning","warning","Ex-Job no should be 15 digit!")
               return false;
@@ -89,11 +90,14 @@ import { DatePipe } from '@angular/common';
             CityCode:this._loginService.getLogin()[0].CITYCODE,
              }
             this._dataService.getData("Accounts/Export_Search_List_acct", jsonData)
-            .subscribe((data: any) => {
-              
+                        .subscribe((data: any) => {
+              this.searched = true;
+              this.noRows = !(data.Table && data.Table.length);
+              if (this.noRows) { return; } // guarded: row 0 of an empty result used to throw
               if(data.Table.length>1)
               {
                 this.ContainerData=data.Table;
+                this.pager.set(this.ContainerData);
                 if(this.rdbtype=='containerno') {
                 this.FillContainer();
               }
@@ -176,4 +180,9 @@ import { DatePipe } from '@angular/common';
         this.ExportNo="";
         this.lblexportNo="Export Code";
       }
-    }
+    
+        // ---- redesign: search state + 10/page pager (display only) ----
+        searched = false;
+        noRows = false;
+        pager = new FinPager<any>(10);
+}

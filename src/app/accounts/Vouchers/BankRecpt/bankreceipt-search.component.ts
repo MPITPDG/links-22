@@ -13,8 +13,7 @@ import {environment}  from '../../../../environments/environment.prod'
 @Component({
     selector: 'app-accounts-vouchers-receipt-bankreceipt-search',
     templateUrl: 'bankreceipt-search.component.html',
-    // styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    encapsulation: ViewEncapsulation.None,
+    styleUrls: ['../vouchers-page.css'],
     providers:[        DatePipe    ],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
@@ -23,10 +22,10 @@ export class BankReceiptSearchComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {
         dateFormat: 'dd/mm/yyyy',
         inline: false,
-        height: '16px',
-        width: '120px',
+        height: '30px',
+        width: '100%',
         componentDisabled: false,
-        selectionTxtFontSize: '12px',
+        selectionTxtFontSize: '13px',
         editableDateField: false,
         sunHighlight: true,
         satHighlight: true,
@@ -66,6 +65,13 @@ export class BankReceiptSearchComponent implements OnInit {
     VoucherType : any="0";
     frmdt:any;
     todt:any;
+    /** header select-all box (was bound in the template but never declared) */
+    checkbox: boolean = false;
+    readonly pageSize = 10;
+    page: number = 1;
+    Quick: string = '';
+    loading: boolean = false;
+    loadError: boolean = false;
     constructor(
         private _dataService: DataService,private datePipe: DatePipe,
         private _loginService: LoginService,
@@ -103,18 +109,33 @@ export class BankReceiptSearchComponent implements OnInit {
             //  this._loginService.verifyRights(9, '')
             //  .subscribe((data: any) => { this._loginService.checkVerify('View', data); });
             if (this.PageType=="BR"){  this._loginService.verifyRights(5, '')
-            .subscribe((data: any) => { this._loginService.checkVerify('View', data); });}
+            .subscribe((data: any) => { if (this._loginService.checkVerify('View', data)) { this.loadDefault(); } });}
             else  if (this.PageType=="BP"){  this._loginService.verifyRights(6, '')
-            .subscribe((data: any) => { this._loginService.checkVerify('View', data); });}
+            .subscribe((data: any) => { if (this._loginService.checkVerify('View', data)) { this.loadDefault(); } });}
             else  if (this.PageType=="CR"){  this._loginService.verifyRights(7, '')
-            .subscribe((data: any) => { this._loginService.checkVerify('View', data); });}
+            .subscribe((data: any) => { if (this._loginService.checkVerify('View', data)) { this.loadDefault(); } });}
             else  if (this.PageType=="CP"){  this._loginService.verifyRights(8, '')
-            .subscribe((data: any) => { this._loginService.checkVerify('View', data); });}
+            .subscribe((data: any) => { if (this._loginService.checkVerify('View', data)) { this.loadDefault(); } });}
             else  if (this.PageType=="CE"){  this._loginService.verifyRights(29, '')
-            .subscribe((data: any) => { this._loginService.checkVerify('View', data); });}
+            .subscribe((data: any) => { if (this._loginService.checkVerify('View', data)) { this.loadDefault(); } });}
             else  if (this.PageType=="CC"){  this._loginService.verifyRights(91, '')
-            .subscribe((data: any) => { this._loginService.checkVerify('View', data); });} 
+            .subscribe((data: any) => { if (this._loginService.checkVerify('View', data)) { this.loadDefault(); } });} 
     }
+    /** default list on open: the same date-wise search (DISPLAYTYPE DATE) over the last 30 days,
+        without the one-row auto-open or the "No record found" toast of a user search */
+    loadDefault() {
+        const p2 = (n: number) => String(n).padStart(2, '0');
+        const dmy = (d: Date) => p2(d.getDate()) + '/' + p2(d.getMonth() + 1) + '/' + d.getFullYear();
+        const to = new Date();
+        const from = new Date(); from.setDate(from.getDate() - 30);
+        this.Type = 'DATE';
+        this.FromDate = dmy(from);
+        this.ToDate = dmy(to);
+        this.frmdt = this._dataService.convertFromdd_mm_yyyTodd_mmm_yyy(this.FromDate);
+        this.todt = this._dataService.convertFromdd_mm_yyyTodd_mmm_yyy(this.ToDate);
+        this.getData('DATE', true);
+    }
+
     frmDateChanged(ev){
         this.FromDate=ev.formatted
         this.frmdt = this._dataService.convertFromdd_mm_yyyTodd_mmm_yyy(this.FromDate)
@@ -273,7 +294,7 @@ export class BankReceiptSearchComponent implements OnInit {
             this.todt=this._dataService.convertFromdd_mm_yyyTodd_mmm_yyy(this.ToDate)
         }
             }
-    getData(searchtype) {
+    getData(searchtype, isDefault: boolean = false) {
         this.getbankactdate(searchtype)
         let API_Pass=""
         let _jsonData
@@ -320,11 +341,22 @@ export class BankReceiptSearchComponent implements OnInit {
 
        // console.log(_jsonData)
         this._loaderService.display(true);
+        this.loading = true;
+        this.loadError = false;
         this._dataService.getData(API_Pass, _jsonData)
             .subscribe((data: any) => {
            // console.log(data)
                 this._loaderService.display(false);
+                this.loading = false;
+                this.page = 1;
+                if (isDefault) {
+                    this.searchList = (data && data.Table) ? data.Table : [];
+                    return;
+                }
+                // fail soft: a response without Table is an empty list, not a crash
+                if (!data || !data.Table) { this.searchList = []; this.loadError = true; return; }
                 if (data.Table.length == 0) {
+                    this.searchList = [];
                     this._toasterService.toast("warning", "Alert", "No record found");
                 }
                   else if (data.Table.length == 1) {  
@@ -347,6 +379,10 @@ export class BankReceiptSearchComponent implements OnInit {
                     this.displayType = 'LIST';
                     this.searchList = data.Table;
                 }
+            }, () => {
+                this._loaderService.display(false);
+                this.loading = false;
+                this.loadError = true;
             });
     }
 
@@ -376,7 +412,11 @@ export class BankReceiptSearchComponent implements OnInit {
             .subscribe((data: any) => {
             console.log(data)
                 this._loaderService.display(false);
+                this.page = 1;
+                // fail soft: a response without Table is an empty list, not a crash
+                if (!data || !data.Table) { this.searchList = []; this.loadError = true; return; }
                 if (data.Table.length == 0) {
+                    this.searchList = [];
                     this._toasterService.toast("warning", "Alert", "No record found");
                 }
                   else if (data.Table.length == 1) {
@@ -401,6 +441,9 @@ export class BankReceiptSearchComponent implements OnInit {
                     this.displayType = 'LIST';
                     this.searchList = data.Table;
                 }
+            }, () => {
+                this._loaderService.display(false);
+                this.loadError = true;
             });
     }
     getCheckboxValues(event, data) {
@@ -509,6 +552,51 @@ export class BankReceiptSearchComponent implements OnInit {
           let theLeft = (screen.width / 2) - (780 / 2);
           let toolbar = 'resizable=no,scrollbars=no,width=800,height=450,status=no,left=' + theLeft + ',top=' + theTop;
           window.open('./#/popup/Account-CashBook-BankReceipt-print/' + this.PageType + '/' + this.EntryNo + '/' , "CashBook BankReceipt Print", toolbar);
+    }
+
+    /** Links: the Our bank select calls GetActName on change; OurBank itself is set by ngModel.
+        The method was never declared on this component, so it is a fail-soft no-op. */
+    GetActName(acctCode?: any) { }
+
+    clearList() { this.ResetAll(); this.Quick = ''; this.searchList = []; this.printarray = []; this.checkbox = false; this.displayType = 'SEARCH'; this.page = 1; }
+
+    // ---------- list: quick filter, 10/page pager, CSV export (presentation only) ----------
+    get Filtered(): Array<any> {
+        const q = (this.Quick || '').trim().toLowerCase();
+        const list: Array<any> = (this.searchList) || [];
+        if (!q) { return list; }
+        return list.filter((r: any) => [r.ENTRYNO, r.ENTRYDT, r.STATUS, r.OURBANK, r.CHEQUENO, r.AMOUNT, r.PAYEENAME, r.NARRATION].some(v => String(v == null ? '' : v).toLowerCase().indexOf(q) >= 0));
+    }
+    get pageCount(): number { return Math.max(1, Math.ceil(this.Filtered.length / this.pageSize)); }
+    get curPage(): number { return Math.min(this.page, this.pageCount); }
+    get pageRows(): Array<any> { const s = (this.curPage - 1) * this.pageSize; return this.Filtered.slice(s, s + this.pageSize); }
+    get rangeStart(): number { return this.Filtered.length ? (this.curPage - 1) * this.pageSize + 1 : 0; }
+    get rangeEnd(): number { return Math.min(this.curPage * this.pageSize, this.Filtered.length); }
+    get pageList(): number[] {
+        const n = this.pageCount, p = this.curPage;
+        if (n <= 7) { return Array.from({ length: n }, (_, i) => i + 1); }
+        const out: number[] = [1];
+        const lo = Math.max(2, p - 1), hi = Math.min(n - 1, p + 1);
+        if (lo > 2) { out.push(0); }
+        for (let i = lo; i <= hi; i++) { out.push(i); }
+        if (hi < n - 1) { out.push(0); }
+        out.push(n);
+        return out;
+    }
+    goPage(p: number) { if (p >= 1 && p <= this.pageCount) { this.page = p; } }
+    exportCsv() {
+        const head = ['Entry no', 'Entry date', 'Status', 'Bank name', 'Cheque no', 'Amount', 'Payee name', 'Narration'];
+        const rows = this.Filtered.map((r: any) => [r.ENTRYNO, r.ENTRYDT, r.STATUS, r.OURBANK, r.CHEQUENO, r.AMOUNT, r.PAYEENAME, r.NARRATION]);
+        const q = (v: any) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+        const csv = [head, ...rows].map((l: any[]) => l.map(q).join(',')).join('\r\n');
+        const d = new Date();
+        const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+        const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = (this.searchHeaderText || 'vouchers').toLowerCase().replace(/ /g, '-') + '-' + stamp + '.csv';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 0);
     }
 }
 // import { Component, OnInit,ViewEncapsulation } from '@angular/core';

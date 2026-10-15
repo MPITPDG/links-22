@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 @Component({
     selector: 'app-JV-print',
     templateUrl: './JV-print.component.html',
+    host: { class: 'kit-print' },
     styles: [`
     .dgHeader {
       border-right: black 1px solid;

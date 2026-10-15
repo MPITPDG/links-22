@@ -11,7 +11,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 @Component({
     selector: 'app-RePrintCheque-Cancel-ChequeNo',
     templateUrl: './ReprintCheque-Cancel-ChequeNo.component.html',
-    styles: [],
+    // Page kit is global (src/styles/kit); kit-cheque scopes cheque-page.css.
+    host: { class: 'kit-cheque' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -76,12 +77,17 @@ import { ActivatedRoute, Router } from '@angular/router';
      // console.log(jsonmaster)
       this._dataService.getData("Accounts/Acc_BP_CMP_ReqNo_Get", jsonmaster)
         .subscribe((data: any) => {
+          // guard: an empty result used to throw on Table[0] and leave the loader spinning
+          if (!data || !data.Table || !data.Table.length) {
+            this.EntryNo = ""; this.ChequeNo = "";
+            this.loaderService.display(false)
+            this._toasterService.toast("warning", "warning", "No record found")
+            return
+          }
           this.EntryNo=data.Table[0].ENTRYNO;
           this.ChequeNo=data.Table[0].CHEQUENO;
           this.loaderService.display(false)
-          
-      
-        })
+        }, () => { this.loaderService.display(false) })
     }
  
     
@@ -128,9 +134,7 @@ import { ActivatedRoute, Router } from '@angular/router';
               this.BPNo=""
               this.Remark=""
               this.loaderService.display(false)
-              
-          
-            })
+            }, () => { this.loaderService.display(false) })
       }
       else 
       {

@@ -7,7 +7,7 @@ import { ToastCommonService } from '../../../shared/service/toastService';
 @Component({
   selector: 'app-staffpurchase-view',
   templateUrl: './staffpurchase-view.component.html',
-  styles: [],
+    styleUrls: ['../../purchase/purchase-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

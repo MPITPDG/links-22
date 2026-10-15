@@ -11,10 +11,11 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { environment } from 'src/environments/environment';
 
+import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, finAmt, finByMonth } from '../fin-kit';
 @Component({
   selector: 'app-clientoutstanding-search',
   templateUrl: './clientoutstanding-allcity-search.component.html',
-  styles: [],
+  host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -159,14 +160,16 @@ export class ClientOutstandingAllCityComponent implements OnInit {
     }
     this._dataService.getData("Accounts/Acc_Rpt_ClientOutstandingALL_AllCITY_LIST", jsonmaster)
       .subscribe((data: any) => {
-        if (data.Table.length > 0) {
+        if (data?.Table?.length > 0) {
           this.displayType = 'LIST';
           this.Searchdata_list = data.Table;
+          this.failed = false; this.buildView();
           this.exceldata_list = data.Table4;
           // this.exceldata_list.forEach((row: any) => {
           //   this.dataForExcel.push(Object.values(row))
           //   });
           this.searchHeaderText = "Account Statement From " + this.FromDate + " To " + this.ToDate;
+          if (!data.Table1?.[0] || !data.Table2?.[0]) { this.loaderService.display(false); return; } // fail soft: no summary rows
           if (data.Table1[0].OPBAL > 0) {
             this.OpDrBal = parseFloat(data.Table1[0].OPBAL).toFixed(2) ;//+ " Dr";
             this.rptopbal = parseFloat(data.Table1[0].OPBAL).toFixed(2) + " Dr";
@@ -224,7 +227,7 @@ export class ClientOutstandingAllCityComponent implements OnInit {
           this._toasterService.toast('info', 'info', 'No Data Found !');
           return false;
         }
-      })
+      }, () => { this.loaderService.display(false); this.failed = true; })
     this.loaderService.display(false)
   }
 
@@ -232,7 +235,7 @@ export class ClientOutstandingAllCityComponent implements OnInit {
 
   GetClientName(clientcode) {
     let updateItem = this.ClientList.find(item => item.acctcodename === clientcode);
-    this.ClientName = updateItem.acctname;
+    this.ClientName = updateItem?.acctname; // guarded: clearing the select passed undefined
     //  this.ClientName=event.target.options[event.target.options.selectedIndex].text///.split("|")[1];
   }
 
@@ -572,6 +575,27 @@ export class ClientOutstandingAllCityComponent implements OnInit {
     let toolbar = 'resizable=no,scrollbars=no,width=800,height=450,status=no,left=' + theLeft + ',top=' + theTop;
     window.open(URL + this._loginService.getLogin()[0].CMP_USERENCCODE + '/' + this.Client + '/' + this.ClientName + '/', "Print View", toolbar);
   }
+
+    // ---- redesign: period presets, pager, monthly chart (display only) ----
+    failed = false;
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    pager = new FinPager<any>(10);
+    chart: FinChart | null = null;
+    fmt = finAmt;
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.FromDate = this._dataService.datechnge1(r.from);
+        this.ToDate = this._dataService.datechnge1(r.to);
+    }
+    buildView() {
+        const rows = this.Searchdata_list || [];
+        this.pager.set(rows);
+        const items = finByMonth(rows, r => r.TRANSDATE, r => finNum(r.DRAMT) - finNum(r.CRAMT));
+        this.chart = items.length ? finBars(items) : null;
+    }
 }
 
 

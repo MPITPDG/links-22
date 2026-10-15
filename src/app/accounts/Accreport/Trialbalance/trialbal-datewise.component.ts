@@ -7,10 +7,11 @@ import { LoaderService } from '../../../shared/service/loader.service';
 import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/shared/service/dataService';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
+import { FIN_PERIODS, FinPeriod, finRange } from '../fin-kit';
 @Component({
     selector: 'app-trialbalance-datewise',
     templateUrl: './trialbal-datewise.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -134,4 +135,15 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
      });
     this.loaderService.display(false);
 }*/
+
+    // ---- redesign: quick period presets (set the same selDate strings the pickers already use) ----
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.FromDate = this._dataService.datechnge(r.from);
+        this.ToDate = this._dataService.datechnge(r.to);
+    }
 }

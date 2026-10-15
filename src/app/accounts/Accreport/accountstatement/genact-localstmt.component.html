@@ -1,392 +1,245 @@
-<div class="animated fadeIn">
-    @if (displayType=='SEARCH') {
-<div class="row no-gutters" >
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                         <div class="col-sm-12">
-                            <strong>{{searchHeaderText}}</strong>
-                        </div>  
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Accounts -> Reports -> Account statement -> General account statement (local).
+  Report recipe: filter card + KPIs + monthly chart + paginated ledger with the legacy
+  opening / current / closing / advance rows. Data: Acc_Rpt_ClientOutstandingList_GetAll (Showdata).
+  Print() and the voucher links (Openprint) open the legacy ./#/popup/... print windows, unchanged.
+  The legacy "Email To Client" button called EmailToClient(), which does not exist on the
+  component (clicking it threw); it is not rendered.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Account statement</h1>
+      <p>Ledger of one account for a period with opening, closing and advance balances &middot; print, export or add a follow-up remark</p>
     </div>
-}
+  </div>
 
-    @if (displayType=='SEARCH') {
-<div class="row no-gutters">
-        <div class="col-sm-12 col-md-3 col-lg-3">
+  <div class="card sec">
+    <div class="filters fk-f">
+      <div class="f w2">
+        <label>Client name <span class="req">*</span></label>
+        <ng-select [items]="ClientList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME" (ngModelChange)="GetClientName($event)"
+          [(ngModel)]="Client" class="custom" placeholder="--Please Select--"></ng-select>
+      </div>
+      <div class="f w2">
+        <label>Period</label>
+        <div class="fk-seg">
+          @for (p of periods; track p.key) {
+            <button type="button" [class.on]="period === p.key" (click)="setPeriod(p.key)">{{ p.label }}</button>
+          }
         </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-
-                <tr>
-                    <td class="col-form-span-heading" colspan="4">
-                        <b>{{PageName}}</b>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Client Name</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                       
-                            <td  colspan="3" >
-                                 
-                                <ng-select [items]="ClientList" bindLabel="ACCTNAME"
-                                bindValue="ACCTCODENAME" (ngModelChange)="GetClientName($event)"
-                                [(ngModel)]="Client" class="custom" placeholder="--Please Select--">
-                            </ng-select>
-                            </td>
-                </tr>
-                <tr>
-                     
-                    <td><span class="col-form-span-label"><b>From Date</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                    <td>              
-                        <my-date-picker name="FromDate" [options]="myDatePickerOptions" (dateChanged)="FromDateChanged($event)"
-                            class="form-control"  [selDate]="FromDate"    ></my-date-picker>
-                    </td>
-                    <td><span class="col-form-span-label"><b>To </b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td>              
-                        <my-date-picker name="ToDate" [options]="myDatePickerOptions" (dateChanged)="ToDateChanged($event)"
-                            class="form-control"  [selDate]="ToDate"   ></my-date-picker>
-                    </td>
-                </tr>
-        
-
-                <tr>
-                    <td colspan="4" class="centerlabel">
-                        <button uiBtn variant="default" size="sm" type="submit" (click)="Showdata()" > <span
-                                class="col-form-span-label"><i class="fa fa-print"></i>
-                                Print</span></button>&nbsp;
-                               
-                        <button uiBtn variant="outline" size="sm" type="reset"> <span class="col-form-span-label"
-                                (click)="clear();"><i class="fa fa-ban"></i>Clear</span></button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
+      </div>
+      <div class="f">
+        <label>From <span class="req">*</span></label>
+        <my-date-picker name="FromDate" [options]="myDatePickerOptions" (dateChanged)="FromDateChanged($event); period = ''" [selDate]="FromDate"></my-date-picker>
+      </div>
+      <div class="f">
+        <label>To <span class="req">*</span></label>
+        <my-date-picker name="ToDate" [options]="myDatePickerOptions" (dateChanged)="ToDateChanged($event); period = ''" [selDate]="ToDate"></my-date-picker>
+      </div>
+      <div class="f act">
+        <button class="btn g" type="reset" (click)="clear(); period = ''">Clear</button>
+        <button class="btn p" type="submit" (click)="Showdata()">Show statement</button>
+      </div>
     </div>
-}
+  </div>
 
-    @if (displayType=='LIST') {
-<div class="row no-gutters">
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-        <div class="col-sm-12 col-md-10 col-lg-10 ">
-            <table class="table table-bordered table-sm-new bgwhite" >
-                <tr align="right" class="title-head formheading">
-                    <td colspan="8" >
-                  <a href="javascript:void(0);" (click)="displayType='SEARCH';dataList=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="12" class="centerlabel">
-                        <strong>{{searchHeaderText}}</strong>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="12" class="centerlabel">
-                        <strong> {{ClientName}}</strong>
-                    </td>
-                </tr>
-            </table>
+  @if (failed) {
+    <div class="card fk-alert">The statement could not be loaded. Try again.</div>
+  }
 
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td align="right">
-                        <table  class="table table-bordered table-sm-new bgwhite" style="width:300px">             
-                 
-                            <tr>
-                                <td class="col-form-span-label" align="left">Opening:   </td>
-                                <td  class="col-form-span-label" align="right">{{OpDrBal}} </td>
-                                <td class="col-form-span-label" align="right">{{OpCrBal}} </td>                               
-                            </tr>
-                            <tr>
-                              <td class="col-form-span-label" align="right">Current Total:</td>
-                              <td  class="col-form-span-label" align="right">{{currTotalDr}}  </td>
-                              <td  class="col-form-span-label" align="right">{{currTotalcr}} </td>                           
-                            </tr>
-                              <tr>
-                                 <td class="col-form-span-label" align="right">Closing:  </td>
-                                 <td  class="col-form-span-label" align="right">{{CLDrBal}}  </td>
-                                <td  class="col-form-span-label" align="right">{{CLCrBal}} </td>
-                             </tr>
-                             <tr>
-                                <td class="col-form-span-label anchor-link" (click)="AdvanceViewData()" align="right">Advance:  </td>
-                                <td  class="col-form-span-label" align="right">{{AdvCrAmt}}  </td>
-                                <td  class="col-form-span-label" align="right">{{AdvDrAmt}} </td>                                      
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
+  @if (displayType=='LIST') {
+    <div class="fk-kpis">
+      <div class="card fk-kpi"><div class="k">Opening</div><div class="v">{{ OpDrBal }}{{ OpCrBal }}</div></div>
+      <div class="card fk-kpi"><div class="k">Current total Dr</div><div class="v">{{ currTotalDr || '—' }}</div></div>
+      <div class="card fk-kpi"><div class="k">Current total Cr</div><div class="v">{{ currTotalcr || '—' }}</div></div>
+      <div class="card fk-kpi"><div class="k">Closing</div><div class="v">{{ CLDrBal }}{{ CLCrBal }}</div></div>
+      <div class="card fk-kpi"><div class="k">Advance</div><div class="v">{{ AdvCrAmt }} {{ AdvDrAmt }}</div>
+        <div class="s"><a href="javascript:void(0);" class="lnk" (click)="AdvanceViewData()">View advance details</a></div></div>
     </div>
-}
 
-    @if (displayType=='LIST') {
-<div class="row no-gutters"  >
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-        <div class="col-sm-12 col-md-10 col-lg-10 ">
+    <div class="card sec">
+      <div class="card-h"><h2>Debit &minus; credit by month</h2><span class="meta">grey = net credit</span></div>
+      <div class="fk-chart">
+        @if (chart) {
+          <svg [attr.viewBox]="'0 0 ' + chart.w + ' ' + chart.h" role="img" aria-label="Net movement by month">
+            @for (g of chart.grid; track $index) {
+              <line class="gl" [attr.x1]="chart.l" [attr.x2]="chart.w - 12" [attr.y1]="g.y" [attr.y2]="g.y"></line>
+              <text class="ax" [attr.x]="chart.l - 6" [attr.y]="g.y + 3" text-anchor="end">{{ g.label }}</text>
+            }
+            @for (b of chart.bars; track $index) {
+              <rect class="fb" [class.neg]="b.neg" [attr.x]="b.x" [attr.y]="b.y" [attr.width]="b.w" [attr.height]="b.h"><title>{{ b.label }}: {{ fmt(b.value, 2) }}</title></rect>
+              <text class="ax" [attr.x]="b.lx" [attr.y]="b.ly" text-anchor="middle">{{ b.label }}</text>
+            }
+          </svg>
+        } @else {
+          <div class="empty">Nothing to chart.</div>
+        }
+      </div>
+    </div>
 
-           
-            <div class="row  xyscroll"  style="height: 300px;">
-                <table class="table table-bordered table-sm-new table-striped table-hover" >
-                    <thead>
-                        <tr class="title-head formheading table-primary">
-                            <th class="col-form-span-label" align="center"></th>
-                            <th class="col-form-span-label" align="center">Number</th>
-                            <th class="col-form-span-label" align="center">Date</th>
-                            <th class="col-form-span-label" align="center">Particulars</th>
-                            <th class="col-form-span-label" align="center">	Debit</th>
-                            <th class="col-form-span-label" align="center">Credit</th>                          
-                        </tr>
-                    </thead>
-                    @if (dataList.length > 0) {
-<tbody>
-                        @for (data of dataList; track data) {
-<tr >
-                            <td  style="width: 30px;"><span  class="col-form-span-label" >{{data.TRANSTYPE}}</span> </td> 
-                             <td  style="width: 130px;"><span   class="col-form-span-label anchor-link " (click)="Openprint(data.TRANSCODE,data.TRANSTYPE)" >{{data.TRANSCODE}}</span> </td> 
-                             <td  style="width: 90px;"><span  class="col-form-span-label">{{data.TRANSDATE}}</span> </td>
-                             <td  style="width:200px; " class="col-form-span-label">
-                               
-                                <p    style="white-space: pre-wrap;width: 400px; " > {{data.NARR}}{{data.EXP_SNAME}}{{data.SUP_SNAME}} {{data.ACCTNAME}}</p>
-                               
-                                     
-                             </td> 
-                            <td  style="width: 100px;"><span class="col-form-span-label">{{data.DRAMT|number:'2.2-4'}}</span>  </td>                             
-                            <td  style="width: 100px;"><span class="col-form-span-label">{{data.CRAMT|number:'2.2-4'}}</span>  </td>
-                        </tr>
-}
-                    </tbody>
-}
-                </table>
-              
-    
-            </div>
-           <table class="table table-bordered table-sm-new bgwhite ">
+    <div class="card sec">
+      <div class="card-h">
+        <h2>{{searchHeaderText}}</h2>
+        <span class="meta">{{ClientName}}</span>
+      </div>
+      <div class="toolbar">
+        <span><span class="count">{{ dataList?.length || 0 }} {{ dataList?.length === 1 ? 'transaction' : 'transactions' }}</span></span>
+        <span class="tb-r">
+          <button class="btn g" type="button" (click)="displayType='SEARCH';dataList=[]">Clear results</button>
+          <button class="btn g" type="submit" (click)="ShowRemark()">Add remark</button>
+          <button class="btn g" type="submit" (click)="expt_exlwithadv()">Export</button>
+          <button class="btn p" type="submit" (click)="Print()">Print</button>
+        </span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
             <tr>
-                <td colspan="4" align="center">
-                    <button uiBtn variant="default" size="sm" type="submit" (click)="Print()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Print</span></button>
-                    <button uiBtn variant="default" size="sm" type="submit" (click)="expt_exlwithadv()" > <span class="col-form-span-label"><i class="fa fa-file-excel-o"></i>Export To Excel </span></button>
-                    <button uiBtn variant="default" size="sm" type="submit" (click)="EmailToClient()"> <span  class="col-form-span-label"><i class="fa fa-envelope"></i> Email To Client</span></button>
-                     <button uiBtn variant="default" size="sm" type="submit" (click)="ShowRemark()"> <span class="col-form-span-label"  ><i class="fa fa-plus"></i>Add Remark</span></button>
-                </td>
+              <th></th>
+              <th>Number</th>
+              <th>Date</th>
+              <th>Particulars</th>
+              <th class="num">Debit</th>
+              <th class="num">Credit</th>
             </tr>
-           </table>
-        </div>
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-
-    </div>
-}  
-     
-</div>
-<div class="modal" [style.display]="showModal_Advance ? 'block' : 'none'">
-    <div class="modal-dialog modal-lg" role="document"  >
-        <div class="modal-content " style="height:400px; width:800px;overflow-x: auto;">
-            <div class="modal-header">   </div>
-            <div class="modal-body">
-                <table class="table table-sm-new table-responsive-sm" >
-                    <tr>
-                        <td colspan="6" class="centerlabel">   <strong>{{advheader}}</strong>  </td>
-                    </tr>
-                    <tr>
-                        <td colspan="6" class="centerlabel"> <strong> {{ClientName}}</strong>  </td>
-                    </tr>
-                </table>
-                <div class="row">
-                        <div class="col" >
-                            <table align="right" class="table  table-sm-new bgwhite" style="width:150px">
-                                <tr>
-                                    <td align="right">  <span class="col-form-span-label">Advance Total:</span>        </td>
-                                    <td>  <span  class="col-form-span-label">{{AdvTotal}}</span>   </td>
-                                </tr>
-                            </table>
-                            <table class="table table-bordered table-sm-new bgwhite ">
-                                <thead>
-                                  <tr class="col-form-span-heading ">                                 
-                                    <th class="col-form-span-label"></th>
-                                    <th class="col-form-span-label">Number</th>
-                                    <th class="col-form-span-label">Date</th>
-                                    <th class="col-form-span-label">Particulars</th>
-                                    <th class="col-form-span-label">Amount</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  @for (data of AdvanceTable; track data) {
-<tr>
-                                    <td class="col-form-span-label">{{data.transtype}}</td>
-                                    <td class="col-form-span-label">{{data.Transcode}}</td>
-                                    <td class="col-form-span-label">{{data.Transdate}}</td>
-                                    <td class="col-form-span-label">{{data.exp_sname}},{{data.sup_sname}},{{data.acctname}}</td>
-                                    <td class="col-form-span-label">{{data.cramt}}</td>
-                                  </tr>
-}
-                                </tbody>
-                              </table>
-                              <table class="table table-bordered table-sm-new bgwhite ">
-                                    <tr>
-                                        <td colspan="4" align="center">
-                                            <button uiBtn variant="default" size="sm" type="submit" (click)="Print()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Print</span></button>
-                                            <button uiBtn variant="default" size="sm" type="submit" (click)="expt_exlwithadv()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> ExportToExcel</span></button>
-                                            <button uiBtn variant="outline" size="sm" (click)="close()"><span class="col-form-span-label"><i class="fa fa-ban"
-                                              aria-hidden="true"></i> Close</span></button>
-                                        </td>
-                                    </tr>
-                             </table>
-                        </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row no-gutters">
-    <div class="col-sm-12 col-md-1 col-lg-1">
-    </div>
-    <div class="col-sm-12 col-md-10 col-lg-10 ">
-    <div class="modal" [style.display]="showModal_Remark ? 'block' : 'none'">
-        <div class="modal-dialog modal-lg" role="document"  >
-            <div class="modal-content " style="height:465px; width:700px;overflow-x: auto;">
-                <div class="modal-body">
-                    <div class="row no-gutters">
-                    <div class="col-sm-12 col-md-1 col-lg-1">
-                    </div>
-                    <div class="col-sm-12 col-md-10 col-lg-10 ">
-                    <div class="form-group row d-flex justify-content-center "> <strong> Client Remark </strong>  </div></div>
-                    <div class="col-sm-12 col-md-1 col-lg-1">
-                    </div>
-                </div>
-                <div class="row no-gutters">
-                    <div class="col-sm-12 col-md-1 col-lg-1">
-                    </div>
-                    <div class="col-sm-12 col-md-10 col-lg-10 ">
-                    <div class="form-group row d-flex justify-content-center "> <strong>  {{ClientName}}</strong>  </div></div>
-                    <div class="col-sm-12 col-md-1 col-lg-1">
-                    </div>
-                </div>
-                    <div class="form-group row d-flex justify-content-center ">
-                    
-                        <!-- <div > <strong> {{ClientName}}</strong> </div> -->
-                            <br>
-                            <br>
-                        <div class="row no-gutters"   >
-                            <div class="col-sm-12 col-md-1 col-lg-1">
-                            </div>
-                            <div class="col-sm-12 col-md-10 col-lg-10 ">
-                    
-                        
-                            <table class="table table-bordered table-sm-new bgwhite" > 
-                                <tr>
-                                    <td colspan="2"> 
-                                        <table class="table table-bordered table-sm-new bgwhite" > 
-                                            <tr>
-                                                <td><span class="col-form-span-label">Opening : </span> </td>
-                                                <td><span class="col-form-span-label">{{OpDrBal}}</span></td>
-                                                <td><span class="col-form-span-label"> {{OpCrBal}}</span></td>
-                                                <td align="right"><span class="col-form-span-label">Current Total:</span></td>
-                                                <td><span class="col-form-span-label">{{currTotalDr}}</span></td>
-                                                <td><span class="col-form-span-label">{{currTotalcr}}</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td ><span class="col-form-span-label">Closing : </span> </td>
-                                                <td><span class="col-form-span-label">{{CLDrBal}}</span></td>
-                                                <td><span class="col-form-span-label"> {{CLCrBal}}</span></td>
-                                                <td align="right"><span class="col-form-span-label">Advance:</span></td>
-                                                <td><span class="col-form-span-label">{{AdvCrAmt}}</span></td>
-                                                <td><span class="col-form-span-label">{{AdvDrAmt}}</span></td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span style= "min-height: 100px;display: inline-flex;  align-items: center; "
-                                         class="col-form-span-label"> Remark</span>
-                                    </td>
-                                    <td  align ="left" >
-                                     
-                                             <textarea rows="5" cols="50" class="form-control" OnlyCharacter="true" [(ngModel)]="Remark"></textarea>
-                                  
-                                        </td>
-                                    
-                                </tr>
-                                <tr>
-                                    <td colspan="2">
-                                        <div class="row  d-flex justify-content-center">
-                            
-                                            <button uiBtn variant="default" size="sm" type="submit" [disabled]='disableAddbtn' (click)="AddRemark()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Add</span></button>
-                                            <button uiBtn variant="outline" size="sm" [disabled]='disableCancelAddbtn' (click)="Clearctrl()"><span class="col-form-span-label"><i class="fa fa-ban"
-                                              aria-hidden="true"></i> Cancel</span></button>
-                                             
-                                        </div> 
-                                    </td>
-                                </tr>
-                                <tr>
-                                   <td colspan="2">
-                            
-                               <div class="row  xyscroll"  style="height: 200px;">
-                                <table class="table table table-responsive-sm  table-bordered " >
-                                    <thead>
-                                        <tr class="title-head formheading table-primary">
-                                            <th class="col-form-span-label" align="center">User Name</th>
-                                            <th class="col-form-span-label" align="center">Remark</th>                          
-                                        </tr>
-                                    </thead>
-                                    <tbody >
-                                        @for (data of RemarkList; track data) {
-<tr>
-                                            <td  style="width: 25%;"><span class="col-form-span-label" (click)="DisplayRemark(data.remark)">{{data.entrydt}}</span>  </td>                             
-                                            <td  style="width: 75%;" class="col-form-span-label">
-                                            <p    style="white-space: pre-wrap;word-break:break-all;" > {{data.remark}}</p>  </td>
-                                        </tr>
-}
-                                    </tbody>
-                                </table>
-                               
-                            </div>
-                           
-                                   </td> 
-                                </tr>
-                              <tr>
-                                    <td colspan="2">
-                                        <div class="col-md-12"  style="text-align: right;">
-                                            <button   uiBtn variant="default" size="sm" (click)="UploadDoc()"><span class="col-form-span-label"><i class="fa fa-ban"
-                                                aria-hidden="true"></i> Upload Document</span></button>
-                                            <button  uiBtn variant="outline" size="sm" (click)="closeRemark()"><span class="col-form-span-label"><i class="fa fa-ban"
-                                                aria-hidden="true"></i> Close</span></button>
-                                        </div>   
-                                    </td>
-                                </tr> 
-                            </table>  
-                        <!-- </div> -->
-                         </div>
-                         <div class="col-sm-12 col-md-1 col-lg-1">
-                        </div>
-                        
-                    </div> 
-                   
+          </thead>
+          <tbody>
+            <tr class="tot">
+              <td colspan="4">Opening</td>
+              <td class="num">{{OpDrBal}}</td>
+              <td class="num">{{OpCrBal}}</td>
+            </tr>
+            @for (data of pager.paged; track $index) {
+              <tr>
+                <td>{{data.TRANSTYPE}}</td>
+                <td><a href="javascript:void(0);" class="lnk" (click)="Openprint(data.TRANSCODE,data.TRANSTYPE)">{{data.TRANSCODE}}</a></td>
+                <td>{{data.TRANSDATE}}</td>
+                <td class="fk-wrap">{{data.NARR}}{{data.EXP_SNAME}}{{data.SUP_SNAME}} {{data.ACCTNAME}}</td>
+                <td class="num">{{data.DRAMT|number:'2.2-4'}}</td>
+                <td class="num">{{data.CRAMT|number:'2.2-4'}}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="6">No transactions.</td></tr>
+            }
+            <tr class="tot">
+              <td colspan="4">Current total</td>
+              <td class="num">{{currTotalDr}}</td>
+              <td class="num">{{currTotalcr}}</td>
+            </tr>
+            <tr class="tot">
+              <td colspan="4">Closing</td>
+              <td class="num">{{CLDrBal}}</td>
+              <td class="num">{{CLCrBal}}</td>
+            </tr>
+            <tr class="tot">
+              <td colspan="4"><a href="javascript:void(0);" class="lnk" (click)="AdvanceViewData()">Advance</a></td>
+              <td class="num">{{AdvCrAmt}}</td>
+              <td class="num">{{AdvDrAmt}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      @if (pager.rows.length > pager.size) {
+        <div class="pager">
+          <span>Showing <b>{{ pager.from }}&ndash;{{ pager.to }}</b> of <b>{{ pager.rows.length }}</b></span>
+          <div class="pages">
+            <button type="button" [disabled]="pager.page === 1" (click)="pager.go(pager.page - 1)" aria-label="Previous page">&lsaquo;</button>
+            @for (p of pager.numbers; track $index) {
+              @if (p === '...') { <span class="gap">&hellip;</span> }
+              @else { <button type="button" [class.on]="p === pager.page" (click)="pager.go(p)">{{ p }}</button> }
+            }
+            <button type="button" [disabled]="pager.page === pager.total" (click)="pager.go(pager.page + 1)" aria-label="Next page">&rsaquo;</button>
           </div>
-    </div>
-            </div>
         </div>
+      }
     </div>
-    </div>
-    <div class="col-sm-12 col-md-1 col-lg-1">
-    </div>
-    
-</div>      
-                
-                       
+  }
 
+  <!-- Advance details (showModal_Advance) -->
+  @if (showModal_Advance) {
+    <div class="fk-modal-back">
+      <div class="card fk-modal" role="dialog" aria-modal="true">
+        <div class="card-h"><h2>{{advheader}}</h2><span class="meta">{{ClientName}} &middot; advance total <b>{{AdvTotal}}</b></span></div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Number</th>
+                <th>Date</th>
+                <th>Particulars</th>
+                <th class="num">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (data of AdvanceTable; track $index) {
+                <tr>
+                  <td>{{data.transtype}}</td>
+                  <td>{{data.Transcode}}</td>
+                  <td>{{data.Transdate}}</td>
+                  <td>{{data.exp_sname}},{{data.sup_sname}},{{data.acctname}}</td>
+                  <td class="num">{{data.cramt}}</td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="5">No advances.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="fk-modal-bar">
+          <button class="btn g" type="button" (click)="close()">Close</button>
+          <button class="btn g" type="submit" (click)="expt_exlwithadv()">Export to Excel</button>
+          <button class="btn p" type="submit" (click)="Print()">Print</button>
+        </div>
+      </div>
+    </div>
+  }
 
- 
+  <!-- Client remark (showModal_Remark) -->
+  @if (showModal_Remark) {
+    <div class="fk-modal-back">
+      <div class="card fk-modal" role="dialog" aria-modal="true">
+        <div class="card-h"><h2>Client remark</h2><span class="meta">{{ClientName}}</span></div>
+        <div class="fields">
+          <div class="fld"><label>Opening</label><span class="mono">{{OpDrBal}} {{OpCrBal}}</span></div>
+          <div class="fld"><label>Current total</label><span class="mono">{{currTotalDr}} {{currTotalcr}}</span></div>
+          <div class="fld"><label>Closing</label><span class="mono">{{CLDrBal}} {{CLCrBal}}</span></div>
+          <div class="fld"><label>Advance</label><span class="mono">{{AdvCrAmt}} {{AdvDrAmt}}</span></div>
+          <div class="fld full">
+            <label>Remark</label>
+            <textarea rows="5" OnlyCharacter="true" [(ngModel)]="Remark"></textarea>
+          </div>
+        </div>
+        <div class="fk-modal-bar">
+          <button class="btn g" type="button" [disabled]="disableCancelAddbtn" (click)="Clearctrl()">Cancel</button>
+          <button class="btn p" type="submit" [disabled]="disableAddbtn" (click)="AddRemark()">Add</button>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Remark</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (data of RemarkList; track $index) {
+                <tr>
+                  <td><a href="javascript:void(0);" class="lnk" (click)="DisplayRemark(data.remark)">{{data.entrydt}}</a></td>
+                  <td class="fk-wrap">{{data.remark}}</td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="2">No remarks yet.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="fk-modal-bar">
+          <button class="btn g" type="button" (click)="UploadDoc()">Upload document</button>
+          <button class="btn g" type="button" (click)="closeRemark()">Close</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

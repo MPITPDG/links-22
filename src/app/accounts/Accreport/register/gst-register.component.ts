@@ -8,10 +8,11 @@ import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/shared/service/dataService';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 import { DatePipe } from '@angular/common';
+import { FIN_PERIODS, FinPeriod, finRange, finDp } from '../fin-kit';
 @Component({
   selector: 'app-Gst-register',
   templateUrl: './gst-register.component.html',
-  styles: [],
+  host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -87,4 +88,15 @@ export class GstRegisterComponent implements OnInit {
     this.FromDate="";
     this.ToDate="";
   }
+
+    // ---- redesign: quick period presets (same my-date-picker model shape the pickers emit) ----
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.FromDate = finDp(r.from, this.myDatePickerOptions.dateFormat);
+        this.ToDate = finDp(r.to, this.myDatePickerOptions.dateFormat);
+    }
 }

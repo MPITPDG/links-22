@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-purchase-general',
   templateUrl: './purchase-general.component.html',
-  styles: [],
+    styleUrls: ['./purchase-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

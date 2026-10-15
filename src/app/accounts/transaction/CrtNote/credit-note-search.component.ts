@@ -10,23 +10,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {environment}  from '../../../../environments/environment.prod'
 
 @Component({
-  selector: 'app-credit-note-search',
-  templateUrl: './credit-note-search.component.html',
-  styles: [ `main{
-    position: absolute;
-    top: 110px;
-    left: 231px;
-    right: 0;
-    bottom: 0;
-    background: #f2f5fe;
-    padding: 1rem;
-  }
-
-  #content{
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }`],
+    selector: 'app-credit-note-search',
+    templateUrl: './credit-note-search.component.html',
+    // Page kit is global (src/styles/kit); crtnote-page.css is MP's area sheet, copied locally.
+    styleUrls: ['./crtnote-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -34,6 +21,7 @@ export class CreditNoteSearchComponent implements OnInit {
     clientable: any = []; exampleRadios1: string = 'CreditNo'; client: string = ""; crtno: string = "";
     client_startdate; client_enddate; jobno: string = ""; amount: string = ""; printallcredit_date;printarray:any=[]
     datewise_startdate; datewise_enddate; Searchdata_list: any = []
+    checkbox: boolean = false; // header select-all checkbox model; was bound in the template with no backing member
     public myDatePickerOptions: IMyDpOptions = {
       dateFormat: 'dd-mmm-yyyy',
       inline: false,

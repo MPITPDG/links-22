@@ -1,208 +1,215 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{PageName|uppercase}}</strong>
-                        </div>
-                    </div>
-                </div>
+<!--
+  Accounts -> Reports -> MAWB / Container job profit (route param Type = MAWB | CNTR).
+  Recipe: report with KPIs + chart. Data: Accounts/ACC_RPT_MAWBPROFITS_JOBWISE.
+  The three expanders used Bootstrap data-toggle="collapse"; they are now driven by the same
+  reverse_CONT / reverse_VOCHR / isvisible flags the legacy click handlers already flip, so the
+  open/closed state is identical. Voucher links call voucherprint(VOUCHER_NO, VOUCHERNO) (legacy
+  Linkserp .aspx for invoices, ./#/popup/... for the rest) and job links call
+  jobprofitreport() (popup) -- both unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ PageName | titlecase }}</h1>
+      <p>Expense, recovery and difference for every job on a {{ PageType == 'CNTR' ? 'container' : 'MAWB' }}</p>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="filters fk-f">
+      <div class="f w2">
+        <label for="searchno">{{inputname}} <span class="req">*</span></label>
+        <input id="searchno" [(ngModel)]="searchno" type="text" maxlength="40">
+      </div>
+      <div class="f act">
+        <button class="btn g" type="reset" (click)="Reset();">Reset</button>
+        <button class="btn p" type="submit" (click)="Search()">Search</button>
+      </div>
+    </div>
+  </div>
+
+  @if (failed) {
+    <div class="card fk-alert">The job profit could not be loaded. Try the search again.</div>
+  }
+
+  @if (detailsdata_serch) {
+    <div class="fk-kpis">
+      <div class="card fk-kpi"><div class="k">Jobs</div><div class="v">{{ job_table2?.length || 0 }}</div></div>
+      <div class="card fk-kpi"><div class="k">Expense</div><div class="v">{{ fmt(kpiExp, 2) }}</div></div>
+      <div class="card fk-kpi"><div class="k">Recovery</div><div class="v">{{ fmt(kpiRec, 2) }}</div></div>
+      <div class="card fk-kpi"><div class="k">Difference</div><div class="v">{{ fmt(kpiDiff, 2) }}</div></div>
+    </div>
+
+    <div class="card sec">
+      <div class="card-h"><h2>Difference by job</h2><span class="meta">grey = loss</span></div>
+      <div class="fk-chart">
+        @if (chart) {
+          <svg [attr.viewBox]="'0 0 ' + chart.w + ' ' + chart.h" role="img" aria-label="Difference by job">
+            @for (g of chart.grid; track $index) {
+              <line class="gl" [attr.x1]="chart.l" [attr.x2]="chart.w - 12" [attr.y1]="g.y" [attr.y2]="g.y"></line>
+              <text class="ax" [attr.x]="chart.l - 6" [attr.y]="g.y + 3" text-anchor="end">{{ g.label }}</text>
+            }
+            @for (b of chart.bars; track $index) {
+              <rect class="fb" [class.neg]="b.neg" [attr.x]="b.x" [attr.y]="b.y" [attr.width]="b.w" [attr.height]="b.h"><title>{{ b.label }}: {{ fmt(b.value, 2) }}</title></rect>
+              <text class="ax" [attr.x]="b.lx" [attr.y]="b.ly" text-anchor="middle">{{ b.label }}</text>
+            }
+          </svg>
+        } @else {
+          <div class="empty">Nothing to chart.</div>
+        }
+      </div>
+    </div>
+
+    <div class="card sec">
+      <div class="card-h"><h2>{{ PageType == 'CNTR' ? 'Container' : 'MAWB' }}</h2></div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th class="ck"></th>
+              <th>{{ PageType == 'CNTR' ? 'Container no.' : 'MAWB no.' }}</th>
+              <th></th>
+              <th class="num">Expense</th>
+              <th class="num">Recovery</th>
+              <th class="num">Difference</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (data of cont_table1; track $index) {
+              <tr class="grp">
+                <td class="ck"><button type="button" class="btn g fk-tog" (click)="setOrder_CONT()" [attr.aria-expanded]="reverse_CONT">{{ reverse_CONT ? '−' : '+' }}</button></td>
+                <td>{{data.CTR_MAWBNO}}</td>
+                <td>{{data.JOBNO}}</td>
+                <td class="num">{{data.DRAMT}}</td>
+                <td class="num">{{data.CRAMT}}</td>
+                <td class="num">{{data.GRANDVALUE_TOTAL}}</td>
+                <td>{{data.GRANDVALUE}}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="7">No rows.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (reverse_CONT) {
+        <div id="accordion_containerdetail">
+          <div class="toolbar">
+            <span><button type="button" class="btn g fk-tog" (click)="setOrder_Voucher()" [attr.aria-expanded]="reverse_VOCHR">{{ reverse_VOCHR ? '−' : '+' }}</button>
+              <span class="count">Summary profit {{'['+ searchno +']'}}</span></span>
+          </div>
+          @if (reverse_VOCHR) {
+            <div id="accordion_summarydetail" class="tbl-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Voucher no.</th>
+                    <th>Date</th>
+                    <th class="num">Expense</th>
+                    <th class="num">Recovery</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (data of vouchr_table3; track $index) {
+                    <tr>
+                      <td>
+                        <a href="javascript:void(0);" class="lnk" (click)="voucherprint(data.VOUCHER_NO,data.VOUCHERNO)" [innerHtml]="data.VOUCHER_NO"></a>
+                      </td>
+                      <td>{{data.TRAN_DATE}}</td>
+                      <td class="num">{{data.PAYMENT_EURO}}</td>
+                      <td class="num">{{data.RECOVERY_EURO}}</td>
+                    </tr>
+                  } @empty {
+                    <tr><td class="empty" colspan="4">No vouchers.</td></tr>
+                  }
+                </tbody>
+              </table>
             </div>
+          }
         </div>
+      }
     </div>
-    <div class="row no-gutters">
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
+
+    <div class="card sec">
+      <div class="toolbar">
+        <span><span class="count">{{ job_table2?.length || 0 }} {{ job_table2?.length === 1 ? 'job' : 'jobs' }}</span></span>
+        <span class="tb-r"><button class="btn g" type="button" (click)="exportJobs()" [disabled]="!job_table2?.length">Export</button></span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th class="ck"></th>
+              <th>Job no.</th>
+              <th>Client</th>
+              <th class="num">Expense</th>
+              <th class="num">Recovery</th>
+              <th class="num">Difference</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (data of pager.paged; track $index) {
+              <tr>
+                <td class="ck"><button type="button" class="btn g fk-tog" (click)="setOrder_JOB(data.JOBNO)" [attr.aria-expanded]="!data?.isvisible">{{ data?.isvisible ? '+' : '−' }}</button></td>
+                <td><a href="javascript:void(0);" class="lnk" (click)="jobprofitreport(data.JOBNO)">{{data.JOBNO}}</a></td>
+                <td>{{data.CLIENT_NAME}}</td>
+                <td class="num">{{data.DRAMT}}</td>
+                <td class="num">{{data.CRAMT}}</td>
+                <td class="num">{{data.GRANDVALUE_TOTAL}}</td>
+                <td>{{data.GRANDVALUE}}</td>
+              </tr>
+              @if (!data?.isvisible) {
                 <tr>
-                    <td><span class="col-form-span-label"><b>{{inputname}}</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td> <input id="searchno" [(ngModel)]="searchno" type="text" class="form-control width150"
-                            maxlength="40"> </td>
-                    <td colspan="2" class="centerlabel">
-                        <button uiBtn variant="default" size="sm" type="submit" (click)="Search()"> <span
-                                class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>
-                                Search</span></button>
-                        <button uiBtn variant="outline" size="sm" type="reset"> <span class="col-form-span-label"
-                                (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
-                    </td>
+                  <td></td>
+                  <td colspan="6">
+                    <table class="tbl">
+                      <thead>
+                        <tr>
+                          <th>Voucher no.</th>
+                          <th>Date</th>
+                          <th class="num">Expense</th>
+                          <th class="num">Recovery</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (childdata of data.childdetail; track $index) {
+                          <tr>
+                            <td>
+                              <a href="javascript:void(0);" class="lnk" (click)="voucherprint(childdata.VOUCHER_NO,childdata.VOUCHERNO)" [innerHtml]="childdata.VOUCHER_NO"></a>
+                            </td>
+                            <td><span (click)="voucherprint(childdata.VOUCHER_NO)">{{childdata.TRAN_DATE}}</span></td>
+                            <td class="num">{{childdata.PAYMENT_EURO}}</td>
+                            <td class="num">{{childdata.RECOVERY_EURO}}</td>
+                          </tr>
+                        } @empty {
+                          <tr><td class="empty" colspan="4">No vouchers for this job.</td></tr>
+                        }
+                      </tbody>
+                    </table>
+                  </td>
                 </tr>
-            </table>
+              }
+            } @empty {
+              <tr><td class="empty" colspan="7">No jobs.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (pager.rows.length > pager.size) {
+        <div class="pager">
+          <span>Showing <b>{{ pager.from }}&ndash;{{ pager.to }}</b> of <b>{{ pager.rows.length }}</b></span>
+          <div class="pages">
+            <button type="button" [disabled]="pager.page === 1" (click)="pager.go(pager.page - 1)" aria-label="Previous page">&lsaquo;</button>
+            @for (p of pager.numbers; track $index) {
+              @if (p === '...') { <span class="gap">&hellip;</span> }
+              @else { <button type="button" [class.on]="p === pager.page" (click)="pager.go(p)">{{ p }}</button> }
+            }
+            <button type="button" [disabled]="pager.page === pager.total" (click)="pager.go(pager.page + 1)" aria-label="Next page">&rsaquo;</button>
+          </div>
         </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
+      }
     </div>
-    @if (detailsdata_serch) {
-<div class="row no-gutters">
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-        <div class="col-sm-12 col-md-10 col-lg-10 xyscroll" style="height: 470px;">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td>
-
-                        <table class="table table-bordered table-sm-new bgwhite">
-                            <thead>
-                                <tr class="title-head" style="background-color: #3aa2d3">
-                                    <th></th>
-                                    <th class="col-form-span-label">Container No.</th>
-                                    <th class="col-form-span-label"></th>
-                                    <th class="col-form-span-label">Expense</th>
-                                    <th class="col-form-span-label">Recovery </th>
-                                    <th class="col-form-span-label">Difference </th>
-                                    <th class="col-form-span-label">Remarks</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                                @for (data of cont_table1; track data) {
-<tr style="font-weight: bold;">
-                                    <td data-toggle="collapse" data-target="#accordion_containerdetail"
-                                        (click)="setOrder_CONT()" class="clickable" style="width: 15px;"><span
-                                            [hidden]="reverse_CONT" id="icon_show">+</span>
-                                        <span [hidden]="!reverse_CONT" id="icon_show">-</span>
-                                    </td>
-
-                                    <td><span class="col-form-span-label">{{data.CTR_MAWBNO}}</span></td>
-                                    <td><span class="col-form-span-label">{{data.JOBNO}}</span></td>
-                                    <td><span class="col-form-span-label">{{data.DRAMT}}</span> </td>
-                                    <td><span class="col-form-span-label">{{data.CRAMT}}</span> </td>
-                                    <td><span class="col-form-span-label">{{data.GRANDVALUE_TOTAL}}</span></td>
-                                    <td><span class="col-form-span-label">{{data.GRANDVALUE}}</span> </td>
-
-                                </tr>
-}
-                            </tbody>
-                        </table>
-
-
-                        <div style="padding-left: 15px;" id="accordion_containerdetail" class="collapse">
-                            <table class="table table-bordered table-sm-new bgwhite">
-                                <tr class="title-head">
-                                    <td style="width: 15px;" (click)="setOrder_Voucher()" data-toggle="collapse"
-                                        data-target="#accordion_summarydetail" class="clickable">
-                                        <span [hidden]="reverse_VOCHR" id="icon_show">+</span>
-                                        <span [hidden]="!reverse_VOCHR" id="icon_show">-</span>
-                                    </td>
-                                    <td class="col-form-span-label"> SUMMARY PROFIT {{'['+ searchno +']'}}</td>
-                                    <td></td>
-                                </tr>
-                            </table>
-
-                            <div style="padding-left: 15px;" id="accordion_summarydetail" class="collapse">
-                                <table class="table table-bordered table-sm-new bgwhite">
-                                    <thead>
-                                        <tr class="title-head" style="background-color: #89CFF0">
-                                            <th style="width: 15px;"></th>
-                                            <th class="col-form-span-label" colspan="2">Voucher No.</th>
-                                            <th class="col-form-span-label">Date</th>
-                                            <th class="col-form-span-label">Expense</th>
-                                            <th class="col-form-span-label">Recovery </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @for (data of vouchr_table3; track data) {
-<tr>
-                                            <td></td>
-                                            <td colspan="2"><span class="col-form-span-label"
-                                                     (click)="voucherprint(data.VOUCHER_NO,data.VOUCHERNO)" 
-                                                    [innerHtml]="data.VOUCHER_NO"></span>
-                                            </td>
-                                            <td><span class="col-form-span-label">{{data.TRAN_DATE}}</span> </td>
-                                            <td><span class="col-form-span-label">{{data.PAYMENT_EURO}}</span> </td>
-                                            <td><span class="col-form-span-label">{{data.RECOVERY_EURO}}</span></td>
-                                        </tr>
-}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <table class="table table-bordered table-sm-new bgwhite">
-                                <thead>
-                                    <tr class="title-head" style="background-color: #89CFF0">
-                                        <th></th>
-                                        <th class="col-form-span-label">Job No.</th>
-                                        <th class="col-form-span-label">Client</th>
-                                        <th class="col-form-span-label">Expense</th>
-                                        <th class="col-form-span-label">Recovery </th>
-                                        <th class="col-form-span-label">Difference </th>
-                                        <th class="col-form-span-label">Remarks</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (data of job_table2; track data) {
-
-                                        <tr>
-                                            <td style="width: 15px;" (click)="setOrder_JOB(data.JOBNO)"
-                                                class="clickable">
-                                                <span [hidden]="reverse_JOB" id="icon_show">+</span>
-                                                <span [hidden]="!reverse_JOB" id="icon_show">-</span>
-                                            </td>
-                                            <td><span class="col-form-span-label anchor-link"
-                                                    (click)="jobprofitreport(data.JOBNO)">{{data.JOBNO}}</span></td>
-                                            <td><span class="col-form-span-label">{{data.CLIENT_NAME}}</span> </td>
-                                            <td><span class="col-form-span-label">{{data.DRAMT}}</span> </td>
-                                            <td><span class="col-form-span-label">{{data.CRAMT}}</span></td>
-                                            <td><span class="col-form-span-label">{{data.GRANDVALUE_TOTAL}}</span> </td>
-                                            <td><span class="col-form-span-label">{{data.GRANDVALUE}}</span> </td>
-                                        </tr>
-                                        <tr class="{{data?.isvisible ? 'd-none' : ''}}">
-                                            <td><span class="col-form-span-label"></span>
-
-                                            </td>
-                                            <td colspan="6">
-                                                <!-- <span class="col-form-span-label"> -->
-                                                    <table class="table table-bordered table-sm-new bgwhite">
-                                                        <thead>
-                                                            <tr class="title-head" style="background-color: #89CFF0">
-                                                                <th style="width: 15px;"></th>
-                                                                <th class="col-form-span-label" colspan="2">Voucher No.</th>
-                                                                <th class="col-form-span-label">Date</th>
-                                                                <th class="col-form-span-label">Expense</th>
-                                                                <th class="col-form-span-label">Recovery </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @for (childdata of data.childdetail; track childdata) {
-<tr>
-                                                                <td></td>
-                                                                <td colspan="2">
-                                                                    <span class="col-form-span-label"
-                                                                        (click)="voucherprint(childdata.VOUCHER_NO,childdata.VOUCHERNO)"
-                                                                        [innerHtml]="childdata.VOUCHER_NO">
-                                                                    </span>
-                                                                </td>
-                                                                <td>
-                                                                    <span class="col-form-span-label"
-                                                                        (click)="voucherprint(childdata.VOUCHER_NO)">{{childdata.TRAN_DATE}}
-                                                                    </span>
-                                                                </td>
-                                                                <td><span class="col-form-span-label">{{childdata.PAYMENT_EURO}}</span>
-                                                                </td>
-                                                                <td><span class="col-form-span-label">{{childdata.RECOVERY_EURO}}</span>
-                                                                </td>
-                                                            </tr>
-}
-                                                        </tbody>
-                                                    </table>
-                                                <!-- </span> -->
-                                            </td>
-                                        </tr>
-
-                                    
-}
-                                </tbody>
-                            </table>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-    </div>
-}
+  }
 </div>

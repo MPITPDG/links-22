@@ -12,66 +12,15 @@ import { DatePipe } from '@angular/common';
  
 @Component({
     templateUrl: 'proforma-invoice.component.html',
+    // Page kit recipe 2 (ported from MPERPNG-20): global .im-page kit (src/styles/kit) plus the
+    // component-local invoice/proforma additions in invoice-page.css.
+    styleUrls: ['../invoice/invoice-page.css'],
     styles: [`
-    a:hover,a:focus{
-        text-decoration: none;
-        outline: none;
+    #autoresizing {
+        display: block;
+        overflow: hidden;
+        resize: none;
     }
-    .tab .nav-tabs {
-        border-bottom:0 none;
-    }
-    .tab .nav-tabs li{
-        margin-right: 10px;
-    }
-    .tab .nav-tabs li a{
-        position: relative;
-        padding: 4px;
-        color: #fff;
-        font-size: 11px;
-        z-index: 1;
-        font-family:verdana;
-        font-weight:bold
-    }
-    .tab .nav-tabs li a:hover{
-        background:transparent;
-        border:1px solid transparent;
-        color: var(--mp-soft, #444);
-    }
-     .tab .nav-tabs li a:before{
-        content: "";
-        width:100%;
-        height:100%;
-        position:absolute;
-        bottom: 5px;
-        left:-1px;
-        font-size:11px;
-  
-        background-color: #379b50;
-        border: 1px solid #d3d3d3;
-        border-bottom: 0px none;
-        border-radius: 10px 10px 0 0;
-        transform-origin: left center 0;
-        transform: perspective(3px) rotateX(5deg);
-        z-index:-1;
-    } 
-    .tab .nav-tabs li a.active:before{
-        background: var(--mp-surface, #fff);
-    }
-    .tab .nav-tabs li a.active,
-    .tab .nav-tabs li a.active:focus,
-    .tab .nav-tabs li a.active:hover{
-        border:1px solid transparent;
-        background:transparent;
-        color: var(--mp-ink, #212529);
-        z-index: 2;
-    }
-    #autoresizing { 
-        display: block; 
-        overflow: hidden; 
-        resize: none; 
-    } 
-    
-    
     `],
     providers: [DatePipe],
     changeDetection: ChangeDetectionStrategy.Eager,
@@ -79,6 +28,7 @@ import { DatePipe } from '@angular/common';
 })
 export class ProformaInvoiceComponent implements OnInit    {
     term: string;
+    saving: boolean = false;   // true while a save request is in flight (double-submit guard)
     selected_data: any
     Header: string = "Invoice ";
     value: number = 1;
@@ -1006,6 +956,7 @@ export class ProformaInvoiceComponent implements OnInit    {
 
     //Final Submit 
     MainInvoice_submit() {
+        if (this.saving) { return false; }
         //console.log(this.invoiceid)
              if(this.invdate=="" || this.invdate==undefined || this.invdate==null){
             this._toasterService.toast('warning', 'warning', 'Please enter Invoice Date!');
@@ -1087,10 +1038,20 @@ export class ProformaInvoiceComponent implements OnInit    {
             INVSTARTDATE:this.invstartdate
         }
         // console.log(jsonmaster)
+        // Guard against a second click while the save is in flight: two inserts would consume
+        // two numbers off the series and book the document twice.
+        this.saving = true;
         if (this.invoiceid == "0") {
             this._dataService.Common("Accounts/ACC_PROFORMA_INSERT", jsonmaster)
                 .subscribe((data: any) => {
+                    this.saving = false;
                     //  console.log(data)
+                    // fail soft: a reply without Table[0] is reported, not thrown
+                    if (!(data && data.Table && data.Table[0])) {
+                        this._toasterService.toast("error", "error", "Unexpected reply from the server. Check the search before saving again.");
+                        this._loaderService.display(false);
+                        return;
+                    }
                     if (data.Table[0].STATUS == "100") {
                         this._toasterService.toast("success", "success", data.Table[0].STATUSTEXT);
                         this.MainReset();
@@ -1100,11 +1061,21 @@ export class ProformaInvoiceComponent implements OnInit    {
                         //this.MainReset();
                         this._loaderService.display(false);
                     }
+                }, () => {
+                    this.saving = false;
+                    this._loaderService.display(false);
                 })
         } else {
             this._dataService.Common("Accounts/ACC_PROFORMA_UPDATE", jsonmaster)
                 .subscribe((data: any) => {
+                    this.saving = false;
                     //  console.log(data);
+                    // fail soft: a reply without Table[0] is reported, not thrown
+                    if (!(data && data.Table && data.Table[0])) {
+                        this._toasterService.toast("error", "error", "Unexpected reply from the server. Check the search before saving again.");
+                        this._loaderService.display(false);
+                        return;
+                    }
                     if (data.Table[0].STATUS == "100") {
                         this._toasterService.toast("success", "success", data.Table[0].STATUSTEXT);
                         this.MainReset();
@@ -1114,6 +1085,9 @@ export class ProformaInvoiceComponent implements OnInit    {
                        // this.MainReset();
                         this._loaderService.display(false);
                     }
+                }, () => {
+                    this.saving = false;
+                    this._loaderService.display(false);
                 })
         }
     }

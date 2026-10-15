@@ -1,225 +1,103 @@
-<div class="animated fadeIn" >  
-    <div class="row no-gutters"  >
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{Header}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row no-gutters">
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-
-                <tr>
-                    <td class="col-form-span-heading" colspan="6"> <b>Bank Reconciliation</b> </td>
-           </tr>
-                <tr>
-                    <td >
-                        <span  class="col-form-span-label"><b>Bank</b> </span><span
-                        class="col-form-span-error">*</span>
-                    </td>
-
-                            <td colspan="3" >
-                               <ng-select   [items]="BankList" bindLabel="acctname"
-                               bindValue="acctcodename"  [(ngModel)]="Bank"
-                               class="custom" placeholder="--Select OurBank--">
-                                </ng-select>
-                            </td>
-                </tr>
-                <tr>
-
-                    <td><span class="col-form-span-label"><b>From</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                <td>
-                    <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)"  [options]="myDatePickerOptions"
-                     class="form-control"  [selDate]="FromDate"  ></my-date-picker>
-                </td>
-                    <td><span class="col-form-span-label"><b>To </b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td><my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)"  [options]="myDatePickerOptions"
-                            class="form-control"  [selDate]="ToDate"   ></my-date-picker>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Balance As Per Bank</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                <td colspan="3">
-                 <input [(ngModel)]="BankBalance" type="text"  [OnlyNumber]="true"  class="form-control width150" maxlength="40" > 
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="6" class="centerlabel">
-                        <button uiBtn variant="default" size="sm" type="submit" (click)="SearchData()" > <span
-                                class="col-form-span-label"><i class="fa fa-search"></i>
-                                Search </span></button>&nbsp;
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
+<!--
+  Accounts -> Bank reconciliation -> Statement (legacy report).
+  Search (bank, from, to, balance as per bank; SearchData) -> cheques issued / received but not cleared
+  and the cash book balance block. As before, the result sections appear only when bankrecList has rows.
+  Entry links open the legacy voucher print popups (Openprint). Exports unchanged (ExportOutstand,
+  Exportrecstatement).
+  Links port of the MPERPNG-20 layout (kit .im-page + host class kit-accreport); the .ts is Links' own
+  (Fill_CashBook_BankRecRptNew1, legacy aspx invoice print in Openprint).
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Header }}</h1>
+      <p>Cheques issued and received that the bank has not cleared, with the cash book balance and difference</p>
     </div>
     @if (bankrecList.length > 0) {
-<div class="row no-gutters">
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-        <div class="col-sm-12 col-md-10 col-lg-10 ">
-            <div>
-                <span class="col-form-span-label"><b>
-                    Cheque Issued But Not Clear  </b> </span>
-            </div>
-           <div class="row  xyscroll"  style="height: 150px;">
-                <table class="table table-bordered table-sm-new table-striped " >
-                 <thead>
-                        <tr class="title-head formheading ">
-                            <th class="col-form-span-label" align="center">	Entry No </th>
-                            <th class="col-form-span-label" align="center">Entry Date</th>   
-                            <th class="col-form-span-label" align="center">Chq Type</th>   
-                            <th class="col-form-span-label" align="center">Cheque No</th>    
-                            <th class="col-form-span-label" align="center">Cheque Date</th>   
-                            <th class="col-form-span-label" align="center">Amount</th>   
-                         </tr>
-                    </thead>
-                    @if (bankpayList.length > 0) {
-<tbody>
-                        @for (data of bankpayList; track data) {
-<tr>
-                            <td ><span  class="col-form-span-label anchor-link " (click)="Openprint(data.ENTRYNO,data.STATUS)" >{{data.ENTRYNO}}</span> </td> 
-                            <td  ><span class="col-form-span-label">{{data.ENTRYDT}}</span>  </td>                             
-                            <td  ><span class="col-form-span-label">{{data.STATUS}}</span>  </td> 
-                            <td ><span class="col-form-span-label">{{data.CHEQUENO}}</span>  </td> 
-                            <td ><span class="col-form-span-label">{{data.CHEQUEDT}}</span>  </td>
-                            <td  ><span class="col-form-span-label">{{data.ACTUALAMOUNT|number:'2.2-4'}}</span>  </td> 
-                       
-                        </tr>
-}
-                      
-                    </tbody>
-}
-                </table>
-                     </div>
-            <div  style="float: right;">
-                <span class="col-form-span-label"><b>
-                    {{IssueTotal}} </b> </span>
-            </div>
-         </div>
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-                    
+      <div class="tools">
+        <button class="btn g" type="submit" (click)="ExportOutstand()">Export outstanding</button>
+        <button class="btn g" type="button" (click)="Exportrecstatement();">Export statement</button>
+      </div>
+    }
+  </div>
+
+  <div class="card sec">
+    <div class="card-h"><h2>Bank reconciliation</h2><span class="meta"><b>*</b> required</span></div>
+    <div class="filters fk-f">
+      <div class="f w2">
+        <label>Bank <span class="req">*</span></label>
+        <ng-select [items]="BankList" bindLabel="acctname" bindValue="acctcodename" [(ngModel)]="Bank" placeholder="Select our bank"></ng-select>
+      </div>
+      <div class="f">
+        <label>From <span class="req">*</span></label>
+        <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)" [options]="myDatePickerOptions" [selDate]="FromDate"></my-date-picker>
+      </div>
+      <div class="f">
+        <label>To <span class="req">*</span></label>
+        <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)" [options]="myDatePickerOptions" [selDate]="ToDate"></my-date-picker>
+      </div>
+      <div class="f">
+        <label>Balance as per bank <span class="req">*</span></label>
+        <input [(ngModel)]="BankBalance" type="text" [OnlyNumber]="true" maxlength="40">
+      </div>
+      <div class="f act">
+        <button class="btn p" type="submit" (click)="SearchData()">Search</button>
+      </div>
     </div>
-}  
-    @if (bankrecList.length > 0) {
-<div class="row no-gutters">
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-        <div class="col-sm-12 col-md-10 col-lg-10 ">
-         
-             <div>
-                <span class="col-form-span-label"><b>
-                    Cheque Received But Not Clear  </b> </span>
-            </div>
-            <div class="row  xyscroll"  style="height: 150px;">
-             <table class="table table-bordered table-sm-new table-striped " >
-              
-                <thead>
-                    <tr class="title-head formheading ">
-                        <th class="col-form-span-label" align="center">	Entry No </th>
-                        <th class="col-form-span-label" align="center">Entry Date</th>   
-                        <th class="col-form-span-label" align="center">Chq Type</th>   
-                        <th class="col-form-span-label" align="center">Cheque No</th>    
-                        <th class="col-form-span-label" align="center">Cheque Date</th>   
-                        <th class="col-form-span-label" align="center">Amount</th>   
-                         
-                    </tr>
-                </thead>
-                @if (bankrecList.length > 0) {
-<tbody>
-                    @for (data of bankrecList; track data) {
-<tr>
-                        <td ><span  class="col-form-span-label anchor-link " (click)="Openprint(data.ENTRYNO,data.STATUS)" >{{data.ENTRYNO}}</span> </td> 
-                        <td  ><span class="col-form-span-label">{{data.ENTRYDT}}</span>  </td>                             
-                        <td  ><span class="col-form-span-label">{{data.STATUS}}</span>  </td> 
-                        <td ><span class="col-form-span-label">{{data.CHEQUENO}}</span>  </td> 
-                        <td ><span class="col-form-span-label">{{data.CHEQUEDT}}</span>  </td>
-                        <td  ><span class="col-form-span-label">{{data.ACTUALAMOUNT|number:'2.2-4'}}</span>  </td> 
-                     </tr>
-}
-               </tbody>
-}
-            </table>
-            </div>
-            <div style="float: right;" >
-                <span class="col-form-span-label"><b>
-                     {{RecTotal}} </b> </span>
-            </div>
-            </div>
-             <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-                    
+  </div>
+
+  @if (bankrecList.length > 0) {
+    <div class="fk-kpis">
+      <div class="card fk-kpi"><div class="k">Opening balance</div><div class="v">{{lblOpBal}}</div></div>
+      <div class="card fk-kpi"><div class="k">Dr amount</div><div class="v">{{CurrentDrBal}}</div></div>
+      <div class="card fk-kpi"><div class="k">Cr amount</div><div class="v">{{CurrentCrbal}}</div></div>
+      <div class="card fk-kpi"><div class="k">Closing balance</div><div class="v">{{lblclbal}}</div></div>
+      <div class="card fk-kpi"><div class="k">Difference amount</div><div class="v"><b>{{lbldiff}}</b></div></div>
     </div>
-}  
-    @if (bankrecList.length > 0) {
-<div class="row no-gutters"  >
-        <div class="col-sm-12 col-md-1 col-lg-1">
+
+    <div class="fk-2col">
+      <div class="card sec">
+        <div class="toolbar"><span><span class="count">Cheques issued, not cleared</span><span class="sub-t"> &middot; {{IssueTotal}}</span></span></div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Entry no.</th><th>Entry date</th><th>Chq type</th><th>Cheque no.</th><th>Cheque date</th><th class="num">Amount</th></tr></thead>
+            <tbody>
+              @for (data of bankpayList; track $index) {
+                <tr>
+                  <td class="mono"><a class="lnk" (click)="Openprint(data.ENTRYNO,data.STATUS)">{{data.ENTRYNO}}</a></td>
+                  <td>{{data.ENTRYDT}}</td>
+                  <td>{{data.STATUS}}</td>
+                  <td class="mono">{{data.CHEQUENO}}</td>
+                  <td>{{data.CHEQUEDT}}</td>
+                  <td class="num">{{data.ACTUALAMOUNT|number:'2.2-4'}}</td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="6">Nothing outstanding.</td></tr>
+              }
+            </tbody>
+          </table>
         </div>
-        <div class="col-sm-12 col-md-10 col-lg-10">
-            <div style="float:right" class="row no-gutters">
-            
-                <table  class="table  table-sm-new bgwhite" style="width:325px">     
-                       
-                    <tr>
-                      <td class="col-form-span-label" align="right">Opening Balance:</td>
-                      <td class="col-form-span-label" align="left">{{lblOpBal}}</td>
-                     
-                    </tr>
-                    <tr>
-                      <td  class="col-form-span-label" align="right">Dr. Amt :</td>
-                      <td  class="col-form-span-label" align="left">{{CurrentDrBal}} </td>
-                      <td  class="col-form-span-label" align="right">Cr. Amt :</td>
-                      <td  class="col-form-span-label" align="left">{{CurrentCrbal}} </td>
-                    </tr>
-                    <tr>
-                        <td  class="col-form-span-label" align="right">Closing Balance  :</td>
-                        <td  class="col-form-span-label" align="left">{{lblclbal}} </td>
-                      
-                      </tr>
-                      <tr>
-                        <td  class="col-form-span-label" align="right">Difference Amount:</td>
-                        <td  class="col-form-span-label" align="left">{{lbldiff}} </td>
-                      
-                      </tr>
-              </table>
-            </div>
-         
+      </div>
+      <div class="card sec">
+        <div class="toolbar"><span><span class="count">Cheques received, not cleared</span><span class="sub-t"> &middot; {{RecTotal}}</span></span></div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Entry no.</th><th>Entry date</th><th>Chq type</th><th>Cheque no.</th><th>Cheque date</th><th class="num">Amount</th></tr></thead>
+            <tbody>
+              @for (data of bankrecList; track $index) {
+                <tr>
+                  <td class="mono"><a class="lnk" (click)="Openprint(data.ENTRYNO,data.STATUS)">{{data.ENTRYNO}}</a></td>
+                  <td>{{data.ENTRYDT}}</td>
+                  <td>{{data.STATUS}}</td>
+                  <td class="mono">{{data.CHEQUENO}}</td>
+                  <td>{{data.CHEQUEDT}}</td>
+                  <td class="num">{{data.ACTUALAMOUNT|number:'2.2-4'}}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-        <div class="col-sm-12 col-md-10 col-lg-10" >
-            <div style="float:center" class="row no-gutters">
-                <table  class="table  table-sm-new bgwhite" > 
-                    <tr>
-                        <td align="center">
-                            <button uiBtn variant="default" size="sm" type="submit" (click)="ExportOutstand()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Outstanding</span></button>
-            <button uiBtn variant="default" size="sm" type="reset"> <span class="col-form-span-label" (click)="Exportrecstatement();"><i class="fa fa-ban"></i> Statement</span></button>
-                        </td>
-                    </tr>
-                </table>
-                </div>
-        </div>
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div> 
-            </div>
-}
+      </div>
+    </div>
+  }
 </div>
-
-

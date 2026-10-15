@@ -11,59 +11,9 @@ import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-credit-note',
     templateUrl: './credit-note.component.html',
+    // Page kit is global (src/styles/kit); crtnote-page.css is MP's area sheet, copied locally.
+    styleUrls: ['./crtnote-page.css'],
     styles: [`
-a:hover,a:focus{
-    text-decoration: none;
-    outline: none;
-}
-.tab .nav-tabs {
-    border-bottom:0 none;
-}
-.tab .nav-tabs li{
-    margin-right: 10px;
-}
-.tab .nav-tabs li a{
-    position: relative;
-    padding: 4px;
-    color: #fff;
-    font-size: 11px;
-    z-index: 1;
-    font-family:verdana;
-    font-weight:bold
-}
-.tab .nav-tabs li a:hover{
-    background:transparent;
-    border:1px solid transparent;
-    color: var(--mp-soft, #444);
-}
- .tab .nav-tabs li a:before{
-    content: "";
-    width:100%;
-    height:100%;
-    position:absolute;
-    bottom: 5px;
-    left:-1px;
-    font-size:11px;
-
-    background-color: #379b50;
-    border: 1px solid #d3d3d3;
-    border-bottom: 0px none;
-    border-radius: 10px 10px 0 0;
-    transform-origin: left center 0;
-    transform: perspective(3px) rotateX(5deg);
-    z-index:-1;
-}
-.tab .nav-tabs li a.active:before{
-    background: var(--mp-surface, #fff);
-}
-.tab .nav-tabs li a.active,
-.tab .nav-tabs li a.active:focus,
-.tab .nav-tabs li a.active:hover{
-    border:1px solid transparent;
-    background:transparent;
-    color: var(--mp-ink, #212529);
-    z-index: 2;
-}
 #autoresizing {
     display: block;
     overflow: hidden;
@@ -77,6 +27,10 @@ export class CreditNoteComponent implements OnInit {
     /*  Called by the template but never implemented on this page (pre-existing). Declared so the
         production (AOT) build compiles; clicking it does nothing, as before, and logs a warning.  */
     Calcamount(..._args: any[]): any { console.warn('CreditNoteComponent: Calcamount is not implemented on this page'); }
+    // UI-only: which tab is shown. Presentation state added for the monochrome
+    // segmented-tab restyle (replaces the bootstrap data-toggle="tab" markup);
+    // no data/behaviour change.
+    activeTab: string = 'zero';
     Header: string = "Credit Note ";
     TotalAmount = 0;
     checkno

@@ -8,10 +8,11 @@ import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/shared/service/dataService';
 import { JobprofitserviceService } from 'src/app/shared/service/jobprofitservice.service';
 import {Configuration}  from '../../../app.constants'
+import { FIN_PERIODS, FinPeriod, finRange, finDp } from '../../Accreport/fin-kit';
 @Component({
     selector: 'app-consigneejobprofit',
     templateUrl: './consignee_jobprofit.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' }, // Links: import-page + accreport-page are global (src/styles/kit)
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -184,5 +185,16 @@ export class ConsigneeJobprofitComponent implements OnInit {
         this.ToDate = "";
         this.modetype = "SEA";
     
+    }
+
+    // ---- redesign: quick period presets (same my-date-picker model shape the pickers emit) ----
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.FromDate = finDp(r.from, this.myDatePickerOptions.dateFormat);
+        this.ToDate = finDp(r.to, this.myDatePickerOptions.dateFormat);
     }
 }

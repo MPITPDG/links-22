@@ -12,7 +12,10 @@ import { FilterPipe } from 'ngx-filter-pipe';
 @Component({
   selector: 'app-proforma-invoice-search',
   templateUrl: './proforma-invoice-search.component.html',
-  styleUrls: ['./proforma-invoice-search.component.css'],
+  // Page kit recipe 1 (ported from MPERPNG-20): global .im-page kit (src/styles/kit) plus the
+  // component-local invoice-page.css (shared with Invoice) and the drawer rules in
+  // proforma-invoice-search.page.css. This page no longer uses the x-page theme (proforma-theme.css).
+  styleUrls: ['../invoice/invoice-page.css', './proforma-invoice-search.page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -38,6 +41,8 @@ export class ProformaInvoiceSearchComponent implements OnInit {
 
   order: string = 'CLIENTNAME';
   term: string = '';                 // quick filter over the loaded rows
+  PageActual: number = 1;            // kit pager page (reset when the filter changes)
+  checkbox: boolean = false;         // select-all in the 'Print all of a day' grid (was bound, never declared)
   reverse: boolean = false;
   sortedCollection: any[];
   clientable: any = []; exampleRadios1: string = 'INVOICENO'; client: string = ""; invoiceno: string = "";
@@ -282,6 +287,21 @@ export class ProformaInvoiceSearchComponent implements OnInit {
       })
   }
 
+  /*  'Print all of a day' -> Print. The template has always called this, but the method was
+      never written, so the button threw. It now opens the existing proforma print popup for
+      each ticked proforma (one window each); nothing ticked gives the same warning as Invoice. */
+  PrintInvoice() {
+    if (!this.printarray || this.printarray.length == 0) {
+      this._toasterService.toast("warning", "warning", "Select at least One Proforma No to Print.");
+      return false;
+    }
+    this.printarray.forEach((item: any) => {
+      window.open('./#/popup/Account-Proforma-Print/' + item.invoiceno + '/', 'Proforma Invoice Print ' + item.invoiceno,
+        'resizable=no,scrollbars=no,width=800,height=450,status=no');
+    });
+    return true;
+  }
+
   getCheckboxValues(event, data) {
     var index = this.printarray.findIndex(x => x.invoiceno == data);
     if (event) {
@@ -334,4 +354,49 @@ reset(){
   this.amount=""
   this.printall_date = ""
  }
+  /* ---- kit pager + export (from MPERPNG-20, additive). Rows are the loaded list after the
+     Links quick filter (term) and the column sort, as the old filter/orderBy/paginate pipes
+     gave them; select-all still covers every loaded row. ---- */
+  readonly pageSize = 25;
+  get filteredRows(): any[] {
+    const rows = this.Searchdata_list || [];
+    return this.term ? (this.filterPipe.transform(rows, this.term) || []) : rows;
+  }
+  get sortedRows(): any[] {
+    return this.orderPipe.transform(this.filteredRows, this.order, this.reverse, true) || [];
+  }
+  get pageCount(): number { return Math.max(1, Math.ceil(this.filteredRows.length / this.pageSize)); }
+  get pg(): number { return Math.min(Math.max(1, this.PageActual || 1), this.pageCount); }
+  get pageRows(): any[] { const st = (this.pg - 1) * this.pageSize; return this.sortedRows.slice(st, st + this.pageSize); }
+  get rangeStart(): number { return this.filteredRows.length ? (this.pg - 1) * this.pageSize + 1 : 0; }
+  get rangeEnd(): number { return Math.min(this.pg * this.pageSize, this.filteredRows.length); }
+  get pageList(): number[] {
+    const n = this.pageCount, p = this.pg;
+    if (n <= 7) { return Array.from({ length: n }, (_, i) => i + 1); }
+    const out: number[] = [1];
+    const lo = Math.max(2, p - 1), hi = Math.min(n - 1, p + 1);
+    if (lo > 2) { out.push(0); }
+    for (let i = lo; i <= hi; i++) { out.push(i); }
+    if (hi < n - 1) { out.push(0); }
+    out.push(n);
+    return out;
+  }
+  goPage(p: number) { if (p >= 1 && p <= this.pageCount) { this.PageActual = p; } }
+  exportCsv() {
+    const all = this.exampleRadios1 == '6';
+    const head = all ? ['Inv No', 'Inv Date', 'Client', 'Bill type', 'Total amt']
+                     : ['Inv No', 'Inv Date', 'Client', 'Bill type', 'Invoiced on', 'Converted inv no'];
+    const rows = this.sortedRows.map(r => all ? [r.INV_NO, r.INV_DATE, r.EXP_NAME, r.INV_BILLTYPE, r.TOTALAMT]
+                     : [r.INV_NO, r.INV_DATE, r.EXP_NAME, r.INV_BILLTYPE, r.INVOICED_ON, r.CONVERTED_INV_NO]);
+    const q = (v: any) => '"' + ((v === null || v === undefined) ? '' : String(v)).replace(/"/g, '""') + '"';
+    const csv = [head, ...rows].map(line => line.map(q).join(',')).join('\r\n');
+    const d = new Date();
+    const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'proformas-' + stamp + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
 }

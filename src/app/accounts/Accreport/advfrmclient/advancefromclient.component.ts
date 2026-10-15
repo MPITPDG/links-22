@@ -7,10 +7,11 @@ import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/shared/service/dataService';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 
+import { FinPager, FinChart, finBars, finNum, finAmt } from '../fin-kit';
 @Component({
     selector: 'app-advancefromClient',
     templateUrl: './advancefromclient.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -103,7 +104,9 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
            this.dataForExcel.push(Object.values(row))
            this._loaderService.display(false)
           })
-           })
+          this._loaderService.display(false); // also clear the loader when no rows come back
+          this.failed = false; this.buildView();
+           }, () => { this._loaderService.display(false); this.failed = true; })
     }    
     
    
@@ -169,4 +172,25 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
       this.Exporter="";
       this.Type="JOBNO";
     }  
+
+    // ---- redesign: KPIs, chart and pager (display only; subtotal rows have TYPE == '') ----
+    failed = false;
+    pager = new FinPager<any>(10);
+    kpiDr = 0;
+    kpiCr = 0;
+    kpiClients = 0;
+    chart: FinChart | null = null;
+    fmt = finAmt;
+    buildView() {
+        const rows = this.ClAdvList || [];
+        this.pager.set(rows);
+        const lines = rows.filter(r => r.TYPE !== '');
+        this.kpiDr = lines.reduce((a, r) => a + finNum(r.DRAMT), 0);
+        this.kpiCr = lines.reduce((a, r) => a + finNum(r.CRAMT), 0);
+        const by = new Map<string, number>();
+        lines.forEach(r => { const k = (r.CLIENTNAME || '—').toString(); by.set(k, (by.get(k) || 0) + finNum(r.CRAMT) - finNum(r.DRAMT)); });
+        this.kpiClients = by.size;
+        const items = Array.from(by.entries()).map(([label, value]) => ({ label, value })).sort((a, b) => Math.abs(b.value) - Math.abs(a.value)).slice(0, 12);
+        this.chart = items.length ? finBars(items) : null;
+    }
 }

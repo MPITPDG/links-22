@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 @Component({
     selector: 'app-cheque-review',
     templateUrl: './cheque-preview.component.html',
+    // Page kit is global (src/styles/kit); kit-cheque scopes cheque-page.css.
+    host: { class: 'kit-cheque' },
     styles: [`
 
     .space{

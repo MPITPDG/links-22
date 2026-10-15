@@ -1,111 +1,51 @@
-<div class="br-page">
-
-  <!-- ========================================================= -->
-  <!-- SEARCH SCREEN -->
-  <!-- ========================================================= -->
+<!--
+  Accounts -> Bank reconciliation -> Reconciliation statement.
+  Search (bank, from, as-on; SearchData) -> statement: the books-to-bank equation (same bindings and
+  checks: crossCheckOk, agreesWithBank, bankOnlyUnavailable), then Outstanding / All / Bank-only views
+  (setActiveView, displayList, bankOnlyList) with the existing totals. Export: exportToExcel().
+  Links port of the MPERPNG-20 layout (kit .im-page + host class kit-accreport); .ts unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Bank reconciliation statement</h1>
+      <p>Balance as per books reconciled to the balance as per bank
+        @if (showResult) { &middot; @if (selectedBankName) { {{ selectedBankName }} &middot; } {{ FromDate }} &ndash; {{ ToDate }} }</p>
+    </div>
+    @if (showResult) {
+      <div class="tools">
+        <button class="btn g" type="button" (click)="BackToSearch()">Back to search</button>
+        <button class="btn g" type="button" (click)="exportToExcel()">Export to Excel</button>
+      </div>
+    }
+  </div>
 
   @if (!showResult) {
-<div>
-    <div class="br-card search-card-clean">
-      <div class="clean-row-layout">
-
-        <!-- BANK ACCOUNT -->
-        <div class="clean-field clean-bank">
-          <label>Bank Account <span class="br-req">*</span></label>
-          <ng-select
-            [items]="BankList"
-            bindLabel="acctname"
-            bindValue="acctcodename"
-            [(ngModel)]="Bank"
-            [appendTo]="'body'"
-            placeholder="Select Bank Account">
-          </ng-select>
+    <div class="card sec">
+      <div class="card-h"><h2>Bank and period</h2><span class="meta"><b>*</b> required</span></div>
+      <div class="filters fk-f">
+        <div class="f w2">
+          <label>Bank account <span class="req">*</span></label>
+          <ng-select [items]="BankList" bindLabel="acctname" bindValue="acctcodename" [(ngModel)]="Bank" [appendTo]="'body'" placeholder="Select bank account"></ng-select>
         </div>
-
-        <!-- FROM DATE -->
-        <div class="clean-field clean-date">
-          <label>From Date <span class="br-req">*</span></label>
-          <my-date-picker
-            name="FromDate"
-            (dateChanged)="FromDateChanged($event)"
-            [options]="myDatePickerOptions"
-            [selDate]="FromDate"
-            class="search-date-control">
-          </my-date-picker>
+        <div class="f">
+          <label>From date <span class="req">*</span></label>
+          <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)" [options]="myDatePickerOptions" [selDate]="FromDate"></my-date-picker>
         </div>
-
-        <!-- TO DATE -->
-        <div class="clean-field clean-date">
-          <label>As On Date <span class="br-req">*</span></label>
-          <my-date-picker
-            name="ToDate"
-            (dateChanged)="ToDateChanged($event)"
-            [options]="myDatePickerOptions"
-            [selDate]="ToDate"
-            class="search-date-control">
-          </my-date-picker>
+        <div class="f">
+          <label>As on date <span class="req">*</span></label>
+          <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)" [options]="myDatePickerOptions" [selDate]="ToDate"></my-date-picker>
         </div>
-
-        <!-- BUTTONS -->
-        <div class="clean-actions">
-          <button class="br-btn br-btn--primary" type="button" (click)="SearchData()">
-            <i class="fa fa-search"></i> Show Statement
-          </button>
-          <button class="br-btn br-btn--ghost" type="button" (click)="Reset()">
-            <i class="fa fa-refresh"></i> Reset
-          </button>
+        <div class="f act">
+          <button class="btn g" type="button" (click)="Reset()">Reset</button>
+          <button class="btn p" type="button" (click)="SearchData()">Show statement</button>
         </div>
-
       </div>
     </div>
-  </div>
-}
-
-  <!-- ========================================================= -->
-  <!-- RESULT SCREEN -->
-  <!-- ========================================================= -->
+  }
 
   @if (showResult) {
-<div class="br-result-view">
-
-    <!-- TOP BAR -->
-
-    <div class="br-topbar">
-
-      <button
-        class="br-back-btn"
-        type="button"
-        (click)="BackToSearch()">
-
-        <i class="fa fa-arrow-left"></i>
-        Back To Search
-
-      </button>
-
-      <div class="br-topbar-right">
-
-        <span class="br-record-chip">
-          {{ bankreconcilList.length }} Records
-        </span>
-
-        <button
-          class="br-btn br-btn--export"
-          type="button"
-          (click)="exportToExcel()">
-
-          <i class="fa fa-file-excel-o"></i>
-          Export To Excel
-
-        </button>
-
-      </div>
-
-    </div>
-
-    <!-- RECONCILIATION SCHEDULE (compact strip) -->
-
-    <div
-      class="br-card recon-schedule"
+    <div class="card sec"
       [title]="!crossCheckOk
         ? 'Schedule total doesn\'t match the outstanding transaction detail below — please review.'
         : (bankOnlyUnavailable
@@ -113,505 +53,118 @@
             : (agreesWithBank
                 ? ('Agrees with ' + outstandingCount + ' outstanding entr(ies) in the books, and every bank statement line is matched.')
                 : (bankOnlyCount + ' bank statement line(s) have no ledger entry — see the Bank-Only Items tab.')))">
-
-      <div class="recon-topline">
-
-        <div class="recon-title-group">
-          <span class="recon-schedule-title">Bank Reconciliation Statement</span>
-          @if (selectedBankName) {
-<span class="recon-meta">{{ selectedBankName }}</span>
-}
-          <span class="recon-meta">{{ FromDate }} – {{ ToDate }}</span>
-          <span class="recon-meta">Opening : {{ OpBalDr || OpBalCr || '—' }}</span>
-        </div>
-
-        <!-- Two independent checks, deliberately not collapsed into one badge:
-             crossCheckOk only proves the detail rows agree with the summary
-             (both ledger-side). agreesWithBank is the one that proves the bank
-             statement holds nothing the books are missing. -->
-        <span
-          class="recon-check-badge"
-          [ngClass]="!crossCheckOk ? 'warn' : (bankOnlyUnavailable ? 'warn' : (agreesWithBank ? 'ok' : 'warn'))">
-
-          <i class="fa" [ngClass]="(crossCheckOk && agreesWithBank && !bankOnlyUnavailable) ? 'fa-check-circle' : 'fa-exclamation-triangle'"></i>
-
-          @if (!crossCheckOk) {
-Mismatch
-}
-          @if (crossCheckOk && bankOnlyUnavailable) {
-Bank side not checked
-}
-          @if (crossCheckOk && !bankOnlyUnavailable && !agreesWithBank) {
-
-            {{ bankOnlyCount }} bank item(s) not in books
-          
-}
-          @if (crossCheckOk && !bankOnlyUnavailable && agreesWithBank) {
-Reconciled
-}
-
+      <div class="card-h">
+        <h2>Reconciliation</h2>
+        <span class="meta">
+          Opening: {{ OpBalDr || OpBalCr || '—' }} &middot;
+          @if (!crossCheckOk) { <span class="chip dash">Mismatch</span> }
+          @if (crossCheckOk && bankOnlyUnavailable) { <span class="chip dash">Bank side not checked</span> }
+          @if (crossCheckOk && !bankOnlyUnavailable && !agreesWithBank) { <span class="chip"><span class="dot"></span>{{ bankOnlyCount }} bank item(s) not in books</span> }
+          @if (crossCheckOk && !bankOnlyUnavailable && agreesWithBank) { <span class="chip solid">Reconciled</span> }
         </span>
-
       </div>
-
-      <div class="recon-equation">
-
-        <div class="recon-seg">
-          <span class="recon-seg-label">Balance as per Books</span>
-          <span class="recon-seg-val">{{ BalanceDr || BalanceCr || '—' }}</span>
-        </div>
-
-        <span class="recon-op">+</span>
-
-        <div class="recon-seg">
-          <span class="recon-seg-label">
-            Payments Not Presented
-            @if (outstandingCreditCount) {
-<em>({{ outstandingCreditCount }})</em>
-}
-          </span>
-          <span class="recon-seg-val add">{{ CrNotRef || '—' }}</span>
-        </div>
-
-        <span class="recon-op">−</span>
-
-        <div class="recon-seg">
-          <span class="recon-seg-label">
-            Deposits In Transit
-            @if (outstandingDebitCount) {
-<em>({{ outstandingDebitCount }})</em>
-}
-          </span>
-          <span class="recon-seg-val less">{{ DrNotRef || '—' }}</span>
-        </div>
-
-        <span class="recon-op">=</span>
-
-        <div class="recon-seg">
-          <span class="recon-seg-label">Derived Balance</span>
-          <span class="recon-seg-val">{{ DrRef || CrRef || 'Pending' }}</span>
-        </div>
-
-        <span class="recon-op">+</span>
-
-        <div class="recon-seg">
-          <span class="recon-seg-label">
-            Credited by Bank, Not in Books
-          </span>
-          <span class="recon-seg-val add">
-            {{ bankOnlyDepositTotal ? (bankOnlyDepositTotal | number:'1.2-2') + ' Dr' : '—' }}
-          </span>
-        </div>
-
-        <span class="recon-op">−</span>
-
-        <div class="recon-seg">
-          <span class="recon-seg-label">
-            Debited by Bank, Not in Books
-          </span>
-          <span class="recon-seg-val less">
-            {{ bankOnlyWithdrawalTotal ? (bankOnlyWithdrawalTotal | number:'1.2-2') + ' Cr' : '—' }}
-          </span>
-        </div>
-
-        <span class="recon-op">=</span>
-
-        <div class="recon-seg recon-seg--result">
-          <span class="recon-seg-label">Closing Balance as per Bank</span>
-          <span class="recon-seg-val result">
-            @if (!bankOnlyUnavailable) {
-{{ formatDrCr(bankClosingBalance) }}
-}
-            @if (bankOnlyUnavailable) {
-Not verified
-}
-          </span>
-        </div>
-
+      <div class="fk-kpis fk-eq">
+        <div class="fk-kpi"><div class="k">Balance as per books</div><div class="v">{{ BalanceDr || BalanceCr || '—' }}</div></div>
+        <div class="fk-kpi"><div class="k">+ Payments not presented @if (outstandingCreditCount) { ({{ outstandingCreditCount }}) }</div><div class="v">{{ CrNotRef || '—' }}</div></div>
+        <div class="fk-kpi"><div class="k">&minus; Deposits in transit @if (outstandingDebitCount) { ({{ outstandingDebitCount }}) }</div><div class="v">{{ DrNotRef || '—' }}</div></div>
+        <div class="fk-kpi"><div class="k">= Derived balance</div><div class="v">{{ DrRef || CrRef || 'Pending' }}</div></div>
       </div>
-
-      <!-- Only shown when it means something: the exact rupee value of bank
-           activity that has never been entered in the books. -->
+      <div class="fk-kpis fk-eq fk-eq-2">
+        <div class="fk-kpi"><div class="k">+ Credited by bank, not in books</div><div class="v">{{ bankOnlyDepositTotal ? (bankOnlyDepositTotal | number:'1.2-2') + ' Dr' : '—' }}</div></div>
+        <div class="fk-kpi"><div class="k">&minus; Debited by bank, not in books</div><div class="v">{{ bankOnlyWithdrawalTotal ? (bankOnlyWithdrawalTotal | number:'1.2-2') + ' Cr' : '—' }}</div></div>
+        <div class="fk-kpi"><div class="k">= Closing balance as per bank</div><div class="v"><b>@if (!bankOnlyUnavailable) { {{ formatDrCr(bankClosingBalance) }} } @else { Not verified }</b></div></div>
+      </div>
       @if (!bankOnlyUnavailable && !agreesWithBank) {
-<div class="recon-diffline">
-        <i class="fa fa-exclamation-triangle"></i>
-        Difference of <b>{{ formatDrCr(bankOnlyNet) }}</b> — {{ bankOnlyCount }} bank statement
-        line(s) have no matching ledger entry. Review them under
-        <b>Bank-Only Items</b> and pass the missing entries.
-      </div>
-}
-
+        <div class="fk-note">Difference of <b>{{ formatDrCr(bankOnlyNet) }}</b>: {{ bankOnlyCount }} bank statement line(s) have no matching ledger entry. Review them under <b>Bank-only items</b> and pass the missing entries.</div>
+      }
       @if (bankOnlyUnavailable) {
-<div class="recon-diffline">
-        <i class="fa fa-exclamation-triangle"></i>
-        Bank statement data could not be loaded, so the bank side of this
-        reconciliation has <b>not</b> been checked.
-      </div>
-}
-
+        <div class="fk-note">Bank statement data could not be loaded, so the bank side of this reconciliation has <b>not</b> been checked.</div>
+      }
     </div>
 
-    <!-- VIEW TOGGLE -->
-
-    <div class="br-view-toggle">
-
-      <button
-        class="toggle-btn"
-        [class.active]="activeView === 'OUTSTANDING'"
-        (click)="setActiveView('OUTSTANDING')">
-
-        Outstanding Items
-        <span class="toggle-count">{{ outstandingCount }}</span>
-
-      </button>
-
-      <button
-        class="toggle-btn"
-        [class.active]="activeView === 'ALL'"
-        (click)="setActiveView('ALL')">
-
-        All Entries
-        <span class="toggle-count">{{ bankreconcilList.length }}</span>
-
-      </button>
-
-      <button
-        class="toggle-btn"
-        [class.active]="activeView === 'BANKONLY'"
-        (click)="setActiveView('BANKONLY')">
-
-        Bank-Only Items
-        <span class="toggle-count" [class.toggle-count--alert]="bankOnlyCount > 0">
-          {{ bankOnlyUnavailable ? '?' : bankOnlyCount }}
-        </span>
-
-      </button>
-
-    </div>
-
-    <!-- TABLE CARD -->
-
-    @if (activeView !== 'BANKONLY') {
-<div class="br-card br-table-card">
-
-      <!-- TABLE -->
-
-      <div class="br-table-wrap">
-
-        <table class="br-table">
-
-          <thead>
-
-            <tr>
-
-              <th>
-                Entry No
-              </th>
-
-              <th>
-                Date
-              </th>
-
-              <th>
-                Type
-              </th>
-
-              <th>
-                Party / Reference
-              </th>
-
-              <th>
-                Chq Type
-              </th>
-
-              <th>
-                Cheque No
-              </th>
-
-              <th>
-                Cheque Dt
-              </th>
-
-              <th class="num">
-                Debit
-              </th>
-
-              <th class="num">
-                Credit
-              </th>
-
-              <th>
-                Clearance Status
-              </th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            @for (data of displayList; track data) {
-<tr
-             
-              [class.br-row--receipt]="data.STATUS === 'BR'"
-              [class.br-row--payment]="data.STATUS === 'BP'">
-
-              <!-- ENTRY -->
-
-              <td class="mono">
-                {{ data.ENTRYNO }}
-              </td>
-
-              <!-- DATE -->
-
-              <td class="mono">
-                {{ data.ENTRYDT }}
-              </td>
-
-              <!-- TYPE -->
-
-              <td>
-
-                <span
-                  class="br-badge"
-                  [ngClass]="data.STATUS === 'BR'
-                  ? 'br-badge--br'
-                  : 'br-badge--bp'">
-
-                  {{ data.STATUS }}
-
-                </span>
-
-              </td>
-
-              <!-- PARTY -->
-
-              <td>
-
-                <div
-                 class="br-party-name"
-                  [innerHTML]="data.PARTYNAME">
-                </div>
-
-                @if (data.CHEQUENO) {
-<div
-                  class="br-party-ref"
-                 >
-
-                  {{ data.CHEQUETYPE }}
-                  |
-                  {{ data.CHEQUENO }}
-
-                </div>
-}
-
-              </td>
-
-              <!-- CHQ TYPE -->
-
-              <td class="mono">
-                {{ data.CHEQUETYPE || '—' }}
-              </td>
-
-              <!-- CHQ NO -->
-
-              <td class="mono">
-                {{ data.CHEQUENO || '—' }}
-              </td>
-
-              <!-- CHQ DATE -->
-
-              <td class="mono">
-                {{ data.CHEQUEDT || '—' }}
-              </td>
-
-              <!-- DR -->
-
-              <td class="num dr-amt">
-
-                @if (data.DRAMT) {
-<span>
-                  {{ data.DRAMT | number:'1.2-2' }}
-                </span>
-}
-
-                @if (!data.DRAMT) {
-<span
-                 
-                  class="muted">
-                  —
-                </span>
-}
-
-              </td>
-
-              <!-- CR -->
-
-              <td class="num cr-amt">
-
-                @if (data.CRAMT) {
-<span>
-                  {{ data.CRAMT | number:'1.2-2' }}
-                </span>
-}
-
-                @if (!data.CRAMT) {
-<span
-                 
-                  class="muted">
-                  —
-                </span>
-}
-
-              </td>
-
-              <!-- CLEARANCE STATUS (read-only) -->
-
-              <td>
-
-                @if (data.CLEARANCEDATE) {
-<span
-                 
-                  class="br-cleared">
-                  <i class="fa fa-check-circle"></i>
-                  {{ data.CLEARANCEDATE }}
-                </span>
-}
-
-                @if (!data.CLEARANCEDATE) {
-<span
-                 
-                  class="br-uncleared">
-                  Not Cleared
-                </span>
-}
-
-              </td>
-
-            </tr>
-}
-
-            @if (displayList.length === 0) {
-<tr>
-              <td colspan="10" class="text-center text-muted">
-                @if (activeView === 'OUTSTANDING') {
-Nothing outstanding — fully reconciled for this period
-}
-                @if (activeView === 'ALL') {
-No entries found for this period
-}
-              </td>
-            </tr>
-}
-
-          </tbody>
-
-          @if (displayList.length > 0) {
-<tfoot>
-            <tr>
-              <td colspan="7" class="totals-label">Total</td>
-              <td class="num">{{ displayDebitTotal | number:'1.2-2' }}</td>
-              <td class="num">{{ displayCreditTotal | number:'1.2-2' }}</td>
-              <td></td>
-            </tr>
-          </tfoot>
-}
-
-        </table>
-
+    <div class="card sec">
+      <div class="toolbar">
+        <div class="fk-seg fk-tabs">
+          <button type="button" [class.on]="activeView === 'OUTSTANDING'" (click)="setActiveView('OUTSTANDING')">Outstanding &middot; {{ outstandingCount }}</button>
+          <button type="button" [class.on]="activeView === 'ALL'" (click)="setActiveView('ALL')">All entries &middot; {{ bankreconcilList.length }}</button>
+          <button type="button" [class.on]="activeView === 'BANKONLY'" (click)="setActiveView('BANKONLY')">Bank-only items &middot; {{ bankOnlyUnavailable ? '?' : bankOnlyCount }}</button>
+        </div>
+        <span class="count">{{ bankreconcilList.length }} records</span>
       </div>
 
+      @if (activeView !== 'BANKONLY') {
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Entry no.</th><th>Date</th><th>Type</th><th>Party / reference</th><th>Chq type</th><th>Cheque no.</th><th>Cheque date</th>
+                <th class="num">Debit</th><th class="num">Credit</th><th>Clearance</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (data of displayList; track $index) {
+                <tr>
+                  <td class="mono">{{ data.ENTRYNO }}</td>
+                  <td class="mono">{{ data.ENTRYDT }}</td>
+                  <td>@if (data.STATUS === 'BR') { <span class="chip solid">{{ data.STATUS }}</span> } @else { <span class="chip">{{ data.STATUS }}</span> }</td>
+                  <td>
+                    <div [innerHTML]="data.PARTYNAME"></div>
+                    @if (data.CHEQUENO) { <div class="fk-sub">{{ data.CHEQUETYPE }} | {{ data.CHEQUENO }}</div> }
+                  </td>
+                  <td class="mono">{{ data.CHEQUETYPE || '—' }}</td>
+                  <td class="mono">{{ data.CHEQUENO || '—' }}</td>
+                  <td class="mono">{{ data.CHEQUEDT || '—' }}</td>
+                  <td class="num">@if (data.DRAMT) { {{ data.DRAMT | number:'1.2-2' }} } @else { <span class="sub-t">—</span> }</td>
+                  <td class="num">@if (data.CRAMT) { {{ data.CRAMT | number:'1.2-2' }} } @else { <span class="sub-t">—</span> }</td>
+                  <td>@if (data.CLEARANCEDATE) { <span class="chip solid">Cleared {{ data.CLEARANCEDATE }}</span> } @else { <span class="chip dash">Not cleared</span> }</td>
+                </tr>
+              } @empty {
+                <tr><td colspan="10" class="empty">{{ activeView === 'OUTSTANDING' ? 'Nothing outstanding: fully reconciled for this period.' : 'No entries found for this period.' }}</td></tr>
+              }
+              @if (displayList.length > 0) {
+                <tr class="tot">
+                  <td colspan="7">Total</td>
+                  <td class="num">{{ displayDebitTotal | number:'1.2-2' }}</td>
+                  <td class="num">{{ displayCreditTotal | number:'1.2-2' }}</td>
+                  <td></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      @if (activeView === 'BANKONLY') {
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Bank ref no.</th><th class="num">Deposit</th><th class="num">Withdrawal</th><th>Clearance date</th></tr></thead>
+            <tbody>
+              @for (data of bankOnlyList; track $index) {
+                <tr>
+                  <td class="mono">{{ data.BANKREFNO || '—' }}</td>
+                  <td class="num">@if (data.DEPOSIT > 0) { {{ data.DEPOSIT | number:'1.2-2' }} } @else { <span class="sub-t">—</span> }</td>
+                  <td class="num">@if (data.WITHDRAWAL > 0) { {{ data.WITHDRAWAL | number:'1.2-2' }} } @else { <span class="sub-t">—</span> }</td>
+                  <td class="mono">{{ data.CLEARANCEDT || '—' }}</td>
+                </tr>
+              }
+              @if (bankOnlyList.length === 0 && !bankOnlyUnavailable) {
+                <tr><td colspan="4" class="empty">No unmatched bank statement lines: the bank agrees with the books.</td></tr>
+              }
+              @if (bankOnlyUnavailable) {
+                <tr><td colspan="4" class="empty">Bank statement data could not be loaded: the bank side was not checked.</td></tr>
+              }
+              @if (bankOnlyList.length > 0) {
+                <tr class="tot">
+                  <td>Total</td>
+                  <td class="num">{{ bankOnlyDepositTotal | number:'1.2-2' }}</td>
+                  <td class="num">{{ bankOnlyWithdrawalTotal | number:'1.2-2' }}</td>
+                  <td></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
     </div>
-}
-
-    <!-- BANK-ONLY ITEMS CARD -->
-    <!-- The bank leg of the reconciliation: statement lines with no ledger
-         counterpart. Columns mirror the UnReconcil tab on Search Upload
-         Statement, since both read Table2 of the same procedure. -->
-
-    @if (activeView === 'BANKONLY') {
-<div class="br-card br-table-card">
-
-      <div class="br-table-wrap">
-
-        <table class="br-table br-table--bankonly">
-
-          <thead>
-            <tr>
-              <th>Bank Ref No</th>
-              <th class="num">Deposit</th>
-              <th class="num">Withdrawal</th>
-              <th>Clearance Dt</th>
-            </tr>
-          </thead>
-
-          <tbody>
-
-            @for (data of bankOnlyList; track data) {
-<tr>
-
-              <td class="mono">{{ data.BANKREFNO || '—' }}</td>
-
-              <td class="num dr-amt">
-                @if (data.DEPOSIT > 0) {
-<span>{{ data.DEPOSIT | number:'1.2-2' }}</span>
-}
-                @if (!(data.DEPOSIT > 0)) {
-<span class="muted">—</span>
-}
-              </td>
-
-              <td class="num cr-amt">
-                @if (data.WITHDRAWAL > 0) {
-<span>{{ data.WITHDRAWAL | number:'1.2-2' }}</span>
-}
-                @if (!(data.WITHDRAWAL > 0)) {
-<span class="muted">—</span>
-}
-              </td>
-
-              <td class="mono">{{ data.CLEARANCEDT || '—' }}</td>
-
-            </tr>
-}
-
-            @if (bankOnlyList.length === 0 && !bankOnlyUnavailable) {
-<tr>
-              <td colspan="4" class="text-center text-muted">
-                No unmatched bank statement lines — the bank agrees with the books
-              </td>
-            </tr>
-}
-
-            @if (bankOnlyUnavailable) {
-<tr>
-              <td colspan="4" class="text-center text-muted">
-                Bank statement data could not be loaded — the bank side was not checked
-              </td>
-            </tr>
-}
-
-          </tbody>
-
-          @if (bankOnlyList.length > 0) {
-<tfoot>
-            <tr>
-              <td class="totals-label">Total</td>
-              <td class="num">{{ bankOnlyDepositTotal | number:'1.2-2' }}</td>
-              <td class="num">{{ bankOnlyWithdrawalTotal | number:'1.2-2' }}</td>
-              <td></td>
-            </tr>
-          </tfoot>
-}
-
-        </table>
-
-      </div>
-
-    </div>
-}
-
-  </div>
-}
-
+  }
 </div>

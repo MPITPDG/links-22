@@ -6,10 +6,11 @@ import { FormGroup, FormControl, Validators} from '@angular/forms';
 import { LoginService } from '../../shared/service/loginService';
 import {Configuration}  from '../../app.constants'
 import { LoaderService } from '../../shared/service/loader.service';
+import { EInvGrid } from './einvoice-grid';
 @Component({
     selector: 'app-einvoice-uploadirn',
     templateUrl: './einvoice-uploadirn.component.html',
-    styles: [],
+    styleUrls: ['./einvoice-page.css'], // Links: import-page.css is global (src/styles/kit)
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -39,6 +40,9 @@ import { LoaderService } from '../../shared/service/loader.service';
   @Output() public onUploadFinished = new EventEmitter();
   snackbar: any;
   data_table: any = [];
+  /** display-only filter / pager / CSV / on-page notice (see einvoice-grid.ts) */
+  grid = new EInvGrid(() => this.data_table, ['INVNO', 'CLIENTNAME', 'IRNNO', 'ACKNO', 'SUPTYPE']);
+  exportCsv() { this.grid.exportCsv('einvoice-irn-response', [['Inv no','INVNO'],['Inv date','INVDATE'],['Supply type','SUPTYPE'],['Client','CLIENTNAME'],['IRN no','IRNNO'],['Ack no','ACKNO'],['Ack dt','ACKDATE'],['JSON created by','JSON CREATED BY'],['Response updated by','RESPONSE UPDATED BY']] as Array<[string, string]>); }
     constructor(
         private _dataService: DataService,
         private http: HttpClient,
@@ -69,6 +73,8 @@ import { LoaderService } from '../../shared/service/loader.service';
             return false;
           }
           this._loaderService.display(true);
+          this.grid.loading = true;
+          const upname = this.selectedFile.name;
           const filedata=new FormData();
           filedata.append("file",this.selectedFile,this.selectedFile.name)
           filedata.append("transtype",this.rdbtype)
@@ -78,21 +84,29 @@ import { LoaderService } from '../../shared/service/loader.service';
           this.http.post(this.url,filedata)
          // this.http.post("http://localhost:45896/api/Accounts/UploadIRNFile",filedata)
           .subscribe((data: any) => {
-         
+            this.grid.loading = false;
             if(data.Table[0].STATUS=="100"){
               this.data_table=data.Table1;
               this._loaderService.display(false);
+              this.grid.say('ok', 'IRN response uploaded · ' + upname, data.Table[0].STATUSTXT);
               alert(data.Table[0].STATUSTXT);
             }
             else {
+              this.grid.say('err', 'IRN response not uploaded · ' + upname, data.Table[0].STATUSTXT);
               alert(data.Table[0].STATUSTXT);
             }
             this.selectedFile=null
             this._loaderService.display(false);
+            }, (err: any) => {
+              this.grid.loading = false;
+              this.grid.say('err', 'Upload failed · ' + upname, EInvGrid.errText(err));
+              this.selectedFile=null
+              this._loaderService.display(false);
             });
             this.myInputVariable.nativeElement.value=""
         }
         Reset(){
           this.data_table=[];
-              }    
+          this.grid.notice = null;
+              }
 }

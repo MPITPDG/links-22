@@ -8,10 +8,11 @@ import { DataService } from 'src/app/shared/service/dataService';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 
 
+import { FinPager, FinChart, finBars, finNum, finAmt } from '../fin-kit';
 @Component({
     selector: 'app-CashBookNotOver-search',
     templateUrl: './cashbooknotover-list.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -45,21 +46,23 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
                  }
               this._dataService.getData("Accounts/Acc_Rpt_NotOver_List", jsonList)
               .subscribe((data: any) => {
-               this.NotOverList = data.Table
+               this.NotOverList = data.Table || []
+               this.loading = false; this.buildView();
                this.exceldata_list= data.Table1;
-                this.TotLable=data.Table2[0].TOTALAMOUNT;
-                this.total=data.Table2[0].Totactualamount;
+                this.TotLable=data.Table2?.[0]?.TOTALAMOUNT; // guarded: Table2 can be empty
+                this.total=data.Table2?.[0]?.Totactualamount;
                //this.exceltotdata_list=data.Table2;
                this.exceldata_list.forEach(function(x){delete x.status});
                this.exceldata_list.forEach((row: any) => {
                  this.dataForExcel.push(Object.values(row))
                this._loaderService.display(false)
             })
+               this._loaderService.display(false) // also clear the loader when Table1 is empty
         //     this.exceltotdata_list.forEach((row: any) => {
         //         this.dataForTotExcel.push(Object.values(row))
         //       this._loaderService.display(false)
         //    })
-              })
+              }, () => { this.loading = false; this.failed = true; this._loaderService.display(false); })
   
 }
 
@@ -140,4 +143,23 @@ var jsoncmp = {
   } 
 
 
+
+    // ---- redesign: view state, KPIs, chart and pager (display only) ----
+    loading = true;
+    failed = false;
+    pager = new FinPager<any>(10);
+    kpiAmount = 0;
+    kpiBanks = 0;
+    chart: FinChart | null = null;
+    fmt = finAmt;
+    buildView() {
+        const rows = this.NotOverList || [];
+        this.pager.set(rows);
+        this.kpiAmount = rows.reduce((a, r) => a + finNum(r.actualamount), 0);
+        const by = new Map<string, number>();
+        rows.forEach(r => { const k = (r.bank || '—').toString(); by.set(k, (by.get(k) || 0) + finNum(r.actualamount)); });
+        this.kpiBanks = by.size;
+        const items = Array.from(by.entries()).map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value).slice(0, 12);
+        this.chart = items.length ? finBars(items) : null;
+    }
 }

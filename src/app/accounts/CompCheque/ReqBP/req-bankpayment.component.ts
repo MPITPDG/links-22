@@ -8,9 +8,10 @@ import { LoaderService } from 'src/app/shared/service/loader.service';
 import { LoginService } from 'src/app/shared/service/loginService';
 import { ToastCommonService } from 'src/app/shared/service/toastService';
 @Component({
-  selector: 'app-req-bankpayment',
-  templateUrl: './req-bankpayment.component.html',
-  styles: [],
+    selector: 'app-req-bankpayment',
+    templateUrl: './req-bankpayment.component.html',
+    // Page kit is global (src/styles/kit); kit-cheque scopes cheque-page.css.
+    host: { class: 'kit-cheque' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

@@ -10,7 +10,7 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-OutstandingOverseasClient',
     templateUrl: './rcbl-overseasagent.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -114,6 +114,7 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
         this.actstmtallList=data.Table8;
         this.actstmtalltotList=data.Table9; 
         this.workingList=data.Table10;  
+        this.dataForExcel = []; // reset: rows used to accumulate across exports
         this.workingList.forEach((row: any) => {
            this.dataForExcel.push(Object.values(row))
         });

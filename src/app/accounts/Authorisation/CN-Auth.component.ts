@@ -11,6 +11,9 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({
     templateUrl: 'CN-Auth.component.html',
+    // List recipe (ported from MPERPNG-20): global .im-page kit + the accreport add-on, which
+    // Links loads globally under the host class (MP: styleUrls import-page.css + accreport-page.css).
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -52,6 +55,7 @@ export class CNAuth implements OnInit {
             });
     }
       getdataforauth(){
+        this.loading = true;
         const jsonmaster = {
           cmpid: this._loginService.getLogin()[0].CMPID,
           cmp_code: this._loginService.getLogin()[0].CMPCODE,
@@ -60,19 +64,22 @@ export class CNAuth implements OnInit {
         }
         this._dataService.getData("Accounts/ACC_invoice_auth_list", jsonmaster)
           .subscribe((data: any) => {
-            this.Crtdata = data.Table;
+            this.Crtdata = (data && data.Table) || [];
+            this.newArray = []; this.checkbox = false; // fresh rows arrive unticked: drop the old selection so it is not re-sent
+            this.loading = false; this.failed = false;
             this.loaderService.display(false)
-          })
+          }, () => { this.loading = false; this.failed = true; this.loaderService.display(false); })
       }
       getCheckboxValues(event, data) {
         var index = this.newArray.findIndex(x => x.inoiceno == data);
         if (event) {
+          if (index >= 0) { return; } // already selected: do not add it twice
           let obj = {
             inoiceno: data
           }
           this.newArray.push(obj);
         }
-        else {
+        else if (index >= 0) { // fixed: index -1 (row not in the selection) used to splice(-1) and drop the LAST-ticked row
           this.newArray.splice(index, 1);
         }
       }
@@ -144,4 +151,8 @@ export class CNAuth implements OnInit {
         let toolbar = 'resizable=no,scrollbars=no,width=800,height=450,status=no,left=' + theLeft + ',top=' + theTop;
         window.open('./#/popup/Account-CreditNote-View/' + creditno + '/' , "CreditNote View", toolbar);
     }
+
+  // ---- redesign: list state (display only, from MPERPNG-20) ----
+  loading = true;
+  failed = false;
 }

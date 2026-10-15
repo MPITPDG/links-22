@@ -24,7 +24,10 @@ import { BankReconcilCashbookStatementExportService } from './bank-reconcil-cash
 @Component({
     selector: 'app-BankReconcil-cashbook-statement',
     templateUrl: './bank-reconcil-cashbook-statement.component.html',
-    styleUrls: ['./bank-reconcil-cashbook-statement.component.css'],
+    // MPERPNG-20 layout: the page kit (import-page / accreport-page) is GLOBAL in Links;
+    // the host class opts in. The old component .css is no longer referenced.
+    styleUrls: [],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

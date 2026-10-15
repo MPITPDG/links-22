@@ -11,7 +11,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 @Component({
     selector: 'app-RePrintCheque-Chequereport-search',
     templateUrl: './ReprintCheque-Assign-ChequeNo.component.html',
-    styles: [],
+    // Page kit is global (src/styles/kit); kit-cheque scopes cheque-page.css.
+    host: { class: 'kit-cheque' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -27,6 +28,9 @@ import { ActivatedRoute, Router } from '@angular/router';
     ListChq: any=[]; 
     newArray: any = [];
     checkbox: boolean;
+    readonly pageSize = 10;
+    page: number = 1;
+    Quick: string = '';
     Loadstatus:string;
     ChkStatus:string;
     SChequeNo:String;
@@ -446,4 +450,43 @@ import { ActivatedRoute, Router } from '@angular/router';
             // this.loaderService.display(false);
       }
 
+    
+    // ---------- list: quick filter, 10/page pager, CSV export (presentation only) ----------
+    get Filtered(): Array<any> {
+        const q = (this.Quick || '').trim().toLowerCase();
+        const list: Array<any> = (this.data_list) || [];
+        if (!q) { return list; }
+        return list.filter((r: any) => [r.PRINTSTATUS, r.ENTRYNO, r.CHEQUENO, r.PAYEENAME, r.CHEQUEDT, r.AMOUNT, r.RequestedBy, r.ENTRYDT].some(v => String(v == null ? '' : v).toLowerCase().indexOf(q) >= 0));
     }
+    get pageCount(): number { return Math.max(1, Math.ceil(this.Filtered.length / this.pageSize)); }
+    get curPage(): number { return Math.min(this.page, this.pageCount); }
+    get pageRows(): Array<any> { const s = (this.curPage - 1) * this.pageSize; return this.Filtered.slice(s, s + this.pageSize); }
+    get rangeStart(): number { return this.Filtered.length ? (this.curPage - 1) * this.pageSize + 1 : 0; }
+    get rangeEnd(): number { return Math.min(this.curPage * this.pageSize, this.Filtered.length); }
+    get pageList(): number[] {
+        const n = this.pageCount, p = this.curPage;
+        if (n <= 7) { return Array.from({ length: n }, (_, i) => i + 1); }
+        const out: number[] = [1];
+        const lo = Math.max(2, p - 1), hi = Math.min(n - 1, p + 1);
+        if (lo > 2) { out.push(0); }
+        for (let i = lo; i <= hi; i++) { out.push(i); }
+        if (hi < n - 1) { out.push(0); }
+        out.push(n);
+        return out;
+    }
+    goPage(p: number) { if (p >= 1 && p <= this.pageCount) { this.page = p; } }
+    exportCsv() {
+        const head = ['Status', 'Entry no', 'Cheque no', 'Payee name', 'Pay date', 'Amount', 'Requested by', 'Requested on'];
+        const rows = this.Filtered.map((r: any) => [r.PRINTSTATUS, r.ENTRYNO, r.CHEQUENO, r.PAYEENAME, r.CHEQUEDT, r.AMOUNT, r.RequestedBy, r.ENTRYDT]);
+        const q = (v: any) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+        const csv = [head, ...rows].map((l: any[]) => l.map(q).join(',')).join('\r\n');
+        const d = new Date();
+        const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+        const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'cheques-to-reprint' + '-' + stamp + '.csv';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
+}

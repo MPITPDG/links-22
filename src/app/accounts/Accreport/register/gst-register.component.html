@@ -1,117 +1,51 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>GST REGISTER</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Accounts -> Reports -> Register -> GSTR1 (GST register).
+  Download-only: ExportToExcel() -> Accounts/GstRegister queues the file, then routes to
+  /accounts/report/ReportDownload/:pkid (Report log view) where it is downloaded.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>GST register</h1>
+      <p>Branch-wise GST register (GSTR1) for a period &middot; generated in the background and downloaded from the Report log</p>
     </div>
-    <!-- <div class="row no-gutters">
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
+  </div>
 
-                <tr>
-                    <td class="col-form-span-heading" colspan="6">
-                        <b>{{PageName}}</b>
-                    </td>
-                </tr>
-                <tr >
-                    <td  class="width150">
-                        <span  class="col-form-span-label"><b>Branch</b> </span><span
-                        class="col-form-span-error">*</span>
-                    </td>
-                    <td colspan="4">
-                      
-                        <div class="leftlabel">
-                            <span class="col-form-span-label">
-                                <input type="radio" name="radioDisplay" value="ALL" [(ngModel)]="Branch" />&nbsp;All </span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <span class="col-form-span-label">
-                                <input type="radio" name="radioDisplay" value="1" [(ngModel)]="Branch"  />&nbsp;{{City}}</span>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2"><span class="col-form-span-label"><b>Date Wise</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                    <td><span class="col-form-span-label"><b>From</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                <td>              
-                    <my-date-picker name="FromDate" [options]="myDatePickerOptions"
-                        class="form-control"  [(ngModel)]="FromDate"   ></my-date-picker>
-                </td>
-                    <td><span class="col-form-span-label"><b>To </b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td>              
-                        <my-date-picker name="ToDate" [options]="myDatePickerOptions"
-                            class="form-control"  [(ngModel)]="ToDate"  ></my-date-picker>
-                    </td>
-                </tr>
-        
-
-                <tr>
-                    <td colspan="6" class="centerlabel">
-                                    <button uiBtn variant="default" size="sm" type="submit" (click)="ExportToExcel()"> <span
-                                    class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
-                                    Export To Excel </span></button>&nbsp;
-                        <button uiBtn variant="outline" size="sm" type="reset"> <span class="col-form-span-label"
-                                (click)="clear();"><i class="fa fa-ban"></i>Clear</span></button>
-                    </td>
-                </tr>
-            </table>
+  <div class="card sec">
+    <div class="card-h"><h2>Period and branch</h2><span class="meta"><b>*</b> required</span></div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Quick period</label>
+        <div class="fk-seg">
+          @for (p of periods; track p.key) {
+            <button type="button" [class.on]="period === p.key" (click)="setPeriod(p.key)">{{ p.label }}</button>
+          }
         </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
+      </div>
+      <div class="fld">
+        <label>From <span class="req">*</span></label>
+        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate" (dateChanged)="period = ''"></my-date-picker>
+      </div>
+      <div class="fld">
+        <label>To <span class="req">*</span></label>
+        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate" (dateChanged)="period = ''"></my-date-picker>
+      </div>
+      <div class="fld full">
+        <label>Branch <span class="req">*</span></label>
+        <div class="fk-opts">
+          <label><input type="radio" name="rdbcityAll" value="ALL" [(ngModel)]="Branch" /> All</label>
+          <label><input type="radio" name="rdbcityAll" value="" [(ngModel)]="Branch" /> {{ City }}</label>
         </div>
-    </div> -->
-    <div class="row no-gutters">
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td class="col-form-span-heading" colspan="4" style="text-align: left;">
-                        <b>GST Register</b>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Branch</b> </span><span class="col-form-span-error">*</span>
-                    </td>
-                    <td colspan="4">
-                        <div class="leftlabel">                         
-                            <span class="col-form-span-label">  <input type="radio" name="rdbcityAll" value="ALL" [(ngModel)]="Branch"  />&nbsp;All</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <span class="col-form-span-label"> <input type="radio" name="rdbcityAll" value="" [(ngModel)]="Branch" />&nbsp; {{City}} </span>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>From</b> </span><span class="col-form-span-error">*</span>
-                    </td>
-                    <td style="text-align: left;">
-                        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate" ></my-date-picker>
-                    </td>
-                    <td><span class="col-form-span-label"><b>To </b> </span><span class="col-form-span-error">*</span>
-                    </td>
-                    <td style="text-align: left;">
-                        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate" ></my-date-picker>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="6" class="centerlabel">
-                        <button uiBtn variant="default" size="sm" type="submit" (click)="ExportToExcel()"> <span class="col-form-span-label"><i class="fa fa-file-excel-o"></i> Export To Excel </span></button>&nbsp;
-                        <button uiBtn variant="outline" size="sm" type="reset"> <span class="col-form-span-label" (click)="clear();"><i class="fa fa-ban"></i>Clear</span></button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
+      </div>
     </div>
+    <div class="fk-note">The register is generated in the background. Once it is queued you are taken to the Report log view, where the file can be downloaded as soon as it is ready.</div>
+  </div>
 
+  <div class="bar">
+    <span class="note">Nothing is shown on this screen; the output is an Excel file.</span>
+    <div class="r">
+      <button class="btn g" type="button" (click)="clear(); period = ''">Clear</button>
+      <button class="btn p" type="button" (click)="ExportToExcel()">Export to Excel</button>
+    </div>
+  </div>
 </div>

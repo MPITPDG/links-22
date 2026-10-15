@@ -1,32 +1,26 @@
-<div class="animated fadeIn" >  
-    @if (displayType=='SEARCH') {
-<div class="row no-gutters" >
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{Header}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Accounts -> MIS -> Admin report -> Client / supplier register (route Type Client | Supp).
+  Download-only: the register downloads automatically when the page opens (ExporttoExcel() in
+  ngOnInit -> ACCT_MST_RPT_CLIENT_REGISTER / ACCT_USP_MST_RPT_SUPPLIER_REGISTER, workbook built
+  client-side). "Download again" calls the same method.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Type == 'Client' ? 'Client register' : 'Supplier register' }}</h1>
+      <p>Full {{ Type == 'Client' ? 'client' : 'supplier' }} master as an Excel workbook &middot; downloads automatically when this page opens</p>
     </div>
-}
-    <div class="row no-gutters" >
-        <div class="col-sm-12 col-md-3 col-lg-3">
+  </div>
 
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
+  <div class="card sec">
+    <div class="card-h"><h2>Export</h2>@if (displayType=='SEARCH') {<span class="meta">{{ Ondate }}</span>}</div>
+    <div class="fk-note">{{ ErrorMessage || 'Preparing the register…' }}</div>
+  </div>
 
-                <tr>
-                    <td class="col-form-span-heading" colspan="6"> <b>{{ErrorMessage}}</b> </td>
-           </tr>
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-            </div>
+  <div class="bar">
+    <span class="note">Your browser saves the file; nothing is listed on this screen.</span>
+    <div class="r">
+      <button class="btn p" type="button" (click)="ExporttoExcel()">Download again</button>
     </div>
+  </div>
 </div>

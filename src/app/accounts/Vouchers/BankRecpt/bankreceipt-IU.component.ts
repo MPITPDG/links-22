@@ -11,6 +11,7 @@ import { Configuration } from '../../../app.constants';
 
 @Component({
     templateUrl: 'bankreceipt-IU.component.html',
+    styleUrls: ['../vouchers-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

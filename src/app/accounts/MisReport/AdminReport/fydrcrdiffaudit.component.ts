@@ -9,7 +9,7 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-FyDrCrDiffAudit',
     templateUrl: './fydrcrdiffaudit.component.html',
-    styleUrls: ['./fydrcrdiffaudit.component.css'],
+    host: { class: 'kit-accreport' }, // Links: import-page + accreport-page are global (src/styles/kit)
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

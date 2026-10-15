@@ -1,65 +1,49 @@
-<div class="animated fadeIn">
-    <div class="container">
-        <!-- <div class="row" *ngIf="Searchdata_list.length==0"> -->
-            <div class="row" >
-            <div class="col-sm-3"></div>
-            <div class="col-sm-6">
-                <table class="table table-bordered table-sm-new bgwhite" style="font-family:  Verdana;font-size: 12px;">
-                    <tbody style='height:30px'>
-                        <tr>
-                            <td class="col-form-span-heading" colspan="5">
-                                CANCEL - CHEQUE
+<!--
+  Cancel cheque.
+  Monochrome page kit (import-page.css + ../cheque-page.css). BP no. + Search (GetReqNo), remark
+  and "Cancel this cheque" (UpdateChequeNo, with its confirm) are unchanged. The request entry
+  and cheque number GetReqNo already fetched are now shown, read-only.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Cancel cheque</h1>
+      <p>Cancel the cheque issued against a bank payment, with a reason</p>
+    </div>
+  </div>
 
-                            </td>
-                        </tr>
-                        <tr>
-                           
-                            <td >
-                                <span class="col-form-span-label width150"><b>Bank Payment No</b> </span>
-                               
-                            </td> 
-                             <td>
-                                <input type="text" class="form-control width150" maxlength="15" [(ngModel)]="BPNo" >
-                            </td>  
-                              <td>
-                                <button uiBtn variant="default" class="w-full" type="submit" (click)="GetReqNo()"><span
-                                    class="col-form-span-label"><i class="fa fa-search"></i> Search</span></button>
-                                      </td>
-                        </tr>
-                        
-                     
-                        <tr>
-                            
-
-                            <td>
-                                <span class="col-form-span-label width150" ><b>Remark</b> </span>
-                             
-                            </td>
-                            <td colspan="2">
-                                <!-- <input type="text" class="form-control width100" [(ngModel)]="Remark" > -->
-                                <textarea  class="form-control "[(ngModel)]="Remark" maxlength="8000" aria-multiline="true" ></textarea>
-                            </td>  
-
-                        </tr>
-                       
-                     <tr>
-                         <td>
-
-                         </td>
-                        <td colspan="2">
-                            <button uiBtn variant="outline" class="w-full" type="submit" (click)="UpdateChequeNo()"><span
-                                class="col-form-span-label"><i class="fa fa-ban"></i> Cancel This Cheque</span></button>
-                                  </td>
-                     </tr>
-                      
-                    
-                    </tbody>
-                </table>
-
-            </div>
-
-            <div class="col-sm-3"></div>        </div>
-  
-                     
-            </div>
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Bank payment</h2>
+      <span class="meta"><b>*</b> required</span>
+    </div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Bank payment no. <span class="req">*</span></label>
+        <div class="v-pair">
+          <input type="text" maxlength="15" [(ngModel)]="BPNo" (keyup.enter)="GetReqNo()">
+          <button class="btn g" type="submit" (click)="GetReqNo()">Search</button>
         </div>
+      </div>
+      <div class="fld">
+        <label>Request entry no.</label>
+        <input type="text" [value]="EntryNo || ''" readonly>
+      </div>
+      <div class="fld">
+        <label>Cheque no.</label>
+        <input type="text" [value]="ChequeNo || ''" readonly>
+      </div>
+      <div class="fld full">
+        <label>Remark <span class="req">*</span></label>
+        <textarea [(ngModel)]="Remark" maxlength="8000" aria-multiline="true"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">You will be asked to confirm before the cheque is cancelled.</span>
+    <div class="r">
+      <button class="btn p" type="submit" (click)="UpdateChequeNo()">Cancel this cheque</button>
+    </div>
+  </div>
+</div>

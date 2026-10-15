@@ -1,184 +1,179 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>{{Header| uppercase}}</strong>
-                </div>
-            </div>
-        </div>
+<!--
+  Print cheque - company bank payments ready to print.
+  Recipe 4 (print chrome). Opens on the first of our banks (legacy). Bank change (cheserchprint),
+  View available cheque no. (stock modal), Cheque status (cheqavailable), the per-row checkboxes,
+  bank-ref inputs and "Assign cheque no. to entry no." (payordergenrte) are unchanged.
+  Links: the bank-ref input stays disabled on 'Not Authorised' rows (Links guard).
+  Print mechanism: payordergenrte() routes to /accounts/CompCheque/prntchque/chqreview/... (the
+  cheque preview screen), which lays out and prints the cheque; that route and layout are untouched.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Print cheque</h1>
+      <p>Company bank payments ready to print: assign cheque numbers from stock, then preview and print</p>
     </div>
-    <div class="row no-gutters">
-        <div class="col-12 col-md-1 col-lg-1"> </div>
-        <div class="col-sm-12 col-md-10 col-lg-10">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td><span class="col-form-span-label"><b>Bank</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                <td>
-                    <select class="form-control width350"  [(ngModel)]="BankName" (ngModelChange)="cheserchprint()">
-                        <option value="">Please select</option>
-                        @for (d of BankList; track d) {
-<option  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
-}
-                    </select>
-                </td>.
-                <td colspan="2" align="center">
-                    <button uiBtn variant="default" size="sm" type="submit" (click)="addchequestock()">
-                        <span class="col-form-span-label"><i
-                                class="fa fa-dot-circle-o"></i>View Available Cheque No</span></button>
-                </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Starting Cheque No</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                <td colspan="3">
-                    <div style="display: inline-flex;">
-                    <input [(ngModel)]="start_chqno" type="text"  class="form-control width180" maxlength="40" >
-                    <button uiBtn variant="default" size="sm" type="submit" (click)="cheqavailable()">
-                        <span class="col-form-span-label"><i
-                                class="fa fa-dot-circle-o"></i>Cheque Status</span></button>&nbsp;&nbsp;
-                                <span class="col-form-span-label font-weight-bold">{{chkstatus}}</span>
-                            </div>  </td>
-                </tr>
-            </table>
+  </div>
+
+  <div class="card sec">
+    <div class="fields">
+      <div class="fld">
+        <label>Bank <span class="req">*</span></label>
+        <div class="v-pair">
+          <select [(ngModel)]="BankName" (ngModelChange)="cheserchprint()">
+            <option value="">Please select</option>
+            @for (d of BankList; track d) {
+              <option value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+            }
+          </select>
+          <button class="btn g" type="submit" (click)="addchequestock()">Available cheques</button>
         </div>
-        <div class="col-12 col-md-1 col-lg-1"> </div>
+      </div>
+      <div class="fld">
+        <label>Starting cheque no. <span class="req">*</span></label>
+        <div class="v-pair">
+          <input [(ngModel)]="start_chqno" type="text" maxlength="40">
+          <button class="btn g" type="submit" (click)="cheqavailable()">Cheque status</button>
+        </div>
+      </div>
+      @if (chkstatus) {
+        <div class="fld full">
+          <label>Status</label>
+          <b>{{chkstatus}}</b>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="fields">
+      <div class="fld full">
+        <label>Filter</label>
+        <input type="text" [(ngModel)]="Quick" (ngModelChange)="page = 1" placeholder="Entry no., cheque no., payee, requested by">
+      </div>
     </div>
 
-    <div class="row no-gutters">
-        <div class="col-12 col-md-1 col-lg-1"> </div>
-        <div class="col-sm-12 col-md-10 col-lg-10">
-            <div  style="height: 380px;overflow-y:auto;overflow-x: hidden;width: 100%;">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <thead >
-                    <tr  class="col-form-span-heading">
-                        <td class="col-form-span-label"></td >
-                        <td class="col-form-span-label font-weight-bold ">Status</td >
-                        <td class="col-form-span-label font-weight-bold ">Entry No</td                              >
-                        <td  class="col-form-span-label font-weight-bold ">Cheque No</td >
-                        <td  class="col-form-span-label font-weight-bold ">Cheque Type</td >
-                        <td  class="col-form-span-label font-weight-bold ">Payee Name</td >
-                        <td  class="col-form-span-label font-weight-bold ">Pay Date</td >
-                        <td  class="col-form-span-label font-weight-bold "> Amount</td >
-                        <td  class="col-form-span-label font-weight-bold ">Requested By</td >
-                        <td  class="col-form-span-label font-weight-bold ">Requested On</td >
-                        <td  class="col-form-span-label font-weight-bold ">Bank Ref No</td >
-                    </tr>
-                </thead>
-                @if (searvhptintlist.length>0) {
-<tbody >
-                    @for (obj of searvhptintlist |paginate: { itemsPerPage:20, currentPage: PageActual }; track obj) {
-<tr>
-                        <td class="col-form-span-label"><input type="checkbox" [(ngModel)]="obj.Checked"   [disabled]="obj.PRINTSTATUS=='Not Authorised'"
-                            (ngModelChange)="getCheckboxValues($event,obj.ENTRYNO,obj.CHEQUETYPE,obj.AMOUNT,obj.BANKREFNO)"> &nbsp;</td>
-                        <td><span class="col-form-span-label">{{obj.PRINTSTATUS}} </span>
-                        </td>
-                        <td><span class="col-form-span-label"  (click)="OpenView(obj.ENTRYNO)">{{obj.ENTRYNO}}</span></td>
-                        <td   > @if (obj.Checked != true) {
-<span class="col-form-span-label" >{{obj.CHEQUENO}}</span>
-}
-                            @if (obj.Checked==true && flag=='1') {
-<span [ngClass]="{'class1':CHEQUENO=='Not Available.', 'class2':CHEQUENO!='Not Available.'}">{{CHEQUENO}}</span>
-}
-                        </td>
-                        <td><span class="col-form-span-label">{{obj.CHEQUETYPE}}</span></td>
-                        <td><span class="col-form-span-label">{{obj.PAYEENAME}}</span></td>
-                        <td><span class="col-form-span-label">{{obj.CHEQUEDT}}</span></td>
-                        <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>
-                        <td><span class="col-form-span-label">{{obj.RequestedBy}}</span></td>
-                        <td><span class="col-form-span-label">{{obj.ENTRYDT}}</span></td>
-                        <!-- <td><span class="col-form-span-label">{{obj.BANKREFNO}}</span></td> -->
-                        <td class="col-form-span-label"> @if (obj.CHEQUETYPE!='') {
-<input [(ngModel)]="obj.BANKREFNO"  (change)="getbankrefno(obj.ENTRYNO,obj.BANKREFNO)" [disabled]="obj.PRINTSTATUS=='Not Authorised'" type="text" maxlenght="40" autofocus class="form-control width150">
-}
-                            @if (obj.Checked==true && (obj.CHEQUETYPE=='CHQ' || obj.CHEQUETYPE=='')) {
-<span [ngClass]="{'class1':StartCheck=='Not Available.', 'class2':StartCheck!='Not Available.'}" >{{BankRefNo}}</span>
-}</td>
-                    </tr>
-}
-
-                </tbody>
-}
-                <!-- <tr>
-                    <td colspan="9">
-                      <div class="row justify-content-center no-gutters"
-                        style="font-family:verdana;font-size: 11px;padding: 1px;">
-                        <pagination-controls (pageChange)="PageActual=$event" autoHide="true"></pagination-controls>
-                      </div>
-                    </td>
-                  </tr>  -->
-            </table>
-
-            </div>
-        </div>
-        <div class="col-12 col-md-1 col-lg-1"> </div>
+    <div class="toolbar">
+      <span>
+        <span class="count">{{ Filtered.length }} {{ Filtered.length === 1 ? 'payment' : 'payments' }}</span>
+        <span class="sub-t"> ready to print</span>
+      </span>
+      <span class="tb-r">
+        <button class="btn g" type="button" (click)="Quick = ''; page = 1">Clear</button>
+        <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!Filtered.length">Export</button>
+      </span>
     </div>
-    <div class="row no-gutters">
-        <div class="col-12 col-md-1 col-lg-1"> </div>
-        <div class="col-sm-12 col-md-10 col-lg-10">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td colspan="9">
-                      <div class="row justify-content-center no-gutters"
-                        style="font-family:verdana;font-size: 11px;padding: 1px;">
-                        <pagination-controls (pageChange)="PageActual=$event" autoHide="true"></pagination-controls>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td  colspan="4"  >
-                        <button uiBtn variant="default" size="sm" style="float: right;" type="submit" (click)="payordergenrte()">
-                            <span class="col-form-span-label"><i
-                                    class="fa fa-dot-circle-o"></i>Assign Cheque No to Entry No</span></button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-12 col-md-1 col-lg-1"> </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Status</th>
+            <th>Entry no.</th>
+            <th>Cheque no.</th>
+            <th>Cheque type</th>
+            <th>Payee name</th>
+            <th>Pay date</th>
+            <th class="num">Amount</th>
+            <th>Requested by</th>
+            <th>Requested on</th>
+            <th>Bank ref no.</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (obj of pageRows; track obj) {
+            <tr>
+              <td><input type="checkbox" [(ngModel)]="obj.Checked" [disabled]="obj.PRINTSTATUS=='Not Authorised'"
+                (ngModelChange)="getCheckboxValues($event,obj.ENTRYNO,obj.CHEQUETYPE,obj.AMOUNT,obj.BANKREFNO)"></td>
+              <td>
+                @if (obj.PRINTSTATUS == 'Not Authorised') {
+                  <span class="chip dash">{{obj.PRINTSTATUS}}</span>
+                } @else if (obj.PRINTSTATUS) {
+                  <span class="chip">{{obj.PRINTSTATUS}}</span>
+                }
+              </td>
+              <td><a class="lnk" (click)="OpenView(obj.ENTRYNO)">{{obj.ENTRYNO}}</a></td>
+              <td>
+                @if (obj.Checked != true) {
+                  <span class="mono">{{obj.CHEQUENO}}</span>
+                }
+                @if (obj.Checked==true && flag=='1') {
+                  <span [ngClass]="{'class1':CHEQUENO=='Not Available.', 'class2':CHEQUENO!='Not Available.'}">{{CHEQUENO}}</span>
+                }
+              </td>
+              <td>{{obj.CHEQUETYPE}}</td>
+              <td>{{obj.PAYEENAME}}</td>
+              <td>{{obj.CHEQUEDT}}</td>
+              <td class="num">{{obj.AMOUNT}}</td>
+              <td>{{obj.RequestedBy}}</td>
+              <td>{{obj.ENTRYDT}}</td>
+              <td>
+                @if (obj.CHEQUETYPE!='') {
+                  <input [(ngModel)]="obj.BANKREFNO" (change)="getbankrefno(obj.ENTRYNO,obj.BANKREFNO)" [disabled]="obj.PRINTSTATUS=='Not Authorised'" type="text" maxlength="40" autofocus>
+                }
+                @if (obj.Checked==true && (obj.CHEQUETYPE=='CHQ' || obj.CHEQUETYPE=='')) {
+                  <span [ngClass]="{'class1':StartCheck=='Not Available.', 'class2':StartCheck!='Not Available.'}">{{BankRefNo}}</span>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr><td class="empty" colspan="11">No bank payments are ready to print on this bank.</td></tr>
+          }
+        </tbody>
+      </table>
     </div>
-</div>
 
-
-<div class="modal" [style.display]="showModal_ChequenoList ? 'block' : 'none'">
-    <div class="modal-dialog modal-sm" role="document"  >
-        <div class="modal-content " >
-            <div class="modal-header formheading">
-                        <strong>CHEQUE STOCK LIST</strong>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                        <div class="col-12"  >
-                        <table class="table table-bordered table-sm-new bgwhite">
-                                    <thead style="text-align: center;">
-                                        <tr>
-                                            <th class="col-form-span-heading">Cheque No</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody >
-                                        @for (obj of cheque_nolist | paginate: { itemsPerPage: 10, currentPage: p2, id: 'second' }; track obj) {
-<tr>
-                                            <td class="col-form-span-label ">{{obj.CHEQUENO}}</td>
-                                        </tr>
-}
-                                    </tbody>
-
-                        </table>
-                       <span class="row justify-content-center no-gutters"
-                       style="font-family:verdana;font-size: 11px;padding: 1px;">
-                        <pagination-controls (pageChange)="p2 = $event" id="second" autoHide="true"></pagination-controls>
-
-                       </span>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer" style="border:none">
-                <div style="float: right;">
-                    <button uiBtn variant="outline" size="sm" type="reset"> <span class="col-form-span-label"
-                            (click)="close1()"><i class="fa fa-ban"></i>
-                            Close</span></button>
-                </div>
-              </div>
-        </div>
+    <div class="pager">
+      <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ Filtered.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="curPage <= 1" (click)="goPage(curPage - 1)" aria-label="Previous page">‹</button>
+        @for (p of pageList; track $index) {
+          @if (p === 0) {
+            <span class="gap">…</span>
+          } @else {
+            <button type="button" [class.on]="p === curPage" (click)="goPage(p)">{{ p }}</button>
+          }
+        }
+        <button type="button" [disabled]="curPage >= pageCount" (click)="goPage(curPage + 1)" aria-label="Next page">›</button>
+      </div>
     </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">Tick payments, set the starting cheque no., then assign to open the cheque preview.</span>
+    <div class="r">
+      <button class="btn p" type="submit" (click)="payordergenrte()">Assign cheque no. to entry no.</button>
+    </div>
+  </div>
+
+  <div class="modal v-modal" [style.display]="showModal_ChequenoList ? 'block' : 'none'">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="card-h">
+          <h2>Cheque stock</h2>
+          <span class="meta">{{ cheque_nolist?.length || 0 }} available</span>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>Cheque no.</th></tr>
+            </thead>
+            <tbody>
+              @for (obj of cheque_nolist | paginate: { itemsPerPage: 10, currentPage: p2, id: 'second' }; track obj) {
+                <tr><td class="mono">{{obj.CHEQUENO}}</td></tr>
+              } @empty {
+                <tr><td class="empty">No cheques in stock for this bank.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="v-actions">
+          <pagination-controls (pageChange)="p2 = $event" id="second" autoHide="true"></pagination-controls>
+          <span class="sp"></span>
+          <button class="btn g" type="reset" (click)="close1()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

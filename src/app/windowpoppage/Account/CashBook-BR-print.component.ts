@@ -9,6 +9,7 @@ import { param } from 'jquery';
 @Component({
   selector: 'app-cash-book-br-print',
   templateUrl: './CashBook-BR-print.component.html',
+  host: { class: 'kit-print' },
   styles: [`
   .dgHeader {
     border-right: black 1px solid;

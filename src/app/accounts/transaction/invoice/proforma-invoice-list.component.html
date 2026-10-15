@@ -1,82 +1,71 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-      <div class="col-sm-12">
-        <div class="card">
-          <div class="card-header formheading">
-            <strong>Proforma Invoice Print List</strong>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row no-gutters" >
-      <div class="col-md-1 col-lg-1 col-12" >
-      </div>
-      <div class="col-md-10 col-lg-10 col-12" >
-        <table>
-          <tr>
-            <td colspan="8">
-              <div class="input-group input-group-rounded"  style="float: right;width: 300px;font-family: verdana;font-size:11px;padding: 1px;">
-                <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-search"></i></span>
-                </div>
-                <input class="form-control" type="search" [(ngModel)]="searchString" autocomplete="off"
-                    placeholder="Search">
-            </div>
-            </td>
-          </tr>
-        </table>
-        <table class="table table-bordered table-sm-new "  style="overflow-y: auto;height: 00px;" >
-          <thead class="title-head formheading" >
-
-            <tr  style="white-space:nowrap;">
-              <!-- <th class="col-form-span-label"  style="  background-color: #004980; color: white;"><input type="checkbox"  [(ngModel)]='checkbox' (change)="checkAll($event)" /> &nbsp; </th> -->
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;">Trans Type</th>
-              <th class="col-form-span-label"  style="  background-color: #004980;color: white;" [class.active]="order === 'INV_CRTNO'" (click)="setOrder('INV_CRTNO')">  Inv No <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;" [class.active]="order === 'INV_CRTDT'" (click)="setOrder('INV_CRTDT')">  Inv Date <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span> </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;" [class.active]="order === 'CREATEDBY'" (click)="setOrder('CREATEDBY')">  Prepared By <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span>  </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;" [class.active]="order === 'INV_CRT_DAT'" (click)="setOrder('INV_CRT_DAT')">  Prepared On <span [hidden]="reverse">▼</span>   <span [hidden]="!reverse">▲</span> </th>
-              <th class="col-form-span-label"   style=" background-color:#004980; color: white;"[class.active]="order === 'CLIENTNAME'" (click)="setOrder('CLIENTNAME')">    Client <span [hidden]="reverse">▼</span> <span [hidden]="!reverse">▲</span>    </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;" [class.active]="order === 'TOTAL_AMT'" (click)="setOrder('TOTAL_AMT')">     Amount <span [hidden]="reverse">▼</span>  <span [hidden]="!reverse">▲</span>  </th>
-            </tr>
-          </thead>
-          <tbody class="bgwhite">
-            @for (obj of invoicedata | proformainvfilterpipe: searchString |orderBy: order:reverse:'case-insensitive'|paginate: { itemsPerPage:25, currentPage: PageActual }; track obj) {
-<tr
-             
-              >
-              <!-- <td class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.Checked"
-                  (ngModelChange)="getCheckboxValues($event,obj.INV_CRTNO)"> &nbsp; </td> -->
-              <td class="col-form-span-label">{{obj.TRNS_TYPE}}</td>
-              <td class="col-form-span-label" (click)="invoiceviewdata(obj.INV_CRTNO,template)">{{obj.INV_CRTNO}}</td>
-              <td class="col-form-span-label">{{obj.INV_CRTDT}}</td>
-              <td class="col-form-span-label">{{obj.CREATEDBY}}</td>
-              <td class="col-form-span-label">{{obj.INV_CRT_DAT}}</td>
-              <td class="col-form-span-label" [innerHTML]="obj.CLIENTNAME"></td>
-              <td class="col-form-span-label" style="text-align: right;">{{obj.TOTAL_AMT|number:'2.2-4'}}</td>
-            </tr>
-}
-          </tbody>
-          <tr>
-            <td colspan="8" class="right-text pr-2">
-              <!-- <button uiBtn variant="default" size="sm" type="submit" (click)="authorisedata()"> <span
-                  class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Authorize</span></button> -->
-              <!-- <button uiBtn variant="outline" size="sm" type="submit"  (click)="abortdata()">
-                <span class="col-form-span-label"><i class="fa fa-ban"></i>Abort</span></button> -->
-            </td>
-          </tr>
-          <tr>
-            <td colspan="8">
-              <div class="row justify-content-center no-gutters"
-                style="font-family:verdana;font-size: 11px;padding: 1px;">
-                <pagination-controls (pageChange)="PageActual=$event" autoHide="true"></pagination-controls>
-              </div>
-            </td>
-          </tr>
-        </table>
-
-      </div>
-      <div class="col-md-1 col-lg-1 col-12">
-      </div>
-
+<!--
+  Proforma invoice print list. Page kit recipe 1 (src/styles/kit/import-page.css +
+  ./invoice-page.css), ported from MPERPNG-20. Every ngModel, (click) handler, sort column
+  and row order is unchanged; only the bootstrap table chrome moved to the kit's page header,
+  toolbar, table.tbl and pager. Row click still opens the legacy print popup
+  (Account-ProformaInvoice-Print) exactly as before.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Proforma Invoice Print List</h1>
+      <p>Search, sort and open a proforma invoice for print.</p>
     </div>
   </div>
+
+  <div class="toolbar">
+    <span class="count">{{filteredRows.length}} invoice(s)</span>
+    <div class="tb-r">
+      <input class="form-control gis-filter" type="search" [(ngModel)]="searchString" (ngModelChange)="PageActual = 1" autocomplete="off" placeholder="Search">
+      <button class="btn g" type="button" (click)="exportCsv()"><i class="fa fa-download"></i> Export</button>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Trans Type</th>
+            <th class="gis-sort" [class.active]="order === 'INV_CRTNO'" (click)="setOrder('INV_CRTNO')">Inv No <span [hidden]="reverse">▼</span><span [hidden]="!reverse">▲</span></th>
+            <th class="gis-sort" [class.active]="order === 'INV_CRTDT'" (click)="setOrder('INV_CRTDT')">Inv Date <span [hidden]="reverse">▼</span><span [hidden]="!reverse">▲</span></th>
+            <th class="gis-sort" [class.active]="order === 'CREATEDBY'" (click)="setOrder('CREATEDBY')">Prepared By <span [hidden]="reverse">▼</span><span [hidden]="!reverse">▲</span></th>
+            <th class="gis-sort" [class.active]="order === 'INV_CRT_DAT'" (click)="setOrder('INV_CRT_DAT')">Prepared On <span [hidden]="reverse">▼</span><span [hidden]="!reverse">▲</span></th>
+            <th class="gis-sort" [class.active]="order === 'CLIENTNAME'" (click)="setOrder('CLIENTNAME')">Client <span [hidden]="reverse">▼</span><span [hidden]="!reverse">▲</span></th>
+            <th class="num gis-sort" [class.active]="order === 'TOTAL_AMT'" (click)="setOrder('TOTAL_AMT')">Amount <span [hidden]="reverse">▼</span><span [hidden]="!reverse">▲</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (!pageRows.length) {
+            <tr><td colspan="7" class="empty">{{ (invoicedata && invoicedata.length) ? 'No proforma invoice matches the search.' : 'No proforma invoices found.' }}</td></tr>
+          }
+          @for (obj of pageRows; track obj) {
+            <tr>
+              <td>{{obj.TRNS_TYPE}}</td>
+              <td class="mono"><a class="lnk" (click)="invoiceviewdata(obj.INV_CRTNO)">{{obj.INV_CRTNO}}</a></td>
+              <td>{{obj.INV_CRTDT}}</td>
+              <td>{{obj.CREATEDBY}}</td>
+              <td>{{obj.INV_CRT_DAT}}</td>
+              <td [innerHTML]="obj.CLIENTNAME"></td>
+              <td class="num">{{obj.TOTAL_AMT|number:'2.2-4'}}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ filteredRows.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="pg <= 1" (click)="goPage(pg - 1)" aria-label="Previous page">‹</button>
+        @for (p of pageList; track $index) {
+          @if (p === 0) {
+            <span class="gap">…</span>
+          } @else {
+            <button type="button" [class.on]="p === pg" (click)="goPage(p)">{{ p }}</button>
+          }
+        }
+        <button type="button" [disabled]="pg >= pageCount" (click)="goPage(pg + 1)" aria-label="Next page">›</button>
+      </div>
+    </div>
+  </div>
+</div>

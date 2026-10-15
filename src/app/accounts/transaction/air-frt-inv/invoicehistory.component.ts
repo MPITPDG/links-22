@@ -7,19 +7,18 @@ import { LoaderService } from '../../../shared/service/loader.service';
 import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/shared/service/dataService';
 @Component({
-  selector: 'app-invoicehistory',
-  templateUrl: './invoicehistory.component.html',
-  styles: [`
-  .anchor-link{
-    text-decoration:none !important
-  }
-  `],
+    selector: 'app-invoicehistory',
+    templateUrl: './invoicehistory.component.html',
+    // Page kit is global (src/styles/kit); air-frt-inv-page.css is MP's area sheet, copied locally.
+    styleUrls: ['./air-frt-inv-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class InvoicehistoryComponent implements OnInit {
   Header:string="AIRFREIGHT - INVOICE - HISTORY"
-  tablehistry: any;
+  tablehistry: any = [];
+  loading: boolean = true;
+  loadError: string = '';
   constructor(
     private _dataService: DataService,
     private _toasterService: ToastCommonService,
@@ -41,8 +40,12 @@ export class InvoicehistoryComponent implements OnInit {
     this._dataService.getData("Accounts/ACC_INV_MAWB_AIRFRT_CONS_PUR_LIST", jsoncmp)
       .subscribe((data: any) => {
         console.log(data)
+          this.loading = false
           this.tablehistry=data.Table
          // this.loaderService.display(false)
+      }, (err: any) => {
+          this.loading = false
+          this.loadError = (err && (err.message || err.statusText)) || 'request failed'
       })
   }
 
@@ -87,5 +90,42 @@ export class InvoicehistoryComponent implements OnInit {
     let theLeft = (screen.width / 2) - (780 / 2);
     let toolbar = 'resizable=no,scrollbars=no,width=800,height=450,status=no,left=' + theLeft + ',top=' + theTop;
     window.open('./#/popup/Account-PurchasePrint-InvoiceHistory/' + puchaseno + '/' , "Console Purchase Print", toolbar);
+  }
+
+  /* ---- kit pager + export (additive; data loading and actions unchanged) ---- */
+  readonly pageSize = 10;
+  page: number = 1;
+  get allRows(): any[] { return (this.tablehistry) || []; }
+  get pageCount(): number { return Math.max(1, Math.ceil(this.allRows.length / this.pageSize)); }
+  get pg(): number { return Math.min(Math.max(1, this.page), this.pageCount); }
+  get pageRows(): any[] { const st = (this.pg - 1) * this.pageSize; return this.allRows.slice(st, st + this.pageSize); }
+  get rangeStart(): number { return this.allRows.length ? (this.pg - 1) * this.pageSize + 1 : 0; }
+  get rangeEnd(): number { return Math.min(this.pg * this.pageSize, this.allRows.length); }
+  get pageList(): number[] {
+    const n = this.pageCount, p = this.pg;
+    if (n <= 7) { return Array.from({ length: n }, (_, i) => i + 1); }
+    const out: number[] = [1];
+    const lo = Math.max(2, p - 1), hi = Math.min(n - 1, p + 1);
+    if (lo > 2) { out.push(0); }
+    for (let i = lo; i <= hi; i++) { out.push(i); }
+    if (hi < n - 1) { out.push(0); }
+    out.push(n);
+    return out;
+  }
+  goPage(p: number) { if (p >= 1 && p <= this.pageCount) { this.page = p; } }
+  stripHtml(v: any): string { return String(v === null || v === undefined ? '' : v).replace(/<br\s*\/?>/gi, ' / ').replace(/<[^>]*>/g, '').trim(); }
+  exportCsv() {
+    const head = ['Frt.Inv No', 'Frt.Inv Dt', 'Profit Share No', 'Profit Share Dt', 'Frt.Pur No', 'Profit Share Pur No', 'Pur Dt', 'Exch. Rate', 'Console No', 'MAWB No', 'MAWB Dt', 'Created By', 'Created On'];
+    const rows = this.allRows.map(r => [r.IND_INV_NO, r.INV_DATE, r.IND_CN_NO, r.CN_DATE, r.CONS_PURCODE, r.CN_CONS_PURCODE, r.CONS_PURDT, r.EXCH_RATE, r.CONSOLENO, r.MAWBNO, r.MAWBDT, r.FULLNAME, r.CREATEDON].map(v => this.stripHtml(v)));
+    const q = (v: any) => '"' + String(v).replace(/"/g, '""') + '"';
+    const csv = [head, ...rows].map(line => line.map(q).join(',')).join('\r\n');
+    const d = new Date();
+    const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'air-freight-invoice-history-' + stamp + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
   }
 }

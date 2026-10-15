@@ -9,10 +9,11 @@ import { DataService } from 'src/app/shared/service/dataService';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 
+import { FIN_PERIODS, FinPeriod, finRange } from '../fin-kit';
 @Component({
     selector: 'app-ItemStatement',
     templateUrl: './item-stmt.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -105,7 +106,7 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 
         GetItemName(icode) {
             let updateItem = this.ItemList.find(item => item.ITEMCODE === icode);
-            this.ItemName=updateItem.ITEMACTNAME.split("|")[1];
+                        this.ItemName=updateItem?.ITEMACTNAME?.split("|")[1]; // guarded: clearing the select passed undefined
         }
         FromDateChanged(ev){
             this.FromDate=ev.formatted
@@ -151,4 +152,15 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
             this.loaderService.display(false);
       }
       download(){}
+    
+    // ---- redesign: quick period presets (set the same selDate strings the pickers already use) ----
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.FromDate = this._dataService.datechnge(r.from);
+        this.ToDate = this._dataService.datechnge(r.to);
     }
+}

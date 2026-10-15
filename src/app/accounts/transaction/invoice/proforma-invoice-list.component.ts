@@ -8,19 +8,11 @@ import { LoaderService } from '../../../shared/service/loader.service';
 import { OrderPipe } from 'ngx-order-pipe';
 import { FilterPipe } from 'ngx-filter-pipe';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import { ProformaInvfilterpipe } from './proformainvfilterpipe.pipe';
 @Component({
   templateUrl: 'proforma-invoice-list.component.html',
-  styles:[`
-  .ddddd  th {
-    border: 2px solid #c2cfd6 ;
-  }
-  th {
-    background: var(--mp-surface, white);
-    position: sticky;
-    top: 0; /* Don't forget this, required for the stickiness */
-    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
-  }
-  `],
+    // Page kit recipe 1 (ported from MPERPNG-20): global .im-page kit + component-local invoice-page.css.
+    styleUrls: ['./invoice-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -199,4 +191,45 @@ export class ProformaInvoicePrintList implements OnInit {
     let toolbar = 'resizable=no,scrollbars=no,width=800,height=450,status=no,left=' + theLeft + ',top=' + theTop;
     window.open('./#/popup/Account-ProformaInvoice-Print/' + Invoiceno + '/' , "Invoice View", toolbar);
 }
+  /* ---- kit pager + export (from MPERPNG-20, additive; the list, its search and sort are
+     unchanged). Links keeps its 25-row page and its PageActual page number. ---- */
+  readonly pageSize = 25;
+  private readonly proformaFilterPipe = new ProformaInvfilterpipe();
+  get filteredRows(): any[] {
+    return this.proformaFilterPipe.transform(this.invoicedata || [], this.searchString) || [];
+  }
+  get sortedRows(): any[] {
+    return this.orderPipe.transform(this.filteredRows, this.order, this.reverse, true) || [];
+  }
+  get pageCount(): number { return Math.max(1, Math.ceil(this.filteredRows.length / this.pageSize)); }
+  get pg(): number { return Math.min(Math.max(1, this.PageActual || 1), this.pageCount); }
+  get pageRows(): any[] { const st = (this.pg - 1) * this.pageSize; return this.sortedRows.slice(st, st + this.pageSize); }
+  get rangeStart(): number { return this.filteredRows.length ? (this.pg - 1) * this.pageSize + 1 : 0; }
+  get rangeEnd(): number { return Math.min(this.pg * this.pageSize, this.filteredRows.length); }
+  get pageList(): number[] {
+    const n = this.pageCount, p = this.pg;
+    if (n <= 7) { return Array.from({ length: n }, (_, i) => i + 1); }
+    const out: number[] = [1];
+    const lo = Math.max(2, p - 1), hi = Math.min(n - 1, p + 1);
+    if (lo > 2) { out.push(0); }
+    for (let i = lo; i <= hi; i++) { out.push(i); }
+    if (hi < n - 1) { out.push(0); }
+    out.push(n);
+    return out;
+  }
+  goPage(p: number) { if (p >= 1 && p <= this.pageCount) { this.PageActual = p; } }
+  exportCsv() {
+    const head = ['Trans Type', 'Inv No', 'Inv Date', 'Prepared By', 'Prepared On', 'Client', 'Amount'];
+    const rows = this.sortedRows.map(r => [r.TRNS_TYPE, r.INV_CRTNO, r.INV_CRTDT, r.CREATEDBY, r.INV_CRT_DAT, r.CLIENTNAME, r.TOTAL_AMT]);
+    const q = (v: any) => '"' + ((v === null || v === undefined) ? '' : String(v)).replace(/"/g, '""') + '"';
+    const csv = [head, ...rows].map(line => line.map(q).join(',')).join('\r\n');
+    const d = new Date();
+    const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'proforma-invoices-' + stamp + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
   }

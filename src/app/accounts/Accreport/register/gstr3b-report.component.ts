@@ -8,10 +8,12 @@ import { DataService } from 'src/app/shared/service/dataService';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 import { DatePipe } from '@angular/common';
 
+import { FIN_PERIODS, FinPeriod, finRange, finDp } from '../fin-kit';
 @Component({
   selector: 'app-gstr3b-report',
   templateUrl: './gstr3b-report.component.html',
-  styleUrls: ['./register-search.shared.css', './gstr3b-report.component.css'],
+    styleUrls: ['./gstr3b-report.component.css'],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -455,4 +457,15 @@ export class Gstr3bReportComponent implements OnInit {
     this.Searched = false;
     ['SUMMARY', 'NET', 'RCM', 'LEDGER', 'WARN'].forEach(k => this.clearFilter(k));
   }
+
+    // ---- redesign: quick period presets (same my-date-picker model shape the pickers emit) ----
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.FromDate = finDp(r.from, this.myDatePickerOptions.dateFormat);
+        this.ToDate = finDp(r.to, this.myDatePickerOptions.dateFormat);
+    }
 }

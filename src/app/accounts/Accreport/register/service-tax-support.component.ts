@@ -8,10 +8,11 @@ import { LoaderService } from '../../../shared/service/loader.service';
 import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/shared/service/dataService';
  
+import { FIN_PERIODS, FinPeriod, finRange, finDp } from '../fin-kit';
 @Component({
   selector: 'app-ServiceTax-register',
   templateUrl: './service-tax-support.component.html',
-  styles: [],
+  host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -74,4 +75,15 @@ export class serviceTaxSupport implements OnInit {
          // /accounts/report/register/ServiceTaxRegistersupport
        }
        clear(){}
+
+    // ---- redesign: quick period presets (same my-date-picker model shape the pickers emit) ----
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.FromDate = finDp(r.from, this.myDatePickerOptions.dateFormat);
+        this.ToDate = finDp(r.to, this.myDatePickerOptions.dateFormat);
+    }
 }

@@ -1,141 +1,194 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>{{Header}}</strong>
-                </div>
-            </div>
+<!--
+  Accounts -> MIS -> Job handler register.
+  Report recipe: filter card, KPIs, jobs-by-handler chart, per-handler summary and the job list
+  (both 10/page). Data: fn_Acc_MIS_JobHandler_Register (Mode SEARCH), loaded for the current week
+  on open. Export job numbers open the consignment view popup via ViewJob() (unchanged).
+  Excel keeps the existing export (ExportExcel).
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Header || 'Job handler register' }}</h1>
+      <p>Jobs opened per handler (sales person) and job type for a period</p>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="filters fk-f">
+      <div class="f w2">
+        <label>Period</label>
+        <div class="fk-seg">
+          @for (p of periods; track p.key) {
+            <button type="button" [class.on]="period === p.key" (click)="setPeriod(p.key)">{{ p.label }}</button>
+          }
         </div>
+      </div>
+      <div class="f">
+        <label>From <span class="req">*</span></label>
+        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate" (dateChanged)="period = ''"></my-date-picker>
+      </div>
+      <div class="f">
+        <label>To <span class="req">*</span></label>
+        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate" (dateChanged)="period = ''"></my-date-picker>
+      </div>
+      <div class="f">
+        <label>Sales person</label>
+        <ng-select [items]="SalesPersonList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" placeholder="-- All Sales Persons --" [(ngModel)]="SalesPerson"></ng-select>
+      </div>
+      <div class="f">
+        <label>Job type</label>
+        <select [(ngModel)]="JobType">
+          @for (t of JobTypeList; track $index) {
+            <option [value]="t.VALUEFIELD">{{t.TEXTFIELD}}</option>
+          }
+        </select>
+      </div>
+      <div class="f act">
+        <button class="btn g" type="button" (click)="Reset(); period = ''">Reset</button>
+        <button class="btn p" type="button" (click)="Search()">Search</button>
+      </div>
+    </div>
+  </div>
+
+  @if (failed) {
+    <div class="card fk-alert">The register could not be loaded. Try the search again.</div>
+  }
+  @if (searched && registerdata.length == 0) {
+    <div class="card fk-alert">No jobs found for the selected filters.</div>
+  }
+
+  @if (registerdata.length > 0) {
+    <div class="fk-kpis">
+      <div class="card fk-kpi"><div class="k">Jobs</div><div class="v">{{ registerdata.length }}</div></div>
+      <div class="card fk-kpi"><div class="k">Handlers</div><div class="v">{{ summary.length }}</div></div>
+      <div class="card fk-kpi"><div class="k">Export</div><div class="v">{{ kpi.EXPORT }}</div></div>
+      <div class="card fk-kpi"><div class="k">Import</div><div class="v">{{ kpi.IMPORT }}</div></div>
+      <div class="card fk-kpi"><div class="k">Misc</div><div class="v">{{ kpi.MISC }}</div></div>
     </div>
 
-    <div class="row no-gutters">
-        <div class="col-sm-12 col-md-2 col-lg-2"></div>
-        <div class="col-sm-12 col-md-8 col-lg-8">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr class="trbg">
-                    <td class="width120"><span class="col-form-span-label"><b>From</b></span>
-                        <span class="col-form-span-error">*</span></td>
-                    <td style="text-align: left;">
-                        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate"></my-date-picker>
-                    </td>
-                    <td class="width120"><span class="col-form-span-label"><b>To</b></span>
-                        <span class="col-form-span-error">*</span></td>
-                    <td style="text-align: left;">
-                        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate"></my-date-picker>
-                    </td>
-                </tr>
-                <tr class="trbg">
-                    <td><span class="col-form-span-label"><b>Sales Person</b></span></td>
-                    <td>
-                        <ng-select [items]="SalesPersonList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
-                            placeholder="-- All Sales Persons --" [(ngModel)]="SalesPerson" class="form-control">
-                        </ng-select>
-                    </td>
-                    <td><span class="col-form-span-label"><b>Job Type</b></span></td>
-                    <td>
-                        <select class="form-control" [(ngModel)]="JobType">
-                            @for (t of JobTypeList; track t) {
-<option [value]="t.VALUEFIELD">{{t.TEXTFIELD}}</option>
-}
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="4" class="centerlabel">
-                        <button uiBtn variant="default" size="sm" type="button" (click)="Search()">
-                            <span class="col-form-span-label"><i class="fa fa-search"></i> Search</span></button>&nbsp;
-                        <button uiBtn variant="default" size="sm" type="button" (click)="ExportExcel()" [disabled]="registerdata.length==0">
-                            <span class="col-form-span-label"><i class="fa fa-file-excel-o"></i> Excel</span></button>&nbsp;
-                        <button uiBtn variant="outline" size="sm" type="button" (click)="Reset()">
-                            <span class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-2 col-lg-2"></div>
+    <div class="card sec">
+      <div class="card-h"><h2>Jobs by handler</h2><span class="meta">top 12</span></div>
+      <div class="fk-chart">
+        @if (chart) {
+          <svg [attr.viewBox]="'0 0 ' + chart.w + ' ' + chart.h" role="img" aria-label="Jobs by handler">
+            @for (g of chart.grid; track $index) {
+              <line class="gl" [attr.x1]="chart.l" [attr.x2]="chart.w - 12" [attr.y1]="g.y" [attr.y2]="g.y"></line>
+              <text class="ax" [attr.x]="chart.l - 6" [attr.y]="g.y + 3" text-anchor="end">{{ g.label }}</text>
+            }
+            @for (b of chart.bars; track $index) {
+              <rect class="fb" [attr.x]="b.x" [attr.y]="b.y" [attr.width]="b.w" [attr.height]="b.h"><title>{{ b.label }}: {{ b.value }} jobs</title></rect>
+              <text class="ax" [attr.x]="b.lx" [attr.y]="b.ly" text-anchor="middle">{{ b.label }}</text>
+            }
+          </svg>
+        } @else {
+          <div class="empty">Nothing to chart.</div>
+        }
+      </div>
     </div>
 
-    <!-- per-handler summary -->
-    @if (summary.length > 0) {
-<div class="row no-gutters">
-        <div class="col-sm-12 col-md-3 col-lg-3"></div>
-        <div class="col-sm-12 col-md-6 col-lg-6">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <thead>
-                    <tr class="title-head formheading table-primary">
-                        <th class="col-form-span-label">Handler (Sales Person)</th>
-                        <th class="col-form-span-label jh-right">Export</th>
-                        <th class="col-form-span-label jh-right">Import</th>
-                        <th class="col-form-span-label jh-right">Misc</th>
-                        <th class="col-form-span-label jh-right">Total Jobs</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (s of summary; track s) {
-<tr>
-                        <td class="col-form-span-label">{{s.Handler}}</td>
-                        <td class="col-form-span-label jh-right">{{s.EXPORT}}</td>
-                        <td class="col-form-span-label jh-right">{{s.IMPORT}}</td>
-                        <td class="col-form-span-label jh-right">{{s.MISC}}</td>
-                        <td class="col-form-span-label jh-right"><b>{{s.Total}}</b></td>
-                    </tr>
-}
-                </tbody>
-            </table>
+    <div class="card sec">
+      <div class="card-h"><h2>Per handler</h2><span class="meta">{{ summary.length }} handlers</span></div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Handler (sales person)</th>
+              <th class="num">Export</th>
+              <th class="num">Import</th>
+              <th class="num">Misc</th>
+              <th class="num">Total jobs</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of sumPager.paged; track $index) {
+              <tr>
+                <td>{{s.Handler}}</td>
+                <td class="num">{{s.EXPORT}}</td>
+                <td class="num">{{s.IMPORT}}</td>
+                <td class="num">{{s.MISC}}</td>
+                <td class="num"><b>{{s.Total}}</b></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (sumPager.rows.length > sumPager.size) {
+        <div class="pager">
+          <span>Showing <b>{{ sumPager.from }}&ndash;{{ sumPager.to }}</b> of <b>{{ sumPager.rows.length }}</b></span>
+          <div class="pages">
+            <button type="button" [disabled]="sumPager.page === 1" (click)="sumPager.go(sumPager.page - 1)" aria-label="Previous page">&lsaquo;</button>
+            @for (p of sumPager.numbers; track $index) {
+              @if (p === '...') { <span class="gap">&hellip;</span> }
+              @else { <button type="button" [class.on]="p === sumPager.page" (click)="sumPager.go(p)">{{ p }}</button> }
+            }
+            <button type="button" [disabled]="sumPager.page === sumPager.total" (click)="sumPager.go(sumPager.page + 1)" aria-label="Next page">&rsaquo;</button>
+          </div>
         </div>
-        <div class="col-sm-12 col-md-3 col-lg-3"></div>
+      }
     </div>
-}
 
-    <!-- job list -->
-    @if (registerdata.length > 0) {
-<div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="jh-scroll">
-                <table class="table table-bordered table-sm-new bgwhite jh-table">
-                    <thead>
-                        <tr class="title-head formheading table-primary">
-                            <th class="col-form-span-label">#</th>
-                            <th class="col-form-span-label">Job Type</th>
-                            <th class="col-form-span-label">Job No</th>
-                            <th class="col-form-span-label">Job Date</th>
-                            <th class="col-form-span-label">Mode</th>
-                            <th class="col-form-span-label">Client</th>
-                            <th class="col-form-span-label">Handler</th>
-                            <th class="col-form-span-label">Controller</th>
-                            <th class="col-form-span-label">POL</th>
-                            <th class="col-form-span-label">POD</th>
-                            <th class="col-form-span-label">Agent</th>
-                            <th class="col-form-span-label">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (r of registerdata; track r; let i = $index) {
-<tr>
-                            <td class="col-form-span-label">{{i + 1}}</td>
-                            <td class="col-form-span-label">{{r['Job Type']}}</td>
-                            <td class="col-form-span-label" [ngClass]="{'anchor-link': r['Job Type']=='EXPORT'}" (click)="ViewJob(r)">{{r['Job No']}}</td>
-                            <td class="col-form-span-label">{{r['Job Date']}}</td>
-                            <td class="col-form-span-label">{{r['Mode']}}</td>
-                            <td class="col-form-span-label">{{r['Client']}}</td>
-                            <td class="col-form-span-label">{{r['Handler']}}</td>
-                            <td class="col-form-span-label">{{r['Controller']}}</td>
-                            <td class="col-form-span-label">{{r['POL']}}</td>
-                            <td class="col-form-span-label">{{r['POD']}}</td>
-                            <td class="col-form-span-label">{{r['Agent']}}</td>
-                            <td class="col-form-span-label" style="color: red;">{{r['Status']}}</td>
-                        </tr>
-}
-                    </tbody>
-                </table>
-            </div>
+    <div class="card sec">
+      <div class="toolbar">
+        <span><span class="count">{{ registerdata.length }} jobs</span></span>
+        <span class="tb-r"><button class="btn g" type="button" (click)="ExportExcel()" [disabled]="registerdata.length==0">Export</button></span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th class="num">#</th>
+              <th>Job type</th>
+              <th>Job no.</th>
+              <th>Job date</th>
+              <th>Mode</th>
+              <th>Client</th>
+              <th>Handler</th>
+              <th>Controller</th>
+              <th>POL</th>
+              <th>POD</th>
+              <th>Agent</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of pager.paged; track $index; let i = $index) {
+              <tr>
+                <td class="num">{{ pager.from + i }}</td>
+                <td>{{r['Job Type']}}</td>
+                <td>
+                  @if (r['Job Type']=='EXPORT') {
+                    <a href="javascript:void(0);" class="lnk" (click)="ViewJob(r)">{{r['Job No']}}</a>
+                  } @else {
+                    {{r['Job No']}}
+                  }
+                </td>
+                <td>{{r['Job Date']}}</td>
+                <td>{{r['Mode']}}</td>
+                <td>{{r['Client']}}</td>
+                <td>{{r['Handler']}}</td>
+                <td>{{r['Controller']}}</td>
+                <td>{{r['POL']}}</td>
+                <td>{{r['POD']}}</td>
+                <td>{{r['Agent']}}</td>
+                <td>@if (r['Status']) {<span class="chip">{{r['Status']}}</span>}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (pager.rows.length > pager.size) {
+        <div class="pager">
+          <span>Showing <b>{{ pager.from }}&ndash;{{ pager.to }}</b> of <b>{{ pager.rows.length }}</b></span>
+          <div class="pages">
+            <button type="button" [disabled]="pager.page === 1" (click)="pager.go(pager.page - 1)" aria-label="Previous page">&lsaquo;</button>
+            @for (p of pager.numbers; track $index) {
+              @if (p === '...') { <span class="gap">&hellip;</span> }
+              @else { <button type="button" [class.on]="p === pager.page" (click)="pager.go(p)">{{ p }}</button> }
+            }
+            <button type="button" [disabled]="pager.page === pager.total" (click)="pager.go(pager.page + 1)" aria-label="Next page">&rsaquo;</button>
+          </div>
         </div>
+      }
     </div>
-}
-    @if (searched && registerdata.length == 0) {
-<div class="row no-gutters">
-        <div class="col-sm-12 centerlabel"><span class="col-form-span-label">No jobs found for the selected filters.</span></div>
-    </div>
-}
+  }
 </div>

@@ -1,70 +1,54 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>{{Header| uppercase}}</strong>
-                </div>
-            </div>
-        </div>
+<!--
+  Cheque stock - add a cheque book range.
+  Monochrome page kit (import-page.css + ../cheque-page.css). Our bank, from / to cheque no.,
+  entry date, addchequestock() and resetchequestock() are unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Cheque stock</h1>
+      <p>Register a new range of cheque leaves against one of our banks</p>
     </div>
-    <div class="row no-gutters">
-        <div class="col-sm-12 col-md-3 col-lg-3"> </div>
-        <div class="col-sm-12 col-md-6 col-lg-6">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td class="col-form-span-heading" colspan="2">
-                        <b>Cheque Add</b>
-                    </td>
-                </tr>
-                <tr>
-                    <td ><span class="col-form-span-label"><b>Our Bank</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td >
-                        <select class="form-control"  [(ngModel)]="OurBank" >
-                            <option value="">Please select</option>
-                            @for (d of OurBankList; track d) {
-<option  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
-}
-                        </select>
-                    </td>
-                </tr>
-                 <tr>
-                    <td>
-                        <span class="col-form-span-label "><b>From Cheque No</b></span><span
-                        class="col-form-span-error">*</span> </td>
-                    <td>
-                        <input [(ngModel)]="from_chqno" type="text"  class="form-control width180" maxlength="40" >
-                    </td>                    
-                </tr>  
-                <tr>
-                    <td> <span class="col-form-span-label "><b>To Cheque No</b></span> <span
-                        class="col-form-span-error">*</span></td>
-                    <td>
-                        <input [(ngModel)]="to_chqno" type="text"   class="form-control width180" maxlength="40" >
-                    </td>
-                </tr> 
-                <tr>
-                    <td>
-                        <span class="col-form-span-label "><b> Cheque Entry Date</b></span><span
-                        class="col-form-span-error">*</span> </td>
-                    <td>
-                        <my-date-picker name="cheque_create_date" [options]="myDatePickerOptions" [(ngModel)]="cheque_create_date"></my-date-picker>
-                    </td>
-                </tr> 
-                <tr>
-                    <td colspan="2" align="center">
-                        <button uiBtn variant="default" size="sm" type="submit" (click)="addchequestock()">
-                            <span class="col-form-span-label"><i
-                                    class="fa fa-dot-circle-o"></i>Add</span></button>
-                        <button uiBtn variant="outline" size="sm" type="reset"> <span
-                                class="col-form-span-label" (click)="resetchequestock();"><i
-                                    class="fa fa-ban"></i> Reset</span></button>
-                    </td>
-                </tr>            
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-3 col-lg-3"> </div>
+    <div class="tools">
+      <button class="btn g" type="button" routerLink="/accounts/CompCheque/Cheque/search">Cheque stock list</button>
     </div>
+  </div>
 
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Cheque range</h2>
+      <span class="meta"><b>*</b> required</span>
     </div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Our bank <span class="req">*</span></label>
+        <select [(ngModel)]="OurBank">
+          <option value="">Please select</option>
+          @for (d of OurBankList; track d) {
+            <option value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>From cheque no. <span class="req">*</span></label>
+        <input [(ngModel)]="from_chqno" type="text" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>To cheque no. <span class="req">*</span></label>
+        <input [(ngModel)]="to_chqno" type="text" maxlength="40">
+      </div>
+      <div class="fld full">
+        <label>Cheque entry date <span class="req">*</span></label>
+        <my-date-picker name="cheque_create_date" [options]="myDatePickerOptions" [(ngModel)]="cheque_create_date"></my-date-picker>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose Add.</span>
+    <div class="r">
+      <button class="btn g" type="reset" (click)="resetchequestock();">Reset</button>
+      <button class="btn p" type="submit" (click)="addchequestock()">Add</button>
+    </div>
+  </div>
+</div>

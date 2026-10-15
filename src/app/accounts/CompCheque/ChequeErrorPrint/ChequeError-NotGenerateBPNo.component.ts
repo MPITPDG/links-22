@@ -10,7 +10,8 @@ import { environment } from  '../../../../environments/environment';
 @Component({
     selector: 'app-ChequeErrorPrint-ChequeError-search',
     templateUrl: './ChequeError-NotGenerateBPNo.component.html',
-    styles: [],
+    // Page kit is global (src/styles/kit); kit-cheque scopes cheque-page.css.
+    host: { class: 'kit-cheque' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -72,6 +73,12 @@ import { environment } from  '../../../../environments/environment';
         };
         this._dataService.getData("Accounts/Acc__ChequePrintError_Report", _jsonData)
         .subscribe((data: any) => {
+            // guard: an empty result used to throw on Table[0] and leave the loader spinning
+            if (!data || !data.Table || !data.Table.length) {
+                this._toasterService.toast('error', 'error', `Cheque No Doesnot Exist. Please Contact System Administrator`);
+                this.loaderService.display(false);
+                return;
+            }
             if (data.Table[0].STATUS == "-2") {
                this._toasterService.toast('error', 'error',`Cheque Cannot Be Cancel. Please Contact System Administrator`);  
                 this.loaderService.display(false);
@@ -98,6 +105,6 @@ import { environment } from  '../../../../environments/environment';
                     window.open(URL, "", toolbar);
                     this.loaderService.display(false);
             }
-        });
+        }, () => { this.loaderService.display(false); });
     }
 }

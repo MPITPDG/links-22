@@ -5,9 +5,11 @@ import { LoginService } from '../../shared/service/loginService';
 import { DataService } from '../../shared/service/dataService';
 
 @Component({
-  selector: 'app-creditnote-print',
-  templateUrl: './creditnote-print.component.html',
-  styles: [`
+    selector: 'app-creditnote-print',
+    templateUrl: './creditnote-print.component.html',
+    // Print chrome is global (src/styles/kit/acc-print-chrome.css), scoped by kit-print.
+    host: { class: 'kit-print' },
+    styles: [`
   p .MsoNormal{
     padding:0rem !important;
     margin:0rem !important

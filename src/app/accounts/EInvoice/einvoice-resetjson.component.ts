@@ -6,19 +6,14 @@ import { LoginService } from '../../shared/service/loginService';
 import { ToastCommonService } from '../../shared/service/toastService';
 import { LoaderService } from '../../shared/service/loader.service';
 import {Configuration}  from '../../app.constants'
+import { EInvGrid } from './einvoice-grid';
 
 @Component({
     selector: 'app-einvoice-resetjson',
     templateUrl: './einvoice-resetjson.component.html',
-    styles: [`
-    .green-text {
-        color: green; /* Adjust the styles as per your requirement */
-      }
-      .disabled-row {
-        opacity: 0.5; /* or any other styling to indicate a disabled state */
-        pointer-events: none; /* Disable pointer events */
-      }
-    `],
+    styleUrls: ['./einvoice-page.css'], // Links: import-page.css is global (src/styles/kit)
+    /* Links: B2CS rows stay unselectable (this rule worked in Links; MP's copy lost it to a stray comma) */
+    styles: [`.disabled-row { opacity: 0.5; pointer-events: none; }`],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -29,6 +24,9 @@ import {Configuration}  from '../../app.constants'
     rptdownloadurl:string;
     subheader:string="";
     JsonId:string="";
+    /** display-only filter / pager / CSV / on-page notice (see einvoice-grid.ts) */
+    grid = new EInvGrid(() => this.resetjsonlist, ['JSONFILENAME', 'INV_NO', 'CLIENT', 'SUPTYPE']);
+    exportCsv() { this.grid.exportCsv('einvoice-json', [['JSON file name','JSONFILENAME'],['Doc no','INV_NO'],['Doc date','INV_DATE'],['Client','CLIENT'],['Supply type','SUPTYPE'],['Taxable amt','TAXABLEAMT'],['Non taxable amt','NONTAXABLEAMT'],['IGST','IGST'],['CGST','CGST'],['SGST','SGST'],['Round-off amt','ROUNDOFFAMT'],['Total amount','TOTALAMT']] as Array<[string, string]>); }
     constructor(
         private _router: Router,
         private _dataService: DataService,
@@ -53,12 +51,19 @@ import {Configuration}  from '../../app.constants'
           CITYCODE: this._loginService.getLogin()[0].CITYCODE
         }
             this._loaderService.display(true);
+            this.grid.loading = true;
+            this.grid.loadError = '';
               this._dataService.getData("Accounts/ACC_EInvoice_ResetJsonList", jsonmaster)
           .subscribe((data: any) => {
             console.log(data)
             this.resetjsonlist = data.Table;
+            this.grid.loading = false;
             this._loaderService.display(false);
             
+          }, (err: any) => {
+            this.grid.loading = false;
+            this.grid.loadError = EInvGrid.errText(err);
+            this._loaderService.display(false);
           })
       }
       getCheckboxValuesold(event, jsonid,id,invno,i) {
@@ -172,6 +177,7 @@ import {Configuration}  from '../../app.constants'
                   .subscribe((data: any) => {
                     if(data.Table[0].STATUS=="100")
                     {
+                       this.grid.say('ok', 'JSON reset · file ' + this.JsonId, data.Table[0].STATUSMSG + '\nInvoices: ' + output1);
                        alert(data.Table[0].STATUSMSG);
                        this.GetResetJsonList();
                        this.newArray=[];
@@ -181,11 +187,15 @@ import {Configuration}  from '../../app.constants'
                       
                     }
                     else{
+                      this.grid.say('err', 'JSON not reset', (data.Table[0].STATUSMSG || 'No Json file to Reset !!') + '\nInvoices: ' + output1);
                       alert('No Json file to Reset !!');
                       this._loaderService.display(false);
                       return false;
                     }
                    
+                  }, (err: any) => {
+                    this.grid.say('err', 'Reset JSON failed', EInvGrid.errText(err));
+                    this._loaderService.display(false);
                   })
                 
               

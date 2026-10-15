@@ -1,229 +1,116 @@
-<div class="br-page">
-
-  <!-- ========================================================= -->
-  <!-- SEARCH -->
-  <!-- ========================================================= -->
+<!--
+  Accounts -> MIS -> Admin report -> FY debit / credit difference audit.
+  Report recipe on the kit. Submit() runs the audit; check types drill down into the affected
+  vouchers (Toggle / GetDetails). Export is the existing Excel export (ExportStatement).
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Header || 'Debit / credit difference audit' }}</h1>
+      <p>Vouchers whose debits and credits do not balance for a financial year
+        @if (cmpnyname) { &middot; {{ cmpnyname }} }</p>
+    </div>
+    @if (Searched) {
+      <div class="tools">
+        <button class="btn g" type="button" (click)="BackToSearch()">Back to search</button>
+        <button class="btn p" type="button" (click)="ExportStatement()">Export to Excel</button>
+      </div>
+    }
+  </div>
 
   @if (!Searched) {
-<div class="br-card search-card-clean">
-    <div class="clean-row-layout">
-
-      <!-- BRANCH -->
-      <div class="clean-field clean-branch">
-        <label>Branch</label>
-        <select class="form-control" name="Branch" [(ngModel)]="Branch">
-          @for (b of BranchList; track b) {
-<option value="{{b.CITYCODE1}}">{{b.CITYNAME}}</option>
-}
-        </select>
+    <div class="card sec">
+      <div class="card-h"><h2>Financial year and branch</h2><span class="meta"><b>*</b> required</span></div>
+      <div class="filters fk-f">
+        <div class="f">
+          <label>Branch</label>
+          <select name="Branch" [(ngModel)]="Branch">
+            @for (b of BranchList; track $index) {
+              <option value="{{b.CITYCODE1}}">{{b.CITYNAME}}</option>
+            }
+          </select>
+        </div>
+        <div class="f">
+          <label>FY start date <span class="req">*</span></label>
+          <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)" [options]="myDatePickerOptions" [selDate]="FromDate"></my-date-picker>
+        </div>
+        <div class="f">
+          <label>FY end date <span class="req">*</span></label>
+          <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)" [options]="myDatePickerOptions" [selDate]="ToDate"></my-date-picker>
+        </div>
+        <div class="f act">
+          <button class="btn p" type="button" (click)="Submit()">Run audit</button>
+        </div>
       </div>
-
-      <!-- FROM DATE -->
-      <div class="clean-field clean-date">
-        <label>F.Y. Start Date <span class="br-req">*</span></label>
-        <my-date-picker
-          name="FromDate"
-          (dateChanged)="FromDateChanged($event)"
-          [options]="myDatePickerOptions"
-          [selDate]="FromDate">
-        </my-date-picker>
-      </div>
-
-      <!-- TO DATE -->
-      <div class="clean-field clean-date">
-        <label>F.Y. End Date <span class="br-req">*</span></label>
-        <my-date-picker
-          name="ToDate"
-          (dateChanged)="ToDateChanged($event)"
-          [options]="myDatePickerOptions"
-          [selDate]="ToDate">
-        </my-date-picker>
-      </div>
-
-      <!-- SUBMIT -->
-      <div class="clean-actions">
-        <button class="br-btn br-btn--primary" type="button" (click)="Submit()">
-          <i class="fa fa-search"></i> Run Audit
-        </button>
-      </div>
-
     </div>
-  </div>
-}
-
-  <!-- ========================================================= -->
-  <!-- RESULT -->
-  <!-- ========================================================= -->
+  }
 
   @if (Searched) {
-<div class="br-result-view">
-
-    <!-- TOP BAR -->
-
-    <div class="br-topbar">
-
-      <div class="br-topbar-title">
-        <span class="pl-title">{{ Header }}</span>
-        @if (cmpnyname) {
-<span class="pl-meta">{{ cmpnyname }}</span>
-}
-      </div>
-
-      <div class="br-topbar-right">
-        <button class="br-back-btn" type="button" (click)="BackToSearch()">
-          <i class="fa fa-arrow-left"></i> Back To Search
-        </button>
-        <button class="br-btn br-btn--export" type="button" (click)="ExportStatement()">
-          <i class="fa fa-file-excel-o"></i> Export To Excel
-        </button>
-      </div>
-
-    </div>
-
-    <!-- SUMMARY STRIP -->
-
-    <div class="br-card recon-schedule">
-
-      <div class="recon-topline">
-
-        <div class="recon-title-group">
-          <span class="recon-schedule-title">Audit Summary</span>
-          <span class="recon-meta">{{ FromDate }} – {{ ToDate }}</span>
-          <span class="recon-meta">{{ BranchLabel }}</span>
-        </div>
-
-        <span
-          class="recon-check-badge"
-          [ngClass]="IsClean ? 'ok' : 'warn'">
-
-          <i class="fa" [ngClass]="IsClean ? 'fa-check-circle' : 'fa-exclamation-triangle'"></i>
-          {{ IsClean ? 'ALL CLEAR' : 'ISSUES FOUND' }}
-
+    <div class="card sec">
+      <div class="card-h">
+        <h2>Audit summary</h2>
+        <span class="meta">{{ FromDate }} &ndash; {{ ToDate }} &middot; {{ BranchLabel }} &middot;
+          @if (IsClean) { <span class="chip solid">All clear</span> } @else { <span class="chip dash">Issues found</span> }
         </span>
-
       </div>
-
       @if (!IsClean) {
-<div class="recon-equation">
-
-        <div class="recon-seg">
-          <span class="recon-seg-label">Check Types Flagged</span>
-          <span class="recon-seg-val">{{ Groups.length }}</span>
+        <div class="fk-kpis fk-eq">
+          <div class="fk-kpi"><div class="k">Check types flagged</div><div class="v">{{ Groups.length }}</div></div>
+          <div class="fk-kpi"><div class="k">Flagged entries</div><div class="v">{{ TotalIssueRows }}</div></div>
+          <div class="fk-kpi"><div class="k">Total absolute difference</div><div class="v"><b>{{ TotalDiffAmt | number:'1.2-2' }}</b></div></div>
         </div>
-
-        <div class="recon-seg">
-          <span class="recon-seg-label">Total Flagged Entries</span>
-          <span class="recon-seg-val less">{{ TotalIssueRows }}</span>
-        </div>
-
-        <div class="recon-seg recon-seg--result">
-          <span class="recon-seg-label">Total Absolute Difference</span>
-          <span class="recon-seg-val result less">{{ TotalDiffAmt | number:'1.2-2' }}</span>
-        </div>
-
-      </div>
-}
-
+      } @else {
+        <div class="fk-alert">No debit / credit differences found. Every voucher checked balanced for this period and branch selection.</div>
+      }
     </div>
-
-    <!-- CLEAN STATE -->
-
-    @if (IsClean) {
-<div class="br-card">
-      <div class="audit-clean">
-        <i class="fa fa-check-circle"></i>
-        <div class="audit-clean-title">No debit/credit differences found</div>
-        <div class="audit-clean-sub">Every voucher checked balanced for this period and branch selection.</div>
-      </div>
-    </div>
-}
-
-    <!-- CHECKTYPE GROUPS (drill-down into vouchers) -->
 
     @if (!IsClean) {
-<div class="br-card br-table-card">
-
-      <div class="br-card-header">
-        <div class="br-card-title">
-          <i class="fa fa-sitemap"></i>
-          Check Types
-          <span class="br-hint">click a check type to see the affected vouchers</span>
+      <div class="card sec">
+        <div class="toolbar">
+          <span><span class="count">{{ Groups.length }} check types</span><span class="sub-t"> &middot; click a check type to see the affected vouchers</span></span>
         </div>
-        <span class="br-record-chip">{{ Groups.length }} Check Types</span>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th class="ck"></th><th>Check type</th><th class="num">Entries</th><th class="num">Total diff</th></tr></thead>
+            <tbody>
+              @for (g of Groups; track $index) {
+                <tr class="fk-click" (click)="Toggle(g.CHECKTYPE)">
+                  <td class="ck">{{ IsExpanded(g.CHECKTYPE) ? '−' : '+' }}</td>
+                  <td><span class="chip">{{ g.CHECKTYPE }}</span></td>
+                  <td class="num">{{ g.ENTRIES }}</td>
+                  <td class="num">{{ g.TOTAL_DIFF | number:'1.2-2' }}</td>
+                </tr>
+                @if (IsExpanded(g.CHECKTYPE)) {
+                  <tr>
+                    <td></td>
+                    <td colspan="3" class="fd-sub">
+                      <table class="tbl">
+                        <thead>
+                          <tr><th>Type</th><th>Voucher no.</th><th>Date</th><th>Name</th><th class="num">Debit</th><th class="num">Credit</th><th class="num">Diff</th><th>Remark</th></tr>
+                        </thead>
+                        <tbody>
+                          @for (d of GetDetails(g.CHECKTYPE); track $index) {
+                            <tr>
+                              <td class="mono">{{ d.VTYPE }}</td>
+                              <td class="mono">{{ d.VOUCHERNO }}</td>
+                              <td class="mono">{{ d.VDATE }}</td>
+                              <td>{{ d.NAME }}</td>
+                              <td class="num">{{ d.DRAMT | number:'1.2-2' }}</td>
+                              <td class="num">{{ d.CRAMT | number:'1.2-2' }}</td>
+                              <td class="num"><b>{{ d.DIFF | number:'1.2-2' }}</b></td>
+                              <td class="fk-wrap">{{ d.REMARK }}</td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
-
-      <div class="br-table-wrap">
-        <table class="br-table">
-          <thead>
-            <tr>
-              <th>Check Type</th>
-              <th class="num">Entries</th>
-              <th class="num">Total Diff</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (g of Groups; track g) {
-
-
-              <tr class="pl-grp-row" (click)="Toggle(g.CHECKTYPE)">
-                <td>
-                  <i
-                    class="fa pl-chevron"
-                    [ngClass]="IsExpanded(g.CHECKTYPE) ? 'fa-minus-square-o' : 'fa-plus-square-o'">
-                  </i>
-                  <span class="pl-checktype-badge">{{ g.CHECKTYPE }}</span>
-                </td>
-                <td class="num">{{ g.ENTRIES }}</td>
-                <td class="num less">{{ g.TOTAL_DIFF | number:'1.2-2' }}</td>
-              </tr>
-
-              @if (IsExpanded(g.CHECKTYPE)) {
-<tr class="pl-ledger-row">
-                <td colspan="3">
-                  <div class="pl-ledger-wrap">
-                    <table class="br-table pl-ledger-table">
-                      <thead>
-                        <tr>
-                          <th>Type</th>
-                          <th>Voucher No</th>
-                          <th>Date</th>
-                          <th>Name</th>
-                          <th class="num">Debit</th>
-                          <th class="num">Credit</th>
-                          <th class="num">Diff</th>
-                          <th>Remark</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @for (d of GetDetails(g.CHECKTYPE); track d) {
-<tr>
-                          <td class="mono">{{ d.VTYPE }}</td>
-                          <td class="mono">{{ d.VOUCHERNO }}</td>
-                          <td class="mono">{{ d.VDATE }}</td>
-                          <td>{{ d.NAME }}</td>
-                          <td class="num dr-amt">{{ d.DRAMT | number:'1.2-2' }}</td>
-                          <td class="num cr-amt">{{ d.CRAMT | number:'1.2-2' }}</td>
-                          <td class="num less">{{ d.DIFF | number:'1.2-2' }}</td>
-                          <td class="audit-remark">{{ d.REMARK }}</td>
-                        </tr>
-}
-                      </tbody>
-                    </table>
-                  </div>
-                </td>
-              </tr>
-}
-
-            
-}
-          </tbody>
-        </table>
-      </div>
-
-    </div>
-}
-
-  </div>
-}
-
+    }
+  }
 </div>

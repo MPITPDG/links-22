@@ -10,6 +10,7 @@ import { DatePipe } from '@angular/common';
 
 @Component({
     templateUrl: './clntstatus-followup.component.html',
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

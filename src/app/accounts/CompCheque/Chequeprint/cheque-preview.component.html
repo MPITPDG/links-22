@@ -1,13 +1,22 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>{{Header| uppercase}}</strong>
-                </div>
-            </div>
-        </div>
+<!--
+  Cheque preview (route prntchque/chqreview/...), reached from Print cheque.
+  Recipe 4: only the page header and the action bar are restyled. The cheque / advice layout
+  below (div#space and its tables, classes and inline styles) is byte-identical to Links (incl.
+  its table8 company bindings). Print mechanism:
+  printchq() opens the legacy frm_Acc_CompCheq_PrintCheque_Print.aspx (URL unchanged) which prints
+  the cheque; BPprint() opens #/popup/Account-CashBook-BankReceipt-print for the BP voucher.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Cheque preview</h1>
+      <p>Check the cheque and payment advice, then print the cheque or the bank payment voucher</p>
     </div>
+    <div class="tools">
+      @if (chequeno) { <span class="chip solid">Cheque {{chequeno}}</span> }
+      @if (printentryno) { <span class="chip">BP {{printentryno}}</span> }
+    </div>
+  </div>
     <div>
         <table style="width: 100%; height: 100%" border="0" cellpadding="0" cellspacing="0">
 
@@ -369,38 +378,14 @@
                     </div>
                 </td>
             </tr>
-            <tr class="formheading" height="20">
-                <td>
-                    <table style="width: 100%;" border="0">
-                        <tr>
-                            <td width="50%">
-
-                            </td>
-                            <td align="right" valign="bottom" width="150px">
-
-                                <table style="width: 100%;" border="0">
-                                    <tr>
-
-                                        <td align="left">
-                                            <button uiBtn variant="default" size="sm" type="submit" (click)="printchq()">
-                                                <span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Print Cheque No. {{CHQNO}}</span></button>
-                                        </td>
-                                        <td align="left">
-                                            <button uiBtn variant="default" size="sm" type="submit" disabled>
-                                                <span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Update Cheque
-                                                    No. {{CHQNO}}</span></button>
-                                        </td>
-                                        <td align="left">
-                                            <button uiBtn variant="default" size="sm" type="submit" (click)="BPprint()">
-                                                <span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Print BP No. {{ACC_BANK_ENTRYNO}}</span></button>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
         </table>
     </div>
+
+  <div class="bar">
+    <span class="note">The cheque prints from the legacy print page.</span>
+    <div class="r">
+      <button class="btn g" type="submit" (click)="BPprint()">Print BP no. {{printentryno}}</button>
+      <button class="btn g" type="submit" disabled>Update cheque no. {{chequeno}}</button>
+      <button class="btn p" type="submit" (click)="printchq()">Print cheque no. {{chequeno}}</button>
+    </div>  </div>
 </div>

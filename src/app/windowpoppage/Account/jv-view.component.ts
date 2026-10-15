@@ -9,7 +9,8 @@ import { ToastCommonService } from '../../shared/service/toastService';
 @Component({
     selector: 'app-JV-view',
     templateUrl: './jv-view.component.html',
-    styles: [],
+    // import-page / import-entry are global in Links (src/styles/kit); only the popup area CSS is local
+    styleUrls: ['../export/consign-popup.css', './acc-popup-view.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

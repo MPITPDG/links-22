@@ -13,15 +13,12 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
  * plus POL / POD / Agent - the table Nakul Tanna asked for (mail 09-09-2026).
  * Data: USP_Acc_MIS_JobHandler_Register via Accounts/fn_Acc_MIS_JobHandler_Register.
  */
+import { FIN_PERIODS, FinPeriod, finRange, finDp, FinPager, FinChart, finBars, finAmt } from '../../Accreport/fin-kit';
 @Component({
     selector: 'app-jobhandler-register',
     templateUrl: './jobhandler-register.component.html',
-    styles: [`
-        .jh-table th { position: sticky; top: 0; background: #d9edf7; }
-        .jh-scroll { max-height: 520px; overflow: auto; }
-        .jh-right { text-align: right; }
-    `],
     changeDetection: ChangeDetectionStrategy.Eager,
+    host: { class: 'kit-accreport' }, // Links: import-page + accreport-page are global (src/styles/kit)
     standalone: false
 })
 export class JobHandlerRegisterComponent implements OnInit {
@@ -79,8 +76,9 @@ export class JobHandlerRegisterComponent implements OnInit {
         const monday = new Date(today);
         monday.setDate(today.getDate() - ((today.getDay() + 6) % 7));
         this.FromDate = this.toPickerDate(monday);
-        this.ToDate = this.toPickerDate(today);
+                this.ToDate = this.toPickerDate(today);
         this.fillDropdown();
+        this.Search(); // redesign: open on this week's jobs instead of an empty page
     }
 
     private toPickerDate(d: Date) {
@@ -127,12 +125,14 @@ export class JobHandlerRegisterComponent implements OnInit {
             .subscribe((data: any) => {
                 this.loaderService.display(false);
                 this.registerdata = (data && data.Table) ? data.Table : [];
-                this.searched = true;
+                                this.searched = true;
+                this.failed = false;
                 this.buildSummary();
+                this.buildView();
                 if (this.registerdata.length == 0) {
                     this._toasterService.toast('warning', 'warning', 'No Record Found !');
                 }
-            }, () => this.loaderService.display(false));
+                        }, () => { this.loaderService.display(false); this.failed = true; });
     }
 
     private buildSummary() {
@@ -181,5 +181,30 @@ export class JobHandlerRegisterComponent implements OnInit {
         this.summary = [];
         this.searched = false;
         this.ngOnInit();
+    }
+
+    // ---- redesign: presets, KPIs, jobs-by-handler chart, pagers (display only) ----
+    failed = false;
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    pager = new FinPager<any>(10);
+    sumPager = new FinPager<any>(10);
+    chart: FinChart | null = null;
+    fmt = finAmt;
+    kpi = { EXPORT: 0, IMPORT: 0, MISC: 0 };
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.FromDate = finDp(r.from, this.myDatePickerOptions.dateFormat);
+        this.ToDate = finDp(r.to, this.myDatePickerOptions.dateFormat);
+    }
+    buildView() {
+        this.pager.set(this.registerdata);
+        this.sumPager.set(this.summary);
+        this.kpi = { EXPORT: 0, IMPORT: 0, MISC: 0 };
+        this.summary.forEach(s => { this.kpi.EXPORT += s.EXPORT || 0; this.kpi.IMPORT += s.IMPORT || 0; this.kpi.MISC += s.MISC || 0; });
+        const items = this.summary.slice(0, 12).map(s => ({ label: String(s.Handler), value: s.Total }));
+        this.chart = items.length ? finBars(items) : null;
     }
 }

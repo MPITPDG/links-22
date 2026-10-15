@@ -9,10 +9,11 @@ import { DataService } from 'src/app/shared/service/dataService';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ModalDirective } from 'ngx-bootstrap/modal';
+import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, finAmt, finByMonth } from '../fin-kit';
 @Component({
     selector: 'app-General-AccountStmt-Local',
     templateUrl: './genact-localstmt.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -160,10 +161,11 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
           this._loaderService.display(true);
           this._dataService.getData("Accounts/Acc_Rpt_ClientOutstandingList_GetAll", jsonData)
           .subscribe((data: any) => {
-            if (data.Table.length>0)
+            if (data?.Table?.length>0)
             {
           this.displayType="LIST";
           this.dataList = data.Table;
+          this.failed = false; this.buildView();
           for (var i = 0; i < this.dataList.length; i++) {
             let obj = {
               Type: this.dataList[i].TRANSTYPE,
@@ -178,6 +180,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
          this.exceldata_list.forEach((row: any) => {
           this.dataForExcel.push(Object.values(row))
           });
+            if (!data.Table1?.[0] || !data.Table2?.[0]) { this.searchHeaderText="Account Statement From " + this.FromDate + " To " + this.ToDate; this._loaderService.display(false); return; } // fail soft: no summary rows
             if(data.Table1[0].OPBAL >0) {
               this.OpDrBal=data.Table1[0].OPBAL  + " Dr";
               this.rptopbal=data.Table1[0].OPBAL  + " Dr"; }
@@ -235,12 +238,12 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
           this._loaderService.display(false);
           return false;
            }
-        })     
+        }, () => { this._loaderService.display(false); this.failed = true; })     
       } 
       GetClientName(clientcode)
       {
         let updateItem = this.ClientList.find(item => item.ACCTCODENAME === clientcode);
-        this.ClientName=updateItem.ACCTNAME;
+        this.ClientName=updateItem?.ACCTNAME; // guarded: clearing the select passed undefined
         //  this.ClientName=event.target.options[event.target.options.selectedIndex].text///.split("|")[1];
       }
       Openprint(No,Type) 
@@ -497,4 +500,25 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
             this.FromDate="";
             this.ToDate="";
        }
+
+    // ---- redesign: period presets, pager, monthly chart (display only) ----
+    failed = false;
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    pager = new FinPager<any>(10);
+    chart: FinChart | null = null;
+    fmt = finAmt;
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.FromDate = this._dataService.datechnge1(r.from);
+        this.ToDate = this._dataService.datechnge1(r.to);
+    }
+    buildView() {
+        const rows = this.dataList || [];
+        this.pager.set(rows);
+        const items = finByMonth(rows, r => r.TRANSDATE, r => finNum(r.DRAMT) - finNum(r.CRAMT));
+        this.chart = items.length ? finBars(items) : null;
+    }
 }

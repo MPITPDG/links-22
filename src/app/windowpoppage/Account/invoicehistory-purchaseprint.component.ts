@@ -6,6 +6,7 @@ import { LoginService } from '../../shared/service/loginService';
 @Component({
   selector: 'app-invoicehistory-purchaseprint',
   templateUrl: './invoicehistory-purchaseprint.component.html',
+  host: { class: 'kit-print' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

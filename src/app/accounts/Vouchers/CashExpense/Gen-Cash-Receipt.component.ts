@@ -10,6 +10,7 @@ import { DatePipe } from '@angular/common'
 @Component({
   selector: 'app-gen-cash-receipt',
   templateUrl: './Gen-Cash-Receipt.component.html',
+  styleUrls: ['../vouchers-page.css'],
   styles: [],
   providers: [DatePipe],
     changeDetection: ChangeDetectionStrategy.Eager,
@@ -31,8 +32,8 @@ export class GenCashReceiptComponent implements OnInit {
   public myDatePickerOptionsInv: IMyDpOptions = {
     dateFormat: 'dd-mmm-yyyy',
     inline: false,
-    height: '18px',
-    width: '180px',
+    height: '30px',
+    width: '100%',
     componentDisabled: false,
     selectionTxtFontSize: '12px',
     editableDateField: false,

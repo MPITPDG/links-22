@@ -8,6 +8,7 @@ import { ActivatedRoute,Router } from '@angular/router';
 
 @Component({
     templateUrl: 'staffpur-GenCode.component.html',
+    styleUrls: ['../../purchase/purchase-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -16,6 +17,11 @@ import { ActivatedRoute,Router } from '@angular/router';
     Status:string="";
     strheader:string="";
     PAGETYPE:string="";
+    // ---------- page state (additive: loading / error, pager, export) ----------
+    readonly pageSize = 10;
+    page: number = 1;
+    loading: boolean = false;
+    loadError: boolean = false;
     constructor(
         private _router: Router,
         private _dataService: DataService,
@@ -34,15 +40,15 @@ import { ActivatedRoute,Router } from '@angular/router';
             this.Status= params["Status"];
             if(this.Status=="SRPI")
             {
-            this.strheader="GENERATE PURCHASE INVOICE FOR STAFF PURCHASE REQUEST "
+            this.strheader="Generate purchase invoice for staff purchase requests"
           }
           else   if(this.Status=="RPI")
           {
-          this.strheader="GENERATE PURCHASE INVOICE FOR PURCHASE REQUEST  "
+          this.strheader="Generate purchase invoice for purchase requests"
         }
           else   if(this.Status=="JVREQ")
           {
-          this.strheader="GENERATE JOURNAL VOUCHER "
+          this.strheader="Generate journal vouchers"
         }
              });
         this.getdataforgenerate()
@@ -58,9 +64,16 @@ import { ActivatedRoute,Router } from '@angular/router';
             STATUS: this.Status,
             AUTHORISATIONSTATUS: "V"
           }
+          this.loading = true;
+          this.loadError = false;
           this._dataService.getData("Accounts/ACC_REQUEST_FILL_TO_GENERATE_PAGELOAD", jsonmaster)
             .subscribe((data: any) => {
               this.datatable=data.Table;
+              this.loading = false;
+              this.loaderService.display(false)
+            }, () => {
+              this.loading = false;
+              this.loadError = true;
               this.loaderService.display(false)
             })
       }
@@ -165,5 +178,76 @@ import { ActivatedRoute,Router } from '@angular/router';
         }
       }
 
+    
+    /** rows shown by the pager: the verified requests waiting to be generated */
+    get Filtered(): Array<any> {
+      return Array.isArray(this.datatable) ? this.datatable : [];
     }
+
+    exportCsv() {
+      const jv = this.Status == 'JVREQ';
+      const head = ['Status', 'Req code', 'Requested by', 'Requested on']
+        .concat(jv ? ['Debit', 'Credit'] : ['Amount'], ['Authorised by', 'Authorised on']);
+      this.downloadCsv('generate-' + (this.Status || 'requests').toLowerCase(), head,
+        this.Filtered.map(r => [r.AUTHORISESTATUS, r.REQCODE, r.REQUESTEDBY, r.REQUESTEDON]
+          .concat(jv ? [r.DEBIT, r.CREDIT] : [r.AMOUNT], [r.AUTHORISEDBY, r.AUTHORISATIONDATE])));
+    }
+
+    // ---------- pagination (10 / page) ----------
+    get pageCount(): number {
+        return Math.max(1, Math.ceil(this.Filtered.length / this.pageSize));
+    }
+
+    get pageRows(): Array<any> {
+        // the list reloads after each generate; never point past its last page
+        if (this.page > this.pageCount) { this.page = this.pageCount; }
+        const start = (this.page - 1) * this.pageSize;
+        return this.Filtered.slice(start, start + this.pageSize);
+    }
+
+    get rangeStart(): number {
+        return this.Filtered.length ? (this.page - 1) * this.pageSize + 1 : 0;
+    }
+
+    get rangeEnd(): number {
+        return Math.min(this.page * this.pageSize, this.Filtered.length);
+    }
+
+    /** page numbers with 0 standing in for an ellipsis */
+    get pageList(): number[] {
+        const n = this.pageCount, p = this.page;
+        if (n <= 7) { return Array.from({ length: n }, (_, i) => i + 1); }
+        const out: number[] = [1];
+        const lo = Math.max(2, p - 1), hi = Math.min(n - 1, p + 1);
+        if (lo > 2) { out.push(0); }
+        for (let i = lo; i <= hi; i++) { out.push(i); }
+        if (hi < n - 1) { out.push(0); }
+        out.push(n);
+        return out;
+    }
+
+    goPage(p: number) {
+        if (p >= 1 && p <= this.pageCount) { this.page = p; }
+    }
+
+    /** client-side CSV of every filtered row: UTF-8 BOM, quoted */
+    private downloadCsv(name: string, head: string[], rows: any[][]) {
+        const q = (v: any) => {
+            const s = (v === null || v === undefined) ? '' : String(v);
+            return '"' + s.replace(/"/g, '""') + '"';
+        };
+        const csv = [head, ...rows].map(line => line.map(q).join(',')).join('\r\n');
+        const d = new Date();
+        const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+        const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name + '-' + stamp + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
+}
     

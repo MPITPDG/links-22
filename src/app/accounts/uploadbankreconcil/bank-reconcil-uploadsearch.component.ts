@@ -11,7 +11,9 @@ import { ExportexcelService } from '../../shared/service/exportexcel.service';
 @Component({
     selector: 'app-bankreconcil-uploadsearch',
     templateUrl: './bank-reconcil-uploadsearch.component.html',
-    styleUrls: ['./bank-reconcil-uploadsearch.component.css'],
+    // MPERPNG-20 layout: the page kit (import-page / accreport-page) is GLOBAL in Links; the host class opts in.
+    styleUrls: [],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

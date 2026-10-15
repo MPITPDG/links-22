@@ -9,6 +9,7 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
   
   selector: 'app-cashexpense',
   templateUrl: './cashexpense.component.html',
+  styleUrls: ['../vouchers-page.css'],
   styles: [],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false

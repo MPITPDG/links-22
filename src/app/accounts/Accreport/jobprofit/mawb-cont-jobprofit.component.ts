@@ -8,9 +8,11 @@ import { DataService } from 'src/app/shared/service/dataService';
 import { log } from 'console';
 import { AccordionComponent } from 'ngx-bootstrap/accordion';
 
+import { FinPager, FinChart, finBars, finNum, finAmt, finCsv } from '../fin-kit';
 @Component({
   selector: 'app-mawb-cont-jobprofit',
   templateUrl: './mawb-cont-jobprofit.component.html',
+  host: { class: 'kit-accreport' },
   styles: [`
   table{
     margin-bottom:0rem !important
@@ -76,15 +78,15 @@ export class MawbContJobprofitComponent implements OnInit {
       .subscribe((data: any) => {
         //console.log(data);
         this.loaderService.display(false)
-
-        if (data.Table[0].STATUS == "100") {
+        this.failed = false;
+        if (data?.Table?.[0]?.STATUS == "100") {
           this.detailsdata_serch = true
-          this.cont_table1 = data.Table1
-          this.job_table2 = data.Table2;
+          this.cont_table1 = data.Table1 || []
+          this.job_table2 = data.Table2 || [];
 
           if (this.job_table2.length>0){
             this.job_table2.forEach(job => {
-              job["childdetail"]=data.Table4.filter(x => x.JOBNO_JS === job.JOBNO);
+              job["childdetail"]=(data.Table4 || []).filter(x => x.JOBNO_JS === job.JOBNO);
               job["isvisible"]=true;
             });
             console.log(this.job_table2);
@@ -92,11 +94,12 @@ export class MawbContJobprofitComponent implements OnInit {
           this.jobdetail_table4 = data.Table4
           this.vouchr_table3 = data.Table3
           //console.log(this.jobdetail_table4);
+          this.buildView();
         } else {
-          this._toasterService.toast('success', 'success', data.Table[0].STATUS)
+          this._toasterService.toast('success', 'success', data?.Table?.[0]?.STATUS || 'No data found')
         }
 
-      })
+      }, () => { this.loaderService.display(false); this.failed = true; })
   }
 
   // findDetails(jobno) {
@@ -207,5 +210,28 @@ export class MawbContJobprofitComponent implements OnInit {
   }
   Reset() {
     this.searchno = ""
+  }
+
+  // ---- redesign: KPIs, chart, pager and CSV export (display only) ----
+  failed = false;
+  pager = new FinPager<any>(10);
+  kpiExp = 0;
+  kpiRec = 0;
+  kpiDiff = 0;
+  chart: FinChart | null = null;
+  fmt = finAmt;
+  buildView() {
+    const jobs = this.job_table2 || [];
+    this.pager.set(jobs);
+    this.kpiExp = jobs.reduce((a, r) => a + finNum(r.DRAMT), 0);
+    this.kpiRec = jobs.reduce((a, r) => a + finNum(r.CRAMT), 0);
+    this.kpiDiff = jobs.reduce((a, r) => a + finNum(r.GRANDVALUE_TOTAL), 0);
+    const items = jobs.map(r => ({ label: String(r.JOBNO || '').slice(-6), value: finNum(r.GRANDVALUE_TOTAL) })).slice(0, 20);
+    this.chart = items.length ? finBars(items) : null;
+  }
+  exportJobs() {
+    finCsv((this.PageType == 'CNTR' ? 'container' : 'mawb') + '-job-profit',
+      ['Job No', 'Client', 'Expense', 'Recovery', 'Difference', 'Remarks'],
+      (this.job_table2 || []).map(r => [r.JOBNO, r.CLIENT_NAME, r.DRAMT, r.CRAMT, r.GRANDVALUE_TOTAL, r.GRANDVALUE]));
   }
 }

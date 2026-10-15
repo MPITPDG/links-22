@@ -11,6 +11,7 @@ import { Configuration } from '../../../app.constants';
 
 @Component({
     templateUrl: 'bankpayment-IU.component.html',
+    styleUrls: ['../vouchers-page.css'],
     // ,
     // styles:[` table, tr, td, th{
     //           border: none;

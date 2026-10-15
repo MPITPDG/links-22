@@ -10,10 +10,11 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 
+import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, finAmt, finCsv, finByMonth } from '../fin-kit';
 @Component({
     selector: 'app-ItemStatement-search',
     templateUrl: './item-search.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -156,7 +157,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
       GetItemName(icode)    {
         
           let updateItem = this.ItemList.find(item => item.ITEMCODE === icode);
-          this.ItemName=updateItem.ITEMACTNAME.split("|")[1];
+          this.ItemName=updateItem?.ITEMACTNAME?.split("|")[1]; // guarded: clearing the select passed undefined
       }
       Showdata()
       {
@@ -199,8 +200,12 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
          // console.log(jsonmaster)
           this._dataService.getData("Accounts/Acc_Rpt_ItemWise_Statement_List", jsonmaster)
             .subscribe((data: any) => {
+              this.failed = false;
+              this.noRows = !(data?.Table?.length > 0);
               this.displayType = 'LIST';
-              this.SearchItemdata_list = data.Table;
+              this.SearchItemdata_list = data?.Table || [];
+              this.buildView();
+              if (!data?.Table1?.[0] || !data?.Table2?.[0] || !data?.Table3?.[0]) { return; } // fail soft: no summary rows -> list / empty state only
               this.searchHeaderText="Item Wise Statement From " +this._dataService.convertFromdd_mm_yyyTodd_mmm_yyy(this.FromDate) + " To " + this._dataService.convertFromdd_mm_yyyTodd_mmm_yyy(this.ToDate) ;
               this.SubHeader=data.Table3[0].NAME//OPBALthis.ItemName;
               if(data.Table1[0].OPBAL >0)
@@ -251,7 +256,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
               {
                 this.AdvCrAmt=(data.Table2[0].ADVTOTALCR=="0.00")?"" :Math.abs(data.Table2[0].ADVTOTALCR) ;
               } 
-          });
+          }, () => { this.loaderService.display(false); this.failed = true; });
           this.loaderService.display(false);
       }
   
@@ -582,4 +587,31 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
             return false;
            }
         }
-    } 
+
+    // ---- redesign: period presets, pager, monthly chart, CSV (display only) ----
+    failed = false;
+    noRows = false;
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    pager = new FinPager<any>(10);
+    chart: FinChart | null = null;
+    fmt = finAmt;
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.FromDate = this._dataService.datechnge(r.from);
+        this.ToDate = this._dataService.datechnge(r.to);
+    }
+    buildView() {
+        const rows = this.SearchItemdata_list || [];
+        this.pager.set(rows);
+        const items = finByMonth(rows, r => r.TRANSDATE, r => finNum(r.DRAMT) - finNum(r.CRAMT));
+        this.chart = items.length ? finBars(items) : null;
+    }
+    exportCsv() {
+        finCsv('item-statement', ['Type', 'Number', 'Date', 'Particulars', 'Debit', 'Credit'],
+            (this.SearchItemdata_list || []).map(d => [d.TRANSTYPE, d.TRANSCODE, d.TRANSDATE,
+                ((d.NARR || '') + (d.EXP_SNAME || '') + (d.SUP_SNAME || '') + ' ' + (d.ACCTNAME || '')).trim(), d.DRAMT, d.CRAMT]));
+    }
+} 

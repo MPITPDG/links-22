@@ -1,580 +1,117 @@
-<div class="br-page">
-
-  <!-- ========================================================= -->
-  <!-- SEARCH SCREEN -->
-  <!-- ========================================================= -->
+<!--
+  Accounts -> Bank reconciliation -> Reconcile (Add).
+  Links port of the MPERPNG-20 layout (kit .im-page + host class kit-accreport + bank-reconcil.page.css).
+  Search (bank, from, to; SearchData) -> balance tiles, Uncleared / Cleared tabs (setActiveTab,
+  filteredBankreconcilList) with the active-tab Debit / Credit totals; uncleared rows take a clearance
+  date (data.CLEARANCEDATE) and are saved with BankRecUpdate() from the sticky bar.
+  Links-only: Export to Excel (ExportExcel -> BankReconcilAddEditExportService, every entry of the result).
+-->
+<div class="im-page br-page">
+  <div class="ph">
+    <div>
+      <h1>Bank reconciliation</h1>
+      <p>Enter clearance dates for bank receipts and payments and reconcile the books to the bank</p>
+    </div>
+    @if (showResult) {
+      <div class="tools">
+        <button class="btn g" type="button" (click)="BackToSearch()">Back to search</button>
+        <button class="btn g" type="button" (click)="ExportExcel()">Export to Excel</button>
+      </div>
+    }
+  </div>
 
   @if (!showResult) {
-<div>
-<div class="br-card search-card-clean">
-  <div class="clean-row-layout">
-
-    <!-- BANK ACCOUNT -->
-    <div class="clean-field clean-bank">
-      <label>Bank Account <span class="br-req">*</span></label>
-      <ng-select
-        [items]="BankList"
-        bindLabel="acctname"
-        bindValue="acctcodename"
-        [(ngModel)]="Bank"
-        [appendTo]="'body'"
-        placeholder="Select Bank Account">
-      </ng-select>
+    <div class="card sec">
+      <div class="card-h"><h2>Bank and period</h2><span class="meta"><b>*</b> required</span></div>
+      <div class="filters fk-f">
+        <div class="f w2">
+          <label>Bank account <span class="req">*</span></label>
+          <ng-select [items]="BankList" bindLabel="acctname" bindValue="acctcodename" [(ngModel)]="Bank" [appendTo]="'body'" placeholder="Select bank account"></ng-select>
+        </div>
+        <div class="f">
+          <label>From date <span class="req">*</span></label>
+          <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)" [options]="myDatePickerOptions" [selDate]="FromDate"></my-date-picker>
+        </div>
+        <div class="f">
+          <label>To date <span class="req">*</span></label>
+          <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)" [options]="myDatePickerOptions" [selDate]="ToDate"></my-date-picker>
+        </div>
+        <div class="f act">
+          <button class="btn g" type="button" (click)="Reset()">Reset</button>
+          <button class="btn p" type="button" (click)="SearchData()">Search</button>
+        </div>
+      </div>
     </div>
-
-    <!-- FROM DATE -->
-    <div class="clean-field clean-date">
-      <label>From Date <span class="br-req">*</span></label>
-      <my-date-picker
-        name="FromDate"
-        (dateChanged)="FromDateChanged($event)"
-        [options]="myDatePickerOptions"
-        [selDate]="FromDate"
-        class="search-date-control">
-      </my-date-picker>
-    </div>
-
-    <!-- TO DATE -->
-    <div class="clean-field clean-date">
-      <label>To Date <span class="br-req">*</span></label>
-      <my-date-picker
-        name="ToDate"
-        (dateChanged)="ToDateChanged($event)"
-        [options]="myDatePickerOptions"
-        [selDate]="ToDate"
-        class="search-date-control">
-      </my-date-picker>
-    </div>
-
-    <!-- BUTTONS -->
-    <div class="clean-actions">
-      <button class="br-btn br-btn--primary" type="button" (click)="SearchData()">
-        <i class="fa fa-search"></i> Search
-      </button>
-      <button class="br-btn br-btn--ghost" type="button" (click)="Reset()">
-        <i class="fa fa-refresh"></i> Reset
-      </button>
-    </div>
-
-  </div>
-</div>
-
-</div>
-}
-
- 
-
-
-  <!-- ========================================================= -->
-  <!-- RESULT SCREEN -->
-  <!-- ========================================================= -->
+  }
 
   @if (showResult) {
-<div class="br-result-view">
-
-    <!-- TOP BAR -->
-
-   
-
-    <!-- SUMMARY -->
-
-    <div class="br-summary-strip">
-
-      <!-- OPENING -->
-
-      <div class="br-summary-card">
-
-        <div class="br-summary-label">
-          Opening Balance
-        </div>
-
-        <div class="br-summary-val">
-
-          @if (OpBalDr) {
-<span class="dr">
-            {{ OpBalDr }}
-          </span>
-}
-
-          @if (OpBalCr) {
-<span class="cr">
-            {{ OpBalCr }}
-          </span>
-}
-
-          @if (!OpBalDr && !OpBalCr) {
-<span class="neutral">
-            —
-          </span>
-}
-
-        </div>
-
-        <div class="br-summary-sub">
-          Dr / Cr
-        </div>
-
-      </div>
-
-      <!-- COMPANY BOOK -->
-
-      <div class="br-summary-card">
-
-        <div class="br-summary-label">
-          Balance As Per Company Book
-        </div>
-
-        <div class="br-summary-val">
-
-          @if (BookBalDr) {
-<span class="dr">
-            {{ BookBalDr }}
-          </span>
-}
-
-          @if (BookBalCr) {
-<span class="cr">
-            {{ BookBalCr }}
-          </span>
-}
-
-          @if (!BookBalDr && !BookBalCr) {
-<span class="neutral">
-            —
-          </span>
-}
-
-        </div>
-
-      </div>
-
-      <!-- REFLECTED -->
-
-      <div class="br-summary-card">
-
-        <div class="br-summary-label">
-          Amount Reflected In Bank
-        </div>
-
-        <div class="br-summary-val stacked">
-
-          @if (DrReflected) {
-<span class="dr">
-            {{ DrReflected }}
-          </span>
-}
-
-          @if (CrReflected) {
-<span class="cr">
-            {{ CrReflected }}
-          </span>
-}
-
-        </div>
-
-      </div>
-
-      <!-- UNRECONCILED -->
-
-      <div class="br-summary-card">
-
-        <div class="br-summary-label">
-          <!-- Unreconciled Amount -->
-           Amount Not Reflected In Bank
-        </div>
-
-        <div class="br-summary-val stacked">
-
-          @if (DrNotRef) {
-<span class="dr">
-            {{ DrNotRef }}
-          </span>
-}
-
-          @if (CrNotRef) {
-<span class="cr">
-            {{ CrNotRef }}
-          </span>
-}
-
-        </div>
-
-      </div>
-
-      <!-- TARGET -->
-
-      <div class="br-summary-card br-summary-card--highlight">
-
-        <div class="br-summary-label">
-          Balance As Per Bank
-        </div>
-
-        <div class="br-summary-val">
-
-          @if (BankBalDr) {
-<span class="dr">
-            {{ BankBalDr }}
-          </span>
-}
-
-          @if (BankBalCr) {
-<span class="cr">
-            {{ BankBalCr }}
-          </span>
-}
-
-          @if (!BankBalDr && !BankBalCr) {
-<span class="neutral">
-            —
-          </span>
-}
-
-        </div>
-
-      </div>
-
+    <div class="td-tiles">
+      <div class="td-tile"><div class="k">Opening balance</div><div class="v">{{ OpBalDr }}{{ OpBalCr }}@if (!OpBalDr && !OpBalCr) { — }</div><div class="s">Dr / Cr</div></div>
+      <div class="td-tile"><div class="k">Balance as per company book</div><div class="v">{{ BookBalDr }}{{ BookBalCr }}@if (!BookBalDr && !BookBalCr) { — }</div><div class="s">Dr / Cr</div></div>
+      <div class="td-tile"><div class="k">Reflected in bank</div><div class="v">{{ DrReflected }}@if (DrReflected && CrReflected) { / }{{ CrReflected }}</div><div class="s">Dr / Cr</div></div>
+      <div class="td-tile"><div class="k">Not reflected in bank</div><div class="v">{{ DrNotRef }}@if (DrNotRef && CrNotRef) { / }{{ CrNotRef }}</div><div class="s">Dr / Cr</div></div>
+      <div class="td-tile strong"><div class="k">Balance as per bank</div><div class="v">{{ BankBalDr }}{{ BankBalCr }}@if (!BankBalDr && !BankBalCr) { — }</div><div class="s">book adjusted for entries not yet in the bank</div></div>
     </div>
 
-    <!-- VIEW TOGGLE -->
-
-    <div class="br-view-toggle" #toggleRow>
-
-      <div class="br-view-toggle-tabs">
-
-        <button
-          class="toggle-btn"
-          [class.active]="activeTab === 'UNCLEARED'"
-          (click)="setActiveTab('UNCLEARED')">
-
-          Uncleared
-          <span class="toggle-count">{{ unclearedList.length }}</span>
-
-        </button>
-
-        <button
-          class="toggle-btn"
-          [class.active]="activeTab === 'CLEARED'"
-          (click)="setActiveTab('CLEARED')">
-
-          Cleared
-          <span class="toggle-count">{{ clearedList.length }}</span>
-
-        </button>
-
+    <div class="card sec">
+      <div class="br-band">
+        <div class="br-tabs" role="tablist">
+          <button type="button" [class.on]="activeTab === 'UNCLEARED'" (click)="setActiveTab('UNCLEARED')">Uncleared &middot; {{ unclearedList.length }}</button>
+          <button type="button" [class.on]="activeTab === 'CLEARED'" (click)="setActiveTab('CLEARED')">Cleared &middot; {{ clearedList.length }}</button>
+        </div>
+        <span class="br-totals">
+          <span class="count">{{ filteredBankreconcilList.length }} records</span>
+          <span>&middot; Debit <b class="mono">{{ activeDrTotal | number:'1.2-2' }}</b> &middot; Credit <b class="mono">{{ activeCrTotal | number:'1.2-2' }}</b></span>
+        </span>
       </div>
-
-      <!-- Totals for the active tab. Each box is positioned over its own
-           column (left/width measured from the Debit/Credit header cells in
-           alignTotals()), so they stay aligned at any page width. -->
-      <div class="br-view-toggle-totals">
-
-        <div class="br-col-total" [style.left.px]="drTotalLeft" [style.width.px]="drTotalWidth">
-          <div class="br-col-total-label">Debit</div>
-          <div class="br-col-total-val dr">{{ activeDrTotal | number:'1.2-2' }}</div>
-        </div>
-
-        <div class="br-col-total" [style.left.px]="crTotalLeft" [style.width.px]="crTotalWidth">
-          <div class="br-col-total-label">Credit</div>
-          <div class="br-col-total-val cr">{{ activeCrTotal | number:'1.2-2' }}</div>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- TABLE CARD -->
-
-    <div class="br-card br-table-card">
-
-      <!-- HEADER -->
-
-      <!-- <div class="br-card-header">
-
-        <div class="br-card-title">
-
-          <i class="fa fa-list-alt"></i>
-
-          Transaction Entries
-
-        </div>
-
-        <div class="br-card-actions">
-
-          <span class="br-record-chip">
-            {{ selectedCount }} Selected
-          </span>
-
-          <select
-            class="br-type-filter"
-            [(ngModel)]="typeFilter">
-
-            <option value="">
-              All Types
-            </option>
-
-            <option value="BR">
-              BR — Receipt
-            </option>
-
-            <option value="BP">
-              BP — Payment
-            </option>
-
-          </select>
-
-        </div>
-
-      </div> -->
-
-      <!-- TABLE -->
-
-      <div class="br-table-wrap" (scroll)="alignTotals()">
-
-        <table class="br-table">
-
+      <div class="tbl-wrap">
+        <table class="tbl">
           <thead>
-
-            <tr class="br-col-headers">
-
-              <th>
-                Entry No
-              </th>
-
-              <th>
-                Date
-              </th>
-
-              <th>
-                Type
-              </th>
-
-              <th>
-                Party / Reference
-              </th>
-
-              <th>
-                Chq Type
-              </th>
-
-              <th>
-                Chq No
-              </th>
-
-              <th>
-                Chq Dt
-              </th>
-
-              <th class="num" #drTh>
-                Debit
-              </th>
-
-              <th class="num" #crTh>
-                Credit
-              </th>
-
-              <th>
-                Clearance Date
-              </th>
-
+            <tr>
+              <th>Entry no.</th><th>Date</th><th>Type</th><th>Party / reference</th><th>Chq type</th><th>Chq no.</th><th>Chq date</th>
+              <th class="num">Debit</th><th class="num">Credit</th><th>Clearance date</th>
             </tr>
-
           </thead>
-
           <tbody>
-
-            @for (data of filteredBankreconcilList; track data) {
-<tr
-             
-              [class.br-row--receipt]="data.STATUS === 'BR'"
-              [class.br-row--payment]="data.STATUS === 'BP'">
-
-              <!-- ENTRY -->
-
-              <td class="mono">
-                {{ data.ENTRYNO }}
-              </td>
-
-              <!-- DATE -->
-
-              <td class="mono">
-                {{ data.ENTRYDT }}
-              </td>
-
-              <!-- TYPE -->
-
-              <td>
-
-                <span
-                  class="br-badge"
-                  [ngClass]="data.STATUS === 'BR'
-                  ? 'br-badge--br'
-                  : 'br-badge--bp'">
-
-                  {{ data.STATUS }}
-
-                </span>
-
-              </td>
-
-              <!-- PARTY -->
-
-              <td>
-
-                <div
-                 class="br-party-name"
-                  [innerHTML]="data.PARTYNAME">
-                </div>
-
-                @if (data.CHEQUENO) {
-<div
-                  class="br-party-ref"
-                 >
-
-                  {{ data.CHEQUETYPE }}
-                  |
-                  {{ data.CHEQUENO }}
-
-                </div>
-}
-
-              </td>
-
-              <!-- CHQ TYPE -->
-
-              <td class="mono">
-                {{ data.CHEQUETYPE || '—' }}
-              </td>
-
-              <!-- CHQ NO -->
-
-              <td class="mono">
-                {{ data.CHEQUENO || '—' }}
-              </td>
-
-              <!-- CHQ DATE -->
-
-              <td class="mono">
-                {{ data.CHEQUEDT || '—' }}
-              </td>
-
-              <!-- DR -->
-
-              <td class="num dr-amt">
-
-                @if (data.DRAMT) {
-<span>
-                  {{ data.DRAMT | number:'1.2-2' }}
-                </span>
-}
-
-                @if (!data.DRAMT) {
-<span
-                 
-                  class="muted">
-                  —
-                </span>
-}
-
-              </td>
-
-              <!-- CR -->
-
-              <td class="num cr-amt">
-
-                @if (data.CRAMT) {
-<span>
-                  {{ data.CRAMT | number:'1.2-2' }}
-                </span>
-}
-
-                @if (!data.CRAMT) {
-<span
-                 
-                  class="muted">
-                  —
-                </span>
-}
-
-              </td>
-
-              <!-- CLEARANCE -->
-
-              <td>
-
-              @if (activeTab === 'UNCLEARED') {
-<my-date-picker
- 
-  name="dtbld_{{ data.ENTRYNO }}"
-  [options]="myDatePickerOptions"
-  [(ngModel)]="data.CLEARANCEDATE"
-  class="form-control br-datepicker br-datepicker--inline">
-</my-date-picker>
-}
-
-@if (activeTab === 'CLEARED') {
-<span
- 
-  class="br-cleared-text">
-  {{ data.CLEARANCEDATE?.formatted }}
-</span>
-}
-
-              </td>
-
-            </tr>
-}
-
+            @for (data of filteredBankreconcilList; track $index) {
+              <tr>
+                <td class="mono">{{ data.ENTRYNO }}</td>
+                <td class="mono">{{ data.ENTRYDT }}</td>
+                <td>@if (data.STATUS === 'BR') { <span class="chip solid">{{ data.STATUS }}</span> } @else { <span class="chip">{{ data.STATUS }}</span> }</td>
+                <td>
+                  <div [innerHTML]="data.PARTYNAME"></div>
+                  @if (data.CHEQUENO) { <div class="fk-sub">{{ data.CHEQUETYPE }} | {{ data.CHEQUENO }}</div> }
+                </td>
+                <td class="mono">{{ data.CHEQUETYPE || '—' }}</td>
+                <td class="mono">{{ data.CHEQUENO || '—' }}</td>
+                <td class="mono">{{ data.CHEQUEDT || '—' }}</td>
+                <td class="num">@if (data.DRAMT) { {{ data.DRAMT | number:'1.2-2' }} } @else { <span class="sub-t">—</span> }</td>
+                <td class="num">@if (data.CRAMT) { {{ data.CRAMT | number:'1.2-2' }} } @else { <span class="sub-t">—</span> }</td>
+                <td>
+                  @if (activeTab === 'UNCLEARED') {
+                    <my-date-picker name="dtbld_{{ data.ENTRYNO }}" [options]="myDatePickerOptions" [(ngModel)]="data.CLEARANCEDATE"></my-date-picker>
+                  }
+                  @if (activeTab === 'CLEARED') {
+                    <span class="mono">{{ data.CLEARANCEDATE?.formatted }}</span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="10" class="empty">No {{ activeTab === 'UNCLEARED' ? 'uncleared' : 'cleared' }} entries for this period.</td></tr>
+            }
           </tbody>
-
         </table>
-
       </div>
-
     </div>
 
-    <!-- ACTION BAR -->
-
-  <div class="br-action-bar">
-
-  <!-- ✅ LEFT SIDE — Back button -->
-  <button class="br-back-btn" type="button" (click)="BackToSearch()">
-    <i class="fa fa-arrow-left"></i> Back To Search
-  </button>
-
-  <!-- ✅ LEFT SIDE — Records count -->
-  <span class="br-record-chip">
-    {{ filteredBankreconcilList.length }} Records
-  </span>
-
-  <!-- ✅ LEFT SIDE — Export to Excel -->
-  <button class="br-btn br-btn--export" type="button" (click)="ExportExcel()">
-    <i class="fa fa-file-excel-o"></i> Export To Excel
-  </button>
-
-  <!-- ✅ Diff pill — also left side -->
-  <!-- <div class="br-diff-pill">
-    Difference : {{ differenceLabel }}
-  </div> -->
-
-  <!-- ✅ RIGHT SIDE — pushed by margin-left:auto on Reset -->
-  <button class="br-btn br-btn--ghost" type="button" (click)="Reset()"
-          style="margin-left: auto;">
-    <i class="fa fa-ban"></i> Reset
-  </button>
-
-  @if (activeTab === 'UNCLEARED') {
-<button
-   
-    class="br-btn br-btn--submit"
-    type="button"
-    (click)="BankRecUpdate()">
-    <i class="fa fa-check-circle"></i> Submit Reconciliation
-  </button>
-}
-
-</div>
-
-  </div>
-}
-
+    <div class="bar">
+      <span class="note">{{ filteredBankreconcilList.length }} records</span>
+      <div class="r">
+        <button class="btn g" type="button" (click)="Reset()">Reset</button>
+        @if (activeTab === 'UNCLEARED') {
+          <button class="btn p" type="button" (click)="BankRecUpdate()">Submit reconciliation</button>
+        }
+      </div>
+    </div>
+  }
 </div>

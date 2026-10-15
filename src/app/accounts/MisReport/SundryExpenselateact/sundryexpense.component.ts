@@ -8,10 +8,11 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 import { DatePipe } from '@angular/common';
+import { FIN_PERIODS, FinPeriod, finRange, finDp, FinPager, FinChart, finBars, finNum, finAmt, finByKey } from '../../Accreport/fin-kit';
 @Component({
     selector: 'app-SundryExpenses',
     templateUrl: './sundryexpense.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' }, // Links: import-page + accreport-page are global (src/styles/kit)
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -102,13 +103,15 @@ import { DatePipe } from '@angular/common';
             }
   
       this._dataService.getData("Accounts/ACC_MIS_SUNDRY_EXPENSES",jsonparam)
-      .subscribe((data: any) => {
+            .subscribe((data: any) => {
           this.displayType='LIST'
-          this.SundryexpenseList=data.Table;
+          this.SundryexpenseList=data.Table || [];
+          this.dataForExcel = []; // reset: rows used to accumulate across Generate clicks
           this.SundryexpenseList.forEach((row: any) => {
             this.dataForExcel.push(Object.values(row))
             });
-       });
+          this.failed = false; this.buildView();
+       }, () => { this.failed = true; });
   }
   // ExportData() {
   //   let reportData = {
@@ -186,4 +189,32 @@ import { DatePipe } from '@angular/common';
     let toolbar = 'resizable=no,scrollbars=no,width=800,height=450,status=no,left=' + theLeft + ',top=' + theTop;
     window.open('././#/popup/Account-Job-Profit-Report/' +  jobno + '/', "Job Print",  toolbar);
   }
+
+    // ---- redesign: presets, KPIs, amount-by-account chart, pager (display only) ----
+    failed = false;
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    pager = new FinPager<any>(10);
+    chart: FinChart | null = null;
+    fmt = finAmt;
+    grandTotal: any = null;
+    kpiAmount = 0;
+    kpiJobs = 0;
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.FromDate = finDp(r.from, this.myDatePickerOptions.dateFormat).formatted;
+        this.ToDate = finDp(r.to, this.myDatePickerOptions.dateFormat).formatted;
+    }
+    buildView() {
+        const all = this.SundryexpenseList || [];
+        const rows = all.filter(r => r.JOBNO1 !== 'GRAND TOTAL');
+        this.grandTotal = all.find(r => r.JOBNO1 === 'GRAND TOTAL') || null;
+        this.pager.set(rows);
+        this.kpiAmount = rows.reduce((a, r) => a + finNum(r.AMOUNT), 0);
+        this.kpiJobs = new Set(rows.map(r => r.JOBNO1).filter(x => !!x)).size;
+        const items = finByKey(rows, r => r.ACCTNAME, r => finNum(r.AMOUNT));
+        this.chart = items.length ? finBars(items) : null;
+    }
 }

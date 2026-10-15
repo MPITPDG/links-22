@@ -6,11 +6,12 @@ import { LoginService } from '../../shared/service/loginService';
 import { ToastCommonService } from '../../shared/service/toastService';
 import { LoaderService } from '../../shared/service/loader.service';
 import {Configuration}  from '../../app.constants'
+import { EInvGrid } from './einvoice-grid';
 
 @Component({
     selector: 'app-ecreditnote-generatejson',
     templateUrl: './ecreditnote-generatejson.component.html',
-    styles: [],
+    styleUrls: ['./einvoice-page.css'], // Links: import-page.css is global (src/styles/kit)
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -21,6 +22,9 @@ import {Configuration}  from '../../app.constants'
     rptdownloadurl:string;
     subheader:string="";
     NoofRows:string=""
+    /** display-only filter / pager / CSV / on-page notice (see einvoice-grid.ts) */
+    grid = new EInvGrid(() => this.EcreditnoteListtbl, ['INV_NO', 'CLIENT', 'EXP_GSTNO', 'SUPTYPE']);
+    exportCsv() { this.grid.exportCsv('ecreditnote-pending', [['Doc no','INV_NO'],['Doc date','INV_DATE'],['Client','CLIENT'],['Client GST no.','EXP_GSTNO'],['Supply type','SUPTYPE'],['Total amount','TOTALAMT'],['Taxable amt','TAXABLEAMT'],['Non taxable amt','NONTAXABLEAMT'],['IGST','IGST'],['CGST','CGST'],['SGST','SGST']] as Array<[string, string]>); }
     constructor(
         private _router: Router,
         private _dataService: DataService,
@@ -45,11 +49,18 @@ import {Configuration}  from '../../app.constants'
           CITYCODE: this._loginService.getLogin()[0].CITYCODE
         }
         this._loaderService.display(true);
+        this.grid.loading = true;
+        this.grid.loadError = '';
         this._dataService.getData("Accounts/ACC_ECreditNote_List", jsonmaster)
           .subscribe((data: any) => {
             console.log(data)
             this.EcreditnoteListtbl = data.Table
             this.NoofRows=data.Table.length;
+            this.grid.loading = false;
+            this._loaderService.display(false);
+          }, (err: any) => {
+            this.grid.loading = false;
+            this.grid.loadError = EInvGrid.errText(err);
             this._loaderService.display(false);
           })
       }
@@ -102,6 +113,7 @@ import {Configuration}  from '../../app.constants'
               .subscribe((data: any) => {
                 if(data.Table7[0].STATUS=="100")
                 {
+                  this.grid.say('ok', 'JSON generated · ' + (data.Table7[0].FILENAMET || ''), data.Table7[0].STATUSMSG + '\nCredit notes: ' + output1);
                   alert(data.Table7[0].STATUSMSG);
                   this.downloadFile(data.Table7[0].FILENAMET );
                   this.GetECreditNoteList();
@@ -111,11 +123,15 @@ import {Configuration}  from '../../app.constants'
 
                 }
                 else{
+                  this.grid.say('err', 'No JSON generated', (data.Table7[0].STATUSMSG || 'No Json file to Generate !!') + '\nCredit notes: ' + output1);
                   alert('No Json file to Generate !!');
                   this._loaderService.display(false);
                   return false;
                 }
 
+              }, (err: any) => {
+                this.grid.say('err', 'Generate JSON failed', EInvGrid.errText(err));
+                this._loaderService.display(false);
               })
 
 

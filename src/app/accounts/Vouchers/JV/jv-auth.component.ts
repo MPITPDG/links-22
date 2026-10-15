@@ -9,6 +9,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 import { ActivatedRoute, Router } from '@angular/router';
 @Component({
     templateUrl: 'jv-auth.component.html',
+    styleUrls: ['../vouchers-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -24,6 +25,11 @@ import { ActivatedRoute, Router } from '@angular/router';
     order: string = 'REQCODE';
     reverse: boolean = false;
     rowcount:string; 
+    /** header select-all box (was bound in the template but never declared) */
+    checkbox: boolean = false;
+    readonly pageSize = 10;
+    page: number = 1;
+    Quick: string = '';
     constructor(
         private _router: Router,
         private _dataService: DataService,
@@ -239,7 +245,9 @@ checkAll(ev) {
   }
 }
 getCheckboxValues(event, data) {
-  var index = this.newArray.findIndex(x => x.REQCODE == data);
+  // entries are stored as { inoiceno }, so match on that (matching x.REQCODE never found the
+  // row and splice(-1, 1) dropped the last selected request instead of the unticked one)
+  var index = this.newArray.findIndex(x => x.inoiceno == data);
   if (event) {
     let obj = {
       inoiceno: data
@@ -247,8 +255,50 @@ getCheckboxValues(event, data) {
     
     this.newArray.push(obj);
   }
-  else {
+  else if (index >= 0) {
     this.newArray.splice(index, 1);
   }
+}
+
+// ---------- list: quick filter, pager, export (presentation only) ----------
+get Filtered(): Array<any> {
+  const q = (this.Quick || '').trim().toLowerCase();
+  const list = this.Unauthlist || [];
+  if (!q) { return list; }
+  return list.filter((r: any) => [r.REQCODE, r.REQUESTEDON, r.REQUESTEDBY, r.AUTHORISEDBY, r.AUTHORISATIONDATE]
+    .some(v => String(v == null ? '' : v).toLowerCase().indexOf(q) >= 0));
+}
+get pageCount(): number { return Math.max(1, Math.ceil(this.Filtered.length / this.pageSize)); }
+get pageRows(): Array<any> { const s = (Math.min(this.page, this.pageCount) - 1) * this.pageSize; return this.Filtered.slice(s, s + this.pageSize); }
+get rangeStart(): number { return this.Filtered.length ? (Math.min(this.page, this.pageCount) - 1) * this.pageSize + 1 : 0; }
+get rangeEnd(): number { return Math.min(Math.min(this.page, this.pageCount) * this.pageSize, this.Filtered.length); }
+get pageList(): number[] {
+  const n = this.pageCount, p = this.page;
+  if (n <= 7) { return Array.from({ length: n }, (_, i) => i + 1); }
+  const out: number[] = [1];
+  const lo = Math.max(2, p - 1), hi = Math.min(n - 1, p + 1);
+  if (lo > 2) { out.push(0); }
+  for (let i = lo; i <= hi; i++) { out.push(i); }
+  if (hi < n - 1) { out.push(0); }
+  out.push(n);
+  return out;
+}
+goPage(p: number) { if (p >= 1 && p <= this.pageCount) { this.page = p; } }
+get viewLabel(): string {
+  return this.hidebtnrow == 'V' ? 'verified' : this.hidebtnrow == 'R' ? 'rejected' : 'awaiting verification';
+}
+exportCsv() {
+  const head = ['Req code', 'Requested on', 'Requested by', 'Debit', 'Credit', 'Authorised by', 'Authorised on'];
+  const rows = this.Filtered.map((r: any) => [r.REQCODE, r.REQUESTEDON, r.REQUESTEDBY, r.DEBIT, r.CREDIT, r.AUTHORISEDBY, r.AUTHORISATIONDATE]);
+  const q = (v: any) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const csv = [head, ...rows].map(l => l.map(q).join(',')).join('\r\n');
+  const d = new Date();
+  const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'jv-requests-' + this.viewLabel.split(' ')[0] + '-' + stamp + '.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 }
