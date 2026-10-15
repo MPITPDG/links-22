@@ -188,6 +188,20 @@ export const routes: Routes = [
         ]
     },
     {
+        // Raise-ticket board (ported from MPERPNG-20).
+        path: 'tickets',
+        component: FullLayoutComponent,
+        data: {
+            title: 'Tickets'
+        },
+        children: [
+            {
+                path: '',
+                loadChildren: () => import('./tickets/tickets.module').then(m => m.TicketsModule),
+            }
+        ]
+    },
+    {
         path: 'information',
         component: SimpleLayoutComponent,
         data: {

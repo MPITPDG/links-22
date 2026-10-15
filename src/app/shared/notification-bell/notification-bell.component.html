@@ -36,13 +36,62 @@
       </div>
 
       <!--
-        PLUG-IN POINT: MP renders two more sections here, above the messages -
-        "Job alerts" (JobStateService, export job-state alerts) and "Tickets"
-        (TicketService, ticket events) - followed by a "Messages" sub-heading
-        when either is present. Links' API has no JobState / Tickets endpoints
-        yet; port those blocks from MPERPNG-20's notification-bell.component.html
-        (and the matching .nb-sub/.nb-alert CSS) once it does.
+        Job alerts (JobStateService) and ticket events (TicketService), as MP.
+        Both sections stay hidden while their endpoint returns nothing (or is
+        not deployed yet), so the panel is then the plain message list.
       -->
+      @if (recentAlerts().length) {
+        <div class="nb-head nb-sub">
+          <span class="nb-title">Job alerts</span>
+          <span class="nb-count">{{ alertCount() }} need attention</span>
+          <span class="nb-spacer"></span>
+          <a class="nb-act" routerLink="/export/today" (click)="open = false">View all</a>
+        </div>
+        <div class="nb-list nb-alerts">
+          @for (a of recentAlerts(); track a.alert_id) {
+            <div class="nb-item nb-alert" role="button" tabindex="0"
+                 [title]="'Open job ' + a.exptno" (click)="openJob(a)" (keydown.enter)="openJob(a)">
+              <span class="nb-mark nb-sev" [class.nb-crit]="a.severity === 'CRIT'">{{ a.severity }}</span>
+              <div class="nb-body">
+                <div class="nb-item-title">{{ a.exptno }}</div>
+                <div class="nb-item-text">{{ a.message }}</div>
+                <div class="nb-when">{{ a.last_seen ? when($any(a.last_seen)) : '' }}</div>
+              </div>
+              <button type="button" class="nb-x nb-ack" title="Acknowledge"
+                      [attr.aria-label]="'Acknowledge alert on job ' + a.exptno"
+                      (click)="acknowledge(a, $event)">&#10003;</button>
+            </div>
+          }
+        </div>
+      }
+
+      @if (ticketEvents().length) {
+        <div class="nb-head nb-sub">
+          <span class="nb-title">Tickets</span>
+          <span class="nb-count">{{ ticketUnread() }} {{ ticketUnread() === 1 ? 'update' : 'updates' }}</span>
+          <span class="nb-spacer"></span>
+          <button type="button" class="nb-act" (click)="markTicketsSeen()"
+                  [disabled]="ticketUnread() === 0">Mark seen</button>
+          <a class="nb-act" routerLink="/tickets" (click)="open = false">View board</a>
+        </div>
+        <div class="nb-list nb-alerts">
+          @for (e of ticketEvents(); track e.event_id) {
+            <div class="nb-item nb-alert" [class.nb-unread]="unseen(e)" role="button" tabindex="0"
+                 [title]="'Open ticket ' + e.ticket_no" (click)="openTicket(e)" (keydown.enter)="openTicket(e)">
+              <span class="nb-mark nb-sev" [class.nb-crit]="unseen(e)">{{ ticketMark(e) }}</span>
+              <div class="nb-body">
+                <div class="nb-item-title">{{ e.ticket_no }} · {{ e.subject }}</div>
+                <div class="nb-item-text">{{ ticketLine(e) }}</div>
+                <div class="nb-when">{{ e.at ? when($any(e.at)) : '' }}</div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (recentAlerts().length || ticketEvents().length) {
+        <div class="nb-head nb-sub"><span class="nb-title">Messages</span></div>
+      }
 
       <div class="nb-list">
         @for (n of items(); track n.id) {

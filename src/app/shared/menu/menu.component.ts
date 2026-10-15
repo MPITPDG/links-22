@@ -210,6 +210,11 @@ export class MenuComponent implements OnInit, AfterViewInit {
         return !['admin', 'edixml'].includes((this.menuBaseUrl || '').toLowerCase());
     }
 
+    /** Export job-state alerts page, listed next to Dashboard in the Export menu (as MP). */
+    get hasToday(): boolean {
+        return (this.menuBaseUrl || '').toLowerCase() === 'export';
+    }
+
     /**
      * The Dashboard entry opens the landing page of the module you are in - the
      * same url the module picker enters it with. In Links every module is

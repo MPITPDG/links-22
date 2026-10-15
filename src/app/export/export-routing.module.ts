@@ -9,7 +9,12 @@ const routes: Routes = [
             title: 'Export'
         },
         children: [
-            { path: '', component: ExportComponent, data: { title: 'Home' } },           
+            { path: '', component: ExportComponent, data: { title: 'Home' } },
+            {
+                // Export > Today: job-state alerts (ported from MPERPNG-20).
+                path: 'today',
+                loadChildren: () => import('./today/export-today.module').then(m => m.ExportTodayModule),
+            },
               {
                 path: 'Consignment',
                 loadChildren: () => import('./consignment/consignment/expt-consignment-module').then(m => m.ExportConsignmentModule),

@@ -70,6 +70,7 @@ export class ModuleComponent implements OnInit {
         7: { g: 'sys', d: 'Document archive - opens in a new tab' },
         12: { g: 'sys', d: 'Users, rights and settings' },
         2: { g: 'sys', d: 'Users, rights and settings' },
+        11: { g: 'sys', d: 'Report a problem to IT' },
     };
 
     segments: { m: any; d: string; color: string; group: string; desc: string; lx: number; ly: number; dx: number; dy: number }[] = [];
@@ -272,7 +273,7 @@ export class ModuleComponent implements OnInit {
                // { id: 4, moduleid: 10, name: 'Order', listyle: null, labelstyle: null, icon: 'fa fa-shopping-cart fa-2x', url: null },
                 //{ id: 5, moduleid: 12, name: 'ICS', listyle: null, labelstyle: null, icon: 'fa fa-sitemap fa-2x', url: null },
                 //{ id: 6, moduleid: 6, name: 'BHEL', listyle: null, labelstyle: null, icon: 'fa fa-tachometer fa-2x', url: null },
-               // { id: 7, moduleid: 11, name: 'Raise Ticket', listyle: null, labelstyle: null, icon: 'fa fa-ticket fa-2x', url: null },
+                { id: 7, moduleid: 11, name: 'Raise Ticket', listyle: null, labelstyle: null, icon: 'fa fa-ticket fa-2x', url: '/tickets' },
                 //{ id: 8, moduleid: 12, name: 'Profile', listyle: null, labelstyle: null, icon: 'fa fa-user-circle-o fa-2x', url: null },
                 //{ id: 9, moduleid: 5, name: 'EDI/XML', listyle: null, labelstyle: null, icon: 'fa fa-comments-o fa-2x', url: null },
                 { id: 10, moduleid: 7, name: 'E-Doc', listyle: null, labelstyle: null, icon: 'fa fa-folder-open fa-2x', url: '7' },

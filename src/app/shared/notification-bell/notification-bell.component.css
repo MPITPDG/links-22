@@ -206,8 +206,40 @@
     outline-color: var(--mp-surface, #FFFFFF);
 }
 
-/* ---------- section rows ----------
-   MP also styles its job-state alert and ticket-event sections here
-   (.nb-sub, .nb-alerts, .nb-alert, .nb-sev, .nb-ack). Links' API has no
-   JobState or Tickets endpoint yet, so those sections - and their styles - are
-   not ported. Copy them back from MPERPNG-20 when the endpoints exist. */
+/* ---------- job-state alerts (JobStateService) ---------- */
+.nb-sub {
+    padding: 6px 12px;
+    border-top: 1px solid var(--mp-line, #E4E4E4);
+}
+
+.nb-alerts {
+    flex: 0 1 auto;
+    max-height: 300px;
+}
+
+.nb-alert {
+    cursor: pointer;
+}
+
+.nb-alert:hover {
+    background: var(--mp-bg, #FAFAFA);
+}
+
+.nb-sev.nb-crit {
+    background: var(--mp-primary, #0A0A0A);
+    border-color: var(--mp-primary, #0A0A0A);
+    color: var(--mp-primary-fg, #FFFFFF);
+}
+
+.nb-ack {
+    font-size: 13px;
+}
+
+a.nb-act {
+    text-decoration: none;
+}
+
+/* ---------- ticket events (TicketService) - reuse the alert rows; unread = dark mark ---------- */
+.nb-alert.nb-unread .nb-item-title {
+    font-weight: 700;
+}

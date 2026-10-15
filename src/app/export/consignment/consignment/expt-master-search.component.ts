@@ -70,6 +70,36 @@ export class ExportMasterSearchComponent implements OnInit {
                 this._loginService.checkVerify('View', data);
             });
         this.getData("PAGELOAD", "", "");
+        this.loadRecent();
+    }
+
+    // ---------------------------------------------------------------- recent list
+    // Ported from MPERPNG-20. On open the page lists the most recently opened export
+    // jobs for the logged-in user's city/company, newest first, in the same grid as
+    // search results. Backed by USP_EXPT_CONSIGNMENT_RECENT via Export/GetRecentConsignments
+    // (Links search columns: GRPID present, no INCOTERM/CONTFRT); Table1[0].SEARCH_HEAD is
+    // the caption. Fails silently (endpoint not deployed, error envelope): the page is then
+    // the plain search it always was.
+    static RECENT_TOP: number = 50;
+
+    loadRecent() {
+        const l = this._loginService.getLogin()?.[0];
+        if (!l) { return; }
+        const _jsonData = { Type1: l.CITYCODE, Type2: l.CMPCODE, Type3: ExportMasterSearchComponent.RECENT_TOP };
+        this._dataService.Common("Export/GetRecentConsignments", _jsonData)
+            .subscribe((data: any) => {
+                // A search the user started while this was in flight wins.
+                if (this.searchHeaderText) { return; }
+                const rows: any[] = Array.isArray(data?.Table) ? data.Table : [];
+                // ErrorLog envelope ({STATUS:'101', ...}) instead of rows: ignore.
+                if (rows.some(r => r && String(r.STATUS ?? '') === '101')) { return; }
+                const jobs = rows.filter(r => r && r.EXPTNO);
+                if (jobs.length > 0) {
+                    this.searchList = jobs;
+                    this.searchHeaderText = (data?.Table1?.[0]?.SEARCH_HEAD || 'Recent consignments').toString();
+                }
+            },
+            () => { /* silent: the page still works as a plain search */ });
     }
 
     mainCheck(ctype) {
