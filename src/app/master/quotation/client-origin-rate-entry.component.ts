@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IMyDpOptions } from 'mydatepicker';
 import { DataService } from '../../shared/service/dataService';
 import { ToastCommonService } from '../../shared/service/toastService';
@@ -13,6 +13,7 @@ import { OnlyNumberDirective } from '../../shared/onlynumber.directive';
   selector: 'app-client-origin-rate-entry',
   templateUrl: './client-origin-rate-entry.component.html',
   styles: [],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ClientOriginRateEntryComponent implements OnInit {

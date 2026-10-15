@@ -1,4 +1,4 @@
-﻿//  import { Component, OnInit } from '@angular/core';
+﻿//  import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 // import { DataService } from '../shared/service/dataService';
 // import { AuthService } from '../shared/service/authService';
 // import {Router} from '@angular/router';
@@ -28,10 +28,10 @@
 //         color: #ffffff;
 //         font-family: Verdana, Arial;
 //       }
-//     `]
-//,
-    standalone: false
-})
+//     `],
+//     changeDetection: ChangeDetectionStrategy.Eager,
+//     standalone: false
+// })
 // export class FreightLoginComponent implements OnInit {
 //     public username: string = '';
 //     public password: string = '';
