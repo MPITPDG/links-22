@@ -10,6 +10,7 @@ import { UserprofileRoutingModule } from './userprofile-routing.module';
 import { userprofilesearch} from './userprofile-search.component';
 import {userprofilecreation} from './userprofile-creation.component';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { SharedModule } from '../../shared/shared.module';
 import {UserfilerpipePipe} from '../userfilerpipe.pipe'
 @NgModule({
   declarations: [userprofilesearch,userprofilecreation,UserfilerpipePipe],
@@ -19,7 +20,8 @@ import {UserfilerpipePipe} from '../userfilerpipe.pipe'
     TabsModule,
     CommonModule,
     MyDatePickerModule,
-    NgSelectModule,NgxPaginationModule
+    NgSelectModule,NgxPaginationModule,
+    SharedModule
   ] ,providers: [
 	],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],

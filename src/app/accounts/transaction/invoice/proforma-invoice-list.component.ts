@@ -15,7 +15,7 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
     border: 2px solid #c2cfd6 ;
   }
   th {
-    background: white;
+    background: var(--mp-surface, white);
     position: sticky;
     top: 0; /* Don't forget this, required for the stickiness */
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);

@@ -32,4 +32,198 @@
 
 
 
- 
+ /* ==========================================================================
+   Dark colour mode — page ground.
+
+   Anchored on the shell's OWN colours so the page reads as one product:
+       masthead  #26A6D4  (cyan)
+       sidebar   #005169  (deep teal)
+   The ground is a much darker sibling of the sidebar teal, not a generic
+   indigo navy - an indigo page under a cyan masthead looked like two
+   different applications bolted together.
+
+   The JV Request (new layout) screen stamps data-color-mode="dark" on <html>
+   and clears it on leaving, so these rules are inert everywhere else. They
+   exist because a component stylesheet cannot reach the shell containers.
+   ========================================================================== */
+html[data-color-mode="dark"] body,
+html[data-color-mode="dark"] .app-body,
+html[data-color-mode="dark"] main.main,
+html[data-color-mode="dark"] main.main > .container-fluid,
+html[data-color-mode="dark"] .container-fluid {
+  background: #001B24 !important;
+}
+
+/* breadcrumb: selectors kept broad because the bar sits between the masthead
+   and the content and was the one strip still glowing white */
+html[data-color-mode="dark"] .breadcrumb,
+html[data-color-mode="dark"] ol.breadcrumb,
+html[data-color-mode="dark"] main.main > .breadcrumb {
+  background: #002B38 !important;
+  background-color: #002B38 !important;
+  border-bottom: 1px solid #0A4B5D !important;
+}
+html[data-color-mode="dark"] .breadcrumb,
+html[data-color-mode="dark"] .breadcrumb a,
+html[data-color-mode="dark"] .breadcrumb .breadcrumb-item,
+html[data-color-mode="dark"] .breadcrumb .breadcrumb-item.active,
+html[data-color-mode="dark"] .breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  color: #A8C2CE !important;
+}
+html[data-color-mode="dark"] .breadcrumb a { color: #4FC3E8 !important; }
+
+/* ---------- BLACK mode: shell ground ---------- */
+html[data-color-mode="black"] body,
+html[data-color-mode="black"] .app-body,
+html[data-color-mode="black"] main.main,
+html[data-color-mode="black"] main.main > .container-fluid,
+html[data-color-mode="black"] .container-fluid {
+  background: #000 !important;
+}
+html[data-color-mode="black"] .breadcrumb,
+html[data-color-mode="black"] ol.breadcrumb,
+html[data-color-mode="black"] main.main > .breadcrumb {
+  background: #0B0B0B !important;
+  background-color: #0B0B0B !important;
+  border-bottom: 1px solid #242424 !important;
+}
+html[data-color-mode="black"] .breadcrumb,
+html[data-color-mode="black"] .breadcrumb a,
+html[data-color-mode="black"] .breadcrumb .breadcrumb-item,
+html[data-color-mode="black"] .breadcrumb .breadcrumb-item.active,
+html[data-color-mode="black"] .breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  color: #A8A8A8 !important;
+}
+html[data-color-mode="black"] .breadcrumb a { color: #45B8DC !important; }
+/* @theme-sweep:legacy ==========================================================
+   Palette theming for CoreUI / Bootstrap / ng-select pieces that are not
+   reachable by tools/theme-sweep.mjs hex replacement. Only applies when a
+   palette is set (Classic = no data-theme) and never in chrome-only scope,
+   where pages stay grey. Not swept by the script (marker above).
+   ============================================================================= */
+$mp-t: 'html[data-theme]:not([data-theme-scope="chrome"])';
+
+#{$mp-t} {
+  .btn-primary,
+  .btn-dark,
+  .badge-primary,
+  .badge-dark,
+  .bg-primary,
+  .bg-dark,
+  .progress-bar,
+  .page-item.active .page-link,
+  .dropdown-item.active,
+  .dropdown-item:active,
+  .list-group-item.active,
+  .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: var(--mp-primary) !important;
+    border-color: var(--mp-primary) !important;
+    color: var(--mp-primary-fg) !important;
+  }
+  .btn-primary:hover, .btn-primary:focus,
+  .btn-dark:hover, .btn-dark:focus {
+    filter: brightness(1.1);
+  }
+  .btn-secondary,
+  .badge-secondary {
+    background-color: var(--mp-band) !important;
+    border-color: var(--mp-line) !important;
+    color: var(--mp-ink) !important;
+  }
+  .btn-outline-primary,
+  .btn-outline-dark {
+    border-color: var(--mp-primary) !important;
+    color: var(--mp-primary) !important;
+  }
+  .btn-outline-primary:hover,
+  .btn-outline-dark:hover {
+    background-color: var(--mp-primary) !important;
+    color: var(--mp-primary-fg) !important;
+  }
+
+  .table thead th,
+  .thead-light th {
+    background-color: var(--mp-band);
+    border-color: var(--mp-line);
+    color: var(--mp-ink);
+  }
+  .thead-dark th,
+  .table .thead-dark th {
+    background-color: var(--mp-primary) !important;
+    border-color: var(--mp-primary) !important;
+    color: var(--mp-primary-fg) !important;
+  }
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--mp-band);
+  }
+  .table td, .table th, .table-bordered, .table-bordered td, .table-bordered th {
+    border-color: var(--mp-line);
+  }
+
+  .nav-tabs .nav-link.active,
+  .nav-tabs .nav-item.show .nav-link {
+    border-color: var(--mp-line) var(--mp-line) var(--mp-surface);
+    border-top: 2px solid var(--mp-primary);
+    color: var(--mp-primary);
+  }
+  .card {
+    border-color: var(--mp-line);
+  }
+  .card-header {
+    background-color: var(--mp-band);
+    border-color: var(--mp-line);
+    color: var(--mp-ink);
+  }
+  .breadcrumb {
+    background-color: var(--mp-surface);
+    border-color: var(--mp-line);
+  }
+  .breadcrumb a { color: var(--mp-primary); }
+
+  .form-control:focus,
+  .custom-select:focus,
+  .custom-control-input:focus ~ .custom-control-label::before {
+    border-color: var(--mp-primary) !important;
+    box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--mp-primary) 25%, transparent) !important;
+  }
+
+  .text-primary { color: var(--mp-primary) !important; }
+  .border-primary { border-color: var(--mp-primary) !important; }
+  .page-link { color: var(--mp-primary); }
+
+  /* ng-select */
+  .ng-select .ng-select-container {
+    border-color: var(--mp-line);
+  }
+  .ng-select.ng-select-focused:not(.ng-select-opened) > .ng-select-container {
+    border-color: var(--mp-primary);
+    box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--mp-primary) 25%, transparent);
+  }
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+    background-color: var(--mp-band);
+    color: var(--mp-ink);
+  }
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected,
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected.ng-option-marked {
+    background-color: var(--mp-primary);
+    color: var(--mp-primary-fg);
+  }
+  .ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-value {
+    background-color: var(--mp-band);
+    border-color: var(--mp-line);
+    color: var(--mp-ink);
+  }
+
+  /* mydatepicker (legacy lib + shim) */
+  .mydp .selectedday .datevalue,
+  .mydp .selectedday,
+  .mydp .selectedmonth .monthvalue,
+  .mydp .selectedyear .yearvalue {
+    background-color: var(--mp-primary) !important;
+    border-color: var(--mp-primary) !important;
+    color: var(--mp-primary-fg) !important;
+  }
+  .mydp .currday { color: var(--mp-primary); }
+  .mydp .headertodaybtn, .mydp .headerbtn { color: var(--mp-primary); }
+  .mydp-shim-btn { color: var(--mp-primary); }
+}

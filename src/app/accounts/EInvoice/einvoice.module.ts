@@ -11,6 +11,7 @@ import {EcreditNoteGenerateJson} from './ecreditnote-generatejson.component';
 import { CreditNoteResetJson  } from './ecreditnote-resetjson.component'; 
 import { einvoiceRoutingModule } from './einvoice.routing';
 import { EInvoiceList } from './einvoice-list.component';
+import { UiButton } from '../../shared/ui/button';
 // import { ClientEdiDesignComponent } from './client-edi-design.component';
 // import { ClientedifilterpipePipe } from './client-edifilterpipe.pipe';
 @NgModule({
@@ -20,7 +21,8 @@ import { EInvoiceList } from './einvoice-list.component';
       CommonModule,
       
       MyDatePickerModule,
-      NgSelectModule
+      NgSelectModule,
+      UiButton
       //SharedModule
   ],
   declarations: [GenerateJson,UploadIRN,ResetJson,EcreditNoteGenerateJson,CreditNoteResetJson,

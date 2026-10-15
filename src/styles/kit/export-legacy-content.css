@@ -1,0 +1,567 @@
+/* ----------------------------------------------------------------
+   Links port (Phase 1): GLOBAL page-kit stylesheet, registered in
+   angular.json `styles` after src/tailwind.css.
+   Source: MPERPNG-20 src/app/export/consignment/consignment/export-legacy-content.css
+   Root class .x-legacy (restyles legacy Bootstrap table markup in place).
+   Loaded after export-theme.css and after the area add-ons, matching MP where it
+   came last (consig_main_edit_modal / import-entry).
+   Every rule stays under its root class, so no legacy screen is affected.
+   Do not edit by hand without mirroring MP; regenerate from MP instead.
+   ---------------------------------------------------------------- */
+/* ============================================================
+   Legacy editor content, restyled in place.
+   The 17 edit-modal editors and the routed air-shipment / CO2 screens still carry their
+   original table markup (`table-sm-new`, `col-form-span-label`, `width150` label cells...).
+   These rules retype that markup wherever it is hosted inside a container carrying the
+   .x-legacy class, so no inline template has to be rewritten.
+   Import AFTER export-theme.css.
+
+   THE LOOK matches the freight rating sheets (export-rating.css): a ruled monochrome
+   form. Black, white and grey only - hierarchy from weight, rules and fills, never hue.
+   Every field keeps a visible box, because in an ERP people need to see what they can
+   type into before they click it; a dashed box on a grey fill means calculated or
+   locked. Tables are ruled both ways in light grey, headings sit on a pale grey band,
+   and black is reserved for text and the primary action - an editor is several
+   small tables stacked, so black outlines and black bands on each one read as a
+   wall of black.
+
+   The palette is declared here, on .x-legacy, rather than by changing the --ex-* tokens
+   in export-theme.css: those tokens also paint the drawer shell and the other export
+   screens, which keep their current look.
+   ============================================================ */
+
+:root .x-legacy {
+    --lg-ink: var(--mp-ink, #0A0A0A);
+    --lg-ink-soft: var(--mp-soft, #565656);
+    --lg-faint: var(--mp-soft, #9A9A9A);
+    --lg-line: #DEDEDE;
+    --lg-line-soft: var(--mp-line, #F1F1F1);
+    --lg-fill: var(--mp-band, #ECECEC);
+    --lg-sheet: var(--mp-surface, #FFFFFF);
+    --lg-edge: #CFCFCF;
+    --lg-band: #F4F4F4;
+    --lg-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+    color: var(--lg-ink);
+}
+
+/* ---------- every table is a boxed, ruled sheet ---------- */
+:root .x-legacy table {
+    width: 100%;
+    margin: 0 0 14px;
+    background: var(--lg-sheet);
+    border: 1px solid var(--lg-edge);
+    border-radius: 0;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    /* no overflow:hidden - it clips date-picker calendars opened inside a cell */
+}
+
+/* A table nested inside a cell is part of that cell, not a second sheet. */
+:root .x-legacy table table {
+    border: 0;
+    box-shadow: none;
+    margin: 0;
+}
+
+:root .x-legacy table table td,
+:root .x-legacy table table th {
+    border: 0 !important;
+}
+
+:root .x-legacy table.table-striped tbody tr:nth-of-type(odd),
+:root .x-legacy table.table-striped tbody tr:nth-of-type(even),
+:root .x-legacy .bgwhite,
+:root .x-legacy .trbg,
+:root .x-legacy .bglightmaroon,
+:root .x-legacy .bglightgray {
+    background: transparent !important;
+}
+
+/* Ruled both ways: forms are read across a field and down a column. */
+:root .x-legacy table td,
+:root .x-legacy table th {
+    border: 0 !important;
+    border-right: 1px solid var(--lg-line) !important;
+    border-bottom: 1px solid var(--lg-line) !important;
+    padding: 6px 10px;
+    vertical-align: middle;
+    color: var(--lg-ink);
+    line-height: 1.4;
+}
+
+:root .x-legacy table td:last-child,
+:root .x-legacy table th:last-child {
+    border-right: 0 !important;
+}
+
+:root .x-legacy table tbody tr:last-child > td {
+    border-bottom: 0 !important;
+}
+
+:root .x-legacy table tbody tr:hover > td {
+    background: var(--lg-line-soft);
+}
+
+/* ---------- label / value split for the key-value tables ----------
+   Label cells are the ones carrying a widthNNN class in the first column. Grids (tables
+   with a thead) are excluded further down, where widthNNN sits on data cells instead. */
+:root .x-legacy table td[class*="width"]:first-child {
+    width: 210px;
+    background: transparent;
+    vertical-align: middle;
+}
+
+/* Labels read like the row text in Document Details - sentence case on white,
+   told apart from values by weight alone. A grey label column with small
+   uppercase labels made the key-value editors look like a different system. */
+:root .x-legacy table td[class*="width"]:first-child .col-form-span-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--lg-ink);
+}
+
+:root .x-legacy .col-form-span-label {
+    font-family: var(--ex-font);
+    font-size: 12.5px;
+    color: var(--lg-ink);
+}
+
+/* Required markers and error text. Monochrome, so they earn attention with weight. */
+:root .x-legacy .col-form-span-error,
+:root .x-legacy .red {
+    color: var(--lg-ink) !important;
+    font-weight: 700;
+}
+
+/* grids keep plain cells - a thead means widthNNN is on data columns, not labels */
+:root .x-legacy table > thead ~ tbody > tr > td[class*="width"]:first-child {
+    width: auto;
+    background: transparent;
+}
+
+:root .x-legacy table > thead ~ tbody > tr > td[class*="width"]:first-child .col-form-span-label {
+    font-size: 12.5px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--lg-ink);
+}
+
+/* ---------- headings sit on a pale grey band ---------- */
+:root .x-legacy .col-form-span-heading,
+:root .x-legacy thead th,
+:root .x-legacy .title-head,
+:root .x-legacy .formheading,
+:root .x-legacy .card-header {
+    background: var(--lg-band) !important;
+    color: var(--lg-ink) !important;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    border-bottom: 1px solid var(--lg-edge) !important;
+    white-space: nowrap;
+}
+
+:root .x-legacy .col-form-span-heading .col-form-span-label,
+:root .x-legacy .col-form-span-heading strong,
+:root .x-legacy .col-form-span-heading span,
+:root .x-legacy thead th .col-form-span-label,
+:root .x-legacy thead th strong,
+:root .x-legacy thead th span,
+:root .x-legacy .card-header span,
+:root .x-legacy .card-header strong {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    text-decoration: none;
+    color: var(--lg-ink) !important;
+}
+
+/* .centerlabel in this legacy markup only means "centre the cell" - it sits on
+   action cells (edit / delete icons) and button rows as often as on headers, so
+   it must never pick up the heading band. Headers are already covered by
+   thead th and .col-form-span-heading above. */
+:root .x-legacy td.centerlabel {
+    text-align: center;
+}
+
+/* the E-Document banner reads as an action, so make it look like one */
+:root .x-legacy th.link-label,
+:root .x-legacy td.link-label {
+    background: var(--lg-sheet) !important;
+    color: var(--lg-ink) !important;
+    cursor: pointer;
+}
+
+:root .x-legacy th.link-label span,
+:root .x-legacy td.link-label span {
+    color: var(--lg-ink) !important;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+:root .x-legacy th.link-label:hover,
+:root .x-legacy td.link-label:hover {
+    background: var(--lg-line-soft) !important;
+}
+
+:root .x-legacy .link-label {
+    color: var(--lg-ink);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+
+/* the rowspan'd "shipment clearance" cell becomes a side badge */
+:root .x-legacy td[rowspan][class*="width"]:not(:first-child) {
+    background: var(--lg-line-soft);
+    text-align: center;
+    vertical-align: middle;
+}
+
+:root .x-legacy td[rowspan] strong {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--lg-ink-soft);
+}
+
+/* ---------- fields keep their boxes ---------- */
+:root .x-legacy input.form-control,
+:root .x-legacy select.form-control,
+:root .x-legacy textarea.form-control {
+    min-height: 30px;
+    font-family: inherit;
+    font-size: 12.5px;
+    border: 1px solid var(--lg-faint);
+    border-radius: 3px;
+    padding: 3px 8px;
+    color: var(--lg-ink);
+    background: var(--lg-sheet);
+    box-shadow: none;
+    transition: border-color .12s;
+}
+
+:root .x-legacy input.form-control:hover:not(:disabled):not([readonly]),
+:root .x-legacy select.form-control:hover:not(:disabled),
+:root .x-legacy textarea.form-control:hover:not(:disabled):not([readonly]) {
+    border-color: var(--lg-ink-soft);
+}
+
+:root .x-legacy input.form-control:focus,
+:root .x-legacy select.form-control:focus,
+:root .x-legacy textarea.form-control:focus {
+    border-color: var(--mp-primary, var(--lg-ink));
+    box-shadow: 0 0 0 2px var(--lg-fill);
+    outline: none;
+}
+
+/* Calculated or locked: a dashed box on a grey fill. The value stays fully
+   readable - browsers grey disabled text via -webkit-text-fill-color, which
+   `color` alone will not override. */
+:root .x-legacy input.form-control:disabled,
+:root .x-legacy input.form-control[disabled],
+:root .x-legacy input.form-control[readonly],
+:root .x-legacy select.form-control:disabled,
+:root .x-legacy textarea.form-control:disabled,
+:root .x-legacy textarea.form-control[readonly] {
+    border-style: dashed;
+    border-color: var(--lg-faint);
+    background: var(--lg-line-soft);
+    color: var(--lg-ink-soft);
+    -webkit-text-fill-color: var(--lg-ink-soft);
+    opacity: 1;
+}
+
+:root .x-legacy .ng-select .ng-select-container {
+    min-height: 30px;
+    border: 1px solid var(--lg-faint);
+    border-radius: 3px;
+    background: var(--lg-sheet);
+    font-size: 12.5px;
+    color: var(--lg-ink);
+}
+
+:root .x-legacy .ng-select.ng-select-opened .ng-select-container,
+:root .x-legacy .ng-select.ng-select-focused .ng-select-container {
+    border-color: var(--mp-primary, var(--lg-ink));
+    box-shadow: 0 0 0 2px var(--lg-fill);
+}
+
+:root .x-legacy .ng-select.ng-select-disabled .ng-select-container {
+    border-style: dashed;
+    background: var(--lg-line-soft);
+}
+
+:root .x-legacy .ng-dropdown-panel .ng-option.ng-option-marked {
+    background: var(--lg-line-soft);
+    color: var(--lg-ink);
+}
+
+:root .x-legacy .ng-dropdown-panel .ng-option.ng-option-selected {
+    background: var(--lg-fill);
+    color: var(--lg-ink);
+    font-weight: 600;
+}
+
+:root .x-legacy .mydp .selectiongroup {
+    height: 30px;
+    border-radius: 3px;
+    border-color: var(--lg-faint);
+}
+
+:root .x-legacy .mydp {
+    height: auto !important;
+    overflow: visible !important;
+    border: 0;
+}
+
+:root .x-legacy .mydp .selector {
+    z-index: 1200;
+    height: auto !important;
+}
+
+:root .x-legacy input[type="radio"],
+:root .x-legacy input[type="checkbox"] {
+    accent-color: var(--mp-primary, var(--lg-ink));
+}
+
+/* ---------- buttons ---------- */
+:root .x-legacy .btn {
+    border-radius: 3px;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border: 1px solid var(--mp-primary, var(--lg-ink));
+    background: var(--lg-sheet);
+    color: var(--lg-ink);
+}
+
+:root .x-legacy .btn:hover {
+    background: var(--lg-line-soft);
+}
+
+:root .x-legacy .btn-primary,
+:root .x-legacy .btn-success {
+    background: var(--mp-primary, var(--lg-ink));
+    border-color: var(--mp-primary, var(--lg-ink));
+    color: var(--mp-primary-fg, var(--lg-sheet));
+}
+
+:root .x-legacy .btn-primary:hover,
+:root .x-legacy .btn-success:hover {
+    background: var(--mp-primary, #2A2A2A);
+    border-color: var(--mp-primary, #2A2A2A);
+}
+
+:root .x-legacy .btn-danger {
+    background: var(--lg-sheet);
+    border-color: var(--mp-primary, var(--lg-ink));
+    color: var(--lg-ink);
+}
+
+/* The label spans inside legacy buttons carry .col-form-span-label, whose ink
+   colour otherwise turns a filled button's text black on black. */
+:root .x-legacy .btn span,
+:root .x-legacy .btn i {
+    color: inherit !important;
+    font-size: inherit;
+}
+
+/* ---------- the hosted routed screens bring their own card chrome ---------- */
+:root .x-legacy .card {
+    border: 1px solid var(--lg-edge);
+    border-radius: 0;
+    margin-bottom: 14px;
+}
+
+:root .x-legacy .card-header {
+    padding: 8px 12px;
+}
+
+:root .x-legacy .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+
+/* ============================================================
+   The card-and-grid editors (.ed-card, used by Shipper / BillTo / Consignee)
+   are built without tables. Styled here to read exactly like the table
+   editors: a light-edged box, a pale grey heading band, and one ruled line
+   per field with the label on the left - the Document Details look.
+   Prefixed with .x-legacy so these win over the older .ed-* rules in
+   consig_main_edit_modal.component.css.
+   ============================================================ */
+:root .x-legacy .ed {
+    gap: 14px;
+    color: var(--lg-ink);
+}
+
+:root .x-legacy .ed-card {
+    background: var(--lg-sheet);
+    border: 1px solid var(--lg-edge);
+    border-radius: 0;
+}
+
+:root .x-legacy .ed-head {
+    gap: 8px;
+    padding: 7px 10px;
+    background: var(--lg-band);
+    border-bottom: 1px solid var(--lg-edge);
+}
+
+:root .x-legacy .ed-head i {
+    color: var(--lg-ink-soft);
+    font-size: 11px;
+}
+
+:root .x-legacy .ed-head h4 {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    color: var(--lg-ink);
+}
+
+:root .x-legacy .ed-body {
+    padding: 0;
+}
+
+/* One ruled line per field: the grid drops its gaps and every cell carries
+   the row rule, so label and field sit on the same line like a table row. */
+:root .x-legacy .ed-fields {
+    gap: 0;
+    grid-template-columns: 210px minmax(0, 1fr);
+}
+
+:root .x-legacy .ed-fields-4 {
+    grid-template-columns: 210px minmax(0, 1fr) 210px minmax(0, 1fr);
+}
+
+:root .x-legacy .ed-fields > * {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--lg-line);
+}
+
+:root .x-legacy .ed-fields > ng-select {
+    display: block;
+}
+
+:root .x-legacy .ed-lbl {
+    font-size: 12.5px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--lg-ink);
+    border-right: 1px solid var(--lg-line);
+}
+
+:root .x-legacy .ed-req {
+    color: var(--lg-ink);
+    font-weight: 700;
+}
+
+:root .x-legacy .ed-check {
+    margin: 0;
+    padding: 9px 10px;
+    border: 0;
+    border-bottom: 1px solid var(--lg-line);
+    border-radius: 0;
+    font-size: 12.5px;
+}
+
+:root .x-legacy .ed-body .ed-fields + .ed-check {
+    margin-top: 0;
+}
+
+:root .x-legacy .ed-sub {
+    margin: 0;
+    padding: 7px 10px;
+    background: var(--lg-band);
+    border-bottom: 1px solid var(--lg-edge);
+    font-size: 10px;
+    color: var(--lg-ink);
+}
+
+:root .x-legacy .ed-sub::after {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    :root .x-legacy .ed-fields,
+    :root .x-legacy .ed-fields-4 {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    :root .x-legacy .ed-lbl {
+        margin-top: 0;
+        min-height: 0;
+        padding-bottom: 0;
+        border-right: 0;
+        border-bottom: 0;
+    }
+}
+
+
+/* ============================================================
+   Responsive: the legacy editors keep their table markup, so each table gets
+   its own horizontal scroll rather than pushing the drawer sideways.
+   ============================================================ */
+:root .x-legacy {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+@media (max-width: 900px) {
+    :root .x-legacy table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    :root .x-legacy table > tbody,
+    :root .x-legacy table > thead {
+        display: table;
+        width: 100%;
+        min-width: 520px;
+    }
+
+    :root .x-legacy table td[class*="width"]:first-child {
+        width: 150px;
+    }
+}
+
+@media (max-width: 600px) {
+    :root .x-legacy table td,
+    :root .x-legacy table th {
+        padding: 6px 8px;
+    }
+
+    :root .x-legacy table td[class*="width"]:first-child {
+        width: 130px;
+    }
+}
+
+@media (pointer: coarse) {
+    :root .x-legacy input.form-control,
+    :root .x-legacy select.form-control,
+    :root .x-legacy textarea.form-control,
+    :root .x-legacy .ng-select .ng-select-container {
+        min-height: 38px;
+        font-size: 16px;
+    }
+
+    :root .x-legacy .btn { min-height: 38px; }
+}

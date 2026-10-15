@@ -20,20 +20,20 @@
     /* Palette, radii and Inter are taken from the JV Request screen
        (accounts/Vouchers/JV/journalvoucher_IU.component.css) so the two
        modernised areas of the ERP read as one product. */
-    --ex-ink: #0F172A;
-    --ex-ink-soft: #475569;
-    --ex-muted: #64748B;
+    --ex-ink: var(--mp-ink, #0F172A);
+    --ex-ink-soft: var(--mp-soft, #475569);
+    --ex-muted: var(--mp-soft, #64748B);
     --ex-faint: #94A3B8;
-    --ex-head: #4B5563;
-    --ex-panel: #FFFFFF;
+    --ex-head: var(--mp-strong, #4B5563);
+    --ex-panel: var(--mp-surface, #FFFFFF);
     --ex-surface: #F8FAFF;
-    --ex-surface-2: #F1F5F9;
-    --ex-line: #E2E8F0;
-    --ex-line-2: #CBD5E1;
+    --ex-surface-2: var(--mp-band, #F1F5F9);
+    --ex-line: var(--mp-line, #E2E8F0);
+    --ex-line-2: var(--mp-line, #CBD5E1);
     --ex-line-soft: #EEF2F6;
 
-    --ex-brand: #2563EB;
-    --ex-brand-hover: #1D4ED8;
+    --ex-brand: var(--mp-primary, #2563EB);
+    --ex-brand-hover: var(--mp-primary, #1D4ED8);
     --ex-brand-soft: #EFF6FF;
     --ex-brand-ink: #1E40AF;
     --ex-violet: #7C3AED;
@@ -314,7 +314,7 @@
 }
 
 .x-btn:hover {
-    border-color: var(--ex-brand);
+    border-color: var(--mp-primary, var(--ex-brand));
     color: var(--ex-brand);
 }
 
@@ -324,15 +324,15 @@
 }
 
 .x-btn-primary {
-    background: var(--ex-brand);
-    border-color: var(--ex-brand);
-    color: #fff;
+    background: var(--mp-primary, var(--ex-brand));
+    border-color: var(--mp-primary, var(--ex-brand));
+    color: var(--mp-primary-fg, #fff);
 }
 
 .x-btn-primary:hover {
-    background: var(--ex-brand-hover);
-    border-color: var(--ex-brand-hover);
-    color: #fff;
+    background: var(--mp-primary, var(--ex-brand-hover));
+    border-color: var(--mp-primary, var(--ex-brand-hover));
+    color: var(--mp-primary-fg, #fff);
 }
 
 /* "Old Page" escape hatch - present, but visibly secondary */
@@ -344,8 +344,8 @@
 
 .x-btn-classic:hover {
     border-style: solid;
-    background: #F1F5F9;
-    color: #000;
+    background: var(--mp-band, #F1F5F9);
+    color: var(--mp-ink, #000);
     -webkit-text-fill-color: #000;
     opacity: 1;
 }
@@ -389,7 +389,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: .08em;
-    color: #374151;
+    color: var(--mp-soft, #374151);
 }
 
 .x-v {
@@ -483,7 +483,7 @@
     padding: 5px 10px;
     border-bottom: 1px solid var(--ex-line-soft);
     vertical-align: middle;
-    color: #111827;
+    color: var(--mp-ink, #111827);
 }
 
 .x-table tbody tr:last-child td {
@@ -588,13 +588,13 @@
 }
 
 .x-step.is-done .x-step-dot {
-    border-color: var(--ex-ink);
-    background: var(--ex-ink);
-    color: #fff;
+    border-color: var(--mp-primary, var(--ex-ink));
+    background: var(--mp-primary, var(--ex-ink));
+    color: var(--mp-primary-fg, #fff);
 }
 
 .x-step.is-done::after {
-    background: var(--ex-ink);
+    background: var(--mp-primary, var(--ex-ink));
 }
 
 .x-step.is-done .x-step-lbl {
@@ -618,7 +618,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: .08em;
-    color: #374151;
+    color: var(--mp-soft, #374151);
 }
 
 .x-req {
@@ -666,12 +666,12 @@
 }
 
 .x-chip:hover {
-    border-color: #cbd5e1;
+    border-color: var(--mp-line, #cbd5e1);
     background: var(--ex-surface);
 }
 
 .x-chip.active {
-    border-color: var(--ex-ink);
+    border-color: var(--mp-primary, var(--ex-ink));
     background: var(--ex-panel);
     color: var(--ex-ink);
     font-weight: 600;
@@ -762,7 +762,7 @@
     border: 1px solid var(--ex-line-2);
     border-radius: var(--ex-r-sm);
     padding: 4px 10px;
-    color: #000;
+    color: var(--mp-ink, #000);
     background: var(--ex-panel);
     box-shadow: none;
 }
@@ -770,7 +770,7 @@
 :host ::ng-deep .x-page input.form-control:focus,
 :host ::ng-deep .x-page select.form-control:focus,
 :host ::ng-deep .x-page textarea.form-control:focus {
-    border-color: var(--ex-brand);
+    border-color: var(--mp-primary, var(--ex-brand));
     box-shadow: var(--ex-focus);
     outline: none;
 }
@@ -793,12 +793,12 @@
     border: 1px solid var(--ex-line-2);
     border-radius: var(--ex-r-sm);
     font-size: 12.5px;
-    color: #000;
+    color: var(--mp-ink, #000);
 }
 
 :host ::ng-deep .x-page .ng-select.ng-select-opened .ng-select-container,
 :host ::ng-deep .x-page .ng-select.ng-select-focused .ng-select-container {
-    border-color: var(--ex-brand);
+    border-color: var(--mp-primary, var(--ex-brand));
     box-shadow: var(--ex-focus);
 }
 

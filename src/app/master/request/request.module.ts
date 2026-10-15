@@ -11,6 +11,7 @@ import {RequestComponent} from './request.component';
  import{ ReqMastersearch} from './request-search.component';
 //import { Http,   } from '@angular/http';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { UiButton } from '../../shared/ui/button';
 import {suppliermaster} from './supplier.component';
 import {vesselAgentmaster} from './vessel_Agent.component';
 import {Linermaster} from './liner.component';
@@ -20,7 +21,7 @@ import {Linermaster} from './liner.component';
         CommonModule,
         TabsModule,
         MyDatePickerModule,
-        NgSelectModule,NgxPaginationModule ],
+        NgSelectModule,NgxPaginationModule, UiButton ],
     declarations: [clientmaster,RequestComponent,
         consigneemaster,ReqMastersearch,suppliermaster,vesselAgentmaster,Linermaster
     ],

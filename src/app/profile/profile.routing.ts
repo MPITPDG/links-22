@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { profileComponent } from './profile.component';
 import { updatePassword} from './update-password.component'
+import { ThemeSettingsComponent } from './theme/theme-settings.component';
 const routes: Routes = [
   {
     path: '',
@@ -10,7 +11,8 @@ const routes: Routes = [
       title: ''
     },
     children: [
-      {path: '', component: profileComponent, data: { title: 'Home' }},
+      { path: '', redirectTo: 'Theme', pathMatch: 'full' },
+      { path: 'Theme', component: ThemeSettingsComponent, data: { title: 'Theme' } },
       { path: 'ChangePassword', component: updatePassword, data: { title: 'Change Password' },pathMatch: 'full' },
       
     ]

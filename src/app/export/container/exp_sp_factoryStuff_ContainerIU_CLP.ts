@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
 import { Router} from '@angular/router';
-import { ToasterService } from 'angular2-toaster';
 import { LoginService } from '../../shared/service/loginService';
 import { IMyDpOptions } from 'mydatepicker';
 import { ToastCommonService } from '../../shared/service/toastService';

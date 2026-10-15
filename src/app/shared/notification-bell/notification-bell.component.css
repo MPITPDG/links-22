@@ -1,0 +1,213 @@
+/* ============================================================
+   Header notification bell + panel.
+   Monochrome only, and deliberately written with the same tokens and
+   proportions as the Import page kit (src/app/import/import-page.css) so the
+   panel reads as part of the same application. The kit itself is scoped under
+   .im-page, which a header popover is not inside, so the handful of values it
+   needs are restated here rather than the shared file being touched.
+   ============================================================ */
+
+:host {
+    display: inline-flex;
+}
+
+.nb-root {
+    position: relative;
+    display: inline-flex;
+}
+
+/* ---------- trigger ---------- */
+.nb-trigger {
+    position: relative;
+}
+
+.nb-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--mp-primary, #0A0A0A);
+    color: var(--mp-primary-fg, #FFFFFF);
+    border: 1px solid rgba(255, 255, 255, .55);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 14px;
+    text-align: center;
+    letter-spacing: 0;
+}
+
+/* ---------- panel ---------- */
+.nb-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 1080;
+    width: 380px;
+    max-width: calc(100vw - 24px);
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--mp-surface, #FFFFFF);
+    color: var(--mp-ink, #0A0A0A);
+    border: 1px solid var(--mp-strong, #D2D2D2);
+    border-radius: 6px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .18);
+    font-family: Inter, system-ui, "Segoe UI", sans-serif;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: left;
+}
+
+.nb-panel * {
+    box-sizing: border-box;
+}
+
+.nb-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--mp-line, #E4E4E4);
+    background: var(--mp-band, #F5F5F5);
+    flex: 0 0 auto;
+}
+
+.nb-title {
+    font-weight: 600;
+}
+
+.nb-count {
+    font-size: 11px;
+    color: var(--mp-soft, #8C8C8C);
+}
+
+.nb-spacer {
+    flex: 1 1 auto;
+}
+
+.nb-act {
+    font: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--mp-ink, #0A0A0A);
+    background: var(--mp-surface, #FFFFFF);
+    border: 1px solid var(--mp-strong, #D2D2D2);
+    border-radius: 4px;
+    padding: 3px 8px;
+    cursor: pointer;
+}
+
+.nb-act:hover:not(:disabled) {
+    background: var(--mp-band, #EDEDED);
+}
+
+.nb-act:disabled {
+    color: var(--mp-soft, #8C8C8C);
+    border-color: var(--mp-line, #E4E4E4);
+    cursor: default;
+}
+
+/* ---------- list ---------- */
+.nb-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.nb-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 9px 10px 9px 12px;
+    border-bottom: 1px solid var(--mp-line, #F0F0F0);
+    border-left: 3px solid transparent;
+}
+
+/* Unread is carried by a left rule plus a faint fill - no colour. */
+.nb-item.nb-unread {
+    border-left-color: var(--mp-primary, #0A0A0A);
+    background: var(--mp-bg, #FAFAFA);
+}
+
+.nb-mark {
+    flex: 0 0 auto;
+    margin-top: 1px;
+    min-width: 46px;
+    padding: 1px 5px;
+    border: 1px solid var(--mp-strong, #D2D2D2);
+    border-radius: 3px;
+    background: var(--mp-surface, #FFFFFF);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--mp-soft, #565656);
+}
+
+.nb-body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.nb-item-title {
+    font-weight: 500;
+    word-break: break-word;
+}
+
+.nb-item-text {
+    color: var(--mp-soft, #565656);
+    word-break: break-word;
+}
+
+.nb-when {
+    margin-top: 2px;
+    font-size: 11px;
+    color: var(--mp-soft, #8C8C8C);
+}
+
+.nb-x {
+    flex: 0 0 auto;
+    font: inherit;
+    font-size: 16px;
+    line-height: 1;
+    color: var(--mp-soft, #8C8C8C);
+    background: transparent;
+    border: 0;
+    padding: 2px 4px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.nb-x:hover {
+    color: var(--mp-ink, #0A0A0A);
+    background: var(--mp-band, #EDEDED);
+}
+
+.nb-empty {
+    padding: 28px 12px;
+    text-align: center;
+    color: var(--mp-soft, #8C8C8C);
+}
+
+/* ---------- focus ---------- */
+.nb-act:focus-visible,
+.nb-x:focus-visible,
+.nb-trigger:focus-visible {
+    outline: 2px solid var(--mp-ink, #0A0A0A);
+    outline-offset: 2px;
+}
+
+.nb-trigger:focus-visible {
+    outline-color: var(--mp-surface, #FFFFFF);
+}
+
+/* ---------- section rows ----------
+   MP also styles its job-state alert and ticket-event sections here
+   (.nb-sub, .nb-alerts, .nb-alert, .nb-sev, .nb-ack). Links' API has no
+   JobState or Tickets endpoint yet, so those sections - and their styles - are
+   not ported. Copy them back from MPERPNG-20 when the endpoints exist. */

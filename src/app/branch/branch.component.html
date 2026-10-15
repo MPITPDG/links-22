@@ -1,24 +1,129 @@
-<div class="animated fadeIn">
-	<div class="row">
-		<div class="col-sm-5">
-		</div>
-		<div class="col-sm-2">
-			@if (countries.length==0) {
-<img src="assets/img/loading.gif"/>
-}
-			@if (countries.length > 0) {
-<div class="card">
-				<div class="card-body">
-					@for (obj of countries; track obj) {
-<button type="button" class="btn btn-outline-primary btn-block" [ngStyle]="{'margin-top':'0rem'}" (click)="setCity(obj.CITYCODE);">
-						<u>{{ obj.CITYNAME | titlecase }}</u>
-					</button>
-}
-				</div>
-			</div>
-}
-		</div>
-		<div class="col-sm-5">
-		</div>
-	</div>
+<!--
+  Branch picker. Left: step indicator, title, search and the branches grouped
+  by country. Right: every branch pinned on a network map. Hovering a row or a
+  pin highlights the same branch in both.
+
+  Selection is unchanged - every row and pin still calls setCity(CITYCODE),
+  which stores the branch and routes on exactly as before, and a single-branch
+  login is still sent straight through by ngOnInit. Search and Enter only
+  filter the rows already loaded.
+-->
+<div class="bp-page">
+  <app-hub-steps current="branch" />
+
+  <div class="bp-main">
+  <div class="bp-shell">
+
+    <!-- left -->
+    <section class="bp-side">
+      <h1 class="bp-heading">Branch</h1>
+      <p class="bp-lede">Where are you working today?</p>
+
+      <div class="bp-search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+        <input class="bp-search-input" type="text" autofocus autocomplete="off" spellcheck="false"
+               placeholder="Search city, code or country"
+               aria-label="Search city, code or country"
+               [value]="query"
+               (input)="query = $any($event.target).value"
+               (keydown.enter)="pickFirst()" />
+        @if (query && firstMatch) { <kbd class="bp-kbd">↵</kbd> }
+      </div>
+
+      <div class="bp-list">
+        @if (countries.length === 0) {
+          <div class="bp-state"><span class="bp-spinner" aria-hidden="true"></span>Loading branches&hellip;</div>
+        } @else if (groups.length === 0) {
+          <div class="bp-state">No branch matches "{{ query }}".</div>
+        } @else {
+          @for (g of groups; track g.country) {
+            <div class="bp-group">
+              <div class="bp-group-head">
+                <span>{{ g.country }}</span><span class="bp-count">{{ g.rows.length }}</span>
+              </div>
+              @for (obj of g.rows; track obj.CITYCODE) {
+                <button type="button" class="bp-item"
+                        [class.is-hover]="hovered === obj || (!hovered && query && obj === firstMatch)"
+                        (mouseenter)="hovered = obj" (mouseleave)="hovered = null"
+                        (focus)="hovered = obj" (blur)="hovered = null"
+                        (click)="setCity(obj.CITYCODE);">
+                  <span class="bp-code">{{ obj.CITYCODE }}</span>
+                  <span class="bp-name">{{ obj.CITYNAME | titlecase }}</span>
+                  <svg class="bp-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+                </button>
+              }
+            </div>
+          }
+        }
+      </div>
+    </section>
+
+    <!-- right -->
+    <section class="bp-map-card">
+      <div class="bp-map-head">
+        <div>
+          <p class="bp-map-eyebrow">Network</p>
+          <p class="bp-map-title">
+            @if (countries.length) { {{ countries.length }} branches across {{ countryNames.length }} countries }
+            @else { Loading network }
+          </p>
+        </div>
+        @if (focusPin; as f) {
+          <div class="bp-focus">
+            <span class="bp-focus-code">{{ f.row.CITYCODE }}</span>
+            <div>
+              <div class="bp-focus-name">{{ f.row.CITYNAME | titlecase }}</div>
+              <div class="bp-focus-country">{{ f.country }}</div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <svg class="bp-map" viewBox="0 0 640 340" role="group" aria-label="Branch map">
+        <defs>
+          <pattern id="bp-dots" width="14" height="14" patternUnits="userSpaceOnUse">
+            <circle cx="7" cy="7" r="1.1" fill="#D9DEE6" />
+          </pattern>
+          <radialGradient id="bp-fade" cx="50%" cy="50%" r="60%">
+            <stop offset="60%" stop-color="#FFFFFF" stop-opacity="0" />
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="1" />
+          </radialGradient>
+        </defs>
+        <rect width="640" height="340" fill="url(#bp-dots)" />
+        <rect width="640" height="340" fill="url(#bp-fade)" />
+
+        <!-- routes from the focused branch -->
+        @if (focusPin; as f) {
+          @for (p of visiblePins; track p.row.CITYCODE) {
+            @if (p !== f) {
+              <path class="bp-route" [attr.d]="arc(f, p)" />
+            }
+          }
+        }
+
+        <!-- country labels -->
+        @for (c of countryLabels; track c.name) {
+          <text class="bp-country" [attr.x]="c.x" [attr.y]="c.y">{{ c.name }}</text>
+        }
+
+        <!-- pins -->
+        @for (p of visiblePins; track p.row.CITYCODE) {
+          <g class="bp-pin" tabindex="-1"
+             [class.is-focus]="p === focusPin"
+             [class.is-dim]="focusPin && p !== focusPin"
+             [attr.transform]="'translate(' + p.x + ' ' + p.y + ')'"
+             (mouseenter)="hovered = p.row" (mouseleave)="hovered = null"
+             (click)="setCity(p.row.CITYCODE)">
+            <circle class="bp-pin-halo" r="14" />
+            <circle class="bp-pin-dot" r="4.5" />
+            <text class="bp-pin-label" y="-11">{{ p.row.CITYCODE }}</text>
+          </g>
+        }
+      </svg>
+
+      <p class="bp-map-foot">Hover a branch to see its routes. Click to open.</p>
+    </section>
+
+  </div>
+  </div>
 </div>

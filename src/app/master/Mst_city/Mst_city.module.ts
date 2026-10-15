@@ -7,6 +7,7 @@ import {NgSelectModule} from '@ng-select/ng-select';
 import {Mst_citycomponent} from './Mst_city.component';
  
 import {Mst_cityrouting} from './Mst_city.routing';
+import { SharedModule } from '../../shared/shared.module';
 
 @NgModule ({
     imports: [
@@ -15,7 +16,8 @@ import {Mst_cityrouting} from './Mst_city.routing';
         TabsModule,
         CommonModule,
         MyDatePickerModule,
-        NgSelectModule
+        NgSelectModule,
+        SharedModule
     ],
     declarations:[Mst_citycomponent],
     providers:[],

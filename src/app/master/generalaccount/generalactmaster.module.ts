@@ -10,6 +10,7 @@ import {generalactmastersearch} from './generalactmaster-search.component';
 import {itemcodeIU} from './itemcode-IU.component';
 import{ GeneralAccountRoutingModule } from './generalactmaster-routing.module'
 import { NgxPaginationModule } from 'ngx-pagination';
+import { UiButton } from '../../shared/ui/button';
 @NgModule({
   declarations: [generalactmasterIU,generalactmastersearch,itemcodeIU],
   imports: [GeneralAccountRoutingModule,
@@ -18,7 +19,8 @@ import { NgxPaginationModule } from 'ngx-pagination';
     TabsModule,
     CommonModule,
     MyDatePickerModule,
-    NgSelectModule,NgxPaginationModule
+    NgSelectModule,NgxPaginationModule,
+    UiButton
   ] ,providers: [
 	],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],

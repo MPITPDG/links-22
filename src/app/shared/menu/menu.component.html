@@ -1,83 +1,193 @@
-﻿ <div class="sidebar">
-    <nav class="sidebar-nav">
-      <ul class="nav">
-        <li class="nav-item">
-          <a class="nav-link" [routerLink]="['/dashboard']"><i class="icon-speedometer"></i> Dashboard </a>
-        </li>
-		<li class="nav-title">
-           {{menuModuleName}}
-        </li>
-		@for (ml of menuList; track ml) {
-<li class="{{ml.ischild == 'y' ? 'nav-item nav-dropdown' : 'nav-item'}}"  appNavDropdown>
-			@if (ml.ischild == 'y') {
-<a class="nav-link nav-dropdown-toggle" href="#"  appNavDropdownToggle>  
-				<i [ngClass]="ml.icon"></i>{{ ml.menuname }}
-			</a>
-}  
-			@if (ml.ischild == 'n') {
-<a [routerLink]="[ml.routerlink]" class="nav-link">  
-				<i [ngClass]="ml.icon"></i>{{ ml.menuname }} 
-			</a>
-}
-			@if (ml.data.length > 0) {
-<ul class="nav-dropdown-items" style="font-size: 12px;">
-				@for (mlchild of ml.data; track mlchild) {
-<li class="{{mlchild.ischild == 'y' ? 'nav-item nav-dropdown' : 'nav-item'}}" appNavDropdown>
-					@if (mlchild.ischild == 'y') {
-<a class="nav-link nav-dropdown-toggle" href="#" appNavDropdownToggle>  
-						<i [ngClass]="mlchild.icon"></i>{{ mlchild.menuname }}
-					</a>
-}  
-					@if (mlchild.ischild == 'n') {
-<a [routerLink]="[mlchild.routerlink]" class="nav-link">  
-						<i [ngClass]="mlchild.icon"></i> {{ mlchild.menuname }} 
-					</a>
-} 
-					@if (mlchild.data.length > 0) {
-<ul class="nav-dropdown-items">
-						@for (mlsubchild of mlchild.data; track mlsubchild) {
-<li class="{{mlsubchild.ischild == 'y' ? 'nav-item nav-dropdown' : 'nav-item'}}" appNavDropdown>
-							@if (mlsubchild.ischild == 'y') {
-<a class="nav-link nav-dropdown-toggle" href="#" appNavDropdownToggle>  
-								<i [ngClass]="mlsubchild.icon"></i>{{ mlsubchild.menuname }}
-							</a>
-}  
-							@if (mlsubchild.ischild == 'n') {
-<a [routerLink]="[mlsubchild.routerlink]" class="nav-link">  
-								<i [ngClass]="mlsubchild.icon"></i> {{ mlsubchild.menuname }} 
-							</a>
-} 
-							@if (mlsubchild.data.length > 0) {
-<ul class="nav-dropdown-items">
-								@for (mlsubsubchild of mlsubchild.data; track mlsubsubchild) {
-<li class="{{mlsubsubchild.ischild == 'y' ? 'nav-item nav-dropdown' : 'nav-item'}}" appNavDropdown>
-									@if (mlsubsubchild.ischild == 'y') {
-<a class="nav-link nav-dropdown-toggle" href="#" appNavDropdownToggle>  
-										<i [ngClass]="mlsubsubchild.icon"></i>{{ mlsubsubchild.menuname }}
-									</a>
-}  
-									@if (mlsubsubchild.ischild == 'n') {
-<a [routerLink]="[mlsubsubchild.routerlink]" class="nav-link">  
-										<i [ngClass]="mlsubsubchild.icon"></i> {{ mlsubsubchild.menuname }} 
-									</a>
-} 
-									
-									
-								</li>
-}
-							</ul>
-}
-						</li>
-}
-					</ul>
-}
-				</li>
-}
-			</ul>
-}	
-		</li>
-}
+<!--
+  Sidebar navigation (ported from MPERPNG-20; menu data is Links' own).
 
-      </ul>
-    </nav>
+  Rows render through one recursive <ng-template> rather than the four
+  near-identical copies the old markup used, so every depth looks and behaves
+  the same and a fifth level would cost nothing.
+
+  Expansion state lives in UiSidebarService, not on this component: the router
+  is configured with shouldReuseRoute = () => false, so this component is
+  rebuilt on every navigation and local state would close the menu the moment
+  you clicked inside it.
+
+  Collapsed, the rail is icon-only and nested rows are not rendered - there is
+  no width for them.
+-->
+<aside class="theme-gray flex h-full w-full flex-col overflow-hidden
+              bg-[var(--sidebar)] text-[var(--sidebar-foreground)]"
+       [attr.data-state]="collapsed ? 'collapsed' : 'expanded'">
+
+  <!--
+    Module identity. The company name is in the header, where it has the width
+    for it - in this 16rem rail it truncated.
+  -->
+  <div class="flex h-12 shrink-0 items-center gap-2.5 border-b border-[var(--sidebar-border)] px-3">
+    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md
+                 bg-[var(--sidebar-accent)] text-[var(--sidebar-accent-foreground)]">
+      <i [ngClass]="moduleIcon" class="text-[13px]" aria-hidden="true"></i>
+    </span>
+    @if (!collapsed) {
+      <span class="truncate text-[11px] font-semibold uppercase tracking-[0.08em]
+                   text-[var(--sidebar-accent-foreground)]">{{ moduleLabel }}</span>
+    }
   </div>
+
+  <nav #navScroll (scroll)="onNavScroll($event)"
+       class="min-h-0 flex-1 overflow-y-auto px-2 py-2">
+
+    @if (hasDashboard) {
+    <ul>
+      <li>
+        <a [routerLink]="[dashboardLink]"
+           [routerLinkActiveOptions]="{ exact: true }"
+           routerLinkActive="!bg-[var(--sidebar-accent)] !text-[var(--sidebar-accent-foreground)] font-medium"
+           [title]="collapsed ? 'Dashboard' : ''"
+           class="flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm
+                  text-[var(--sidebar-foreground)] transition-colors
+                  hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
+           [class.justify-center]="collapsed" [class.px-0]="collapsed">
+          <i class="icon-speedometer w-4 shrink-0 text-center text-[15px]" aria-hidden="true"></i>
+          @if (!collapsed) { <span class="truncate">Dashboard</span> }
+        </a>
+      </li>
+    </ul>
+    }
+
+    @if (collapsed) { <div class="my-2 border-t border-[var(--sidebar-border)]"></div> }
+
+    @if (!collapsed && !menuList?.length) {
+      <div class="px-2.5 py-6 text-center text-xs leading-relaxed text-[var(--sidebar-muted)]">
+        No menu is configured for this module.
+      </div>
+    }
+
+    <ul class="flex flex-col gap-0.5">
+      @for (item of menuList; track trackNode($index, item); let i = $index) {
+        <ng-container *ngTemplateOutlet="node; context: { $implicit: item, depth: 0, parentKey: '', index: i }" />
+      }
+    </ul>
+  </nav>
+
+  <!-- user: identity plus the account menu. Replaces the version string. -->
+  <div class="relative shrink-0 border-t border-[var(--sidebar-border)] p-2">
+
+    @if (userMenuOpen) {
+      <!-- click-away catcher, sits under the menu -->
+      <div class="fixed inset-0 z-40" (click)="closeUserMenu()" aria-hidden="true"></div>
+
+      <div class="no-scrollbar absolute bottom-full left-2 right-2 z-50 mb-1 overflow-hidden rounded-lg
+                  border border-[var(--sidebar-border)] bg-[var(--sidebar)] py-1 shadow-lg"
+           role="menu">
+        <button type="button" (click)="goTheme()" role="menuitem"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm
+                       text-[var(--sidebar-foreground)] transition-colors
+                       hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]">
+          <i class="fa fa-paint-brush w-4 text-center opacity-80" aria-hidden="true"></i>
+          <span>Theme</span>
+        </button>
+        @if (themeActive()) {
+        <button type="button" (click)="resetTheme()" role="menuitem"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm
+                       text-[var(--sidebar-foreground)] transition-colors
+                       hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]">
+          <i class="fa fa-undo w-4 text-center opacity-80" aria-hidden="true"></i>
+          <span>Reset theme to Classic</span>
+        </button>
+        }
+        <button type="button" (click)="goProfile()" role="menuitem"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm
+                       text-[var(--sidebar-foreground)] transition-colors
+                       hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]">
+          <i class="fa fa-key w-4 text-center opacity-80" aria-hidden="true"></i>
+          <span>Change password</span>
+        </button>
+        <div class="my-1 border-t border-[var(--sidebar-border)]"></div>
+        <button type="button" (click)="logout()" role="menuitem"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm
+                       text-red-400 transition-colors hover:bg-[var(--sidebar-accent)] hover:text-red-300">
+          <i class="fa fa-sign-out w-4 text-center opacity-80" aria-hidden="true"></i>
+          <span>Log out</span>
+        </button>
+      </div>
+    }
+
+    <button type="button" (click)="toggleUserMenu($event)"
+            [attr.aria-expanded]="userMenuOpen"
+            [title]="collapsed ? userName : ''"
+            class="flex w-full items-center gap-2.5 rounded-lg p-1.5 text-left transition-colors
+                   hover:bg-[var(--sidebar-accent)]"
+            [class.justify-center]="collapsed">
+
+      @if (userImage) {
+        <img [src]="'assets/img/pics/' + userImage" alt=""
+             class="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-[var(--sidebar-border)]" />
+      } @else {
+        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full
+                     bg-[var(--sidebar-accent)] text-[11px] font-semibold
+                     text-[var(--sidebar-accent-foreground)]">{{ userInitials }}</span>
+      }
+
+      @if (!collapsed) {
+        <span class="flex min-w-0 flex-1 flex-col leading-tight">
+          <span class="truncate text-sm font-medium text-[var(--sidebar-accent-foreground)]">{{ userName }}</span>
+          @if (userRole) {
+            <span class="truncate text-[11px] text-[var(--sidebar-muted)]">{{ userRole }}</span>
+          }
+        </span>
+        <svg class="h-3.5 w-3.5 shrink-0 opacity-60" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true">
+          <polyline points="18 15 12 9 6 15" />
+        </svg>
+      }
+    </button>
+  </div>
+</aside>
+
+<!-- One row, any depth. Branches toggle, leaves navigate. -->
+<ng-template #node let-item let-depth="depth" let-parentKey="parentKey" let-index="index">
+
+  @if (collapsed && depth > 0) {
+    <!-- nothing: no width for nested rows in the icon rail -->
+  } @else if (hasChildren(item)) {
+    <li>
+      <button type="button"
+              (click)="toggle(nodeKey(parentKey, item, index), $event)"
+              [attr.aria-expanded]="isExpanded(nodeKey(parentKey, item, index))"
+              [title]="collapsed ? item.menuname : ''"
+              [class]="branchCls(nodeKey(parentKey, item, index), depth)">
+        <i [ngClass]="item.icon" class="w-4 shrink-0 text-center text-[15px] opacity-80" aria-hidden="true"></i>
+        @if (!collapsed) {
+          <span class="min-w-0 flex-1 truncate text-left">{{ item.menuname }}</span>
+          <svg class="h-3.5 w-3.5 shrink-0 opacity-60 transition-transform duration-200"
+               [class.rotate-90]="isExpanded(nodeKey(parentKey, item, index))"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        }
+      </button>
+
+      @if (!collapsed && isExpanded(nodeKey(parentKey, item, index)) && item.data?.length) {
+        <ul class="relative ms-[1.15rem] mt-0.5 flex flex-col gap-0.5 border-s border-[var(--sidebar-border)] ps-2">
+          @for (child of item.data; track trackNode($index, child); let ci = $index) {
+            <ng-container *ngTemplateOutlet="node; context: {
+              $implicit: child, depth: depth + 1,
+              parentKey: nodeKey(parentKey, item, index), index: ci }" />
+          }
+        </ul>
+      }
+    </li>
+
+  } @else {
+    <li>
+      <a [routerLink]="[item.routerlink]"
+         routerLinkActive="!bg-[var(--sidebar-accent)] !text-[var(--sidebar-accent-foreground)] font-medium"
+         [title]="collapsed ? item.menuname : ''"
+         [class]="leafCls(depth)">
+        <i [ngClass]="item.icon" class="w-4 shrink-0 text-center text-[15px] opacity-80" aria-hidden="true"></i>
+        @if (!collapsed) { <span class="min-w-0 flex-1 truncate text-left">{{ item.menuname }}</span> }
+      </a>
+    </li>
+  }
+</ng-template>

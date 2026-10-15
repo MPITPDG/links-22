@@ -1,7 +1,6 @@
 ﻿import { Component, OnInit, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { Router} from '@angular/router';
-import { ToasterService } from 'angular2-toaster';
 import { LoginService } from '../../shared/service/loginService';
 import { ToastCommonService } from '../../shared/service/toastService';
 import { IMyDpOptions } from 'mydatepicker';

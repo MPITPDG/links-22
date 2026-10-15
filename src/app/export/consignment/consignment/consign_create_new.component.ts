@@ -7,7 +7,6 @@ import { LoginService } from '../../../shared/service/loginService';
 import { SharedDataSerice } from '../../export-share-data.service';
 import { LoaderService } from '../../../shared/service/loader.service';
 import { IMyDpOptions } from 'mydatepicker';
-import { ToasterConfig } from 'angular2-toaster';
 @Component({
     templateUrl: 'consign_create_new.component.html',
  //   styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 

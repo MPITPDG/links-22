@@ -32,7 +32,9 @@ setup('authenticate', async ({ page }) => {
 
   await username.fill(user);
   await password.fill(pass);
-  await page.getByRole('button', { name: /login/i }).click();
+  // The shell port (from MPERPNG-20) relabelled the button "Sign in"; the old
+  // "Login" label is still accepted so the suite runs against either build.
+  await page.getByRole('button', { name: /log ?in|sign in/i }).click();
 
   // Landing page after login is the branch picker, or further along if the
   // account only has one of something.
@@ -44,13 +46,19 @@ setup('authenticate', async ({ page }) => {
   // and every request that sends citycode then fails. Walk the same screens a
   // real user walks. Each auto-forwards when there is only one choice, so each
   // step is conditional rather than assumed.
+  //
+  // Selectors: the redesigned hub pages render each choice as a button -
+  // .bp-item (branch), .cp-item (company), .mp-item (module list next to the
+  // donut). The pre-redesign selectors are kept as fallbacks. Company used to
+  // fall back to the first <button> on the page, which in the new header is
+  // the notification bell, so that bare fallback is gone.
   for (let step = 0; step < 3 && !/#\/(dashboard|export|import|accounts)/.test(page.url()); step++) {
     if (/#\/branch/.test(page.url())) {
-      await page.locator('.card-body button').first().click();
+      await page.locator('.bp-item, .card-body button').first().click();
     } else if (/#\/company/.test(page.url())) {
-      await page.locator('.card-body button, button').first().click();
+      await page.locator('.cp-item, .card-body button').first().click();
     } else if (/#\/module/.test(page.url())) {
-      await page.locator('.selectormodule li label').first().click();
+      await page.locator('.mp-item, .selectormodule li label').first().click();
     } else {
       break;
     }

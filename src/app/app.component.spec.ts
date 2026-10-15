@@ -17,7 +17,7 @@ describe('AppComponent', () => {
         { provide: DataService, useValue: {} },
         { provide: LoginService, useValue: {} },
       ],
-      // <toaster-container> comes from the toaster shim module, not needed here.
+      // <ui-toaster> (standalone, imported by AppModule) is not needed here.
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
   });

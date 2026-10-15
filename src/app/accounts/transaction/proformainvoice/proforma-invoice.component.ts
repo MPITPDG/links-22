@@ -2,7 +2,6 @@
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
 import { Router, ActivatedRoute } from '@angular/router';
-import { ToasterService } from 'angular2-toaster';
 import { LoginService } from '../../../shared/service/loginService';
 import { IMyDpOptions } from 'mydatepicker';
 import { ToastCommonService } from '../../../shared/service/toastService';
@@ -36,7 +35,7 @@ import { DatePipe } from '@angular/common';
     .tab .nav-tabs li a:hover{
         background:transparent;
         border:1px solid transparent;
-        color: #444;
+        color: var(--mp-soft, #444);
     }
      .tab .nav-tabs li a:before{
         content: "";
@@ -56,14 +55,14 @@ import { DatePipe } from '@angular/common';
         z-index:-1;
     } 
     .tab .nav-tabs li a.active:before{
-        background: #fff;
+        background: var(--mp-surface, #fff);
     }
     .tab .nav-tabs li a.active,
     .tab .nav-tabs li a.active:focus,
     .tab .nav-tabs li a.active:hover{
         border:1px solid transparent;
         background:transparent;
-        color: #212529;
+        color: var(--mp-ink, #212529);
         z-index: 2;
     }
     #autoresizing { 

@@ -9,13 +9,15 @@ import { ClientEdiDesignComponent } from './client-edi-design.component';
 import { ClientedifilterpipePipe } from './client-edifilterpipe.pipe';
 import { ClientEdiRoutingModule } from './clientedi.routing';
 import { ClientEdiFileUploadComponent } from './client-fileupload.component';
+import { UiButton } from '../../shared/ui/button';
 @NgModule({
     
   imports: [ClientEdiRoutingModule,
       FormsModule,
       CommonModule,
         MyDatePickerModule,
-      NgSelectModule
+      NgSelectModule,
+      UiButton
       //SharedModule
   ],
   declarations: [ClientEdiDesignComponent, ClientedifilterpipePipe,ClientEdiFileUploadComponent

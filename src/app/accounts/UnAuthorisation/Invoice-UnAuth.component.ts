@@ -2,7 +2,6 @@ import { Component, TemplateRef, OnInit, ChangeDetectionStrategy } from '@angula
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
 import { Router } from '@angular/router';
-import { ToasterService } from 'angular2-toaster';
 import { LoginService } from '../../shared/service/loginService';
 
 import { ToastCommonService } from '../../shared/service/toastService';

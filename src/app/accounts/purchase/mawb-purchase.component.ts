@@ -32,7 +32,7 @@ import { HttpClient } from '@angular/common/http';
     .tab .nav-tabs li a:hover{
         background:transparent;
         border:1px solid transparent;
-        color: #444;
+        color: var(--mp-soft, #444);
     }
      .tab .nav-tabs li a:before{
         content: "";
@@ -51,14 +51,14 @@ import { HttpClient } from '@angular/common/http';
         z-index:-1;
     } 
     .tab .nav-tabs li a.active:before{
-        background: #fff;
+        background: var(--mp-surface, #fff);
     }
     .tab .nav-tabs li a.active,
     .tab .nav-tabs li a.active:focus,
     .tab .nav-tabs li a.active:hover{
         border:1px solid transparent;
         background:transparent;
-        color: #212529;
+        color: var(--mp-ink, #212529);
         z-index: 2;
     }
     `],

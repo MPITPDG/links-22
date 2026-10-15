@@ -10,7 +10,8 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { NAV_DROPDOWN_DIRECTIVES } from './shared/nav-dropdown.directive';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ToasterModule } from 'angular2-toaster';
+import { UiToaster } from './shared/ui/toaster';
+import { UiButton } from './shared/ui/button';
 
 import { NgChartsModule } from 'ng2-charts';
 import { Chart, registerables } from 'chart.js';
@@ -18,6 +19,7 @@ Chart.register(...registerables);
 import { SIDEBAR_TOGGLE_DIRECTIVES } from './shared/sidebar.directive';
 import { AsideToggleDirective } from './shared/aside.directive';
 import { BreadcrumbsComponent } from './shared/breadcrumb.component';
+import { ContentLoaderComponent } from './shared/content-loader.component';
 
 // Routing Module
 import { AppRoutingModule } from './app.routing';
@@ -29,12 +31,13 @@ import { Configuration } from './app.constants';
 import { FullLayoutComponent } from './layouts/full-layout.component';
 import { SimpleLayoutComponent } from './layouts/simple-layout.component';
 import { HeaderFooterLayoutComponent } from './layouts/header-footer-layout.component';
-import { FullLayoutComponent_acc } from './layouts/full-layout.component_acct';
 
 import { MenuComponent } from './shared/menu/menu.component';
 import { FinancialYearComponent } from './shared/financial-year/financial-year.component';
+import { NotificationBellComponent } from './shared/notification-bell/notification-bell.component';
 
 import { ToastCommonService } from './shared/service/toastService';
+import { NotificationCenterService } from './shared/service/notificationCenterService';
 
 // Popover Component
 import { PopoverModule } from 'ngx-bootstrap/popover';
@@ -57,7 +60,13 @@ import { environment } from '../environments/environment';
         BrowserModule,
         BrowserAnimationsModule,
         AppRoutingModule,
-        ToasterModule.forRoot(),
+        // Spartan/sonner toaster drawn once at the app root (<ui-toaster /> in
+        // app.component); replaces angular2-toaster's ToasterModule.forRoot().
+        UiToaster,
+        UiButton,
+        ContentLoaderComponent,
+        // Standalone since the route-driven ui-breadcrumbs port (MP 21b4428).
+        BreadcrumbsComponent,
         BsDropdownModule,
         TabsModule,
         ModalModule,
@@ -73,17 +82,16 @@ import { environment } from '../environments/environment';
     declarations: [
         AppComponent,
         FullLayoutComponent,
-        FullLayoutComponent_acc,
         SimpleLayoutComponent,
         HeaderFooterLayoutComponent,
         NAV_DROPDOWN_DIRECTIVES,
-        BreadcrumbsComponent,
         SIDEBAR_TOGGLE_DIRECTIVES,
         AsideToggleDirective,
         MenuComponent,
         PageLoadModalComponent,FinancialYearComponent,
+        NotificationBellComponent,
     ],
-    providers: [Configuration, ToastCommonService, ErrorDataSerice,  {
+    providers: [Configuration, NotificationCenterService, ToastCommonService, ErrorDataSerice,  {
         provide: LocationStrategy,
         useClass: HashLocationStrategy
     }, LoaderService, ButtonService, provideHttpClient(withXhr(), withInterceptorsFromDi())],
