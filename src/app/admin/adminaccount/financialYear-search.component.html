@@ -1,75 +1,46 @@
-<div class="animated fadeIn">
-	<div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                
-            </div>
-        </div>
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Financial Year Search</h1>
+      <p>Find companies by financial year date range</p>
     </div>
-    <div class="row">
-		<div class="col-sm-3">
-		</div>
-		<div class="col-sm-6">
-			<table class="table table-bordered table-sm-new bgwhite">
-				<tbody style='height:30px'>
-				<tr>
-					<td class="col-form-span-heading" colspan="4"  >
-						FINANCIAL YEAR SEARCH
-					</td>
-				</tr>
-                    <tr class="bgwhite">
-                        <td > 
-                            <span class="col-form-span-label"><b>Start Date</b> </span>
-                            <span class="col-form-span-error">*</span>
-                        </td>         
-                        <td >   
-                            <my-date-picker name="StartDate" [options]="myDatePickerOptions" [(ngModel)]="StartDate"></my-date-picker>
-                        </td>  
-                        <td > 
-                            <span class="col-form-span-label"><b>End Date</b> </span>
-                            <span class="col-form-span-error">*</span>
-                        </td>         
-                        <td>   
-                            <my-date-picker name="EndDate" [options]="myDatePickerOptions" [(ngModel)]="EndDate"></my-date-picker>
-                        </td>  
-                    </tr>
-					
-					<tr>
-						<td colspan="4" class="centerlabel" >
-							<button uiBtn variant="default" size="sm" type="submit"   (click)="searchlist()"><span class="col-form-span-label"><i class="fa fa-search"></i> Search</span></button>
-						</td>
-					</tr>
-					<tr>
-						@if (branchlist.length>0) {
-<td colspan="4" >
-							<div  class="row yscroll" style="max-height:300px">
-								<table class="table table-hover">
-									<thead>
-										<tr class="col-form-span-heading" style="white-space:nowrap;">
-											<th class="col-form-span-label">COMPANY NAME</th>
-										                                          
-										</tr>
-									 </thead>
-									<tbody class="bgwhite">
-										@for (obj of branchlist; track obj) {
-<tr>
-											<td><span class="col-form-span-label">{{obj.CMP_NAME}}</span></td>
-											<!--td><span  >{{obj.CMP_NAME}}</span></td-->
-											<!--td><span class="col-form-span-label anchor-link" (click)="ListOnclick(obj.PK_YEARID)" style="cursor:pointer;">{{obj.CMP_NAME}}</span></td-->
-										</tr>
-}
-									</tbody>
-								</table>
-							</div>
-						</td>
-}
-					</tr>
-				</tbody>
-			</table>
-			 
-		</div>
-	</div>
-	<div class="col-sm-3">
-	</div>
-	
+  </div>
 
+  <div class="card">
+    <div class="filters">
+      <div class="f">
+        <label>Start Date <span class="req">*</span></label>
+        <my-date-picker name="StartDate" [options]="myDatePickerOptions" [(ngModel)]="StartDate"></my-date-picker>
+      </div>
+      <div class="f">
+        <label>End Date <span class="req">*</span></label>
+        <my-date-picker name="EndDate" [options]="myDatePickerOptions" [(ngModel)]="EndDate"></my-date-picker>
+      </div>
+      <div class="f">
+        <button class="btn p" type="submit" (click)="searchlist()">Search</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <span class="count">{{ branchlist?.length || 0 }} {{ branchlist?.length === 1 ? 'company' : 'companies' }}</span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Company Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (obj of branchlist; track obj) {
+            <tr>
+              <td>{{obj.CMP_NAME}}</td>
+            </tr>
+          } @empty {
+            <tr><td class="empty">No companies to show. Pick a date range and search.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

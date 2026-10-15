@@ -1,0 +1,53 @@
+/* ----------------------------------------------------------------
+   Links port (Phase 2.5, Admin): screen stylesheet for src/app/admin/**.
+   MPERPNG-20 has no admin-local CSS (its admin screens list only
+   import-page.css); in Links the .im-page kit is global
+   (src/styles/kit/import-page.css), so these are the few Links-only
+   additions the kit does not cover. Component-local (:host ::ng-deep),
+   listed in styleUrls by userprofile-search, userprofile-creation and
+   company-IU. Monochrome only.
+   ---------------------------------------------------------------- */
+
+/* checkboxes in a .fld: black tick, same size everywhere */
+:host ::ng-deep .im-page .fld input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    margin: 0;
+    accent-color: var(--mp-primary, #0A0A0A);
+    cursor: pointer;
+}
+
+/* password rules under the password box (static list, no colour) */
+:host ::ng-deep .im-page .ad-pw .hint {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 14px;
+    margin-top: 6px;
+}
+
+:host ::ng-deep .im-page .ad-pw .hint .fa {
+    color: var(--soft);
+    margin-right: 4px;
+}
+
+/* ngx-pagination inside a card: monochrome (same values as cheque-page.css) */
+:host ::ng-deep .im-page .ngx-pagination {
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+}
+
+:host ::ng-deep .im-page .ngx-pagination .current {
+    background: var(--mp-primary, var(--ink));
+    color: var(--mp-primary-fg, #fff);
+    border-radius: 4px;
+}
+
+:host ::ng-deep .im-page .ngx-pagination a {
+    color: var(--ink);
+}
+
+/* two row actions side by side in .act */
+:host ::ng-deep .im-page table.tbl td.act button + button {
+    margin-left: 6px;
+}

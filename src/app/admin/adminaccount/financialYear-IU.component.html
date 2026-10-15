@@ -1,82 +1,48 @@
-<div class="animated fadeIn">
-	<div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>{{Header| uppercase}}</strong>
-                </div>
-            </div>
-        </div>
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{Header| uppercase}}</h1>
+      <p>Financial year master</p>
     </div>
-    <div class="row">
-		<div class="col-sm-3">
-		</div>
-		<div class="col-sm-6">
-							
-            <table class="table table-bordered table-sm-new bgwhite">    
-                <tr>
-                    
-                    
-                    </tr>        
-                        <tr>
-                            <td><span class="col-form-span-label"><b>City</b> </span><span class="col-form-span-error">*</span></td>        
-                            <td>
-                                <!--select class="form-control width150"  [(ngModel)]="city"-->
-                                    <select class="form-control width150"  [(ngModel)]="city"(change)="selectionChange($event.target.value)">
-                                    <option value="">Please select</option>
-                                    @for (d of Citylist; track d) {
-<option value={{d.CITYCODE}}>{{d.CITYNAME}}</option>
-}
-                                </select>
-                            </td> 
-                            
-                        </tr>
-                        <tr>
+  </div>
 
-                        </tr>
-                        <tr>
-                            <td><span class="col-form-span-label"><b>Company</b> </span><span class="col-form-span-error">*</span></td>        
-                            <td colspan="3">
-                                <select class="form-control width350"  [(ngModel)]="company">
-                                    <option value="">Please select</option>
-                                    @for (d of CompanyList; track d) {
-<option value={{d.CMP_CODE}}>{{d.CMP_NAME}}</option>
-}
-                                </select>
-                            </td> 
-                            
-                        </tr>
-                     
-                           <tr>
-                            <td > 
-                                <span class="col-form-span-label"><b>Start Date</b> </span>
-                                <span class="col-form-span-error">*</span>
-                            </td>         
-                            <td >   
-                                <my-date-picker name="StartDate" [options]="myDatePickerOptions" [(ngModel)]="StartDate"></my-date-picker>
-                            </td>  
-                            <td > 
-                                <span class="col-form-span-label"><b>End Date</b> </span>
-                                <span class="col-form-span-error">*</span>
-                            </td>         
-                            <td>   
-                                <my-date-picker name="EndDate" [options]="myDatePickerOptions" [(ngModel)]="EndDate"></my-date-picker>
-                            </td>  
-                        </tr>
+  <div class="card sec">
+    <div class="card-h"><h2>Financial Year Details</h2></div>
+    <div class="fields">
+      <div class="fld">
+        <label>City <span class="req">*</span></label>
+        <select class="form-control" [(ngModel)]="city" (change)="selectionChange($event.target.value)">
+          <option value="">Please select</option>
+          @for (d of Citylist; track d) {
+            <option value={{d.CITYCODE}}>{{d.CITYNAME}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld full">
+        <label>Company <span class="req">*</span></label>
+        <select class="form-control" [(ngModel)]="company">
+          <option value="">Please select</option>
+          @for (d of CompanyList; track d) {
+            <option value={{d.CMP_CODE}}>{{d.CMP_NAME}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Start Date <span class="req">*</span></label>
+        <my-date-picker name="StartDate" [options]="myDatePickerOptions" [(ngModel)]="StartDate"></my-date-picker>
+      </div>
+      <div class="fld">
+        <label>End Date <span class="req">*</span></label>
+        <my-date-picker name="EndDate" [options]="myDatePickerOptions" [(ngModel)]="EndDate"></my-date-picker>
+      </div>
+    </div>
+  </div>
 
-                        
-
-                        <tr>
-                            <td colspan="4"  class="centerlabel">                                
-                                <button uiBtn variant="default" size="sm" type="submit" (click)="AddMain()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{text}}</span></button>
-                                <button uiBtn variant="outline" size="sm" type="reset"> <span class="col-form-span-label" (click)="RestMain();"><i class="fa fa-ban"></i> Reset</span></button>
-                            </td>
-                        </tr>
-					</table>
-				
-			</div>
-		</div>
-		<div class="col-sm-3">
-		</div>
-    
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose {{text}}.</span>
+    <div class="r">
+      <button class="btn g" type="reset" (click)="RestMain();">Reset</button>
+      <button class="btn p" type="submit" (click)="AddMain()">{{text}}</button>
+    </div>
+  </div>
 </div>

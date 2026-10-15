@@ -1,319 +1,191 @@
-<div class="animated fadeIn">
-    <div class="card">
-        <div class="card-header formheading">
-            <strong>{{Header| uppercase}}</strong>
-        </div>
+<!-- Quotation rate master entry. Recipe 2 (form): kit header, .fields card,
+     sticky bottom-right bar, and a table.tbl grid of rates entered so far. -->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{Header | uppercase}}</h1>
+      <p>Add or edit a quotation rate</p>
     </div>
-    <div class="container">
-        <div class="row">
-          <div class="col-sm-2"> </div> 
-            <div class="col-sm-8">
-                <table class="table table-bordered table-sm-new bgwhite">
-                    <tr>
-                        <td class="col-form-span-heading" colspan="4">
-                        Quotation Rate  
-                        </td>
-                    </tr>
-                    <tr>
-                        <td ><span class="col-form-span-label"><b>Shipping Line</b> </span><span
-                                class="col-form-span-error">*</span></td>
-                        <td colspan="3">
-                            <!-- <select class="form-control  " [(ngModel)]="client">
-                                <option value="">--Please Select Client--</option>
-                                <option *ngFor="let data of clientable" value={{data.DATAVALUE}}>{{data.DATATEXTVALUE}}
-                                </option>
-                            </select> -->
-                            <ng-select [items]="linertable"
-                                bindLabel="DATATEXTVALUE"
-                                bindValue="DATAVALUE" 
-                                [(ngModel)]="liner"
-                                class="custom"  
-                                placeholder="--Please Select--" >
-                             </ng-select>
-                        </td>
-                    </tr>
-                    <!-- <tr>
-                        <td colspan="4">
-                            <table  class="table table-bordered table-sm-new bgwhite">
-                                <tr>
-                                    <td ><span class="col-form-span-label"><b>Shipment Type </b> </span>
-                                    </td>
-                                    <td>
-                                        <select class="form-control width100" [(ngModel)]="shipmenttype">
-                                            <option value="">-- Select --</option>
-                                            <option *ngFor="let d of shipmenttypetable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
-                                            </option>
-                                        </select>
-                                    </td>
-                                    <td ><span class="col-form-span-label"><b>Shipment Mode </b> </span>
-                                    </td>
-                                    <td>
-                                        <select class="form-control width100" [(ngModel)]="shipmentmode">
-                                            <option value="">-- Select --</option>
-                                            <option *ngFor="let d of shipmentmodetable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
-                                            </option>
-                                        </select>
-                                    </td>
-                                    <td ><span class="col-form-span-label"><b>Stuff Type </b> </span><span
-                                        class="col-form-span-error">*</span>
-                                </td>
-                                <td>
-                                    <select class="form-control width120" [(ngModel)]="stufftype">
-                                        <option value="">-- Select--</option>
-                                        <option *ngFor="let d of stufftypetable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
-                                    </select>
-                                </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr> -->
-                     <tr>
-                        
-                        <td ><span class="col-form-span-label"><b>Shipment Type </b> </span>
-                            <span class="col-form-span-error">*</span>
-                            </td>
-                        <td>
-                            <select class="form-control width120" [(ngModel)]="shipmenttype">
-                                <option value="">--Please Select --</option>
-                                @for (d of shipmenttypetable; track d) {
-<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
-                                </option>
-}
-                            </select>
-                        </td>
-                        <td ><span class="col-form-span-label"><b>Shipment Mode </b> </span>
-                            <span  class="col-form-span-error">*</span>
-                        </td>
-                        <td>
-                            <select class="form-control width100" [(ngModel)]="shipmentmode">
-                                <option value="">-- Select --</option>
-                                @for (d of shipmentmodetable; track d) {
-<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
-                                </option>
-}
-                            </select>
-                        </td>
-                     </tr>
-                        <tr>
-                        <td ><span class="col-form-span-label"><b>Stuff Type </b> </span><span
-                            class="col-form-span-error">*</span>
-                    </td>
-                    <td>
-                        <select class="form-control width120" [(ngModel)]="stufftype">
-                            <option value="">--Please Select--</option>
-                            @for (d of stufftypetable; track d) {
-<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
-}
-                        </select>
-                    </td>
-                    </tr> 
-                    <tr>
-                        <td ><span class="col-form-span-label"><b>Pol </b> </span><span
-                                class="col-form-span-error">*</span>
-                        </td>
-                        <td >
-                            <ng-select [items]="commoncities"
-                            bindLabel="CITY_NAME"
-                            bindValue="CITY_CODE"
-                            placeholder="--Select--" 
-                            [(ngModel)]="pol"
-                            (change)="GetTerminal(pol)"
-                            class="form-control width150"
-                            >
-                 </ng-select>
-                        </td>
-                        <td ><span class="col-form-span-label"><b>Terminal </b> </span><span
-                            class="col-form-span-error">*</span>
-                        </td>
-                    <td>
-                        <select class="form-control width120" [(ngModel)]="loadingportterminal">
-                            <option value="">--Please Select --</option>
-                            @for (d of portterminal; track d) {
-<option value={{d.ID}}>{{d.TERMINAL}}
-                            </option>
-}
-                        </select>
-                        <!-- <ng-select [items]="portterminal"
-                        bindLabel="TERMINAL"
-                        bindValue="ID"
-                        [(ngModel)]="loadingportterminal"
-                        class="form-control width150"
-                     
-                        > 
-             </ng-select>-->
-                    </td>
-                 
-                    </tr>
-                    <tr>
-                        <td><span class="col-form-span-label"><b>Pod </b> </span><span
-                                class="col-form-span-error">*</span>
-                        </td>
-                        <td >
-                            <ng-select [items]="commoncities"
-                            bindLabel="CITY_NAME"
-                            bindValue="CITY_CODE"
-                            placeholder="--Select--" 
-                            [(ngModel)]="pod"
-                            class="form-control width150"
-                            >
-                 </ng-select>
-                        </td>
-                        <td><span class="col-form-span-label"><b>Item Type </b> </span><span
-                            class="col-form-span-error">*</span>
-                        </td>
-                    <td>
-                        <select class="form-control width120" [(ngModel)]="itemtype">
-                            <option value="">-- Select --</option>
-                            @for (d of itemtypetable; track d) {
-<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
-                            </option>
-}
-                        </select>
-                    </td>
-                     
-                    </tr>
-                    <tr>
-                        <td><span class="col-form-span-label"><b>Container Type </b> </span><span
-                                class="col-form-span-error">*</span>
-                        </td>
-                        <td >
-                            <select class="form-control width120" [(ngModel)]="conttype">
-                                <option value="">--Please Select--</option>
-                                @for (d of conttypetable; track d) {
-<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
-}
-                            </select>
-                        </td>
-                        <td><span class="col-form-span-label"><b>Container Size </b> </span><span
-                            class="col-form-span-error">*</span>
-                        </td>
-                        <td>
-                        <select class="form-control width120" [(ngModel)]="contsize">
-                            <option value="">--Please Select --</option>
-                            @for (d of contsizetable; track d) {
-<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
-                            </option>
-}
-                        </select>
-                        </td>
-                                 
-                    </tr>
-                    <tr>
-                        <td><span class="col-form-span-label"><b>Charges </b> </span><span
-                                class="col-form-span-error">*</span>
-                        </td>
-                        <td colspan="3">
-                            <!-- <select class="form-control" [(ngModel)]="charges">
-                                <option value="">--Please Select--</option>
-                                <option *ngFor="let d of chargestable" value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
-                            </select> -->
-                            <ng-select [items]="chargestable"
-                            bindLabel="DATATEXTVALUE"
-                            bindValue="DATAVALUE" 
-                            [(ngModel)]="charges"
-                            class="custom"
-                            placeholder="--Please Select--"  >
-                     </ng-select>
-                        </td>
-                      
-                    </tr>
-                    <tr>
-                        <td><span class="col-form-span-label"><b>Currency</b> </span><span
-                                class="col-form-span-error">*</span></td>
-                        <td >
-                            <select class="form-control width150" [(ngModel)]="currency">
-                                <option value="">--Please Select Currency--</option>
-                                @for (d of currencytable; track d) {
-<option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}
-                                </option>
-}
+  </div>
 
-                            </select>
-                        </td>
-                        </tr>
-                        <tr>
-                        <td><span class="col-form-span-label"><b>Rate</b></span><span
-                                class="col-form-span-error">*</span> </td>
-                        <td> <input [(ngModel)]="rate" OnlyNumber="true"  type="text" class="form-control width180" OnlyNumber="true" (blur)="onchangefindcomma(rate)" > </td>
-                     
-                        <td><span class="col-form-span-label"><b>Ex.Rate</b></span><span
-                            class="col-form-span-error">*</span> </td>
-                    <td> <input [(ngModel)]="exrate" OnlyNumber="true"  type="text" class="form-control width180" OnlyNumber="true" (blur)="onchangefindcomma(rate)" > </td>  
-                    </tr>
-                    <tr>
-                        <td><span class="col-form-span-label"><b>Effective From </b> </span><span
-                                class="col-form-span-error">*</span>
-                        </td>
-                        <td>
-                            <my-date-picker name="Effective_from0" [options]="myDatePickerOptions"
-                                (dateChanged)="onDateChanged($event)" [selDate]="Effective_from0"></my-date-picker>
+  <div class="card sec">
+    <div class="card-h"><h2>Rate details</h2></div>
+    <div class="fields">
+      <div class="fld">
+        <label>Shipping Line *</label>
+        <ng-select [items]="linertable"
+          bindLabel="DATATEXTVALUE"
+          bindValue="DATAVALUE"
+          [(ngModel)]="liner"
+          placeholder="--Please Select--">
+        </ng-select>
+      </div>
+      <div class="fld">
+        <label>Shipment Type *</label>
+        <select [(ngModel)]="shipmenttype">
+          <option value="">--Please Select --</option>
+          @for (d of shipmenttypetable; track d) {
+            <option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Shipment Mode *</label>
+        <select [(ngModel)]="shipmentmode">
+          <option value="">-- Select --</option>
+          @for (d of shipmentmodetable; track d) {
+            <option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Stuff Type *</label>
+        <select [(ngModel)]="stufftype">
+          <option value="">--Please Select--</option>
+          @for (d of stufftypetable; track d) {
+            <option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Pol *</label>
+        <ng-select [items]="commoncities"
+          bindLabel="CITY_NAME"
+          bindValue="CITY_CODE"
+          placeholder="--Select--"
+          [(ngModel)]="pol"
+          (change)="GetTerminal(pol)">
+        </ng-select>
+      </div>
+      <div class="fld">
+        <label>Terminal *</label>
+        <select [(ngModel)]="loadingportterminal">
+          <option value="">--Please Select --</option>
+          @for (d of portterminal; track d) {
+            <option value={{d.ID}}>{{d.TERMINAL}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Pod *</label>
+        <ng-select [items]="commoncities"
+          bindLabel="CITY_NAME"
+          bindValue="CITY_CODE"
+          placeholder="--Select--"
+          [(ngModel)]="pod">
+        </ng-select>
+      </div>
+      <div class="fld">
+        <label>Item Type *</label>
+        <select [(ngModel)]="itemtype">
+          <option value="">-- Select --</option>
+          @for (d of itemtypetable; track d) {
+            <option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Container Type *</label>
+        <select [(ngModel)]="conttype">
+          <option value="">--Please Select--</option>
+          @for (d of conttypetable; track d) {
+            <option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Container Size *</label>
+        <select [(ngModel)]="contsize">
+          <option value="">--Please Select --</option>
+          @for (d of contsizetable; track d) {
+            <option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Charges *</label>
+        <ng-select [items]="chargestable"
+          bindLabel="DATATEXTVALUE"
+          bindValue="DATAVALUE"
+          [(ngModel)]="charges"
+          placeholder="--Please Select--">
+        </ng-select>
+      </div>
+      <div class="fld">
+        <label>Currency *</label>
+        <select [(ngModel)]="currency">
+          <option value="">--Please Select Currency--</option>
+          @for (d of currencytable; track d) {
+            <option value={{d.DATAVALUE}}>{{d.DATATEXTVALUE}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Rate *</label>
+        <input [(ngModel)]="rate" OnlyNumber="true" type="text" (blur)="onchangefindcomma(rate)">
+      </div>
+      <div class="fld">
+        <label>Ex.Rate *</label>
+        <input [(ngModel)]="exrate" OnlyNumber="true" type="text" (blur)="onchangefindcomma(rate)">
+      </div>
+      <div class="fld">
+        <label>Effective From *</label>
+        <my-date-picker name="Effective_from0" [options]="myDatePickerOptions"
+          (dateChanged)="onDateChanged($event)" [selDate]="Effective_from0"></my-date-picker>
+      </div>
+      <div class="fld">
+        <label>Effective To *</label>
+        <my-date-picker name="Effective_to0" [options]="myDatePickerOptions"
+          (dateChanged)="onDateChanged1($event)" [selDate]="Effective_to0"></my-date-picker>
+      </div>
+    </div>
 
-                        </td>
-                        <td><span class="col-form-span-label"><b>Effective To </b> </span><span
-                                class="col-form-span-error">*</span></td>
-                        <td> 
-                            <my-date-picker name="Effective_to0" [options]="myDatePickerOptions"
-                                (dateChanged)="onDateChanged1($event)" [selDate]=Effective_to0></my-date-picker>
-
-                        </td>
-                    </tr>
+    <div class="tbl-wrap" style="margin-top:16px;">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Shipping Line</th>
+            <th>Shipment Type</th>
+            <th>Pol</th>
+            <th>Pod</th>
+            <th>Charge name</th>
+            <th>Currency</th>
+            <th>Rate</th>
+            <th>Ex.Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (ratedetails?.length > 0) {
+            @for (obj of ratedetails; track obj) {
               <tr>
-                        <td colspan="4" class="centerlabel">
-                            <button uiBtn variant="default" size="sm" type="submit" (click)="Addquotationrate()"> <span
-                                    class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>{{txtsubmit}}</span></button>
-                            <button uiBtn variant="outline" size="sm" type="reset"> <span class="col-form-span-label"
-                                    (click)="ResetQuotationrate();"><i class="fa fa-ban"></i> Reset</span></button>
-                        </td>
-                    </tr>
+                <td class="act">
+                  <button type="button" (click)="EditQuotationrate(obj.PKRTID)">Edit</button>
+                  <button type="button" (click)="DeleteQuotationrate(obj.PKRTID)">Delete</button>
+                </td>
+                <td>{{obj.LINER_NAME}}</td>
+                <td>{{obj.SHIPMENTYPETEXT}}</td>
+                <td>{{obj.POLNAME}}</td>
+                <td>{{obj.PODNAME}}</td>
+                <td>{{obj.CHRG_DESC}}</td>
+                <td>{{obj.CUR_SNAME}}</td>
+                <td>{{obj.RATE}}</td>
+                <td>{{obj.EXRATE}}</td>
+              </tr>
+            }
+          } @else {
+            <tr><td class="empty" colspan="9">No rates added yet.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-                    <tr>
-                        <td colspan="4">
-                            <div class="xyscroll" style="width:715px;height: 150px;">
-                                <table class="table table-responsive-sm table-bordered">
-                                    <thead>
-                                        <tr class="title-head formheading">
-                                            <th class="col-form-span-label"></th>
-                                            <th class="col-form-span-label">Shipping Line</th>
-                                            <th class="col-form-span-label">Shipment Type</th>
-                                            <th class="col-form-span-label">Pol</th>
-                                            <th class="col-form-span-label">Pod</th>
-                                            <th class="col-form-span-label">Charge name</th>
-                                            <th class="col-form-span-label">Currency</th>
-                                            <th class="col-form-span-label">Rate</th>
-                                            <th class="col-form-span-label">Ex.Rate</th>
-                                           
-                                        </tr>
-                                    </thead>
-                                    @if (ratedetails.length>0) {
-<tbody>
-                                        @for (obj of ratedetails; track obj) {
-<tr>
-                                            <td class="centerlabel">
-                                                <i class="fa fa-pencil" (click)="EditQuotationrate(obj.PKRTID)"></i>
-                                                &nbsp;
-                                                <i class="fa fa-trash" (click)="DeleteQuotationrate(obj.PKRTID)"></i>
-                                            </td>
-                                          
-                                            <td><span class="col-form-span-label">{{obj.LINER_NAME}}</span></td>
-                                            <td><span class="col-form-span-label">{{obj.SHIPMENTYPETEXT}}</span></td>
-                                            <td><span class="col-form-span-label">{{obj.POLNAME}}</span></td>
-                                            <td><span class="col-form-span-label">{{obj.PODNAME}}</span></td>
-                                            <td><span class="col-form-span-label">{{obj.CHRG_DESC}}</span></td>
-                                            <td><span class="col-form-span-label">{{obj.CUR_SNAME}}</span></td>
-                                            <td><span class="col-form-span-label">{{obj.RATE}}</span></td>
-                                            <td><span class="col-form-span-label">{{obj.EXRATE}}</span></td>
-                                        </tr>
-}
-                                    </tbody>
-}
-                                </table>
-                            </div>
-                        </td>
-                    </tr>
-                  
-                </table>
-            </div>
-             <div class="col-sm-2"> </div> 
-        </div>
-    </div> 
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose {{txtsubmit}}.</span>
+    <div class="r">
+      <button class="btn g" type="reset" (click)="ResetQuotationrate();">Reset</button>
+      <button class="btn p" type="submit" (click)="Addquotationrate()">{{txtsubmit}}</button>
+    </div>
+  </div>
 </div>

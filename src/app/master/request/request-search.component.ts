@@ -11,6 +11,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-mastersearch',
     templateUrl: 'request-search.component.html',
+    styleUrls: ['./request-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -122,7 +123,7 @@ export class ReqMastersearch  implements OnInit  {
         this.loaderService.display(true);
         this._dataService.getData("Master/Master_Search_common",jsonmaster)
         .subscribe((data: any) => {
-             this.Reqlist=data.Table;
+             this.Reqlist=(data && data.Table) || [];
              this.loaderService.display(false);
         });
         this.config = {

@@ -12,7 +12,7 @@ import { DatePipe } from '@angular/common'
 @Component({
   selector: 'app-quot-rate-master-entry',
   templateUrl: './quot-rate-master-entry.component.html',
-  styles: [],
+  styleUrls: ['./quotation-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

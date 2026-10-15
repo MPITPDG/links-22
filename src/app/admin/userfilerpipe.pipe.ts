@@ -6,18 +6,20 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class UserfilerpipePipe implements PipeTransform {
 
+  // User List quick filter: user name, full name or e-mail contains the text.
+  // Null-safe: a user with no FULLNAME / MAIL, or a list that failed to load,
+  // no longer throws while typing.
   transform(value:any[],searchString:string) {
-    if(!searchString){
-  
-      return value  
+    if(!searchString || !Array.isArray(value)){
+      return value
     }
-  return value.filter(it=>{   
-      
-        const FULLNAME = it.FULLNAME.toLowerCase().includes(searchString.toLowerCase())
-        const CMP_USERNAME = it.CMP_USERNAME.toLowerCase().includes(searchString.toLowerCase())
-        const MAIL = it.MAIL.toLowerCase().includes(searchString.toLowerCase())
-        return ( FULLNAME+CMP_USERNAME+MAIL);      
-    }) 
+    const q = searchString.toLowerCase();
+    return value.filter(it=>{
+        const FULLNAME = String(it?.FULLNAME ?? '').toLowerCase().includes(q)
+        const CMP_USERNAME = String(it?.CMP_USERNAME ?? '').toLowerCase().includes(q)
+        const MAIL = String(it?.MAIL ?? '').toLowerCase().includes(q)
+        return FULLNAME || CMP_USERNAME || MAIL;
+    })
   }
 
 }

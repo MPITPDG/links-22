@@ -10,10 +10,7 @@ import { IMyDpOptions } from 'mydatepicker';
 @Component({
     selector: 'app-GeneralaccountCreation',
     templateUrl: 'generalactmaster-IU.component.html',
-    styles: [`
-    table, tr, td, th{
-        border: none;
-        } `],
+    styleUrls: ['../request/request-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

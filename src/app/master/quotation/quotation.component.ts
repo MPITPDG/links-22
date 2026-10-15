@@ -13,7 +13,7 @@ import { DatePipe } from '@angular/common'
 @Component({
   selector: 'app-quotation-entry',
   templateUrl: './quotation.component.html',
-  styleUrls: ['./quotation.component.css'],
+  styleUrls: ['./quotation-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

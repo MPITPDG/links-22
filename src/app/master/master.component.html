@@ -1,3 +1,155 @@
-<div class="flex-row">
-    
+<div class="im-page im-dash ms-dash">
+  <div class="im-ph">
+    <div>
+      <h1>Master Dashboard</h1>
+      <p>{{ cityName }} &middot; requests pending now &middot; quotations and enquiries {{ fromLabel }} &ndash; {{ toLabel }}</p>
+    </div>
+    <div class="im-tools">
+      <button type="button" class="im-btn im-btn-g" (click)="load()" [disabled]="loadingAny">{{ loadingAny ? 'Loading...' : 'Refresh' }}</button>
+    </div>
+  </div>
+
+  <div class="im-grid im-kpis">
+    <div class="im-card im-kpi">
+      <div class="k">Pending requests</div>
+      @if (reqLoading) { <div class="ms-skel h28 w40"></div><div class="ms-skel w60"></div> } @else {
+        <div class="v">{{ reqPending }}</div>
+        <div class="s">{{ reqFailed ? 'some types failed to load' : 'awaiting approval, all types' }}</div>
+      }
+    </div>
+    <div class="im-card im-kpi">
+      <div class="k">Quotations</div>
+      @if (quotLoading) { <div class="ms-skel h28 w40"></div><div class="ms-skel w60"></div> } @else if (quotFailed) {
+        <div class="v">&ndash;</div><div class="s">could not be loaded</div>
+      } @else {
+        <div class="v">{{ quotTotal }}</div>
+        <div class="s">Sea {{ quotSea }} &middot; Air {{ quotAir }} &middot; last 12 months</div>
+      }
+    </div>
+    <div class="im-card im-kpi">
+      <div class="k">Enquiries this month</div>
+      @if (enqLoading) { <div class="ms-skel h28 w40"></div><div class="ms-skel w60"></div> } @else if (enqFailed) {
+        <div class="v">&ndash;</div><div class="s">could not be loaded</div>
+      } @else {
+        <div class="v">{{ enqThisMonth }}</div>
+        <div class="s">{{ enqTotal }} in last 12 months</div>
+      }
+    </div>
+    <div class="im-card im-kpi">
+      <div class="k">Open enquiries</div>
+      @if (enqLoading) { <div class="ms-skel h28 w40"></div><div class="ms-skel w60"></div> } @else if (enqFailed) {
+        <div class="v">&ndash;</div><div class="s">could not be loaded</div>
+      } @else {
+        <div class="v">{{ enqOpen }}</div>
+        <div class="s">not yet won or lost</div>
+      }
+    </div>
+  </div>
+
+  <div class="im-grid im-charts">
+    <div class="im-card">
+      <div class="im-card-h">
+        <h2>Enquiries{{ quotDated ? ' and quotations' : '' }} per month</h2>
+        <div class="im-legend"><span><i class="im-dot-sea"></i>Enquiries</span>@if (quotDated) {<span><i class="im-dot-air"></i>Quotations</span>}</div>
+      </div>
+      @if (enqLoading || quotLoading) {
+        <div class="ms-skel ms-skel-chart"></div>
+      } @else if (enqFailed && (quotFailed || !quotDated)) {
+        <div class="im-empty">Monthly figures could not be loaded. <a href="javascript:void(0);" class="im-link" (click)="load()">Try again</a></div>
+      } @else {
+        <div class="im-chart">
+          <svg [attr.viewBox]="'0 0 ' + chartW + ' ' + chartH" role="img" aria-label="Enquiries and quotations per month">
+            @for (g of gridLines; track g.y) {
+              <line [attr.x1]="chartL" [attr.x2]="chartW - chartR" [attr.y1]="g.y" [attr.y2]="g.y" [class.im-grid-zero]="g.label === 0" class="im-gridline"></line>
+              <text [attr.x]="chartL - 8" [attr.y]="g.y + 4" text-anchor="end" class="im-axis-label">{{ g.label }}</text>
+            }
+            @for (b of bars; track $index) {
+              <rect [attr.x]="b.x" [attr.y]="b.eY" [attr.width]="b.w" [attr.height]="b.eH" class="im-bar-sea"><title>{{ b.label }}: {{ b.enq }} enquiries</title></rect>
+              @if (quotDated) {
+                <rect [attr.x]="b.x + b.w + 1" [attr.y]="b.qY" [attr.width]="b.w" [attr.height]="b.qH" class="im-bar-air"><title>{{ b.label }}: {{ b.quot }} quotations</title></rect>
+              }
+              <text [attr.x]="b.lx" [attr.y]="chartH - 8" text-anchor="middle" class="im-axis-label">{{ b.label }}</text>
+            }
+          </svg>
+        </div>
+      }
+    </div>
+
+    <div class="im-card">
+      <div class="im-card-h"><h2>Pending requests by type</h2><span class="meta">requests</span></div>
+      <div class="im-top">
+        @for (t of types; track t.label) {
+          <div class="im-bar-row">
+            <div class="t"><span>{{ t.label }}</span>
+              @if (t.loading) { <b>&hellip;</b> } @else if (t.failed) { <b>failed</b> } @else { <b>{{ t.count }}</b> }
+            </div>
+            @if (t.loading) { <div class="ms-skel h8"></div> } @else { <div class="im-track"><div [style.width.%]="t.pct"></div></div> }
+          </div>
+        }
+      </div>
+      <div class="im-card-h im-card-h-flat ms-gap"><h2>Enquiries by status</h2><span class="meta">12 months</span></div>
+      <div class="im-top">
+        @if (enqLoading) { <div class="ms-skel"></div><div class="ms-skel w80"></div><div class="ms-skel w60"></div> }
+        @else if (enqFailed) { <div class="im-empty-inline">Enquiries could not be loaded.</div> }
+        @else {
+          @for (s of enqStatuses; track s.name) {
+            <div class="im-bar-row">
+              <div class="t"><span>{{ s.name }}</span><b>{{ s.count }}</b></div>
+              <div class="im-track"><div [style.width.%]="s.pct"></div></div>
+            </div>
+          }
+          @if (!enqStatuses.length) { <div class="im-empty-inline">No enquiries in this window.</div> }
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="im-card">
+    <div class="im-card-h"><h2>Pending master requests</h2><span class="meta">grouped by type</span></div>
+    <div class="im-tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Code</th><th>Type</th><th>Name</th><th>City</th><th>Country</th><th>Requested by</th></tr>
+        </thead>
+        <tbody>
+          @if (reqLoading && !requests.length) {
+            @for (i of [1,2,3,4,5]; track i) {
+              <tr><td colspan="6"><div class="ms-skel"></div></td></tr>
+            }
+          } @else if (reqFailed && !requests.length) {
+            <tr><td colspan="6" class="im-empty">Requests could not be loaded. <a href="javascript:void(0);" class="im-link" (click)="load()">Try again</a></td></tr>
+          } @else if (!requests.length) {
+            <tr><td colspan="6" class="im-empty">No master requests are waiting for approval.</td></tr>
+          } @else {
+            @for (r of pagedRequests; track r.type + r.code) {
+              <tr>
+                <td class="mono"><a href="javascript:void(0);" class="im-link" (click)="openRequest(r)">{{ r.code }}</a></td>
+                <td><span class="im-chip">{{ r.type }}</span></td>
+                <td>{{ r.name }}</td>
+                <td>{{ r.city }}</td>
+                <td>{{ r.country }}</td>
+                <td>{{ r.user }}</td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (requests.length) {
+      <div class="im-pager">
+        <span>Showing <b>{{ pageFrom }}&ndash;{{ pageTo }}</b> of <b>{{ requests.length }}</b></span>
+        <div class="im-pages">
+          <button type="button" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">&lsaquo;</button>
+          @for (p of pageNumbers; track $index) {
+            @if (p === '...') {
+              <button type="button" disabled class="im-ellipsis">&hellip;</button>
+            } @else {
+              <button type="button" [class.on]="p === currentPage" (click)="goToPage(p)">{{ p }}</button>
+            }
+          }
+          <button type="button" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">&rsaquo;</button>
+        </div>
+      </div>
+    }
+  </div>
 </div>

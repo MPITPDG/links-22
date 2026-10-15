@@ -10,7 +10,7 @@ import { IMyDpOptions } from 'mydatepicker';
 @Component({
   selector: 'app-enquiry-search',
   templateUrl: './enquiry.search.component.html',
-  styleUrls: ['./quotation.search.component.scss'],
+  styleUrls: ['./quotation-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -122,8 +122,8 @@ export class EnquirySearchComponent implements OnInit {
         this._dataService.getData("Admin/ADMIN_SALESENQUIRY_SEARCHLIST", jsonmaster)
       .subscribe((data: any) => {
        // console.log(data)
-        this.enquirylist = data.Table
-        if(data.Table.length==0){
+        this.enquirylist = (data && data.Table) || [];
+        if(this.enquirylist.length==0){
           this._toasterService.toast('warning', 'warning', "No records found !");
         }
         this.displayType='LIST';

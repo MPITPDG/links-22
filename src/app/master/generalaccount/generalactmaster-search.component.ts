@@ -8,6 +8,7 @@ import { Router} from '@angular/router';
  @Component({
     selector: 'app-GeneralMastersearch',
     templateUrl: 'generalactmaster-search.component.html',
+    styleUrls: ['../request/request-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -172,7 +173,7 @@ export class generalactmastersearch implements OnInit   {
             this.loaderService.display(true);
             this._dataService.getData("Master/MST_GENERAL_ACCOUNT_SEARCH",_jsonData)
             .subscribe((data: any) => {
-            this.accountlist = data.Table;      
+            this.accountlist = (data && data.Table) || [];      
             this.loaderService.display(false);      
              });
              this.config = {
@@ -195,7 +196,7 @@ export class generalactmastersearch implements OnInit   {
         }
          this._dataService.getData("Master/MST_GENERAL_ACCOUNT_SEARCH",jsoncompany)
             .subscribe((data: any) => {
-           this.accountlist = data.Table;      
+           this.accountlist = (data && data.Table) || [];      
            this.loaderService.display(false);             
     
    });

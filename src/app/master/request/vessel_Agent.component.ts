@@ -12,6 +12,7 @@ import { Configuration } from '../../app.constants';
 @Component({
     selector: 'app-masterAgentVessel',
     templateUrl: 'vessel_Agent.component.html',
+    styleUrls: ['./request-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })  

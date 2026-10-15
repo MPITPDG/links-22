@@ -13,6 +13,7 @@ import { Configuration } from '../../app.constants';
 @Component({
     selector: 'app-userprofilecreation',
     templateUrl: 'userprofile-creation.component.html',
+    styleUrls: ['../admin-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
