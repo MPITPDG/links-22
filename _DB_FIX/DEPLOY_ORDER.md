@@ -13,6 +13,7 @@ failed prerequisite, and has a matching `ROLLBACK_` script in this folder.
 | 3 | `EXPT_JOB_STATE_LINKSDB20_20261015.sql` (its last step runs the engine once and prints alert counts) | normal login | pending |
 | 4 | `EXPT_JOB_STATE_AGENT_JOBS_LINKSDB20_20261015.sql` (creates "LinksDB20 - Export job state + alerts" and "... watchdog") | sysadmin (e.g. jolly_a) | pending |
 | 5 | `FINANCE_DASHBOARD_AUDIT.sql` (creates USP_ACC_RPT_FINANCE_DASHBOARD_AUDIT, the Finance dashboard's Audit tab; older script from the 2026-08 port, never applied) | normal login | pending |
+| 6 | `USP35_IMP_IMPORT_RPT_SEARCH_LINKSDB20_20261015.sql` (re-enables Import search types 2-7; fixes Import home and Sea/Air search) | normal login | pending |
 
 ## 2. Links API (Links_v5_API, branch `feature/links-redesign-backend`)
 
