@@ -1,925 +1,540 @@
-<div class="animated fadeIn">
-  <div class="row">
-    <div class="col-sm-6 col-lg-3">
-      <div class="card text-white bg-primary">
-        <div class="card-body pb-0">
-          <div class="btn-group float-right" dropdown>
-            <button type="button" uiBtn class="btn-transparent dropdown-toggle p-0" dropdownToggle>
-              <i class="icon-settings"></i>
-            </button>
-            <div class="dropdown-menu dropdown-menu-right" *dropdownMenu>
-              <a class="dropdown-item" href="#">Action</a>
-              <a class="dropdown-item" href="#">Another action</a>
-              <a class="dropdown-item" href="#">Something else here</a>
-            </div>
-          </div>
-          <h4 class="mb-0">9.823</h4>
-          <p>Members online</p>
-        </div>
-        <div class="chart-wrapper px-3" style="height:70px;">
-          <canvas baseChart class="chart"
-          [datasets]="lineChart1Data"
-          [labels]="lineChart1Labels"
-          [options]="lineChart1Options"
-          [legend]="lineChart1Legend"
-          [type]="lineChart1Type"
-          (chartHover)="chartHovered($event)"
-          (chartClick)="chartClicked($event)"></canvas>
-        </div>
-      </div>
-    </div><!--/.col-->
-    <div class="col-sm-6 col-lg-3">
-      <div class="card text-white bg-info">
-        <div class="card-body pb-0">
-          <button type="button" uiBtn class="btn-transparent p-0 float-right">
-            <i class="icon-location-pin"></i>
-          </button>
-          <h4 class="mb-0">9.823</h4>
-          <p>Members online</p>
-        </div>
-        <div class="chart-wrapper px-3" style="height:70px;">
-          <canvas baseChart class="chart"
-          [datasets]="lineChart2Data"
-          [labels]="lineChart2Labels"
-          [options]="lineChart2Options"
-          [legend]="lineChart2Legend"
-          [type]="lineChart2Type"
-          (chartHover)="chartHovered($event)"
-          (chartClick)="chartClicked($event)"></canvas>
-        </div>
-      </div>
-    </div><!--/.col-->
-    <div class="col-sm-6 col-lg-3">
-      <div class="card text-white bg-warning">
-        <div class="card-body pb-0">
-          <div class="btn-group float-right" dropdown>
-            <button type="button" uiBtn class="btn-transparent dropdown-toggle p-0" dropdownToggle>
-              <i class="icon-settings"></i>
-            </button>
-            <div class="dropdown-menu dropdown-menu-right" *dropdownMenu>
-              <a class="dropdown-item" href="#">Action</a>
-              <a class="dropdown-item" href="#">Another action</a>
-              <a class="dropdown-item" href="#">Something else here</a>
-            </div>
-          </div>
-          <h4 class="mb-0">9.823</h4>
-          <p>Members online</p>
-        </div>
-        <div class="chart-wrapper" style="height:70px;">
-          <canvas baseChart class="chart"
-          [datasets]="lineChart3Data"
-          [labels]="lineChart3Labels"
-          [options]="lineChart3Options"
-          [legend]="lineChart3Legend"
-          [type]="lineChart3Type"
-          (chartHover)="chartHovered($event)"
-          (chartClick)="chartClicked($event)"></canvas>
-        </div>
-      </div>
-    </div><!--/.col-->
-    <div class="col-sm-6 col-lg-3">
-      <div class="card text-white bg-danger">
-        <div class="card-body pb-0">
-          <div class="btn-group float-right" dropdown>
-            <button type="button" uiBtn class="btn-transparent dropdown-toggle p-0" dropdownToggle>
-              <i class="icon-settings"></i>
-            </button>
-            <div class="dropdown-menu dropdown-menu-right" *dropdownMenu>
-              <a class="dropdown-item" href="#">Action</a>
-              <a class="dropdown-item" href="#">Another action</a>
-              <a class="dropdown-item" href="#">Something else here</a>
-            </div>
-          </div>
-          <h4 class="mb-0">9.823</h4>
-          <p>Members online</p>
-        </div>
-        <div class="chart-wrapper px-3" style="height:70px;">
-          <canvas baseChart class="chart"
-          [datasets]="barChart1Data"
-          [labels]="barChart1Labels"
-          [options]="barChart1Options"
-          [legend]="barChart1Legend"
-          [type]="barChart1Type"
-          (chartHover)="chartHovered($event)"
-          (chartClick)="chartClicked($event)"></canvas>
-        </div>
-      </div>
-    </div><!--/.col-->
-  </div><!--/.row-->
-  <div class="card">
-    <div class="card-body">
-      <div class="row">
-        <div class="col-sm-5">
-          <h4 class="card-title mb-0">Traffic</h4>
-          <div class="small text-muted">November 2015</div>
-        </div><!--/.col-->
-        <div class="col-sm-7 hidden-sm-down">
-          <button type="button" uiBtn variant="default" class="float-right"><i class="icon-cloud-download"></i></button>
-          <div class="btn-toolbar float-right" role="toolbar" aria-label="Toolbar with button groups">
-            <div class="btn-group mr-3" data-toggle="buttons" aria-label="First group">
-              <label uiBtn variant="outline">
-                <input type="radio" name="options" id="option1"> Day
-              </label>
-              <label uiBtn variant="outline" class="active">
-                <input type="radio" name="options" id="option2" checked> Month
-              </label>
-              <label uiBtn variant="outline">
-                <input type="radio" name="options" id="option3"> Year
-              </label>
-            </div>
-          </div>
-        </div><!--/.col-->
-      </div><!--/.row-->
-      <div class="chart-wrapper" style="height:300px;margin-top:40px;">
-        <canvas baseChart class="chart"
-        [datasets]="mainChartData"
-        [labels]="mainChartLabels"
-        [options]="mainChartOptions"
-        [legend]="mainChartLegend"
-        [type]="mainChartType"
-        (chartHover)="chartHovered($event)"
-        (chartClick)="chartClicked($event)"></canvas>
-      </div>
+<!-- Export Dashboard (/dashboard), ported from MPERPNG-20. Six sections, urgency first:
+     header, attention tiles, act now, this week, workload picture, detail, reference.
+     Links is sea-only, so every Air control is behind `air` (AIR_ENABLED). Prealert removed by user decision.
+     Renders only with the View right on FORM_ID 443 (or as SA), as the V8 export home did. Without it
+     this stays empty: no redirect, no message, and the menu still works. -->
+@if (canView) {
+<div class="im-page im-dash ex-dash ed-page">
+
+  <!-- ================= 0. header row ================= -->
+  <div class="ed-head">
+    <div class="ed-title">
+      <h1>Export Dashboard</h1>
+      <p>{{ greeting }}@if (userName) {, {{ userName }}} &middot; {{ cityName }} &middot; jobs created {{ fromLabel }} &ndash; today@if (updatedAt && !loading) { &middot; status as of {{ stamp(updatedAt) }}}</p>
     </div>
-    <div class="card-footer">
-      <ul>
-        <li>
-          <div class="text-muted">Visits</div>
-          <strong>29.703 Users (40%)</strong>
-          <div class="progress progress-xs mt-2">
-            <div class="progress-bar bg-success" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
-        </li>
-        <li class="hidden-sm-down">
-          <div class="text-muted">Unique</div>
-          <strong>24.093 Users (20%)</strong>
-          <div class="progress progress-xs mt-2">
-            <div class="progress-bar bg-info" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
-        </li>
-        <li>
-          <div class="text-muted">Pageviews</div>
-          <strong>78.706 Views (60%)</strong>
-          <div class="progress progress-xs mt-2">
-            <div class="progress-bar bg-warning" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
-        </li>
-        <li class="hidden-sm-down">
-          <div class="text-muted">New Users</div>
-          <strong>22.123 Users (80%)</strong>
-          <div class="progress progress-xs mt-2">
-            <div class="progress-bar bg-danger" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
-        </li>
-        <li class="hidden-sm-down">
-          <div class="text-muted">Bounce Rate</div>
-          <strong>40.15%</strong>
-          <div class="progress progress-xs mt-2">
-            <div class="progress-bar" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
-        </li>
-      </ul>
+    <div class="ed-tools">
+      <div class="fld"><label for="edDays">Period</label>
+        <select id="edDays" [ngModel]="days" (ngModelChange)="setDaysSel($event)" [disabled]="loading">
+          <option [ngValue]="30">Last 30 days</option>
+          <option [ngValue]="90">Last 90 days</option>
+          <option [ngValue]="365">Last 1 year</option>
+        </select>
+      </div>
+      <button type="button" class="btn pri" (click)="load()" [disabled]="loading">{{ loading ? 'Loading…' : 'Refresh' }}</button>
     </div>
   </div>
-  <!--/.card-->
-  <div class="row">
-    <div class="col-sm-6 col-lg-3">
-      <div class="social-box facebook">
-        <i class="fa fa-facebook"></i>
-        <div class="chart-wrapper">
-          <canvas baseChart class="chart"
-          [datasets]="socialChartData1"
-          [labels]="socialChartLabels"
-          [options]="socialChartOptions"
-          [legend]="socialChartLegend"
-          [type]="socialChartType"
-          (chartHover)="chartHovered($event)"
-          (chartClick)="chartClicked($event)"></canvas>
-        </div>
-        <ul>
-          <li>
-            <strong>89k</strong>
-            <span>friends</span>
-          </li>
-          <li>
-            <strong>459</strong>
-            <span>feeds</span>
-          </li>
-        </ul>
-      </div>
-      <!--/.social-box-->
-    </div><!--/.col-->
-    <div class="col-sm-6 col-lg-3">
-      <div class="social-box twitter">
-        <i class="fa fa-twitter"></i>
-        <div class="chart-wrapper">
-          <canvas baseChart class="chart"
-          [datasets]="socialChartData2"
-          [labels]="socialChartLabels"
-          [options]="socialChartOptions"
-          [legend]="socialChartLegend"
-          [type]="socialChartType"
-          (chartHover)="chartHovered($event)"
-          (chartClick)="chartClicked($event)"></canvas>
-        </div>
-        <ul>
-          <li>
-            <strong>973k</strong>
-            <span>followers</span>
-          </li>
-          <li>
-            <strong>1.792</strong>
-            <span>tweets</span>
-          </li>
-        </ul>
-      </div>
-      <!--/.social-box-->
-    </div><!--/.col-->
-    <div class="col-sm-6 col-lg-3">
-      <div class="social-box linkedin">
-        <i class="fa fa-linkedin"></i>
-        <div class="chart-wrapper">
-          <canvas baseChart class="chart"
-          [datasets]="socialChartData3"
-          [labels]="socialChartLabels"
-          [options]="socialChartOptions"
-          [legend]="socialChartLegend"
-          [type]="socialChartType"
-          (chartHover)="chartHovered($event)"
-          (chartClick)="chartClicked($event)"></canvas>
-        </div>
-        <ul>
-          <li>
-            <strong>500+</strong>
-            <span>contacts</span>
-          </li>
-          <li>
-            <strong>292</strong>
-            <span>feeds</span>
-          </li>
-        </ul>
-      </div>
-      <!--/.social-box-->
-    </div><!--/.col-->
-    <div class="col-sm-6 col-lg-3">
-      <div class="social-box google-plus">
-        <i class="fa fa-google-plus"></i>
-        <div class="chart-wrapper">
-          <canvas baseChart class="chart"
-          [datasets]="socialChartData4"
-          [labels]="socialChartLabels"
-          [options]="socialChartOptions"
-          [legend]="socialChartLegend"
-          [type]="socialChartType"
-          (chartHover)="chartHovered($event)"
-          (chartClick)="chartClicked($event)"></canvas>
-        </div>
-        <ul>
-          <li>
-            <strong>894</strong>
-            <span>followers</span>
-          </li>
-          <li>
-            <strong>92</strong>
-            <span>circles</span>
-          </li>
-        </ul>
-      </div>
-      <!--/.social-box-->
-    </div><!--/.col-->
-  </div><!--/.row-->
-  <div class="row">
-    <div class="col-md-12">
-      <div class="card">
-        <div class="card-header">
-          Traffic &amp; Sales
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-sm-12 col-lg-4">
-              <div class="row">
-                <div class="col-sm-6">
-                  <div class="callout callout-info">
-                    <small class="text-muted">New Clients</small>
-                    <br>
-                    <strong class="h4">9,123</strong>
-                    <div class="chart-wrapper" style="width:100px;height:30px;">
-                      <canvas baseChart class="chart"
-                      [datasets]="sparklineChartData1"
-                      [labels]="sparklineChartLabels"
-                      [options]="sparklineChartOptions"
-                      [legend]="sparklineChartLegend"
-                      [type]="sparklineChartType"
-                      (chartHover)="chartHovered($event)"
-                      (chartClick)="chartClicked($event)"></canvas>
-                    </div>
-                  </div>
-                </div><!--/.col-->
-                <div class="col-sm-6">
-                  <div class="callout callout-danger">
-                    <small class="text-muted">Recuring Clients</small>
-                    <br>
-                    <strong class="h4">22,643</strong>
-                    <div class="chart-wrapper" style="width:100px;height:30px;">
-                      <canvas baseChart class="chart"
-                      [datasets]="sparklineChartData2"
-                      [labels]="sparklineChartLabels"
-                      [options]="sparklineChartOptions"
-                      [legend]="sparklineChartLegend"
-                      [type]="sparklineChartType"
-                      (chartHover)="chartHovered($event)"
-                      (chartClick)="chartClicked($event)"></canvas>
-                    </div>
-                  </div>
-                </div><!--/.col-->
-              </div><!--/.row-->
-              <hr class="mt-0">
-              <ul class="horizontal-bars">
-                <li>
-                  <div class="title">
-                    Monday
-                  </div>
-                  <div class="bars">
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-info" role="progressbar" style="width: 34%" aria-valuenow="34" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-danger" role="progressbar" style="width: 78%" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <div class="title">
-                    Tuesday
-                  </div>
-                  <div class="bars">
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-info" role="progressbar" style="width: 56%" aria-valuenow="56" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-danger" role="progressbar" style="width: 94%" aria-valuenow="94" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <div class="title">
-                    Wednesday
-                  </div>
-                  <div class="bars">
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-info" role="progressbar" style="width: 12%" aria-valuenow="12" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-danger" role="progressbar" style="width: 67%" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <div class="title">
-                    Thursday
-                  </div>
-                  <div class="bars">
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-info" role="progressbar" style="width: 43%" aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-danger" role="progressbar" style="width: 91%" aria-valuenow="91" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <div class="title">
-                    Friday
-                  </div>
-                  <div class="bars">
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-info" role="progressbar" style="width: 22%" aria-valuenow="22" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-danger" role="progressbar" style="width: 73%" aria-valuenow="73" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <div class="title">
-                    Saturday
-                  </div>
-                  <div class="bars">
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-info" role="progressbar" style="width: 53%" aria-valuenow="53" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-danger" role="progressbar" style="width: 82%" aria-valuenow="82" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <div class="title">
-                    Sunday
-                  </div>
-                  <div class="bars">
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-info" role="progressbar" style="width: 9%" aria-valuenow="9" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-danger" role="progressbar" style="width: 69%" aria-valuenow="69" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </li>
-                <li class="legend">
-                  <span class="badge badge-pill badge-info"></span> <small>New clients</small> &nbsp; <span class="badge badge-pill badge-danger"></span> <small>Recurring clients</small>
-                </li>
-              </ul>
-            </div><!--/.col-->
-            <div class="col-sm-6 col-lg-4">
-              <div class="row">
-                <div class="col-sm-6">
-                  <div class="callout callout-warning">
-                    <small class="text-muted">Pageviews</small>
-                    <br>
-                    <strong class="h4">78,623</strong>
-                    <div class="chart-wrapper" style="width:100px;height:30px;">
-                      <canvas baseChart class="chart"
-                      [datasets]="sparklineChartData1"
-                      [labels]="sparklineChartLabels"
-                      [options]="sparklineChartOptions"
-                      [legend]="sparklineChartLegend"
-                      [type]="sparklineChartType"
-                      (chartHover)="chartHovered($event)"
-                      (chartClick)="chartClicked($event)"></canvas>
-                    </div>
-                  </div>
-                </div><!--/.col-->
-                <div class="col-sm-6">
-                  <div class="callout callout-success">
-                    <small class="text-muted">Organic</small>
-                    <br>
-                    <strong class="h4">49,123</strong>
-                    <div class="chart-wrapper" style="width:100px;height:30px;">
-                      <canvas baseChart class="chart"
-                      [datasets]="sparklineChartData2"
-                      [labels]="sparklineChartLabels"
-                      [options]="sparklineChartOptions"
-                      [legend]="sparklineChartLegend"
-                      [type]="sparklineChartType"
-                      (chartHover)="chartHovered($event)"
-                      (chartClick)="chartClicked($event)"></canvas>
-                    </div>
-                  </div>
-                </div><!--/.col-->
-              </div><!--/.row-->
-              <hr class="mt-0">
-              <ul class="horizontal-bars type-2">
-                <li>
-                  <i class="icon-user"></i>
-                  <span class="title">Male</span>
-                  <span class="value">43%</span>
-                  <div class="bars">
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-warning" role="progressbar" style="width: 43%" aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <i class="icon-user-female"></i>
-                  <span class="title">Female</span>
-                  <span class="value">37%</span>
-                  <div class="bars">
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-warning" role="progressbar" style="width: 37%" aria-valuenow="37" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </li>
-                <li class="divider"></li>
-                <li>
-                  <i class="icon-globe"></i>
-                  <span class="title">Organic Search</span>
-                  <span class="value">191,235 <span class="text-muted small">(56%)</span></span>
-                  <div class="bars">
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-success" role="progressbar" style="width: 56%" aria-valuenow="56" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <i class="icon-social-facebook"></i>
-                  <span class="title">Facebook</span>
-                  <span class="value">51,223 <span class="text-muted small">(15%)</span></span>
-                  <div class="bars">
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-success" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <i class="icon-social-twitter"></i>
-                  <span class="title">Twitter</span>
-                  <span class="value">37,564 <span class="text-muted small">(11%)</span></span>
-                  <div class="bars">
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-success" role="progressbar" style="width: 11%" aria-valuenow="11" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <i class="icon-social-linkedin"></i>
-                  <span class="title">LinkedIn</span>
-                  <span class="value">27,319 <span class="text-muted small">(8%)</span></span>
-                  <div class="bars">
-                    <div class="progress progress-xs">
-                      <div class="progress-bar bg-success" role="progressbar" style="width: 8%" aria-valuenow="8" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </li>
-                <li class="divider text-center">
-                  <button type="button" uiBtn variant="link" size="sm" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="show more"><i class="icon-options"></i></button>
-                </li>
-              </ul>
-            </div><!--/.col-->
-            <div class="col-sm-6 col-lg-4">
-              <div class="row">
-                <div class="col-sm-6">
-                  <div class="callout">
-                    <small class="text-muted">CTR</small>
-                    <br>
-                    <strong class="h4">23%</strong>
-                    <div class="chart-wrapper" style="width:100px;height:30px;">
-                      <canvas baseChart class="chart"
-                      [datasets]="sparklineChartData1"
-                      [labels]="sparklineChartLabels"
-                      [options]="sparklineChartOptions"
-                      [legend]="sparklineChartLegend"
-                      [type]="sparklineChartType"
-                      (chartHover)="chartHovered($event)"
-                      (chartClick)="chartClicked($event)"></canvas>
-                    </div>
-                  </div>
-                </div><!--/.col-->
-                <div class="col-sm-6">
-                  <div class="callout callout-primary">
-                    <small class="text-muted">Bounce Rate</small>
-                    <br>
-                    <strong class="h4">5%</strong>
-                    <div class="chart-wrapper" style="width:100px;height:30px;">
-                      <canvas baseChart class="chart"
-                      [datasets]="sparklineChartData2"
-                      [labels]="sparklineChartLabels"
-                      [options]="sparklineChartOptions"
-                      [legend]="sparklineChartLegend"
-                      [type]="sparklineChartType"
-                      (chartHover)="chartHovered($event)"
-                      (chartClick)="chartClicked($event)"></canvas>
-                    </div>
-                  </div>
-                </div><!--/.col-->
-              </div><!--/.row-->
-              <hr class="mt-0">
-              <ul class="icons-list">
-                <li>
-                  <i class="icon-screen-desktop bg-primary"></i>
-                  <div class="desc">
-                    <div class="title">iMac 4k</div>
-                    <small>Lorem ipsum dolor sit amet</small>
-                  </div>
-                  <div class="value">
-                    <div class="small text-muted">Sold this week</div>
-                    <strong>1.924</strong>
-                  </div>
-                  <div class="actions">
-                    <button type="button" uiBtn variant="link" class="text-muted"><i class="icon-settings"></i></button>
-                  </div>
-                </li>
-                <li>
-                  <i class="icon-screen-smartphone bg-info"></i>
-                  <div class="desc">
-                    <div class="title">Samsung Galaxy Edge</div>
-                    <small>Lorem ipsum dolor sit amet</small>
-                  </div>
-                  <div class="value">
-                    <div class="small text-muted">Sold this week</div>
-                    <strong>1.224</strong>
-                  </div>
-                  <div class="actions">
-                    <button type="button" uiBtn variant="link" class="text-muted"><i class="icon-settings"></i></button>
-                  </div>
-                </li>
-                <li>
-                  <i class="icon-screen-smartphone bg-warning"></i>
-                  <div class="desc">
-                    <div class="title">iPhone 6S</div>
-                    <small>Lorem ipsum dolor sit amet</small>
-                  </div>
-                  <div class="value">
-                    <div class="small text-muted">Sold this week</div>
-                    <strong>1.163</strong>
-                  </div>
-                  <div class="actions">
-                    <button type="button" uiBtn variant="link" class="text-muted"><i class="icon-settings"></i></button>
-                  </div>
-                </li>
-                <li>
-                  <i class="icon-user bg-danger"></i>
-                  <div class="desc">
-                    <div class="title">Premium accounts</div>
-                    <small>Lorem ipsum dolor sit amet</small>
-                  </div>
-                  <div class="value">
-                    <div class="small text-muted">Sold this week</div>
-                    <strong>928</strong>
-                  </div>
-                  <div class="actions">
-                    <button type="button" uiBtn variant="link" class="text-muted"><i class="icon-settings"></i></button>
-                  </div>
-                </li>
-                <li>
-                  <i class="icon-social-spotify bg-success"></i>
-                  <div class="desc">
-                    <div class="title">Spotify Subscriptions</div>
-                    <small>Lorem ipsum dolor sit amet</small>
-                  </div>
-                  <div class="value">
-                    <div class="small text-muted">Sold this week</div>
-                    <strong>893</strong>
-                  </div>
-                  <div class="actions">
-                    <button type="button" uiBtn variant="link" class="text-muted"><i class="icon-settings"></i></button>
-                  </div>
-                </li>
-                <li>
-                  <i class="icon-cloud-download bg-danger"></i>
-                  <div class="desc">
-                    <div class="title">Ebook</div>
-                    <small>Lorem ipsum dolor sit amet</small>
-                  </div>
-                  <div class="value">
-                    <div class="small text-muted">Downloads</div>
-                    <strong>121.924</strong>
-                  </div>
-                  <div class="actions">
-                    <button type="button" uiBtn variant="link" class="text-muted"><i class="icon-settings"></i></button>
-                  </div>
-                </li>
-                <li>
-                  <i class="icon-camera bg-warning"></i>
-                  <div class="desc">
-                    <div class="title">Photos</div>
-                    <small>Lorem ipsum dolor sit amet</small>
-                  </div>
-                  <div class="value">
-                    <div class="small text-muted">Uploaded</div>
-                    <strong>12.125</strong>
-                  </div>
-                  <div class="actions">
-                    <button type="button" uiBtn variant="link" class="text-muted"><i class="icon-settings"></i></button>
-                  </div>
-                </li>
-                <li class="divider text-center">
-                  <button type="button" uiBtn variant="link" size="sm" class="text-muted" data-toggle="tooltip" data-placement="top" title="show more"><i class="icon-options"></i></button>
-                </li>
-              </ul>
-            </div><!--/.col-->
-          </div><!--/.row-->
-          <br>
-          <div class="table-responsive"></div>
-          <table class="table table-responsive table-hover table-outline mb-0">
-            <thead class="thead-default">
-              <tr>
-                <th class="text-center"><i class="icon-people"></i></th>
-                <th>User</th>
-                <th class="text-center">Country</th>
-                <th>Usage</th>
-                <th class="text-center">Payment Method</th>
-                <th>Activity</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="text-center">
-                  <div class="avatar">
-                    <img src="assets/img/avatars/1.jpg" class="img-avatar" alt="admin@bootstrapmaster.com" src="assets/img/avatars/1.jpg">
-                    <span class="avatar-status badge-success"></span>
-                  </div>
-                </td>
-                <td>
-                  <div>Yiorgos Avraamu</div>
-                  <div class="small text-muted">
-                    <span>New</span> | Registered: Jan 1, 2015
-                  </div>
-                </td>
-                <td class="text-center">
-                  <img src="assets/img/flags/USA.png" alt="USA" style="height:24px;" src="assets/img/flags/USA.png">
-                </td>
-                <td>
-                  <div class="clearfix">
-                    <div class="float-left">
-                      <strong>50%</strong>
-                    </div>
-                    <div class="float-right">
-                      <small class="text-muted">Jun 11, 2015 - Jul 10, 2015</small>
-                    </div>
-                  </div>
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                </td>
-                <td class="text-center">
-                  <i class="fa fa-cc-mastercard" style="font-size:24px"></i>
-                </td>
-                <td>
-                  <div class="small text-muted">Last login</div>
-                  <strong>10 sec ago</strong>
-                </td>
-              </tr>
-              <tr>
-                <td class="text-center">
-                  <div class="avatar">
-                    <img src="assets/img/avatars/2.jpg" class="img-avatar" alt="admin@bootstrapmaster.com" src="assets/img/avatars/2.jpg">
-                    <span class="avatar-status badge-danger"></span>
-                  </div>
-                </td>
-                <td>
-                  <div>Avram Tarasios</div>
-                  <div class="small text-muted">
 
-                    <span>Recurring</span> | Registered: Jan 1, 2015
-                  </div>
-                </td>
-                <td class="text-center">
-                  <img src="assets/img/flags/Brazil.png" alt="Brazil" style="height:24px;" src="assets/img/flags/Brazil.png">
-                </td>
-                <td>
-                  <div class="clearfix">
-                    <div class="float-left">
-                      <strong>10%</strong>
-                    </div>
-                    <div class="float-right">
-                      <small class="text-muted">Jun 11, 2015 - Jul 10, 2015</small>
-                    </div>
-                  </div>
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-info" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                </td>
-                <td class="text-center">
-                  <i class="fa fa-cc-visa" style="font-size:24px"></i>
-                </td>
-                <td>
-                  <div class="small text-muted">Last login</div>
-                  <strong>5 minutes ago</strong>
-                </td>
-              </tr>
-              <tr>
-                <td class="text-center">
-                  <div class="avatar">
-                    <img src="assets/img/avatars/3.jpg" class="img-avatar" alt="admin@bootstrapmaster.com" src="assets/img/avatars/3.jpg">
-                    <span class="avatar-status badge-warning"></span>
-                  </div>
-                </td>
-                <td>
-                  <div>Quintin Ed</div>
-                  <div class="small text-muted">
-                    <span>New</span> | Registered: Jan 1, 2015
-                  </div>
-                </td>
-                <td class="text-center">
-                  <img src="assets/img/flags/India.png" alt="India" style="height:24px;" src="assets/img/flags/India.png">
-                </td>
-                <td>
-                  <div class="clearfix">
-                    <div class="float-left">
-                      <strong>74%</strong>
-                    </div>
-                    <div class="float-right">
-                      <small class="text-muted">Jun 11, 2015 - Jul 10, 2015</small>
-                    </div>
-                  </div>
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-warning" role="progressbar" style="width: 74%" aria-valuenow="74" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                </td>
-                <td class="text-center">
-                  <i class="fa fa-cc-stripe" style="font-size:24px"></i>
-                </td>
-                <td>
-                  <div class="small text-muted">Last login</div>
-                  <strong>1 hour ago</strong>
-                </td>
-              </tr>
-              <tr>
-                <td class="text-center">
-                  <div class="avatar">
-                    <img src="assets/img/avatars/4.jpg" class="img-avatar" alt="admin@bootstrapmaster.com" src="assets/img/avatars/4.jpg">
-                    <span class="avatar-status badge-default"></span>
-                  </div>
-                </td>
-                <td>
-                  <div>Enéas Kwadwo</div>
-                  <div class="small text-muted">
-                    <span>New</span> | Registered: Jan 1, 2015
-                  </div>
-                </td>
-                <td class="text-center">
-                  <img src="assets/img/flags/France.png" alt="France" style="height:24px;" src="assets/img/flags/France.png">
-                </td>
-                <td>
-                  <div class="clearfix">
-                    <div class="float-left">
-                      <strong>98%</strong>
-                    </div>
-                    <div class="float-right">
-                      <small class="text-muted">Jun 11, 2015 - Jul 10, 2015</small>
-                    </div>
-                  </div>
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-danger" role="progressbar" style="width: 98%" aria-valuenow="98" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                </td>
-                <td class="text-center">
-                  <i class="fa fa-paypal" style="font-size:24px"></i>
-                </td>
-                <td>
-                  <div class="small text-muted">Last login</div>
-                  <strong>Last month</strong>
-                </td>
-              </tr>
-              <tr>
-                <td class="text-center">
-                  <div class="avatar">
-                    <img src="assets/img/avatars/5.jpg" class="img-avatar" alt="admin@bootstrapmaster.com" src="assets/img/avatars/5.jpg">
-                    <span class="avatar-status badge-success"></span>
-                  </div>
-                </td>
-                <td>
-                  <div>Agapetus Tadeáš</div>
-                  <div class="small text-muted">
-                    <span>New</span> | Registered: Jan 1, 2015
-                  </div>
-                </td>
-                <td class="text-center">
-                  <img src="assets/img/flags/Spain.png" alt="Spain" style="height:24px;" src="assets/img/flags/Spain.png">
-                </td>
-                <td>
-                  <div class="clearfix">
-                    <div class="float-left">
-                      <strong>22%</strong>
-                    </div>
-                    <div class="float-right">
-                      <small class="text-muted">Jun 11, 2015 - Jul 10, 2015</small>
-                    </div>
-                  </div>
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-info" role="progressbar" style="width: 22%" aria-valuenow="22" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                </td>
-                <td class="text-center">
-                  <i class="fa fa-google-wallet" style="font-size:24px"></i>
-                </td>
-                <td>
-                  <div class="small text-muted">Last login</div>
-                  <strong>Last week</strong>
-                </td>
-              </tr>
-              <tr>
-                <td class="text-center">
-                  <div class="avatar">
-                    <img src="assets/img/avatars/6.jpg" class="img-avatar" alt="admin@bootstrapmaster.com" src="assets/img/avatars/6.jpg">
-                    <span class="avatar-status badge-danger"></span>
-                  </div>
-                </td>
-                <td>
-                  <div>Friderik Dávid</div>
-                  <div class="small text-muted">
-                    <span>New</span> | Registered: Jan 1, 2015
-                  </div>
-                </td>
-                <td class="text-center">
-                  <img src="assets/img/flags/Poland.png" alt="Poland" style="height:24px;" src="assets/img/flags/Poland.png">
-                </td>
-                <td>
-                  <div class="clearfix">
-                    <div class="float-left">
-                      <strong>43%</strong>
-                    </div>
-                    <div class="float-right">
-                      <small class="text-muted">Jun 11, 2015 - Jul 10, 2015</small>
-                    </div>
-                  </div>
-                  <div class="progress progress-xs">
-                    <div class="progress-bar bg-success" role="progressbar" style="width: 43%" aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                </td>
-                <td class="text-center">
-                  <i class="fa fa-cc-amex" style="font-size:24px"></i>
-                </td>
-                <td>
-                  <div class="small text-muted">Last login</div>
-                  <strong>Yesterday</strong>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+  @if (failed) {
+    <div class="ed-alert">The export job board could not be loaded. <button type="button" class="btn sm" (click)="loadCore()">Retry</button></div>
+  } @else if (partial && !loading) {
+    <div class="ed-alert">{{ partial }} jobs could not be loaded; figures below show {{ partial === 'Sea' ? 'Air' : 'Sea' }} only. <button type="button" class="btn sm" (click)="loadCore()">Retry</button></div>
+  }
+  @if (loading && slow) {
+    <div class="ed-alert">Still loading the export job board — this can take a minute when the server is busy. The menu stays available.</div>
+  }
+
+  <!-- ================= 1. attention tiles (max 6) ================= -->
+  <div class="ed-tiles">
+    @if (loading) {
+      @for (k of [1,2,3,4,5,6]; track k) {
+        <div class="td-tile"><div class="ex-skel w40"></div><div class="ex-skel h28 w60"></div><div class="ex-skel w80"></div></div>
+      }
+    } @else {
+      <button type="button" class="td-tile" [class.hot]="attentionCount > 0" (click)="showRisk('attention')">
+        <span class="k">Needs attention</span>
+        <span class="v">{{ attentionCount ? fmt(attentionCount) : 'All clear' }}</span>
+        <span class="s">@if (attentionCount) { {{ lateCount }} sailed this week &middot; {{ dueSoonCount }} sail within {{ RISK_DAYS }} d, no document } @else { no job sails before its document is ready }</span>
+      </button>
+      <button type="button" class="td-tile" (click)="showRisk('attention')">
+        <span class="k">Sails &le; {{ RISK_DAYS }} d, no doc</span>
+        <span class="v">{{ fmt(dueSoonCount) }}</span>
+        <span class="s">vessel sails today to +{{ RISK_DAYS }} days, {{ docLabel }} not entered</span>
+      </button>
+      <button type="button" class="td-tile" (click)="scrollTo('ed-week')">
+        <span class="k">Sailing this week</span>
+        <span class="v">{{ fmt(week.length) }} <small class="ed-soft">vessel{{ week.length === 1 ? '' : 's' }}</small></span>
+        <span class="s">{{ weekJobs }} of our jobs on board in the next 7 days &middot; {{ weekReady }} ready@if (sailLoading) { &middot; vessel list loading…}</span>
+      </button>
+      <button type="button" class="td-tile" (click)="pickStage(6)">
+        <span class="k">Documented</span>
+        <span class="v">{{ pct(documented, total) }}%</span>
+        <span class="ed-prog"><span [style.width.%]="pct(documented, total)"></span></span>
+        <span class="s">{{ fmt(documented) }} of {{ fmt(total) }} jobs have their {{ docLabel }}</span>
+      </button>
+      <button type="button" class="td-tile" (click)="clearFilters(); scrollTo('ed-detail')">
+        <span class="k">Jobs opened &middot; {{ days === 365 ? '1 year' : days + ' d' }}</span>
+        <span class="v">{{ fmt(total) }}</span>
+        <span class="s">@if (air) { Sea {{ fmt(seaCount) }} &middot; Air {{ fmt(airCount) }} } @else { Sea {{ fmt(seaCount) }} } &middot; {{ fmt(inProgress) }} in progress</span>
+      </button>
+      <button type="button" class="td-tile" (click)="showRisk('stale')">
+        <span class="k">Older jobs to tidy</span>
+        <span class="v">{{ fmt(staleCount) }}</span>
+        <span class="s">sailed over {{ LATE_DAYS }} d ago, {{ docLabel }} not yet entered</span>
+      </button>
+    }
+  </div>
+
+  <!-- ================= 2. act now ================= -->
+  <section class="ed-sec" id="ed-act">
+    <div class="ed-band">Act now</div>
+    <p class="ed-sub">Jobs whose vessel sails before the document is ready.@if (sampled && !loading) { Listed from the newest 50 jobs at each step ({{ fmt(jobs.length) }} of {{ fmt(total) }}).}</p>
+
+    <div class="x-card">
+      <div class="ed-ch">
+        <h2>Sailing risk @if (riskAll.length) { <span class="ed-count">{{ riskAll.length }}</span> }</h2>
+        <span class="ed-meta">no {{ docLabel }} yet, vessel sails within {{ RISK_DAYS }} days or has sailed &middot; soonest ETD first &middot; <a href="javascript:void(0);" class="im-link" (click)="goConsignments()">Open consignments</a></span>
+      </div>
+      <div class="ed-filters">
+        <div class="fld"><label for="edScope">Show</label>
+          <select id="edScope" [(ngModel)]="riskScope" (ngModelChange)="applyRisk()">
+            <option value="attention">Needs attention ({{ attentionCount }})</option>
+            <option value="stale">Older jobs to tidy up ({{ staleCount }})</option>
+            <option value="all">All ({{ riskAll.length }})</option>
+          </select>
+        </div>
+        @if (hasAgents) {
+          <div class="fld"><label for="edRa">Agent</label>
+            <select id="edRa" [(ngModel)]="riskAgent" (ngModelChange)="applyRisk()">
+              <option value="">Every agent</option>
+              @for (a of riskAgents; track a) { <option [value]="a">{{ a }}</option> }
+            </select>
+          </div>
+        }
+        @if (hasExporters) {
+          <div class="fld"><label for="edRe">Exporter</label>
+            <select id="edRe" [(ngModel)]="riskExporter" (ngModelChange)="applyRisk()">
+              <option value="">Every exporter</option>
+              @for (e of riskExporters; track e) { <option [value]="e">{{ e }}</option> }
+            </select>
+          </div>
+        }
+        <span class="ed-meta">{{ riskPager.rows.length }} of {{ riskScopeTotal }}</span>
+        @if (hasRiskFilters) { <button type="button" class="btn sm" (click)="clearRiskFilters()">Clear</button> }
+      </div>
+      <div class="im-tbl-wrap">
+        <table class="ed-tbl">
+          <thead><tr><th>Export no.</th>@if (air) {<th>Mode</th>}@if (hasExporters) {<th>Exporter</th>}<th>Consignee</th>@if (hasAgents) {<th>Agent</th>}<th>Vessel / voyage</th><th>ETD</th><th class="num">Days</th><th>Stage</th><th></th></tr></thead>
+          <tbody>
+            @if (loading) {
+              @for (k of skel5; track k) { <tr>@for (c of [1,2,3,4,5,6,7,8]; track c) { <td><div class="ex-skel"></div></td> }</tr> }
+            } @else if (failed) {
+              <tr><td colspan="10" class="ed-empty">Not available. <a href="javascript:void(0);" class="im-link" (click)="loadCore()">Retry</a></td></tr>
+            } @else {
+              @for (r of riskPager.paged; track r.job.key) {
+                <tr [class.ed-late]="r.days < 0">
+                  <td class="mono"><a href="javascript:void(0);" class="im-link" (click)="open(r.job)">{{ r.job.exptno }}</a></td>
+                  @if (air) { <td>{{ r.job.mode }}</td> }
+                  @if (hasExporters) { <td>{{ r.job.exporter || '—' }}</td> }
+                  <td>{{ r.job.consignee }}</td>
+                  @if (hasAgents) { <td>{{ r.job.agent || '—' }}</td> }
+                  <td>{{ r.job.carrier || '—' }}</td>
+                  <td class="nw">{{ r.job.etdStr || '—' }}</td>
+                  <td class="num nw" [class.ed-b]="r.days <= 1">{{ riskText(r.days) }}</td>
+                  <td>{{ r.job.stageLabel }}</td>
+                  <td><a href="javascript:void(0);" class="im-link" (click)="open(r.job)">Open &rsaquo;</a></td>
+                </tr>
+              } @empty {
+                <tr><td colspan="10" class="ed-empty">
+                  @if (hasRiskFilters) { No job matches these filters. }
+                  @else if (riskScope === 'stale') { No older job waiting for its {{ docLabel }}. }
+                  @else { Nothing to chase: no job in the list sails within {{ RISK_DAYS }} days without a {{ docLabel }}. }
+                </td></tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (!loading && riskPager.rows.length) {
+        <div class="pg">
+          <span>Showing <b>{{ riskPager.from }}&ndash;{{ riskPager.to }}</b> of <b>{{ riskPager.rows.length }}</b></span>
+          @if (riskPager.total > 1) {
+            <div class="pg-btns">
+              <button type="button" [disabled]="riskPager.page === 1" (click)="riskPager.go(riskPager.page - 1)">&lsaquo;</button>
+              @for (p of riskPager.numbers; track $index) {
+                @if (p === '...') { <span class="pg-gap">&hellip;</span> }
+                @else { <button type="button" [class.on]="p === riskPager.page" (click)="riskPager.go(p)">{{ p }}</button> }
+              }
+              <button type="button" [disabled]="riskPager.page === riskPager.total" (click)="riskPager.go(riskPager.page + 1)">&rsaquo;</button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ================= 3. this week ================= -->
+  <section class="ed-sec" id="ed-week">
+    <div class="ed-band">This week</div>
+    <p class="ed-sub">Vessels sailing in the next 7 days with our jobs on them, our jobs by ETD, and every vessel sailing next from the branch vessel list.</p>
+    <div class="ed-grid2">
+      <div class="x-card">
+        <div class="ed-ch">
+          <h2>The week ahead</h2>
+          <span class="ed-meta">
+            @if (sailLoading) { {{ sailSlow ? 'Vessel list still loading…' : 'Loading vessel list…' }} }
+            @else { {{ week.length }} vessels &middot; {{ weekJobs }} of our jobs &middot; {{ weekReady }} ready@if (!sailFailed) { &middot; {{ sailPager.rows.length }} upcoming on the vessel list} }
+          </span>
+        </div>
+        @if (loading && sailLoading) {
+          @for (k of skel5; track k) { <div class="ed-pad"><div class="ex-skel h20"></div></div> }
+        } @else {
+          @for (d of weekDays; track d.days) {
+            <div class="ed-day">
+              <div class="ed-day-h">
+                <span class="ed-datebox"><b>{{ day(d.date) }}</b><span>{{ mon(d.date) }}</span></span>
+                <span class="ed-day-n">{{ weekDay(d) }}</span>
+                @if (d.jobs) {
+                  <span class="ed-day-sum">{{ d.ready }} of {{ d.jobs }} job{{ d.jobs === 1 ? '' : 's' }} ready
+                    <span class="ed-prog sm"><span [style.width.%]="pct(d.ready, d.jobs)"></span></span></span>
+                } @else { <span class="ed-day-sum ed-soft">no jobs of ours in the sample</span> }
+              </div>
+              @for (v of d.vessels; track $index) {
+                <div class="ed-vsl">
+                  <span class="ed-vn">{{ v.name }}@if (v.voy) { <span class="ed-soft"> / {{ v.voy }}</span> }</span>
+                  <span class="ed-soft">{{ v.port || (v.onList ? '—' : 'not on the vessel list') }}@if (v.jobs.length) { &middot; {{ v.jobs.length }} job{{ v.jobs.length === 1 ? '' : 's' }}}</span>
+                  <span class="ed-jobs">
+                    @for (j of v.jobs; track j.key) {
+                      <a href="javascript:void(0);" class="dx-job" [class.ok]="j.docsIn" (click)="open(j)"
+                         [attr.title]="j.consignee + ' · ' + j.stageLabel + (j.docsIn ? ' · document issued' : ' · no document yet')">
+                        <span class="dx-tick">@if (j.docsIn) { &#10003; }</span>{{ j.exptno }}
+                      </a>
+                    }
+                  </span>
+                </div>
+              }
+            </div>
+          } @empty {
+            <div class="ed-empty">
+              @if (sailFailed) { The vessel list could not be loaded, and no job in the sample sails this week. <a href="javascript:void(0);" class="im-link" (click)="loadSailings()">Retry</a> }
+              @else { A quiet week: nothing sails in the next 7 days. }
+            </div>
+          }
+          @if (sailFailed && week.length) { <p class="ed-note">Vessel list unavailable &mdash; showing vessels from our jobs only. <a href="javascript:void(0);" class="im-link" (click)="loadSailings()">Retry</a></p> }
+          <p class="ed-note">&#10003; / black = document issued (@if (air) {FCR/HBL, master BL, MAWB or HAWB} @else {FCR/HBL or master BL}).@if (sampled) { Jobs come from the newest 50 at each step.}</p>
+        }
+      </div>
+
+      <div class="x-card">
+        <div class="ed-ch"><h2>Departing next</h2><span class="ed-meta">our export jobs by ETD, soonest first</span></div>
+        @if (loading) {
+          @for (k of skel5; track k) { <div class="ed-pad"><div class="ex-skel h20"></div></div> }
+        } @else {
+          <div class="im-tbl-wrap">
+            <table class="ed-tbl">
+              <thead><tr><th>ETD</th><th>Export no.</th>@if (air) {<th>Mode</th>}<th>Consignee</th>@if (hasAgents) {<th>Agent</th>}<th>Stage</th></tr></thead>
+              <tbody>
+                @for (s of departing; track s.key) {
+                  <tr>
+                    <td class="nw">{{ daysUntil(s.etd) }} <span class="ed-soft">{{ dMonY(s.etd) }}</span></td>
+                    <td class="mono"><a href="javascript:void(0);" class="im-link" (click)="open(s)">{{ s.exptno }}</a></td>
+                    @if (air) { <td>{{ s.mode }}</td> }
+                    <td>{{ s.consignee || '—' }}</td>
+                    @if (hasAgents) { <td>{{ s.agent || '—' }}</td> }
+                    <td [class.ed-b]="s.docsIn">{{ s.stageLabel }}</td>
+                  </tr>
+                } @empty {
+                  <tr><td colspan="6" class="ed-empty">Nothing departing: no job in the window has an ETD from today on.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="x-card ed-gap-t">
+      <div class="ed-ch">
+        <h2>Vessels sailing next @if (!sailLoading && !sailFailed) { <span class="ed-count">{{ sailingsThisWeek }}</span> }</h2>
+        <span class="ed-meta">
+          @if (sailLoading) { {{ sailSlow ? 'Vessel list still loading…' : 'Loading vessel list…' }} }
+          @else if (!sailFailed) { {{ sailingsThisWeek }} this week &middot; {{ sailPager.rows.length }} from today on, soonest first &middot; from the export vessel list }
+        </span>
+      </div>
+      <div class="im-tbl-wrap">
+        <table class="ed-tbl">
+          <thead><tr><th>ETD</th><th>Vessel / voyage</th><th>Port</th><th>Rotation no.</th><th class="num">Our jobs</th></tr></thead>
+          <tbody>
+            @if (sailLoading) {
+              @for (k of skel5; track k) { <tr>@for (c of [1,2,3,4,5]; track c) { <td><div class="ex-skel"></div></td> }</tr> }
+            } @else if (sailFailed) {
+              <tr><td colspan="5" class="ed-empty">The vessel list could not be loaded. <a href="javascript:void(0);" class="im-link" (click)="loadSailings()">Retry</a></td></tr>
+            } @else {
+              @for (s of sailPager.paged; track $index) {
+                <tr>
+                  <td class="nw" [class.ed-b]="s.days <= 1">{{ riskText(s.days) }} <span class="ed-soft">{{ s.etdStr }}</span></td>
+                  <td><span class="ed-vn">{{ s.name }}</span>@if (s.voy) { <span class="ed-soft"> / {{ s.voy }}</span> }</td>
+                  <td>{{ s.port || '—' }}</td>
+                  <td class="mono">{{ s.rtno || '—' }}</td>
+                  <td class="num">{{ s.jobs || '—' }}</td>
+                </tr>
+              } @empty {
+                <tr><td colspan="5" class="ed-empty">No sailings ahead: no vessel from this branch has an ETD from today on.</td></tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (!sailLoading && sailPager.rows.length) {
+        <div class="pg">
+          <span>Showing <b>{{ sailPager.from }}&ndash;{{ sailPager.to }}</b> of <b>{{ sailPager.rows.length }}</b>@if (sampled) { &middot; our jobs counted from the newest 50 at each step }</span>
+          @if (sailPager.total > 1) {
+            <div class="pg-btns">
+              <button type="button" [disabled]="sailPager.page === 1" (click)="sailPager.go(sailPager.page - 1)">&lsaquo;</button>
+              @for (p of sailPager.numbers; track $index) {
+                @if (p === '...') { <span class="pg-gap">&hellip;</span> }
+                @else { <button type="button" [class.on]="p === sailPager.page" (click)="sailPager.go(p)">{{ p }}</button> }
+              }
+              <button type="button" [disabled]="sailPager.page === sailPager.total" (click)="sailPager.go(sailPager.page + 1)">&rsaquo;</button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ================= 4. workload picture ================= -->
+  <section class="ed-sec">
+    <div class="ed-band">Workload picture</div>
+    <p class="ed-sub">Every job in the window. Click a step or an agent to list its jobs in the detail table below.</p>
+    <div class="ed-grid2">
+      <div class="x-card">
+        <div class="ed-ch">
+          <h2>Where the jobs are</h2>
+          @if (air) {
+            <div class="ed-seg" role="group" aria-label="Mode">
+              <button type="button" [class.on]="chartMode === 'all'" (click)="setChartMode('all')">All</button>
+              <button type="button" [class.on]="chartMode === 'Sea'" (click)="setChartMode('Sea')">Sea</button>
+              <button type="button" [class.on]="chartMode === 'Air'" (click)="setChartMode('Air')">Air</button>
+            </div>
+          }
+        </div>
+        <div class="im-chart ed-chart">
+          @if (loading) {
+            <div class="ex-skel ex-skel-chart"></div>
+          } @else {
+            <svg [attr.viewBox]="'0 0 ' + chartW + ' ' + chartH" role="img" aria-label="Export jobs by stage">
+              @for (g of gridLines; track g.y) {
+                <line [attr.x1]="chartL" [attr.x2]="chartW - chartR" [attr.y1]="g.y" [attr.y2]="g.y" [class.im-grid-zero]="g.label === 0" class="im-gridline"></line>
+                <text [attr.x]="chartL - 8" [attr.y]="g.y + 4" text-anchor="end" class="im-axis-label">{{ g.label }}</text>
+              }
+              @for (g of barGeoms; track $index) {
+                <rect [attr.x]="g.seaX" [attr.y]="g.seaY" [attr.width]="g.seaW" [attr.height]="g.seaH" class="im-bar-sea"></rect>
+                @if (g.airPath) { <path [attr.d]="g.airPath" class="im-bar-air"></path> }
+                <text [attr.x]="g.labelX" [attr.y]="g.tipY - 5" text-anchor="middle" class="ed-bar-v">{{ g.total }}</text>
+                <text [attr.x]="g.labelX" [attr.y]="g.labelY" text-anchor="middle" class="im-axis-label" [class.ed-sel]="+stageFilter === g.code">{{ g.label }}</text>
+                <rect [attr.x]="g.hitX" [attr.y]="g.hitY" [attr.width]="g.hitW" [attr.height]="g.hitH" class="im-bar-hit ed-hit"
+                      [class.ed-hit-on]="+stageFilter === g.code"
+                      (mouseenter)="showTip(g)" (mouseleave)="hideTip()" (click)="pickStage(g.code)"></rect>
+              }
+            </svg>
+            @if (tip) {
+              <div class="im-tip" [style.left.%]="tip.tipX / chartW * 100" [style.top.%]="tip.tipY / chartH * 100">
+                {{ tip.fullLabel }}<br>@if (air) { Sea <b>{{ tip.sea }}</b> &middot; Air <b>{{ tip.air }}</b> &middot; Total <b>{{ tip.total }}</b> } @else { Jobs <b>{{ tip.total }}</b> }
+              </div>
+            }
+          }
+        </div>
+        @if (air) { <div class="im-legend ed-legend"><span><i class="im-dot-sea"></i>Sea</span><span><i class="im-dot-air"></i>Air</span></div> }
+        <p class="ed-note">Each job counted once, at the furthest step it has reached. The steps add up to {{ fmt(total) }}.@if (cancelledCount) { {{ fmt(cancelledCount) }} cancelled not counted.}</p>
+      </div>
+
+      <div class="x-card">
+        <div class="ed-ch">
+          <h2>Shipments by agent @if (hasAgents) { <span class="ed-count">{{ agentCount }}</span> }</h2>
+          @if (air) { <div class="im-legend"><span><i class="im-dot-sea"></i>Sea</span><span><i class="im-dot-air"></i>Air</span></div> }
+          @else { <span class="ed-meta">every job in the window &middot; click an agent to list its jobs</span> }
+        </div>
+        <div class="im-top ed-pad">
+          @if (loading) {
+            @for (k of skel5; track k) { <div class="ex-skel-bar"><div class="ex-skel w60"></div><div class="ex-skel h8"></div></div> }
+          } @else if (failed) {
+            <div class="ed-soft">Not available.</div>
+          } @else if (!hasAgents) {
+            <div class="ed-soft">The board procedure on this server does not return agents yet.</div>
+          } @else {
+            @for (a of agentBars; track a.name) {
+              <button type="button" class="im-bar-row ed-agent" [class.on]="agentFilter === a.name" (click)="pickAgent(a.name)"
+                      [attr.title]="a.name + ': ' + a.n + ' jobs' + (air ? ' (Sea ' + a.sea + ', Air ' + a.air + ')' : '') + ' · click to list'">
+                <div class="t"><span>{{ a.name }}</span><b>{{ fmt(a.n) }}</b></div>
+                <div class="im-track dx-stack"><div class="dx-sea" [style.width.%]="a.seaPct"></div>@if (air) {<div class="dx-air" [style.width.%]="a.airPct"></div>}</div>
+              </button>
+            } @empty {
+              <div class="ed-soft">No jobs in this window.</div>
+            }
+          }
+        </div>
+        @if (!loading && hasAgents && agentCount > agentBars.length) {
+          <p class="ed-note">Top {{ agentBars.length }} of {{ agentCount }} agents; the rest are in the Agent filter of the detail table. Complete counts, last {{ days }} days.</p>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 5. detail ================= -->
+  <section class="ed-sec" id="ed-detail">
+    <div class="ed-band">Detail</div>
+    <p class="ed-sub">Recent export jobs, newest opened first. Filters combine.</p>
+    <div class="x-card">
+      <div class="ed-filters">
+        <div class="fld"><label for="dxq">Search</label><input id="dxq" type="text" [(ngModel)]="search" (ngModelChange)="applyFilter()" [placeholder]="'Export no., exporter, consignee, agent, vessel, ' + docLabel"></div>
+        @if (air) {
+          <div class="fld"><label for="dxm">Mode</label>
+            <select id="dxm" [(ngModel)]="modeFilter" (ngModelChange)="applyFilter()">
+              <option value="all">All</option><option value="Sea">Sea</option><option value="Air">Air</option>
+            </select>
+          </div>
+        }
+        <div class="fld"><label for="dxs">Stage</label>
+          <select id="dxs" [(ngModel)]="stageFilter" (ngModelChange)="applyFilter()">
+            <option [ngValue]="-1">Every stage</option>
+            @for (o of stageOptions; track o.code) { <option [ngValue]="o.code">{{ o.label }}</option> }
+          </select>
+        </div>
+        @if (hasAgents) {
+          <div class="fld"><label for="dxa">Agent</label>
+            <select id="dxa" [(ngModel)]="agentFilter" (ngModelChange)="applyFilter()">
+              <option value="">Every agent</option>
+              @for (a of agentOptions; track a) { <option [value]="a">{{ a }}</option> }
+            </select>
+          </div>
+        }
+        @if (hasExporters) {
+          <div class="fld"><label for="dxe">Exporter</label>
+            <select id="dxe" [(ngModel)]="exporterFilter" (ngModelChange)="applyFilter()">
+              <option value="">Every exporter</option>
+              @for (e of exporterOptions; track e) { <option [value]="e">{{ e }}</option> }
+            </select>
+          </div>
+        }
+        @if (hasFilters) { <button type="button" class="btn sm" (click)="clearFilters()">Clear</button> }
+      </div>
+      <div class="im-tbl-wrap">
+        <table class="ed-tbl">
+          <thead>
+            <tr><th>Export no.</th>@if (air) {<th>Mode</th>}@if (hasExporters) {<th>Exporter</th>}<th>Consignee</th>@if (hasAgents) {<th>Agent</th>}<th>Stage</th><th>Vessel / voyage</th><th>ETD</th><th>{{ docLabel }}</th><th>Opened</th><th class="num">Age (d)</th></tr>
+          </thead>
+          <tbody>
+            @if (loading) {
+              @for (k of skel5; track k) { <tr>@for (c of [1,2,3,4,5,6,7,8,9]; track c) { <td><div class="ex-skel"></div></td> }</tr> }
+            } @else if (failed) {
+              <tr><td colspan="11" class="ed-empty">Recent export jobs could not be loaded. <a href="javascript:void(0);" class="im-link" (click)="loadCore()">Try again</a></td></tr>
+            } @else {
+              @for (s of recentPager.paged; track s.key) {
+                <tr>
+                  <td class="mono"><a href="javascript:void(0);" class="im-link" (click)="open(s)">{{ s.exptno }}</a></td>
+                  @if (air) { <td>{{ s.mode }}</td> }
+                  @if (hasExporters) { <td>{{ s.exporter || '—' }}</td> }
+                  <td>{{ s.consignee }}</td>
+                  @if (hasAgents) { <td>{{ s.agent || '—' }}</td> }
+                  <td>
+                    <span class="ed-stage">{{ s.cancelled ? 'Cancelled' : s.stageLabel }}</span>
+                    @if (!s.cancelled) { <span class="ed-prog sm"><span [style.width.%]="(s.stageCode + 1) * 100 / stageSteps"></span></span> }
+                  </td>
+                  <td>{{ s.carrier || '—' }}</td>
+                  <td class="nw">{{ s.etdStr || '—' }}</td>
+                  <td class="mono">{{ s.document || '—' }}</td>
+                  <td class="nw">{{ dMonY(s.opened) }}</td>
+                  <td class="num">{{ s.ageDays === null ? '—' : s.ageDays }}</td>
+                </tr>
+              } @empty {
+                <tr><td colspan="11" class="ed-empty">@if (hasFilters) { No job in the sample matches these filters. <a href="javascript:void(0);" class="im-link" (click)="clearFilters()">Clear filters</a> } @else { No export jobs opened in the last {{ days }} days. Try a wider period, or use Consignment search for older jobs. }</td></tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (!loading && recentPager.rows.length) {
+        <div class="pg">
+          <span>Showing <b>{{ recentPager.from }}&ndash;{{ recentPager.to }}</b> of <b>{{ fmt(recentPager.rows.length) }}</b>@if (sampled) { &middot; newest 50 jobs per step, of {{ fmt(total) }} in this window }</span>
+          @if (recentPager.total > 1) {
+            <div class="pg-btns">
+              <button type="button" [disabled]="recentPager.page === 1" (click)="recentPager.go(recentPager.page - 1)">&lsaquo;</button>
+              @for (p of recentPager.numbers; track $index) {
+                @if (p === '...') { <span class="pg-gap">&hellip;</span> }
+                @else { <button type="button" [class.on]="p === recentPager.page" (click)="recentPager.go(p)">{{ p }}</button> }
+              }
+              <button type="button" [disabled]="recentPager.page === recentPager.total" (click)="recentPager.go(recentPager.page + 1)">&rsaquo;</button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ================= 6. reference ================= -->
+  <section class="ed-sec">
+    <div class="ed-band">Reference</div>
+    <p class="ed-sub">Totals and the busiest names, for context.</p>
+    <div class="ed-grid3">
+      <div class="x-card">
+        <div class="ed-ch"><h2>{{ air ? 'Sea and air' : 'Jobs in the window' }}</h2><span class="ed-meta">{{ loading ? '' : fmt(total) + ' jobs' }}</span></div>
+        <div class="ed-pad">
+          @if (loading) {
+            <div class="ex-skel ex-skel-donut"></div>
+          } @else {
+            @if (air) {
+              <svg viewBox="0 0 200 110" class="im-donut ed-donut" role="img" [attr.aria-label]="'Sea ' + seaCount + ', Air ' + airCount">
+                @if (!total) { <path [attr.d]="donutEmptyPath" class="ex-donut-empty"></path> }
+                @if (donutSeaPath) { <path [attr.d]="donutSeaPath" class="im-donut-sea"></path> }
+                @if (donutAirPath) { <path [attr.d]="donutAirPath" class="im-donut-air"></path> }
+                <text x="100" y="82" text-anchor="middle" class="im-donut-pct">{{ seaPct }}%</text>
+                <text x="100" y="98" text-anchor="middle" class="im-donut-sub">sea</text>
+              </svg>
+              <div class="ed-kv"><span><i class="im-dot-sea"></i>Sea</span><b>{{ fmt(seaCount) }}</b></div>
+              <div class="ed-kv"><span><i class="im-dot-air"></i>Air</span><b>{{ fmt(airCount) }}</b></div>
+            } @else {
+              <div class="ed-kv"><span>Sea</span><b>{{ fmt(seaCount) }}</b></div>
+              <div class="ed-kv"><span>Documented</span><b>{{ fmt(documented) }}</b></div>
+              <div class="ed-kv"><span>In progress</span><b>{{ fmt(inProgress) }}</b></div>
+              <div class="ed-kv"><span class="ed-soft">Cancelled, not counted</span><b class="ed-soft">{{ fmt(cancelledCount) }}</b></div>
+            }
+            <div class="ed-kv tot"><span>Total</span><b>{{ fmt(total) }}</b></div>
+          }
         </div>
       </div>
-    </div><!--/.col-->
-  </div><!--/.row-->
+      <div class="x-card">
+        <div class="ed-ch"><h2>Busiest consignees</h2><span class="ed-meta">jobs in the sample</span></div>
+        <div class="im-top ed-pad">
+          @if (loading) {
+            @for (k of skel5; track k) { <div class="ex-skel-bar"><div class="ex-skel w60"></div><div class="ex-skel h8"></div></div> }
+          } @else {
+            @for (t of topConsignees; track t.name) {
+              <div class="im-bar-row"><div class="t"><span>{{ t.name }}</span><b>{{ t.count }}</b></div><div class="im-track"><div [style.width.%]="t.pct"></div></div></div>
+            } @empty { <div class="ed-soft">No jobs in this window.</div> }
+          }
+        </div>
+      </div>
+      <div class="x-card">
+        <div class="ed-ch"><h2>Busiest vessels@if (air) { &amp; flights}</h2><span class="ed-meta">jobs in the sample</span></div>
+        <div class="im-top ed-pad">
+          @if (loading) {
+            @for (k of skel5; track k) { <div class="ex-skel-bar"><div class="ex-skel w60"></div><div class="ex-skel h8"></div></div> }
+          } @else {
+            @for (t of topCarriers; track t.name) {
+              <div class="im-bar-row"><div class="t"><span>{{ t.name }}</span><b>{{ t.count }}</b></div><div class="im-track"><div [style.width.%]="t.pct"></div></div></div>
+            } @empty { <div class="ed-soft">No vessel on the jobs in this window.</div> }
+          }
+        </div>
+      </div>
+    </div>
+
+    <p class="ed-foot">
+      The tiles, steps, agents and totals count every job. The lists count the newest 50 jobs at each step
+      ({{ fmt(jobs.length) }} jobs), so on a busy branch they show the recent work, not all {{ fmt(total) }}.
+      <button type="button" class="ed-linkbtn" (click)="helpOpen = !helpOpen" [attr.aria-expanded]="helpOpen">{{ helpOpen ? 'Hide' : 'How this page works' }} {{ helpOpen ? '▴' : '▾' }}</button>
+    </p>
+    @if (helpOpen) {
+      <div class="x-card ed-help">
+        <div><b>Which jobs (the date used)</b>Export jobs of your branch whose job was created in the system (the entry date stamped when the export job is opened) within the chosen period, up to today. One per export number; cancelled jobs are left out. Stage, {{ docLabel }} and ETD are shown as they stand right now.</div>
+        <div><b>Needs attention</b>A job with no {{ docLabel }} yet whose vessel sails within {{ RISK_DAYS }} days, or sailed in the last {{ LATE_DAYS }} days. Jobs whose vessel sailed longer ago are "older jobs to tidy up" &mdash; usually the BL just was not entered.</div>
+        <div><b>The week ahead</b>Vessels from the export vessel list sailing in the next 7 days, with our jobs by ETD. A tick means the job already has its document. A job is matched to its vessel by vessel name and ETD day.</div>
+        <div><b>Vessels sailing next</b>Every vessel on the branch vessel list with an ETD from today on, soonest first, with how many of our listed jobs are on it.</div>
+        <div><b>Where the jobs are</b>Each job sits at the furthest step it has reached: opened, shipping bill, cargo received, carted, containerised, out of charge, document issued.</div>
+        <div><b>Documented</b>Jobs with an @if (air) {FCR / HBL, master BL, MAWB or HAWB} @else {FCR / HBL or master BL} number recorded.</div>
+        <div><b>Lists and top 5</b>Built from the newest 50 jobs at each step, so they show recent work. The headline numbers always count every job.</div>
+      </div>
+    }
+    <p class="ed-src">Sources: export master job board (Export/EXPT_EXPORT_DASHBOARD_Board over EXPT_MASTER, one row per export no.@if (air) {, called once for sea and once for air} @else {, sea}), export vessel list (Export/Export_Vessel_List).</p>
+  </section>
 </div>
+}

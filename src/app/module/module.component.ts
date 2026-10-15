@@ -269,7 +269,7 @@ export class ModuleComponent implements OnInit {
             tmpArray = [
                 { id: 1, moduleid: 1, name: 'Finance', listyle: null, labelstyle: null, icon: 'fa fa-inr fa-2x', url: '/accounts' },
                 { id: 2, moduleid: 8, name: 'Master', listyle: null, labelstyle: null, icon: 'fa fa-plus-square fa-2x', url: '/master' },
-                { id: 3, moduleid: 3, name: 'Export', listyle: null, labelstyle: null, icon: 'fa fa-exchange fa-2x', url: '/export' },
+                { id: 3, moduleid: 3, name: 'Export', listyle: null, labelstyle: null, icon: 'fa fa-exchange fa-2x', url: '/dashboard' },
                // { id: 4, moduleid: 10, name: 'Order', listyle: null, labelstyle: null, icon: 'fa fa-shopping-cart fa-2x', url: null },
                 //{ id: 5, moduleid: 12, name: 'ICS', listyle: null, labelstyle: null, icon: 'fa fa-sitemap fa-2x', url: null },
                 //{ id: 6, moduleid: 6, name: 'BHEL', listyle: null, labelstyle: null, icon: 'fa fa-tachometer fa-2x', url: null },

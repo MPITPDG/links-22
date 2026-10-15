@@ -191,7 +191,7 @@ export class SeaSearchComponent implements OnInit {
             VesselType: this.VesselType,
             Agent: (this.Agent) ? this.Agent : "",
             AgentType: this.AgentType,
-            GlFromDate: (this.GlToDate) ? this.SqlDate(this.GlToDate.formatted) : "",
+            GlFromDate: (this.GlFromDate) ? this.SqlDate(this.GlFromDate.formatted) : "",
             GlToDate: (this.GlToDate) ? this.SqlDate(this.GlToDate.formatted) : "",
             SearchType: searchtype,
             CityCode1: this._loginService.getLogin()[0].CITYCODE1,

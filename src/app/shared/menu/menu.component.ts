@@ -217,13 +217,14 @@ export class MenuComponent implements OnInit, AfterViewInit {
 
     /**
      * The Dashboard entry opens the landing page of the module you are in - the
-     * same url the module picker enters it with. In Links every module is
-     * entered at '/<baseUrl>' (Export included: '/export'), so that is the
-     * link; '/dashboard' only when no module is bound.
+     * same url the module picker enters it with. Export lands on the Export
+     * Dashboard at '/dashboard' (as MP; '/export' only redirects there), and so
+     * does an unbound menu; every other module at '/<baseUrl>' (Accounts ->
+     * '/accounts', Import -> '/import').
      */
     get dashboardLink(): string {
         const b = (this.menuBaseUrl || '').toLowerCase();
-        if (!b) { return '/dashboard'; }
+        if (!b || b === 'export') { return '/dashboard'; }
         return '/' + this.menuBaseUrl;
     }
 

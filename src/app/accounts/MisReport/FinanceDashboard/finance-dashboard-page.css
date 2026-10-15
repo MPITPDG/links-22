@@ -1,0 +1,317 @@
+/* ============================================================
+   Finance dashboard (/ap/dashboard) - house style on top of import-page.css and
+   Accreport/accreport-page.css. Greyscale only: ink #0A0A0A, soft #6B6B6B,
+   line #DADADA, band #F3F3F3, bg #FAFAFA, white cards. Everything scoped under
+   .fd-page. Semantic emphasis is black fill or bold, never colour.
+   Links port: copied from MPERPNG-20; the only edit is dropping declarations that the
+   "palette accents" block below re-declares on the same selector (no visual change),
+   to keep the built file under the 20 kB component-style warning.
+   ============================================================ */
+
+/* ---------- tokens: retune the kit to the house greys ---------- */
+:host ::ng-deep .im-page.fd-page {
+    --ink: var(--mp-ink, #0A0A0A);
+    --soft: var(--mp-soft, #6B6B6B);
+    --faint: var(--mp-soft, #6B6B6B);
+    --line: var(--mp-line, #DADADA);
+    --edge: var(--mp-line, #DADADA);
+    --band: var(--mp-band, #F3F3F3);
+    --fill: var(--mp-band, #F3F3F3);
+    --ground: var(--mp-bg, #FAFAFA);
+    --sheet: var(--mp-surface, #FFFFFF);
+    --box: var(--mp-strong, #BDBDBD);
+    background: var(--ground);
+}
+
+/* ---------- section header = band strip ---------- */
+:host ::ng-deep .fd-page .card { background: var(--sheet); border: 1px solid var(--line); border-radius: 4px; box-shadow: none; }
+:host ::ng-deep .fd-page .card-h,
+:host ::ng-deep .fd-page .fd-band,
+:host ::ng-deep .fd-page .sub-t {
+    background: var(--band); border-bottom: 1px solid var(--line); padding: 7px 12px; min-height: 0;
+    display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px;
+}
+:host ::ng-deep .fd-page .card-h h2,
+:host ::ng-deep .fd-page .fd-band,
+:host ::ng-deep .fd-page .sub-t {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--soft); margin: 0;
+}
+:host ::ng-deep .fd-page .card-h .meta { font-size: 11px; color: var(--soft); text-transform: none; letter-spacing: 0; }
+
+/* ---------- filter bar: one wrapping flex row, labels LEFT of boxed 30px controls ---------- */
+:host ::ng-deep .fd-page .filters.fk-f { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; padding: 10px 12px; }
+:host ::ng-deep .fd-page .filters.fk-f .f { display: flex; align-items: center; gap: 8px; min-width: 0; }
+:host ::ng-deep .fd-page .filters.fk-f .f > label {
+    margin: 0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--soft); white-space: nowrap;
+}
+:host ::ng-deep .fd-page .filters.fk-f .f.act { margin-left: auto; gap: 8px; }
+/* the global theme sets select{height:18px}; boxed 30px controls inside the page */
+:host ::ng-deep .fd-page select,
+:host ::ng-deep .fd-page input[type="text"] {
+    height: 30px; border: 1px solid var(--box); border-radius: 4px; background: var(--sheet); color: var(--ink);
+    padding: 0 8px; font: inherit; font-size: 12.5px; box-shadow: none;
+}
+:host ::ng-deep .fd-page .filters.fk-f select { min-width: 150px; }
+:host ::ng-deep .fd-page textarea { border: 1px solid var(--box); border-radius: 4px; background: var(--sheet); color: var(--ink); }
+:host ::ng-deep .fd-page .mydp { border: 1px solid var(--box); border-radius: 4px; }
+:host ::ng-deep .fd-page select:focus,
+:host ::ng-deep .fd-page input[type="text"]:focus,
+:host ::ng-deep .fd-page textarea:focus { outline: none; border-color: var(--ink); }
+
+/* client type-ahead */
+:host ::ng-deep .fd-page .fd-ta { position: relative; width: 260px; }
+:host ::ng-deep .fd-page .fd-ta input[type="text"] { width: 100%; padding-right: 26px; }
+:host ::ng-deep .fd-page .fd-ta-x { position: absolute; right: 4px; top: 4px; width: 22px; height: 22px; border: 0; background: transparent; color: var(--soft); font-size: 16px; line-height: 1; cursor: pointer; }
+:host ::ng-deep .fd-page .fd-ta-list {
+    position: absolute; z-index: 1060; top: 32px; left: 0; right: 0; max-height: 320px; overflow: auto;
+    background: var(--sheet); border: 1px solid var(--ink); border-radius: 4px;
+}
+:host ::ng-deep .fd-page .fd-ta-opt { padding: 6px 10px; font-size: 12.5px; cursor: pointer; border-bottom: 1px solid var(--band); }
+:host ::ng-deep .fd-page .fd-ta-opt:hover { background: var(--band); }
+:host ::ng-deep .fd-page .fd-ta-msg { padding: 8px 10px; font-size: 12px; color: var(--soft); }
+
+/* ---------- buttons: outlined black, primary = black fill, 30px; in tables 24px ---------- */
+:host ::ng-deep .fd-page .btn { height: 30px; border: 1px solid var(--ink); border-radius: 4px; background: var(--sheet); color: var(--ink); box-shadow: none; }
+:host ::ng-deep .fd-page .btn.p,
+:host ::ng-deep .fd-page .btn.pri { background: var(--mp-primary, var(--ink)); color: var(--mp-primary-fg, #FFFFFF); }
+:host ::ng-deep .fd-page .btn:disabled { opacity: .45; }
+:host ::ng-deep .fd-page table.tbl td .btn { height: 24px; padding: 0 8px; font-size: 11.5px; }
+
+/* ---------- layout ---------- */
+:host ::ng-deep .fd-page .fd-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+:host ::ng-deep .fd-page .fd-tabbar { padding: 0 0 12px; border: 0; background: transparent; }
+:host ::ng-deep .fd-page .fk-seg { border-color: var(--ink); }
+:host ::ng-deep .fd-page .fk-seg button { border-right-color: var(--ink); background: var(--sheet); }
+:host ::ng-deep .fd-page .fk-seg button.on { background: var(--mp-primary, var(--ink)); color: var(--mp-primary-fg, #FFFFFF); }
+:host ::ng-deep .fd-page .fk-seg.fd-tabs { display: inline-flex; flex-wrap: wrap; height: auto; min-height: 30px; }
+:host ::ng-deep .fd-page .fk-seg.fd-tabs button { height: 30px; padding: 0 14px; }
+:host ::ng-deep .fd-page .fd-pad { padding: 12px 16px; }
+:host ::ng-deep .fd-page .fd-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+:host ::ng-deep .fd-page .card > .empty,
+:host ::ng-deep .fd-page .fk-hbars .empty { padding: 24px; text-align: center; color: var(--soft); }
+:host ::ng-deep .fd-page .fd-top-note { border-top: 0; border-bottom: 1px solid var(--line); }
+:host ::ng-deep .fd-page .fk-alert { border-left: 3px solid var(--ink); color: var(--ink); }
+
+/* ---------- tiles (house .td-tile): max 6 per row, wrap ---------- */
+:host ::ng-deep .fd-page .fk-kpis,
+:host ::ng-deep .fd-page .fd-tiles { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+:host ::ng-deep .fd-page .fd-tile {
+    flex: 1 1 calc((100% - 60px) / 6); min-width: 170px;
+    background: var(--sheet); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px;
+}
+:host ::ng-deep .fd-page .fd-tile.flat { border: 0; padding: 12px 16px; }
+:host ::ng-deep .fd-page .fd-tile .k { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--soft); }
+:host ::ng-deep .fd-page .fd-tile .v {
+    font-size: 28px; font-weight: 700; line-height: 1.1; margin-top: 6px; color: var(--ink);
+    font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+:host ::ng-deep .fd-page .fd-tile .v.sm { font-size: 20px; }
+:host ::ng-deep .fd-page .fd-tile .v .u { font-size: .56em; font-weight: 500; color: var(--soft); margin: 0 .12em; }
+:host ::ng-deep .fd-page .fd-tile .s { font-size: 11.5px; color: var(--soft); margin-top: 3px; line-height: 1.4; }
+:host ::ng-deep .fd-page .fd-tile.fd-kpi-click { cursor: pointer; }
+:host ::ng-deep .fd-page .fd-tile.fd-kpi-click:hover { border-color: var(--ink); }
+:host ::ng-deep .fd-page .fd-tiles.fd-pad { margin: 0; }
+
+/* tile breakdown rows */
+:host ::ng-deep .fd-page .fd-kpi-rows { display: grid; gap: 2px; margin-top: 6px; font-size: 11.5px; color: var(--soft); }
+:host ::ng-deep .fd-page .fd-kpi-row { display: flex; justify-content: space-between; gap: 8px; }
+:host ::ng-deep .fd-page .fd-kpi-row b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+:host ::ng-deep .fd-page .fd-kpi-row--sum { border-top: 1px dashed var(--line); padding-top: 3px; margin-top: 2px; font-weight: 600; }
+:host ::ng-deep .fd-page .fd-kpi-row--sub span { padding-left: 12px; font-size: 11px; }
+:host ::ng-deep .fd-page .fd-kpi-row--sub b { font-weight: 500; }
+:host ::ng-deep .fd-page .fd-kpi-foot { font-size: 10.5px; line-height: 1.45; color: var(--soft); margin: 2px 0 3px; }
+
+/* ---------- CSS bars (greyscale) ---------- */
+:host ::ng-deep .fd-page .fk-hbar { grid-template-columns: 180px 1fr 170px; }
+:host ::ng-deep .fd-page .fk-hbar .t { height: 10px; background: var(--band); border-radius: 2px; }
+/* Payables ageing: older buckets (SORTORDER >= 4) in ink, recent ones in soft grey */
+:host ::ng-deep .fd-page .fk-hbar.fd-old .t > div { background: var(--mp-primary, var(--ink)); }
+:host ::ng-deep .fd-page .fk-hbar.fd-old > span:first-child { font-weight: 700; }
+:host ::ng-deep .fd-page .fd-meter { height: 4px; background: var(--band); border-radius: 2px; margin-top: 4px; overflow: hidden; min-width: 60px; }
+:host ::ng-deep .fd-page .fd-meter div { height: 100%; }
+:host ::ng-deep .fd-page .fd-legend { display: flex; gap: 14px; font-size: 11px; color: var(--soft); text-transform: none; letter-spacing: 0; }
+:host ::ng-deep .fd-page .fd-legend span { display: inline-flex; align-items: center; gap: 5px; }
+:host ::ng-deep .fd-page .fd-sw { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+:host ::ng-deep .fd-page .fd-sw.lite { border: 1px solid var(--soft); }
+/* recovery SVG: credit bars light, actual bars ink */
+:host ::ng-deep .fd-page svg .fb.neg { stroke: var(--soft); stroke-width: .5; }
+:host ::ng-deep .fd-page svg .gl { stroke: var(--line); }
+:host ::ng-deep .fd-page svg .ax { fill: var(--soft); font-size: 10px; }
+
+/* funnel */
+:host ::ng-deep .fd-page .fd-funnel { padding: 14px 16px; display: grid; gap: 6px; }
+:host ::ng-deep .fd-page .fd-stage { background: var(--mp-primary, var(--ink)); color: var(--mp-primary-fg, #FFFFFF); border-radius: 4px; padding: 8px 12px; display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; min-width: 220px; }
+:host ::ng-deep .fd-page .fd-stage:nth-of-type(2n) { background: var(--soft); }
+:host ::ng-deep .fd-page .fd-stage b { font-weight: 700; font-variant-numeric: tabular-nums; }
+:host ::ng-deep .fd-page .fd-stage small { font-family: inherit; }
+:host ::ng-deep .fd-page .fd-drop { font-size: 11.5px; color: var(--soft); padding-left: 12px; }
+
+/* ---------- tables: band header, 11px uppercase, 7px/10px cells, tabular numbers ---------- */
+:host ::ng-deep .fd-page table.tbl th {
+    background: var(--band); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--soft); padding: 7px 10px; border-bottom: 1px solid var(--line);
+}
+:host ::ng-deep .fd-page table.tbl td { padding: 7px 10px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+:host ::ng-deep .fd-page table.tbl th.sort { cursor: pointer; user-select: none; }
+:host ::ng-deep .fd-page table.tbl th.sort:hover { color: var(--ink); }
+:host ::ng-deep .fd-page table.tbl td .chip { margin-left: 4px; }
+:host ::ng-deep .fd-page td.fd-sub { background: var(--ground); padding: 8px 12px 12px 28px; }
+:host ::ng-deep .fd-page .fd-caret { display: inline-block; width: 12px; color: var(--soft); }
+:host ::ng-deep .fd-page .fd-nowrap { white-space: nowrap; font-variant-numeric: tabular-nums; }
+:host ::ng-deep .fd-page td.fd-neg { font-weight: 700; }
+:host ::ng-deep .fd-page .pager { border-top: 1px solid var(--line); }
+
+/* chips: severity / status by fill and border, never colour */
+:host ::ng-deep .fd-page .chip { border: 1px solid var(--soft); color: var(--ink); background: var(--sheet); }
+:host ::ng-deep .fd-page .chip.dash,
+:host ::ng-deep .fd-page .chip.fd-pill--amber { border-style: dashed; }
+:host ::ng-deep .fd-page .chip.fd-pill--muted,
+:host ::ng-deep .fd-page .chip.fd-pill--grey { color: var(--soft); border-color: var(--line); }
+
+/* audit */
+:host ::ng-deep .fd-page .fd-audit { border-top: 1px solid var(--line); padding: 10px 16px; }
+:host ::ng-deep .fd-page .fd-audit-h { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+:host ::ng-deep .fd-page .fd-audit-n { margin-left: auto; font-size: 12.5px; color: var(--soft); }
+:host ::ng-deep .fd-page .fd-audit .tbl-wrap { margin-top: 8px; }
+
+/* Margin tab: billed party vs shipper */
+:host ::ng-deep .fd-page .fd-marginby { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+:host ::ng-deep .fd-page .fd-marginby .fk-lbl { min-width: 0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--soft); }
+:host ::ng-deep .fd-page .fd-marginby .fk-seg { display: inline-flex; height: 30px; }
+:host ::ng-deep .fd-page .fd-marginby .fk-seg button { padding: 0 14px; }
+:host ::ng-deep .fd-page .fd-marginby-note { font-size: 12px; color: var(--soft); flex: 1 1 320px; min-width: 240px; }
+:host ::ng-deep .fd-page .fd-othername { font-size: 11px; color: var(--soft); margin-left: 14px; }
+
+/* payables */
+:host ::ng-deep .fd-page .fd-testbar { border-left: 3px solid var(--ink); color: var(--ink); }
+:host ::ng-deep .fd-page select.fd-inline-sel { width: auto; min-width: 120px; margin-left: 6px; }
+
+/* ---------- popups (KPI explain / evidence, legend, reminder, client) ---------- */
+:host ::ng-deep .fd-page .fk-modal-back { background: rgba(10, 10, 10, .35); }
+:host ::ng-deep .fd-page .fk-modal { max-height: calc(100vh - 120px); overflow: auto; }
+:host ::ng-deep .fd-page textarea.fd-remtext { min-height: 260px; font-family: var(--num); font-size: 12.5px; width: 100%; }
+:host ::ng-deep .fd-page .fk-modal.fd-explain { width: min(1180px, 97vw); }
+:host ::ng-deep .fd-page .fd-ex-scroll { max-height: 52vh; overflow: auto; }
+:host ::ng-deep .fd-page table.fd-ex-data th,
+:host ::ng-deep .fd-page table.fd-ex-data td { white-space: nowrap; }
+:host ::ng-deep .fd-page table.fd-ex-data th:first-child,
+:host ::ng-deep .fd-page table.fd-ex-data td:first-child { white-space: normal; min-width: 240px; }
+:host ::ng-deep .fd-page table.fd-ex-data tfoot td { position: sticky; bottom: 0; background: var(--band); font-weight: 700; }
+:host ::ng-deep .fd-page .fd-ex-tally { margin-right: auto; align-self: center; }
+:host ::ng-deep .fd-page .fd-ex-what { font-size: 13px; line-height: 1.55; color: var(--ink); }
+:host ::ng-deep .fd-page .fd-ex-pad { padding-top: 8px; }
+:host ::ng-deep .fd-page table.fd-ex-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+:host ::ng-deep .fd-page table.fd-ex-table td { padding: 6px 8px; border-bottom: 1px dashed var(--line); vertical-align: top; }
+:host ::ng-deep .fd-page .fd-ex-op { width: 26px; text-align: center; font-weight: 700; color: var(--soft); font-family: var(--num); }
+:host ::ng-deep .fd-page .fd-ex-val { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 600; }
+:host ::ng-deep .fd-page tr.fd-ex-result td { border-top: 2px solid var(--ink); border-bottom: 0; background: var(--band); font-weight: 700; }
+:host ::ng-deep .fd-page tr.fd-ex-extra td { color: var(--soft); font-size: 12px; border-bottom: 0; }
+:host ::ng-deep .fd-page ul.fd-ex-notes { margin: 0; padding: 8px 16px 12px 34px; font-size: 12.5px; line-height: 1.55; color: var(--ink); }
+:host ::ng-deep .fd-page ul.fd-ex-notes li { margin-bottom: 4px; }
+
+/* legend */
+:host ::ng-deep .fd-page .fk-modal.fd-legend-modal { width: min(820px, 97vw); }
+:host ::ng-deep .fd-page .fd-lg { font-size: 12.5px; }
+:host ::ng-deep .fd-page .fd-lg .sub-t { margin: 14px 0 6px; }
+:host ::ng-deep .fd-page .fd-lg .sub-t:first-child { margin-top: 0; }
+:host ::ng-deep .fd-page table.fd-lg-table { width: 100%; border-collapse: collapse; }
+:host ::ng-deep .fd-page table.fd-lg-table td { padding: 6px 8px; border-bottom: 1px dashed var(--line); vertical-align: top; line-height: 1.45; }
+:host ::ng-deep .fd-page table.fd-lg-table td:first-child { width: 200px; white-space: nowrap; }
+:host ::ng-deep .fd-page table.fd-lg-table.fd-lg-2col td:first-child { width: 50%; white-space: normal; }
+:host ::ng-deep .fd-page table.fd-lg-table td .chip { margin-left: 0; }
+:host ::ng-deep .fd-page .fd-lg-sub { margin: 10px 0 4px; font-size: 12px; font-weight: 700; color: var(--ink); }
+:host ::ng-deep .fd-page table.fd-lg-score { margin-bottom: 6px; }
+:host ::ng-deep .fd-page table.fd-lg-score td { white-space: normal; }
+:host ::ng-deep .fd-page .fd-lg-note { margin-top: 10px; }
+
+/* ---------- job profit drawer (in-page, right side) ---------- */
+:host ::ng-deep .fd-page .fd-drawer-back { position: fixed; inset: 0; background: rgba(10, 10, 10, .25); z-index: 1050; }
+:host ::ng-deep .fd-page .fd-drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(640px, 100vw); z-index: 1051;
+    background: var(--sheet); border-left: 1px solid var(--ink); overflow: auto; display: flex; flex-direction: column;
+}
+:host ::ng-deep .fd-page .fd-drawer-h { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+:host ::ng-deep .fd-page .fd-drawer-h .tb-r { margin-left: auto; display: inline-flex; gap: 8px; }
+:host ::ng-deep .fd-page .fd-drawer-k { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--soft); }
+:host ::ng-deep .fd-page .fd-drawer-t { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+:host ::ng-deep .fd-page .fd-drawer-meta { display: grid; gap: 4px; padding: 10px 16px; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+:host ::ng-deep .fd-page .fd-drawer-meta > div { display: flex; gap: 10px; }
+:host ::ng-deep .fd-page .fd-drawer-meta span { width: 70px; color: var(--soft); }
+:host ::ng-deep .fd-page .fd-drawer .fd-tile { min-width: 120px; }
+
+@media (max-width: 1000px) {
+    :host ::ng-deep .fd-page .fd-2 { grid-template-columns: 1fr; }
+    :host ::ng-deep .fd-page .fk-hbar { grid-template-columns: 110px 1fr 120px; }
+    :host ::ng-deep .fd-page .filters.fk-f .f.act { margin-left: 0; }
+    :host ::ng-deep .fd-page .fd-ta { width: 100%; }
+}
+
+/* ---------- priority layout: attention -> act now -> this week -> workload -> detail -> reference ---------- */
+:host ::ng-deep .fd-page .fd-sec { margin-bottom: 16px; }
+:host ::ng-deep .fd-page .fd-sech {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px;
+    background: var(--band); border: 1px solid var(--line); border-radius: 4px; padding: 7px 12px; margin-bottom: 12px;
+}
+:host ::ng-deep .fd-page .fd-sech h2 { margin: 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--ink); }
+:host ::ng-deep .fd-page .fd-sech span { font-size: 12px; color: var(--soft); }
+:host ::ng-deep .fd-page .fd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 16px; margin-bottom: 16px; }
+:host ::ng-deep .fd-page .fd-grid > .card { margin-bottom: 0; min-width: 0; }
+:host ::ng-deep .fd-page .fd-secnote { margin: 0 0 12px; padding: 0; border: 0; background: transparent; color: var(--soft); font-size: 12px; }
+:host ::ng-deep .fd-page .fd-subband { border: 1px solid var(--line); border-radius: 4px; margin-bottom: 12px; }
+:host ::ng-deep .fd-page .fd-day { display: flex; justify-content: space-between; padding: 6px 12px; border-bottom: 1px solid var(--line); background: var(--ground); font-size: 12px; }
+:host ::ng-deep .fd-page .fd-day span { color: var(--soft); font-variant-numeric: tabular-nums; }
+:host ::ng-deep .fd-page .fd-dayrow { display: flex; justify-content: space-between; gap: 12px; padding: 4px 12px 4px 24px; border-bottom: 1px dashed var(--line); font-size: 12px; }
+:host ::ng-deep .fd-page .fd-dayrow b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+:host ::ng-deep .fd-page .card-h .fk-seg button { height: 22px; padding: 0 8px; font-size: 11px; }
+:host ::ng-deep .fd-page .card-h.fk-click { cursor: pointer; }
+:host ::ng-deep .fd-page .fd-ref { padding: 10px 16px; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+:host ::ng-deep .fd-page .fd-ref-h { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 4px; }
+:host ::ng-deep .fd-page .fd-ref-h .btn { height: 24px; padding: 0 8px; font-size: 11.5px; }
+:host ::ng-deep .fd-page .fd-ref-w { margin: 4px 0 6px; line-height: 1.45; }
+:host ::ng-deep .fd-page .fd-refaudit { margin-bottom: 12px; }
+@media (max-width: 900px) {
+    :host ::ng-deep .fd-page .fd-grid { grid-template-columns: 1fr; }
+}
+
+/* ---------- palette accents (Classic tokens resolve to greys / ink) ---------- */
+:host ::ng-deep .fd-page .fd-tile { border-top: 3px solid var(--mp-primary, #0A0A0A); }
+:host ::ng-deep .fd-page .fk-kpis > .fd-tile:first-child { background: var(--mp-primary-soft, #EFEFEF); }
+:host ::ng-deep .fd-page .fd-sech h2,
+:host ::ng-deep .fd-page .card-h h2,
+:host ::ng-deep .fd-page .fd-band { color: var(--mp-primary, #0A0A0A); font-weight: 700; }
+:host ::ng-deep .fd-page table.tbl tbody tr:hover > td { background: var(--mp-primary-soft, #EFEFEF); }
+:host ::ng-deep .fd-page td.fd-late, :host ::ng-deep .fd-page td.fd-late b { color: var(--mp-late, #0A0A0A); font-weight: 700; }
+:host ::ng-deep .fd-page a.lnk { color: var(--mp-primary, #0A0A0A); }
+:host ::ng-deep .fd-page .pager .pages button.on,
+:host ::ng-deep .fd-page .pg-btns button.on { background: var(--mp-primary, #0A0A0A); border-color: var(--mp-primary, #0A0A0A); color: var(--mp-primary-fg, #FFFFFF); }
+:host ::ng-deep .fd-page .chip.solid,
+:host ::ng-deep .fd-page .chip.fd-pill--red { background: var(--mp-late, #0A0A0A); border-color: var(--mp-late, #0A0A0A); color: #FFFFFF; }
+:host ::ng-deep .fd-page .chip.fd-pill--amber { border-color: var(--mp-accent, #6B6B6B); background: var(--mp-accent-soft, #E8E8E8); }
+/* default CSS bars: first series */
+:host ::ng-deep .fd-page .fk-hbar .t > div { background: var(--mp-chart-2, #6B6B6B); }
+/* ageing severity: oldest bucket = late, then chart-1..4 */
+:host ::ng-deep .fd-page .fk-hbar[data-sev="0"] .t > div { background: var(--mp-late, #0A0A0A); }
+:host ::ng-deep .fd-page .fk-hbar[data-sev="1"] .t > div { background: var(--mp-chart-1, #0A0A0A); }
+:host ::ng-deep .fd-page .fk-hbar[data-sev="2"] .t > div { background: var(--mp-chart-2, #6B6B6B); }
+:host ::ng-deep .fd-page .fk-hbar[data-sev="3"] .t > div { background: var(--mp-chart-3, #9E9E9E); }
+:host ::ng-deep .fd-page .fk-hbar[data-sev="4"] .t > div { background: var(--mp-chart-4, #C8C8C8); }
+/* revenue composition: one colour per series */
+:host ::ng-deep .fd-page .fk-hbar[data-ser="0"] .t > div { background: var(--mp-chart-1, #0A0A0A); }
+:host ::ng-deep .fd-page .fk-hbar[data-ser="1"] .t > div { background: var(--mp-chart-2, #6B6B6B); }
+:host ::ng-deep .fd-page .fk-hbar[data-ser="2"] .t > div { background: var(--mp-chart-3, #9E9E9E); }
+:host ::ng-deep .fd-page .fk-hbar[data-ser="3"] .t > div { background: var(--mp-chart-4, #C8C8C8); }
+:host ::ng-deep .fd-page .fk-hbar[data-ser="4"] .t > div { background: var(--mp-chart-5, #DADADA); }
+/* margin bars: positive chart-1, negative chart-2 */
+:host ::ng-deep .fd-page .fk-hbar.fk-click .t > div { background: var(--mp-chart-1, #0A0A0A); }
+:host ::ng-deep .fd-page .fk-hbar .t > div.fd-negbar { background: var(--mp-chart-2, #6B6B6B); }
+/* cash funnel stages chart-1..3 */
+:host ::ng-deep .fd-page .fd-stage[data-i="0"] { background: var(--mp-chart-1, #0A0A0A); }
+:host ::ng-deep .fd-page .fd-stage[data-i="1"] { background: var(--mp-chart-2, #6B6B6B); }
+:host ::ng-deep .fd-page .fd-stage[data-i="2"] { background: var(--mp-chart-3, #9E9E9E); }
+:host ::ng-deep .fd-page .fd-stage small { color: inherit; opacity: .8; }
+/* recovery SVG + legend: actual chart-1, credit period chart-4 */
+:host ::ng-deep .fd-page svg .fb { fill: var(--mp-chart-1, #0A0A0A); }
+:host ::ng-deep .fd-page svg .fb.neg { fill: var(--mp-chart-4, #DADADA); }
+:host ::ng-deep .fd-page .fd-sw { background: var(--mp-chart-1, #0A0A0A); }
+:host ::ng-deep .fd-page .fd-sw.lite { background: var(--mp-chart-4, #DADADA); }
+:host ::ng-deep .fd-page .fd-meter div { background: var(--mp-chart-1, #0A0A0A); }

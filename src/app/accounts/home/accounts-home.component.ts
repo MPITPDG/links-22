@@ -1,10 +1,10 @@
-﻿import { Component, HostListener, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { ChartOptions, ChartDataset } from 'chart.js';
+import { Component, HostListener, Input, OnInit, OnDestroy, NgZone, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { LoginService } from '../../shared/service/loginService';
 import { ToastCommonService } from '../../shared/service/toastService';
 import { LoaderService } from '../../shared/service/loader.service';
 import { ExportexcelService } from '../../shared/service/exportexcel.service';
+import { finFigure } from '../Accreport/fin-kit';
 
 /*  Accounts module home.
 
@@ -13,10 +13,17 @@ import { ExportexcelService } from '../../shared/service/exportexcel.service';
     30-day invoicing trend. One call to Accounts/ACC_RPT_ACCOUNTS_HOME, which the API caches for
     ten minutes, so the page paints in well under a second on every visit but the first.
 
-    Rights-gated. If the user has no View right on the dashboard form, nothing renders and the
-    page is the blank home it has always been - no redirect, no message. That is deliberate:
-    this is the landing page of the module, and a user who cannot see the summary must still be
-    able to land here and use the menu.
+    Layout (from MPERPNG-20): header row, Needs attention tiles, Act now (clients to chase,
+    earned but not collected), This week (cash position, forecast, DSO vs DPO), Workload
+    picture (KPI cards, ageing, jobs by mode, 30-day trend), Detail (the drill-down tables,
+    10 rows a page) and Reference (top clients, quick links, a collapsed "How this page works").
+    Greyscale house style, no look mode. Styles: the global dashboard kit (.im-dash,
+    src/styles/kit/import-home.css) plus accounts-home.component.css.
+
+    Rights-gated (see VIEW_GATE_FORM_ID). If the user has no View right on the gate form,
+    nothing renders and the page is the blank home it has always been - no redirect, no
+    message. That is deliberate: this is the landing page of the module, and a user who cannot
+    see the summary must still be able to land here and use the menu.
 
     The figures are the Finance Dashboard's figures, cut down. Anything that needs explaining is
     explained in ACCOUNTS_HOME_SETUP.sql, not re-derived here.                                  */
@@ -27,11 +34,14 @@ import { ExportexcelService } from '../../shared/service/exportexcel.service';
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
-export class AccountsHomeComponent implements OnInit {
+export class AccountsHomeComponent implements OnInit, OnDestroy {
 
-    /*  tbl_mst_form id that gates this page. 447 on Manilal, 438 on Links - the two systems
-        number their forms differently, so this constant differs between the two repos.    */
-    static readonly FORM_ID = '438';
+    /*  THE rights gate for this page, and the only place it is configured: the tbl_mst_form id
+        whose View right shows the summary (SA always sees it). 438 on Links. MPERPNG-20 uses
+        447, which in LinksDB20 is "Mgmt day-end all branches", so do not copy MP's value.
+        To drop gating, set this to null: the page then loads for every logged-in user, as the
+        Import home does. checkViewGate() is the only reader.                              */
+    static readonly VIEW_GATE_FORM_ID: string | null = '438';
 
     /*  Future use: the same component on the Export / Import homes, where finance tiles are
         not shown. Only 'accounts' exists today.                                           */
@@ -59,18 +69,17 @@ export class AccountsHomeComponent implements OnInit {
         The shared LoaderService paints a fixed full-screen mask (.loading:before in
         spinner.scss, z-index 1200) that covers the side menu too, so while the summary
         was loading nobody could click away to another screen. The summary takes a few
-        seconds on a cold cache, which made the whole ERP feel frozen. This page now
-        shows its own progress strip and leaves the menu alive.                        */
-    busy: boolean = false;
+        seconds on a cold cache (All branches can take 30s+), which made the whole ERP feel
+        frozen. This page shows its own loading banner and leaves the menu alive.       */
+    loading: boolean = false;
     failed: boolean = false;
     failReason: string = '';   // API-side message (ERROR table), shown under the alert
 
-    /*  ng2-charts (chart.js 2), the library both Manilal and Links already carry - the same
-        component file must run unchanged in either repo.                                  */
+    /*  ng2-charts 4 / Chart.js 4: colours live on the dataset, scales are keyed x / y,
+        legend and tooltip sit under plugins.                                              */
     trendLabels: string[] = [];
-    trendData: ChartDataset<'bar'>[] = [];
-    trendColors: any[] = [{ backgroundColor: '#2A78D6', hoverBackgroundColor: '#1F5FAE', borderWidth: 0 }];
-    trendOptions: ChartOptions<'bar'> = null;
+    trendData: any[] = [];
+    trendOptions: any = null;
     trendTotal: number = 0;
 
     quickLinks = [
@@ -86,23 +95,26 @@ export class AccountsHomeComponent implements OnInit {
         private _loginService: LoginService,
         private _toasterService: ToastCommonService,
         private loaderService: LoaderService,
-        private exportser: ExportexcelService) { }
+        private exportser: ExportexcelService,
+        private zone: NgZone,
+        private cdr: ChangeDetectorRef) { }
 
     ngOnInit() {
-        this.restoreDark();
         this.login = this._loginService.getLogin()[0];
 
         try {
             this.allBranches = sessionStorage.getItem('ah.allBranches') == '1';
         } catch (e) { this.allBranches = false; }
 
-        this.checkRights();
+        this.checkViewGate();
     }
 
     /*  ---- rights --------------------------------------------------------------------- */
 
-    checkRights() {
-        if (this.login && this.login.ROLETYPE == 'SA') {
+    /*  The whole rights check, driven by VIEW_GATE_FORM_ID (null = no gate). */
+    checkViewGate() {
+        const formId = AccountsHomeComponent.VIEW_GATE_FORM_ID;
+        if (!formId || (this.login && this.login.ROLETYPE == 'SA')) {
             this.canView = true;
             this.load(false);
             return;
@@ -110,7 +122,7 @@ export class AccountsHomeComponent implements OnInit {
 
         /*  verifyRights returns viewForm; checkVerify is the piece that redirects to
             access-denied, and it is deliberately not called here.                         */
-        this._loginService.verifyRights(AccountsHomeComponent.FORM_ID, '')
+        this._loginService.verifyRights(formId, '')
             .subscribe((data: any) => {
                 let ok = false;
                 if (data && data.Table && data.Table.length > 0 && data.Table[0].STATUS == '100') {
@@ -124,6 +136,12 @@ export class AccountsHomeComponent implements OnInit {
                     permission check errored is the wrong way round.                          */
                 this.canView = false;
             });
+    }
+
+    /*  Attention tiles and the How to read button scroll to their section. */
+    go(id: string): void {
+        const el = document.getElementById(id);
+        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     }
 
     /*  ---- data ----------------------------------------------------------------------- */
@@ -145,7 +163,8 @@ export class AccountsHomeComponent implements OnInit {
     }
 
     load(syncNow: boolean) {
-        this.busy = true;
+        this.loading = true;
+        this.loaded = false;
         this.failed = false;
         this.failReason = '';
 
@@ -158,7 +177,7 @@ export class AccountsHomeComponent implements OnInit {
 
         this._dataService.getData('Accounts/ACC_RPT_ACCOUNTS_HOME', jsonItem)
             .subscribe((data: any) => {
-                this.busy = false;
+                this.loading = false;
                 this.loaded = true;
 
                 const ok = data && data.Table && data.Table.length > 0 && data.Table[0].STATUS == '100';
@@ -182,7 +201,7 @@ export class AccountsHomeComponent implements OnInit {
                 }
                 this.buildTrend();
             }, () => {
-                this.busy = false;
+                this.loading = false;
                 this.loaded = true;
                 this.failed = true;
                 this.kpi = null;
@@ -210,10 +229,29 @@ export class AccountsHomeComponent implements OnInit {
     drillSortKey = 'GOP';
     drillSortDir = -1;
 
+    /*  Drill tables show 10 rows a page. One page index per table key ('watch', 'ovd', 'jobs',
+        'mcli', 'b:<client>'); out-of-range pages clamp, so a narrower search lands on the
+        last page that exists.                                                            */
+    readonly drillPageSize = 10;
+    drillPg: { [k: string]: number } = {};
+    pageOf(list: any[], key: string): any[] {
+        const i = this.pgInfo(list, key);
+        return list.slice(i.p * this.drillPageSize, (i.p + 1) * this.drillPageSize);
+    }
+    pgInfo(list: any[], key: string): { from: number; to: number; n: number; p: number; pages: number } {
+        const n = list.length, pages = Math.max(1, Math.ceil(n / this.drillPageSize));
+        const p = Math.min(Math.max(0, this.drillPg[key] || 0), pages - 1);
+        return { from: n ? p * this.drillPageSize + 1 : 0, to: Math.min(n, (p + 1) * this.drillPageSize), n, p, pages };
+    }
+    goPage(key: string, p: number, ev?: any) {
+        if (ev) { ev.stopPropagation(); }
+        this.drillPg[key] = p;
+    }
+
     openDrill(kind: string, ev?: any) {
         // the small icon on a card opens its explanation, not the detail
         const t: any = ev && ev.target;
-        if (t && t.closest && t.closest('.ah-kpi-ico-btn')) { return; }
+        if (t && t.closest && t.closest('.ah-ico')) { return; }
         this.drillKind = kind;
         this.dragX = 0;           // opens centred; the title bar drags it (same handler as the explanation popup)
         this.dragY = 0;
@@ -221,6 +259,7 @@ export class AccountsHomeComponent implements OnInit {
         this.drillOpenClient = null;
         this.drillOpenBill = null;
         this.drillShowAll = {};
+        this.drillPg = {};
         this.drillFilter = 'ALL';
         this.marginView = 'JOBS';
         this.marginOpenClient = null;
@@ -300,7 +339,7 @@ export class AccountsHomeComponent implements OnInit {
     clientBills(code: string): any[] {
         const d = this.drill.OVERDUE;
         const list = (d && d.byClient[code]) || [];
-        return this.drillShowAll[code] ? list : list.slice(0, 100);
+        return list;     // paged 10 at a time by pageOf(); every bill is reachable
     }
     clientBillCount(code: string): number {
         const d = this.drill.OVERDUE;
@@ -442,6 +481,11 @@ export class AccountsHomeComponent implements OnInit {
         return sign + a.toLocaleString('en-IN', { maximumFractionDigits: 0 });
     }
 
+    /*  Headline figure split for the dashboard KPI style: number, then a small grey unit (L / Cr). */
+    amt(v: any): { n: string; u: string } {
+        return finFigure(this.short(v));
+    }
+
     count(v: any): string {
         if (v === null || v === undefined || v === '') { return '-'; }
         const n = Number(v);
@@ -478,25 +522,8 @@ export class AccountsHomeComponent implements OnInit {
     }
 
     /*  Width of a bar as a share of the largest value in the list, for the CSS bars. */
-    /** Help modal (the ? button) and look mode (sun/moon). Look mode is remembered per browser. */
+    /** "How this page works" (collapsed by default, in the Reference section). No look mode. */
     helpOpen: boolean = false;
-    dark: boolean = false;
-    private static readonly DARK_KEY = 'ACC_HOME_DARK';
-
-    toggleDark(): void {
-        this.dark = !this.dark;
-        this.applyChartTheme();
-        try { localStorage.setItem(AccountsHomeComponent.DARK_KEY, this.dark ? '1' : '0'); } catch (e) { }
-    }
-
-    private restoreDark(): void {
-        try { this.dark = localStorage.getItem(AccountsHomeComponent.DARK_KEY) == '1'; } catch (e) { this.dark = false; }
-    }
-
-    /** Chart.js takes colours from options, so the builder reads the current look and is re-run on toggle. */
-    private applyChartTheme(): void {
-        if (this.daily && this.daily.length > 0) { this.buildTrend(); }
-    }
 
     /** Cash-side helpers. Days come back as DECIMAL(5,1) strings; null means "no settled bills". */
     days(v: any): string {
@@ -544,17 +571,45 @@ export class AccountsHomeComponent implements OnInit {
         this.dragStartX = ev.clientX - this.dragX;
         this.dragStartY = ev.clientY - this.dragY;
         ev.preventDefault();
+        this.bindDrag();
     }
 
-    @HostListener('document:mousemove', ['$event'])
-    onDragMove(ev: MouseEvent): void {
-        if (!this.dragging) { return; }
-        this.dragX = ev.clientX - this.dragStartX;
-        this.dragY = ev.clientY - this.dragStartY;
+    /*  The move/up listeners exist only while a drag is in progress. They are added outside
+        Angular's zone (a document-level mousemove inside the zone would run change detection
+        on every mouse move anywhere in the app); each move re-enters the zone just to update
+        the popup position, and mouseup removes both listeners.                              */
+    private dragOff: (() => void) | null = null;
+
+    private bindDrag(): void {
+        this.unbindDrag();
+        const move = (ev: MouseEvent) => {
+            this.zone.run(() => {
+                this.dragX = ev.clientX - this.dragStartX;
+                this.dragY = ev.clientY - this.dragStartY;
+            });
+        };
+        const up = () => this.zone.run(() => this.onDragEnd());
+        this.zone.runOutsideAngular(() => {
+            document.addEventListener('mousemove', move);
+            document.addEventListener('mouseup', up);
+        });
+        this.dragOff = () => {
+            document.removeEventListener('mousemove', move);
+            document.removeEventListener('mouseup', up);
+        };
     }
 
-    @HostListener('document:mouseup')
-    onDragEnd(): void { this.dragging = false; }
+    private unbindDrag(): void {
+        if (this.dragOff) { this.dragOff(); this.dragOff = null; }
+    }
+
+    onDragEnd(): void {
+        this.dragging = false;
+        this.unbindDrag();
+        this.cdr.markForCheck();
+    }
+
+    ngOnDestroy(): void { this.unbindDrag(); }
 
     /*  Close only when the press starts on the dim background itself. Using click here would
         also close the popup when a drag happens to end outside it.                          */
@@ -791,11 +846,15 @@ export class AccountsHomeComponent implements OnInit {
         }
 
         this.trendLabels = cats;
-        this.trendData = [{ data: vals, label: 'Invoiced', barPercentage: 0.8, categoryPercentage: 0.9, ...this.trendColors[0] }];
+        this.trendData = [{
+            data: vals, label: 'Invoiced',
+            backgroundColor: '#0A0A0A', hoverBackgroundColor: '#6B6B6B', borderWidth: 0,
+            barPercentage: 0.8, categoryPercentage: 0.9
+        }];
 
         const self = this;
-        const tick = this.dark ? '#a1a1a1' : '#4b5563';
-        const grid = this.dark ? 'rgba(255,255,255,.08)' : '#f1f3f5';
+        const tick = '#6B6B6B';
+        const grid = '#F3F3F3';
         this.trendOptions = {
             responsive: true,
             maintainAspectRatio: false,

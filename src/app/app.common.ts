@@ -149,7 +149,6 @@
         {
             moduleid: "1", modulename: "Accounts", type: null, baseUrl: 'accounts',
             data: [
-                { menuid: "1", icon: "fa fa-home", menuname: "Home", routerlink: "/ap/dashboard", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                 { menuid: "2", icon: "fa fa-history", menuname: "Master", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
                     { menuid: "2.1", icon: "fa fa-plus-circle", menuname: "Bank Reconciliation", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
                         { menuid: "2.1.1", icon: "fa fa-search-plus", menuname: "Add/Edit", routerlink: "/accounts/Master/Reconcil/Add", ischild: 'n', parentid: 0, isactive: 1, data: [] },
@@ -488,7 +487,6 @@
         {
             moduleid: "4", modulename: "Import", type: null, baseUrl: 'import',
             data: [
-                { menuid: "1", icon: "fa fa-home", menuname: "Home", routerlink: "/import", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                 {
                     menuid: "2", icon: "fa fa-folder-o", menuname: "Master", routerlink: "/master", ischild: 'y', parentid: 0, isactive: 1, data: [
                         {
@@ -724,30 +722,9 @@
                 // ] },
 
             
-            ]  },
-       
-        {
-            moduleid: "2", modulename: "Module2", type: null, baseUrl: 'ap',
-            data: [
-                { menuid: "1", icon: "fa fa-users", menuname: "menu1", routerlink: "/ap/dashboard", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                { menuid: "2", icon: "fa fa-users", menuname: "menu1", routerlink: "/ap/dashboard", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                {
-                    menuid: "3", icon: "fa fa-users", menuname: "menu1", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
-                        {
-                            menuid: "3.1", icon: "fa fa-users", menuname: "menu1", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
-                                { menuid: "3.1.1", icon: "fa fa-users", menuname: "menu1", routerlink: "/ap/dashboard", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                                { menuid: "3.1.2", icon: "fa fa-users", menuname: "menu1", routerlink: "/ap/dashboard", ischild: 'n', parentid: 0, isactive: 1, data: [] }
-                            ]
-                        },
-                        { menuid: "3.2", icon: "fa fa-users", menuname: "menu1", routerlink: "/ap/dashboard", ischild: 'n', parentid: 0, isactive: 1, data: [] }
-                    ]
-                }
-            ]
-        }
-
-
-
-
+            ]  }
+        // The 'ap' placeholder menu (moduleid 2, "Module2") was removed: every entry pointed at
+        // an ap dashboard route Links never had, and no module tile selects moduleid 2.
     ]
     };
 }

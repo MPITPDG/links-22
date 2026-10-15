@@ -1,5 +1,4 @@
-import { Component, OnInit, HostListener, ChangeDetectionStrategy } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { Component, HostListener, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { IMyDpOptions } from 'mydatepicker';
 import { DataService } from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
@@ -7,10 +6,16 @@ import { ToastCommonService } from '../../../shared/service/toastService';
 import { LoaderService } from '../../../shared/service/loader.service';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 
+import { FinPager, finFigure } from '../../Accreport/fin-kit';
+/*  Links port of the MPERPNG-20 Finance dashboard (MP commits 2c9513f / 297bee6 / cddd6de).
+    import-page.css and accreport-page.css are GLOBAL in Links (src/styles/kit/*); the host
+    class "kit-accreport" opts this page into the accreport add-on. Only the page's own
+    stylesheet stays component-scoped.                                                      */
 @Component({
     selector: 'app-FinanceDashboard',
     templateUrl: './finance-dashboard.component.html',
-    styleUrls: ['./finance-dashboard.component.css'],
+    styleUrls: ['./finance-dashboard-page.css'],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -20,8 +25,8 @@ export class FinanceDashboardComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {
         dateFormat: 'dd/mm/yyyy',
         inline: false,
-        height: '36px',
-        width: '150px',
+        height: '20px',
+        width: '130px',
         componentDisabled: false,
         selectionTxtFontSize: '12px',
         editableDateField: false,
@@ -45,13 +50,15 @@ export class FinanceDashboardComponent implements OnInit {
     BranchLabel = '';
     ClientCode: any = null;
     ClientList: any[] = [];
-    ClientMaster: any[] = [];      // full client master; ClientList falls back to the search result if it is empty
+    ClientMaster: any[] = [];      // full client master (~13k rows), loaded on first use of the type-ahead
+    ClientMasterState = 'IDLE';    // IDLE | LOADING | READY | FAILED
+    ClientQuery = '';              // what is typed in the client type-ahead
+    ClientPickOpen = false;
     CurrencyMode = 'INR';          // 'INR' | 'TXN'
     TopN = 10;
 
     Searched = false;
-    Tab = 'OVERVIEW';              // OVERVIEW | RECEIVABLES | MARGIN | UNBILLED | PAYABLES | AUDIT
-    DarkMode = false;
+    Tab = 'RECEIVABLES';           // Detail section tabs: RECEIVABLES | MARGIN | UNBILLED | PAYABLES (audit lives in Reference)
 
     /* ---- result sets ---- */
     Kpi: any = null;
@@ -75,6 +82,8 @@ export class FinanceDashboardComponent implements OnInit {
         if (this.MarginBy === mode) { return; }
         this.MarginBy = mode;
         this.MarginOpen = {};      // open drills belong to the other grouping
+        this.marginPager.set(this.MarginSorted());
+        this.BuildMarginBars();
     }
     MarginRows(): any[] { return (this.MarginBy === 'SHIPPER' ? this.MarginShipper : this.Margin) || []; }
     /* the column a margin row is keyed on, and the job field that matches it */
@@ -96,19 +105,26 @@ export class FinanceDashboardComponent implements OnInit {
     AuditDetail: any[] = [];
     AuditLoaded = false;
     AuditLoading = false;
+    AuditUnavailable = false;      // Links: USP_ACC_RPT_FINANCE_DASHBOARD_AUDIT not deployed yet -> empty state
     AuditOpen: any = {};
     ShowPassing = false;
 
     /* ---- payment reminder composer ---- */
     ReminderOpen = false;
+    ReminderClient: any = null;
+    ReminderText = '';
+    ReminderSubject = '';
 
-    /* ---- job profit drawer: the Job Profit statement inside the dashboard (iframe on the
-       existing popup route), so checking many jobs does not mean many windows ---- */
+    /* ---- job profit drawer: a compact Job Profit statement inside the dashboard, from the
+       same proc the popup page uses (ACC_RPT_JOBPROFITS_JOBWISE), so checking many jobs
+       does not mean many windows. The Window button still opens the full popup page. ---- */
     JobDrawerNo: string = null;
-    JobDrawerUrl: SafeResourceUrl = null;
-
-    /* ---- "how is this calculated?" explainer (click on a KPI card icon) ---- */
-    ExplainKey: string = null;
+    JobLoading = false;
+    JobFailed = false;
+    JobInfo: any = {};             // Table1: invoice / party block
+    JobHeads: any[] = [];          // Table2: one row per account head
+    JobIncome = 0;
+    JobExpense = 0;
 
     /* ---- legend / help: what every badge, colour and abbreviation means ---- */
     LegendOpen = false;
@@ -136,9 +152,6 @@ export class FinanceDashboardComponent implements OnInit {
     PayView = 'SUPPLIER';         // SUPPLIER | BILLS | DQ
     PayDqOpen: any = {};
     PayOverdueOnly = false;
-    ReminderClient: any = null;
-    ReminderText = '';
-    ReminderSubject = '';
 
     /* ---- client drill-down ---- */
     DrillClient: any = null;
@@ -146,73 +159,26 @@ export class FinanceDashboardComponent implements OnInit {
     DrillMargin: any[] = [];
     DrillJobs: any[] = [];
 
-    /* ---- charts (ng2-charts / Chart.js 2.8) ---- */
+    /* ---- chart source data (drawn as inline SVG / CSS bars by BuildView, greyscale) ---- */
     recoveryLabels: string[] = [];
     recoveryData: any[] = [];
-    /* palette lifted from the Management Dashboard prototype (shadcn chart tokens):
-       #1447e6 blue, #00bb7f green, #f99c00 amber, #ac4bff purple, #e40014 red */
-    recoveryColors: any[] = [
-        { backgroundColor: '#93b4ff', borderRadius: 4 },
-        { backgroundColor: '#1447e6', borderRadius: 4 }
-    ];
-    barOptions: any = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        tooltips: { backgroundColor: '#171717', xPadding: 10, yPadding: 8, cornerRadius: 8 },
-        scales: {
-            y: {
-                beginAtZero: true, ticks: { color: '#737373' },
-                grid: { color: 'rgba(115,115,115,.12)', borderDash: [4, 4], drawBorder: false },
-                title: { display: true, text: 'Days', color: '#737373' }
-            },
-            x: {
-                ticks: { autoSkip: false, maxRotation: 60, minRotation: 30, color: '#737373' },
-                grid: { display: false }
-            }
-        }
-    };
-
     mixLabels: string[] = [];
-    mixData: number[] = [];
-    mixColors: any[] = [{ backgroundColor: ['#1447e6', '#93b4ff', '#00bb7f', '#8fe6c8', '#f99c00'] }];
-    donutOptions: any = {
-        responsive: true,
-        maintainAspectRatio: false,
-        legend: { position: 'bottom', labels: { usePointStyle: true, color: '#737373', padding: 16 } },
-        tooltips: { backgroundColor: '#171717', xPadding: 10, yPadding: 8, cornerRadius: 8 },
-        cutout: '62%'
-    };
-
+    mixData: any[] = [{ data: [] }];
     ageingLabels: string[] = ['0-30', '31-60', '61-90', '91-120', '121-180', '181-365', '366-730', '731-1095', '1095+'];
     ageingData: any[] = [];
-    /* green -> amber -> red as the bucket ages, like the prototype's status meters */
-    ageingColors: any[] = [{
-        backgroundColor: ['#00bb7f', '#00bb7f', '#00bb7f', '#f99c00', '#f99c00', '#f99c00', '#e40014', '#e40014', '#e40014']
-    }];
-    hbarOptions: any = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        tooltips: { backgroundColor: '#171717', xPadding: 10, yPadding: 8, cornerRadius: 8 },
-        scales: {
-            x: {
-                beginAtZero: true, ticks: { color: '#737373' },
-                grid: { color: 'rgba(115,115,115,.12)', borderDash: [4, 4], drawBorder: false }
-            },
-            y: { ticks: { color: '#737373' }, grid: { display: false } }
-        }
-    };
-
-    private RANK_COLORS = ['#1447e6', '#00bb7f', '#f99c00', '#ac4bff', '#009588', '#e40014', '#737373'];
 
     constructor(private _dataService: DataService,
         private _toasterService: ToastCommonService,
         private loaderService: LoaderService,
         private _loginService: LoginService,
         private exportser: ExportexcelService,
-        private _sanitizer: DomSanitizer
-    ) { }
+        private cdr: ChangeDetectorRef) { }
+
+    /* async HTTP callbacks sometimes leave the view stale in this app; repaint explicitly */
+    private repaint() {
+        this.cdr.markForCheck();
+        try { this.cdr.detectChanges(); } catch (e) { /* view already destroyed */ }
+    }
 
     ngOnInit() {
         /* default period = current Indian financial year to date, built from the JS date
@@ -231,7 +197,6 @@ export class FinanceDashboardComponent implements OnInit {
 
         this.Branch = this._loginService.getLogin()[0].CITYCODE1;
         this.FillBranches();
-        this.FillClients();
 
         const jsonmaster = {
             CmpCode: this._loginService.getLogin()[0].CMPCODE,
@@ -240,9 +205,18 @@ export class FinanceDashboardComponent implements OnInit {
         this._dataService.getData('Accounts/fn_Acc_Rpt_Common_CompanyDetails', jsonmaster)
             .subscribe((data: any) => {
                 if (data && data.Table && data.Table.length > 0) { this.cmpnyname = data.Table[0].cmp_name; }
+                this.repaint();
             });
 
-        /* user form rights - form no 442 = Finance Dashboard */
+        this.VerifyPageRights();
+
+        /* redesign: open on the default period instead of an empty page */
+        this.Submit();
+    }
+
+    /*  Page gating - unchanged from the Links page before the redesign, kept in this one
+        member: user form rights, form no 442 = Finance Dashboard, 'View' right.          */
+    private VerifyPageRights() {
         this._loginService.verifyRights(442, '')
             .subscribe((data: any) => { this._loginService.checkVerify('View', data); });
     }
@@ -256,12 +230,20 @@ export class FinanceDashboardComponent implements OnInit {
             .subscribe((data: any) => {
                 const list = (data && data.Table) ? data.Table : [];
                 this.BranchList = [{ CITYCODE1: 'ALL', CITYNAME: 'ALL BRANCHES (CONSOLIDATED)' }].concat(list);
+                /* the first load can finish before the branch list; fill the label in afterwards */
+                const bsel = this.BranchList.find(b => b.CITYCODE1 === this.Branch);
+                if (bsel && this.Searched) { this.BranchLabel = bsel.CITYNAME; }
+                this.repaint();
             });
     }
 
-    /* client master for the searchable picker (same source as the outstanding screens);
-       ng-select virtual-scrolls, so the full list is fine */
+    /* Client type-ahead. The master (ACC_CMP_FillClient, ~13,000 rows) is fetched once, on
+       first focus, and never bound to a list: matches are filtered client-side only after
+       2+ characters and capped at 20. Until it has loaded (or if it fails) matches come
+       from the clients in the current result, as before the port.                        */
     FillClients() {
+        if (this.ClientMasterState === 'LOADING' || this.ClientMasterState === 'READY') { return; }
+        this.ClientMasterState = 'LOADING';
         const login = this._loginService.getLogin()[0];
         const json = { cmpcode: login.CMPCODE, citycode: login.CITYCODE, citycode1: login.CITYCODE1 };
         this._dataService.getData('Accounts/ACC_CMP_FillClient', json)
@@ -270,9 +252,39 @@ export class FinanceDashboardComponent implements OnInit {
                 this.ClientMaster = rows
                     .map(r => ({ CODE: r.acctcodename || r.ACCTCODENAME || r.acctcode || r.ACCTCODE,
                                  NAME: r.acctname || r.ACCTNAME }))
-                    .filter(r => r.CODE && r.NAME);
-                if (this.ClientMaster.length > 0) { this.ClientList = this.ClientMaster; }
-            }, () => { /* fall back to the result-derived list after the first search */ });
+                    .filter(r => r.CODE && r.NAME)
+                    .map(r => Object.assign(r, { KEY: (r.NAME + ' ' + r.CODE).toUpperCase() }));
+                this.ClientMasterState = 'READY';
+                this.repaint();
+            }, () => { this.ClientMasterState = 'FAILED'; this.repaint(); });
+    }
+    ClientFocus() { this.ClientPickOpen = true; this.FillClients(); }
+    /* delay so a mousedown on a match lands before the list closes */
+    ClientBlur() { setTimeout(() => { this.ClientPickOpen = false; this.repaint(); }, 150); }
+    ClientTyped(q: string) {
+        this.ClientQuery = q;
+        this.ClientPickOpen = true;
+        if (!q) { this.ClientCode = null; }
+    }
+    ClientMatches(): any[] {
+        const q = (this.ClientQuery || '').trim().toUpperCase();
+        if (q.length < 2) { return []; }
+        const src = this.ClientMaster.length ? this.ClientMaster : this.ClientList;
+        const out: any[] = [];
+        for (const c of src) {
+            const key = c.KEY || ((c.NAME || '') + ' ' + (c.CODE || '')).toUpperCase();
+            if (key.indexOf(q) >= 0) { out.push(c); if (out.length >= 20) { break; } }
+        }
+        return out;
+    }
+    PickClient(c: any) {
+        this.ClientCode = c.CODE;
+        this.ClientQuery = c.NAME;
+        this.ClientPickOpen = false;
+        /* remember the name so the active-filter chip can show it */
+        if (!this.ClientList.find(x => x.CODE === c.CODE)) {
+            this.ClientList = this.ClientList.concat([{ CODE: c.CODE, NAME: c.NAME }]);
+        }
     }
 
     /* the pickers hold plain dd/mm/yyyy strings; tolerate an event object too */
@@ -294,8 +306,10 @@ export class FinanceDashboardComponent implements OnInit {
             return;
         }
 
-        this.loaderService.display(true);
-        this.Searched = false;
+        /* redesign: no global blocking loader - skeletons render while Loading is true,
+           so the sidebar stays usable */
+        this.Loading = true;
+        this.LoadFailed = false;
         this.DrillClient = null;
 
         const bsel = this.BranchList.find(b => b.CITYCODE1 === this.Branch);
@@ -313,12 +327,16 @@ export class FinanceDashboardComponent implements OnInit {
 
         this._dataService.getData('Accounts/ACC_RPT_FINANCE_DASHBOARD', jsonItem)
             .subscribe((data: any) => {
-                this.loaderService.display(false);
+                this.Loading = false;
 
                 if (!data || !data.Table || data.Table.length === 0) {
+                    this.Searched = false;
+                    this.NoData = true;
                     this._toasterService.toast('warning', 'warning', 'No Record Found !');
+                    this.repaint();
                     return;
                 }
+                this.NoData = false;
 
                 this.Kpi = data.Table[0];
                 this.Exposure = data.Table1 ? data.Table1 : [];
@@ -339,20 +357,36 @@ export class FinanceDashboardComponent implements OnInit {
                 this.UnbilledOpen = {};
                 /* the audit belongs to a filter set; a new Submit invalidates it */
                 this.AuditLoaded = false;
+                this.AuditUnavailable = false;
                 this.AuditSummary = [];
                 this.AuditDetail = [];
+                /* so do the payables (same period and branch): drop them, and re-fetch
+                   straight away if that tab is the one on screen */
+                this.PayLoaded = false;
+                this.PayKpi = null;
+                this.PayUnlinked = null;
+                this.PayBills = [];
+                this.SetPayDerived();
+                /* payables feed the attention tiles, Act now and This week, so they load with
+                   every Submit now (same call the Payables tab always made). Quiet: an empty
+                   payable result is already said on the tiles, so no extra toast here. */
+                this.LoadPayables(false, true);
+                if (this.RefAuditOpen) { this.LoadAudit(); }
 
-                /* the client filter list is derived from the result, so no extra API call
-                   and no 13,000-row master dropdown */
-                if (this.ClientMaster.length === 0 && !this.ClientCode) {
+                /* clients in the result: the type-ahead's fallback source and the chip's names */
+                if (!this.ClientCode) {
                     this.ClientList = this.Exposure.map(r => ({ CODE: r.CLIENTCODE, NAME: r.CLIENTNAME }));
                 }
 
                 this.BuildCharts();
+                this.BuildView();
                 this.Searched = true;
+                this.repaint();
             }, () => {
-                this.loaderService.display(false);
+                this.Loading = false;
+                this.LoadFailed = true;
                 this._toasterService.toast('error', 'error', 'Error while loading Finance Dashboard !');
+                this.repaint();
             });
     }
 
@@ -370,7 +404,7 @@ export class FinanceDashboardComponent implements OnInit {
         const tf = this.num(this.Kpi.TAXABLE_FX_INR);
         const ntf = this.num(this.Kpi.NONTAXABLE_FX_INR);
         this.mixLabels = ['Taxable (INR)', 'Non-taxable (INR)', 'Taxable (Foreign)', 'Non-taxable (Foreign)'];
-        this.mixData = [t, nt, tf, ntf];
+        this.mixData = [{ data: [t, nt, tf, ntf] }];
 
         /* receivable ageing, summed across the returned clients */
         const cols = ['DAYS_000_030', 'DAYS_031_060', 'DAYS_061_090', 'DAYS_091_120', 'DAYS_121_180',
@@ -391,16 +425,20 @@ export class FinanceDashboardComponent implements OnInit {
     /* re-run the whole dashboard scoped to one client */
     LoadClient(code: string) {
         this.ClientCode = code;
+        const c = this.ClientList.find(x => x.CODE === code);
+        this.ClientQuery = c ? c.NAME : code;
         this.Submit();
     }
     /* name + code for the active-filter chip; falls back to the code alone */
     ClientLabel(): string {
-        const c = this.ClientList.find(x => x.CODE === this.ClientCode);
+        const c = this.ClientList.find(x => x.CODE === this.ClientCode)
+               || this.ClientMaster.find(x => x.CODE === this.ClientCode);
         return c ? (c.NAME + ' (' + c.CODE + ')') : this.ClientCode;
     }
 
     ClearClient() {
         this.ClientCode = null;
+        this.ClientQuery = '';
         this.Submit();
     }
 
@@ -408,7 +446,7 @@ export class FinanceDashboardComponent implements OnInit {
 
     SyncNow() { this.Submit(true); }
 
-    /* ---- AUDIT tab: fetched live on first activation, never with the dashboard ---- */
+    /* ---- AUDIT / PAYABLES tabs: fetched live on first activation, never with the dashboard ---- */
     SetTab(tab: string) {
         this.Tab = tab;
         if (tab === 'AUDIT' && !this.AuditLoaded && !this.AuditLoading) { this.LoadAudit(); }
@@ -419,8 +457,9 @@ export class FinanceDashboardComponent implements OnInit {
        PAYABLES
        Same period and branch as the rest of the screen. SUPPLIERCODE is blank -
        the client filter above belongs to the receivable side and must not leak in.
+       No global loader (redesign): PayLoading drives an inline skeleton.
     --------------------------------------------------------------------------- */
-    LoadPayables(syncNow: boolean = false) {
+    LoadPayables(syncNow: boolean = false, quiet: boolean = false) {
         const from = this.fmtDate(this.FromDate), to = this.fmtDate(this.ToDate);
         if (!from || !to) {
             this._toasterService.toast('warning', 'warning', 'Please select both From and To dates !');
@@ -439,14 +478,13 @@ export class FinanceDashboardComponent implements OnInit {
         };
         if (syncNow) { jsonItem.SYNCNOW = '1'; }
 
-        this.loaderService.display(true);
         this._dataService.getData('Accounts/ACC_RPT_PAYABLE_DASHBOARD', jsonItem)
             .subscribe((data: any) => {
-                this.loaderService.display(false);
                 this.PayLoading = false;
                 if (!data || !data.Table || data.Table.length === 0) {
-                    this._toasterService.toast('warning', 'warning', 'No payable data found for this period !');
+                    if (!quiet) { this._toasterService.toast('warning', 'warning', 'No payable data found for this period !'); }
                     this.PayLoaded = true;
+                    this.repaint();
                     return;
                 }
                 this.PayKpi       = data.Table[0];
@@ -461,14 +499,22 @@ export class FinanceDashboardComponent implements OnInit {
                 this.PayCacheInfo = (data.CACHEINFO && data.CACHEINFO.length) ? data.CACHEINFO[0] : null;
                 this.PayDqOpen    = {};
                 this.PayLoaded    = true;
+                this.paySuppPager.set(this.PaySupp);
+                this.payBillPager.set(this.PayBillRows());
+                this.SetPayDerived();
+                this.repaint();
             }, () => {
-                this.loaderService.display(false);
                 this.PayLoading = false;
                 this._toasterService.toast('error', 'error', 'Error while loading Payables !');
+                this.repaint();
             });
     }
     ReloadPayables() { this.PayLoaded = false; this.LoadPayables(); }
     SyncPayables()   { this.LoadPayables(true); }
+
+    paySuppPager = new FinPager<any>(10);
+    payBillPager = new FinPager<any>(10);
+    SetPayOverdueOnly(v: boolean) { this.PayOverdueOnly = v; this.payBillPager.set(this.PayBillRows()); }
 
     /* rows of the bill worklist, honouring the "overdue only" switch */
     PayBillRows(): any[] {
@@ -518,19 +564,27 @@ export class FinanceDashboardComponent implements OnInit {
             CLIENTCODE: '',
             TOPN: this.TopN
         };
-        this.loaderService.display(true);
+        /* redesign: AuditLoading drives an inline skeleton; no global loader */
         this._dataService.getData('Accounts/ACC_RPT_FINANCE_DASHBOARD_AUDIT', jsonItem)
             .subscribe((data: any) => {
-                this.loaderService.display(false);
                 this.AuditLoading = false;
+                /* The Links API swallows a missing proc and answers 200 with an empty
+                   DataSet. No Table at all = the audit proc is not deployed: say so instead
+                   of "All checks passing" (fail soft, no toast). */
+                this.AuditUnavailable = !(data && data.Table);
                 this.AuditSummary = data && data.Table ? data.Table : [];
                 this.AuditDetail = data && data.Table1 ? data.Table1 : [];
                 this.AuditOpen = {};
                 this.AuditLoaded = true;
+                this.repaint();
             }, () => {
-                this.loaderService.display(false);
+                /* fail soft: empty state in the Reference section, no error toast */
                 this.AuditLoading = false;
-                this._toasterService.toast('error', 'error', 'Error while loading the audit checks !');
+                this.AuditUnavailable = true;
+                this.AuditSummary = [];
+                this.AuditDetail = [];
+                this.AuditLoaded = true;
+                this.repaint();
             });
     }
 
@@ -638,8 +692,85 @@ export class FinanceDashboardComponent implements OnInit {
         area.setSelectionRange(0, 0);
     }
 
-    /* ---- Margin table sort: default client A-Z then service type; click a header to change ---- */
-    /* default: most recently billed client x service first, so the latest billing is on top */
+    fmtINR(v): string {
+        const n = this.num(v);
+        return n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    cacheAge(): string {
+        if (!this.CacheInfo) { return ''; }
+        const s = this.num(this.CacheInfo.AGE_SECONDS);
+        if (s < 90) { return 'just now'; }
+        if (s < 5400) { return Math.round(s / 60) + ' min ago'; }
+        return (s / 3600).toFixed(1) + ' h ago';
+    }
+
+    funnelWidth(f: any): number {
+        const p = this.num(f.PCT_OF_FIRST);
+        return Math.max(12, Math.min(100, p));
+    }
+
+    /* ---- job-level drills (Job Profit grain) ---- */
+    ToggleMargin(code: string) { this.MarginOpen[code] = !this.MarginOpen[code]; }
+    ToggleUnbilled(jobno: string) { this.UnbilledOpen[jobno] = !this.UnbilledOpen[jobno]; }
+
+    /* jobs behind one Margin row: same client AND same service type (the template
+       passes both; filtering by client alone repeated every job under every type) */
+    JobsFor(client: string, svc?: string): any[] {
+        const t = (svc || '').toUpperCase().trim();
+        /* children follow the parent: Last Billed newest first (or oldest first if the
+           header arrow is flipped); never-billed jobs sink to the bottom, by job date */
+        const dir = (this.MarginSortKey === 'LAST_BILLED_YMD') ? this.MarginSortDir : -1;
+        return this.JobRowsFor(client)
+            .filter(j => !t || (j.SERVICE_TYPE || '').toUpperCase().trim() === t)
+            .sort((a, b) => {
+                const ab = this.ymd(a.LAST_BILLED), bb = this.ymd(b.LAST_BILLED);
+                if (ab && !bb) { return -1; }
+                if (!ab && bb) { return 1; }
+                const r = ab.localeCompare(bb) * dir;
+                return r || this.ymd(a.JOB_DATE).localeCompare(this.ymd(b.JOB_DATE)) * dir
+                         || (a.JOBNO || '').localeCompare(b.JOBNO || '');
+            });
+    }
+    /*  The jobs under a Margin row. In the Shipper view that is simply the job's own P&L.
+        In the Billed-party view a job billed to several parties shows THIS client's share:
+        its own invoices as income, and the cost of the charges it was billed for (Table13,
+        split in the procedure). SPLIT tells the row how many parties share the job.     */
+    private JobRowsFor(client: string): any[] {
+        if (this.MarginBy === 'SHIPPER' || !this.JobSplit.length) {
+            const key = this.MarginKey();
+            return this.JobPL.filter(j => (j[key] || j.CLIENTCODE) === client);
+        }
+        const jobs: any = {};
+        this.JobPL.forEach(j => { jobs[(j.JOBNO || '').toString().trim()] = j; });
+        return this.JobSplit
+            .filter(s => s.CLIENTCODE === client)
+            .map(s => {
+                const j = jobs[(s.JOBNO || '').toString().trim()] || {};
+                return Object.assign({}, j, {
+                    JOBNO: s.JOBNO,
+                    INCOME: s.INCOME, EXPENSE: s.EXPENSE, PROFIT: s.PROFIT, PROFIT_PCT: s.PROFIT_PCT,
+                    LAST_BILLED: s.LAST_BILLED || j.LAST_BILLED,
+                    SPLIT: this.num(s.CLIENTS_ON_JOB), UNMATCHED: this.num(s.UNMATCHED_COST),
+                    JOB_INCOME: j.INCOME, JOB_EXPENSE: j.EXPENSE
+                });
+            });
+    }
+
+    /* dd/MM/yyyy -> yyyyMMdd so job dates sort chronologically */
+    private ymd(d: string): string {
+        const s = (d || '').toString();
+        return s.length === 10 ? s.substr(6, 4) + s.substr(3, 2) + s.substr(0, 2) : s;
+    }
+    /* voucher lines under an unbilled job: by voucher date, then type, then number */
+    LinesFor(jobno: string): any[] {
+        return this.UnbilledLines.filter(l => l.JOBNO === jobno)
+            .sort((a, b) => this.ymd(a.REF_DATE).localeCompare(this.ymd(b.REF_DATE))
+                || (a.VCH_TYPE || a.SOURCE_ || '').localeCompare(b.VCH_TYPE || b.SOURCE_ || '')
+                || (a.REFNO || '').localeCompare(b.REFNO || ''));
+    }
+
+    /* ---- Margin table sort: default most recently billed client x service first; click a header to change ---- */
     MarginSortKey = 'LAST_BILLED_YMD';
     MarginSortDir = -1;           // 1 asc, -1 desc
     SortMargin(key: string) {
@@ -649,6 +780,7 @@ export class FinanceDashboardComponent implements OnInit {
             /* text columns start ascending, figures start with the biggest first */
             this.MarginSortDir = (key === 'CLIENTNAME' || key === 'SERVICE_TYPE') ? 1 : -1;
         }
+        this.marginPager.set(this.MarginSorted());
     }
     sortArrow(key: string): string {
         return this.MarginSortKey === key ? (this.MarginSortDir === 1 ? '▲' : '▼') : '';
@@ -677,7 +809,39 @@ export class FinanceDashboardComponent implements OnInit {
         });
     }
 
-    /* ERP voucher-type abbreviations -> full name (tooltip on the voucher pill) */
+    /* ---- Unbilled table sort: default OLDEST first (a billing worklist), then biggest cost ---- */
+    UnbilledSortKey = 'AGE_DAYS';
+    UnbilledSortDir = -1;
+    SortUnbilled(key: string) {
+        if (this.UnbilledSortKey === key) { this.UnbilledSortDir = -this.UnbilledSortDir; }
+        else {
+            this.UnbilledSortKey = key;
+            const text = (key === 'JOBNO' || key === 'MODE_' || key === 'CLIENTNAME' || key === 'JOB_DATE');
+            this.UnbilledSortDir = text ? 1 : -1;      /* text & date ascending, figures biggest first */
+        }
+        this.unbilledPager.set(this.UnbilledSorted());
+    }
+    usortArrow(key: string): string {
+        return this.UnbilledSortKey === key ? (this.UnbilledSortDir === 1 ? '▲' : '▼') : '';
+    }
+    UnbilledSorted(): any[] {
+        const k = this.UnbilledSortKey, d = this.UnbilledSortDir;
+        const text = (k === 'JOBNO' || k === 'MODE_' || k === 'CLIENTNAME' || k === 'JOB_DATE');
+        return (this.UnbilledJobs || []).slice().sort((a, b) => {
+            let r: number;
+            if (k === 'JOB_DATE') { r = this.ymd(a.JOB_DATE).localeCompare(this.ymd(b.JOB_DATE)); }
+            else if (text) {
+                const av = (a[k] || '').toString().toUpperCase(), bv = (b[k] || '').toString().toUpperCase();
+                r = av < bv ? -1 : av > bv ? 1 : 0;
+            } else { r = this.num(a[k]) - this.num(b[k]); }
+            if (r !== 0) { return r * d; }
+            /* tie-breakers: biggest cost, then oldest */
+            return (this.num(b.TOTAL_COST) - this.num(a.TOTAL_COST))
+                || (this.num(b.AGE_DAYS) - this.num(a.AGE_DAYS));
+        });
+    }
+
+    /* ERP voucher-type abbreviations -> full name (tooltip on the voucher chip) */
     vchName(t: string): string {
         switch ((t || '').toUpperCase().trim()) {
             case 'II': return 'Invoice';
@@ -709,14 +873,147 @@ export class FinanceDashboardComponent implements OnInit {
         }
     }
 
-    /* ======================= KPI explainers ======================= */
-    /*  The Outstanding card used to print "Bills pending" and "Unapplied credit" next to
-        each other, and the two do not subtract to the headline - credit is netted PER
-        CLIENT in the proc, so a customer holding more credit than open bills cannot pay
-        off anybody else's bills. Split the credit into the part that actually knocked
-        bills off (this always reconciles: pending - applied = outstanding) and the part
-        left stranded. Computed here as well as in the proc, so the screen reads right
-        whichever order the build and the SQL are deployed in.                          */
+    /* job number click -> in-page drawer (stays on the dashboard). One call, the same one
+       the Account-Job-Profit-Report popup makes; shows the heads only - the Window button
+       opens the full voucher-level page. */
+    OpenJobDrawer(jobno: string) {
+        const no = String(jobno || '').replace(/^'/, '').trim();
+        if (!no) { return; }
+        this.JobDrawerNo = no;
+        this.JobLoading = true;
+        this.JobFailed = false;
+        this.JobInfo = {};
+        this.JobHeads = [];
+        this.JobIncome = 0;
+        this.JobExpense = 0;
+        this._dataService.getData('Accounts/ACC_RPT_JOBPROFITS_JOBWISE', { JOBNO: no })
+            .subscribe((data: any) => {
+                if (this.JobDrawerNo !== no) { return; }      // closed, or another job opened meanwhile
+                this.JobLoading = false;
+                if (!data || !data.Table || data.Table.length === 0) { this.JobFailed = true; this.repaint(); return; }
+                this.JobInfo = (data.Table1 && data.Table1.length) ? data.Table1[0] : {};
+                this.JobHeads = data.Table2 || [];
+                const g = (data.Table4 && data.Table4.length) ? data.Table4[0] : {};
+                /* GRAND_DIFFAMT is unsigned in the proc; profit = income - expense, signed */
+                this.JobIncome = this.num(g.GRAND_RECOVERYAMT);
+                this.JobExpense = this.num(g.GRAND_PAIDAMT);
+                this.repaint();
+            }, () => {
+                if (this.JobDrawerNo !== no) { return; }
+                this.JobLoading = false;
+                this.JobFailed = true;
+                this.repaint();
+            });
+    }
+    CloseJobDrawer() { this.JobDrawerNo = null; this.JobLoading = false; }
+    JobProfit(): number { return this.JobIncome - this.JobExpense; }
+    JobMarginPct(): number { return this.JobIncome !== 0 ? this.JobProfit() / this.JobIncome * 100 : null; }
+    JobHeadDiff(g: any): number { return this.num(g.RECOVERYAMT) - this.num(g.PAIDAMT); }
+    JobClient(): string {
+        const t = (v) => (v === null || v === undefined) ? '' : v.toString().trim();
+        return t(this.JobInfo.EXP_NAME) || t(this.JobInfo.BILLTO_NAME) || t(this.JobInfo.EXPORTER_NAME) || '-';
+    }
+
+    /* full voucher-level statement for one job - the existing Job Profit popup page */
+    OpenJobPopup(jobno: string) {
+        const theTop = (screen.height / 2) - (483 / 2);
+        const theLeft = (screen.width / 2) - (780 / 2);
+        const toolbar = 'resizable=no,scrollbars=yes,width=800,height=450,status=no,left=' + theLeft + ',top=' + theTop;
+        window.open('./#/popup/Account-Job-Profit-Report/' + String(jobno).replace(/^'/, '') + '/', 'Job Profit Report', toolbar);
+    }
+
+    Reset() {
+        const today = new Date();
+        const fyStartYear = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
+        this.FromDate = this._dataService.datechnge(new Date(fyStartYear, 3, 1));
+        this.ToDate = this._dataService.datechnge(today);
+        this.Branch = this._loginService.getLogin()[0].CITYCODE1;
+        this.ClientCode = null;
+        this.ClientQuery = '';
+        this.TopN = 10;
+        this.Searched = false;
+        this.Tab = 'RECEIVABLES';
+        this.RefAuditOpen = false;
+        this.DrillClient = null;
+    }
+
+    /* ---- helpers ---- */
+    num(v): number {
+        const n = parseFloat(v);
+        return isNaN(n) ? 0 : n;
+    }
+
+    shortName(n: string): string {
+        if (!n) { return ''; }
+        return n.length > 18 ? n.substring(0, 18) + '..' : n;
+    }
+
+    /* compact Indian display for the KPI cards: 1,23,45,678 -> 1.23 Cr */
+    /** KPI tile: number and unit split so the unit is set smaller (display only). */
+    fig(s: any) { return finFigure(s); }
+
+    fmtShort(v): string {
+        const n = this.num(v);
+        const a = Math.abs(n);
+        const sign = n < 0 ? '-' : '';
+        if (a >= 10000000) { return sign + (a / 10000000).toFixed(2) + ' Cr'; }
+        if (a >= 100000) { return sign + (a / 100000).toFixed(2) + ' L'; }
+        return sign + a.toFixed(0);
+    }
+
+    pillClass(status: string): string {
+        switch (status) {
+            case 'RED': return 'fd-pill--red';
+            case 'AMBER': return 'fd-pill--amber';
+            case 'GREEN': return 'fd-pill--green';
+            default: return 'fd-pill--grey';
+        }
+    }
+
+    meterClass(status: string): string {
+        switch (status) {
+            case 'RED': return 'bad';
+            case 'AMBER': return 'warn';
+            case 'GREEN': return 'ok';
+            default: return '';
+        }
+    }
+
+    iconClass(status: string): string {
+        switch (status) {
+            case 'RED': return 'fd-ico--red';
+            case 'AMBER': return 'fd-ico--amber';
+            case 'GREEN': return 'fd-ico--green';
+            default: return 'fd-ico--blue';
+        }
+    }
+
+    /* width of the utilisation bar, capped so a 400% client does not overflow the cell */
+    utilWidth(v): number {
+        const n = this.num(v);
+        return n > 100 ? 100 : (n < 0 ? 0 : n);
+    }
+
+    pctOf(part, whole): number {
+        const w = this.num(whole);
+        if (w <= 0) { return 0; }
+        const p = this.num(part) / w * 100;
+        return p > 100 ? 100 : (p < 0 ? 0 : p);
+    }
+
+    taxablePct(): number {
+        if (!this.Kpi) { return 0; }
+        const tax = this.num(this.Kpi.TAXABLE_INR) + this.num(this.Kpi.TAXABLE_FX_INR);
+        const all = tax + this.num(this.Kpi.NONTAXABLE_INR) + this.num(this.Kpi.NONTAXABLE_FX_INR);
+        return all > 0 ? tax / all * 100 : 0;
+    }
+
+    deltaArrow(v): string {
+        const n = this.num(v);
+        return n > 0 ? '↗' : (n < 0 ? '↘' : '→');
+    }
+
+    /* ======================= Outstanding card ======================= */
     /*  Outstanding is a position AS ON the To date, so it carries unpaid bills from
         every year - on Links about 20cr of the 43cr pending was raised before the
         current financial year. People read the date filter as "this period", so the
@@ -739,6 +1036,13 @@ export class FinanceDashboardComponent implements OnInit {
         return best ? best.CLIENTNAME + ' ' + this.fmtShort(bestAmt) : '';
     }
 
+    /*  The Outstanding card used to print "Bills pending" and "Unapplied credit" next to
+        each other, and the two do not subtract to the headline - credit is netted PER
+        CLIENT in the proc, so a customer holding more credit than open bills cannot pay
+        off anybody else's bills. Split the credit into the part that actually knocked
+        bills off (this always reconciles: pending - applied = outstanding) and the part
+        left stranded. Computed here as well as in the proc, so the screen reads right
+        whichever order the build and the SQL are deployed in.                          */
     CreditApplied(): number {
         const k: any = this.Kpi || {};
         if (k.CREDIT_APPLIED !== undefined && k.CREDIT_APPLIED !== null) { return +k.CREDIT_APPLIED; }
@@ -751,15 +1055,15 @@ export class FinanceDashboardComponent implements OnInit {
         return (+k.UNADJUSTED_CREDITS || 0) - this.CreditApplied();
     }
 
-    OpenExplain(key: string) { this.ExplainKey = key; this.EvidenceAll = false; }
-
-    /*  "Where does this number come from?" is answered twice over: the arithmetic
-        strip above, and THIS - the actual rows that add up to it, straight from the
-        result sets already on the page. No extra call, no new proc. A figure a person
-        can click through to a named client, a job number and an amount is a figure
-        they can check against their own register, which is the only way a dashboard
-        earns trust. Ten rows are shown; Export writes the full list to Excel.       */
+    /* ======================= KPI card -> the rows behind its figure ======================= */
+    /*  A figure a person can click through to a named client, a job number and an amount
+        is a figure they can check against their own register. Clicking a KPI card opens
+        the actual rows that add up to it, straight from the result sets already on the
+        page - no extra call, no new proc. Ten rows are shown; Export writes the full list. */
+    ExplainKey: string = null;
     EvidenceAll = false;
+    OpenExplain(key: string) { this.ExplainKey = key; this.EvidenceAll = false; }
+    CloseExplain() { this.ExplainKey = null; }
     ToggleEvidenceAll() { this.EvidenceAll = !this.EvidenceAll; }
 
     private evidenceDef(): any {
@@ -768,6 +1072,7 @@ export class FinanceDashboardComponent implements OnInit {
         const by = (arr: any[], f: string) => arr.slice().sort((a, b) => this.num(b[f]) - this.num(a[f]));
         switch (k) {
             case 'EXPOSURE': return {
+                title: 'Total exposure',
                 note: 'Every client with money at stake, biggest first. Outstanding is what is billed and unpaid; '
                     + 'Unbilled is cost booked on jobs not yet invoiced. The two added together is the exposure on the card.',
                 cols: [{ k: 'CLIENTNAME', label: 'Client' },
@@ -778,6 +1083,7 @@ export class FinanceDashboardComponent implements OnInit {
                 file: 'Exposure'
             };
             case 'OUTSTANDING': return {
+                title: 'Outstanding (net)',
                 note: 'Bill-wise pending per client, less the on-account credit set against that same client. '
                     + 'Credit is never moved from one client to another, which is why the column does not simply subtract across the page.',
                 cols: [{ k: 'CLIENTNAME', label: 'Client' },
@@ -790,6 +1096,7 @@ export class FinanceDashboardComponent implements OnInit {
                 file: 'Outstanding'
             };
             case 'RECOVERY': return {
+                title: 'Recovery',
                 note: 'How long each client actually takes to pay, against the credit period agreed with them. '
                     + 'The card shows the value-weighted average, so a large slow client counts more than a small one.',
                 cols: [{ k: 'CLIENTNAME', label: 'Client' },
@@ -801,6 +1108,7 @@ export class FinanceDashboardComponent implements OnInit {
                 file: 'Recovery'
             };
             case 'BILLED': return {
+                title: 'Billed in period',
                 note: 'Invoice value raised in the selected period, client by client. This is the bill value, '
                     + 'not what has been collected - collection is on the Recovery card.',
                 cols: [{ k: 'CLIENTNAME', label: 'Client' },
@@ -810,6 +1118,7 @@ export class FinanceDashboardComponent implements OnInit {
                 totalKey: 'BILLED_PERIOD', totalLabel: 'Billed in period', file: 'Billed'
             };
             case 'UNBILLED': return {
+                title: 'Unbilled (cost)',
                 note: 'Each job that has cost booked against it but no invoice yet. Every rupee here is our money '
                     + 'until the bill goes out. Open the Unbilled tab to see the voucher lines behind a job.',
                 cols: [{ k: 'JOBNO', label: 'Job no' },
@@ -821,6 +1130,7 @@ export class FinanceDashboardComponent implements OnInit {
                 file: 'Unbilled'
             };
             case 'MARGIN': return {
+                title: 'Margin',
                 note: 'Income less job cost from the ledger, by client and type of work - the same rows as the Margin tab, '
                     + 'grouped by ' + (this.MarginBy === 'SHIPPER' ? 'the shipper.' : 'the party that was billed.'),
                 cols: [{ k: 'CLIENTNAME', label: this.MarginBy === 'SHIPPER' ? 'Shipper' : 'Client (billed)' },
@@ -856,20 +1166,19 @@ export class FinanceDashboardComponent implements OnInit {
                 + this.fmtDate(this.FromDate) + ' to ' + this.fmtDate(this.ToDate)
         }, 'FinanceDashboard_' + d.file + '_');
     }
-    CloseExplain() { this.ExplainKey = null; }
 
     /* full-rupee figure for the arithmetic lines (the cards show the short form) */
     fmtRs(v): string { return 'Rs. ' + this.fmtINR(v); }
 
     /* Builds the explanation for the open card from the live KPI row, so the
        arithmetic a layman sees is exactly the numbers on the card. */
-    explain(): any {
+    explain(key: string = this.ExplainKey): any {
         const k = this.Kpi || {};
         const p = this.PayKpi || {};      // PAYABLES cards read their own KPI row
         const n = (v) => this.num(v);
         const period = this.fmtDate(this.FromDate) + ' to ' + this.fmtDate(this.ToDate);
         const asOn = this.fmtDate(this.ToDate);
-        switch (this.ExplainKey) {
+        switch (key) {
             case 'EXPOSURE': return {
                 title: 'Total Exposure',
                 what: 'All the money currently tied up with customers: what they owe us on bills, plus the cost we have already '
@@ -1117,231 +1426,14 @@ export class FinanceDashboardComponent implements OnInit {
         return null;
     }
 
-    fmtINR(v): string {
-        const n = this.num(v);
-        return n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
-    cacheAge(): string {
-        if (!this.CacheInfo) { return ''; }
-        const s = this.num(this.CacheInfo.AGE_SECONDS);
-        if (s < 90) { return 'just now'; }
-        if (s < 5400) { return Math.round(s / 60) + ' min ago'; }
-        return (s / 3600).toFixed(1) + ' h ago';
-    }
-
-    funnelWidth(f: any): number {
-        const p = this.num(f.PCT_OF_FIRST);
-        return Math.max(12, Math.min(100, p));
-    }
-
-    /* ---- job-level drills (Job Profit grain) ---- */
-    ToggleMargin(code: string) { this.MarginOpen[code] = !this.MarginOpen[code]; }
-    ToggleUnbilled(jobno: string) { this.UnbilledOpen[jobno] = !this.UnbilledOpen[jobno]; }
-
-    /* jobs behind one Margin row: same client AND same service type (the template
-       passes both; filtering by client alone repeated every job under every type) */
-    JobsFor(client: string, svc?: string): any[] {
-        const t = (svc || '').toUpperCase().trim();
-        /* children follow the parent: Last Billed newest first (or oldest first if the
-           header arrow is flipped); never-billed jobs sink to the bottom, by job date */
-        const dir = (this.MarginSortKey === 'LAST_BILLED_YMD') ? this.MarginSortDir : -1;
-        return this.JobRowsFor(client)
-            .filter(j => !t || (j.SERVICE_TYPE || '').toUpperCase().trim() === t)
-            .sort((a, b) => {
-                const ab = this.ymd(a.LAST_BILLED), bb = this.ymd(b.LAST_BILLED);
-                if (ab && !bb) { return -1; }
-                if (!ab && bb) { return 1; }
-                const r = ab.localeCompare(bb) * dir;
-                return r || this.ymd(a.JOB_DATE).localeCompare(this.ymd(b.JOB_DATE)) * dir
-                         || (a.JOBNO || '').localeCompare(b.JOBNO || '');
-            });
-    }
-    /*  The jobs under a Margin row. In the Shipper view that is simply the job's own P&L.
-        In the Billed-party view a job billed to several parties shows THIS client's share:
-        its own invoices as income, and the cost of the charges it was billed for (Table13,
-        split in the procedure). SPLIT tells the row how many parties share the job.     */
-    private JobRowsFor(client: string): any[] {
-        if (this.MarginBy === 'SHIPPER' || !this.JobSplit.length) {
-            const key = this.MarginKey();
-            return this.JobPL.filter(j => (j[key] || j.CLIENTCODE) === client);
-        }
-        const jobs: any = {};
-        this.JobPL.forEach(j => { jobs[(j.JOBNO || '').toString().trim()] = j; });
-        return this.JobSplit
-            .filter(s => s.CLIENTCODE === client)
-            .map(s => {
-                const j = jobs[(s.JOBNO || '').toString().trim()] || {};
-                return Object.assign({}, j, {
-                    JOBNO: s.JOBNO,
-                    INCOME: s.INCOME, EXPENSE: s.EXPENSE, PROFIT: s.PROFIT, PROFIT_PCT: s.PROFIT_PCT,
-                    LAST_BILLED: s.LAST_BILLED || j.LAST_BILLED,
-                    SPLIT: this.num(s.CLIENTS_ON_JOB), UNMATCHED: this.num(s.UNMATCHED_COST),
-                    JOB_INCOME: j.INCOME, JOB_EXPENSE: j.EXPENSE
-                });
-            });
-    }
-
-    /* dd/MM/yyyy -> yyyyMMdd so job dates sort chronologically */
-    private ymd(d: string): string {
-        const s = (d || '').toString();
-        return s.length === 10 ? s.substr(6, 4) + s.substr(3, 2) + s.substr(0, 2) : s;
-    }
-    /* voucher lines under an unbilled job: by voucher date, then type, then number */
-    LinesFor(jobno: string): any[] {
-        return this.UnbilledLines.filter(l => l.JOBNO === jobno)
-            .sort((a, b) => this.ymd(a.REF_DATE).localeCompare(this.ymd(b.REF_DATE))
-                || (a.VCH_TYPE || a.SOURCE_ || '').localeCompare(b.VCH_TYPE || b.SOURCE_ || '')
-                || (a.REFNO || '').localeCompare(b.REFNO || ''));
-    }
-
-    /* ---- Unbilled table sort: default OLDEST first (a billing worklist), then biggest cost ---- */
-    UnbilledSortKey = 'AGE_DAYS';
-    UnbilledSortDir = -1;
-    SortUnbilled(key: string) {
-        if (this.UnbilledSortKey === key) { this.UnbilledSortDir = -this.UnbilledSortDir; }
-        else {
-            this.UnbilledSortKey = key;
-            const text = (key === 'JOBNO' || key === 'MODE_' || key === 'CLIENTNAME' || key === 'JOB_DATE');
-            this.UnbilledSortDir = text ? 1 : -1;      /* text & date ascending, figures biggest first */
-        }
-    }
-    usortArrow(key: string): string {
-        return this.UnbilledSortKey === key ? (this.UnbilledSortDir === 1 ? '\u25B2' : '\u25BC') : '';
-    }
-    UnbilledSorted(): any[] {
-        const k = this.UnbilledSortKey, d = this.UnbilledSortDir;
-        const text = (k === 'JOBNO' || k === 'MODE_' || k === 'CLIENTNAME' || k === 'JOB_DATE');
-        return (this.UnbilledJobs || []).slice().sort((a, b) => {
-            let r: number;
-            if (k === 'JOB_DATE') { r = this.ymd(a.JOB_DATE).localeCompare(this.ymd(b.JOB_DATE)); }
-            else if (text) {
-                const av = (a[k] || '').toString().toUpperCase(), bv = (b[k] || '').toString().toUpperCase();
-                r = av < bv ? -1 : av > bv ? 1 : 0;
-            } else { r = this.num(a[k]) - this.num(b[k]); }
-            if (r !== 0) { return r * d; }
-            /* tie-breakers: biggest cost, then oldest */
-            return (this.num(b.TOTAL_COST) - this.num(a.TOTAL_COST))
-                || (this.num(b.AGE_DAYS) - this.num(a.AGE_DAYS));
-        });
-    }
-
-    /* full voucher-level statement for one job - the existing Job Profit popup page */
-    /* job number click -> drawer (stays on the dashboard); the arrow icon still opens the detached window */
-    OpenJobDrawer(jobno: string) {
-        const no = String(jobno || '').replace(/^'/, '').trim();
-        if (!no) { return; }
-        this.JobDrawerNo = no;
-        this.JobDrawerUrl = this._sanitizer.bypassSecurityTrustResourceUrl('./#/popup/Account-Job-Profit-Report/' + no + '/');
-    }
-    CloseJobDrawer() { this.JobDrawerNo = null; this.JobDrawerUrl = null; }
+    /* Esc closes the top-most overlay: job drawer, then the KPI popup, the reminder and the
+       client popup. The legend is an inline Reference section now, so Esc leaves it alone. */
     @HostListener('document:keydown.escape')
     onEsc() {
         if (this.JobDrawerNo) { this.CloseJobDrawer(); }
-        else if (this.LegendOpen) { this.LegendOpen = false; }
         else if (this.ExplainKey) { this.CloseExplain(); }
-    }
-
-    OpenJobPopup(jobno: string) {
-        const theTop = (screen.height / 2) - (483 / 2);
-        const theLeft = (screen.width / 2) - (780 / 2);
-        const toolbar = 'resizable=no,scrollbars=yes,width=800,height=450,status=no,left=' + theLeft + ',top=' + theTop;
-        window.open('./#/popup/Account-Job-Profit-Report/' + String(jobno).replace(/^'/, '') + '/', 'Job Profit Report', toolbar);
-    }
-
-    Reset() {
-        const today = new Date();
-        const fyStartYear = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
-        this.FromDate = this._dataService.datechnge(new Date(fyStartYear, 3, 1));
-        this.ToDate = this._dataService.datechnge(today);
-        this.Branch = this._loginService.getLogin()[0].CITYCODE1;
-        this.ClientCode = null;
-        this.TopN = 10;
-        this.Searched = false;
-        this.Tab = 'OVERVIEW';
-        this.DrillClient = null;
-    }
-
-    /* ---- helpers ---- */
-    num(v): number {
-        const n = parseFloat(v);
-        return isNaN(n) ? 0 : n;
-    }
-
-    shortName(n: string): string {
-        if (!n) { return ''; }
-        return n.length > 18 ? n.substring(0, 18) + '..' : n;
-    }
-
-    /* compact Indian display for the KPI cards: 1,23,45,678 -> 1.23 Cr */
-    fmtShort(v): string {
-        const n = this.num(v);
-        const a = Math.abs(n);
-        const sign = n < 0 ? '-' : '';
-        if (a >= 10000000) { return sign + (a / 10000000).toFixed(2) + ' Cr'; }
-        if (a >= 100000) { return sign + (a / 100000).toFixed(2) + ' L'; }
-        return sign + a.toFixed(0);
-    }
-
-    pillClass(status: string): string {
-        switch (status) {
-            case 'RED': return 'fd-pill--red';
-            case 'AMBER': return 'fd-pill--amber';
-            case 'GREEN': return 'fd-pill--green';
-            default: return 'fd-pill--grey';
-        }
-    }
-
-    meterClass(status: string): string {
-        switch (status) {
-            case 'RED': return 'bad';
-            case 'AMBER': return 'warn';
-            case 'GREEN': return 'ok';
-            default: return '';
-        }
-    }
-
-    iconClass(status: string): string {
-        switch (status) {
-            case 'RED': return 'fd-ico--red';
-            case 'AMBER': return 'fd-ico--amber';
-            case 'GREEN': return 'fd-ico--green';
-            default: return 'fd-ico--blue';
-        }
-    }
-
-    /* width of the utilisation bar, capped so a 400% client does not overflow the cell */
-    utilWidth(v): number {
-        const n = this.num(v);
-        return n > 100 ? 100 : (n < 0 ? 0 : n);
-    }
-
-    pctOf(part, whole): number {
-        const w = this.num(whole);
-        if (w <= 0) { return 0; }
-        const p = this.num(part) / w * 100;
-        return p > 100 ? 100 : (p < 0 ? 0 : p);
-    }
-
-    taxablePct(): number {
-        if (!this.Kpi) { return 0; }
-        const tax = this.num(this.Kpi.TAXABLE_INR) + this.num(this.Kpi.TAXABLE_FX_INR);
-        const all = tax + this.num(this.Kpi.NONTAXABLE_INR) + this.num(this.Kpi.NONTAXABLE_FX_INR);
-        return all > 0 ? tax / all * 100 : 0;
-    }
-
-    deltaArrow(v): string {
-        const n = this.num(v);
-        return n > 0 ? '↗' : (n < 0 ? '↘' : '→');
-    }
-
-    rankColor(i: number): string {
-        return this.RANK_COLORS[i % this.RANK_COLORS.length];
-    }
-
-    bucketColor(sortOrder): string {
-        const n = this.num(sortOrder);
-        return n <= 1 ? '#00bb7f' : (n === 2 ? '#f99c00' : (n === 3 ? '#f05100' : '#e40014'));
+        else if (this.ReminderOpen) { this.CloseReminder(); }
+        else if (this.DrillClient) { this.CloseDrill(); }
     }
 
     ExportExposure() {
@@ -1360,5 +1452,143 @@ export class FinanceDashboardComponent implements OnInit {
                 + this.fmtDate(this.FromDate) + ' to ' + this.fmtDate(this.ToDate)
         };
         this.exportser.exportExceltry(reportData, 'FinanceDashboard_Exposure_');
+    }
+
+    // ---- redesign: view state, pagers and inline-SVG chart geometry (display only) ----
+    Loading = false;
+    LoadFailed = false;
+    NoData = false;
+    expPager = new FinPager<any>(10);
+    agePager = new FinPager<any>(10);
+    marginPager = new FinPager<any>(10);
+    unbilledPager = new FinPager<any>(10);
+    RecoveryBars: { label: string; x: number; cw: number; ch: number; aw: number; ah: number; credit: number; actual: number }[] = [];
+    RecoveryGrid: { y: number; label: string }[] = [];
+    readonly recW = 760;
+    readonly recH = 220;
+    AgeingBars: { label: string; value: number; pct: number }[] = [];
+    MixBars: { label: string; value: number; pct: number }[] = [];
+    CoverageBars: { label: string; value: number; pct: number }[] = [];
+
+    BuildView() {
+        this.expPager.set(this.Exposure);
+        this.agePager.set(this.Ageing);
+        this.marginPager.set(this.MarginSorted());
+        this.unbilledPager.set(this.UnbilledSorted());
+        this.actRecPager.set((this.Exposure || []).filter(r => this.num(r.OVERDUE) > 0.01)
+            .sort((a, b) => this.num(b.OVERDUE) - this.num(a.OVERDUE)));
+        this.actUnbPager.set((this.UnbilledJobs || []).slice()
+            .sort((a, b) => this.num(b.AGE_DAYS) - this.num(a.AGE_DAYS)));
+        this.BuildMarginBars();
+
+        /* credit period vs actual recovery days (same fields BuildCharts uses) */
+        const rows = this.Recovery || [];
+        const l = 40, r = 10, t = 10, b = 40;
+        const max = Math.max(1, ...rows.map(x => Math.max(this.num(x.CREDIT_PERIOD), this.num(x.ACTUAL_DAYS_WTD))));
+        const plotH = this.recH - t - b, slot = rows.length ? (this.recW - l - r) / rows.length : 0;
+        const bw = Math.max(3, Math.min(18, slot * 0.34));
+        /* a prepaid client has NEGATIVE recovery days: draw it as a zero-height bar (the
+           tooltip still shows the real figure) instead of an invalid negative <rect> height */
+        const yOf = (v: number) => t + plotH - (Math.max(0, v) / max) * plotH;
+        this.RecoveryBars = rows.map((x, i) => {
+            const c = this.num(x.CREDIT_PERIOD), a = this.num(x.ACTUAL_DAYS_WTD);
+            const cx = l + i * slot + slot / 2 - bw - 1;
+            return { label: this.shortName(x.CLIENTNAME), x: cx, cw: bw, ch: yOf(c), aw: bw, ah: yOf(a), credit: c, actual: a };
+        });
+        this.RecoveryGrid = [0, 0.25, 0.5, 0.75, 1].map(f => ({ y: yOf(max * f), label: String(Math.round(max * f)) }));
+
+        const share = (items: { label: string; value: number }[]) => {
+            const tot = items.reduce((s, x) => s + Math.max(0, x.value), 0) || 1;
+            return items.map(x => ({ label: x.label, value: x.value, pct: Math.max(0, Math.min(100, x.value / tot * 100)) }));
+        };
+        const ageTotals = (this.ageingData && this.ageingData[0] && this.ageingData[0].data) ? this.ageingData[0].data : [];
+        this.AgeingBars = share(this.ageingLabels.map((lab, i) => ({ label: lab + ' days', value: this.num(ageTotals[i]) })));
+        this.MixBars = share(this.mixLabels.map((lab, i) => ({ label: lab, value: this.num(this.mixData[0].data[i]) })));
+        const cv = this.Coverage;
+        this.CoverageBars = cv ? share([
+            { label: 'Billed within 7 days', value: this.num(cv.LAG_0_7) },
+            { label: '8 - 15 days', value: this.num(cv.LAG_8_15) },
+            { label: '16 - 30 days', value: this.num(cv.LAG_16_30) },
+            { label: '31 - 60 days', value: this.num(cv.LAG_31_60) },
+            { label: 'Over 60 days', value: this.num(cv.LAG_60P) },
+            { label: 'Still unbilled', value: this.num(cv.UNBILLED_JOBS) }
+        ]) : [];
+    }
+    unbilledAgeMax(): number { return Math.max(1, ...(this.UnbilledAge || []).map(u => this.num(u.COST_VALUE))); }
+
+    /* ---- priority layout: Act now / This week / Workload / Reference (display only) ---- */
+    actRecPager = new FinPager<any>(10);
+    actPayPager = new FinPager<any>(10);
+    actUnbPager = new FinPager<any>(10);
+    WeekBills: { day: string; total: number; rows: any[] }[] = [];
+    MarginBars: { name: string; rev: number; margin: number; mpct: number; pct: number }[] = [];
+    RefExplainOpen = false;
+    RefAuditOpen = false;
+    readonly ExplainKeys = ['EXPOSURE', 'OUTSTANDING', 'RECOVERY', 'BILLED', 'UNBILLED', 'MARGIN',
+        'PAY_TOTAL', 'PAY_OVERDUE', 'PAY_DUE', 'PAY_DPO', 'PAY_PURCHASED', 'PAY_PAID'];
+
+    ScrollTo(id: string) {
+        setTimeout(() => {
+            const el = document.getElementById(id);
+            if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        }, 0);
+    }
+    GoDetail(tab: string) { this.SetTab(tab); this.ScrollTo('fd-s-detail'); }
+    ShowLegend() { this.LegendOpen = true; this.ScrollTo('fd-legend'); }
+    ToggleRefAudit() {
+        this.RefAuditOpen = !this.RefAuditOpen;
+        if (this.RefAuditOpen && !this.AuditLoaded && !this.AuditLoading) { this.LoadAudit(); }
+    }
+
+    /* overdue bills (Act now) and bills due in the next 7 days grouped by day (This week),
+       both from the payables bill list already loaded */
+    SetPayDerived() {
+        const bills = this.PayBills || [];
+        this.actPayPager.set(bills.filter(b => this.num(b.OVERDUE_DAYS) > 0)
+            .sort((a, b) => this.num(b.OVERDUE_DAYS) - this.num(a.OVERDUE_DAYS)));
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const groups: { [k: string]: { day: string; t: number; total: number; rows: any[] } } = {};
+        for (const b of bills) {
+            if (this.num(b.OVERDUE_DAYS) > 0) { continue; }
+            const d = this.parseDay(b.DUE_DATE);
+            if (!d) { continue; }
+            const diff = Math.round((d.getTime() - today.getTime()) / 86400000);
+            if (diff < 0 || diff > 7) { continue; }
+            const k = b.DUE_DATE;
+            if (!groups[k]) { groups[k] = { day: k, t: d.getTime(), total: 0, rows: [] }; }
+            groups[k].rows.push(b);
+            groups[k].total += this.num(b.PENDING);
+        }
+        this.WeekBills = Object.keys(groups).map(k => groups[k]).sort((a, b) => a.t - b.t)
+            .map(g => ({ day: g.day, total: g.total, rows: g.rows }));
+    }
+    /* dd/mm/yyyy, dd-mm-yyyy or dd-Mon-yyyy */
+    private parseDay(v: any): Date {
+        if (!v) { return null; }
+        const m = v.toString().trim().match(/^(\d{1,2})[\/\-\s]([A-Za-z]{3}|\d{1,2})[\/\-\s](\d{2,4})/);
+        if (!m) { return null; }
+        const mons = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        const mo = isNaN(+m[2]) ? mons.indexOf(m[2].toUpperCase()) : +m[2] - 1;
+        let y = +m[3]; if (y < 100) { y += 2000; }
+        if (mo < 0) { return null; }
+        return new Date(y, mo, +m[1]);
+    }
+
+    /* margin by billed party / shipper: rows summed per party, top 8 by income */
+    BuildMarginBars() {
+        const by: { [k: string]: { name: string; rev: number; margin: number } } = {};
+        for (const r of this.MarginRows()) {
+            const k = r.CLIENTCODE || r.CLIENTNAME;
+            if (!by[k]) { by[k] = { name: r.CLIENTNAME, rev: 0, margin: 0 }; }
+            by[k].rev += this.num(r.REVENUE);
+            by[k].margin += this.num(r.MARGIN);
+        }
+        const top = Object.keys(by).map(k => by[k]).sort((a, b) => b.rev - a.rev).slice(0, 8);
+        const max = Math.max(1, ...top.map(x => Math.abs(x.margin)));
+        this.MarginBars = top.map(x => ({
+            name: x.name, rev: x.rev, margin: x.margin,
+            mpct: x.rev !== 0 ? x.margin / x.rev * 100 : null,
+            pct: Math.abs(x.margin) / max * 100
+        }));
     }
 }
