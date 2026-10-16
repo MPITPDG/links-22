@@ -1,0 +1,166 @@
+/* ----------------------------------------------------------------
+   Export - print document - MAWB generate / search (host mawb.component.html and its
+   children: app-mawb-search, the job list, the freight update). Screen-level additions
+   on top of the GLOBAL page kit (src/styles/kit/import-page.css, root .im-page): only
+   the approved mock's helpers that the kit does not carry (links-export-mocks.html #m3),
+   pulled in per component through styleUrls (emulated encapsulation), so each of the
+   four components scopes its own copy. Monochrome only.
+     1. component hosts are block boxes, so each child's .im-page spans the page and
+        the freight step's sticky bar pins to the bottom edge.
+     2. the Links my-date-picker shim host is inline-block; make it fill the cell.
+     3. ruled cards: heading on the pale band, small buttons in the heading.
+     4. form helpers: radio group, inline validation line, ruled grid edges.
+     5. tables: tick column, total row with its two editable boxes.
+     6. small kit gaps the mock fills.
+   ---------------------------------------------------------------- */
+
+/* 1. block hosts */
+:host {
+    display: block;
+}
+
+/* 2. date picker fills its cell */
+.im-page my-date-picker {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
+.im-page my-date-picker.dp-s {
+    max-width: 220px;
+}
+
+/* 3. ruled cards */
+.im-page .card {
+    min-width: 0;
+}
+
+.im-page .card-h {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+    background: var(--band);
+    border-radius: 6px 6px 0 0;
+}
+
+.im-page .card-h h2 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+.im-page .card-h .acts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.im-page .btn.sm {
+    height: 28px;
+    padding: 0 10px;
+    font-size: 12px;
+}
+
+/* 4. form helpers */
+.im-page .fld {
+    min-width: 0;
+}
+
+.im-page .fld > label,
+.im-page .fld > .lbl {
+    font-weight: 600;
+    font-size: 12.5px;
+    margin: 0;
+}
+
+.im-page .fld .req {
+    margin-left: 2px;
+}
+
+.im-page .fld .hint.err {
+    color: var(--ink);
+    font-weight: 600;
+    margin-top: 0;
+}
+
+.im-page .opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    align-items: center;
+    min-height: 32px;
+}
+
+.im-page .fld .opt {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.im-page input[type="checkbox"],
+.im-page input[type="radio"] {
+    accent-color: var(--mp-primary, #0A0A0A);
+    width: 15px;
+    height: 15px;
+    margin: 0;
+}
+
+.im-page .fields .fld.full:last-child {
+    border-bottom: 0;
+}
+
+.im-page .fld.cut {
+    border-bottom: 1px solid var(--line) !important;
+}
+
+/* 5. tables */
+.im-page .tbl-wrap.ruled {
+    border-top: 1px solid var(--line);
+}
+
+.im-page table.tbl td.mono {
+    white-space: nowrap;
+}
+
+.im-page table.tbl td.sel,
+.im-page table.tbl th.sel {
+    width: 44px;
+    text-align: center;
+}
+
+.im-page table.tbl tr.tot td {
+    background: var(--band);
+    font-weight: 600;
+}
+
+.im-page table.tbl tr.tot input {
+    height: 28px;
+    text-align: right;
+    font-family: var(--num);
+    font-size: 12.5px;
+    max-width: 120px;
+    margin-left: auto;
+    display: block;
+}
+
+/* 6. kit gaps */
+.im-page .bar .r {
+    margin-left: auto;
+}
+
+@media (max-width: 760px) {
+    .im-page .fields .fld:nth-last-child(2) {
+        border-bottom: 1px solid var(--line);
+    }
+
+    .im-page .fld .hint {
+        margin-top: 0;
+    }
+
+    .im-page .bar .note {
+        display: none;
+    }
+}

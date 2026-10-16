@@ -1,151 +1,97 @@
-﻿@if (viewType != 'Print') {
-<div class="animated fadeIn">
-	<div class="row">
-		<div class="col-sm-12">
-			@if (viewType == 'Search') {
-<app-mawb-search (searchoutput)="getSearchInputValue($event)"></app-mawb-search>
-}
-		</div>
-	</div>
-	@if (viewType == 'Generate' || viewType == 'List') {
-<div class="row">
-		<div class="col-sm-12">
-			<div class="card">
-				<div class="card-header formheading">
-				   <strong>Export - Master Aerobill Generate</strong>
-				</div>
-			</div>
-		</div>
-	</div>
-}
-	@if (viewType == 'Generate' || viewType == 'List') {
-<div class="row">
-		<div class="col-sm-2">
-		</div>
-		<div class="col-sm-8">
-			<table class="table table-sm-new bgwhite">
-				<tr class="title-head formheading">
-					<td colspan="6">
-						<span class="col-form-span-label"><strong>MAWBNO DETAILS </strong></span>
-					</td>
-				</tr>
-			</table>
-			@if (viewType == 'Generate' || viewType == 'List') {
-<table class="table table-sm-new bgwhite">
-				<tr class="title-head trbg">
-					<td class="right-text">
-						<span class="col-form-span-label">AirLine</span><span class="col-form-span-error">*</span>
-					</td>
-					<td >
-						<select class="form-control width250"   [(ngModel)]="AirLine" (change)="getmwawblist(AirLine);" >
-							<!-- <option value="-1">Please select</option>
-							<option value="S100702">Emirate Airline</option> -->
-							<option value="0">Please select</option>
-							@for (d of AirLineList; track d) {
-<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
-}
+﻿<!--
+  Export - print document - MAWB generate (/air/mawb/number) and search / print (/air/mawb/search).
+  Links-only, stock-driven host on the GLOBAL page kit (src/styles/kit/import-page.css, form
+  recipe), built to the approved mock links-export-mocks.html #m3; helpers in mawb-generate.css.
+  The steps keep the old flow: they still appear one after another through viewType
+  (Generate -> List -> Update, Search -> Update). Each child (app-mawb-search, the job list,
+  the freight update) carries its own .im-page root, so the cards stack on one page edge.
+  Bindings, validations, messages and calls are the old screen's.
+-->
+@if (viewType != 'Print') {
+<div class="im-page">
+  @if (isGenerateRoute && viewType != 'Search') {
+    <div class="crumb">Export / Print document / Air / Mawb / Generate</div>
+    <div class="ph">
+      <div>
+        <h1>Generate MAWB</h1>
+        <p>Take a MAWB number from stock and attach the export jobs that fly on it</p>
+      </div>
+    </div>
+  } @else {
+    <div class="crumb">Export / Print document / Air / Mawb / Search/Print</div>
+    <div class="ph">
+      <div>
+        <h1>Find MAWB</h1>
+        <p>Open an existing MAWB to change its freight details or print it</p>
+      </div>
+    </div>
+  }
 
-						</select>
-					</td>
-					<td class="width300">
-						@if (error == 1) {
-<span class="col-form-span-error">Please select AirLine*</span>
-}
-					</td>
-				</tr>
-				<tr class="title-head trbg">
-					<td class="right-text">
-						<span class="col-form-span-label">MAWB No.</span><span class="col-form-span-error">*</span>
-					</td>
-					<td >
-						<select class="form-control width120"   [(ngModel)]="mawbno">
-							<option value="0">Please select</option>
-							<!-- <option value="17645678932">17645678932</option>
-							<option value="17636789525">17636789525</option> -->
-							 @for (d of AirLineMawbNoList; track d) {
-<option value={{d.MAWBNO}}>{{d.MAWBNO}}</option>
-}
-
-						</select>
-					</td>
-					<td class="width300">
-						@if (error == 2) {
-<span class="col-form-span-error">Please select Mawb Number*</span>
-}
-						@if (error == 3) {
-<span class="col-form-span-error">Invalid Mawb Number*</span>
-}
-					</td>
-				</tr>
-				<!-- <tr class="title-head trbg">
-					<td class="right-text">
-						<span class="col-form-span-label">MAWB No.</span><span class="col-form-span-error">*</span>
-					</td>
-					<td class="width130">
-						<input type="text" [(ngModel)]="Airmawbno" class="form-control width120" (change)="fn_generateLastMawbNo(10);" [OnlyNumber]="true" [maxlength]="11" />
-					</td>
-					<td class="width300">
-						<span class="col-form-span-error" *ngIf="error == 1">Invalid Mawb Number*</span>
-					</td>
-				</tr> -->
-				<tr class="title-head trbg">
-					<td class="right-text">
-						<span class="col-form-span-label">MAWB Date.</span><span class="col-form-span-error">*</span>
-					</td>
-					<td class="width130">
-						<my-date-picker name="mawbdate" [options]="myDatePickerOptions" [(ngModel)]="mawbdate"></my-date-picker>
-					</td>
-					<td class="width300">
-						@if (error ==4) {
-<span class="col-form-span-error">Mawb Date can not blank*</span>
-}
-					</td>
-				</tr>
-				<tr class="title-head trbg">
-					<td colspan="3">
-						<div class="centerlabel">
-							<span class="col-form-span-label">
-                                <input type="radio" name="radioDisplay" value="M" [(ngModel)]="MawbType"  />&nbsp;With House</span>
-                            <span class="col-form-span-label">
-                                <input type="radio" name="radioDisplay" value="H" [(ngModel)]="MawbType" />&nbsp;Without House(Direct Mawb)</span>&nbsp;&nbsp;&nbsp;&nbsp;
-
-                        </div>
-					</td>
-				</tr>
-				<tr class="title-head trbg">
-					<td colspan="3" class="centerlabel">
-						<button type="button" name="searchButton" uiBtn variant="default" size="sm" (click)="searchData();">
-							<span class="col-form-span-label"><i class="fa fa-search"></i> Search</span>
-						</button>
-						<button type="button" name="printButton" uiBtn variant="outline" size="sm" (click)="printData();">
-							<span class="col-form-span-label"><i class="fa fa-print"></i>  Print</span>
-						</button>
-					</td>
-				</tr>
-			</table>
-}
-		</div>
-		<div class="col-sm-2">
-		</div>
-	</div>
-}
-	<div class="row">
-		<div class="col-sm-12">
-			@if (viewType == 'List') {
-<app-print-air-mawb-list [searchList]="searchList" (result)="getData($event)"></app-print-air-mawb-list>
-}
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-2">
-		</div>
-		<div class="col-sm-8">
-			@if (viewType == 'Update') {
-<app-print-air-mawb-update [searchList]="searchList" (abort)="cancelled($event)"  [mawbno]="mawbno"  [mawbdate]="strMawbDate" [exptnos]="exptnos" [MawbType]="MawbType" [AirLine]="AirLine" (result)="getPrintData($event)"></app-print-air-mawb-update>
-}
-		</div>
-		<div class="col-sm-2">
-		</div>
-	</div>
+  @if (viewType == 'Generate' || viewType == 'List') {
+    <div class="card sec">
+      <div class="card-h">
+        <h2>1 · MAWB</h2>
+        <div class="acts">
+          <button type="button" name="printButton" class="btn g sm" (click)="printData();">Print</button>
+          <button type="button" name="searchButton" class="btn sm" (click)="searchData();">Search</button>
+        </div>
+      </div>
+      <div class="fields">
+        <div class="fld">
+          <label for="mawb-g-airline">Airline <span class="req">*</span></label>
+          <select id="mawb-g-airline" [(ngModel)]="AirLine" (change)="getmwawblist(AirLine);">
+            <option value="0">Please select</option>
+            @for (d of AirLineList; track d) {
+              <option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+            }
+          </select>
+          @if (error == 1) {
+            <span class="hint err">Please select AirLine*</span>
+          }
+        </div>
+        <div class="fld">
+          <label for="mawb-g-no">MAWB no. <span class="req">*</span></label>
+          <select id="mawb-g-no" class="mono" [(ngModel)]="mawbno">
+            <option value="0">Please select</option>
+            @for (d of AirLineMawbNoList; track d) {
+              <option value={{d.MAWBNO}}>{{d.MAWBNO}}</option>
+            }
+          </select>
+          @if (error == 2) {
+            <span class="hint err">Please select Mawb Number*</span>
+          }
+          @if (error == 3) {
+            <span class="hint err">Invalid Mawb Number*</span>
+          }
+        </div>
+        <div class="fld">
+          <label>MAWB date <span class="req">*</span></label>
+          <my-date-picker name="mawbdate" [options]="myDatePickerOptions" [(ngModel)]="mawbdate"></my-date-picker>
+          @if (error == 4) {
+            <span class="hint err">Mawb Date can not blank*</span>
+          }
+        </div>
+        <div class="fld">
+          <span class="lbl" id="mawb-g-type-l">MAWB type <span class="req">*</span></span>
+          <div class="opts" role="radiogroup" aria-labelledby="mawb-g-type-l">
+            <label class="opt"><input type="radio" name="radioDisplay" value="M" [(ngModel)]="MawbType" /> With house</label>
+            <label class="opt"><input type="radio" name="radioDisplay" value="H" [(ngModel)]="MawbType" /> Without house (direct MAWB)</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 </div>
+
+@if (viewType == 'Search') {
+  <app-mawb-search (searchoutput)="getSearchInputValue($event)"></app-mawb-search>
+}
+
+@if (viewType == 'List') {
+  <app-print-air-mawb-list [searchList]="searchList" (result)="getData($event)"></app-print-air-mawb-list>
+}
+
+@if (viewType == 'Update') {
+  <app-print-air-mawb-update [searchList]="searchList" (abort)="cancelled($event)" [mawbno]="mawbno" [mawbdate]="strMawbDate" [exptnos]="exptnos" [MawbType]="MawbType" [AirLine]="AirLine" (result)="getPrintData($event)"></app-print-air-mawb-update>
+}
 }

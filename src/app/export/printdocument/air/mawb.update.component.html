@@ -1,37 +1,50 @@
 ﻿<!--
-  Export - print document - MAWB update. Page kit recipe 2, ported from MPERPNG-20.
+  Export - print document - MAWB freight details (last step of Generate and of Search / Print).
+  Page kit recipe 2, ported from MPERPNG-20 and fitted to the approved Links mock
+  links-export-mocks.html #m3: "Save" is the old Submit (same submit()), Cancel is cancel(),
+  both on the pinned page bar. The heading only reads exptnos / mawbnoList (jobs picked in
+  Generate -> step 3; opened from Search -> step 2). Bindings unchanged.
   Used by PrintDocumentMawbUpdateComponents (mawb.component.ts) and PrintDocumentMawbUpdateComponent
-  (PrintDocumentMawbUpdateComponent.ts). The host shell is Links' stock-driven MAWB screen and is
-  left as it is, so this child carries its own .im-page root. Bindings unchanged.
+  (PrintDocumentMawbUpdateComponent.ts). The host page heading lives in mawb.component.html;
+  this child carries its own .im-page root.
 -->
 <div class="im-page">
-  <div class="card">
-    <div class="card-h"><h2>MAWB No. details</h2></div>
+  <div class="card sec">
+    <div class="card-h">
+      @if (exptnos) {
+        <h2>3 · Freight details</h2>
+        <span class="meta">{{exptnos.split(',').length - 1}} {{exptnos.split(',').length - 1 == 1 ? 'job' : 'jobs'}} selected</span>
+      } @else {
+        <h2>2 · Freight details</h2>
+        @if (mawbnoList.length > 0) {
+          <span class="chip solid">Saved</span>
+        }
+      }
+    </div>
 
-    <div class="fields" style="padding:14px 16px;">
-
+    <div class="fields">
       <div class="fld">
-        <label>MAWB No. <span class="req">*</span></label>
-        <span>{{mawbno}}</span>
+        <label for="mawb-u-no">MAWB no.</label>
+        <input id="mawb-u-no" type="text" class="mono" [value]="mawbno" disabled />
       </div>
 
       <div class="fld">
-        <label>MAWB Date. <span class="req">*</span></label>
-        <span>{{mawbdate}}</span>
+        <label for="mawb-u-dt">MAWB date</label>
+        <input id="mawb-u-dt" type="text" [value]="mawbdate" disabled />
       </div>
 
       <div class="fld">
-        <label>Freight Type <span class="req">*</span></label>
-        <select [(ngModel)]="FreightType">
-          <option value="-1">select</option>
+        <label for="mawb-u-frt">Freight type <span class="req">*</span></label>
+        <select id="mawb-u-frt" [(ngModel)]="FreightType">
+          <option value="-1">Select</option>
           <option value="CC">CC</option>
           <option value="PP">PP</option>
         </select>
       </div>
 
       <div class="fld">
-        <label>Freight Currency <span class="req">*</span></label>
-        <select [(ngModel)]="Fcurrency">
+        <label for="mawb-u-cur">Freight currency <span class="req">*</span></label>
+        <select id="mawb-u-cur" [(ngModel)]="Fcurrency">
           <option value="-1">Please select</option>
           @for (d of currencyList; track d) {
             <option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
@@ -40,41 +53,41 @@
       </div>
 
       <div class="fld">
-        <label>Freight Amount <span class="req">*</span></label>
-        <input type="text" [(ngModel)]="FreightAmount" [OnlyNumber]="true" [maxlength]="11" />
+        <label for="mawb-u-amt">Freight amount <span class="req">*</span></label>
+        <input id="mawb-u-amt" type="text" class="mono" [(ngModel)]="FreightAmount" [OnlyNumber]="true" [maxlength]="11" />
       </div>
 
-      <div class="fld">
-        <label>Shipment Type <span class="req">*</span></label>
-        <select [(ngModel)]="ShipType" (change)="ddx_Onchange(ShipType)">
-          <option value="-1"> select</option>
+      <div class="fld cut">
+        <label for="mawb-u-ship">Shipment type <span class="req">*</span></label>
+        <select id="mawb-u-ship" [(ngModel)]="ShipType" (change)="ddx_Onchange(ShipType)">
+          <option value="-1">Select</option>
           <option value="0">Normal</option>
           <option value="1">DDX</option>
         </select>
       </div>
 
-      <div class="fld">
-        <label>Dest.Warehouse <span class="req">*</span></label>
-        <select [(ngModel)]="ShipDest" [disabled]="ShipType == '0' || ShipType == null">
+      <div class="fld full">
+        <label for="mawb-u-wh">Dest. warehouse <span class="req">*</span></label>
+        <select id="mawb-u-wh" [(ngModel)]="ShipDest" [disabled]="ShipType == '0' || ShipType == null">
           <option value="0">Please select</option>
           @for (d of destinationList; track d) {
             <option value={{d.PK_ID}}>{{d.DDX_DESTINATION}}</option>
           }
         </select>
+        <span class="hint">Opens when Shipment type is DDX</span>
       </div>
-
     </div>
 
-    <div class="tbl-wrap">
+    <div class="tbl-wrap ruled">
       <table class="tbl">
         <thead>
           <tr>
-            <th>EXPT NO</th>
+            <th>Expt no.</th>
             <th>Shipper</th>
             <th>Consignee</th>
             <th class="num">Pkgs</th>
-            <th class="num">Grwt</th>
-            <th class="num">Chrg.Wt</th>
+            <th class="num">Gr wt</th>
+            <th class="num">Chrg wt</th>
             <th class="num">Pcs</th>
           </tr>
         </thead>
@@ -90,25 +103,22 @@
               <td class="num">{{obj.PCS}}</td>
             </tr>
           }
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td class="num"><input type="text" style="height:26px;" [(ngModel)]="totalGrwt" [OnlyNumber]="true" /></td>
-            <td class="num"><input type="text" style="height:26px;" [(ngModel)]="totalChblwt" [OnlyNumber]="true" /></td>
+          <tr class="tot">
+            <td colspan="4">Total</td>
+            <td><input type="text" aria-label="Total gross weight" [(ngModel)]="totalGrwt" [OnlyNumber]="true" /></td>
+            <td><input type="text" aria-label="Total chargeable weight" [(ngModel)]="totalChblwt" [OnlyNumber]="true" /></td>
             <td></td>
           </tr>
         </tbody>
       </table>
     </div>
+  </div>
 
-    <div class="bar" style="margin:0;">
-      <span class="note"></span>
-      <span class="r">
-        <button type="button" class="btn g" name="cancelButton" (click)="cancel();">Cancel</button>
-        <button type="button" class="btn p" name="submit" (click)="submit();">Submit</button>
-      </span>
+  <div class="bar">
+    <span class="note">Saving links the jobs to this MAWB and opens the print page.</span>
+    <div class="r">
+      <button type="button" class="btn g" name="cancelButton" (click)="cancel();">Cancel</button>
+      <button type="button" class="btn p" name="submit" (click)="submit();">Save</button>
     </div>
   </div>
 </div>

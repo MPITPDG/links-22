@@ -9,6 +9,7 @@ import { IMyDpOptions } from 'mydatepicker';
 @Component({
     selector: 'app-mawbstock-search',
     templateUrl: 'stockmaster-search.component.html',
+    styleUrls: ['./mawb-stock.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

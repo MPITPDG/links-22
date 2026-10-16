@@ -1,108 +1,119 @@
-<div class="animated fadeIn">
-	<div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>MAWB Stock Master</strong>
-                </div>
-            </div>
-        </div>
+<!--
+  Export - MAWB stock add (/export/mawbstock/Add). Links-only screen on the GLOBAL page kit
+  (src/styles/kit/import-page.css, form recipe), built to the approved mock
+  links-export-mocks.html #m2. Screen-only helpers live in mawb-stock.css.
+  Behaviour is the old screen's: same fields, bindings, validations and toasts.
+  "Save" is the old Submit (AddMain, Export/STOCK_MASTER_IU, disabled after a save),
+  "Cancel" is the old Reset (RestMain), "Add new" is AddNew. The Record card only reads
+  the same fields back; it calls nothing.
+-->
+<div class="im-page">
+  <div class="crumb">Export / Mawb stock / Add</div>
+  <div class="ph">
+    <div>
+      <h1>Add MAWB stock</h1>
+      <p>Enter the first MAWB number and how many to add; the system issues the rest of the range</p>
     </div>
-    <div class="row">
-		<div class="col-sm-3">
-		</div>
-		<div class="col-sm-6">
+    <div class="tools"><button type="button" class="btn g" (click)="AddNew()">Add new</button></div>
+  </div>
 
-            <table class="table table-bordered table-sm-new bgwhite">
-                <!-- <tr class="centerlabel">
-                    <td colspan="4">
-                        <input type="radio" name="RADIO" value="0"  [(ngModel)]="stocktype"><span class="col-form-span-label"><b> Our Stock</b></span>
-                        &nbsp;
-                        <input type="radio" name="RADIO" value="1" [(ngModel)]="stocktype"><span class="col-form-span-label"><b> Agent Stock</b></span>
-                    </td>
-                </tr> -->
-                    <!-- <tr>
-                        <td><span class="col-form-span-label"><b>IATA</b></span><span class="col-form-span-error">*</span></td>
-                        <td colspan="4"><input type="text" class="form-control width100" disabled="disabled" [(ngModel)]="IATA" ></td>
-                    </tr> -->
-                    <tr>
+  <div class="form-layout">
+    <div>
+      <div class="card sec">
+        <div class="card-h"><h2>Stock</h2><span class="meta"><b>*</b> required</span></div>
+        <div class="fields">
+          <div class="fld">
+            <label for="stk-docno">Doc no.</label>
+            <input id="stk-docno" type="text" class="mono" disabled="disabled" [(ngModel)]="DocNo">
+          </div>
+          <div class="fld">
+            <label>Doc date <span class="req">*</span></label>
+            <my-date-picker name="DocDate" [selDate]="DocDate" [options]="myDatePickerOptions" (dateChanged)="DocDateChanged($event)"></my-date-picker>
+          </div>
+          <div class="fld full">
+            <label for="stk-agent">IATA agent <span class="req">*</span></label>
+            <select id="stk-agent" [(ngModel)]="iataagent" [disabled]='disable_iataagent'>
+              <option value="">Please select</option>
+              @for (i of iataagentlist; track i) {
+                <option value={{i.DATAVALUEFIELD}}>{{i.DATATEXTFIELD}}</option>
+              }
+            </select>
+          </div>
+          <div class="fld full">
+            <label for="stk-airline">Airline <span class="req">*</span></label>
+            <select id="stk-airline" [(ngModel)]="airline" [disabled]='disable_airline' (change)="getAirlinecodee(airline);">
+              <option value="">Please select</option>
+              @for (a of airlinelist; track a) {
+                <option value={{a.DATAVALUEFIELD}}>{{a.DATATEXTFIELD}}</option>
+              }
+            </select>
+          </div>
+          <div class="fld">
+            <label for="stk-from">MAWB from no. <span class="req">*</span></label>
+            <div class="pair">
+              <input type="text" class="mono" aria-label="Airline prefix" disabled="disabled" maxlength="3" [(ngModel)]="airlinecode">
+              <input id="stk-from" type="text" class="mono" [OnlyNumber]="true" maxlength="8" [(ngModel)]="FrommawbNo" (change)="fn_validateMawbNo(airlinecode + FrommawbNo);">
+            </div>
+          </div>
+          <div class="fld">
+            <label for="stk-count">No. of stock <span class="req">*</span></label>
+            <input id="stk-count" type="text" class="mono" [OnlyNumber]="true" maxlength="3" [(ngModel)]="noofstock">
+          </div>
+          <div class="fld">
+            <label for="stk-to">MAWB to no.</label>
+            <div class="pair">
+              <input type="text" class="mono" aria-label="Airline prefix" disabled="disabled" maxlength="3" [(ngModel)]="airlinecode">
+              <input id="stk-to" type="text" class="mono" [OnlyNumber]="true" maxlength="8" disabled="disabled" [(ngModel)]="TomawbNo">
+            </div>
+          </div>
+          <div class="fld">
+            <label for="stk-type">Type <span class="req">*</span></label>
+            <select id="stk-type" [(ngModel)]="Type">
+              <option value="">Please select</option>
+              @for (c of typelist; track c) {
+                <option value={{c.CODE}}>{{c.SNAME}}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
 
-                        <td colspan="4"  >
-                            <div style="float: right;">
-                            <button uiBtn variant="default" size="sm" type="submit"  (click)="AddNew()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i>Add New</span></button>
-                        </div>
-                        </td>
+    <aside class="aside">
+      <div class="card sec">
+        <div class="card-h">
+          <h2>Record</h2>
+          @if (disable_submitbtn) {
+            <span class="chip solid">Saved</span>
+          } @else {
+            <span class="chip dash">Not saved</span>
+          }
+        </div>
+        <div class="row"><span>Doc no.</span><b>{{DocNo || '—'}}</b></div>
+        <div class="row"><span>First number</span><b>{{(airlinecode + FrommawbNo) || '—'}}</b></div>
+        <div class="row"><span>Last number</span><b>{{TomawbNo || '—'}}</b></div>
+        <div class="row"><span>Numbers issued</span><b>{{noofstock || '—'}}</b></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Before you save</h2></div>
+        <ul>
+          <li>Every field marked * is required.</li>
+          <li>MAWB from no. must pass the airline check digit: the 7 digits after the prefix, mod 7, equal the last digit.</li>
+          <li>Numbers are issued by adding 11 each time (4 after a number ending in 6).</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
 
-                    </tr>
-                    <tr>
-                        <td><span class="col-form-span-label"><b>Doc No.</b> </span></td>
-                        <td><input type="text" class="form-control width150" disabled="disabled"  [(ngModel)]="DocNo">
-                        <td><span class=col-form-span-label><b>Doc Date</b></span><span class="col-form-span-error">*</span></td>
-                        <td >
-                        <my-date-picker name="DocDate"  [selDate]="DocDate" [options]="myDatePickerOptions" (dateChanged)="DocDateChanged($event)" ></my-date-picker>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="col-form-span-label"><b>IATA Agent</b> </span><span class="col-form-span-error">*</span></td>
-                      <td colspan="4">
-                        <select class="form-control width400"  [(ngModel)]="iataagent" [disabled]='disable_iataagent' >
-                            <option value="">Please select</option>
-                            @for (i of iataagentlist; track i) {
-<option value={{i.DATAVALUEFIELD}}>{{i.DATATEXTFIELD}}</option>
-}
-                        </select>
-                    </td>
-                    </tr>
-                    <tr>
-                        <td><span class="col-form-span-label"><b>Airline</b> </span><span class="col-form-span-error">*</span></td>
-                        <td colspan="4">
-                            <select class="form-control width400"  [(ngModel)]="airline"  [disabled]='disable_airline'  (change)="getAirlinecodee(airline);" >
-                                <option value="">Please select</option>
-                                @for (a of airlinelist; track a) {
-<option value={{a.DATAVALUEFIELD}}>{{a.DATATEXTFIELD}}</option>
-}
-                            </select>
-                             </td>
-                        </tr>
-                    <tr>
-                        <td><span class="col-form-span-label"><b>MAWB From No</b></span><span class="col-form-span-error">*</span></td>
-                        <td><input type="text" class="form-control width50" disabled="disabled" maxlength="3" [(ngModel)]="airlinecode">
-                         <input type="text" [OnlyNumber]="true" class="form-control width100" [(ngModel)]="FrommawbNo" (change)="fn_validateMawbNo(airlinecode + FrommawbNo);" style="margin-left: 70px;margin-top: -18px;" maxlength="8" ></td>
-                        <td><span class="col-form-span-label"><b>No of Stock </b></span><span class="col-form-span-error">*</span></td>
-                        <td><input type="text" class="form-control width30" [OnlyNumber]="true"  maxlength="3" [(ngModel)]="noofstock" ></td>
-                    </tr>
-                    <tr>
-                        <td><span class="col-form-span-label"><b>MAWB To No</b></span><span class="col-form-span-error">*</span></td>
-                        <td colspan="3"><input type="text" class="form-control width50" disabled="disabled" maxlength="3" [(ngModel)]="airlinecode">
-                         <input type="text" [OnlyNumber]="true" class="form-control width100" [(ngModel)]="TomawbNo" disabled="disabled"  style="margin-left: 70px;margin-top: -18px;" maxlength="8" ></td>
-                    </tr>
-                    <!-- <tr>
-                        <td><span class=col-form-span-label><b>Date</b></span><span class="col-form-span-error">*</span></td>
-                        <td >
-                               <my-date-picker name="DocDate"  [selDate]="DocDate" [options]="myDatePickerOptions" (dateChanged)="DocDateChanged($event)" ></my-date-picker>
-                        </td>
-                     </tr> -->
-                    <tr>
-                        <td><span class="col-form-span-label"><b>Type</b></span><span class="col-form-span-error">*</span></td>
-                        <td >
-                            <select class="form-control width120" [(ngModel)]="Type">
-                                <option  value="">Please select</option>
-                                @for (c of typelist; track c) {
-<option value={{c.CODE}}>{{c.SNAME}}</option>
-}
-                            </select>
-                        </td>
-                    </tr>
-                             <tr>
-                                <td colspan="4"  class="centerlabel">
-                                    <button uiBtn variant="default" size="sm" type="submit" [disabled]='disable_submitbtn'  (click)="AddMain()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i>Submit</span></button>
-                                    <button uiBtn variant="outline" size="sm" type="reset"> <span class="col-form-span-label" (click)="RestMain();"><i class="fa fa-ban"></i> Reset</span></button>
-                                </td>
-                            </tr>
-					</table>
-			</div>
-		</div>
-		<div class="col-sm-3">
-		</div>
-
+  <div class="bar">
+    @if (disable_submitbtn) {
+      <span class="note">Saved as {{DocNo}}. Use Add new to enter another range.</span>
+    } @else {
+      <span class="note">Fields marked * are required.</span>
+    }
+    <div class="r">
+      <button type="reset" class="btn g" (click)="RestMain();">Cancel</button>
+      <button type="submit" class="btn p" [disabled]='disable_submitbtn' (click)="AddMain()">Save</button>
+    </div>
+  </div>
 </div>

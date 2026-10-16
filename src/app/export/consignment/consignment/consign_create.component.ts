@@ -11,6 +11,9 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 @Component({
     templateUrl: 'consign_create.component.html',
    styleUrls: ['consign_create.component.css'], 
+    // Page kit is global (src/styles/kit): kit-consignment scopes consignment-page.css
+    // (banded card heads, .btn.sm, .cs-opts); consign_create.component.css adds the mock-only helpers.
+    host: { class: 'kit-consignment' },
     animations: [
     trigger('slideToggle', [
       state('open', style({ height: '*', opacity: 1, overflow: 'hidden' })),
@@ -113,6 +116,8 @@ export class CreateJobComponent implements OnInit {
     jobDetailsVisible = false;
     showjobdtls=false;
     newArray: any = [];
+    /** Presentation only (Record aside): the branch the new job is created in. */
+    branchName: string = '';
     constructor(
         private _router: Router,
         private _dataService: DataService,
@@ -132,6 +137,13 @@ export class CreateJobComponent implements OnInit {
         this.trSubAir = 'N';
         this.trSubSea = 'Y'
         this.City = this._loginService.getLogin()[0].CITYCODE;
+        this.branchName = this._loginService.getLogin()[0].CITYNAME || this.City;
+    }
+
+    /** Presentation only (Record aside): the previous job ticked for copying (newArray[0]). */
+    get pickedJob(): any {
+        if (!this.newArray || this.newArray.length == 0) { return null; }
+        return (this.joblist || []).find((row: any) => row.EXPTNO === this.newArray[0].exptno) || null;
     }
 
     ngOnInit(): void {

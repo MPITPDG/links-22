@@ -10,10 +10,13 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 import * as Excel from 'exceljs';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import { ClientedifilterpipePipe } from './client-edifilterpipe.pipe';
 @Component({
   selector: 'app-client-edi',
   templateUrl: './client-edi-design.component.html',
   styleUrls: ['./client-edi-design.component.scss'],
+  // Page kit (.im-page / accreport add-on) is GLOBAL in Links; the host class opts in (fk-dim, ck).
+  host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -505,4 +508,59 @@ onWOSelectChange() {
 
   console.log(this.selectedWONos);
 }
+
+  // ---------------------------------------------------------------------------
+  // Display-only helpers for the redesigned template. They read the fields the
+  // list already returns and change no tick / enable rule, call or message.
+  // ---------------------------------------------------------------------------
+
+  /** Status chip: mirrors the row tick box's [disabled] expression (negated), unchanged. */
+  ediReady(order: any): boolean {
+    return order.ISIRNDONE == 1 && order.ISBOL_SENT == 1 && order.ISAUTHODONE !== 0 && order.BILLTYPEFLAG == 1;
+  }
+
+  /** Status "why": which of those same conditions keeps the row's tick box disabled. */
+  ediWhy(order: any): string {
+    const why: string[] = [];
+    if (order.BILLTYPEFLAG != 1) {
+      const types = String(order.INVOICENO || '').split('<br>')
+        .map(inv => String(inv.split(' - ')[3] || '').trim().toUpperCase());
+      if (types.indexOf('AGENCY BILL') < 0) { why.push('No CHA bill yet'); }
+      if (types.indexOf('RECOVERABLE BILL') < 0) { why.push('No freight bill yet'); }
+      if (why.length == 0) { why.push('Needs both a CHA and a freight bill'); }
+    }
+    if (order.ISIRNDONE != 1) { why.push('IRN not generated'); }
+    if (order.ISBOL_SENT != 1) { why.push('BOL alert not sent'); }
+    if (order.ISAUTHODONE === 0) { why.push('Not authorised'); }
+    return why.join(' · ');
+  }
+
+  /** One INVOICENO entry, "INV_NO - INV_DT - amount - INV_BILLTYPE", split for display.
+   *  Agency bill reads CHA and Recoverable bill reads Freight (the generated files' names). */
+  ediInv(inv: string): { no: string; dt: string; amt: string; type: string } {
+    const parts = String(inv || '').split(' - ');
+    const rawType = String(parts[3] || '').trim();
+    const type = rawType.toUpperCase() == 'AGENCY BILL' ? 'CHA'
+      : rawType.toUpperCase() == 'RECOVERABLE BILL' ? 'Freight'
+      : rawType;
+    const rawAmt = String(parts[2] || '').trim();
+    const n = Number(rawAmt);
+    const amt = rawAmt === '' || isNaN(n)
+      ? rawAmt
+      : n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return { no: parts[0].trim(), dt: String(parts[1] || '').trim(), amt: amt, type: type };
+  }
+
+  ediReadyCount(): number {
+    return (this.workOrders || []).filter(o => this.ediReady(o)).length;
+  }
+
+  ediTickedCount(): number {
+    return (this.workOrders || []).filter(o => o.checked).length;
+  }
+
+  /** Rows the search shows: the same clientedifilterpipe the grid uses. */
+  ediShownCount(): number {
+    return (new ClientedifilterpipePipe().transform(this.workOrders || [], this.searchString) || []).length;
+  }
 }

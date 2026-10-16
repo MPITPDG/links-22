@@ -1,120 +1,121 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>MAWB Stock Search</strong>
-                </div>
-            </div>
-        </div>
+<!--
+  Export - MAWB stock search (/export/mawbstock/Search). Links-only screen on the GLOBAL page kit
+  (src/styles/kit/import-page.css, list recipe), built to the approved mock
+  links-export-mocks.html #m2. Screen-only helpers live in mawb-stock.css.
+  Behaviour is the old screen's: same filters and bindings, Search / Enter calls serchList()
+  (Export/EXP_MAWB_STOCK_SEARCH), Reset calls RestMain(), Add new opens /export/mawbstock/Add,
+  the Total / Available / Used summary shows once searched, the grid only when it has rows.
+-->
+<div class="im-page pb">
+  <div class="crumb">Export / Mawb stock / Search</div>
+  <div class="ph">
+    <div>
+      <h1>MAWB stock</h1>
+      <p>Airline MAWB numbers held in stock, and which are still free to use</p>
     </div>
-    <div class="row">
-        <div class="col-sm-1"></div>
-        <div class="col-sm-10">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td colspan="6">
-                        <div style="float: right;">
-                            <button uiBtn variant="default" size="sm" type="button" (click)="AddNew()"><span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Add New</span></button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Airline</b></span></td>
-                    <td colspan="3">
-                        <select class="form-control width400" [(ngModel)]="airline">
-                            <option value="">All</option>
-                            @for (a of airlinelist; track a) {
-                            <option value={{a.DATAVALUEFIELD}}>{{a.DATATEXTFIELD}}</option>
-                            }
-                        </select>
-                    </td>
-                    <td><span class="col-form-span-label"><b>Status</b></span></td>
-                    <td>
-                        <select class="form-control width120" [(ngModel)]="status">
-                            <option value="">All</option>
-                            <option value="A">Available</option>
-                            <option value="U">Used</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>MAWB No</b></span></td>
-                    <td><input type="text" [OnlyNumber]="true" class="form-control width150" maxlength="11" [(ngModel)]="mawbNo" (keyup.enter)="serchList()"></td>
-                    <td><span class="col-form-span-label"><b>Doc No</b></span></td>
-                    <td><input type="text" class="form-control width150" maxlength="24" [(ngModel)]="docNo" (keyup.enter)="serchList()"></td>
-                    <td><span class="col-form-span-label"><b>Doc Date</b></span></td>
-                    <td style="white-space: nowrap;">
-                        <my-date-picker name="FromDate" [selDate]="fromDate" [options]="myDatePickerOptions" (dateChanged)="FromDateChanged($event)" placeholder="From"></my-date-picker>
-                        <span class="col-form-span-label">&nbsp;to&nbsp;</span>
-                        <my-date-picker name="ToDate" [selDate]="toDate" [options]="myDatePickerOptions" (dateChanged)="ToDateChanged($event)" placeholder="To"></my-date-picker>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="6" class="centerlabel">
-                        <button uiBtn variant="default" size="sm" type="button" (click)="serchList()"><span class="col-form-span-label"><i class="fa fa-search"></i> Search</span></button>
-                        <button uiBtn variant="outline" size="sm" type="button" (click)="RestMain()"><span class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
-                    </td>
-                </tr>
-                @if (searched) {
-                <tr>
-                    <td colspan="6">
-                        <span class="col-form-span-label">
-                            <b>Total:</b> {{totalCount}} &nbsp;|&nbsp;
-                            <b>Available:</b> <span class="text-success">{{availableCount}}</span> &nbsp;|&nbsp;
-                            <b>Used:</b> <span class="text-danger">{{usedCount}}</span>
-                        </span>
-                    </td>
-                </tr>
-                }
-                @if (Searchlist.length > 0) {
-                <tr>
-                    <td colspan="6">
-                        <div class="row yscroll" style="max-height: 400px;">
-                            <table class="table table-hover table-sm-new">
-                                <thead>
-                                    <tr class="col-form-span-heading" style="white-space: nowrap;">
-                                        <th class="col-form-span-label">#</th>
-                                        <th class="col-form-span-label">Doc No</th>
-                                        <th class="col-form-span-label">Doc Date</th>
-                                        <th class="col-form-span-label">IATA Agent</th>
-                                        <th class="col-form-span-label">Airline</th>
-                                        <th class="col-form-span-label">Type</th>
-                                        <th class="col-form-span-label">MAWB No</th>
-                                        <th class="col-form-span-label">Status</th>
-                                        <th class="col-form-span-label">Job No</th>
-                                        <th class="col-form-span-label">Used On</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bgwhite">
-                                    @for (s of Searchlist; track s.MAWBNO; let i = $index) {
-                                    <tr>
-                                        <td class="col-form-span-label">{{i + 1}}</td>
-                                        <td class="col-form-span-label">{{s.DOC_NO}}</td>
-                                        <td class="col-form-span-label">{{s.DOC_DATE}}</td>
-                                        <td class="col-form-span-label">{{s.IATA_AGT_NAME}}</td>
-                                        <td class="col-form-span-label">{{s.AIRLINE_CD}} - {{s.AIRLINE_NAME}}</td>
-                                        <td class="col-form-span-label">{{s.SRVC_NAME}}</td>
-                                        <td class="col-form-span-label"><b>{{s.MAWBNO}}</b></td>
-                                        <td class="col-form-span-label">
-                                            @if (s.STOCK_STATUS === 'Used') {
-                                            <span class="badge badge-danger">Used</span>
-                                            } @else {
-                                            <span class="badge badge-success">Available</span>
-                                            }
-                                        </td>
-                                        <td class="col-form-span-label">{{s.CSRNO}}</td>
-                                        <td class="col-form-span-label">{{s.USED_ON}}</td>
-                                    </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </td>
-                </tr>
-                }
-            </table>
-        </div>
-        <div class="col-sm-1"></div>
+    <div class="tools"><button type="button" class="btn p" (click)="AddNew()">+ Add new</button></div>
+  </div>
+
+  <div class="card">
+    <div class="filters f-stk">
+      <div class="f">
+        <label for="stk-airline">Airline</label>
+        <select id="stk-airline" [(ngModel)]="airline">
+          <option value="">All</option>
+          @for (a of airlinelist; track a) {
+            <option value={{a.DATAVALUEFIELD}}>{{a.DATATEXTFIELD}}</option>
+          }
+        </select>
+      </div>
+      <div class="f">
+        <label for="stk-status">Status</label>
+        <select id="stk-status" [(ngModel)]="status">
+          <option value="">All</option>
+          <option value="A">Available</option>
+          <option value="U">Used</option>
+        </select>
+      </div>
+      <div class="f">
+        <label for="stk-mawb">MAWB no.</label>
+        <input id="stk-mawb" type="text" class="mono" [OnlyNumber]="true" maxlength="11" placeholder="Any" [(ngModel)]="mawbNo" (keyup.enter)="serchList()">
+      </div>
+      <div class="f">
+        <label for="stk-doc">Doc no.</label>
+        <input id="stk-doc" type="text" class="mono" maxlength="24" placeholder="Any" [(ngModel)]="docNo" (keyup.enter)="serchList()">
+      </div>
+      <div class="f">
+        <label>Doc date from</label>
+        <my-date-picker name="FromDate" [selDate]="fromDate" [options]="myDatePickerOptions" (dateChanged)="FromDateChanged($event)" placeholder="From"></my-date-picker>
+      </div>
+      <div class="f">
+        <label>Doc date to</label>
+        <my-date-picker name="ToDate" [selDate]="toDate" [options]="myDatePickerOptions" (dateChanged)="ToDateChanged($event)" placeholder="To"></my-date-picker>
+      </div>
+      <div class="f"><button type="button" class="btn p" (click)="serchList()">Search</button></div>
     </div>
+
+    <div class="toolbar">
+      @if (searched) {
+        <span class="stk-sum">
+          <span class="count">{{totalCount}} MAWB numbers</span>
+          <span class="chip"><span class="dot"></span>{{availableCount}} available</span>
+          <span class="chip solid">{{usedCount}} used</span>
+        </span>
+      } @else {
+        <span class="sub-t">Set the filters and press Search</span>
+      }
+      <span class="tb-r"><button type="button" class="btn g" (click)="RestMain()">Reset</button></span>
+    </div>
+
+    @if (Searchlist.length > 0) {
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th class="num">#</th>
+              <th>Doc no.</th>
+              <th>Doc date</th>
+              <th>IATA agent</th>
+              <th>Airline</th>
+              <th>Type</th>
+              <th>MAWB no.</th>
+              <th>Status</th>
+              <th>Job no.</th>
+              <th>Used on</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of Searchlist; track s.MAWBNO; let i = $index) {
+              <tr>
+                <td class="num">{{i + 1}}</td>
+                <td class="mono">{{s.DOC_NO}}</td>
+                <td>{{s.DOC_DATE}}</td>
+                <td>{{s.IATA_AGT_NAME}}</td>
+                <td>{{s.AIRLINE_CD}} - {{s.AIRLINE_NAME}}</td>
+                <td>{{s.SRVC_NAME}}</td>
+                <td class="mono"><b>{{s.MAWBNO}}</b></td>
+                <td>
+                  @if (s.STOCK_STATUS === 'Used') {
+                    <span class="chip solid">Used</span>
+                  } @else {
+                    <span class="chip"><span class="dot"></span>Available</span>
+                  }
+                </td>
+                <td class="mono">@if (s.CSRNO) { {{s.CSRNO}} } @else {<span class="sub-t">—</span>}</td>
+                <td>@if (s.USED_ON) { {{s.USED_ON}} } @else {<span class="sub-t">—</span>}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <span>Showing <b>1–{{Searchlist.length}}</b> of <b>{{Searchlist.length}}</b></span>
+        <div class="pages">
+          <button type="button" disabled aria-label="Previous page">‹</button>
+          <button type="button" class="on">1</button>
+          <button type="button" disabled aria-label="Next page">›</button>
+        </div>
+      </div>
+    }
+  </div>
 </div>

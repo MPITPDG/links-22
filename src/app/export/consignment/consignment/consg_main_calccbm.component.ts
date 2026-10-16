@@ -6,7 +6,10 @@ import { ToastCommonService } from '../../../shared/service/toastService';
 @Component({
     selector: 'app-main-consignment-calcbm-add',
     templateUrl: 'consg_main_calccbm.component.html',
-    styles: [],
+    // Page kit is global (src/styles/kit): kit-consignment scopes consignment-page.css
+    // (banded card heads, .btn.sm, .cv-acts); the screen sheet adds the mock-only helpers.
+    styleUrls: ['consg_main_calccbm.component.css'],
+    host: { class: 'kit-consignment' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -17,6 +20,10 @@ export class MainCalCbmAddComponent implements OnInit , OnChanges {
     @Input() grosswt: any;
     @Input () noofpkgs:any;
     @Input () exptno:any;
+    /** Presentation only: true when consg_main hosts this calculator in its drawer, whose
+        footer carries Abort / Update (Update calls Close()); the inline Close button is
+        then not drawn. The Port editor's modal leaves it false and keeps that button. */
+    @Input () drawer: boolean = false;
     //exptno: string;
     chkcbm : any="";
     Length : any="";
@@ -299,6 +306,11 @@ export class MainCalCbmAddComponent implements OnInit , OnChanges {
            });
         }
     }
+    }
+    /** Presentation only (Dimension card meta): 1-based position of the row being edited. */
+    get editingRow(): number {
+        if (!this.Dimensionlist || this.ID === "" || this.ID == null) { return 0; }
+        return this.Dimensionlist.findIndex((row: any) => row.PK_ID == this.ID) + 1;
     }
     Close(){
         if(this.runtotnoofpkgs<this.NoOfPackages && this.runtotnoofpkgs > 0 ){

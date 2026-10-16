@@ -1,0 +1,113 @@
+/* ----------------------------------------------------------------
+   Export - MAWB stock (Search, Add): screen-level additions on top of the
+   GLOBAL page kit (src/styles/kit/import-page.css, root .im-page). Only the
+   approved mock's helpers that the kit does not carry live here
+   (links-export-mocks.html #m2), pulled in per component through styleUrls
+   (emulated encapsulation). Monochrome only.
+     1. the Links my-date-picker shim host is inline-block; make it fill the cell.
+     2. the six-filter search bar (.filters.f-stk) and the summary chips.
+     3. ruled cards: heading on the pale band (the export card look).
+     4. form helpers: prefix + number pair, the ruled two-column grid's edges.
+     5. small kit gaps the mock fills (min-widths, wraps, nowrap mono cells).
+   ---------------------------------------------------------------- */
+
+/* 1. date picker fills its cell */
+.im-page my-date-picker {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
+/* 2. search filters + summary */
+.im-page .filters.f-stk {
+    grid-template-columns: 1.8fr 1fr 1.2fr 1.2fr 1fr 1fr auto;
+}
+
+.im-page .f {
+    min-width: 0;
+}
+
+.im-page .stk-sum {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+/* 3. ruled cards */
+.im-page .card-h {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+    background: var(--band);
+    border-radius: 6px 6px 0 0;
+}
+
+.im-page .card-h h2 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+/* 4. form helpers */
+.im-page .pair {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 6px;
+}
+
+.im-page .fld {
+    min-width: 0;
+}
+
+.im-page .fld > label {
+    font-weight: 600;
+    font-size: 12.5px;
+    margin: 0;
+}
+
+.im-page .fields .fld.full:last-child {
+    border-bottom: 0;
+}
+
+.im-page .aside .row b {
+    overflow-wrap: anywhere;
+}
+
+/* 5. kit gaps */
+.im-page .card,
+.im-page .form-layout > * {
+    min-width: 0;
+}
+
+.im-page .toolbar .tb-r {
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.im-page table.tbl td.mono {
+    white-space: nowrap;
+}
+
+.im-page .bar .r {
+    margin-left: auto;
+}
+
+@media (max-width: 1100px) {
+    .im-page .filters.f-stk {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .im-page .filters.f-stk {
+        grid-template-columns: 1fr;
+    }
+
+    .im-page .fields .fld:nth-last-child(2) {
+        border-bottom: 1px solid var(--line);
+    }
+
+    .im-page .bar .note {
+        display: none;
+    }
+}

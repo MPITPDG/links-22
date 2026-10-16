@@ -1,141 +1,133 @@
-
-<table class="table table-bordered table-sm-new" style="width:100%" >
-    <!-- <tr class="title-head trbg">
-            <th colspan="2">
-                    <span class="col-form-span-label">
-                            CALCULATE CBM
-                    </span>
-            </th>
-    </tr> -->
-        <tr>
-            <td>
-                <table class="table table-bordered table-sm-new" style="width:100%" >
-                <tr>
-                <td>
-                <table class="table table-bordered table-sm-new" style="width:100%" >
-                <tr>
-                <td><span class="col-form-span-label">Gr.Wt</span></td>
-                <td>
-                   <input type="text" disabled [(ngModel)]="Grwt" class="form-control width50" />
-                </td>
-                <td><span class="col-form-span-label">No. Of Packages</span></td>
-                <td>
-                   <input type="text" disabled [(ngModel)]="NoOfPackages" class="form-control width50" />
-                </td>
-                </tr>
-                <tr>
-                <td ><span class="col-form-span-label">Unit Type</span> </td>
-                <td colspan="2">
-                   <select class="form-control width50"  [(ngModel)]="Unit"  >
-                    <option value="0">--Select--</option>
-                    <option value="1">Inch</option>
-                    <option value="2">Cm</option>
-                        </select>
-                </td>
-                </tr>
-
-                </table>
-                </td>
-                </tr>
-                <tr>
-                    <td>
-                    <table class="table table-bordered table-sm-new" style="width:100%" >
-                    <tr>
-                    <td><span class="col-form-span-label"> PACKAGES</span></td>
-                    <td><span class="col-form-span-label"> LENGTH</span></td>
-                    <td><span class="col-form-span-label"> WIDTH</span></td>
-                    <td><span class="col-form-span-label"> HEIGHT</span></td>
-                    <td><span class="col-form-span-label"> VOLUME</span></td>
-                </tr>
-            <tr>
-            <td> <input type="text" [(ngModel)]="Packages" class="form-control width50" /> </td>
-            <td> <input type="text" [(ngModel)]="Length" class="form-control width50" /> </td>
-            <td> <input type="text" [(ngModel)]="Width" class="form-control width50" /></td>
-            <td> <input type="text" [(ngModel)]="Height" (change)="fn_CalCBM();" class="form-control width80" />  </td>
-            <td> <input type="text" disabled [(ngModel)]="Volume" class="form-control width80" /> </td>
-            </tr>
-                    </table>
-                    </td>
-                </tr>
-          <tr>
-        <td colspan="5" align="center">
-         <button type="button" name="submitButton" uiBtn variant="default" size="sm" (click)="AddDimension();">
-         <span class="col-form-span-label"> <i class="fa fa-save"></i>{{text}}</span></button>&nbsp;
-         <button type="button" name="ResetButton" uiBtn variant="outline" size="sm" (click)="fun_clear();" >
-         <span class="col-form-span-label"><i class="fa fa-undo"></i>&nbsp;Clear</span></button>&nbsp;
-        </td>
-         </tr>
-    <tr>
-    <td>
-    <table class="table table-bordered table-sm-new" style="width:100%">
-    <tr>
-    <td><span class="col-form-span-label">CBM</span></td>
-    <td>
-       <input type="text" disabled [(ngModel)]="TotCbm" class="form-control width80" />
-    </td>
-    <td><span class="col-form-span-label">Vol Wt.</span></td>
-    <td>
-       <input type="text" disabled [(ngModel)]="VolWt" class="form-control width80" />
-    </td>
-    </tr>
-    </table>
-    </td>
-    </tr>
-    <tr>
-    <td colspan="4">
 <!--
-        <tr>
-             -->
-                <div  style="width:100%"   >
-                    @if (Dimensionlist.length>0) {
-<table class="table table-responsive-sm table-bordered" style="width:100%"  >
-                        <thead>
-                            <tr class="bakgrdliteBlue">
-                                <th  class="col-form-span-label font-weight-bold headerwhite" ></th>
-                                <th class="col-form-span-label font-weight-bold headerwhite">Packages</th>
-                                <th  class="col-form-span-label font-weight-bold headerwhite">Length</th>
-                                <th  class="col-form-span-label font-weight-bold headerwhite">Width</th>
-                                <th  class="col-form-span-label font-weight-bold headerwhite">Height</th>
-                                <th  class="col-form-span-label font-weight-bold headerwhite">Volume</th>
+  Calculate CBM (Links-only, approved mock m7). The calculator content, drawn
+  with the GLOBAL page kit (import-page.css) + consignment-page.css (host
+  class kit-consignment) + consg_main_calccbm.component.css.
+  consg_main hosts it inside its right-side drawer ([drawer]="true"): the
+  drawer footer there carries Abort and Update, and Update calls this
+  component's Close() - the old Close button, same validation and the same
+  result emit. The Links Port editor (consig_main_edit_modal.component.ts)
+  still hosts it in its own small modal without [drawer], so the Close
+  button stays here for that host.
+  Behaviour is unchanged: the same [(ngModel)]s, the Height (change) that
+  recalculates Volume, Add/Update, Clear, row Edit / Delete (now buttons
+  instead of the pencil / bin icons), API calls, alerts, toasts and confirm.
+-->
+<div class="im-page cbm">
+  <div class="card sec">
+    <div class="card-h"><h2>Job</h2><span class="meta">from Goods details</span></div>
+    <div class="fields">
+      <div class="fld">
+        <label for="cbm-gr">Gr. wt</label>
+        <input id="cbm-gr" type="text" class="mono" disabled [(ngModel)]="Grwt" />
+      </div>
+      <div class="fld">
+        <label for="cbm-pkgs">No. of packages</label>
+        <input id="cbm-pkgs" type="text" class="mono" disabled [(ngModel)]="NoOfPackages" />
+      </div>
+      <div class="fld full">
+        <label for="cbm-unit">Unit type</label>
+        <select id="cbm-unit" class="w-200" [(ngModel)]="Unit">
+          <option value="0">--Select--</option>
+          <option value="1">Inch</option>
+          <option value="2">Cm</option>
+        </select>
+      </div>
+    </div>
+  </div>
 
-                            </tr>
-                        </thead>
-                         <tbody   >
-                            @for (obj of Dimensionlist; track obj) {
-<tr>
-                                <td class="centerlabel">
-                                    <i class="fa fa-pencil" (click)="EditDimension(obj.PK_ID)" ></i>
-                                    &nbsp;
-                                    <i class="fa fa-trash" (click)="DeleteDimension(obj.PK_ID,obj.MAINTBLID)"></i>
-                                </td>
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Dimension</h2>
+      <div class="cv-acts">
+        @if (text == 'Update' && editingRow > 0) {
+        <span class="meta">Editing row {{editingRow}}</span>
+        }
+        <button type="button" name="ResetButton" class="btn g sm" (click)="fun_clear();">Clear</button>
+        <button type="button" name="submitButton" class="btn sm" (click)="AddDimension();">{{text}}</button>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="fld">
+        <label for="cbm-p">Packages</label>
+        <input id="cbm-p" type="text" class="mono" [(ngModel)]="Packages" />
+      </div>
+      <div class="fld">
+        <label for="cbm-l">Length</label>
+        <input id="cbm-l" type="text" class="mono" [(ngModel)]="Length" />
+      </div>
+      <div class="fld">
+        <label for="cbm-w">Width</label>
+        <input id="cbm-w" type="text" class="mono" [(ngModel)]="Width" />
+      </div>
+      <div class="fld">
+        <label for="cbm-h">Height</label>
+        <input id="cbm-h" type="text" class="mono" [(ngModel)]="Height" (change)="fn_CalCBM();" />
+      </div>
+      <div class="fld full">
+        <label for="cbm-v">Volume</label>
+        <input id="cbm-v" type="text" class="mono w-200" disabled [(ngModel)]="Volume" />
+        <span class="hint">cm³, recalculated from Packages × L × W × H</span>
+      </div>
+    </div>
+  </div>
 
-                                <td><span class="col-form-span-label">{{obj.DIMPKGS}}</span></td>
-                                <td><span class="col-form-span-label">{{obj.DIMLENGTH}}</span></td>
-                                <td><span class="col-form-span-label">{{obj.DIMWIDTH}}</span></td>
-                                <td><span class="col-form-span-label">{{obj.DIMHEIGHT}}</span></td>
-                                <td><span class="col-form-span-label">{{obj.DIMVOLUME}}</span></td>
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Totals</h2>
+      @if (runtotnoofpkgs !== '' && runtotnoofpkgs != null) {
+      <span class="meta">{{runtotnoofpkgs}} of {{NoOfPackages}} packages measured</span>
+      }
+    </div>
+    <div class="fields">
+      <div class="fld">
+        <label for="cbm-tot">CBM</label>
+        <input id="cbm-tot" type="text" class="mono" disabled [(ngModel)]="TotCbm" />
+      </div>
+      <div class="fld">
+        <label for="cbm-vw">Vol. wt</label>
+        <input id="cbm-vw" type="text" class="mono" disabled [(ngModel)]="VolWt" />
+      </div>
+    </div>
+  </div>
 
-                                 </tr>
-}
-                        </tbody>
-                    </table>
-}
-               </div>
+  @if (Dimensionlist.length>0) {
+  <div class="card cbm-list">
+    <div class="card-h"><h2>Dimensions</h2><span class="meta">{{Dimensionlist.length}} {{Dimensionlist.length == 1 ? 'row' : 'rows'}}</span></div>
+    <div class="tbl-wrap">
+      <table class="tbl w-m">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="num">Packages</th>
+            <th class="num">Length</th>
+            <th class="num">Width</th>
+            <th class="num">Height</th>
+            <th class="num">Volume</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (obj of Dimensionlist; track obj) {
+          <tr [class.upd]="text == 'Update' && obj.PK_ID == ID">
+            <td class="act l">
+              <button type="button" (click)="EditDimension(obj.PK_ID)">Edit</button>
+              <button type="button" (click)="DeleteDimension(obj.PK_ID,obj.MAINTBLID)">Delete</button>
+            </td>
+            <td class="num">{{obj.DIMPKGS}}</td>
+            <td class="num">{{obj.DIMLENGTH}}</td>
+            <td class="num">{{obj.DIMWIDTH}}</td>
+            <td class="num">{{obj.DIMHEIGHT}}</td>
+            <td class="num">{{obj.DIMVOLUME}}</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  }
 
-        <!-- </tr> -->
-
-</td>
-</tr>
-
-<tr>
-<td colspan="5" align="center">
-<button type="button" name="submitButton" uiBtn variant="default" size="sm" (click)="Close();">
-<span class="col-form-span-label"><i class="fa fa-save"></i>Close</span></button>&nbsp;
-</td>
-</tr>
-     </table>
-
-    </td>
-    </tr>
-
-</table>
+  @if (!drawer) {
+  <div class="cbm-actions">
+    <button type="button" name="submitButton" class="btn p" (click)="Close();">Close</button>
+  </div>
+  }
+</div>

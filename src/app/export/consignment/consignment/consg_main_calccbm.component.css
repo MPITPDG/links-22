@@ -1,0 +1,73 @@
+/* ----------------------------------------------------------------
+   Calculate CBM content (Links-only, approved mock m7): screen-level
+   additions on top of the GLOBAL page kit (src/styles/kit/import-page.css,
+   root .im-page) and consignment-page.css (host class kit-consignment).
+   Only the mock-only helpers the kit does not carry; monochrome.
+     1. the host is a size container: in the consg_main drawer (about 620px)
+        fields sit two to a row with a 120px label column, as in the mock;
+        in a narrow host (the Port editor's 400px modal) they stack.
+     2. .w-200 / .mono inputs.
+     3. dimension grid: left-aligned row actions, the row being edited.
+     4. inline Close row, drawn only outside the drawer.
+   ---------------------------------------------------------------- */
+
+/* 1. size container */
+:host {
+    display: block;
+    container-type: inline-size;
+}
+
+.im-page .fld {
+    grid-template-columns: 120px minmax(0, 1fr);
+}
+
+@container (max-width: 520px) {
+    .im-page .fields {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .im-page .fld {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 4px;
+    }
+
+    .im-page .fld .hint {
+        grid-column: 1;
+        margin-top: 0;
+    }
+}
+
+/* 2. inputs */
+.im-page input.w-200,
+.im-page select.w-200 {
+    max-width: 200px;
+}
+
+.im-page input.mono {
+    font-family: var(--num);
+    font-size: 12.5px;
+}
+
+/* 3. dimension grid */
+.im-page table.tbl.w-m {
+    min-width: 520px;
+}
+
+.im-page td.act.l {
+    text-align: left;
+}
+
+.im-page td.act.l button {
+    margin: 0 4px 0 0;
+}
+
+.im-page table.tbl tr.upd td {
+    background: var(--mp-accent-soft, #EBEBEB);
+}
+
+/* 4. inline Close (non-drawer host only) */
+.im-page .cbm-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 12px;
+}

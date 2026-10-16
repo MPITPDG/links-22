@@ -1,125 +1,80 @@
-<div class="animated fadeIn" >
-    <div class="row no-gutters"  >
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{Header}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Export - HBL upload (/export/hblupload/UploadHbl). Links-only screen on the GLOBAL page kit
+  (src/styles/kit/import-page.css, list recipe), built to the approved mock
+  links-export-mocks.html #m1. Screen-only helpers live in hblupload.component.css.
+  Behaviour is the old screen's: "Download Excel" is the old Search button (downloadHBL,
+  Export/EXP_HBL_UPLOAD -> Hblupload.xls), Reset clears the grid, and the grid shows only when
+  data_table has rows, exactly as before (nothing on this screen fills it).
+  The old commented-out file-upload row (Select file + Upload) stays out, as it was.
+-->
+<div class="im-page pb">
+  <div class="crumb">Export / Hbl upload</div>
+  <div class="ph">
+    <div>
+      <h1>{{Header}}</h1>
+      <p>Download the printed house B/Ls for a date range as the upload sheet</p>
     </div>
-    <div class="row no-gutters" >
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td class="col-form-span-heading" colspan="6"> <b>UPLOAD DETAILS</b> </td>
-                </tr>
-                <tr>
-                      <td style="width:120px;">
-                                <span class="col-form-span-label "><b>From Date</b> </span>
-                                <span class="col-form-span-error">*</span>
-                            </td>
-                            <td >
-                                <my-date-picker name="FromDate" [options]="myDatePickerOptions"   [(ngModel)]="fromdate" >
-                                </my-date-picker>
-                            </td>
-                            <td style="width:120px;">
-                                <span class="col-form-span-label "><b>To Date</b> </span>
-                                <span class="col-form-span-error">*</span>
-                            </td>
-                            <td>
-                                <my-date-picker name="ToDate" [options]="myDatePickerOptions"   [(ngModel)]="todate" >
-                                </my-date-picker>
-                            </td>
-                 </tr>
-                   <tr>
-                  
-                    <td colspan="4" style="text-align: center;">
-                        <button uiBtn variant="default" size="sm" type="submit" (click)="downloadHBL()"><span
-                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Search</span></button>
-                            &nbsp;&nbsp;
-                        <button uiBtn variant="outline" size="sm" type="submit" (click)="Reset()"> <span
-                            class="col-form-span-label"><i class="fa fa-ban"></i>Reset</span></button>
-                    </td>
-                </tr>
-                 <!-- <tr>
-                    <td>
-                        <span class="col-form-span-label"><b>Select File</b> </span>
-                        <span class="col-form-span-error">*</span>
-                    </td>
-                <td colspan="3">
-                    <input  type="file" #inputFile  accept=".csv,.xls,.xlsx,.doc,.docx,.ppt,.pptx,.txt,.pdf,.png" (change)="onFileChange($event)" class="form-control width180">
-                    
-                </td>
+  </div>
 
-                </tr> -->
-                <!-- <tr>
-                  
-                    <td>
-                        <button uiBtn variant="default" size="sm" type="submit" (click)="onupload()"><span
-                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Upload</span></button>
-                            &nbsp;&nbsp;
-                        <button uiBtn variant="outline" size="sm" type="submit" (click)="Reset()"> <span
-                            class="col-form-span-label"><i class="fa fa-ban"></i>Reset</span></button>
-                    </td>
-                </tr> -->
-           
-
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
+  <div class="card">
+    <div class="filters f-hbl">
+      <div class="f">
+        <label>From date <span class="req">*</span></label>
+        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="fromdate"></my-date-picker>
+      </div>
+      <div class="f">
+        <label>To date <span class="req">*</span></label>
+        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="todate"></my-date-picker>
+      </div>
+      <div class="f"><button type="button" class="btn g" (click)="Reset()">Reset</button></div>
+      <div class="f"><button type="button" class="btn p" (click)="downloadHBL()">Download Excel</button></div>
     </div>
+
     @if (data_table.length > 0) {
-<div class="row no-gutters">
-      
-        <div class="col-sm-12 col-md-12 col-lg-12 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <thead>
-                    <tr class="col-form-span-heading">
-                       
-                        <th   align="center"><span  class="col-form-span-label"> Mbl No</span></th>
-                        <th   align="center"><span  class="col-form-span-label"> Mbl Date</span> </th>
-                        <th   align="center"><span  class="col-form-span-label">  Hbl No.</span></th>
-                        <th   align="center"> <span  class="col-form-span-label"> Hbl Date</span> </th>
-                        <th   align="center"> <span  class="col-form-span-label"> Port Of Loading</span> </th>
-                        <th   align="center"> <span  class="col-form-span-label">Port of Discharge</span> </th>
-                        <th   align="center"> <span  class="col-form-span-label">Container Status</span> </th>
-                        <th   align="center"> <span  class="col-form-span-label">Consigner Name</span> </th>
-                        <th   align="center"> <span  class="col-form-span-label">Consignee</span> </th>
-                    </tr>
-                </thead>
-                @if (data_table.length > 0) {
-<tbody>
-                    @for (data of data_table; track data) {
-<tr>
-                      
-                        
-                        <td><span class="col-form-span-label">{{data.EXPT_BLNO}}</span>   </td>
-                        <td><span  class="col-form-span-label">{{data.EXPT_BLDT}}</span>  </td>
-                        <td><span  class="col-form-span-label">{{data.EXPT_HBLNO}}</span>  </td>
-                        <td><span  class="col-form-span-label">{{data.EXPT_HBLDT}}</span>  </td>
-                        <td><span  class="col-form-span-label">{{data.LOADINGPORT}}</span>  </td>
-                        <td><span  class="col-form-span-label">{{data.DISCHRGPORT}}</span>  </td>
-                        <td><span  class="col-form-span-label">{{ data.CONTSTATUS}}</span>  </td>
-                        <td><span  class="col-form-span-label">{{ data.CONSIGNORNAME}}</span>  </td>
-                        <td><span  class="col-form-span-label">{{ data.CONSIGNEENAME}}</span>  </td>
-                    </tr>
-}
-                </tbody>
-}
-
-            </table>
+      <div class="toolbar">
+        <span><span class="count">{{data_table.length}} house B/Ls</span><span class="sub-t"> printed {{fromdate?.formatted}} – {{todate?.formatted}}</span></span>
+        <span class="tb-r"><span class="sub-t">Preview of Hblupload.xls</span></span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>MBL no.</th>
+              <th>MBL date</th>
+              <th>HBL no.</th>
+              <th>HBL date</th>
+              <th>Port of loading</th>
+              <th>Port of discharge</th>
+              <th>Container status</th>
+              <th>Consignor</th>
+              <th>Consignee</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (data of data_table; track data) {
+              <tr>
+                <td class="mono">@if (data.EXPT_BLNO) { {{data.EXPT_BLNO}} } @else {<span class="sub-t">—</span>}</td>
+                <td>@if (data.EXPT_BLDT) { {{data.EXPT_BLDT}} } @else {<span class="sub-t">—</span>}</td>
+                <td class="mono">{{data.EXPT_HBLNO}}</td>
+                <td>{{data.EXPT_HBLDT}}</td>
+                <td class="mono">{{data.LOADINGPORT}}</td>
+                <td class="mono">{{data.DISCHRGPORT}}</td>
+                <td>@if (data.CONTSTATUS) {<span class="chip"><span class="dot"></span>{{data.CONTSTATUS}}</span>} @else {<span class="sub-t">—</span>}</td>
+                <td>{{data.CONSIGNORNAME}}</td>
+                <td>{{data.CONSIGNEENAME}}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <span>Showing <b>1–{{data_table.length}}</b> of <b>{{data_table.length}}</b></span>
+        <div class="pages">
+          <button type="button" disabled aria-label="Previous page">‹</button>
+          <button type="button" class="on">1</button>
+          <button type="button" disabled aria-label="Next page">›</button>
         </div>
-  
-    </div>
-}
+      </div>
+    }
+  </div>
 </div>
-
-

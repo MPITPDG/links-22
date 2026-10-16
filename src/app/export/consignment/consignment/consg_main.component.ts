@@ -16,6 +16,8 @@ import { ConsignmentDraftService } from './consignment-draft.service';
     templateUrl: 'consg_main.component.html',
     // Page kit is global (src/styles/kit); kit-consignment scopes consignment-page.css.
     host: { class: 'kit-consignment' },
+    // Links-only: frame of the Calculate CBM drawer (the bsModal at the end of the template).
+    styleUrls: ['consg_main_calccbm.drawer.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

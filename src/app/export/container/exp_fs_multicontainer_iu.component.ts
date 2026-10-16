@@ -11,6 +11,10 @@ import { ThemeService } from 'ng2-charts';
 @Component({
     selector: 'app-multicontainerFS-iu',
     templateUrl: 'exp_fs_multicontainer_iu.component.html',
+    // Page kit is global (src/styles/kit): kit-consignment scopes consignment-page.css
+    // (banded card heads, .btn.sm, .cv-acts); the screen sheet adds the mock-only helpers.
+    host: { class: 'kit-consignment' },
+    styleUrls: ['./exp-fs-multicontainer-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -455,6 +459,11 @@ export class FSmulticontainerIU implements OnInit {
         else{
             this._toasterService.toast('info', 'info', "This container is already containerized please contact administrator !");
         }
+    }
+    /** Presentation only (Containers card meta): rows still carrying a generated
+        CONTAINERNO placeholder, the same test finalSubmit() blocks on. */
+    get pendingContainers(): number {
+        return (this.containerClp || []).filter((obj: any) => !obj.CONTAINERNO || String(obj.CONTAINERNO).startsWith("CONTAINERNO")).length;
     }
     childreset()
     {

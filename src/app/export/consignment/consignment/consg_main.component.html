@@ -5,7 +5,7 @@
   right. The nine ngx-bootstrap tabs became eight sections (ids cs-main ... cs-marks)
   all visible on the one page; the workspace section nav scrolls to them.
 
-  Links-only kept: Calculate CBM button + modal (CalcbmModal / changevolume),
+  Links-only kept: Calculate CBM button + drawer (CalcbmModal / changevolume),
   Volume (CBM) locked unless SEA, gross weight without the CHBL blur, the
   hard-coded incoterm list (FOB / CIF / C&F / C&I), freight select not locked by
   incoterm, Sub Agent row. Links hides Gri No / Gri Date, DEEC book, Exp/Imp book,
@@ -1077,17 +1077,36 @@
 
 </div>
 
-<!-- Links-only: Calculate CBM modal (legacy calculator content restyled in place) -->
-<div bsModal #CalculateCBM="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" [config]="{backdrop: 'static'}">
-  <div class="modal-dialog modal-md">
-    <div class="modal-content" style="width:530px;">
-      <div class="modal-header">
-        <span class="modal-title pull-left">
-          <strong>Calculate CBM</strong>
-        </span>
+<!--
+  Links-only: Calculate CBM as a right-side drawer (approved mock m7), mirroring the
+  consignment edit drawer (consig_main_edit_modal: .dr-head / .dr-body / .dr-foot).
+  Same open / close / apply flow as the old centred modal: the bsModal directive,
+  #CalculateCBM, CalcbmModal() -> show() and changevolume() -> hide() are unchanged.
+  Update calls the calculator's own Close() (the old Close button: same check, same
+  result emit -> changevolume). Abort and the X call hide(), exactly what Esc did on
+  the old modal (closes without applying). Frame styles: consg_main_calccbm.drawer.css.
+-->
+<div bsModal #CalculateCBM="bs-modal" class="modal fade cbm-drawer" tabindex="-1" role="dialog" aria-labelledby="cbmDrawerTitle" aria-hidden="true" [config]="{backdrop: 'static'}">
+  <div class="modal-dialog cbm-dialog">
+    <div class="modal-content im-page dr-shell">
+      <div class="dr-head">
+        <div class="dr-titlewrap">
+          <span class="dr-eyebrow">Consignment {{hdexptno}}</span>
+          <span class="dr-title" id="cbmDrawerTitle">Calculate CBM</span>
+        </div>
+        <button type="button" class="dr-close" (click)="hide()" aria-label="Close">
+          <i class="fa fa-times" aria-hidden="true"></i>
+        </button>
       </div>
-      <div class="modal-body modal-fix-body x-legacy" style="height:400px;width:530px;">
-        <app-main-consignment-calcbm-add (result)="changevolume($event)" [grosswt]="grosswt" [noofpkgs]="noofpackages" [exptno]="hdexptno"></app-main-consignment-calcbm-add>
+      <div class="dr-body">
+        <app-main-consignment-calcbm-add #cbmCalc [drawer]="true" (result)="changevolume($event)" [grosswt]="grosswt" [noofpkgs]="noofpackages" [exptno]="hdexptno"></app-main-consignment-calcbm-add>
+      </div>
+      <div class="dr-foot">
+        <span class="note">CBM and Vol. wt go back to the consignment only when you press Update.</span>
+        <div class="r">
+          <button type="button" class="btn g" (click)="hide()">Abort</button>
+          <button type="button" class="btn p" (click)="cbmCalc.Close()">Update</button>
+        </div>
       </div>
     </div>
   </div>

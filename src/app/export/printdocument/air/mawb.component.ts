@@ -9,6 +9,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-print-air-mawb-list',
     templateUrl: 'mawb.list.component.html',
+    styleUrls: ['./mawb-generate.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -73,6 +74,7 @@ export class PrintDocumentMawbListComponent implements OnChanges {
 @Component({
     selector: 'app-print-air-mawb-update',
     templateUrl: 'mawb.update.component.html',
+    styleUrls: ['./mawb-generate.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -194,6 +196,7 @@ export class PrintDocumentMawbUpdateComponents implements OnChanges {
 
 @Component({
     templateUrl: 'mawb.component.html',
+    styleUrls: ['./mawb-generate.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -229,6 +232,10 @@ export class PrintDocumentMawbComponent implements OnInit {
     Airmawbno:any;
     searchLength: any = 0;
     AllMawbNoList: any = [];
+    /** Display only (page crumb / heading): the same /number test ngOnInit uses for viewType. */
+    get isGenerateRoute(): boolean {
+        return this._router.url.search(/number/gi) != -1;
+    }
     constructor(
         private _router: Router,
         private _activatedRoute: ActivatedRoute,
@@ -401,6 +408,7 @@ export class PrintDocumentMawbComponent implements OnInit {
 @Component({
     selector: 'app-mawb-search',
     templateUrl: 'mawb.search.component.html',
+    styleUrls: ['./mawb-generate.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

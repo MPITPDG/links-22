@@ -1,32 +1,39 @@
 ﻿<!--
-  Export - print document - MAWB job list. Page kit recipe 1, ported from MPERPNG-20.
-  The host shell (mawb.component.html, Links' stock-driven MAWB generate / search) is
-  left as it is, so this child carries its own .im-page root.
+  Export - print document - MAWB job list, step 2 of Generate. Page kit recipe 1, ported from
+  MPERPNG-20 and fitted to the approved Links mock links-export-mocks.html #m3: the old Submit
+  is the card's "Continue" (same submit()). The host (mawb.component.html) owns the page
+  heading; this child carries its own .im-page root. Bindings unchanged.
 -->
 <div class="im-page">
-  <div class="card">
-    <div class="card-h"><h2>Export jobs for this MAWB</h2></div>
+  <div class="card sec">
+    <div class="card-h">
+      <h2>2 · Export jobs without a MAWB</h2>
+      <div class="acts">
+        <span class="meta">Tick jobs of one shipment mode</span>
+        <button type="button" class="btn sm" name="submit" (click)="submit();">Continue</button>
+      </div>
+    </div>
     @if (searchList.length > 0) {
       <div class="tbl-wrap">
         <table class="tbl">
           <thead>
             <tr>
-              <th>Select</th>
-              <th>EXPT NO</th>
+              <th class="sel">Select</th>
+              <th>Expt no.</th>
               <th>Shipper</th>
               <th>Consignee</th>
               <th class="num">Pkgs</th>
-              <th class="num">Grwt</th>
-              <th class="num">Chrg.Wt</th>
+              <th class="num">Gr wt</th>
+              <th class="num">Chrg wt</th>
               <th class="num">Pcs</th>
-              <th>Shipment Mode</th>
+              <th>Shipment mode</th>
             </tr>
           </thead>
           <tbody>
             @for (obj of searchList; track obj) {
               <tr>
-                <td class="text-center">
-                  <input type="checkbox" (checked)="obj.SELECT == true" [disabled]="obj.Disabled == true" (click)="validate(obj.MODEOFSHIP,obj.EXPTNO)" />
+                <td class="sel">
+                  <input type="checkbox" [attr.aria-label]="'Select ' + obj.EXPTNO" (checked)="obj.SELECT == true" [disabled]="obj.Disabled == true" (click)="validate(obj.MODEOFSHIP,obj.EXPTNO)" />
                 </td>
                 <td class="mono">{{obj.EXPTNO}}</td>
                 <td>{{obj.SHIPPER}}</td>
@@ -42,11 +49,5 @@
         </table>
       </div>
     }
-    <div class="bar" style="margin:0;">
-      <span class="note"></span>
-      <span class="r">
-        <button type="button" class="btn p" name="submit" (click)="submit();">Submit</button>
-      </span>
-    </div>
   </div>
 </div>
