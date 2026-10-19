@@ -15,6 +15,7 @@ import { ContainerjobviewComponent } from './importfra/container-jobview.compone
 import {CalCbmViewComponent } from './export/calculatecbm-view.component';
 import {InvoicePrintComponent} from './Account/invoice-print.component';
 import {CreditnotePrintComponent} from './Account/creditnote-print.component';
+import {CreditnotePrintNetComponent} from './Account/creditnote-print-net.component';
 import {CreditnoteViewComponent} from './Account/creditnote-view.component';
 import {InvoiceViewComponent} from './Account/invoice-view.component';
 import {PurchasePrintComponent} from './Account/purchase-print.component';
@@ -63,6 +64,7 @@ import { SharedModule } from '../shared/shared.module';
         CalCbmViewComponent,
         InvoicePrintComponent,
         CreditnotePrintComponent,
+        CreditnotePrintNetComponent,
         CreditnoteViewComponent,InvoiceViewComponent,PurchasePrintComponent,
         ReqbpBillListComponent,ReqbpViewComponent,
         CashBookBRPrintComponent, InvoicehistoryPurchaseprintComponent,

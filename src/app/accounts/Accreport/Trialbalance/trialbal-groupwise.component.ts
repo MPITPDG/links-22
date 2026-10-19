@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../../shared/service/loginService';
 import { ToastCommonService } from '../../../shared/service/toastService';
@@ -8,6 +8,9 @@ import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/shared/service/dataService';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 import { networkInterfaces } from 'os';
+import { TrialBalanceExportService } from './trialbal-export.service';
+import { catchError } from 'rxjs/operators';
+import { EMPTY, Subscription } from 'rxjs';
 @Component({
     selector: 'app-trialbalance-groupwise',
     templateUrl: './trialbal-groupwise.component.html',
@@ -15,7 +18,7 @@ import { networkInterfaces } from 'os';
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
-  export class TrialBalanceGroupwise implements OnInit {
+  export class TrialBalanceGroupwise implements OnInit, OnDestroy {
    
 
     public myDatePickerOptionsInv: IMyDpOptions = {
@@ -49,6 +52,7 @@ import { networkInterfaces } from 'os';
      
 
     cmpnyname:string;
+    private fySub: Subscription;
        constructor(
         private _dataService: DataService,
         private _toasterService: ToastCommonService,
@@ -58,11 +62,12 @@ import { networkInterfaces } from 'os';
         private _activatedRoute: ActivatedRoute,
         private _loginService: LoginService,
         private _loaderService: LoaderService,
+        private tbExport: TrialBalanceExportService,
       ) { }
           ngOnInit() {
-             this.AsonDate = new Date();
-             this.AsonDate =  this._dataService.datechnge(this.AsonDate)
-             this.FinalAsonDate = this._dataService.convertFromdd_mm_yyyTodd_mmm_yyy(this.AsonDate)
+             this.setAsOnDate()
+             /* the financial year is changed from the header dropdown without reloading this page: follow it */
+             this.fySub = LoginService.financialYearChanged.subscribe((fy: any) => { if (fy) { this.setAsOnDate() } })
             // this.asondt=new Date();
             // this.asondt =  this._dataService.convertFromdd_mm_yyyTodd_mmm_yyy(this.asondt);//this._dataService.datechnge1(this.asondt)
             // if (this._dataService.date2Comparison(this._loginService.getLogin()[0].FINANCIAL_YEAR.ENDDATE,this.asondt) == false)
@@ -79,6 +84,29 @@ import { networkInterfaces } from 'os';
             this.FillCompany();
          
            }
+          ngOnDestroy() {
+            if (this.fySub) { this.fySub.unsubscribe() }
+          }
+          /* As on date: today when the selected financial year contains today, otherwise the last day of that financial year */
+          setAsOnDate() {
+            const fy = this._loginService.getLogin()[0].FINANCIAL_YEAR
+            const now = new Date()
+            let asOn = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+            if (fy) {
+              const start = this.parseFyDate(fy.STARTDATE)
+              const end = this.parseFyDate(fy.ENDDATE)
+              if (end && start && (asOn < start || asOn > end)) { asOn = end }
+            }
+            this.AsonDate = this._dataService.datechnge(asOn)
+            this.FinalAsonDate = this._dataService.convertFromdd_mm_yyyTodd_mmm_yyy(this.AsonDate)
+          }
+          /* financial year dates look like 01-Apr-2025 */
+          private parseFyDate(s: any): Date | null {
+            const m = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/.exec((s || '').toString().trim())
+            if (!m) { const d = new Date(s); return isNaN(d.getTime()) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate()) }
+            const mon = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].indexOf(m[2].toLowerCase())
+            return mon < 0 ? null : new Date(+m[3], mon, +m[1])
+          }
            verifyPermission(formId, userMode) {
             this._loaderService.display(true);
             this._loginService.verifyRights(formId, '')
@@ -93,7 +121,7 @@ import { networkInterfaces } from 'os';
             CityCode: this._loginService.getLogin()[0].CITYCODE,
                 }
             this._dataService.getData("Accounts/fn_Acc_Rpt_Common_CompanyDetails", jsonmaster).subscribe((data: any) => {
-            this.cmpnyname = data.Table[0].cmp_name
+            this.cmpnyname = (data.Table[0].cmp_name || '') + ' - ' + (data.Table[0].city_name || '')   // as the .NET export: <company> - <city>
               })
           }
          
@@ -121,32 +149,33 @@ import { networkInterfaces } from 'os';
         FinEndDate1:this.FinalAsonDate ,
         }
     this._dataService.getData("Accounts/Acc_Rpt_TrialBalance_GrpWiseDtls_All_ToExcel_TrialBalanceGroupDetail", jsonview)
+        .pipe(catchError((err: any) => {
+          /* the server could not answer (HTTP 500, endpoint missing, network): stop the loader and say so */
+          this.loaderService.display(false);
+          this._toasterService.toast('error', 'error', 'The server could not return this report (service unavailable or server error). Please contact support.');
+          return EMPTY;
+        }))
         .subscribe((data: any) => {
-        this.trbldata=data.Table;
-        this.trbldata.forEach((row: any) => {
-        this.dataForExcel.push(Object.values(row)) // array format push 
-        })
+        this.loaderService.display(false);
+        /* an empty reply (no Table) means the stored procedure failed on the server */
+        if (!data || !data.Table || data.Table.length == 0) {
+          this._toasterService.toast('warning', 'warning', (data && data.Table) ? 'No Record Found !' : 'The report could not be generated on the server (stored procedure error). Please contact support.');
+          return;
+        }
+        this.trbldata = data.Table;
         this.ExportToExcelData();
             });
-        this.loaderService.display(false);
     }
     ExportToExcelData(){
-    
         var date = new Date(this._loginService.getLogin()[0].FINANCIAL_YEAR.STARTDATE);
         var todate = new Date(this._loginService.getLogin()[0].FINANCIAL_YEAR.ENDDATE);
-        var startshortYear = date.getFullYear(); 
-        var startYear = startshortYear.toString().substr(-2);
-        var toshortYear = todate.getFullYear(); 
-        var endYear = toshortYear.toString().substr(-2);
-          let reportData = {
-            title: this.cmpnyname,
-            subtitle:'Trial Balance As On ' + this.AsonDate ,
-            data: this.dataForExcel,
-            headers: Object.keys(this.trbldata[0]),
-            pagetype: "TrialBalanceGrpwise"
-          }
-          this.exportser.exportExceltry(reportData,'Accounts_TrialBalanceAll_GRP_WiseDtls ' + startYear + ' - ' + endYear);
-          this.dataForExcel= [];
+        var startYear = date.getFullYear().toString().substr(-2);
+        var endYear = todate.getFullYear().toString().substr(-2);
+        /* file name exactly as the .NET page: Accounts_TrialBalanceAll_GRP_WiseDtls-<ClientCode>-<from yy>-<to yy>; the client code is empty there, hence the double dash */
+        this.tbExport.exportGroupWiseDetail({
+          asOn: this.FinalAsonDate,
+          company: this.cmpnyname
+        }, this.trbldata, 'Accounts_TrialBalanceAll_GRP_WiseDtls--' + startYear + '-' + endYear);
     }   
 
 }

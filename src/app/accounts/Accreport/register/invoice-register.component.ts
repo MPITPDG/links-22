@@ -7,6 +7,9 @@ import { LoaderService } from '../../../shared/service/loader.service';
 import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/shared/service/dataService';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
+import { RegisterExportService } from './register-export.service';
+import { catchError } from 'rxjs/operators';
+import { EMPTY } from 'rxjs';
 
 import { FIN_PERIODS, FinPeriod, finRange, finDp } from '../fin-kit';
 @Component({
@@ -45,6 +48,7 @@ export class InvoiceRegisterComponent implements OnInit {
   registerdata_details = []
   registerdata = []
   cmpnyname: any;
+  cmpFullName: string = "";   // "<company> - <city>", the second title line of the .NET exports
   PageType: any;
   PageName: string;
   constructor(
@@ -53,6 +57,7 @@ export class InvoiceRegisterComponent implements OnInit {
     private loaderService: LoaderService,
     private _router: Router,
     private http: HttpClient, private exportser: ExportexcelService,
+    private regExport: RegisterExportService,
     private _activatedRoute: ActivatedRoute,
     private _loginService: LoginService,
   ) { }
@@ -84,6 +89,7 @@ export class InvoiceRegisterComponent implements OnInit {
     }
     this._dataService.getData("Accounts/fn_Acc_Rpt_Common_CompanyDetails", jsonmaster).subscribe((data: any) => {
       this.cmpnyname = data.Table[0].cmp_name
+      this.cmpFullName = (data.Table[0].cmp_name || '') + ' - ' + (data.Table[0].city_name || '')
     })
     this.loaderService.display(false);
   }
@@ -156,157 +162,131 @@ export class InvoiceRegisterComponent implements OnInit {
     }
    
     if (this.PageType == "Invoice") {
-      this._dataService.getData("Accounts/fn_Acc_Rpt_Invoice_Register_XL_Search_Register", jsonmaster).subscribe((data: any) => {
-        if (data.Table.length > 0){
+      this.api("Accounts/fn_Acc_Rpt_Invoice_Register_XL_Search_Register", jsonmaster).subscribe((data: any) => {
+        if (data && data.Table && data.Table.length > 0){
           this.registerdata = data.Table
-          this.registerdata.forEach((row: any) => {
-            this.dataForExcel1.push(Object.values(row)) // array format push 
-          })
 
-          let reportData = {
-            title: this.cmpnyname,
-            subtitle: this.PageType + ' Search Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
-            data: this.dataForExcel1,
-            headers: Object.keys(this.registerdata[0]),
-            pagetype: this.PageType
+          /* the .NET export lists every job number of each invoice: fetch them in one call */
+          const invNos = this.registerdata.map((r: any) => r.INV_NO)
+          const exportInvoice = (jobs: any) => {
+            this.regExport.exportInvoice({
+              header: 'Invoice Search Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
+              company: this.cmpFullName
+            }, this.registerdata, jobs, "Invoice Register");
+            this.loaderService.display(false);
           }
-          this.exportser.exportExceltry(reportData, "Report-Invoice Register");
+          this._dataService.Common("Accounts/fn_Acc_Rpt_Invoice_Register_XL_Search_JobNos", { InvNos: invNos }).subscribe((jd: any) => {
+            const jobs: any = {}
+            const rows = (jd && jd.Table) ? jd.Table : []
+            rows.forEach((j: any) => {
+              const k = (j.INV_NO + '').replace(/^'/, '')
+              const v = (j.INV_JOBNO + '').replace(/^'/, '').trim()
+              if (v !== '') { (jobs[k] = jobs[k] || []).push(v) }
+            })
+            exportInvoice(jobs)
+          }, () => {
+            /* job numbers could not be fetched (for example the API has not been updated yet): still export the register */
+            this._toasterService.toast("warning", "warning", "Job numbers could not be loaded; exporting without them.")
+            exportInvoice({})
+          })
       }
       else{
-        this._toasterService.toast("warning","warning","No Record Found !")
+        this._toasterService.toast("warning","warning", this.noDataMessage(data))
         this.loaderService.display(false);
       }
       })
     
     } else if (this.PageType == "CashBook") {
-      this._dataService.getData("Accounts/fn_Acc_Rpt_CashBook_Register_XL_Fill_CashBook", jsonmaster).subscribe((data: any) => {
-        if (data.Table.length > 0){
+      this.api("Accounts/fn_Acc_Rpt_CashBook_Register_XL_Fill_CashBook", jsonmaster).subscribe((data: any) => {
+        if (data && data.Table && data.Table.length > 0){
           let cashbal = "", bankbal = ""
           cashbal = data.Table[0].Column1
           bankbal = data.Table1[0].Column1
           this.registerdata = data.Table2
-          this.registerdata.forEach((row: any) => {
-            this.dataForExcel1.push(Object.values(row))
-          })
 
-          let reportData = {
-            title: this.cmpnyname,
-            subtitle: this.PageType + ' Search Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
-            data: this.dataForExcel1,
-            headers: Object.keys(this.registerdata[0]),
-            Bal1: cashbal,
-            Bal2: bankbal,
-            pagetype: this.PageType
-          }
-          this.exportser.exportExceltry(reportData, "Report-CashBook Register");
+          this.regExport.exportCashBook({
+            header: 'Cash Book Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
+            company: this.cmpFullName
+          }, cashbal, bankbal, this.registerdata, ((this._loginService.getLogin()[0].CMP_USERNAME || "") + "").trim() + "_Accounts_CashBook_Register");
+          this.loaderService.display(false);
       }
       else{
-        this._toasterService.toast("warning","warning","No Record Found !")
+        this._toasterService.toast("warning","warning", this.noDataMessage(data))
         this.loaderService.display(false);
       }
       })
 
     } else if (this.PageType == "Purchase") {
-      this._dataService.getData("Accounts/fn_Acc_Rpt_Purchase_Register_XL_Fill", jsonmaster).subscribe((data: any) => {
-        if (data.Table.length > 0){
+      this.api("Accounts/fn_Acc_Rpt_Purchase_Register_XL_Fill", jsonmaster).subscribe((data: any) => {
+        if (data && data.Table && data.Table.length > 0){
           this.registerdata = data.Table
-          this.registerdata.forEach((row: any) => {
-            this.dataForExcel1.push(Object.values(row))
-          })
 
-          let reportData = {
-            title: this.cmpnyname,
-            subtitle: this.PageType + ' Search Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
-            data: this.dataForExcel1,
-            headers: Object.keys(this.registerdata[0]),
-            pagetype: this.PageType,
-            totalamount_text: data.Table1[0].HEADER,
-            totalamount_value: data.Table1[0].TOTAL
-          }
-          this.exportser.exportExceltry(reportData, "Report-Purchase Register");
+          this.regExport.exportPurchase({
+            header: 'Purchase Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
+            company: this.cmpFullName
+          }, this.registerdata, data.Table1 && data.Table1[0], ((this._loginService.getLogin()[0].CMP_USERNAME || "") + "").trim() + "_Accounts_Purchase_Register");
+          this.loaderService.display(false);
       }
       else{
-        this._toasterService.toast("warning","warning","No Record Found !")
+        this._toasterService.toast("warning","warning", this.noDataMessage(data))
         this.loaderService.display(false);
       }
       })
 
     } else if (this.PageType == "Brokerage") {
-      this._dataService.getData("Accounts/fn_frm_Acc_Rpt_Brokerage_Register_XL_Fill", jsonmaster).subscribe((data: any) => {
-        if (data.Table.length > 0){
+      this.api("Accounts/fn_frm_Acc_Rpt_Brokerage_Register_XL_Fill", jsonmaster).subscribe((data: any) => {
+        if (data && data.Table && data.Table.length > 0){
           this.registerdata = data.Table
-          this.registerdata.forEach((row: any) => {
-            this.dataForExcel1.push(Object.values(row))
-          })
 
-          let reportData = {
-            title: this.cmpnyname,
-            subtitle: this.PageType + ' Search Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
-            data: this.dataForExcel1,
-            headers: Object.keys(this.registerdata[0]),
-            pagetype: this.PageType,
-            totalamount_text: data.Table1[0].header,
-            totalamount_value: data.Table1[0].Total
-          }
-          this.exportser.exportExceltry(reportData, "Report-Brokerage Register");
+          this.regExport.exportBrokerage({
+            header: 'Brokerage Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
+            company: this.cmpFullName
+          }, this.registerdata, data.Table1 && data.Table1[0], ((this._loginService.getLogin()[0].CMP_USERNAME || "") + "").trim() + "_Accounts_Brokerage_Register");
+          this.loaderService.display(false);
       }
       else{
-        this._toasterService.toast("warning","warning","No Record Found !")
+        this._toasterService.toast("warning","warning", this.noDataMessage(data))
         this.loaderService.display(false);
       }
       })
 
     } else if (this.PageType == "CreditNote") {
-      this._dataService.getData("Accounts/fn_Acc_Rpt_CN_Register_AcctDetail_XL", jsonmaster).subscribe((data: any) => {
-        if (data.Table.length > 0){
+      this.api("Accounts/fn_Acc_Rpt_CN_Register_AcctDetail_XL", jsonmaster).subscribe((data: any) => {
+        if (data && data.Table && data.Table.length > 0){
           this.registerdata = data.Table
-          this.registerdata.forEach((row: any) => {
-            this.dataForExcel1.push(Object.values(row))
-          })
 
-          let reportData = {
-            title: this.cmpnyname,
-            subtitle: this.PageType + ' Search Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
-            data: this.dataForExcel1,
-            headers: Object.keys(this.registerdata[0]),
-            pagetype: this.PageType,
-          }
-          this.exportser.exportExceltry(reportData, "Report-CreditNote Register");
+          this.regExport.exportAutoGrid({
+            header: 'Credit Note Register Accounts Detail From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
+            company: this.cmpFullName
+          }, this.registerdata, ((this._loginService.getLogin()[0].CMP_USERNAME || "") + "").trim() + "_Accounts_CreditNote_Register");
+          this.loaderService.display(false);
       }
       else{
-        this._toasterService.toast("warning","warning","No Record Found !")
+        this._toasterService.toast("warning","warning", this.noDataMessage(data))
         this.loaderService.display(false);
       }
       })
 
     } else if (this.PageType == "Storage") {
-      this._dataService.getData("Accounts/fn_Acc_Rpt_storage_Register_XL_Fill", jsonmaster).subscribe((data: any) => {
-        if (data.Table.length > 0){
+      this.api("Accounts/fn_Acc_Rpt_storage_Register_XL_Fill", jsonmaster).subscribe((data: any) => {
+        if (data && data.Table && data.Table.length > 0){
           this.registerdata = data.Table
-          this.registerdata.forEach((row: any) => {
-            this.dataForExcel1.push(Object.values(row))
-          })
 
-          let reportData = {
-            title: this.cmpnyname,
-            subtitle: this.PageType + ' Search Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
-            data: this.dataForExcel1,
-            headers: Object.keys(this.registerdata[0]),
-            pagetype: this.PageType,
-            totalamount_text: data.Table1[0].header,
-            totalamount_value: data.Table1[0].Total
-          }
-          this.exportser.exportExceltry(reportData, "Report-Storage Register");
+          this.regExport.exportStorage({
+            header: 'Storage Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
+            company: this.cmpFullName
+          }, this.registerdata, data.Table1 && data.Table1[0], ((this._loginService.getLogin()[0].CMP_USERNAME || "") + "").trim() + "_Accounts_Storage_Register");
+          this.loaderService.display(false);
       }
       else{
-        this._toasterService.toast("warning","warning","No Record Found !")
+        this._toasterService.toast("warning","warning", this.noDataMessage(data))
         this.loaderService.display(false);
       }
       })
 
     } else if (this.PageType == "EXPWOP") {
-      this._dataService.getData("Accounts/fn_Acc_Rpt_EXPWOP_Register_XL", jsonmaster).subscribe((data: any) => {
-        if (data.Table.length > 0){
+      this.api("Accounts/fn_Acc_Rpt_EXPWOP_Register_XL", jsonmaster).subscribe((data: any) => {
+        if (data && data.Table && data.Table.length > 0){
           this.registerdata = data.Table
           this.registerdata.forEach((row: any) => {
             this.dataForExcel1.push(Object.values(row))
@@ -322,7 +302,7 @@ export class InvoiceRegisterComponent implements OnInit {
           this.exportser.exportExceltry(reportData, "Report-EXPWOP Register");
       }
       else{
-        this._toasterService.toast("warning","warning","No Record Found !")
+        this._toasterService.toast("warning","warning", this.noDataMessage(data))
         this.loaderService.display(false);
       }
       })
@@ -373,28 +353,34 @@ export class InvoiceRegisterComponent implements OnInit {
       Fin_StartDate: this._loginService.getLogin()[0].FINANCIAL_YEAR.STARTDATE,
       Fin_EndDate: this._loginService.getLogin()[0].FINANCIAL_YEAR.ENDDATE
     }
-    this._dataService.getData("Accounts/fn_Acc_Rpt_Invoice_Register_ActDetail_XL_Search_Acct_details", jsonmaster).subscribe((data: any) => {
-      if (data.Table.length > 0){
+    this.api("Accounts/fn_Acc_Rpt_Invoice_Register_ActDetail_XL_Search_Acct_details", jsonmaster).subscribe((data: any) => {
+      if (data && data.Table && data.Table.length > 0){
         this.registerdata_details = data.Table
-        this.registerdata_details.forEach((row: any) => {
-          this.dataForExcel2.push(Object.values(row))
-        })
 
-        let reportData = {
-          title: this.cmpnyname,
-          subtitle: this.PageType + ' Search Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
-          data: this.dataForExcel2,
-          headers: Object.keys(this.registerdata_details[0]),
-          pagetype: this.PageType
-        }
-
-        this.exportser.exportExceltry(reportData, "Report-Invoice Register Details");
+        this.regExport.exportAutoGrid({
+          header: 'Invoice Register Account Detail From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
+          company: this.cmpFullName
+        }, this.registerdata_details, "Report-Invoice Register Details");
+        this.loaderService.display(false);
     }
     else{
-      this._toasterService.toast("warning","warning","No Record Found !")
+      this._toasterService.toast("warning","warning", this.noDataMessage(data))
       this.loaderService.display(false);
     }
     })
+  }
+  /* report call with error handling: when the server cannot answer (endpoint missing on the live API, HTTP 500, network)
+     stop the loader and say so, instead of leaving the screen waiting */
+  api(name: string, json: any) {
+    return this._dataService.getData(name, json).pipe(catchError((err: any) => {
+      this.loaderService.display(false);
+      this._toasterService.toast('error', 'Error', 'The server could not return this report (service unavailable or server error). Please contact support.');
+      return EMPTY;
+    }))
+  }
+  /* the API answers an empty result (no Table at all) when the stored procedure itself fails; an empty Table means no data */
+  noDataMessage(data: any): string {
+    return (data && data.Table) ? "No Record Found !" : "The report could not be generated on the server (stored procedure error). Please contact support."
   }
   clear() {
    this.FromDate="";

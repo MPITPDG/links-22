@@ -5,8 +5,11 @@ import { ErrorDataSerice } from '../../error/error-share-data.service';
 import { Router } from '@angular/router';
 import { PlatformLocation } from '@angular/common';
 import { HttpClient, HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { Subject } from 'rxjs';
 @Injectable()
 export class LoginService {
+    /* emits the new FINANCIAL_YEAR object (or null) whenever the selected financial year changes; static so every injector instance shares it */
+    public static financialYearChanged: Subject<any> = new Subject<any>();
     constructor(
         private _router: Router,
         private _crypt: CryptoService,
@@ -136,6 +139,7 @@ export class LoginService {
         let tmpdata = this.getLogin();
         tmpdata[0]["FINANCIAL_YEAR"] = data;
         this.setLogin(tmpdata);
+        LoginService.financialYearChanged.next(data);
         return true;
     }
 

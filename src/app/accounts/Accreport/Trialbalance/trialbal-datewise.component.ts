@@ -7,6 +7,8 @@ import { LoaderService } from '../../../shared/service/loader.service';
 import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/shared/service/dataService';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
+import { catchError } from 'rxjs/operators';
+import { EMPTY } from 'rxjs';
 import { FIN_PERIODS, FinPeriod, finRange } from '../fin-kit';
 @Component({
     selector: 'app-trialbalance-datewise',
@@ -97,11 +99,21 @@ import { FIN_PERIODS, FinPeriod, finRange } from '../fin-kit';
             chkcity:this.Branch
             }
             this._dataService.getData("Accounts/TrialBalance_Datewise", jsonview)
+           .pipe(catchError((err: any) => {
+             /* the server could not answer (HTTP 500, network): stop the loader and say so */
+             this.loaderService.display(false);
+             this._toasterService.toast('error', 'error', 'The server could not accept this report request. Please contact support.');
+             return EMPTY;
+           }))
            .subscribe((data: any) => {
-            let pklogid=  data.Table1[0].PKID;   
+            this.loaderService.display(false);
+            if (!data || !data.Table1 || !data.Table1[0] || !data.Table1[0].PKID) {
+              this._toasterService.toast('error', 'error', 'The report request could not be created on the server. Please contact support.');
+              return;
+            }
+            let pklogid=  data.Table1[0].PKID;
             this._router.navigate(['/accounts/report/ReportDownload/'+pklogid]);
              });
-            this.loaderService.display(false);
         }
         DownLoad(){}
 /*  ExportToExcel()

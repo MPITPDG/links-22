@@ -9,6 +9,9 @@ import { DataService } from 'src/app/shared/service/dataService';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ModalDirective } from 'ngx-bootstrap/modal';
+import { catchError } from 'rxjs/operators';
+import { EMPTY } from 'rxjs';
+import { AccountStatementExportService } from './account-statement-export.service';
 import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, finAmt, finByMonth } from '../fin-kit';
 @Component({
     selector: 'app-General-AccountStmt-Local',
@@ -59,6 +62,7 @@ import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, 
       AdvanceTable = [];
       exceldata_list= [];
       Compname:string;
+      CompFull:string;
       rptopbal:string;
       rptclbal:string;
       rptcrtotdr:any;
@@ -88,7 +92,10 @@ import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, 
         private _loginService: LoginService,
         private modalService: BsModalService,
         private _loaderService: LoaderService,
+        private stmtExport: AccountStatementExportService,
       ) { }
+      balRow: any;
+      advTotRow: any;
       ngOnInit() {
         this.FromDate= new Date();
         this.FromDate=this._dataService.datechnge1(this._loginService.getLogin()[0].FINANCIAL_YEAR.STARTDATE)
@@ -165,6 +172,8 @@ import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, 
             {
           this.displayType="LIST";
           this.dataList = data.Table;
+          this.balRow = data.Table1 && data.Table1[0];
+          this.advTotRow = data.Table2 && data.Table2[0];
           this.failed = false; this.buildView();
           for (var i = 0; i < this.dataList.length; i++) {
             let obj = {
@@ -384,6 +393,7 @@ import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, 
         this._dataService.getData("Accounts/fn_Acc_Rpt_Common_CompanyDetails", jsoncmp)
           .subscribe((data: any) => {
           this.Compname=data.Table[0].cmp_name
+          this.CompFull = data.Table[0].cmp_name + (data.Table[0].city_name ? ' - ' + data.Table[0].city_name : '')
           this._loaderService.display(false)
           })
       }
@@ -399,28 +409,40 @@ import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, 
        expt_exlwithadv() {
 
         if(confirm('Click OK For With Advance Excel,\n CANCEL For Without Advance Excel'))
-        { 
-
-          //  this.AdvanceTable.forEach((row: any) => {
-          //  this.advdataForExcel.push(Object.values(row))
-          //         });
-          
-            let reportData = {
-              data: this.dataForExcel,
-              advdata:this.advdataForExcel,
-              headers: ["Type","Number","Date","Particulars","Debit","Credit"],
-              advheaders: ["Type","Number","Particulars","Amount"],
-              pagetype: "AccountStatement",
-              title:this.Compname,
-              subtitle:"Account Statement From " + this.FromDate + " To "  + this.ToDate,
-              clntname:this.ClientName,
-              opbal:"Opening: " + this.rptopbal,
-              currenttot:"Current Total : " + this.rptcrtotdr + " " + this.rptcrtotcr,
-              closing:"Closing : " + this.rptclbal,
-              advance:"Advance : " + this.rptadvtotdr + this.rptadvtotcr
-                     }
-            this.exportser.exportExceltry(reportData, "Account_Statementl_With_Adv_" + this.Client);
-            //this.dataForExcel=[];
+        {
+          if (!this.dataList || this.dataList.length == 0) {
+            this._toasterService.toast('info', 'info', 'No Data Found !');
+            return false;
+          }
+          /* as the .NET page: the statement rows plus the client's advance rows, in one Excel */
+          this._loaderService.display(true)
+          const l = this._loginService.getLogin()[0]
+          const all = this.Status == "All"
+          const jsonadv = all
+            ? { ClCode: this.Client, cmp_code: l.CMPCODE, citycode1: l.CITYCODE1, STARTDATE: this.FromDate, ENDDATE: this.ToDate }
+            : { ClCode: this.Client, FINSTARTDATE: l.FINANCIAL_YEAR.STARTDATE, FINENDDATE: l.FINANCIAL_YEAR.ENDDATE, cmp_code: l.CMPCODE, citycode1: l.CITYCODE1, STARTDATE: this.FromDate, ENDDATE: this.ToDate }
+          this._dataService.getData(all ? "Accounts/Acc_Rpt_TrialBalance_With_Advance_Print_GetAll" : "Accounts/Acc_Rpt_TrialBalance_With_Advance_Print_Get", jsonadv)
+            .pipe(catchError((err: any) => {
+              this._loaderService.display(false);
+              this._toasterService.toast('error', 'error', 'The server could not return the advance details (service unavailable or server error). Please contact support.');
+              return EMPTY;
+            }))
+            .subscribe((data: any) => {
+              this._loaderService.display(false)
+              const advRows = (data && data.Table) ? data.Table : []
+              /* file name as the .NET page: Account_Statement_With_Adv-<client code>-<from yy>-<to yy> */
+              const yy = (s: any) => ((s || '') + '').slice(-2)
+              const fy = l.FINANCIAL_YEAR
+              const filename = 'Account_Statement_With_Adv-' + this.Client + '-' + yy(new Date(fy.STARTDATE).getFullYear()) + '-' + yy(new Date(fy.ENDDATE).getFullYear())
+              this.stmtExport.exportWithAdvance({
+                company: this.CompFull || this.Compname,
+                title: 'Account Statement', companyLast: true, font: { name: 'Calibri', size: 11 },
+                from: this.FromDate,
+                to: this.ToDate,
+                clientName: this.ClientName
+              }, this.dataList, this.balRow, this.advTotRow, advRows, filename)
+              this._toasterService.toast('success', 'success', 'Excel downloaded (.NET format): ' + filename + '.xlsx');
+            })
           }
             else
             {
