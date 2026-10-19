@@ -1,974 +1,265 @@
-/*  Invoice Audit Workspace.
+/*  Invoice Audit Workspace - area rules on top of the page kit (import/import-page.css).
 
-    Self-contained rather than built on the shared accounts theme: this screen has its own
-    visual language (dark command bar, slate ground, 380px rail) and its own hard requirement
-    - one screen, no page scroll. Only the job pane and the line-item table scroll.
+    Monochrome only. Each numbered section is a bordered card with a grey header band carrying
+    the section number and title; the four totals are separate boxed tiles; key/value groups
+    are labelled boxes, label above value. Figures are bold in the page sans with a small grey
+    unit (.u), the grand total the heaviest by size and weight.                               */
 
-    Palette: slate 900/700/400 for ink, indigo for identifiers, emerald for money.          */
-
-:host {
-    /*  Same tokens as the Job Profit statement, so the two screens read as one system
-        rather than two designs. Type scale follows it too: 13px base, 14px section
-        titles, 12px pills - the earlier 8.5-10px sizes bought height at the cost of
-        being genuinely hard to read for the person who lives on this screen.        */
-    --s900: #171717;
-    --s800: #1F2937;
-    --s700: #374151;
-    /*  Users reported the greys were unreadable. #9CA3AF on white is roughly 2.5:1,
-        well under the 4.5:1 that normal text needs; these clear it.                 */
-    --s500: #4B5563;
-    --s400: #64748B;
-    --s200: #E5E7EB;
-    --s100: #F1F3F5;
-    --s50:  #F6F7F9;
-    --indigo: #2563EB;
-    --indigo-soft: #E0E7FF;
-    --emerald: #059669;
-    --emerald-bg: #E3F9F1;
-    --amber: #92400E;
-    --amber-bg: #FFF4D6;
-}
-
-.iv-app {
+.im-page.iv-app {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background: var(--s100);
-    color: var(--s800);
-    font-size: 12px;
+    padding: 0;
+    background: var(--ground);
 }
 
-.iv-mono {
-    font-family: Consolas, "JetBrains Mono", "Courier New", monospace;
+:host-context(.iv-drawer) .im-page.iv-app { min-height: 0; }
+
+.im-page.iv-app .iv-mono,
+.im-page.iv-app .mono {
+    font-family: var(--num);
     font-variant-numeric: tabular-nums;
 }
 
-/* ===================== 1. COMMAND BAR ===================== */
+.im-page.iv-app .iv-dim { color: var(--faint); }
+.im-page.iv-app .iv-strong { font-weight: 700; }
+.im-page.iv-app .iv-c { text-align: center; }
+.im-page.iv-app .u { color: var(--faint); font-size: .62em; font-weight: 500; margin-right: 2px; }
 
-.iv-top {
+/* ===================== header band ===================== */
+.im-page.iv-app .iv-top {
     position: sticky;
     top: 0;
     z-index: 20;
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 7px 12px;
-    background: var(--s900);
-    color: #fff;
-}
-
-.iv-top-l,
-.iv-top-r { display: flex; align-items: center; gap: 9px; min-width: 0; }
-
-.iv-logo {
-    width: 26px; height: 26px;
-    border-radius: 7px;
-    background: rgba(79, 70, 229, .25);
-    border: 1px solid rgba(99, 102, 241, .4);
-    color: #A5B4FC;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px;
-    flex: 0 0 auto;
-}
-
-.iv-eyebrow {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .09em;
-    text-transform: uppercase;
-    color: var(--s400);
-    white-space: nowrap;
-}
-
-.iv-dot, .iv-sep { color: #475569; }
-
-.iv-tag {
-    font-size: 10.5px;
-    font-weight: 600;
-    padding: 1px 8px;
-    border-radius: 999px;
-    white-space: nowrap;
-}
-
-.iv-tag-blue  { background: rgba(59,130,246,.2);  color: #93C5FD; border: 1px solid rgba(59,130,246,.3); }
-.iv-tag-amber { background: rgba(245,158,11,.18); color: #FCD34D; border: 1px solid rgba(245,158,11,.3); }
-
-.iv-h1 {
-    margin: 0;
-    font-size: 13.5px;
-    font-weight: 700;
-    color: #fff;
-    white-space: nowrap;
-    font-family: Consolas, "Courier New", monospace;
-}
-
-/*  The date carries the same weight as the number: both are identity, and an auditor
-    reads them together.                                                            */
-.iv-h1-dt {
-    margin-left: 8px;
-    font-family: Consolas, "Courier New", monospace;
-    font-size: 13.5px;
-    font-weight: 700;
-    color: #fff;
-}
-
-.iv-status { text-align: right; }
-
-.iv-status-k {
-    margin: 0;
-    font-size: 8.5px;
-    font-weight: 700;
-    letter-spacing: .09em;
-    text-transform: uppercase;
-    color: var(--s400);
-}
-
-.iv-status-v {
-    display: flex; align-items: center; justify-content: flex-end; gap: 5px;
-    font-size: 11px;
-    font-weight: 600;
-    color: #FBBF24;
-}
-
-.iv-led {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: #FBBF24;
-}
-
-.iv-ibtn {
-    border: 1px solid #334155;
-    background: transparent;
-    color: #CBD5E1;
-    border-radius: 6px;
-    padding: 4px 7px;
-    font-size: 12px;
-    cursor: pointer;
-}
-
-.iv-ibtn:hover { background: var(--s800); color: #fff; }
-
-.iv-approve {
-    display: flex; align-items: center; gap: 6px;
-    background: #059669;
-    border: 0;
-    color: #fff;
-    border-radius: 7px;
-    padding: 5px 12px;
-    font-size: 11.5px;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-.iv-approve:hover:enabled { background: #10B981; }
-
-/*  Disabled until the queue endpoint exists - it must look unavailable, not merely inert. */
-.iv-approve:disabled {
-    background: #1E293B;
-    border: 1px dashed #475569;
-    color: #64748B;
-    cursor: not-allowed;
-}
-
-.iv-x {
-    border: 0;
-    background: transparent;
-    color: var(--s400);
-    font-size: 20px;
-    line-height: 1;
-    padding: 0 2px;
-    cursor: pointer;
-}
-
-.iv-x:hover { color: #FCA5A5; }
-
-.iv-alert {
-    flex: 0 0 auto;
-    margin: 8px 8px 0;
-    padding: 8px 12px;
-    border-radius: 7px;
-    border-left: 3px solid #B91C1C;
-    background: #FEF2F2;
-    color: #991B1B;
-}
-
-/* ===================== STACKED SECTIONS ===================== */
-
-.iv-body {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 8px;
-}
-
-.iv-sec {
-    flex: 0 0 auto;
-    background: #fff;
-    border: 1px solid var(--s200);
-    border-radius: 10px;
-}
-
-/*  Every charge line is rendered. Nothing is hidden behind an inner scrollbar: on an
-    audit screen a row you cannot see is a row nobody checked.                        */
-.iv-charges {
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: column;
-}
-
-.iv-sec-head {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    color: var(--s700);
-}
-
-.iv-sec-n { color: var(--s400); font-weight: 700; }
-
-.iv-sec-head .fa { color: var(--indigo); font-size: 12px; }
-
-.iv-sec-t {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--s900);
-}
-
-.iv-count {
-    background: var(--indigo-soft);
-    color: #3730A3;
-    border-radius: 999px;
-    padding: 0 7px;
-    font-size: 9.5px;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-.iv-pill {
-    background: var(--amber-bg);
-    color: var(--amber);
-    border: 1px solid #FCD34D;
-    border-radius: 999px;
-    padding: 0 6px;
-    font-size: 9.5px;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-/* ---- section bar (title left, invoice-level facts right) ------------------ */
-
-.iv-sec-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px 16px;
-    padding: 7px 12px;
-    background: #EEF2FF;
-    border-bottom: 1px solid #C7D2FE;
-    border-radius: 10px 10px 0 0;
-}
-
-.iv-barfacts {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 4px 16px;
-    font-size: 10.5px;
-    color: var(--s700);
+    justify-content: space-between;
+    gap: 10px 16px;
+    padding: 12px 20px;
+    background: var(--sheet);
+    border-bottom: 1px solid var(--edge);
 }
 
-.iv-bk {
-    font-style: normal;
-    color: var(--s500);
-    margin-right: 4px;
-}
+.im-page.iv-app .iv-top-l,
+.im-page.iv-app .iv-top-r { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; min-width: 0; }
 
-.iv-hawb {
-    background: var(--s100);
-    border: 1px solid var(--s200);
-    border-radius: 4px;
-    padding: 0 5px;
-}
-
-.iv-dim { color: var(--s400); }
-
-/* ---- 1. client & tax profile --------------------------------------------- */
-
-.iv-profile {
-    display: flex;
-    align-items: stretch;
-    gap: 0;
-}
-
-.iv-profile-l {
-    flex: 1 1 auto;
-    min-width: 0;
-    padding: 9px 14px 10px;
-}
-
-.iv-profile-r {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 22px;
-    padding: 9px 16px 10px;
-    border-left: 1px solid var(--s200);
-}
-
-.iv-fact { min-width: 0; }
-
-.iv-fact-k {
-    display: block;
-    font-size: 10px;
-    letter-spacing: .05em;
-    color: var(--s500);
-    margin-bottom: 3px;
-}
-
-.iv-fact-v {
-    display: block;
+.im-page.iv-app .iv-eyebrow {
     font-size: 11px;
-    font-weight: 700;
-    color: var(--s900);
-    white-space: nowrap;
-}
-
-.iv-client {
-    margin: 6px 0 3px;
-    font-size: 12.5px;
-    font-weight: 700;
-    color: var(--s900);
-}
-
-.iv-addr {
-    margin: 0;
-    font-size: 11px;
-    line-height: 1.5;
-    color: var(--s500);
-}
-
-.iv-gstin {
-    display: inline-block;
-    background: var(--emerald-bg);
-    border: 1px solid #A7F3D0;
-    color: #065F46;
-    border-radius: 999px;
-    padding: 0 6px;
-    font-size: 10px;
-    font-weight: 700;
-}
-
-/* ---- 2. job table --------------------------------------------------------- */
-
-.iv-jobtable { border-radius: 0 0 10px 10px; }
-
-.iv-jobno {
-    color: #4338CA;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.iv-jobno:hover { text-decoration: underline; }
-
-.iv-jobtot td {
-    background: #F7F9FC;
-    border-top: 1px solid var(--s200);
-    border-bottom: 0;
-    font-weight: 700;
-}
-
-.iv-totchip {
-    background: var(--s100);
-    border: 1px solid var(--s200);
-    border-radius: 4px;
-    padding: 1px 7px;
-    font-size: 9.5px;
-    letter-spacing: .05em;
+    font-weight: 600;
+    letter-spacing: .08em;
     text-transform: uppercase;
-    color: var(--s700);
-}
-
-.iv-doctag {
-    display: inline-block;
-    background: var(--emerald-bg);
-    border: 1px solid #A7F3D0;
-    border-radius: 999px;
-    padding: 0 6px;
-    margin-left: 4px;
-    font-size: 11.5px;
-    font-weight: 600;
-    color: #065F46;
-}
-
-.iv-doctag-alt { background: var(--indigo-soft); border-color: #C7D2FE; color: #3730A3; }
-
-/* ---- 3. financial strip --------------------------------------------------- */
-
-.iv-fin {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    padding: 7px 14px;
-}
-
-.iv-fin-i { display: flex; align-items: baseline; gap: 8px; }
-
-.iv-fin-div {
-    width: 1px;
-    align-self: stretch;
-    background: var(--s200);
-}
-
-.iv-fin-k {
-    font-size: 10.5px;
-    font-weight: 600;
-    color: var(--s500);
+    color: var(--faint);
     white-space: nowrap;
 }
 
-.iv-fin-v {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--s900);
-}
-
-.iv-fin-gst { color: var(--indigo); }
-.iv-fin-muted { color: var(--s400); }
-
-.iv-fin-grand {
-    margin-left: auto;
+.im-page.iv-app .iv-h1 {
+    margin: 0;
     display: flex;
     align-items: baseline;
     gap: 10px;
-    background: var(--emerald-bg);
-    border: 1px solid #6EE7B7;
-    border-radius: 8px;
-    padding: 5px 14px;
-}
-
-.iv-fin-grand .iv-fin-k { color: #065F46; }
-.iv-fin-grand .iv-fin-v { color: var(--emerald); font-weight: 800; font-size: 17px; }
-
-.iv-flag {
-    background: var(--indigo-soft);
-    color: #3730A3;
-    border-radius: 3px;
-    padding: 0 5px;
-    font-size: 10.5px;
+    font-size: 20px;
     font-weight: 700;
+    letter-spacing: -.01em;
+    line-height: 1.2;
     white-space: nowrap;
 }
 
-/* ---- line items ----------------------------------------------------------- */
+.im-page.iv-app .iv-h1-dt { font-size: 14px; font-weight: 600; color: var(--soft); }
+.im-page.iv-app .iv-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.im-page.iv-app .iv-x { font-size: 18px; padding: 0 10px; }
 
-.iv-tablewrap {
-    overflow-x: auto;
-}
-
-.iv-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 11.5px;
-}
-
-.iv-table th {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background: var(--s50);
-    border-bottom: 1px solid var(--s200);
-    padding: 6px 10px;
-    font-size: 10px;
+.im-page.iv-app .iv-alert {
+    margin: 12px 20px 0;
+    padding: 9px 12px;
+    border: 1px solid var(--mp-primary, var(--ink));
+    border-radius: 4px;
+    background: var(--band);
     font-weight: 600;
-    letter-spacing: .03em;
-    text-transform: uppercase;
-    color: var(--s500);
-    text-align: left;
-    white-space: nowrap;
 }
 
-.iv-table td {
-    padding: 6px 10px;
-    border-bottom: 1px solid var(--s100);
-    vertical-align: top;
-}
-
-.iv-table tbody tr:hover td { background: #F7F8FE; }
-
-.iv-c { text-align: center; }
-.iv-r { text-align: right; }
-/* `.iv-table th` sets text-align:left and outranks the plain helpers, which left every header
-   hanging off to the left of its centred / right-aligned values. Same weight here, so a header
-   and its column always line up. */
-.iv-table th.iv-c, .iv-table td.iv-c { text-align: center; }
-.iv-table th.iv-r, .iv-table td.iv-r { text-align: right; }
-
-.iv-w-n    { width: 30px; }
-.iv-w-sac  { width: 160px; }
-.iv-w-tax  { width: 38px; }
-.iv-w-qty  { width: 48px; }
-.iv-w-rate { width: 74px; }
-.iv-w-cur  { width: 44px; }
-.iv-w-ex   { width: 60px; }
-.iv-w-amt  { width: 96px; }
-
-/*  Twelve columns need the room, so the table sets its own minimum and the wrapper
-    scrolls sideways on a narrow screen rather than crushing the figures.          */
-.iv-table { min-width: 920px; }
-
-.iv-tablewrap { overflow: auto; }
-
-.iv-idx { color: var(--s500); font-size: 10px; }
-
-.iv-sac {
-    display: inline-block;
-    font-family: Consolas, "Courier New", monospace;
-    font-weight: 700;
-    font-size: 10.5px;
-    color: #3730A3;
-    background: var(--indigo-soft);
-    border-radius: 3px;
-    padding: 0 5px;
-}
-
-.iv-ledger {
-    display: block;
-    margin-top: 3px;
-    font-size: 10px;
-    color: var(--s500);
-    line-height: 1.35;
-}
-
-.iv-svc { font-weight: 500; color: var(--s900); }
-
-.iv-svc-sub {
-    font-size: 10.5px;
-    color: var(--s500);
-    line-height: 1.35;
-}
-
-.iv-nontax { color: var(--s500); }
-
-.iv-rate { color: var(--s800); }
-.iv-amt  { font-weight: 700; color: var(--s900); }
-
-.iv-empty {
-    text-align: center;
-    color: var(--s400);
-    padding: 22px;
-}
-
-/* ---- narration footer ----------------------------------------------------- */
-
-.iv-narrbar {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 11px;
-    background: var(--s50);
-    border-top: 1px solid var(--s200);
-}
-
-.iv-narr-k {
-    display: flex; align-items: center; gap: 5px;
-    flex: 0 0 auto;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .07em;
-    text-transform: uppercase;
-    color: var(--s500);
-}
-
-.iv-narr-k .fa { color: var(--indigo); }
-
-/*  One line, clipped: the full text is in the tooltip. A narration is often a paragraph and
-    must not be allowed to take height from the line items.                                */
-.iv-narr-v {
-    margin: 0;
+/* ===================== body + cards ===================== */
+.im-page.iv-app .iv-body {
     flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px 20px 20px;
     min-width: 0;
-    font-size: 11.5px;
-    color: var(--s700);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-/* ---- narrow screens ------------------------------------------------------- */
+.im-page.iv-app .iv-card { overflow: hidden; }
 
-@media (max-width: 1180px) {
-    .iv-body { overflow-y: auto; }
-    .iv-profile { flex-direction: column; }
-    .iv-profile-r { border-left: 0; border-top: 1px solid var(--s200); flex-wrap: wrap; gap: 14px 26px; }
-    .iv-fin { flex-wrap: wrap; }
-    .iv-fin-grand { margin-left: 0; }
-    .iv-charges { min-height: 360px; }
-}
-
-/* ---- drawer mode ---------------------------------------------------------- */
-
-/*  In the drawer the host is the panel, and 100vh would overshoot it. */
-:host-context(.iv-drawer) .iv-app { min-height: 0; }
-
-/*  Old/new switch - only in the popup window, where both layouts are routable and can be
-    compared on the same invoice. Outlined rather than solid: it is a comparison aid, not
-    an action on the invoice.                                                             */
-.iv-switch {
+.im-page.iv-app .iv-card-h {
     display: flex;
     align-items: center;
-    gap: 5px;
-    border: 1px solid #475569;
-    background: transparent;
-    color: #CBD5E1;
-    border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
+    gap: 10px;
+    padding: 9px 14px;
+    background: var(--band);
+    border-bottom: 1px solid var(--edge);
 }
 
-.iv-switch:hover { background: #1E293B; color: #fff; border-color: #64748B; }
+.im-page.iv-app .iv-card-h h2 { margin: 0; font-size: 13px; font-weight: 700; line-height: 1.4; }
 
-/*  A GSTIN reads as a pass/fail to an auditor, so it is given the weight of one. */
-.iv-gstin {
-    display: inline-block;
-    background: var(--emerald-bg);
-    border: 1px solid #A7F3D0;
-    color: #065F46;
-    border-radius: 999px;
-    padding: 0 5px;
-    font-weight: 700;
-}
-
-.iv-mini-wide { grid-column: 1 / -1; }
-
-/*  Complete reads green, pending amber - the status is glanced at, not read. */
-.iv-status-v.done { color: #34D399; }
-.iv-status-v.done .iv-led { background: #34D399; }
-
-/*  A missing SAC is a finding, not an empty cell. */
-.iv-sac-none {
-    background: #FEF3C7;
-    color: #92400E;
-    border: 1px solid #FDE68A;
-    font-weight: 700;
-}
-
-.iv-warn {
+.im-page.iv-app .iv-n {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    background: #FEF3C7;
-    border: 1px solid #FDE68A;
-    color: #92400E;
-    border-radius: 5px;
-    padding: 1px 8px;
-    font-weight: 600;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 5px;
+    border-radius: 4px;
+    background: var(--mp-primary, var(--ink));
+    color: var(--mp-primary-fg, #fff);
+    font-size: 12px;
+    font-weight: 700;
 }
 
+.im-page.iv-app .iv-meta { margin-left: auto; color: var(--soft); font-size: 12px; white-space: nowrap; }
+.im-page.iv-app .iv-card-b { padding: 12px 14px; }
 
-/* ---- jobs: own scroll box, then a totals bar ------------------------------
-   Capped so a ten-job invoice cannot push the charge lines off the screen.  */
-
-.iv-jobwrap {
-    border-bottom: 1px solid var(--s200);
-}
-
-.iv-jobtotbar {
-    padding: 7px 12px 8px;
-    background: var(--s50);
-    border-top: 1px solid var(--s200);
-    border-radius: 0 0 10px 10px;
-    font-size: 10.5px;
-}
-
-.iv-jobtot-head {
+/* fact strip under a card header */
+.im-page.iv-app .iv-facts {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 6px;
+    gap: 6px 20px;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--line);
+    font-size: 12.5px;
 }
 
-/*  Six equal columns: every label sits on one line and every figure directly under its
-    own label, so the eye can run across them. The previous inline run wrapped wherever
-    the text happened to end, which is what made it look unaligned.                    */
-.iv-jobtot-grid {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 4px 14px;
-}
-
-.iv-tot { min-width: 0; }
-
-.iv-tot-k {
-    display: block;
-    font-size: 9.5px;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-    color: var(--s500);
-    white-space: nowrap;
-}
-
-.iv-tot-v {
-    display: block;
-    margin-top: 2px;
-    font-size: 11.5px;
-    font-weight: 700;
-    color: var(--s800);
-}
-
-.iv-unit {
-    font-size: 9px;
-    font-weight: 600;
-    color: var(--s400);
-}
-
-.iv-trunc2 {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-@media (max-width: 1180px) {
-    .iv-jobtot-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-
-.iv-hi { color: var(--indigo); }
-.iv-money { color: var(--emerald); }
-
-/* ---- footer: narration + tabbed documents --------------------------------- */
-
-.iv-foot {
-    display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(320px, 5fr);
-    gap: 12px;
-    padding: 9px 12px;
-}
-
-.iv-foot-narr { display: flex; align-items: flex-start; gap: 8px; min-width: 0; }
-
-.iv-narr-box {
-    flex: 1 1 auto;
-    min-width: 0;
-    white-space: pre-wrap;
-    background: var(--s50);
-    border: 1px solid var(--s200);
-    border-radius: 8px;
-    padding: 7px 9px;
-    font-family: Consolas, "Courier New", monospace;
-    font-size: 10.5px;
-    line-height: 1.55;
-    color: var(--s700);
-}
-
-.iv-foot-docs {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 8px;
-    min-width: 0;
-}
-
-.iv-doclist {
-    background: var(--s50);
-    border: 1px solid var(--s200);
-    border-radius: 8px;
-    padding: 6px 8px;
-    min-width: 0;
-}
-
-.iv-doclabel {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 10px;
-    font-weight: 700;
+.im-page.iv-app .iv-fk {
+    font-style: normal;
+    color: var(--faint);
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: .05em;
-    color: var(--s500);
+    margin-right: 4px;
 }
 
-.iv-doclabel .fa { color: var(--indigo); }
+/* ===================== key/value boxes ===================== */
+.im-page.iv-app .iv-kv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 8px;
+}
 
-.iv-doctabs {
+.im-page.iv-app .iv-kv {
     display: flex;
-    gap: 6px;
-    padding-bottom: 5px;
-    margin-bottom: 5px;
-    border-bottom: 1px solid var(--s200);
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    background: var(--sheet);
 }
 
-.iv-doctab {
-    border: 1px solid var(--s200);
-    background: #fff;
-    color: var(--s700);
-    border-radius: 5px;
-    padding: 2px 9px;
-    font-size: 10px;
-    font-weight: 700;
+.im-page.iv-app .iv-k {
+    font-size: 10.5px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: .04em;
-    cursor: pointer;
+    letter-spacing: .06em;
+    color: var(--faint);
 }
 
-.iv-doctab:hover { background: var(--s100); }
+.im-page.iv-app .iv-v { font-size: 13px; font-weight: 600; color: var(--ink); }
+.im-page.iv-app .iv-unit { color: var(--faint); font-weight: 500; font-size: 11px; }
 
-.iv-doctab.active {
-    background: var(--indigo);
-    border-color: var(--indigo);
-    color: #fff;
-}
-
-
-.iv-doctable { font-size: 10.5px; background: #fff; }
-.iv-doctable th { padding: 4px 8px; font-size: 9.5px; }
-.iv-doctable td { padding: 3px 8px; }
-
-.iv-code { color: var(--indigo); font-weight: 700; }
-.iv-code-g { color: var(--emerald); }
-
-.iv-trunc {
-    display: block;
-    max-width: 150px;
+.im-page.iv-app .iv-trunc {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-@media (max-width: 1180px) {
-    .iv-foot { grid-template-columns: 1fr; }
+/* ===================== 1. profile ===================== */
+.im-page.iv-app .iv-profile {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(0, 2fr);
+    gap: 14px;
+    align-items: start;
 }
 
-/*  Withdrawn authorisation is not the same as never authorised - red, not amber. */
-.iv-status-v.warn { color: #FCA5A5; }
-.iv-status-v.warn .iv-led { background: #F87171; }
+.im-page.iv-app .iv-client { margin: 0 0 4px; font-size: 15px; font-weight: 700; }
+.im-page.iv-app .iv-addr { margin: 0; color: var(--soft); font-size: 12.5px; line-height: 1.5; }
 
+/* ===================== 2. jobs ===================== */
+.im-page.iv-app .iv-jobno { cursor: pointer; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.im-page.iv-app .iv-jobtot { border-top: 1px solid var(--edge); background: var(--ground); }
+.im-page.iv-app .iv-sub-h { font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+.im-page.iv-app .iv-sub-h .iv-dim { font-weight: 400; margin-left: 6px; }
 
-/*  Foldable section bar. */
-.iv-sec-btn { cursor: pointer; user-select: none; }
-.iv-sec-btn:hover { background: #E4EAFE; }
+/* ===================== tables ===================== */
+.im-page.iv-app table.tbl.iv-tbl { min-width: 720px; }
+.im-page.iv-app table.tbl.iv-doctbl { min-width: 0; }
+.im-page.iv-app table.tbl.iv-tbl td { padding: 7px 12px; vertical-align: top; }
+.im-page.iv-app table.tbl.iv-tbl th { padding: 8px 12px; }
+.im-page.iv-app table.tbl.iv-tbl .iv-c { text-align: center; }
 
-.iv-secchev {
-    margin-left: 6px;
-    color: var(--indigo);
-    font-size: 10px;
-}
+.im-page.iv-app .iv-sac { display: block; font-family: var(--num); font-weight: 600; }
+.im-page.iv-app .iv-ledger { display: block; color: var(--faint); font-size: 11.5px; }
+.im-page.iv-app .iv-svc { font-weight: 600; }
+.im-page.iv-app .iv-svc-sub { color: var(--soft); font-size: 11.5px; }
 
-
-/* ---- dashboard KPI cards ---------------------------------------------------
-   The four figures the whole screen exists to justify. Given real size and a
-   little colour so the eye lands on them before the tables.                  */
-
-.iv-kpis {
+/* ===================== total tiles ===================== */
+.im-page.iv-app .iv-kpis {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
+    gap: 12px;
 }
 
-.iv-kpi {
-    background: #fff;
-    border: 1px solid var(--s200);
-    border-left: 3px solid var(--s200);
-    border-radius: 10px;
-    padding: 9px 13px 10px;
-    min-width: 0;
-}
-
-.iv-kpi-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-}
-
-.iv-kpi-k {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    color: var(--s500);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.iv-kpi-ico {
-    flex: 0 0 auto;
-    width: 22px;
-    height: 22px;
-    border-radius: 7px;
-    background: var(--s100);
-    color: var(--s500);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-}
-
-.iv-kpi-v {
-    margin: 4px 0 2px;
-    font-size: 21px;
-    font-weight: 800;
-    line-height: 1.15;
-    color: var(--s900);
-}
-
-.iv-kpi-muted { color: var(--s400); }
-
-.iv-kpi-sub {
-    display: block;
-    font-size: 10px;
-    color: var(--s500);
-    min-height: 13px;
-}
-
-.iv-kpi-gst { border-left-color: var(--indigo); }
-.iv-kpi-gst .iv-kpi-v { color: var(--indigo); }
-.iv-kpi-gst .iv-kpi-ico { background: var(--indigo-soft); color: var(--indigo); }
-
-.iv-kpi-grand {
-    background: var(--emerald-bg);
-    border-color: #A7F3D0;
-    border-left-color: var(--emerald);
-}
-
-.iv-kpi-grand .iv-kpi-k { color: #065F46; }
-.iv-kpi-grand .iv-kpi-v { color: var(--emerald); }
-.iv-kpi-grand .iv-kpi-sub { color: #047857; }
-.iv-kpi-grand .iv-kpi-ico { background: #fff; color: var(--emerald); }
-
-/*  The rate basis - "(RS 175 PER KG * 22 PKGS)" - is the auditor's arithmetic check,
-    so it is tinted rather than left as grey noise.                                  */
-.iv-basis { color: var(--indigo); }
-
-@media (max-width: 1180px) {
-    .iv-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-.iv-sep-sm { color: #475569; margin-left: 8px; }
-
-/* GST card: one block per component - name and amount on the first line, the base it is
-   charged on beneath in small type. Two short lines always fit the card; one long line did not. */
-.iv-kpi-gst { min-width: 0; overflow: hidden; }
-.iv-gst-lines {
+.im-page.iv-app .iv-kpi {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    margin: 4px 0 6px;
-    padding-top: 5px;
-    border-top: 1px dashed #cbd5e1;
-    font-variant-numeric: tabular-nums;
+    padding: 12px 14px;
+    border: 1px solid var(--edge);
+    border-radius: 6px;
+    background: var(--sheet);
+    min-width: 0;
 }
-.iv-gst-line { display: flex; flex-direction: column; }
-.iv-gst-top  { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-size: 12.5px; }
-.iv-gst-name { font-weight: 700; color: #1d4ed8; white-space: nowrap; }
-.iv-gst-val  { font-weight: 700; color: #111827; white-space: nowrap; }
-.iv-gst-on   { font-size: 11.5px; color: #4b5563; white-space: nowrap; }
 
-/* Advance received: Finance reads this first on the jobs total, so it is set bold and a
-   size up from the other totals */
-.iv-tot-v.iv-adv { font-weight: 800; font-size: 15px; color: #047857; }
+.im-page.iv-app .iv-kpi-k {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--soft);
+}
+
+.im-page.iv-app .iv-kpi-v {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+}
+
+.im-page.iv-app .iv-kpi-sub { color: var(--faint); font-size: 11.5px; min-height: 16px; }
+
+.im-page.iv-app .iv-kpi-grand { border: 2px solid var(--mp-primary, var(--ink)); }
+.im-page.iv-app .iv-kpi-grand .iv-kpi-k { color: var(--ink); }
+.im-page.iv-app .iv-kpi-grand .iv-kpi-v { font-size: 28px; font-weight: 800; }
+
+.im-page.iv-app .iv-gst-lines { display: flex; flex-direction: column; gap: 2px; padding-top: 4px; border-top: 1px dashed var(--edge); }
+.im-page.iv-app .iv-gst-line { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; }
+.im-page.iv-app .iv-gst-name { color: var(--soft); }
+.im-page.iv-app .iv-gst-val { font-weight: 600; }
+
+/* ===================== narration + documents ===================== */
+.im-page.iv-app .iv-narr { font-size: 12.5px; line-height: 1.55; white-space: pre-wrap; }
+.im-page.iv-app .iv-docs { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+
+@media (max-width: 1180px) {
+    .im-page.iv-app .iv-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .im-page.iv-app .iv-profile { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+    .im-page.iv-app .iv-kpis { grid-template-columns: 1fr; }
+    .im-page.iv-app .iv-top,
+    .im-page.iv-app .iv-body { padding-left: 16px; padding-right: 16px; }
+}

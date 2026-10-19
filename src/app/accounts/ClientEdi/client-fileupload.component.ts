@@ -19,6 +19,8 @@ interface UploadedFile {
   selector: 'app-client-file-upload',
   templateUrl: './client-fileupload.component.html',
   styleUrls: ['./client-fileupload.component.scss'],
+  // Page kit (.im-page / accreport add-on) is GLOBAL in Links; the host class opts in (fk-pad, fk-drop, fk-note).
+  host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -168,6 +170,21 @@ export class ClientEdiFileUploadComponent implements OnInit {
     if (size < 1024) return `${size} B`;
     if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
     return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  /** Display only: the chosen file's kind, shown next to its size in the drop zone. */
+  fileKindLabel(): string {
+    if (!this.selectedFile) return '';
+    const ext = this.selectedFile.name.split('.').pop().toLowerCase();
+    const kinds: { [key: string]: string } = {
+      'xls': 'Excel 97–2003 workbook',
+      'xlsx': 'Excel workbook',
+      'csv': 'CSV file',
+      'pdf': 'PDF document',
+      'doc': 'Word 97–2003 document',
+      'docx': 'Word document'
+    };
+    return kinds[ext] || '';
   }
 
   uploadFile(): void {

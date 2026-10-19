@@ -1,64 +1,101 @@
-<header class="app-header navbar">
-  <button class="navbar-toggler d-lg-none" type="button" appMobileSidebarToggler>&#9776;</button>
-  <a class="navbar-brand" href="javascript:void(0);" style="border-bottom: 0px;">
-    <!--<img src="" style="width: 155px;height: 55px;">-->
-  </a>
-  <button class="navbar-toggler d-md-down-none" type="button" appSidebarToggler>&#9776;</button>
-  <ul class="nav navbar-nav d-md-down-none">
-    <li class="nav-item px-3" [ngStyle]="{'text-align': 'justify'}" dropdown>
-      <span style='font-size: 24px; font-weight: bold; font-family: "Euclid Fraktur", "Old English Text MT", fantasy, serif; color: #ffffff; text-shadow: 1px 1px 2px #0300bd, 0 0 25px #0300bd, 0 0 5px #0300bd;'>{{cmpname
-        | titlecase}},&nbsp;</span>
-      <a [ngStyle]="{'font-weight': 'bold','font-size': '10pt','cursor': 'pointer','color': '#070736','font-family': 'Verdana, Arial','font-variant': 'small-caps','text-decoration': 'underline'}"
-        [routerLink]="['/branch']">{{cityName}}</a>
-      <br />
-      <!-- <app-financial-year></app-financial-year> -->
-      <!--<a [ngStyle]="{'font-weight': 'bold','font-size': '10pt','cursor': 'pointer','color': 'navy','font-family': 'Verdana, Arial','font-variant': 'small-caps','text-decoration': 'underline'}" [routerLink]="['/branch']">{{cityName}}</a>-->
-    </li>
-  </ul>
+<!--
+  Application shell (ported from MPERPNG-20).
 
-  <ul class="nav navbar-nav ml-auto">
- 
-    <li class="nav-item dropdown" placement="bottom right"><a aria-haspopup="true" class="nav-link" href="javascript:void(0)"
-        role="button" style="white-space: nowrap;display:inline-block;">
-        <!-- <img class="img-avatar" src="assets/img/pics/{{userimgepath}}" height="40px" width="40px"></a>&nbsp; -->
-        <img class="img-avatar" src="assets/img/pics/{{userimgepath}}" height="40px" width="40px"></a>&nbsp;
+  Full-width header on top, sidebar beneath it. The company name lives in the
+  header where it has room - in the 16rem rail it truncated - and the rail
+  carries the module name instead.
 
-      <button type="button" class="btn btn-success" (click)="goto('HOME')">
-        <span class="col-form-span-label">
-          <i class="fa fa-home fa-lg"></i>&nbsp;
-          <b>Home</b>
-        </span>
-      </button>&nbsp;
-      <button type="button" class="btn btn-danger" (click)="logout()">
-        <span class="col-form-span-label">
-          <i class="fa fa-sign-out fa-lg"></i>&nbsp;
-          <b>Logout</b>
-        </span>
-      </button>&nbsp;&nbsp;<br/>
-      <span [ngStyle]="{'font-family': 'Verdana','font-size': 'X-Small','font-weight': 'bold','color': 'white'}"
-        [innerHtml]="displayName"></span>
-    </li>
-  </ul>
-</header>
+  Used by every top-level route, accounts included (the old
+  FullLayoutComponent_acc copy is gone). There is one shell: change it here and
+  it changes everywhere.
+-->
+<div class="theme-gray flex h-screen w-full flex-col overflow-hidden bg-[var(--background)]"
+     style="--sidebar-width: 16rem; --sidebar-width-icon: 3.25rem;">
 
-<div class="app-body">
-  <app-menu-sidebar></app-menu-sidebar>
+  <!-- ── header: spans the full width ───────────────────────────────────── -->
+  <header class="z-30 flex h-14 shrink-0 items-center gap-3 border-b border-[var(--sidebar-border)]
+                 bg-[var(--sidebar)] px-3 sm:px-4">
 
-  <!-- Main content -->
-  <main class="main">
+    <button type="button" (click)="sidebar.toggleSidebar()"
+            uiBtn variant="ghost" size="icon-sm"
+            title="Toggle sidebar (Ctrl+B)"
+            [attr.aria-label]="sidebar.state() === 'collapsed' ? 'Expand sidebar' : 'Collapse sidebar'"
+            class="-ms-1 !text-white/80 hover:!bg-white/10 hover:!text-[var(--sidebar-accent-foreground)]">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-4 w-4">
+        <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 3v18" />
+      </svg>
+    </button>
 
-    <!-- Breadcrumb -->
-    <ol class="breadcrumb">
-      <app-breadcrumbs></app-breadcrumbs>
-    </ol>
+    <!-- Links logo is a wide wordmark, so the white tile keeps MP's height and
+         radius but sizes its width to the mark instead of a fixed square. -->
+    <img src="assets/img/Untitled-1.png" alt="Links"
+         class="h-8 w-auto max-w-[4.5rem] shrink-0 rounded-lg bg-white/95 object-contain p-1"
+         onerror="this.style.display='none'" />
 
-    <div class="container-fluid">
-      <router-outlet></router-outlet>
+    <span class="truncate text-sm font-semibold text-[var(--sidebar-accent-foreground)] sm:text-base">
+      {{ cmpname | titlecase }}
+    </span>
+
+    <div class="ml-auto flex items-center gap-2">
+      @if (showFinancialYear) {
+        <div class="hidden md:block"><app-financial-year></app-financial-year></div>
+      }
+
+      <!-- Missed-toast recovery: every toast is also recorded here. -->
+      <app-notification-bell></app-notification-bell>
+
+      @if (cityName) {
+        <a [routerLink]="['/branch']" uiBtn variant="ghost" size="sm"
+           [title]="'Change branch - currently ' + cityName"
+           class="border border-white/20 !text-[var(--sidebar-accent-foreground)] hover:!bg-white/10 hover:border-white/30">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-3.5 w-3.5">
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" />
+          </svg>
+          <span class="font-medium uppercase tracking-wide">{{ cityName }}</span>
+        </a>
+      }
+
+      <!-- Red on purpose: leaving for the module picker abandons whatever is
+           open on the current screen, so it should not read as incidental. -->
+      <button type="button" (click)="goto('HOME')" uiBtn variant="destructive" size="sm"
+              title="Switch module">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-4 w-4">
+          <path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z" />
+        </svg>
+        <span class="hidden sm:inline">Modules</span>
+      </button>
     </div>
-    <!-- /.conainer-fluid -->
-  </main>
-</div>
+  </header>
 
-<footer class="app-footer">
-  Version 9.0.30729.1 &copy;2014 Manilal Patel Group. All Rights Reserved.
-</footer>
+  <!-- ── body: sidebar + content, beneath the header ────────────────────── -->
+  <div class="flex min-h-0 flex-1">
+
+    @if (sidebar.isMobile() && sidebar.openMobile()) {
+      <div class="fixed inset-0 top-14 z-40 bg-black/60" (click)="sidebar.setOpenMobile(false)" aria-hidden="true"></div>
+    }
+
+    <div class="z-40 shrink-0 transition-[width,transform] duration-200 ease-linear
+                max-md:fixed max-md:bottom-0 max-md:left-0 max-md:top-14"
+         [style.width]="sidebarWidth"
+         [class.max-md:translate-x-0]="sidebar.openMobile()"
+         [class.max-md:-translate-x-full]="!sidebar.openMobile()">
+      <app-menu-sidebar></app-menu-sidebar>
+    </div>
+
+    <!-- Loading indicator is confined to this content column and never
+         captures the pointer: header and sidebar stay usable while a page
+         loads. See shared/content-loader.component.ts. -->
+    <div class="relative flex min-w-0 flex-1 flex-col">
+      <main #contentScope class="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
+        <div data-crumbs class="border-b border-[var(--border)] bg-[var(--card)] px-4 py-2">
+          <app-breadcrumbs></app-breadcrumbs>
+        </div>
+        <router-outlet></router-outlet>
+      </main>
+      <app-content-loader [scope]="contentScope"></app-content-loader>
+    </div>
+  </div>
+</div>

@@ -8,10 +8,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IMyDpOptions } from 'mydatepicker';
 import { BankReconcilAddEditExportService } from './bank-reconcil-addedit-export.service';
 
+/*  MPERPNG-20 layout: import-page.css and accreport-page.css are GLOBAL in Links (src/styles/kit/*);
+    the host class "kit-accreport" opts this page into the accreport add-on. bank-reconcil.page.css
+    (copied from MP) is the only scoped sheet; bank-reconcil.component.css is the old, unreferenced one.
+    The toggleRow / drTh / crTh refs are absent from the new template, so alignTotals() returns early. */
 @Component({
     selector: 'app-BankReconcil',
     templateUrl: './bank-reconcil.component.html',
-    styleUrls: ['./bank-reconcil.component.css'],
+    styleUrls: ['./bank-reconcil.page.css'],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

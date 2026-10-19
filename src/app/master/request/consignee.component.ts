@@ -11,6 +11,7 @@ import { Configuration } from '../../app.constants';
 @Component({
     selector: 'app-masterconsignee',
     templateUrl: 'consignee.component.html',
+    styleUrls: ['./request-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

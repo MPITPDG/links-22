@@ -13,6 +13,7 @@ import { Configuration } from '../../app.constants';
 @Component({
     selector: 'app-ItemCodeCreation',
     templateUrl: 'itemcode-IU.component.html',
+    styleUrls: ['../request/request-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -96,7 +97,7 @@ bindlist(accode)
     }
     this._dataService.getData("Master/MST_ACCOUNTS_ITEMCODE_FILL_GRID",jsonitem)
     .subscribe((data: any) => {
-             this.ItemList=data.Table
+             this.ItemList=(data && data.Table) || [];
             
      
     });
@@ -112,7 +113,7 @@ SearchItem()
     }
     this._dataService.getData("Master/MST_ACCOUNTS_ITEMCODE_FILL_GRID",jsonitem)
     .subscribe((data: any) => {
-            this.ItemList=data.Table
+            this.ItemList=(data && data.Table) || [];
           
             
 
@@ -242,7 +243,7 @@ SearchItem()
             }
             this._dataService.getData("Master/MST_ACCOUNTS_ITEMCODE_FILL_GRID",jsonitem)
             .subscribe((data: any) => {
-                    this.ItemList=data.Table
+                    this.ItemList=(data && data.Table) || [];
             });
         }
 }

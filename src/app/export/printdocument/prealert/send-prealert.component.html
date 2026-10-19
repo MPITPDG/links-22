@@ -1,0 +1,52 @@
+<!--
+  Send Pre-Alert. Page kit recipe 1 (.im-page), ported from MPERPNG-20. The button is labelled
+  "Send pre-alert" (MP says "Preview") because submit() sends the pre-alert straight away; it
+  stays disabled until a MAWB No. is typed.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Send Pre-Alert</h1>
+      <p>Enter the MAWB No., then submit to send the pre-alert</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="filters" style="grid-template-columns: 1fr auto;">
+      <div class="f">
+        <label for="txtSendMawbNo">MAWB No.</label>
+        <input type="text" id="txtSendMawbNo" name="txtSendMawbNo" [(ngModel)]="MAWBNO" [maxlength]="15" placeholder="MAWB No." />
+      </div>
+      <div class="f">
+        <button class="btn p" type="button" (click)="submit()" [disabled]="!MAWBNO">Send pre-alert</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <span>
+        <span class="count">Ready to send</span>
+        @if (MAWBNO) {
+          <span class="sub-t"> — pre-alert for MAWB {{ MAWBNO }}</span>
+        } @else {
+          <span class="sub-t"> — enter a MAWB No. to continue</span>
+        }
+      </span>
+      @if (MAWBNO) {
+        <span class="tb-r">
+          <span class="chip dash">MAWB {{ MAWBNO }}</span>
+        </span>
+      }
+    </div>
+
+    @if (setLoader==1) {
+      <div class="toolbar">
+        <span class="count">Pre-alert sent successfully</span>
+      </div>
+    }
+    @if (setLoader==2) {
+      <div class="toolbar">
+        <span class="count">Timeout error</span>
+      </div>
+    }
+  </div>
+</div>

@@ -19,7 +19,9 @@ export class LoginService {
         private http: HttpClient ) { }
 
     public removeLogin() {
-        localStorage.removeItem('_user');
+        // The session is stored under '_linksuser' (see setLogin/getLogin);
+        // removing the old '_user' key left the user logged in after Logout.
+        localStorage.removeItem('_linksuser');
         this._router.navigate(['login']);
         // if (this.getBasePath() == 'FRT') {
         //     localStorage.removeItem('_frtUser');
@@ -316,6 +318,9 @@ export class LoginService {
             }
             return true;
         }
+        // SA has every right. This used to fall through and return undefined, so callers
+        // that gate on the result (e.g. Import searches) never loaded anything for SA.
+        return true;
     }
 
     checkVerifyWithMessage(mode, vdata) {

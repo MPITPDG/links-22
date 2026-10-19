@@ -5,7 +5,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { FullLayoutComponent } from './layouts/full-layout.component';
 import { SimpleLayoutComponent } from './layouts/simple-layout.component';
 import { HeaderFooterLayoutComponent } from './layouts/header-footer-layout.component';
-import { FullLayoutComponent_acc } from './layouts/full-layout.component_acct';
 
 export const routes: Routes = [
 
@@ -147,7 +146,10 @@ export const routes: Routes = [
     },
     {
         path: 'accounts',
-        component: FullLayoutComponent_acc,
+        // Was FullLayoutComponent_acc, a copy of the full layout whose only
+        // difference was the financial-year picker. The shared layout now shows
+        // that picker itself on /accounts routes (same as MPERPNG-20).
+        component: FullLayoutComponent,
         data: {
             title: ''
         },
@@ -182,6 +184,20 @@ export const routes: Routes = [
             {
                 path: '',
                 loadChildren: () => import('./import/import.module').then(m => m.ImportModule),
+            }
+        ]
+    },
+    {
+        // Raise-ticket board (ported from MPERPNG-20).
+        path: 'tickets',
+        component: FullLayoutComponent,
+        data: {
+            title: 'Tickets'
+        },
+        children: [
+            {
+                path: '',
+                loadChildren: () => import('./tickets/tickets.module').then(m => m.TicketsModule),
             }
         ]
     },

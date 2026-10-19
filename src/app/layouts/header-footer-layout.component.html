@@ -1,50 +1,72 @@
-﻿<header class="app-header navbar">
-    <a class="navbar-brand" href="javascript:void(0);" style="border-bottom: 0px;">
-    </a>
-    <ul class="nav navbar-nav d-md-down-none">
-        <li class="nav-item px-3" [ngStyle]="{'text-align': 'justify'}">
-            <span style='font-size: 24px; font-weight: bold; font-family: "Euclid Fraktur", "Old English Text MT", fantasy, serif; color: #ffffff; text-shadow: 1px 1px 2px #0300bd, 0 0 25px #0300bd, 0 0 5px #0300bd;'>{{cmpname
-                | titlecase}},&nbsp;</span>
-            <a [ngStyle]="{'font-weight': 'bold','font-size': '10pt','cursor': 'pointer','color': '#070736','font-family': 'Verdana, Arial','font-variant': 'small-caps','text-decoration': 'underline'}"
-                [routerLink]="['/branch']">{{cityName}}</a>
-            <br />
-            <span [ngStyle]="{'font-family': 'Verdana','font-size': 'X-Small','font-weight': 'bold','color': 'white'}" [innerHtml]="displayName"></span>
-        </li>
-    </ul>
+<!--
+  Hub layout: module picker, branch picker, company picker, profile.
+  (Ported from MPERPNG-20; Links name and logo.)
 
-    <ul class="nav navbar-nav ml-auto">
-        <!-- <li class="nav-item d-md-down-none">
-            <button type="button" class="btn btn-warning" (click)="goto('CITY')">
-                <span class="col-form-span-label">
-                    <i class="fa fa-map-marker fa-lg"></i>&nbsp;
-                    <b>
-                        <u>{{cityName}}</u>
-                    </b>
-                </span>
-            </button>&nbsp;
-        </li> -->
-        <li class="nav-item dropdown" placement="bottom right"><a aria-haspopup="true" class="nav-link" href="javascript:void(0)"
-                role="button"><img class="img-avatar" src="assets/img/pics/{{userimgepath}}"  height="40px" width="40px"></a>
-            <!---->
-        </li>
-        <li class="nav-item d-md-down-none">
-            <button type="button" class="btn btn-danger" (click)="logout()">
-                <span class="col-form-span-label">
-                    <i class="fa fa-sign-out fa-lg"></i>&nbsp;
-                    <b>Logout</b>
-                </span>
-            </button>
-        </li>
-        <li>&nbsp;&nbsp;</li>
-    </ul>
-</header>
-<div class="app-body">
-    <div class="container-fluid">
-        <div class="animated fadeIn">
-            <router-outlet></router-outlet>
-        </div>
+  Deliberately has no sidebar - on these pages you are choosing which module to
+  enter, so there is nothing to navigate yet. It shares the shell's styling but
+  not its structure.
+
+  Restyled to match FullLayoutComponent so these pages stop looking like a
+  different application. /Profile in particular is reachable straight from the
+  sidebar user menu, so the jump was jarring.
+-->
+<div class="theme-gray flex h-screen flex-col overflow-hidden bg-[var(--background)]">
+
+  <header class="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--sidebar-border)]
+                 bg-[var(--sidebar)] px-3 sm:px-4">
+
+    <img src="assets/img/Untitled-1.png" alt="Links"
+         class="h-8 w-auto max-w-[4.5rem] shrink-0 rounded-lg bg-white/95 object-contain p-1"
+         onerror="this.style.display='none'" />
+
+    <div class="flex min-w-0 flex-col leading-tight">
+      <span class="truncate text-sm font-semibold text-[var(--sidebar-accent-foreground)]">{{ cmpname | titlecase }}</span>
+      <span class="truncate text-[11px] text-white/50">Links Group</span>
     </div>
+
+    <div class="ml-auto flex items-center gap-2">
+      <!-- Missed-toast recovery: every toast is also recorded here. -->
+      <app-notification-bell></app-notification-bell>
+
+      @if (cityName) {
+        <a [routerLink]="['/branch']" uiBtn variant="ghost" size="sm"
+           [title]="'Change branch - currently ' + cityName"
+           class="border border-white/20 !text-[var(--sidebar-accent-foreground)] hover:!bg-white/10 hover:border-white/30">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-3.5 w-3.5">
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" />
+          </svg>
+          <span class="font-medium uppercase tracking-wide">{{ cityName }}</span>
+        </a>
+      }
+
+      <span class="hidden max-w-[200px] truncate text-xs text-white/60 md:block"
+            [innerHtml]="displayName"></span>
+
+      <img class="hidden h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-white/15 sm:block"
+           [src]="'assets/img/pics/' + userimgepath" alt=""
+           onerror="this.style.display='none'" />
+
+      <button type="button" (click)="goto('HOME')" uiBtn variant="ghost" size="sm"
+              title="Modules"
+              class="!text-white/80 hover:!bg-white/10 hover:!text-white">
+        <i class="fa fa-home" aria-hidden="true"></i>
+        <span class="hidden sm:inline">Modules</span>
+      </button>
+
+      <button type="button" (click)="logout()" uiBtn variant="ghost" size="sm"
+              title="Log out"
+              class="!text-red-400 hover:!bg-white/10 hover:!text-red-300">
+        <i class="fa fa-sign-out" aria-hidden="true"></i>
+        <span class="hidden sm:inline">Logout</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="relative flex min-h-0 flex-1 flex-col">
+    <main #contentScope class="min-h-0 flex-1 overflow-y-auto">
+      <router-outlet></router-outlet>
+    </main>
+    <app-content-loader [scope]="contentScope" [skeletonTop]="0"></app-content-loader>
+  </div>
 </div>
-<footer class="app-footer" style="margin-left:0px; ">
-    Version 9.0.30729.1 &copy;2014 Manilal Patel Group. All Rights Reserved.
-</footer>

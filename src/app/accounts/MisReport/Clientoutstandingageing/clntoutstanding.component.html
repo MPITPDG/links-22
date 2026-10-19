@@ -1,144 +1,141 @@
-<div class="animated fadeIn" >  
-    <div class="row no-gutters" >
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                         <div class="col-sm-12">
-                            <strong>{{HeaderText}}</strong>
-                        </div> 
-                     </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Accounts -> MIS -> Client outstanding ageing.
+  Report recipe: KPIs + receivables-by-age-bucket chart + filterable 10/page table.
+  Data: ACC_RPT_CLIENTOUTSTANDING_AGEING (loaded on open). The client search filters on
+  ACCTNAME exactly like clntoutageingfilterpipe. Select a row to see its follow-up details
+  (findDetails). Export keeps the existing Excel export (ExportOutstandingData).
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Client outstanding ageing</h1>
+      <p>Receivable per client by age bucket, with unadjusted receipts and advances &middot; as on {{ Ondate }}</p>
     </div>
- 
-    <div class="row no-gutters">
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-        <div class="col-sm-12 col-md-10 col-lg-10 ">
-            <table>
+  </div>
+
+  @if (failed) {
+    <div class="card fk-alert">The ageing could not be loaded. Reload the page to try again.</div>
+  }
+
+  <div class="fk-kpis">
+    @if (loading) {
+      @for (k of [1,2,3,4,5]; track k) { <div class="card fk-kpi"><div class="fk-skel w40"></div><div class="fk-skel h24 w60"></div></div> }
+    } @else {
+      <div class="card fk-kpi"><div class="k">Clients</div><div class="v">{{ cloutList.length }}</div></div>
+      <div class="card fk-kpi"><div class="k">Receivable</div><div class="v">{{ fmt(kpiReceivable) }}</div></div>
+      <div class="card fk-kpi"><div class="k">Over 180 days</div><div class="v">{{ fmt(kpiOver180) }}</div></div>
+      <div class="card fk-kpi"><div class="k">Unadjusted receipts</div><div class="v">{{ fmt(kpiUnadj) }}</div></div>
+      <div class="card fk-kpi"><div class="k">Advance</div><div class="v">{{ fmt(kpiAdvance) }}</div></div>
+    }
+  </div>
+
+  <div class="card sec">
+    <div class="card-h"><h2>Receivable by age bucket</h2><span class="meta">all clients</span></div>
+    @if (loading) {
+      <div class="fk-chart"><div class="fk-skel chart"></div></div>
+    } @else {
+      <div class="fk-hbars">
+        @for (b of buckets; track $index) {
+          <div class="fk-hbar"><span>{{ b.label }}</span><div class="t"><div [style.width.%]="b.pct"></div></div><span class="n">{{ fmt(b.value) }} &middot; {{ b.pct | number:'1.0-0' }}%</span></div>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="card sec">
+    <div class="toolbar">
+      <span class="fk-inline">
+        <span class="count">{{ pager.rows.length }} of {{ cloutList.length }} clients</span>
+        <input type="search" [(ngModel)]="searchString" (ngModelChange)="applyFilter()" autocomplete="off" placeholder="Search client" class="fk-search">
+      </span>
+      <span class="tb-r">
+        <button class="btn g" type="submit" (click)="ExportOutstandingData()" [disabled]="!cloutList.length">Export</button>
+      </span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th class="ck"></th>
+            <th>Client name</th>
+            <th>Doc city</th>
+            <th class="num">O/S as on date</th>
+            <th class="num">&lt; 30 days</th>
+            <th class="num">31-60 days</th>
+            <th class="num">61-90 days</th>
+            <th class="num">91-120 days</th>
+            <th class="num">120-180 days</th>
+            <th class="num">181-365 days</th>
+            <th class="num">More than 1 yr</th>
+            <th class="num">Sum of all O/S inv</th>
+            <th class="num">Unadjusted receipts</th>
+            <th class="num">Advance</th>
+            <th class="num">Advance paid on behalf</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+            <tr><td class="empty" colspan="15">Loading ageing&hellip;</td></tr>
+          } @else {
+            @for (data of pager.paged; track $index) {
+              <tr (click)="data.expanded = !data.expanded" class="fk-click">
+                <td class="ck">{{ data.expanded ? '−' : '+' }}</td>
+                <td>{{data.ACCTNAME}}</td>
+                <td>{{data.DOCCITY}}</td>
+                <td class="num">{{data.RECEIVABLE_AS_ON}}</td>
+                <td class="num">{{data.DAYS_000_030}}</td>
+                <td class="num">{{data.DAYS_031_060}}</td>
+                <td class="num">{{data.DAYS_061_090}}</td>
+                <td class="num">{{data.DAYS_091_120}}</td>
+                <td class="num">{{data.DAYS_121_180}}</td>
+                <td class="num">{{data.DAYS_181_365}}</td>
+                <td class="num">{{data.DAYS_366_730}}</td>
+                <td class="num">{{data.INVOICES_OUTSTANDING}}</td>
+                <td class="num">{{data.UNADJUSTED_RECEIPTS}}</td>
+                <td class="num">{{data.ADVANCE}}</td>
+                <td class="num">{{data.ADVANCE_PAIDBYUS}}</td>
+              </tr>
+              @if (data.expanded) {
                 <tr>
-                  <td colspan="8">
-                    <div class="input-group input-group-rounded"  style="float: right;width: 300px;font-family: verdana;font-size:11px;padding: 1px;">
-                      <div class="input-group-prepend">
-                          <span class="input-group-text"><i class="fa fa-search"></i></span>
-                      </div>
-                      <input class="form-control" type="search" [(ngModel)]="searchString" autocomplete="off"
-                          placeholder="Search"  autofocus>
-                  </div>
+                  <td></td>
+                  <td colspan="14" class="fd-sub">
+                    <table class="tbl">
+                      <thead>
+                        <tr><th>Assigned on</th><th>Follow-up assigned to</th><th>Client status</th><th>Invoice city</th></tr>
+                      </thead>
+                      <tbody>
+                        @for (details of findDetails(data); track $index) {
+                          <tr>
+                            <td>{{details.ASSIGNED_ON}}</td>
+                            <td>{{details.FOLLOW_ASSIGNED_TO}}</td>
+                            <td>{{details.CLIENT_STATUS}}</td>
+                            <td>{{details.CITYNAME}}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
                   </td>
                 </tr>
-              </table>
-              <div class="row  xyscroll"  style="height: 500px;">
-                <table class="table table-hover table-bordered table-responsive-xl" >
-                    <thead>
-                    
-                        <tr class="title-head formheading table-primary">
-                            <th class="col-form-span-label" align="center"></th>
-                            <th style="width: 100px;" class="col-form-span-label" align="center">CLIENT NAME</th>
-                            <th style="width: 100px;"class="col-form-span-label" align="center">	DOC CITY</th>
-                            <th style="width: 100px;" class="col-form-span-label" align="center">O/S AS ON DATE</th>      
-                            <th style="width: 100px;" class="col-form-span-label" align="center">LESS THAN 30 DAYS</th>     
-                            <th style="width: 100px;" class="col-form-span-label" align="center">31-60  DAYS</th>     
-                            <th style="width: 100px;" class="col-form-span-label" align="center">61-90  DAYS</th>      
-                            <th  style="width: 100px;" class="col-form-span-label" align="center">91-120  DAYS </th>    
-                            <th style="width: 100px;" class="col-form-span-label" align="center">120-180  DAYS</th>    
-                            <th style="width: 100px;" class="col-form-span-label" align="center"> 181-365  Days </th>    
-                            <th style="width: 100px;"  class="col-form-span-label" align="center"> MORE THAN 1 Yr </th>  
-                            <th style="width: 100px;" class="col-form-span-label" align="center"> SUM OF ALL O/S INV </th> 
-                            <th style="width: 100px;" class="col-form-span-label" align="center" >UNADJUSTED RECEIPTS</th>
-                            <th style="width: 100px;" class="col-form-span-label" align="center" >ADVANCE</th>
-                            <th style="width: 100px;" class="col-form-span-label" align="center" >ADVANCE PAID ON BEHALF</th>
-                        </tr>
-                    </thead>
-                    @if (cloutList.length > 0) {
-<tbody>
-                        @for (data of cloutList | clntoutageingfilterpipe: searchString; track data) {
-
-                        <tr (click)="data.expanded = !data.expanded">
-                            <td ><span  class="col-form-span-label " >{{ data.expanded ? '&ndash;' : '+'}} </span></td> 
-                            <td style="width: 250px;"><span  class="col-form-span-label " >{{data.ACCTNAME}}</span> </td> 
-                            <td style="width: 100px;" ><span class="col-form-span-label">{{data.DOCCITY}}</span>  </td>                             
-                            <td style="width: 90px;" ><span class="col-form-span-label">{{data.RECEIVABLE_AS_ON}}</span>  </td>
-                            <td style="width: 50px;" ><span class="col-form-span-label">{{data.DAYS_000_030}}</span>  </td>
-                            <td style="width: 50px;" ><span class="col-form-span-label">{{data.DAYS_031_060}}</span>  </td>
-                            <td style="width: 50px;" ><span class="col-form-span-label">{{data.DAYS_061_090}}</span>  </td>
-                            <td style="width: 50px;" ><span class="col-form-span-label">{{data.DAYS_091_120}}</span>  </td>
-                            <td style="width: 50px;" ><span class="col-form-span-label">{{data.DAYS_121_180}}</span>  </td>
-                            <td style="width: 50px;" ><span class="col-form-span-label">{{data.DAYS_181_365}}</span>  </td>
-                            <td style="width: 50px;" ><span class="col-form-span-label">{{data.DAYS_366_730}}</span>  </td>
-                            <td style="width: 50px;" ><span class="col-form-span-label">{{data.INVOICES_OUTSTANDING}}</span>  </td>
-                            <td  style="white-space: pre-wrap;width: 50px;"><span class="col-form-span-label">{{data.UNADJUSTED_RECEIPTS}}</span>  </td>
-                            <td style="width: 100px;" ><span class="col-form-span-label">{{data.ADVANCE}}</span>  </td>
-                            <td style="white-space: pre-wrap;width: 100px;" ><span class="col-form-span-label">{{data.ADVANCE_PAIDBYUS}}</span>  </td>
-                           
-                        </tr>
-                        @if (data.expanded) {
-
-                            <tr class="title-head formheading table-primary">
-                                <th ></th>
-                                <th class="col-form-span-label" align="center">ASSIGNED ON:</th>
-                                <th class="col-form-span-label" align="center">FOLLOW UP ASSIGNED TO:</th>
-                                <th class="col-form-span-label" align="center">CLIENT STATUS:</th>
-                                <th class="col-form-span-label" align="center">INVOICE CITY:</th>      
-                              
-                            </tr>
-                        @for (details of findDetails(data); track details) {
-<tr class="title-head formheading table-primary">
-                            <td>  </td>
-                             <td> <span class="col-form-span-label">{{details.ASSIGNED_ON}}</span>  </td>
-                            <td> <span class="col-form-span-label">{{details.FOLLOW_ASSIGNED_TO}}</span>  </td>
-                            <td> <span class="col-form-span-label">{{details.CLIENT_STATUS}}</span>  </td>
-                            <td> <span class="col-form-span-label">{{details.CITYNAME}}</span>  </td>
-                          </tr>
-}
-                        
-}
-                    
-}
-                        <!-- <tr *ngIf ="CHECK==true" >
-                            <td  colspan="4">                                
-                                <table class="table table-bordered table-sm-new bgwhite" >
-                                    <tr *ngFor="let data of cloutList" >
-                                        <td class="col-form-span-label"  >ASSIGNED ON:</td>
-                                        <td>{{ASSIGNED_ON}}</td>
-                                        <td class="col-form-span-label" >FOLLOW UP ASSIGNED TO:</td>
-                                        <td>{{FOLLOW_ASSIGNED_TO}}</td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr> -->
-                    </tbody>
-}
-                    <!-- <tbody *ngIf="cloutList.length > 0">
-                        <tr *ngIf ="CHECK==true" >
-                            <td  colspan="4">                                
-                                <table class="table table-bordered table-sm-new bgwhite" >
-                                    <tr  >
-                                        <td class="col-form-span-label"  >ASSIGNED ON:</td>
-                                        <td>{{ASSIGNED_ON}}</td>
-                                        <td class="col-form-span-label" >FOLLOW UP ASSIGNED TO:</td>
-                                        <td>{{FOLLOW_ASSIGNED_TO}}</td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </tbody> -->
-                  
-                </table>
-            </div>       
+              }
+            } @empty {
+              <tr><td class="empty" colspan="15">{{ searchString ? 'No client matches the search.' : 'No outstanding.' }}</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (pager.rows.length > pager.size) {
+      <div class="pager">
+        <span>Showing <b>{{ pager.from }}&ndash;{{ pager.to }}</b> of <b>{{ pager.rows.length }}</b></span>
+        <div class="pages">
+          <button type="button" [disabled]="pager.page === 1" (click)="pager.go(pager.page - 1)" aria-label="Previous page">&lsaquo;</button>
+          @for (p of pager.numbers; track $index) {
+            @if (p === '...') { <span class="gap">&hellip;</span> }
+            @else { <button type="button" [class.on]="p === pager.page" (click)="pager.go(p)">{{ p }}</button> }
+          }
+          <button type="button" [disabled]="pager.page === pager.total" (click)="pager.go(pager.page + 1)" aria-label="Next page">&rsaquo;</button>
         </div>
-        <div class="col-md-12"> 
-        <div class="row  d-flex justify-content-center" >
-         
-                <button class="btn btn-sm btn-primary" type="submit"  (click)="ExportOutstandingData()" > <span
-                class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
-                Export To Excel </span></button>&nbsp;
-        </div>
-        </div>
-
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-     </div>  
+      </div>
+    }
+  </div>
 </div>

@@ -1,47 +1,47 @@
-<div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>Annexure</strong>
-                    <button type="button" name="searchButton" [ngStyle]="{'float': 'right', 'margin-top': '0px'}" class="btn btn-sm btn-danger"
-                        (click)="backButton();">
-                        <span class="col-form-span-label">
-                            <i class="fa fa-arrow-circle-left"></i>&nbsp;Back To Search</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+﻿<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Annexure</h1>
+      <p>Export No <b>{{exptno}}</b> — edit particulars or print the annexure</p>
     </div>
-    <div class="row">
-        <div class="col-sm-3">
-        </div>
-        <div class="col-sm-6">
-            <table class="table table-bordered table-sm-new">
-                <tbody class="bgwhite">
-                    <tr class="title-head formheading">
-                        <td colspan="2" [ngStyle]="{'text-align': 'right'}">
-                            &nbsp;
-                        </td>
-                    </tr>
-                    @for (obj of EditMenuList; track obj; let i = $index) {
-<tr>
-                        <td>
-                            @if (obj.id==1||obj.id==8) {
-<span class="col-form-span-label">
-                                <b>{{obj.type}}</b>
-                            </span>
-}
-                        </td>
-                        <td>
-                            <span class="col-form-span-label" [ngStyle]="{'text-decoration': 'underline','color': 'blue','cursor': 'pointer'}" (click)="redirectTo(obj.id, obj.type)">
-                                {{obj.name}}
-                            </span>
-                        </td>
-                    </tr>
-}
-                </tbody>
-            </table>
-        </div>
-        <div class="col-sm-3">
-        </div>
+    <div class="tools">
+      <button class="btn g" type="button" name="searchButton" (click)="backButton();">
+        Back to search
+      </button>
     </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Edit</h2>
+      <span class="meta">Choose a section to edit</span>
+    </div>
+    <div class="an-tabs" role="tablist">
+      @for (obj of EditMenuList; track obj) {
+        @if (obj.type === 'EDIT') {
+          <button type="button" role="tab" (click)="redirectTo(obj.id, obj.type)">
+            {{obj.name}}
+          </button>
+        }
+      }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">
+      <h2>Print</h2>
+      <span class="meta">Opens in a new tab</span>
+    </div>
+    <div class="an-print-list">
+      @for (obj of EditMenuList; track obj) {
+        @if (obj.type === 'PRINT') {
+          <div class="row">
+            <span>{{obj.name}}</span>
+            <button class="btn g" type="button" (click)="redirectTo(obj.id, obj.type)">Print</button>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+</div>

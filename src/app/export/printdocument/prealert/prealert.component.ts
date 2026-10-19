@@ -11,6 +11,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
 
     selector: 'app-export-prealert-prepare',
     templateUrl: 'prealert.prepare.component.html',
+    styleUrls: ['prealert-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -39,6 +40,7 @@ export class PreAlertPrepareComponent implements OnChanges {
 @Component({
     selector: 'app-export-prealert-auto',
     templateUrl: 'prealert.auto.component.html',
+    styleUrls: ['prealert-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -46,6 +48,11 @@ export class PreAlertAutoComponent implements OnChanges {
     @Input() searchList: any = [];
     @Input() searchListLength: number = 0;
     @Output() result: EventEmitter<any> = new EventEmitter<any>();
+
+    // ---------- additive (from MPERPNG-20): client-side filter + pagination (presentation only, no API change) ----------
+    readonly autoPageSize = 10;
+    filterText: string = '';
+    autoPage: number = 1;
     constructor(
         private _toasterService: ToastCommonService,
         private _mawbnoshrd : prealertshareservice
@@ -56,6 +63,7 @@ export class PreAlertAutoComponent implements OnChanges {
             this.searchList[i]["CITY"] = null;
             this.searchList[i]["ISDISABLED"] = false;
         }
+        this.autoPage = 1;
     }
 
     autoClick(mawbno, city) {
@@ -69,11 +77,78 @@ export class PreAlertAutoComponent implements OnChanges {
             }
         }
     }
+
+    get filteredList(): any[] {
+        const q = (this.filterText || '').trim().toLowerCase();
+        const list = this.searchList || [];
+        if (!q) { return list; }
+        return list.filter((r: any) =>
+            String(r.MAWBNO || '').toLowerCase().indexOf(q) >= 0 ||
+            String(r.HOUSEBILLNO || '').toLowerCase().indexOf(q) >= 0 ||
+            String(r.CONS_NAME || '').toLowerCase().indexOf(q) >= 0 ||
+            String(r.EXPTNO || '').toLowerCase().indexOf(q) >= 0);
+    }
+
+    get autoPageCount(): number {
+        return Math.max(1, Math.ceil(this.filteredList.length / this.autoPageSize));
+    }
+
+    get autoPageRows(): any[] {
+        const start = (this.autoPage - 1) * this.autoPageSize;
+        return this.filteredList.slice(start, start + this.autoPageSize);
+    }
+
+    get autoRangeStart(): number {
+        return this.filteredList.length ? (this.autoPage - 1) * this.autoPageSize + 1 : 0;
+    }
+
+    get autoRangeEnd(): number {
+        return Math.min(this.autoPage * this.autoPageSize, this.filteredList.length);
+    }
+
+    get autoPageList(): number[] {
+        const n = this.autoPageCount, p = this.autoPage;
+        if (n <= 7) { return Array.from({ length: n }, (_, i) => i + 1); }
+        const out: number[] = [1];
+        const lo = Math.max(2, p - 1), hi = Math.min(n - 1, p + 1);
+        if (lo > 2) { out.push(0); }
+        for (let i = lo; i <= hi; i++) { out.push(i); }
+        if (hi < n - 1) { out.push(0); }
+        out.push(n);
+        return out;
+    }
+
+    goAutoPage(p: number) {
+        if (p >= 1 && p <= this.autoPageCount) { this.autoPage = p; }
+    }
+
+    exportAutoCsv() {
+        const head = ['City', 'MAWB No', 'MAWB DT.', 'ETD', 'ETA', 'HAWB No.', 'HAWB DT.', 'Ex-Jobno.', 'No of Pkgs', 'GRWT', 'CBM', 'Consignee', 'Flight Details', 'MAWB FRT', 'Invoice Type', 'MAWBDEST'];
+        const rows = this.filteredList.map((r: any) => [r.CITY, r.MAWBNO, r.AEROBILLDT, r.ETD, r.ETA, r.HOUSEBILLNO, r.HOUSEBILLDT, r.EXPTNO,
+            r.EXPT_NOOFPGS, r.EXPT_GRWT, r.EXPT_VOLUME, r.CONS_NAME, r.FLIGHTDET, r.MAWBFRT, r.EXPT_INVTYPE, r.MAWBDEST]);
+        const q = (v: any) => {
+            const s = (v === null || v === undefined) ? '' : String(v);
+            return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+        };
+        const csv = [head, ...rows].map(line => line.map(q).join(',')).join('\r\n');
+        const d = new Date();
+        const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+        const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'prealert-auto-' + stamp + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
 }
 
 @Component({
     selector: 'app-export-prealert-sending-through',
     templateUrl: 'prealert.sending.through.expt.component.html',
+    styleUrls: ['prealert-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -109,9 +184,9 @@ export class PreAlertPrepareSendingThroughComponent implements OnInit,OnChanges 
         this._dataService.getData("Export/PrintDocumentPrealertSendingView", _jsonData)
             .subscribe((data: any) => {
                 this.setLoader = 3;
-                this.consoleList = data.Table1;
-                this.jobList = data.Table2;
-                this.orderList = data.Table3;
+                this.consoleList = (data && data.Table1) ? data.Table1 : [];
+                this.jobList = (data && data.Table2) ? data.Table2 : [];
+                this.orderList = (data && data.Table3) ? data.Table3 : [];
             });
     }
 
@@ -125,7 +200,7 @@ export class PreAlertPrepareSendingThroughComponent implements OnInit,OnChanges 
         };
         this._dataService.Common("Export/PrintDocumentPrealertSending", _jsonData)
             .subscribe((data: any) => {
-                if (data.Table[0].status == 100) {
+                if (data && data.Table && data.Table[0] && data.Table[0].status == 100) {
                     this.setLoader = 1;
                     this.getSendingViewData();
                 } else {
@@ -189,13 +264,15 @@ export class PreAlertComponent implements OnInit {
         };
         this._dataService.getData("Export/PrintDocumentPrealertPageload", _jsonData)
             .subscribe((data: any) => {
-                this.searchListLength = (data.Table.length == 0)? -1 : -2;
-                this.searchList = data.Table;
+                const rows = (data && data.Table) ? data.Table : [];
+                this.searchListLength = (rows.length == 0)? -1 : -2;
+                this.searchList = rows;
             });
     }
 
     EnableDisablePrealertButton(mawbno, isdisabled) {
-        let updateItem = this.searchList.find(item => item.MAWBNO === mawbno);
+        let updateItem = (this.searchList || []).find(item => item.MAWBNO === mawbno);
+        if (!updateItem) { return; }
         let index = this.searchList.indexOf(updateItem);
         this.searchList[index]["ISDISABLED"] = isdisabled;
     }
@@ -214,6 +291,11 @@ export class PreAlertComponent implements OnInit {
             this._dataService.common_downloadDocFileByUrl(data,filename);            
             this._loaderService.display(false);
            
+        },
+        (error) => {
+            // From MPERPNG-20: a failed download must not leave the app-wide loader spinning.
+            this._loaderService.display(false);
+            this._toasterService.toast('error', 'Error', 'Unable to prepare Pre-Alert. Please check the MAWB No. and try again.');
         });
 
         // this._dataService.Common("Export/PrintDocumentPrealertPrepare", _jsonData)
@@ -243,7 +325,8 @@ export class PreAlertComponent implements OnInit {
     }
 
     EnableDisableAutoButton(mawbno, isdisabled) {
-        let updateItem = this.searchList.find(item => item.MAWBNO === mawbno);
+        let updateItem = (this.searchList || []).find(item => item.MAWBNO === mawbno);
+        if (!updateItem) { return; }
         let index = this.searchList.indexOf(updateItem);
         this.searchList[index]["ISDISABLED"] = isdisabled;
     }
@@ -260,6 +343,11 @@ export class PreAlertComponent implements OnInit {
         this._dataService.Common("Export/PrintDocumentPrealertAuto", _jsonData)
             .subscribe((data: any) => {
                 this.EnableDisableAutoButton(autoData.MAWBNO, false);
+                if (!data || !data.Table || !data.Table[0]) {
+                    this._toasterService.toast('error', 'Error', "Please contact System Administrator");
+                    this._loaderService.display(false);
+                    return;
+                }
                 let items = '';
                 let msg = '';
                 items = data.Table[0].STATUS;
@@ -313,6 +401,12 @@ export class PreAlertComponent implements OnInit {
                     this._toasterService.toast('error', 'Error', "Please contact System Administrator");
                     this._loaderService.display(false);
                 }
+            },
+            (error) => {
+                // From MPERPNG-20: an HTTP failure must not leave the app-wide loader spinning.
+                this.EnableDisableAutoButton(autoData.MAWBNO, false);
+                this._loaderService.display(false);
+                this._toasterService.toast('error', 'Error', "Please contact System Administrator");
             });
     }
 

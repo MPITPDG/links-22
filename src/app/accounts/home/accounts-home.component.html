@@ -1,1132 +1,1142 @@
-<!--  Renders only with the View right (or as SA). Without it this stays empty, and the home
-      page is the blank one it has always been.                                          -->
+<!--  Accounts home, MPERPNG-20's six-section dashboard (global kit .im-dash, see
+src/styles/kit/import-home.css): header row, Needs attention, Act now, This week, Workload
+picture, Detail, Reference. Greyscale, no look mode. Every figure, table and chart of the
+previous Links page is still here: branch scope, month-to-date vs last month bars, the
+"what is this" popup behind every icon (draggable), the pipeline boxes, cash forecast,
+DSO vs DPO, the Chart.js trend, watch list, top clients, quick links and the drill-downs.
+Renders only with the View right on VIEW_GATE_FORM_ID (or as SA). Without it this stays
+empty, and the home page is the blank one it has always been.                          -->
 @if (canView) {
-<div class="animated fadeIn x-page ah-page" [class.ah-dark]="dark">
-
-    <!-- ================= TOOLBAR ================= -->
-    <div class="x-toolbar">
-        <div class="x-mark">
-            <i class="fa fa-inr" aria-hidden="true"></i>
-        </div>
-        <div class="x-titlewrap">
-            <span class="x-eyebrow">Accounts</span>
-            <h1 class="x-title">{{greeting()}}@if (login?.USERNAME || login?.CMP_USERNAME) {
-, {{login?.USERNAME || login?.CMP_USERNAME}}
-}</h1>
-        </div>
-
-        @if (login) {
-<span class="x-pill x-pill-brand ah-branch">
-            <i class="fa fa-map-marker" aria-hidden="true"></i>
-            {{ allBranches ? 'All branches' : login.CITYNAME }}
-        </span>
-}
-
+  <div class="im-dash ah-page">
+    <!-- ================= HEADER ================= -->
+    <div class="im-ph">
+      <div>
+        <h1>{{greeting()}}@if (login?.USERNAME || login?.CMP_USERNAME) {<span>, {{login?.USERNAME || login?.CMP_USERNAME}}</span>}</h1>
+        <p>
+          Accounts
+          @if (login) {
+            &middot; {{ allBranches ? 'All branches' : login.CITYNAME }}
+          }
+          @if (kpi) {
+            &middot; month to date {{kpi.MTD_FROM}} &ndash; {{kpi.MTD_TO}}, compared with {{kpi.PM_FROM}} &ndash; {{kpi.PM_TO}}
+          }
+          @if (cacheInfo) {
+            <span [title]="'Figures generated ' + cacheInfo.CACHED_AT"> &middot; as of {{cacheInfo.CACHED_AT}} ({{cacheAge()}})</span>
+          }
+        </p>
+      </div>
+      <div class="im-tools">
         <!--  Branch scope is an SA-only choice. Everyone else sees their own branch. -->
         @if (isSA()) {
-<div class="x-seg ah-seg">
-            <label class="x-seg-btn" [class.active]="!allBranches" (click)="setBranches(false)">My branch</label>
-            <label class="x-seg-btn" [class.active]="allBranches" (click)="setBranches(true)">All branches</label>
-        </div>
-}
-
-        <div class="ah-tools">
-        @if (kpi) {
-<div class="ah-period">
-            <span class="ah-period-k">Month to date</span>
-            <span class="ah-period-v">{{kpi.MTD_FROM}} &ndash; {{kpi.MTD_TO}}</span>
-            <span class="ah-period-k">compared with</span>
-            <span class="ah-period-v">{{kpi.PM_FROM}} &ndash; {{kpi.PM_TO}}</span>
-        </div>
-}
-
-        @if (cacheInfo) {
-<span class="ah-asof" [title]="'Figures generated ' + cacheInfo.CACHED_AT">
-            <i class="fa fa-clock-o" aria-hidden="true"></i> As of {{cacheInfo.CACHED_AT}} &middot; {{cacheAge()}}
-        </span>
-}
-
-        <button type="button" class="x-btn x-btn-classic" (click)="refresh()" [disabled]="busy"
-                title="Recompute now, bypassing the 10-minute cache">
-            <i class="fa fa-refresh" [class.fa-spin]="busy" aria-hidden="true"></i> {{ busy ? 'Working' : 'Refresh' }}
+          <div class="im-seg">
+            <button type="button" [class.on]="!allBranches" (click)="setBranches(false)">My branch</button>
+            <button type="button" [class.on]="allBranches" (click)="setBranches(true)">All branches</button>
+          </div>
+        }
+        <button type="button" class="im-btn im-btn-g ah-iconbtn" (click)="helpOpen = true; go('ah-ref')" title="How to read this page">
+          <i class="fa fa-question-circle-o" aria-hidden="true"></i> How to read
         </button>
-
-        <!-- top-right: help and look mode, as on the Finance Dashboard -->
-        <button type="button" class="x-btn x-btn-classic x-iconbtn ah-topbtn" (click)="helpOpen = true"
-                title="How to read this page">
-            <i class="fa fa-question-circle-o" aria-hidden="true"></i>
+        <button type="button" class="im-btn" (click)="refresh()" [disabled]="loading" title="Recompute now, bypassing the 10-minute cache">
+          <i class="fa fa-refresh" [class.fa-spin]="loading" aria-hidden="true"></i> {{ loading ? 'Working' : 'Refresh' }}
         </button>
-        <button type="button" class="x-btn x-btn-classic x-iconbtn ah-topbtn" (click)="toggleDark()"
-                [title]="dark ? 'Light mode' : 'Dark mode'">
-            <i class="fa" [ngClass]="dark ? 'fa-sun-o' : 'fa-moon-o'" aria-hidden="true"></i>
-        </button>
-        </div>
+      </div>
     </div>
-
-    <!-- ================= LOADING (in page, menu stays clickable) ================= -->
-    @if (busy) {
-<div class="ah-busy" role="status" aria-live="polite">
-        <span class="ah-busy-spin" aria-hidden="true"></span>
-        <span class="ah-busy-text">
-            <span class="ah-busy-title">{{ loaded ? 'Refreshing the branch summary...' : 'Loading the branch summary...' }}</span>
-            <span class="ah-busy-hint">This usually takes a few seconds. The menu stays available &mdash; you can move to another screen.</span>
-        </span>
-    </div>
-}
-
-    @if (busy && !loaded) {
-<div class="ah-skeleton">
-        @for (s of [1,2,3,4,5,6]; track s) {
-<div class="ah-sk-card"></div>
-}
-    </div>
-}
-
-    <!-- ================= FAILED ================= -->
+    <!-- ================= LOADING / FAILED ================= -->
+    @if (loading) {
+      <div class="im-card ah-note-card" role="status">
+        <b>Loading the {{ allBranches ? 'all-branches' : 'branch' }} summary&hellip;</b>
+        <span class="im-sub-t">{{ allBranches ? 'All branches can take up to a minute when the figures have not been read recently.' : 'This usually takes a few seconds.' }}</span>
+      </div>
+    }
     @if (loaded && failed) {
-<div class="ah-alert">
-        <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-        The summary could not be loaded. The menu still works; try Refresh in a moment.
+      <div class="im-card ah-note-card ah-alert">
+        <b>The summary could not be loaded. The menu still works; try Refresh in a moment.</b>
         @if (failReason) {
-<div class="ah-alert-detail">{{ failReason }}</div>
-}
-    </div>
-}
-
+          <span class="im-sub-t">{{ failReason }}</span>
+        }
+      </div>
+    }
+    <!-- ================= 1. ATTENTION TILES =================
+    Most urgent first. Every tile drills into the rows behind it or scrolls to its section. -->
+    <div class="ah-band" id="ah-att"><span>Needs attention</span><small>the figures to act on today; click a tile for the rows behind it</small></div>
+    @if (scope == 'accounts') {
+      <div class="td-tiles">
+        <button type="button" class="td-tile strong" (click)="openDrill('OVERDUE', $event)" title="Clients and bills behind this figure">
+          <span class="k">Overdue receivable</span>
+          <span class="v" [title]="money(kpi?.OVERDUE_AMT)">&#8377; {{short(kpi?.OVERDUE_AMT)}}</span>
+          <span class="s">{{kpi?.OVERDUE_PCT || 0}}% of &#8377; {{short(kpi?.TOTAL_OUTSTANDING)}} outstanding is past the credit period</span>
+        </button>
+        <button type="button" class="td-tile" (click)="go('ah-week')" title="See when supplier bills fall due">
+          <span class="k">Overdue payable</span>
+          <span class="v" [title]="money(cash?.PAY_OVERDUE)">&#8377; {{short(cash?.PAY_OVERDUE)}}</span>
+          <span class="s">supplier bills past their due date, of &#8377; {{short(cash?.PAYABLE)}} we owe</span>
+        </button>
+        <button type="button" class="td-tile" (click)="go('ah-act')" title="Earned but not yet collected">
+          <span class="k">Unbilled after 15 days</span>
+          <span class="v">{{count(cash?.UNBILLED15_JOBS)}} <small>jobs</small></span>
+          <span class="s">&#8377; {{short(cash?.UNBILLED15_COST)}} cost booked, no invoice raised yet</span>
+        </button>
+        <button type="button" class="td-tile" (click)="go('ah-week')" title="Cash forecast for the coming days">
+          <span class="k">Due in 7 days</span>
+          <span class="v">&#8377; {{short(cash?.RECV_DUE_7)}}</span>
+          <span class="s">to collect &middot; &#8377; {{short(cash?.PAY_DUE_7)}} to pay suppliers</span>
+        </button>
+        <button type="button" class="td-tile" (click)="openDrill('MARGIN', $event)" title="Jobs behind this figure">
+          <span class="k">GOP this month</span>
+          <span class="v" [title]="money(kpi?.GOP_MTD)">&#8377; {{short(kpi?.GOP_MTD)}}</span>
+          <span class="s">revenue &minus; cost &middot; last month &#8377; {{short(kpi?.GOP_PM)}}</span>
+        </button>
+        <button type="button" class="td-tile" (click)="openDrill('MARGIN', $event)" title="Jobs behind this figure">
+          <span class="k">Margin</span>
+          <span class="v">{{ kpi ? kpi.MARGIN_PCT_MTD : '-' }}@if (kpi) {
+            <small>%</small>
+          }</span>
+          <span class="s">GOP &divide; revenue &middot; last month {{ kpi ? kpi.MARGIN_PCT_PM : '-' }}%</span>
+        </button>
+      </div>
+    }
+    @if (scope == 'accounts') {
+      <p class="ah-soft-line">Bank vs book difference is not part of this summary; see Bank Reconciliation for a bank account.</p>
+    }
+    <!-- ================= ACT NOW ================= -->
+    <div class="ah-band" id="ah-act"><span>Act now</span><small>clients to chase, most stuck money first, and revenue held up before it can be collected</small></div>
+    @if (scope == 'accounts') {
+      <div class="im-grid ah-rowact">
+        <div class="im-card">
+          <div class="im-card-h">
+            <div class="ah-h">
+              <button type="button" class="ah-ico" [class.open]="info == 'watch'" (click)="toggleInfo('watch')" title="What is this?"><i class="fa fa-eye" aria-hidden="true"></i></button>
+              <h2>Clients to ask about @if (watch.length) {
+                <span class="ah-count">{{watch.length}}</span>
+              }</h2>
+            </div>
+            <span class="meta">overdue clients ranked by money unpaid for over 180 days</span>
+          </div>
+          <div class="im-tbl-wrap">
+            <table class="ah-watch">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th class="num">Overdue</th>
+                  <th class="num">Over 180 days</th>
+                  <th class="num">Pays in</th>
+                  <th>Why it is here</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (w of pageOf(watch, 'watch'); track w) {
+                  <tr>
+                    <td class="ah-client" [title]="w.CLIENTCODE + ' - outstanding ' + money(w.OUTSTANDING)">{{w.CLIENTNAME}}</td>
+                    <td class="num ah-strong" [title]="money(w.OVERDUE)">&#8377; {{short(w.OVERDUE)}}</td>
+                    <td class="num" [title]="money(w.OVER_180)">&#8377; {{short(w.OVER_180)}} <span class="ah-pct">({{w.PCT_OVER_180}}%)</span></td>
+                    <td class="num" [title]="'Agreed credit period ' + w.CREDIT_PERIOD + ' days'">
+                      @if (w.PAY_DAYS != null) {
+                        <span>{{days(w.PAY_DAYS)}} d <span class="ah-pct" [class.ah-neg]="w.RECOVERY_GAP > 0">({{w.RECOVERY_GAP > 0 ? '+' : ''}}{{days(w.RECOVERY_GAP)}})</span></span>
+                      }
+                      @if (w.PAY_DAYS == null) {
+                        <span>-</span>
+                      }
+                    </td>
+                    <td class="ah-reason">{{w.REASON}}</td>
+                  </tr>
+                }
+                @if (loaded && watch.length == 0) {
+                  <tr>
+                    <td colspan="5" class="im-empty">No client is overdue. Nothing to chase.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          @if (watch.length > 10 && pgInfo(watch, 'watch'); as pi) {
+            <div class="pg">
+              <span>Showing {{ pi.from }}&ndash;{{ pi.to }} of {{ count(pi.n) }}</span>
+              <span class="pg-btns">
+                <button type="button" class="btn sm" [disabled]="pi.p === 0" (click)="goPage('watch', pi.p - 1, $event)">&lsaquo; Prev</button>
+                <span class="pg-n">{{ pi.p + 1 }} / {{ pi.pages }}</span>
+                <button type="button" class="btn sm" [disabled]="pi.p >= pi.pages - 1" (click)="goPage('watch', pi.p + 1, $event)">Next &rsaquo;</button>
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+    <!-- ================= EARNED BUT NOT COLLECTED ================= -->
+    @if (scope == 'accounts') {
+      <div class="im-card ah-sec">
+        <div class="im-card-h">
+          <div class="ah-h">
+            <button type="button" class="ah-ico" [class.open]="info == 'pipe'" (click)="toggleInfo('pipe')" title="What is this?"><i class="fa fa-hourglass-start" aria-hidden="true"></i></button>
+            <h2>Earned but not yet collected</h2>
+          </div>
+          <span class="meta">revenue held up before it reaches the bank. Each box opens the screen that clears it.</span>
+        </div>
+        <div class="ah-pipe">
+          <a class="ah-pipe-item" routerLink="/accounts/Authorisation/InvoiceAuth" title="Open Invoice Authorisation">
+            <span class="ah-pipe-top">
+              <span class="ah-pipe-k">Invoices waiting for authorisation</span>
+              <span class="ah-ico" [class.open]="info == 'pauth'" (click)="$event.preventDefault(); $event.stopPropagation(); toggleInfo('pauth')" title="What is this?" role="button"><i class="fa fa-gavel" aria-hidden="true"></i></span>
+            </span>
+            <span class="ah-pipe-v">{{count(cash?.AUTH_PENDING_COUNT)}} <span class="ah-pipe-amt"><span class="u">&#8377;</span>{{short(cash?.AUTH_PENDING_VALUE)}}</span></span>
+            <span class="ah-pipe-s">as listed on the Authorisation screen@if (cash && cash.AUTH_PENDING_COUNT > 0) {
+              <span> &middot; oldest {{cash.AUTH_PENDING_OLDEST_DAYS}} days</span>
+            }</span>
+          </a>
+          <a class="ah-pipe-item" routerLink="/accounts/transaction/proformainvoice/proformasearch" title="Open Proforma Invoice search">
+            <span class="ah-pipe-top">
+              <span class="ah-pipe-k">Proformas not yet converted</span>
+              <span class="ah-ico" [class.open]="info == 'ppro'" (click)="$event.preventDefault(); $event.stopPropagation(); toggleInfo('ppro')" title="What is this?" role="button"><i class="fa fa-file-o" aria-hidden="true"></i></span>
+            </span>
+            <span class="ah-pipe-v">{{count(cash?.PROFORMA_OPEN_COUNT)}} <span class="ah-pipe-amt"><span class="u">&#8377;</span>{{short(cash?.PROFORMA_OPEN_VALUE)}}</span></span>
+            <span class="ah-pipe-s">{{count(cash?.PROFORMA_MTD_COUNT)}} raised this month, {{count(cash?.PROFORMA_MTD_CONVERTED)}} converted@if (cash && cash.PROFORMA_OPEN_COUNT > 0) {
+              <span> &middot; oldest {{cash.PROFORMA_OPEN_OLDEST_DAYS}} days</span>
+            }</span>
+          </a>
+          <a class="ah-pipe-item" routerLink="/accounts/MisReport/PendingInvoicingJobs" title="Open Pending Invoicing">
+            <span class="ah-pipe-top">
+              <span class="ah-pipe-k">Shipments unbilled after 15 days</span>
+              <span class="ah-ico" [class.open]="info == 'punb'" (click)="$event.preventDefault(); $event.stopPropagation(); toggleInfo('punb')" title="What is this?" role="button"><i class="fa fa-ship" aria-hidden="true"></i></span>
+            </span>
+            <span class="ah-pipe-v">{{count(cash?.UNBILLED15_JOBS)}} <span class="ah-pipe-amt"><span class="u">&#8377;</span>{{short(cash?.UNBILLED15_COST)}} cost booked</span></span>
+            <span class="ah-pipe-s">opened since the 1st of last month@if (cash && cash.UNBILLED15_JOBS > 0) {
+              <span> &middot; oldest {{cash.UNBILLED15_OLDEST_DAYS}} days</span>
+            }</span>
+          </a>
+          <div class="ah-pipe-item ah-pipe-static">
+            <span class="ah-pipe-top">
+              <span class="ah-pipe-k">Money received, not applied to a bill</span>
+              <span class="ah-ico" [class.open]="info == 'puna'" (click)="$event.preventDefault(); $event.stopPropagation(); toggleInfo('puna')" title="What is this?" role="button"><i class="fa fa-random" aria-hidden="true"></i></span>
+            </span>
+            <span class="ah-pipe-v"><span class="u">&#8377;</span>{{short(cash?.UNAPPLIED_RECEIPTS)}}</span>
+            <span class="ah-pipe-s">{{count(cash?.UNAPPLIED_CLIENTS)}} clients &middot; supplier advances &#8377; {{short(cash?.SUPPLIER_ADVANCES)}}</span>
+          </div>
+        </div>
+      </div>
+    }
+    <!-- ================= THIS WEEK ================= -->
+    <div class="ah-band" id="ah-week"><span>This week</span><small>what falls due in and out, by when, and how fast each side settles</small></div>
+    <!-- ================= CASH POSITION + DSO vs DPO ================= -->
+    @if (scope == 'accounts') {
+      <div class="im-grid ah-rowcash">
+        <div class="im-card">
+          <div class="im-card-h">
+            <div class="ah-h">
+              <button type="button" class="ah-ico" [class.open]="info == 'cash'" (click)="toggleInfo('cash')" title="What is this?"><i class="fa fa-university" aria-hidden="true"></i></button>
+              <h2>Cash position</h2>
+            </div>
+            <span class="meta">what clients owe us against what we owe suppliers, and when each falls due</span>
+          </div>
+          <div class="ah-cash">
+            <div class="ah-cash-top">
+              <div class="ah-cash-stat" [title]="money(cash?.RECEIVABLE)">
+                <span class="ah-cash-k"><span class="ah-ico ah-ico-s" [class.open]="info == 'cin'" (click)="toggleInfo('cin')" title="What is this?" role="button"><i class="fa fa-sign-in" aria-hidden="true"></i></span>Clients owe us</span>
+                <span class="ah-cash-v"><span class="u">&#8377;</span>{{amt(cash?.RECEIVABLE).n}}<span class="u">{{amt(cash?.RECEIVABLE).u}}</span></span>
+                <span class="ah-cash-s">&#8377; {{short(cash?.RECV_OVERDUE)}} overdue &middot; &#8377; {{short(cash?.RECV_DUE_7)}} due in 7 days</span>
+              </div>
+              <div class="ah-cash-op">&minus;</div>
+              <div class="ah-cash-stat" [title]="money(cash?.PAYABLE)">
+                <span class="ah-cash-k"><span class="ah-ico ah-ico-s" [class.open]="info == 'cout'" (click)="toggleInfo('cout')" title="What is this?" role="button"><i class="fa fa-sign-out" aria-hidden="true"></i></span>We owe suppliers</span>
+                <span class="ah-cash-v"><span class="u">&#8377;</span>{{amt(cash?.PAYABLE).n}}<span class="u">{{amt(cash?.PAYABLE).u}}</span></span>
+                <span class="ah-cash-s">&#8377; {{short(cash?.PAY_OVERDUE)}} overdue &middot; &#8377; {{short(cash?.PAY_DUE_7)}} due in 7 days</span>
+              </div>
+              <div class="ah-cash-op">=</div>
+              <div class="ah-cash-stat ah-cash-net" [class.ah-cash-neg]="cash && cash.NET_POSITION < 0" [title]="money(cash?.NET_POSITION)">
+                <span class="ah-cash-k"><span class="ah-ico ah-ico-s" [class.open]="info == 'cnet'" (click)="toggleInfo('cnet')" title="What is this?" role="button"><i class="fa fa-calculator" aria-hidden="true"></i></span>Net position</span>
+                <span class="ah-cash-v"><span class="u">&#8377;</span>{{amt(cash?.NET_POSITION).n}}<span class="u">{{amt(cash?.NET_POSITION).u}}</span></span>
+                <span class="ah-cash-s">{{ cash && cash.NET_POSITION < 0 ? 'we owe more than we are owed' : 'we are owed more than we owe' }}</span>
+              </div>
+            </div>
+            <p class="ah-card-note">
+              <b>Cash forecast.</b> Money due to come in against money due to go out, by when it falls due.
+              Already-overdue amounts are due now. Both sides are net of money received but not yet applied, so the overdue line matches the Overdue card. Bars are drawn to the same scale.
+              @if (cash && cash.PAY_TERMS_PCT < 60) {
+                <span>Only {{cash.PAY_TERMS_PCT}}% of the open supplier bills carry a real due date; the rest are assumed at 30 days.</span>
+              }
+            </p>
+            <div class="im-tbl-wrap">
+              <table class="ah-flow">
+                <thead>
+                  <tr>
+                    <th>When</th>
+                    <th class="num">Money in</th>
+                    <th class="ah-flowbar"></th>
+                    <th class="num">Money out</th>
+                    <th class="ah-flowbar"></th>
+                    <th class="num">Net</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (f of forecast; track f) {
+                    <tr [class.ah-flow-overdue]="f.SORT_NO == 0">
+                      <td class="ah-mode">{{f.BUCKET}}</td>
+                      <td class="num" [title]="money(f.INFLOW)">&#8377; {{short(f.INFLOW)}}</td>
+                      <td class="ah-flowbar"><div class="ah-bar"><div class="ah-bar-fill ah-bar-in" [style.width.%]="flowShare(f.INFLOW)"></div></div></td>
+                      <td class="num" [title]="money(f.OUTFLOW)">&#8377; {{short(f.OUTFLOW)}}</td>
+                      <td class="ah-flowbar"><div class="ah-bar"><div class="ah-bar-fill ah-bar-out" [style.width.%]="flowShare(f.OUTFLOW)"></div></div></td>
+                      <td class="num ah-strong" [class.ah-neg]="f.NET_GAP < 0" [title]="money(f.NET_GAP)">&#8377; {{short(f.NET_GAP)}}</td>
+                    </tr>
+                  }
+                  @if (loaded && forecast.length == 0) {
+                    <tr>
+                      <td colspan="6" class="im-empty">Nothing due either way.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="im-card">
+          <div class="im-card-h">
+            <div class="ah-h">
+              <button type="button" class="ah-ico" [class.open]="info == 'days'" (click)="toggleInfo('days')" title="What is this?"><i class="fa fa-exchange" aria-hidden="true"></i></button>
+              <h2>Days to collect vs days to pay</h2>
+            </div>
+            <span class="meta">last 90 days</span>
+          </div>
+          <div class="ah-days">
+            <div class="ah-days-pair">
+              <div class="ah-days-stat">
+                <span class="ah-days-k"><span class="ah-ico ah-ico-s" [class.open]="info == 'ddso'" (click)="toggleInfo('ddso')" title="What is this?" role="button"><i class="fa fa-hourglass-half" aria-hidden="true"></i></span>Clients pay us in</span>
+                <span class="ah-days-v">{{days(cash?.DSO_DAYS)}}<span class="u">days</span></span>
+                <span class="ah-days-s">{{count(cash?.DSO_BILLS)}} settled invoices &middot; agreed {{days(cash?.AVG_CREDIT_PERIOD)}} days</span>
+              </div>
+              <div class="ah-days-stat">
+                <span class="ah-days-k"><span class="ah-ico ah-ico-s" [class.open]="info == 'ddpo'" (click)="toggleInfo('ddpo')" title="What is this?" role="button"><i class="fa fa-credit-card" aria-hidden="true"></i></span>We pay suppliers in</span>
+                <span class="ah-days-v">{{days(cash?.DPO_DAYS)}}<span class="u">days</span></span>
+                <span class="ah-days-s">{{count(cash?.DPO_BILLS)}} settled bills</span>
+              </div>
+            </div>
+            @if (cash && cash.DSO_DAYS != null && cash.DPO_DAYS != null) {
+              <div class="ah-days-gap" [ngClass]="dsoGap() > 0 ? 'ah-gap-bad' : 'ah-gap-good'">
+                <i class="fa" [ngClass]="dsoGap() > 0 ? 'fa-exclamation-circle' : 'fa-check-circle'" aria-hidden="true"></i>
+                @if (dsoGap() > 0) {
+                  <span>We pay suppliers <b>{{dsoGap()}} days before</b> clients pay us. That gap is funded from our own cash.</span>
+                }
+                @if (dsoGap() <= 0) {
+                  <span>Clients pay us <b>{{-dsoGap()}} days before</b> we pay suppliers. Suppliers are funding the gap.</span>
+                }
+              </div>
+            }
+            @if (cash && (cash.DSO_DAYS == null || cash.DPO_DAYS == null)) {
+              <div class="ah-days-gap ah-gap-flat">
+                Not enough settled bills in the last 90 days to measure.
+              </div>
+            }
+            <p class="ah-card-note ah-note-last">
+              Value-weighted: a large bill counts for more than a small one. Compare the client figure with the agreed credit period.
+            </p>
+          </div>
+        </div>
+      </div>
+    }
+    <!-- ================= WORKLOAD PICTURE ================= -->
+    <div class="ah-band" id="ah-work"><span>Workload picture</span><small>month to date against the same days last month, ageing, jobs by mode and the 30-day invoicing trend</small></div>
     <!-- ================= KPI ROW =================
-         Six figures, each with its change against the same period last month. The prior
-         value is printed in words underneath so nobody has to reverse a percentage.      -->
+    Six figures, each with its change against the same period last month. The prior
+    value is printed in words underneath so nobody has to reverse a percentage.      -->
+    @if (scope == 'accounts' && loading && !kpi) {
+      <div class="im-grid im-kpis ah-kpis">
+        @for (k of [1,2,3,4,5,6]; track k) {
+          <div class="im-card im-kpi">
+            <div class="ah-skel w40"></div><div class="ah-skel h24 w60"></div><div class="ah-skel"></div><div class="ah-skel w40"></div>
+          </div>
+        }
+      </div>
+    }
+    @if (scope == 'accounts' && !(loading && !kpi)) {
+      <div class="im-grid im-kpis ah-kpis">
+        <div class="im-card im-kpi">
+          <div class="ah-kpi-top">
+            <span class="k">Invoiced <span class="ah-hint">this month</span></span>
+            <button type="button" class="ah-ico" [class.open]="info == 'inv'" (click)="toggleInfo('inv')" title="What is this?"><i class="fa fa-file-text-o" aria-hidden="true"></i></button>
+          </div>
+          <div class="v" [title]="money(kpi?.INV_VALUE_MTD)"><span class="u">&#8377;</span>{{amt(kpi?.INV_VALUE_MTD).n}}<span class="u">{{amt(kpi?.INV_VALUE_MTD).u}}</span></div>
+          @if (kpi) {
+            <div class="ah-cmp">
+              <div class="ah-cmp-row"><span class="ah-cmp-k">This month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct('INV_VALUE_MTD','INV_VALUE_PM')"></span></span><span class="ah-cmp-v">&#8377; {{short(kpi?.INV_VALUE_MTD)}}</span></div>
+              <div class="ah-cmp-row"><span class="ah-cmp-k">Last month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct('INV_VALUE_PM','INV_VALUE_MTD')"></span></span><span class="ah-cmp-v">&#8377; {{short(kpi?.INV_VALUE_PM)}}</span></div>
+            </div>
+          }
+          <div class="ah-kpi-foot">
+            <span class="ah-delta" [ngClass]="deltaClass('INV_VALUE_MTD','INV_VALUE_PM', true)">{{deltaText('INV_VALUE_MTD','INV_VALUE_PM')}}</span>
+            <span class="s">{{count(kpi?.INV_COUNT_MTD)}} invoices &middot; {{count(kpi?.INV_COUNT_PM)}} last month</span>
+          </div>
+        </div>
+        <div class="im-card im-kpi">
+          <div class="ah-kpi-top">
+            <span class="k">Collected <span class="ah-hint">applied to bills</span></span>
+            <button type="button" class="ah-ico" [class.open]="info == 'col'" (click)="toggleInfo('col')" title="What is this?"><i class="fa fa-arrow-circle-down" aria-hidden="true"></i></button>
+          </div>
+          <div class="v" [title]="money(kpi?.COLLECTED_MTD)"><span class="u">&#8377;</span>{{amt(kpi?.COLLECTED_MTD).n}}<span class="u">{{amt(kpi?.COLLECTED_MTD).u}}</span></div>
+          @if (kpi) {
+            <div class="ah-cmp">
+              <div class="ah-cmp-row"><span class="ah-cmp-k">This month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct('COLLECTED_MTD','COLLECTED_PM')"></span></span><span class="ah-cmp-v">&#8377; {{short(kpi?.COLLECTED_MTD)}}</span></div>
+              <div class="ah-cmp-row"><span class="ah-cmp-k">Last month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct('COLLECTED_PM','COLLECTED_MTD')"></span></span><span class="ah-cmp-v">&#8377; {{short(kpi?.COLLECTED_PM)}}</span></div>
+            </div>
+          }
+          <div class="ah-kpi-foot">
+            <span class="ah-delta" [ngClass]="deltaClass('COLLECTED_MTD','COLLECTED_PM', true)">{{deltaText('COLLECTED_MTD','COLLECTED_PM')}}</span>
+            <span class="s">vs same days last month</span>
+          </div>
+        </div>
+        <div class="im-card im-kpi">
+          <div class="ah-kpi-top">
+            <span class="k">Outstanding <span class="ah-hint">as of today</span></span>
+            <button type="button" class="ah-ico" [class.open]="info == 'out'" (click)="toggleInfo('out')" title="What is this?"><i class="fa fa-balance-scale" aria-hidden="true"></i></button>
+          </div>
+          <div class="v" [title]="money(kpi?.TOTAL_OUTSTANDING)"><span class="u">&#8377;</span>{{amt(kpi?.TOTAL_OUTSTANDING).n}}<span class="u">{{amt(kpi?.TOTAL_OUTSTANDING).u}}</span></div>
+          <div class="ah-kpi-foot">
+            <span class="s">{{kpi?.OVERDUE_PCT || 0}}% of it is overdue &middot; net of unapplied credit</span>
+          </div>
+        </div>
+        <div class="im-card im-kpi ah-kpi-warn ah-kpi-click" (click)="openDrill('OVERDUE', $event)"
+          title="Click to see the clients and bills behind this figure">
+          <div class="ah-kpi-top">
+            <span class="k">Overdue <span class="ah-hint">past credit period</span></span>
+            <button type="button" class="ah-ico" [class.open]="info == 'ovd'" (click)="toggleInfo('ovd')" title="What is this?"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></button>
+          </div>
+          <div class="v" [title]="money(kpi?.OVERDUE_AMT)"><span class="u">&#8377;</span>{{amt(kpi?.OVERDUE_AMT).n}}<span class="u">{{amt(kpi?.OVERDUE_AMT).u}}</span></div>
+          <div class="ah-kpi-foot">
+            <span class="s">{{count(kpi?.UNBILLED_JOBS)}} jobs this month still unbilled &middot; &#8377; {{short(kpi?.UNBILLED_VALUE)}} cost booked</span>
+          </div>
+          <div class="ah-drill-link">See the bills behind this &rsaquo;</div>
+        </div>
+        <div class="im-card im-kpi ah-kpi-click" (click)="openDrill('MARGIN', $event)"
+          title="Click to see every job behind this figure, with income and expense">
+          <div class="ah-kpi-top">
+            <span class="k">GOP <span class="ah-hint">revenue &minus; cost</span></span>
+            <button type="button" class="ah-ico" [class.open]="info == 'gop'" (click)="toggleInfo('gop')" title="What is this?"><i class="fa fa-line-chart" aria-hidden="true"></i></button>
+          </div>
+          <div class="v" [title]="money(kpi?.GOP_MTD)"><span class="u">&#8377;</span>{{amt(kpi?.GOP_MTD).n}}<span class="u">{{amt(kpi?.GOP_MTD).u}}</span></div>
+          @if (kpi) {
+            <div class="ah-cmp">
+              <div class="ah-cmp-row"><span class="ah-cmp-k">This month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct('GOP_MTD','GOP_PM')"></span></span><span class="ah-cmp-v">&#8377; {{short(kpi?.GOP_MTD)}}</span></div>
+              <div class="ah-cmp-row"><span class="ah-cmp-k">Last month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct('GOP_PM','GOP_MTD')"></span></span><span class="ah-cmp-v">&#8377; {{short(kpi?.GOP_PM)}}</span></div>
+            </div>
+          }
+          <div class="ah-kpi-foot">
+            <span class="ah-delta" [ngClass]="deltaClass('GOP_MTD','GOP_PM', true)">{{deltaText('GOP_MTD','GOP_PM')}}</span>
+            <span class="s">revenue &#8377; {{short(kpi?.REVENUE_MTD)}} &middot; cost &#8377; {{short(kpi?.COST_MTD)}}</span>
+          </div>
+          <div class="ah-drill-link">See the jobs behind this &rsaquo;</div>
+        </div>
+        <div class="im-card im-kpi ah-kpi-click" (click)="openDrill('MARGIN', $event)"
+          title="Click to see every job behind this figure, with income and expense">
+          <div class="ah-kpi-top">
+            <span class="k">Margin <span class="ah-hint">GOP &divide; revenue</span></span>
+            <button type="button" class="ah-ico" [class.open]="info == 'mgn'" (click)="toggleInfo('mgn')" title="What is this?"><i class="fa fa-percent" aria-hidden="true"></i></button>
+          </div>
+          <div class="v">{{ kpi ? kpi.MARGIN_PCT_MTD : '-' }}@if (kpi) {
+            <span class="u">%</span>
+          }</div>
+          @if (kpi) {
+            <div class="ah-cmp">
+              <div class="ah-cmp-row"><span class="ah-cmp-k">This month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct('MARGIN_PCT_MTD','MARGIN_PCT_PM')"></span></span><span class="ah-cmp-v">{{ kpi ? kpi.MARGIN_PCT_MTD : '-' }}%</span></div>
+              <div class="ah-cmp-row"><span class="ah-cmp-k">Last month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct('MARGIN_PCT_PM','MARGIN_PCT_MTD')"></span></span><span class="ah-cmp-v">{{ kpi ? kpi.MARGIN_PCT_PM : '-' }}%</span></div>
+            </div>
+          }
+          <div class="ah-kpi-foot">
+            <span class="ah-delta" [ngClass]="deltaClass('MARGIN_PCT_MTD','MARGIN_PCT_PM', true)">{{deltaText('MARGIN_PCT_MTD','MARGIN_PCT_PM')}}</span>
+            <span class="s">{{count(kpi?.JOBS_MTD)}} jobs opened &middot; {{count(kpi?.JOBS_PM)}} last month</span>
+          </div>
+          <div class="ah-drill-link">See the jobs behind this &rsaquo;</div>
+        </div>
+      </div>
+    }
+    <!-- ================= RECEIVABLE AGEING ================= -->
     @if (scope == 'accounts') {
-<div class="ah-kpis">
-
-        <div class="ah-kpi">
-            <div class="ah-kpi-top">
-                <span class="ah-kpi-label">Invoiced <span class="ah-hint">this month</span></span>
-                <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue" [class.open]="info == 'inv'" (click)="toggleInfo('inv')" title="What is this?" role="button"><i class="fa fa-file-text-o" aria-hidden="true"></i></span>
-            </div>
-            <div class="ah-kpi-value" [title]="money($safeNavigationMigration(kpi?.INV_VALUE_MTD))">&#8377; {{short($safeNavigationMigration(kpi?.INV_VALUE_MTD))}}</div>
-            @if (kpi) {
-<div class="ah-cmp">
-                <div class="ah-cmp-row"><span class="ah-cmp-k">This month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct('INV_VALUE_MTD','INV_VALUE_PM')"></span></span><span class="ah-cmp-v">&#8377; {{short($safeNavigationMigration(kpi?.INV_VALUE_MTD))}}</span></div>
-                <div class="ah-cmp-row"><span class="ah-cmp-k">Last month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct('INV_VALUE_PM','INV_VALUE_MTD')"></span></span><span class="ah-cmp-v">&#8377; {{short($safeNavigationMigration(kpi?.INV_VALUE_PM))}}</span></div>
-            </div>
-}
-            
-            <div class="ah-kpi-foot">
-                <span class="ah-delta" [ngClass]="deltaClass('INV_VALUE_MTD','INV_VALUE_PM', true)">{{deltaText('INV_VALUE_MTD','INV_VALUE_PM')}}</span>
-                <span class="ah-kpi-sub">{{count($safeNavigationMigration(kpi?.INV_COUNT_MTD))}} invoices &middot; {{count($safeNavigationMigration(kpi?.INV_COUNT_PM))}} last month</span>
-            </div>
+      <div class="im-card ah-sec">
+        <div class="im-card-h">
+          <div class="ah-h">
+            <button type="button" class="ah-ico" [class.open]="info == 'age'" (click)="toggleInfo('age')" title="What is this?"><i class="fa fa-calendar" aria-hidden="true"></i></button>
+            <h2>Receivable ageing</h2>
+          </div>
+          <span class="meta">how old the money owed to us is, counted from the invoice date</span>
         </div>
-
-        <div class="ah-kpi">
-            <div class="ah-kpi-top">
-                <span class="ah-kpi-label">Collected <span class="ah-hint">applied to bills</span></span>
-                <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-green" [class.open]="info == 'col'" (click)="toggleInfo('col')" title="What is this?" role="button"><i class="fa fa-arrow-circle-down" aria-hidden="true"></i></span>
+        <div class="ah-ages">
+          @for (a of ageing; track a) {
+            <div class="ah-age" [ngClass]="ageClass(a.BUCKET_NO)" [title]="ageHint(a.BUCKET_NO)">
+              <div class="ah-age-line">
+                <span class="ah-age-k">{{a.BUCKET}}</span>
+                <span class="ah-age-v" [title]="money(a.AMOUNT)"><span class="u">&#8377;</span>{{short(a.AMOUNT)}}</span>
+              </div>
+              <div class="ah-age-bar"><div class="ah-age-fill" [style.width.%]="a.PCT_OF_TOTAL"></div></div>
+              <span class="ah-age-p">{{a.PCT_OF_TOTAL}}% of outstanding</span>
             </div>
-            <div class="ah-kpi-value" [title]="money($safeNavigationMigration(kpi?.COLLECTED_MTD))">&#8377; {{short($safeNavigationMigration(kpi?.COLLECTED_MTD))}}</div>
-            @if (kpi) {
-<div class="ah-cmp">
-                <div class="ah-cmp-row"><span class="ah-cmp-k">This month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct('COLLECTED_MTD','COLLECTED_PM')"></span></span><span class="ah-cmp-v">&#8377; {{short($safeNavigationMigration(kpi?.COLLECTED_MTD))}}</span></div>
-                <div class="ah-cmp-row"><span class="ah-cmp-k">Last month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct('COLLECTED_PM','COLLECTED_MTD')"></span></span><span class="ah-cmp-v">&#8377; {{short($safeNavigationMigration(kpi?.COLLECTED_PM))}}</span></div>
-            </div>
-}
-            
-            <div class="ah-kpi-foot">
-                <span class="ah-delta" [ngClass]="deltaClass('COLLECTED_MTD','COLLECTED_PM', true)">{{deltaText('COLLECTED_MTD','COLLECTED_PM')}}</span>
-                <span class="ah-kpi-sub">vs same days last month</span>
-            </div>
+          }
+          @if (loaded && ageing.length == 0) {
+            <div class="im-empty">Nothing outstanding.</div>
+          }
         </div>
-
-        <div class="ah-kpi">
-            <div class="ah-kpi-top">
-                <span class="ah-kpi-label">Outstanding <span class="ah-hint">as of today</span></span>
-                <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-slate" [class.open]="info == 'out'" (click)="toggleInfo('out')" title="What is this?" role="button"><i class="fa fa-balance-scale" aria-hidden="true"></i></span>
-            </div>
-            <div class="ah-kpi-value" [title]="money($safeNavigationMigration(kpi?.TOTAL_OUTSTANDING))">&#8377; {{short($safeNavigationMigration(kpi?.TOTAL_OUTSTANDING))}}</div>
-            
-            <div class="ah-kpi-foot">
-                <span class="ah-kpi-sub">{{kpi?.OVERDUE_PCT || 0}}% of it is overdue &middot; net of unapplied credit</span>
-            </div>
+      </div>
+    }
+    <!-- ================= JOBS BY MODE + 30-DAY TREND ================= -->
+    <div class="im-grid ah-row2">
+      <div class="im-card">
+        <div class="im-card-h">
+          <div class="ah-h">
+            <button type="button" class="ah-ico" [class.open]="info == 'jobs'" (click)="toggleInfo('jobs')" title="What is this?"><i class="fa fa-cubes" aria-hidden="true"></i></button>
+            <h2>Jobs opened this month <span class="ah-count">{{count(kpi?.JOBS_MTD)}}</span></h2>
+          </div>
+          <span class="meta">vs {{count(kpi?.JOBS_PM)}} same period last month</span>
         </div>
-
-        <div class="ah-kpi ah-kpi-warn ah-kpi-click" (click)="openDrill('OVERDUE', $event)"
-             title="Click to see the clients and bills behind this figure">
-            <div class="ah-kpi-top">
-                <span class="ah-kpi-label">Overdue <span class="ah-hint">past credit period</span></span>
-                <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-red" [class.open]="info == 'ovd'" (click)="toggleInfo('ovd')" title="What is this?" role="button"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
-            </div>
-            <div class="ah-kpi-value ah-red" [title]="money($safeNavigationMigration(kpi?.OVERDUE_AMT))">&#8377; {{short($safeNavigationMigration(kpi?.OVERDUE_AMT))}}</div>
-            
-            <div class="ah-kpi-foot">
-                <span class="ah-kpi-sub">{{count($safeNavigationMigration(kpi?.UNBILLED_JOBS))}} jobs this month still unbilled &middot; &#8377; {{short($safeNavigationMigration(kpi?.UNBILLED_VALUE))}} cost booked</span>
-            </div>
-            <div class="ah-drill-link">See the bills behind this &rsaquo;</div>
+        <p class="ah-card-note ah-note-pad"><b>Billed</b> jobs have at least one tax invoice; <b>Unbilled</b> have none yet. GOP is billed value minus purchase cost on those jobs.</p>
+        <div class="im-tbl-wrap">
+          <table class="ah-modes">
+            <thead>
+              <tr>
+                <th>Mode</th>
+                <th class="num">Jobs</th>
+                <th class="num">Last month</th>
+                <th class="num">Billed</th>
+                <th class="num">Unbilled</th>
+                @if (scope == 'accounts') {
+                  <th class="num">GOP</th>
+                }
+                @if (scope == 'accounts') {
+                  <th class="num">Margin</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (m of modes; track m) {
+                <tr>
+                  <td class="ah-mode">
+                    <span>{{m.MODE_}}</span>
+                    <div class="ah-bar ah-bar-under"><div class="ah-bar-fill" [style.width.%]="share(m.JOBS_MTD, modes, 'JOBS_MTD')"></div></div>
+                  </td>
+                  <td class="num ah-strong">{{count(m.JOBS_MTD)}}</td>
+                  <td class="num">{{count(m.JOBS_PM)}}</td>
+                  <td class="num">@if (m.BILLED_MTD > 0) {
+                    <span class="im-chip">{{count(m.BILLED_MTD)}}</span>
+                    }@if (!(m.BILLED_MTD > 0)) {
+                    <span>0</span>
+                  }</td>
+                  <td class="num">@if (m.UNBILLED_MTD > 0) {
+                    <span class="im-chip solid">{{count(m.UNBILLED_MTD)}}</span>
+                    }@if (!(m.UNBILLED_MTD > 0)) {
+                    <span>0</span>
+                  }</td>
+                  @if (scope == 'accounts') {
+                    <td class="num" [class.ah-neg]="m.GOP_MTD < 0">&#8377; {{short(m.GOP_MTD)}}</td>
+                  }
+                  @if (scope == 'accounts') {
+                    <td class="num">{{m.MARGIN_PCT_MTD}}%</td>
+                  }
+                </tr>
+              }
+              @if (loaded && modes.length == 0) {
+                <tr>
+                  <td colspan="7" class="im-empty">No jobs recorded.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
-
-        <div class="ah-kpi ah-kpi-gop ah-kpi-click" (click)="openDrill('MARGIN', $event)"
-             title="Click to see every job behind this figure, with income and expense">
-            <div class="ah-kpi-top">
-                <span class="ah-kpi-label">GOP <span class="ah-hint">revenue &minus; cost</span></span>
-                <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-green" [class.open]="info == 'gop'" (click)="toggleInfo('gop')" title="What is this?" role="button"><i class="fa fa-line-chart" aria-hidden="true"></i></span>
+      </div>
+      @if (scope == 'accounts') {
+        <div class="im-card">
+          <div class="im-card-h">
+            <div class="ah-h">
+              <button type="button" class="ah-ico" [class.open]="info == 'trend'" (click)="toggleInfo('trend')" title="What is this?"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
+              <h2>Invoiced, 30 days</h2>
             </div>
-            <div class="ah-kpi-value ah-green" [title]="money($safeNavigationMigration(kpi?.GOP_MTD))">&#8377; {{short($safeNavigationMigration(kpi?.GOP_MTD))}}</div>
-            @if (kpi) {
-<div class="ah-cmp">
-                <div class="ah-cmp-row"><span class="ah-cmp-k">This month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct('GOP_MTD','GOP_PM')"></span></span><span class="ah-cmp-v">&#8377; {{short($safeNavigationMigration(kpi?.GOP_MTD))}}</span></div>
-                <div class="ah-cmp-row"><span class="ah-cmp-k">Last month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct('GOP_PM','GOP_MTD')"></span></span><span class="ah-cmp-v">&#8377; {{short($safeNavigationMigration(kpi?.GOP_PM))}}</span></div>
-            </div>
-}
-            
-            <div class="ah-kpi-foot">
-                <span class="ah-delta" [ngClass]="deltaClass('GOP_MTD','GOP_PM', true)">{{deltaText('GOP_MTD','GOP_PM')}}</span>
-                <span class="ah-kpi-sub">revenue &#8377; {{short($safeNavigationMigration(kpi?.REVENUE_MTD))}} &middot; cost &#8377; {{short($safeNavigationMigration(kpi?.COST_MTD))}}</span>
-            </div>
-            <div class="ah-drill-link">See the jobs behind this &rsaquo;</div>
+            <span class="meta ah-nowrap" [title]="money(trendTotal)">&#8377; {{short(trendTotal)}} total</span>
+          </div>
+          <p class="ah-card-note ah-note-pad">Value of tax invoices raised on each of the last 30 days. Point at a bar for the count and amount.</p>
+          <div class="ah-chart">
+            @if (trendOptions && daily.length > 0) {
+              <div class="ah-chart-box">
+                <canvas baseChart type="bar"
+                  [datasets]="trendData" [labels]="trendLabels"
+                [options]="trendOptions" [legend]="false"></canvas>
+              </div>
+            }
+            @if (loading && daily.length == 0) {
+              <div class="ah-skel h24"></div>
+            }
+            @if (loaded && daily.length == 0) {
+              <div class="im-empty">No invoices in the last 30 days.</div>
+            }
+          </div>
         </div>
-
-        <div class="ah-kpi ah-kpi-click" (click)="openDrill('MARGIN', $event)"
-             title="Click to see every job behind this figure, with income and expense">
-            <div class="ah-kpi-top">
-                <span class="ah-kpi-label">Margin <span class="ah-hint">GOP &divide; revenue</span></span>
-                <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-green" [class.open]="info == 'mgn'" (click)="toggleInfo('mgn')" title="What is this?" role="button"><i class="fa fa-percent" aria-hidden="true"></i></span>
-            </div>
-            <div class="ah-kpi-value">{{ kpi ? kpi.MARGIN_PCT_MTD : '-' }}@if (kpi) {
-<span class="ah-unit"> %</span>
-}</div>
-            @if (kpi) {
-<div class="ah-cmp">
-                <div class="ah-cmp-row"><span class="ah-cmp-k">This month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct('MARGIN_PCT_MTD','MARGIN_PCT_PM')"></span></span><span class="ah-cmp-v">{{ kpi ? kpi.MARGIN_PCT_MTD : '-' }}%</span></div>
-                <div class="ah-cmp-row"><span class="ah-cmp-k">Last month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct('MARGIN_PCT_PM','MARGIN_PCT_MTD')"></span></span><span class="ah-cmp-v">{{ kpi ? kpi.MARGIN_PCT_PM : '-' }}%</span></div>
-            </div>
-}
-            
-            <div class="ah-kpi-foot">
-                <span class="ah-delta" [ngClass]="deltaClass('MARGIN_PCT_MTD','MARGIN_PCT_PM', true)">{{deltaText('MARGIN_PCT_MTD','MARGIN_PCT_PM')}}</span>
-                <span class="ah-kpi-sub">{{count($safeNavigationMigration(kpi?.JOBS_MTD))}} jobs opened &middot; {{count($safeNavigationMigration(kpi?.JOBS_PM))}} last month</span>
-            </div>
-            <div class="ah-drill-link">See the jobs behind this &rsaquo;</div>
-        </div>
+      }
     </div>
-}
-
-    <!-- ================= ROW 1b: earned but not collected, one highlighted line ================= -->
+    <!-- ================= DETAIL ================= -->
+    <div class="ah-band" id="ah-detail"><span>Detail</span><small>the rows behind the headline figures; every total adds up to its tile</small></div>
     @if (scope == 'accounts') {
-<div class="ah-rowfull">
-        <!-- stuck pipeline -->
-        <div class="x-card ah-pipe-card">
-            <div class="x-card-head">
-                <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-sec-ico" [class.open]="info == 'pipe'" (click)="toggleInfo('pipe')" title="What is this?" role="button"><i class="fa fa-hourglass-start" aria-hidden="true"></i></span>
-                <h2 class="x-card-title">Earned but not yet collected</h2>
-                <span class="ah-head-sub">revenue held up before it reaches the bank. Each box opens the screen that clears it.</span>
+      <div class="ah-detail-row">
+        <button type="button" class="btn" (click)="openDrill('OVERDUE', $event)">Overdue clients and bills &rsaquo;</button>
+        <button type="button" class="btn" (click)="openDrill('MARGIN', $event)">Jobs behind GOP and margin &rsaquo;</button>
+        <span class="ah-soft-line">Opens a movable table with search, filters, export and 10 rows a page.</span>
+      </div>
+    }
+    <!-- ================= REFERENCE ================= -->
+    <div class="ah-band" id="ah-ref"><span>Reference</span><small>largest balances, shortcuts and how the page works</small></div>
+    <div class="im-grid ah-rowref">
+      @if (scope == 'accounts') {
+        <div class="im-card">
+          <div class="im-card-h">
+            <div class="ah-h">
+              <button type="button" class="ah-ico" [class.open]="info == 'top'" (click)="toggleInfo('top')" title="What is this?"><i class="fa fa-users" aria-hidden="true"></i></button>
+              <h2>Top clients by outstanding @if (topClients.length) {
+                <span class="ah-count">{{topClients.length}}</span>
+              }</h2>
             </div>
-            
-            
-            
-            
-            
-            <div class="x-card-body ah-pipe">
-                <a class="ah-pipe-item" routerLink="/accounts/Authorisation/InvoiceAuth" title="Open Invoice Authorisation">
-                    <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-pipe-ico" [class.open]="info == 'pauth'" (click)="$event.preventDefault(); $event.stopPropagation(); toggleInfo('pauth')" title="What is this?" role="button"><i class="fa fa-gavel" aria-hidden="true"></i></span>
-                    <span class="ah-pipe-body">
-                        <span class="ah-pipe-k">Invoices waiting for authorisation</span>
-                        <span class="ah-pipe-v">{{count($safeNavigationMigration(cash?.AUTH_PENDING_COUNT))}} <span class="ah-pipe-amt">&#8377; {{short($safeNavigationMigration(cash?.AUTH_PENDING_VALUE))}}</span></span>
-                        <span class="ah-pipe-s">as listed on the Authorisation screen@if (cash && cash.AUTH_PENDING_COUNT > 0) {
-<span> &middot; oldest {{cash.AUTH_PENDING_OLDEST_DAYS}} days</span>
-}</span>
-                    </span>
-                </a>
-                <a class="ah-pipe-item" routerLink="/accounts/transaction/proformainvoice/proformasearch" title="Open Proforma Invoice search">
-                    <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-pipe-ico" [class.open]="info == 'ppro'" (click)="$event.preventDefault(); $event.stopPropagation(); toggleInfo('ppro')" title="What is this?" role="button"><i class="fa fa-file-o" aria-hidden="true"></i></span>
-                    <span class="ah-pipe-body">
-                        <span class="ah-pipe-k">Proformas not yet converted</span>
-                        <span class="ah-pipe-v">{{count($safeNavigationMigration(cash?.PROFORMA_OPEN_COUNT))}} <span class="ah-pipe-amt">&#8377; {{short($safeNavigationMigration(cash?.PROFORMA_OPEN_VALUE))}}</span></span>
-                        <span class="ah-pipe-s">{{count($safeNavigationMigration(cash?.PROFORMA_MTD_COUNT))}} raised this month, {{count($safeNavigationMigration(cash?.PROFORMA_MTD_CONVERTED))}} converted@if (cash && cash.PROFORMA_OPEN_COUNT > 0) {
-<span> &middot; oldest {{cash.PROFORMA_OPEN_OLDEST_DAYS}} days</span>
-}</span>
-                    </span>
-                </a>
-                <a class="ah-pipe-item" routerLink="/accounts/MisReport/PendingInvoicingJobs" title="Open Pending Invoicing">
-                    <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-pipe-ico" [class.open]="info == 'punb'" (click)="$event.preventDefault(); $event.stopPropagation(); toggleInfo('punb')" title="What is this?" role="button"><i class="fa fa-ship" aria-hidden="true"></i></span>
-                    <span class="ah-pipe-body">
-                        <span class="ah-pipe-k">Shipments unbilled after 15 days</span>
-                        <span class="ah-pipe-v">{{count($safeNavigationMigration(cash?.UNBILLED15_JOBS))}} <span class="ah-pipe-amt">&#8377; {{short($safeNavigationMigration(cash?.UNBILLED15_COST))}} cost booked</span></span>
-                        <span class="ah-pipe-s">opened since the 1st of last month@if (cash && cash.UNBILLED15_JOBS > 0) {
-<span> &middot; oldest {{cash.UNBILLED15_OLDEST_DAYS}} days</span>
-}</span>
-                    </span>
-                </a>
-                <div class="ah-pipe-item ah-pipe-static">
-                    <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-pipe-ico" [class.open]="info == 'puna'" (click)="$event.preventDefault(); $event.stopPropagation(); toggleInfo('puna')" title="What is this?" role="button"><i class="fa fa-random" aria-hidden="true"></i></span>
-                    <span class="ah-pipe-body">
-                        <span class="ah-pipe-k">Money received, not applied to a bill</span>
-                        <span class="ah-pipe-v">&#8377; {{short($safeNavigationMigration(cash?.UNAPPLIED_RECEIPTS))}}</span>
-                        <span class="ah-pipe-s">{{count($safeNavigationMigration(cash?.UNAPPLIED_CLIENTS))}} clients &middot; supplier advances &#8377; {{short($safeNavigationMigration(cash?.SUPPLIER_ADVANCES))}}</span>
-                    </span>
-                </div>
-            </div>
+            <span class="meta">Share is their part of total outstanding</span>
+          </div>
+          <div class="im-tbl-wrap">
+            <table class="ah-top">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th class="ah-barcol"></th>
+                  <th class="num">Outstanding</th>
+                  <th class="num">Overdue</th>
+                  <th class="num">Share</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (c of topClients; track c) {
+                  <tr>
+                    <td class="ah-client" [title]="c.CLIENTCODE">{{c.CLIENTNAME}}</td>
+                    <td class="ah-barcol">
+                      <div class="ah-bar"><div class="ah-bar-fill" [style.width.%]="share(c.OUTSTANDING, topClients, 'OUTSTANDING')"></div></div>
+                    </td>
+                    <td class="num ah-strong" [title]="money(c.OUTSTANDING)">&#8377; {{short(c.OUTSTANDING)}}</td>
+                    <td class="num" [class.ah-neg]="c.OVERDUE > 0" [title]="money(c.OVERDUE)">&#8377; {{short(c.OVERDUE)}}</td>
+                    <td class="num">{{c.PCT_OF_TOTAL}}%</td>
+                  </tr>
+                }
+                @if (loaded && topClients.length == 0) {
+                  <tr>
+                    <td colspan="5" class="im-empty">Nothing outstanding.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
+      }
+      <div class="im-card ah-sec">
+        <div class="im-card-h">
+          <div class="ah-h">
+            <button type="button" class="ah-ico" [class.open]="info == 'quick'" (click)="toggleInfo('quick')" title="What is this?"><i class="fa fa-th-large" aria-hidden="true"></i></button>
+            <h2>Quick links</h2>
+          </div>
+        </div>
+        <div class="ah-links">
+          @for (q of quickLinks; track q) {
+            <a class="ah-link" [routerLink]="q.link">
+              <i class="fa" [ngClass]="q.icon" aria-hidden="true"></i>
+              <span class="ah-link-label">{{q.label}}</span>
+              <i class="fa fa-angle-right ah-link-go" aria-hidden="true"></i>
+            </a>
+          }
+        </div>
+      </div>
     </div>
-}
-
-    <!-- ================= ROW 2: ageing, four tiles across ================= -->
-    <div class="ah-rowfull">
-        <!-- ageing -->
-        @if (scope == 'accounts') {
-<div class="x-card">
-            <div class="x-card-head">
-                <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-sec-ico" [class.open]="info == 'age'" (click)="toggleInfo('age')" title="What is this?" role="button"><i class="fa fa-calendar" aria-hidden="true"></i></span>
-                <h2 class="x-card-title">Receivable ageing</h2>
-                <span class="ah-head-sub">how old the money owed to us is, counted from the invoice date</span>
-            </div>
-            
-            <div class="x-card-body">
-                <div class="ah-ages">
-                    @for (a of ageing; track a) {
-<div class="ah-age" [ngClass]="ageClass(a.BUCKET_NO)" [title]="ageHint(a.BUCKET_NO)">
-                        <div class="ah-age-line">
-                            <span class="ah-age-k">{{a.BUCKET}}</span>
-                            <span class="ah-age-v" [title]="money(a.AMOUNT)">&#8377; {{short(a.AMOUNT)}}</span>
-                        </div>
-                        <div class="ah-age-bar"><div class="ah-age-fill" [style.width.%]="a.PCT_OF_TOTAL"></div></div>
-                        <span class="ah-age-p">{{a.PCT_OF_TOTAL}}% of outstanding</span>
-                    </div>
-}
-                    @if (loaded && ageing.length == 0) {
-<div class="x-empty">Nothing outstanding.</div>
-}
-                </div>
-            </div>
+    <div class="im-card ah-sec ah-howto">
+      <button type="button" class="ah-howto-t" (click)="helpOpen = !helpOpen" [attr.aria-expanded]="helpOpen">
+        <i class="fa" [ngClass]="helpOpen ? 'fa-caret-down' : 'fa-caret-right'" aria-hidden="true"></i> How this page works
+      </button>
+      @if (helpOpen) {
+        <div class="ah-help-grid">
+          <div class="ah-help-item"><b>Month to date</b><span>From the 1st of this month up to today. "Last month" means the same number of days in the previous month, so the comparison is fair.</span></div>
+          <div class="ah-help-item"><b>Invoiced</b><span>Total of tax invoices raised in the period, GST included. Proforma invoices are not counted.</span></div>
+          <div class="ah-help-item"><b>Collected</b><span>Receipts and journal adjustments applied against invoices in the period. Money received but not yet matched to a bill is not here.</span></div>
+          <div class="ah-help-item"><b>Outstanding</b><span>What all clients still owe today, after receipts and credit notes already applied. A balance, not a monthly figure.</span></div>
+          <div class="ah-help-item"><b>Overdue</b><span>The part of Outstanding that has crossed the client's credit period. Follow these up first.</span></div>
+          <div class="ah-help-item"><b>Ageing</b><span>Outstanding split by days since the invoice date. The lightest bar is fresh; the darkest has been unpaid for more than 180 days.</span></div>
+          <div class="ah-help-item"><b>Jobs opened</b><span>Shipments registered in the period, by mode. Billed means at least one tax invoice exists on the job; Unbilled means none yet.</span></div>
+          <div class="ah-help-item"><b>GOP</b><span>Gross operating profit: billed value minus purchase cost on jobs opened in the period. Costs are often booked before the sale invoice, so early in the month GOP can look low or negative.</span></div>
+          <div class="ah-help-item"><b>Margin</b><span>GOP as a percentage of revenue. 20% means 20 rupees kept from every 100 rupees billed.</span></div>
+          <div class="ah-help-item"><b>Cash position</b><span>What clients owe us minus what we owe suppliers, both as of today. Supplier bills are read for the last 12 months; older unpaid ones are treated as dead data.</span></div>
+          <div class="ah-help-item"><b>Cash forecast</b><span>Open amounts on both sides grouped by when they fall due, net of unapplied receipts and supplier advances. "Already overdue" is due now and equals the Overdue card. Where a supplier bill has no credible due date, 30 days from the bill date is assumed.</span></div>
+          <div class="ah-help-item"><b>Days to collect / pay</b><span>How long invoices and supplier bills of the last 90 days took to settle, weighted by value. If we pay faster than we collect, the gap is funded from our own cash.</span></div>
+          <div class="ah-help-item"><b>Clients to ask about</b><span>Overdue clients ranked by money unpaid for over 180 days. "Pays in" is their actual settlement time against the agreed credit period.</span></div>
+          <div class="ah-help-item"><b>Earned but not collected</b><span>Invoices waiting for authorisation (the same list as the Authorisation screen, for this branch), proformas not converted, shipments still unbilled after 15 days, and receipts not matched to a bill. Each line opens the screen that clears it.</span></div>
+          <div class="ah-help-item"><b>Change pills</b><span>A solid black pill means worse than last month, an outlined pill better, a dashed pill no real change. For Overdue and Cost, going up is worse.</span></div>
+          <div class="ah-help-item"><b>As of</b><span>Figures are computed once and reused for 10 minutes. Refresh recomputes them now.</span></div>
+          <div class="ah-help-item"><b>Source</b><span>All numbers use the same rules as the Finance Dashboard, so the two agree for the same period.</span></div>
         </div>
-}
-
+      }
     </div>
-
-    <!-- ================= ROW 2b: cash position, forecast, DSO vs DPO ================= -->
-    @if (scope == 'accounts') {
-<div class="ah-rowcash">
-
-        <!-- cash position + forecast -->
-        <div class="x-card">
-            <div class="x-card-head">
-                <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-sec-ico" [class.open]="info == 'cash'" (click)="toggleInfo('cash')" title="What is this?" role="button"><i class="fa fa-university" aria-hidden="true"></i></span>
-                <h2 class="x-card-title">Cash position</h2>
-                <span class="ah-head-sub">what clients owe us against what we owe suppliers, and when each falls due</span>
-            </div>
-            
-            <div class="x-card-body ah-cash">
-                <div class="ah-cash-top">
-                    <div class="ah-cash-stat ah-cash-in" [title]="money($safeNavigationMigration(cash?.RECEIVABLE))">
-                        <span class="ah-cash-k"><span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-mini-ico" [class.open]="info == 'cin'" (click)="toggleInfo('cin')" title="What is this?" role="button"><i class="fa fa-sign-in" aria-hidden="true"></i></span>Clients owe us</span>
-                        <span class="ah-cash-v">&#8377; {{short($safeNavigationMigration(cash?.RECEIVABLE))}}</span>
-                        <span class="ah-cash-s">&#8377; {{short($safeNavigationMigration(cash?.RECV_OVERDUE))}} overdue &middot; &#8377; {{short($safeNavigationMigration(cash?.RECV_DUE_7))}} due in 7 days</span>
-                    </div>
-                    <div class="ah-cash-op">&minus;</div>
-                    <div class="ah-cash-stat ah-cash-out" [title]="money($safeNavigationMigration(cash?.PAYABLE))">
-                        <span class="ah-cash-k"><span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-mini-ico" [class.open]="info == 'cout'" (click)="toggleInfo('cout')" title="What is this?" role="button"><i class="fa fa-sign-out" aria-hidden="true"></i></span>We owe suppliers</span>
-                        <span class="ah-cash-v">&#8377; {{short($safeNavigationMigration(cash?.PAYABLE))}}</span>
-                        <span class="ah-cash-s">&#8377; {{short($safeNavigationMigration(cash?.PAY_OVERDUE))}} overdue &middot; &#8377; {{short($safeNavigationMigration(cash?.PAY_DUE_7))}} due in 7 days</span>
-                    </div>
-                    <div class="ah-cash-op">=</div>
-                    <div class="ah-cash-stat ah-cash-net" [class.ah-cash-neg]="cash && cash.NET_POSITION < 0" [title]="money($safeNavigationMigration(cash?.NET_POSITION))">
-                        <span class="ah-cash-k"><span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-mini-ico" [class.open]="info == 'cnet'" (click)="toggleInfo('cnet')" title="What is this?" role="button"><i class="fa fa-calculator" aria-hidden="true"></i></span>Net position</span>
-                        <span class="ah-cash-v">&#8377; {{short($safeNavigationMigration(cash?.NET_POSITION))}}</span>
-                        <span class="ah-cash-s">{{ cash && cash.NET_POSITION < 0 ? 'we owe more than we are owed' : 'we are owed more than we owe' }}</span>
-                    </div>
-                </div>
-
-                
-                
-                
-                <p class="ah-card-note ah-note-inline">
-                    <b>Cash forecast.</b> Money due to come in against money due to go out, by when it falls due.
-                    Already-overdue amounts are due now. Both sides are net of money received but not yet applied, so the overdue line matches the Overdue card. Bars are drawn to the same scale.
-                    @if (cash && cash.PAY_TERMS_PCT < 60) {
-<span>Only {{cash.PAY_TERMS_PCT}}% of the open supplier bills carry a real due date; the rest are assumed at 30 days.</span>
-}
-                </p>
-
-                <div class="x-tablewrap">
-                    <table class="x-table ah-flow">
-                        <thead>
-                            <tr>
-                                <th>WHEN</th>
-                                <th class="x-num">MONEY IN</th>
-                                <th class="ah-flowbar"></th>
-                                <th class="x-num">MONEY OUT</th>
-                                <th class="ah-flowbar"></th>
-                                <th class="x-num">NET</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (f of forecast; track f) {
-<tr [class.ah-flow-overdue]="f.SORT_NO == 0">
-                                <td class="ah-mode">{{f.BUCKET}}</td>
-                                <td class="x-num ah-green" [title]="money(f.INFLOW)">&#8377; {{short(f.INFLOW)}}</td>
-                                <td class="ah-flowbar"><div class="ah-bar"><div class="ah-bar-fill ah-bar-in" [style.width.%]="flowShare(f.INFLOW)"></div></div></td>
-                                <td class="x-num ah-red" [title]="money(f.OUTFLOW)">&#8377; {{short(f.OUTFLOW)}}</td>
-                                <td class="ah-flowbar"><div class="ah-bar"><div class="ah-bar-fill ah-bar-out" [style.width.%]="flowShare(f.OUTFLOW)"></div></div></td>
-                                <td class="x-num ah-strong" [class.ah-red]="f.NET_GAP < 0" [class.ah-green]="f.NET_GAP >= 0" [title]="money(f.NET_GAP)">&#8377; {{short(f.NET_GAP)}}</td>
-                            </tr>
-}
-                            @if (loaded && forecast.length == 0) {
-<tr>
-                                <td colspan="6" class="x-empty">Nothing due either way.</td>
-                            </tr>
-}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- DSO vs DPO -->
-        <div class="x-card">
-            <div class="x-card-head">
-                <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-sec-ico" [class.open]="info == 'days'" (click)="toggleInfo('days')" title="What is this?" role="button"><i class="fa fa-exchange" aria-hidden="true"></i></span>
-                <h2 class="x-card-title">Days to collect vs days to pay</h2>
-                <span class="ah-head-sub">last 90 days</span>
-            </div>
-            
-            <div class="x-card-body ah-days">
-                <div class="ah-days-pair">
-                    <div class="ah-days-stat">
-                        <span class="ah-days-k"><span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-mini-ico" [class.open]="info == 'ddso'" (click)="toggleInfo('ddso')" title="What is this?" role="button"><i class="fa fa-hourglass-half" aria-hidden="true"></i></span>Clients pay us in</span>
-                        <span class="ah-days-v">{{days($safeNavigationMigration(cash?.DSO_DAYS))}}<span class="ah-unit"> days</span></span>
-                        <span class="ah-days-s">{{count($safeNavigationMigration(cash?.DSO_BILLS))}} settled invoices &middot; agreed {{days($safeNavigationMigration(cash?.AVG_CREDIT_PERIOD))}} days</span>
-                    </div>
-                    <div class="ah-days-stat">
-                        <span class="ah-days-k"><span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-mini-ico" [class.open]="info == 'ddpo'" (click)="toggleInfo('ddpo')" title="What is this?" role="button"><i class="fa fa-credit-card" aria-hidden="true"></i></span>We pay suppliers in</span>
-                        <span class="ah-days-v">{{days($safeNavigationMigration(cash?.DPO_DAYS))}}<span class="ah-unit"> days</span></span>
-                        <span class="ah-days-s">{{count($safeNavigationMigration(cash?.DPO_BILLS))}} settled bills</span>
-                    </div>
-                </div>
-                
-                
-                @if (cash && cash.DSO_DAYS != null && cash.DPO_DAYS != null) {
-<div class="ah-days-gap" [ngClass]="dsoGap() > 0 ? 'ah-gap-bad' : 'ah-gap-good'">
-                    <i class="fa" [ngClass]="dsoGap() > 0 ? 'fa-exclamation-circle' : 'fa-check-circle'" aria-hidden="true"></i>
-                    @if (dsoGap() > 0) {
-<span>We pay suppliers <b>{{dsoGap()}} days before</b> clients pay us. That gap is funded from our own cash.</span>
-}
-                    @if (dsoGap() <= 0) {
-<span>Clients pay us <b>{{-dsoGap()}} days before</b> we pay suppliers. Suppliers are funding the gap.</span>
-}
-                </div>
-}
-                @if (cash && (cash.DSO_DAYS == null || cash.DPO_DAYS == null)) {
-<div class="ah-days-gap ah-gap-flat">
-                    Not enough settled bills in the last 90 days to measure.
-                </div>
-}
-                <p class="ah-card-note ah-note-inline ah-note-last">
-                    Value-weighted: a large bill counts for more than a small one. Compare the client figure with the agreed credit period.
-                </p>
-            </div>
-        </div>
-    </div>
-}
-
-    <!-- ================= ROW 3: jobs by mode + 30-day trend ================= -->
-    <div class="ah-row2">
-        <!-- jobs by mode -->
-        <div class="x-card">
-            <div class="x-card-head">
-                <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-sec-ico" [class.open]="info == 'jobs'" (click)="toggleInfo('jobs')" title="What is this?" role="button"><i class="fa fa-cubes" aria-hidden="true"></i></span>
-                <h2 class="x-card-title">Jobs opened this month</h2>
-                <span class="x-count">{{count($safeNavigationMigration(kpi?.JOBS_MTD))}}</span>
-                <span class="ah-head-sub">vs {{count($safeNavigationMigration(kpi?.JOBS_PM))}} same period last month</span>
-            </div>
-            
-            <p class="ah-card-note"><b>Billed</b> jobs have at least one tax invoice; <b>Unbilled</b> have none yet. GOP is billed value minus purchase cost on those jobs.</p>
-            <div class="x-tablewrap">
-                <table class="x-table ah-modes">
-                    <thead>
-                        <tr>
-                            <th>MODE</th>
-                            <th class="x-num">JOBS</th>
-                            <th class="x-num">LAST MONTH</th>
-                            <th class="x-num">BILLED</th>
-                            <th class="x-num">UNBILLED</th>
-                            @if (scope == 'accounts') {
-<th class="x-num">GOP</th>
-}
-                            @if (scope == 'accounts') {
-<th class="x-num">MARGIN</th>
-}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (m of modes; track m) {
-<tr>
-                            <td class="ah-mode">
-                                <span>{{m.MODE_}}</span>
-                                <div class="ah-bar ah-bar-under"><div class="ah-bar-fill" [style.width.%]="share(m.JOBS_MTD, modes, 'JOBS_MTD')"></div></div>
-                            </td>
-                            <td class="x-num ah-strong">{{count(m.JOBS_MTD)}}</td>
-                            <td class="x-num">{{count(m.JOBS_PM)}}</td>
-                            <td class="x-num">@if (m.BILLED_MTD > 0) {
-<span class="x-pill x-pill-ok">{{count(m.BILLED_MTD)}}</span>
-}@if (!(m.BILLED_MTD > 0)) {
-<span>0</span>
-}</td>
-                            <td class="x-num">@if (m.UNBILLED_MTD > 0) {
-<span class="x-pill x-pill-warn">{{count(m.UNBILLED_MTD)}}</span>
-}@if (!(m.UNBILLED_MTD > 0)) {
-<span>0</span>
-}</td>
-                            @if (scope == 'accounts') {
-<td class="x-num" [class.ah-red]="m.GOP_MTD < 0">&#8377; {{short(m.GOP_MTD)}}</td>
-}
-                            @if (scope == 'accounts') {
-<td class="x-num">{{m.MARGIN_PCT_MTD}}%</td>
-}
-                        </tr>
-}
-                        @if (loaded && modes.length == 0) {
-<tr>
-                            <td colspan="7" class="x-empty">No jobs recorded.</td>
-                        </tr>
-}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 30-day trend -->
-        @if (scope == 'accounts') {
-<div class="x-card">
-            <div class="x-card-head">
-                <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-sec-ico" [class.open]="info == 'trend'" (click)="toggleInfo('trend')" title="What is this?" role="button"><i class="fa fa-bar-chart" aria-hidden="true"></i></span>
-                <h2 class="x-card-title">Invoiced, 30 days</h2>
-                <span class="ah-head-sub ah-nowrap" [title]="money(trendTotal)">&#8377; {{short(trendTotal)}} total</span>
-            </div>
-            
-            <p class="ah-card-note">Value of tax invoices raised on each of the last 30 days. Point at a bar for the count and amount.</p>
-            <div class="x-card-body ah-chart">
-                @if (trendOptions && daily.length > 0) {
-<div class="ah-chart-box">
-                    <canvas baseChart type="bar"
-                            [datasets]="trendData" [labels]="trendLabels"
-                            [options]="trendOptions" [legend]="false"></canvas>
-                </div>
-}
-                @if (loaded && daily.length == 0) {
-<div class="x-empty">No invoices in the last 30 days.</div>
-}
-            </div>
-        </div>
-}
-    </div>
-
-    <!-- ================= ROW 3b: watch list + top clients ================= -->
-    @if (scope == 'accounts') {
-<div class="ah-rowwatch">
-
-        <!-- watch list -->
-        <div class="x-card">
-            <div class="x-card-head">
-                <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-sec-ico" [class.open]="info == 'watch'" (click)="toggleInfo('watch')" title="What is this?" role="button"><i class="fa fa-eye" aria-hidden="true"></i></span>
-                <h2 class="x-card-title">Clients to ask about</h2>
-                @if (watch.length) {
-<span class="x-count">{{watch.length}}</span>
-}
-                <span class="ah-head-sub">overdue clients ranked by money unpaid for over 180 days</span>
-            </div>
-            
-            <div class="x-tablewrap">
-                <table class="x-table ah-watch">
-                    <thead>
-                        <tr>
-                            <th>CLIENT</th>
-                            <th class="x-num">OVERDUE</th>
-                            <th class="x-num">OVER 180 DAYS</th>
-                            <th class="x-num">PAYS IN</th>
-                            <th>WHY IT IS HERE</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (w of watch; track w) {
-<tr>
-                            <td class="ah-client" [title]="w.CLIENTCODE + ' - outstanding ' + money(w.OUTSTANDING)">{{w.CLIENTNAME}}</td>
-                            <td class="x-num ah-strong ah-red" [title]="money(w.OVERDUE)">&#8377; {{short(w.OVERDUE)}}</td>
-                            <td class="x-num" [title]="money(w.OVER_180)">&#8377; {{short(w.OVER_180)}} <span class="ah-pct">({{w.PCT_OVER_180}}%)</span></td>
-                            <td class="x-num" [title]="'Agreed credit period ' + w.CREDIT_PERIOD + ' days'">
-                                @if (w.PAY_DAYS != null) {
-<span>{{days(w.PAY_DAYS)}} d <span class="ah-pct" [class.ah-red]="w.RECOVERY_GAP > 0">({{w.RECOVERY_GAP > 0 ? '+' : ''}}{{days(w.RECOVERY_GAP)}})</span></span>
-}
-                                @if (w.PAY_DAYS == null) {
-<span>-</span>
-}
-                            </td>
-                            <td class="ah-reason">{{w.REASON}}</td>
-                        </tr>
-}
-                        @if (loaded && watch.length == 0) {
-<tr>
-                            <td colspan="5" class="x-empty">No client is overdue. Nothing to chase.</td>
-                        </tr>
-}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- top debtors -->
-        @if (scope == 'accounts') {
-<div class="x-card">
-            <div class="x-card-head">
-                <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-sec-ico" [class.open]="info == 'top'" (click)="toggleInfo('top')" title="What is this?" role="button"><i class="fa fa-users" aria-hidden="true"></i></span>
-                <h2 class="x-card-title">Top clients by outstanding</h2>
-                @if (topClients.length) {
-<span class="x-count">{{topClients.length}}</span>
-}
-                <span class="ah-head-sub">clients who owe us the most today; Share is their part of total outstanding</span>
-            </div>
-            
-            <div class="x-tablewrap">
-                <table class="x-table">
-                    <thead>
-                        <tr>
-                            <th>CLIENT</th>
-                            <th class="ah-barcol"></th>
-                            <th class="x-num">OUTSTANDING</th>
-                            <th class="x-num">OVERDUE</th>
-                            <th class="x-num">SHARE</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (c of topClients; track c) {
-<tr>
-                            <td class="ah-client" [title]="c.CLIENTCODE">{{c.CLIENTNAME}}</td>
-                            <td class="ah-barcol">
-                                <div class="ah-bar"><div class="ah-bar-fill ah-bar-slate" [style.width.%]="share(c.OUTSTANDING, topClients, 'OUTSTANDING')"></div></div>
-                            </td>
-                            <td class="x-num ah-strong" [title]="money(c.OUTSTANDING)">&#8377; {{short(c.OUTSTANDING)}}</td>
-                            <td class="x-num" [class.ah-red]="c.OVERDUE > 0" [title]="money(c.OVERDUE)">&#8377; {{short(c.OVERDUE)}}</td>
-                            <td class="x-num">{{c.PCT_OF_TOTAL}}%</td>
-                        </tr>
-}
-                        @if (loaded && topClients.length == 0) {
-<tr>
-                            <td colspan="5" class="x-empty">Nothing outstanding.</td>
-                        </tr>
-}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-}
-
-    </div>
-}
-
-    <!-- ================= ROW 5: quick links in one row ================= -->
-    <div class="ah-rowfull">
-        <!-- quick links -->
-        <div class="x-card">
-            <div class="x-card-head">
-                <span class="ah-kpi-ico ah-kpi-ico-btn ah-ico-blue ah-sec-ico" [class.open]="info == 'quick'" (click)="toggleInfo('quick')" title="What is this?" role="button"><i class="fa fa-th-large" aria-hidden="true"></i></span>
-                <h2 class="x-card-title">Quick links</h2>
-            </div>
-            
-            <div class="x-card-body ah-links">
-                @for (q of quickLinks; track q) {
-<a class="ah-link" [routerLink]="q.link">
-                    <span class="ah-link-ico"><i class="fa" [ngClass]="q.icon" aria-hidden="true"></i></span>
-                    <span class="ah-link-label">{{q.label}}</span>
-                    <i class="fa fa-angle-right ah-link-go" aria-hidden="true"></i>
-                </a>
-}
-            </div>
-        </div>
-    </div>
-
-
-    <!-- ================= EXPLANATION POPUP (any icon on the page) ================= -->
-    <!-- ================= CARD DRILL-DOWN: the rows behind Overdue / GOP / Margin ================= -->
+    <!-- ================= CARD DRILL-DOWN: the rows behind Overdue / GOP / Margin =================
+    Movable by its title bar (same drag handler as the explanation popup). Fetched only on
+    click from Accounts/ACC_RPT_ACCOUNTS_HOME_DRILL; every total adds up to the card.      -->
     @if (drillKind) {
-<div class="ah-drill-back" (mousedown)="$event.target === $event.currentTarget && closeDrill()">
-        <div class="ah-drill" role="dialog" aria-modal="true"
-             [style.transform]="'translate(' + dragX + 'px, ' + dragY + 'px)'">
-            <div class="ah-drill-head" (mousedown)="startDrag($event)" title="Drag to move">
-                <div>
-                    @if (drillKind === 'OVERDUE') {
-<div class="ah-drill-title">
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        Overdue past credit period &mdash; the bills behind &#8377; {{short($safeNavigationMigration(kpi?.OVERDUE_AMT))}}
-                    </div>
-}
-                    @if (drillKind === 'MARGIN') {
-<div class="ah-drill-title">
-                        <i class="fa fa-line-chart" aria-hidden="true"></i>
-                        GOP this month &mdash; the jobs behind &#8377; {{short($safeNavigationMigration(kpi?.GOP_MTD))}} ({{ kpi ? kpi.MARGIN_PCT_MTD : '-' }}%)
-                    </div>
-}
-                    @if (drill[drillKind]; as d) {
-<div class="ah-drill-sub">
-                        {{ drillKind === 'OVERDUE' ? ('As on ' + d.sum.ASON) : ('Jobs opened ' + d.sum.FROMDATE + ' to ' + d.sum.ASON) }}
-                        &middot; {{ allBranches ? 'All branches' : d.sum.BRANCH }}
-                        &middot; every figure below adds up to the card
-                    </div>
-}
+      <div class="ah-modal-back" (mousedown)="$event.target === $event.currentTarget && closeDrill()">
+        <div class="im-card ah-help ah-drill" role="dialog" aria-modal="true"
+          [style.transform]="'translate(' + dragX + 'px, ' + dragY + 'px)'">
+          <div class="im-card-h ah-drag-handle" (mousedown)="startDrag($event)" title="Drag to move">
+            <div class="ah-drill-headtext">
+              @if (drillKind === 'OVERDUE') {
+                <div class="ah-h">
+                  <span class="ah-ico ah-ico-static"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
+                  <h2>Overdue past credit period &mdash; the bills behind &#8377; {{short(kpi?.OVERDUE_AMT)}}</h2>
                 </div>
-                <div class="ah-drill-actions">
-                    <button type="button" class="x-btn x-btn-classic" (click)="loadDrill(drillKind, true)" [disabled]="drillBusy"
-                            title="Read the figures again now">
-                        <i class="fa fa-refresh" [class.fa-spin]="drillBusy" aria-hidden="true"></i> Refresh
-                    </button>
-                    <button type="button" class="ah-drill-x" (click)="closeDrill()" aria-label="Close">&times;</button>
+              }
+              @if (drillKind === 'MARGIN') {
+                <div class="ah-h">
+                  <span class="ah-ico ah-ico-static"><i class="fa fa-line-chart" aria-hidden="true"></i></span>
+                  <h2>GOP this month &mdash; the jobs behind &#8377; {{short(kpi?.GOP_MTD)}} ({{ kpi ? kpi.MARGIN_PCT_MTD : '-' }}%)</h2>
                 </div>
+              }
+              @if (drill[drillKind]; as d) {
+                <span class="meta">
+                  {{ drillKind === 'OVERDUE' ? ('As on ' + d.sum.ASON) : ('Jobs opened ' + d.sum.FROMDATE + ' to ' + d.sum.ASON) }}
+                  &middot; {{ allBranches ? 'All branches' : d.sum.BRANCH }}
+                  &middot; every figure below adds up to the card
+                </span>
+              }
             </div>
-
-            <div class="ah-drill-body">
-                @if (drillBusy) {
-<div class="ah-busy" role="status" aria-live="polite">
-                    <span class="ah-busy-spin" aria-hidden="true"></span>
-                    <span class="ah-busy-text">
-                        <span class="ah-busy-title">Loading the detail...</span>
-                        <span class="ah-busy-hint">The first time can take a few seconds; after that it opens at once for ten minutes.</span>
-                    </span>
+            <div class="ah-drill-actions">
+              <button type="button" class="im-btn im-btn-g" (click)="loadDrill(drillKind, true)" [disabled]="drillBusy"
+                title="Read the figures again now">
+                <i class="fa fa-refresh" [class.fa-spin]="drillBusy" aria-hidden="true"></i> Refresh
+              </button>
+              <button type="button" class="im-btn im-btn-g ah-close" (click)="closeDrill()" title="Close" aria-label="Close">
+                <i class="fa fa-times" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <div class="ah-drill-body">
+            @if (drillBusy) {
+              <div class="ah-note-card ah-drill-note-card" role="status" aria-live="polite">
+                <b>Loading the detail&hellip;</b>
+                <span class="im-sub-t">The first time can take a few seconds; after that it opens at once for ten minutes.</span>
+              </div>
+            }
+            @if (drillError && !drillBusy) {
+              <div class="ah-note-card ah-drill-note-card ah-alert">
+                <b><i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ drillError }}</b>
+              </div>
+            }
+            <!-- ===================== OVERDUE ===================== -->
+            @if (!drillBusy && drillKind === 'OVERDUE' && drill.OVERDUE; as d) {
+              <div class="ah-story">
+                Bills that are past their due date add up to <b>&#8377; {{short(d.sum.OVERDUE_GROSS)}}</b>
+                ({{count(d.sum.BILLS)}} bills, {{count(d.sum.CLIENTS_GROSS)}} clients).
+                What is really overdue &mdash; the figure on the card &mdash; is <b>&#8377; {{short(d.sum.OVERDUE_NET)}}</b>.
+              </div>
+              <!-- the difference is money already in the bank that Accounts booked "on account"
+              without naming the bills; it does not adjust itself, so it is an action, not a note -->
+              @if ((+d.sum.OVERDUE_GROSS - +d.sum.OVERDUE_NET) > 0.5) {
+                <div class="ah-warn" role="alert">
+                  <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                  <div>
+                    <b>&#8377; {{short(+d.sum.OVERDUE_GROSS - +d.sum.OVERDUE_NET)}} has been received from these clients but booked
+                    on account, not against their bills.</b>
+                    It will not adjust by itself &mdash; until Accounts knocks it off bill by bill, those bills keep showing
+                    as overdue. The <b>Paid on account</b> column below shows how much is waiting for each client.
+                  </div>
                 </div>
-}
-                @if (drillError && !drillBusy) {
-<div class="ah-drill-err">
-                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ drillError }}
-                </div>
-}
-
-                <!-- ===================== OVERDUE ===================== -->
-                @if (!drillBusy && drillKind === 'OVERDUE' && drill.OVERDUE; as d) {
-
-                    <div class="ah-story">
-                        Bills that are past their due date add up to <b>&#8377; {{short(d.sum.OVERDUE_GROSS)}}</b>
-                        ({{count(d.sum.BILLS)}} bills, {{count(d.sum.CLIENTS_GROSS)}} clients).
-                        What is really overdue &mdash; the figure on the card &mdash; is <b>&#8377; {{short(d.sum.OVERDUE_NET)}}</b>.
-                    </div>
-                    <!-- the difference is money already in the bank that Accounts booked "on account"
-                         without naming the bills; it does not adjust itself, so it is an action, not a note -->
-                    @if ((+d.sum.OVERDUE_GROSS - +d.sum.OVERDUE_NET) > 0.5) {
-<div class="ah-warn" role="alert">
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <div>
-                            <b>&#8377; {{short(+d.sum.OVERDUE_GROSS - +d.sum.OVERDUE_NET)}} has been received from these clients but booked
-                            on account, not against their bills.</b>
-                            It will not adjust by itself &mdash; until Accounts knocks it off bill by bill, those bills keep showing
-                            as overdue. The <b>Paid on account</b> column below shows how much is waiting for each client.
-                        </div>
-                    </div>
-}
-                    <div class="ah-sum">
-                        <div class="ah-sum-cell"><span>Overdue bills</span><b>&#8377; {{rs(d.sum.OVERDUE_GROSS)}}</b></div>
-                        <div class="ah-sum-op">&minus;</div>
-                        <div class="ah-sum-cell"><span>Already paid on account, not yet matched to a bill</span><b>&#8377; {{rs(+d.sum.OVERDUE_GROSS - +d.sum.OVERDUE_NET)}}</b></div>
-                        <div class="ah-sum-op">=</div>
-                        <div class="ah-sum-cell ah-sum-res"><span>Overdue &mdash; the card</span><b>&#8377; {{rs(d.sum.OVERDUE_NET)}}</b></div>
-                    </div>
-
-                    <div class="ah-drill-h">How late the bills are <span class="ah-drill-hint">days past the due date, before money on account is set off</span></div>
-                    <div class="ah-late">
-                        @for (b of d.t1; track b) {
-<div class="ah-late-row">
-                            <span class="ah-late-k">{{ b.BUCKET }}</span>
-                            <span class="ah-late-track"><span class="ah-late-fill" [class.ah-late-old]="+b.SORT_ >= 4" [style.width.%]="barW(b.AMOUNT, d.maxBar)"></span></span>
-                            <span class="ah-late-n">{{count(b.BILLS)}} bills</span>
-                            <span class="ah-late-v">&#8377; {{short(b.AMOUNT)}}</span>
-                        </div>
-}
-                    </div>
-
-                    <div class="ah-drill-h">Clients <span class="ah-drill-hint">click a client for its bills, then a bill for the jobs on it</span></div>
-                    <div class="ah-drill-tools">
-                        <input type="text" class="form-control ah-drill-search" [(ngModel)]="drillSearch" placeholder="Find a client">
-                        <button type="button" class="x-btn x-btn-classic" (click)="exportDrill('clients')"><i class="fa fa-download" aria-hidden="true"></i> Export clients</button>
-                        <button type="button" class="x-btn x-btn-classic" (click)="exportDrill('bills')"><i class="fa fa-download" aria-hidden="true"></i> Export all bills</button>
-                    </div>
-                    <div class="ah-drill-scroll">
-                        <table class="ah-dt">
-                            <thead>
+              }
+              <div class="ah-sum">
+                <div class="ah-sum-cell"><span>Overdue bills</span><b>&#8377; {{rs(d.sum.OVERDUE_GROSS)}}</b></div>
+                <div class="ah-sum-op">&minus;</div>
+                <div class="ah-sum-cell"><span>Already paid on account, not yet matched to a bill</span><b>&#8377; {{rs(+d.sum.OVERDUE_GROSS - +d.sum.OVERDUE_NET)}}</b></div>
+                <div class="ah-sum-op">=</div>
+                <div class="ah-sum-cell ah-sum-res"><span>Overdue &mdash; the card</span><b>&#8377; {{rs(d.sum.OVERDUE_NET)}}</b></div>
+              </div>
+              <div class="ah-drill-h">How late the bills are <span class="ah-drill-hint">days past the due date, before money on account is set off</span></div>
+              <div class="ah-late">
+                @for (b of d.t1; track b) {
+                  <div class="ah-late-row">
+                    <span class="ah-late-k">{{ b.BUCKET }}</span>
+                    <span class="ah-late-track"><span class="ah-late-fill" [class.ah-late-old]="+b.SORT_ >= 4" [style.width.%]="barW(b.AMOUNT, d.maxBar)"></span></span>
+                    <span class="ah-late-n">{{count(b.BILLS)}} bills</span>
+                    <span class="ah-late-v">&#8377; {{short(b.AMOUNT)}}</span>
+                  </div>
+                }
+              </div>
+              <div class="ah-drill-h">Clients <span class="ah-drill-hint">click a client for its bills, then a bill for the jobs on it</span></div>
+              <div class="ah-drill-tools">
+                <input type="text" class="ah-drill-search" [(ngModel)]="drillSearch" (ngModelChange)="drillPg = {}" placeholder="Find a client">
+                <button type="button" class="im-btn im-btn-g" (click)="exportDrill('clients')"><i class="fa fa-download" aria-hidden="true"></i> Export clients</button>
+                <button type="button" class="im-btn im-btn-g" (click)="exportDrill('bills')"><i class="fa fa-download" aria-hidden="true"></i> Export all bills</button>
+              </div>
+              <div class="ah-drill-scroll">
+                <table class="ah-dt">
+                  <thead>
+                    <tr>
+                      <th class="ah-dt-wrap">Client</th>
+                      <th class="num">Bills</th>
+                      <th class="num" title="Pending on bills past their due date">Overdue bills</th>
+                      <th class="num" title="Receipts on account (OA), general (GR) or against opening (AO) that name no bill">Paid on account</th>
+                      <th class="num" title="Overdue bills less money on account - this is what the card adds up">Overdue (net)</th>
+                      <th class="num">Oldest</th>
+                      <th>Last receipt</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (c of pageOf(drillClients(), 'ovd'); track c) {
+                      <tr class="ah-dt-click" (click)="toggleClient(c.CLIENTCODE)" [class.ah-dt-open]="drillOpenClient === c.CLIENTCODE">
+                        <td class="ah-dt-wrap">
+                          <i class="fa" [ngClass]="drillOpenClient === c.CLIENTCODE ? 'fa-caret-down' : 'fa-caret-right'" aria-hidden="true"></i>
+                          {{ c.CLIENTNAME }} <span class="ah-dt-code">{{ c.CLIENTCODE }}</span>
+                        </td>
+                        <td class="num">{{ count(c.BILLS) }}</td>
+                        <td class="num">{{ rs(c.OVERDUE_GROSS) }}</td>
+                        <td class="num">{{ +c.CREDIT_ON_ACCOUNT > 0 ? rs(c.CREDIT_ON_ACCOUNT) : '-' }}</td>
+                        <td class="num"><b>{{ rs(c.OVERDUE_NET) }}</b></td>
+                        <td class="num">{{ count(c.OLDEST_DAYS) }} d</td>
+                        <td>{{ c.LAST_RECEIPT || '-' }}</td>
+                      </tr>
+                      @if (drillOpenClient === c.CLIENTCODE) {
+                        <tr class="ah-dt-sub">
+                          <td colspan="7">
+                            <table class="ah-dt ah-dt-inner">
+                              <thead>
                                 <tr>
-                                    <th class="ah-dt-wrap">Client</th>
-                                    <th class="num">Bills</th>
-                                    <th class="num" title="Pending on bills past their due date">Overdue bills</th>
-                                    <th class="num" title="Receipts on account (OA), general (GR) or against opening (AO) that name no bill">Paid on account</th>
-                                    <th class="num" title="Overdue bills less money on account - this is what the card adds up">Overdue (net)</th>
-                                    <th class="num">Oldest</th>
-                                    <th>Last receipt</th>
+                                  <th>Bill no</th><th>Bill date</th><th>Due date</th><th class="num">Days late</th>
+                                  <th class="num">Bill value</th><th class="num">Received</th><th class="num">Pending</th><th>Last receipt</th>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @for (c of drillClients(); track c) {
-
-                                    <tr class="ah-dt-click" (click)="toggleClient(c.CLIENTCODE)" [class.ah-dt-open]="drillOpenClient === c.CLIENTCODE">
-                                        <td class="ah-dt-wrap">
-                                            <i class="fa" [ngClass]="drillOpenClient === c.CLIENTCODE ? 'fa-caret-down' : 'fa-caret-right'" aria-hidden="true"></i>
-                                            {{ c.CLIENTNAME }} <span class="ah-dt-code">{{ c.CLIENTCODE }}</span>
-                                        </td>
-                                        <td class="num">{{ count(c.BILLS) }}</td>
-                                        <td class="num">{{ rs(c.OVERDUE_GROSS) }}</td>
-                                        <td class="num ah-dt-green">{{ +c.CREDIT_ON_ACCOUNT > 0 ? rs(c.CREDIT_ON_ACCOUNT) : '-' }}</td>
-                                        <td class="num"><b>{{ rs(c.OVERDUE_NET) }}</b></td>
-                                        <td class="num">{{ count(c.OLDEST_DAYS) }} d</td>
-                                        <td>{{ c.LAST_RECEIPT || '-' }}</td>
-                                    </tr>
-                                    @if (drillOpenClient === c.CLIENTCODE) {
-<tr class="ah-dt-sub">
-                                        <td colspan="7">
-                                            <table class="ah-dt ah-dt-inner">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Bill no</th><th>Bill date</th><th>Due date</th><th class="num">Days late</th>
-                                                        <th class="num">Bill value</th><th class="num">Received</th><th class="num">Pending</th><th>Last receipt</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @for (b of clientBills(c.CLIENTCODE); track b) {
-
-                                                        <tr class="ah-dt-click" (click)="toggleBill(b.INV_NO, $event)" [class.ah-dt-open]="drillOpenBill === b.INV_NO">
-                                                            <td><i class="fa" [ngClass]="drillOpenBill === b.INV_NO ? 'fa-caret-down' : 'fa-caret-right'" aria-hidden="true"></i>
-                                                                @if (!isOpening(b.INV_NO)) {
-{{ b.INV_NO }}
-}
-                                                                @if (isOpening(b.INV_NO)) {
-<span class="ah-dt-opening"
-                                                                      title="Balance brought forward from before the ERP went live, less the receipts entered against it (AO). Shown as OP. BALANCE on the Billwise statement.">Opening balance b/f</span>
-}
-                                                            </td>
-                                                            <td>{{ b.INV_DATE }}</td>
-                                                            <td>{{ b.DUE_DATE }}</td>
-                                                            <td class="num">{{ count(b.DAYS_OVERDUE) }}</td>
-                                                            <td class="num">{{ rs(b.BILL_AMT) }}</td>
-                                                            <td class="num">{{ +b.RECEIVED > 0 ? rs(b.RECEIVED) : '-' }}</td>
-                                                            <td class="num"><b>{{ rs(b.PENDING) }}</b></td>
-                                                            <td>{{ b.LAST_RECEIPT || '-' }}</td>
-                                                        </tr>
-                                                        @if (drillOpenBill === b.INV_NO) {
-<tr class="ah-dt-sub2">
-                                                            <td colspan="8">
-                                                                @if (!billJobs(b.INV_NO).length) {
-<div class="ah-dt-none">
-                                                                    {{ isOpening(b.INV_NO) ? 'An opening balance brought forward from before the ERP went live - it has no job.' : 'No job number is linked to this bill.' }}
-                                                                </div>
-}
-                                                                @if (billJobs(b.INV_NO).length) {
-<table class="ah-dt ah-dt-jobs">
-                                                                    <thead>
-                                                                        <tr><th>Job no</th><th>Job date</th><th class="num">Income</th><th class="num">Expense</th><th class="num">Profit</th></tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        @for (j of billJobs(b.INV_NO); track j) {
-<tr>
-                                                                            <td><a href="#" (click)="openJob(j.JOBNO, $event)" title="Open the Job Profit statement">{{ j.JOBNO }} <i class="fa fa-external-link" aria-hidden="true"></i></a></td>
-                                                                            <td>{{ j.JOB_DATE || '-' }}</td>
-                                                                            <td class="num">{{ rs(j.INCOME) }}</td>
-                                                                            <td class="num">{{ rs(j.EXPENSE) }}</td>
-                                                                            <td class="num" [class.ah-dt-red]="+j.PROFIT < 0" [class.ah-dt-green]="+j.PROFIT > 0">{{ rs(j.PROFIT) }}</td>
-                                                                        </tr>
-}
-                                                                    </tbody>
-                                                                </table>
-}
-                                                            </td>
-                                                        </tr>
-}
-                                                    
-}
-                                                </tbody>
-                                            </table>
-                                            @if (clientBillCount(c.CLIENTCODE) > 100 && !drillShowAll[c.CLIENTCODE]) {
-<button type="button" class="ah-dt-more"
-                                                    (click)="drillShowAll[c.CLIENTCODE] = true; $event.stopPropagation()">
-                                                Show all {{ count(clientBillCount(c.CLIENTCODE)) }} bills
-                                            </button>
-}
-                                        </td>
-                                    </tr>
-}
-                                
-}
-                                @if (!drillClients().length) {
-<tr><td colspan="7" class="ah-dt-none">No client matches.</td></tr>
-}
+                              </thead>
+                              <tbody>
+                                @for (b of pageOf(clientBills(c.CLIENTCODE), 'b:' + c.CLIENTCODE); track b) {
+                                  <tr class="ah-dt-click" (click)="toggleBill(b.INV_NO, $event)" [class.ah-dt-open]="drillOpenBill === b.INV_NO">
+                                    <td><i class="fa" [ngClass]="drillOpenBill === b.INV_NO ? 'fa-caret-down' : 'fa-caret-right'" aria-hidden="true"></i>
+                                    @if (!isOpening(b.INV_NO)) {
+                                      {{ b.INV_NO }}
+                                    }
+                                    @if (isOpening(b.INV_NO)) {
+                                      <span class="ah-dt-opening"
+                                      title="Balance brought forward from before the ERP went live, less the receipts entered against it (AO). Shown as OP. BALANCE on the Billwise statement.">Opening balance b/f</span>
+                                    }
+                                  </td>
+                                  <td>{{ b.INV_DATE }}</td>
+                                  <td>{{ b.DUE_DATE }}</td>
+                                  <td class="num">{{ count(b.DAYS_OVERDUE) }}</td>
+                                  <td class="num">{{ rs(b.BILL_AMT) }}</td>
+                                  <td class="num">{{ +b.RECEIVED > 0 ? rs(b.RECEIVED) : '-' }}</td>
+                                  <td class="num"><b>{{ rs(b.PENDING) }}</b></td>
+                                  <td>{{ b.LAST_RECEIPT || '-' }}</td>
+                                </tr>
+                                @if (drillOpenBill === b.INV_NO) {
+                                  <tr class="ah-dt-sub2">
+                                    <td colspan="8">
+                                      @if (!billJobs(b.INV_NO).length) {
+                                        <div class="ah-dt-none">
+                                          {{ isOpening(b.INV_NO) ? 'An opening balance brought forward from before the ERP went live - it has no job.' : 'No job number is linked to this bill.' }}
+                                        </div>
+                                      }
+                                      @if (billJobs(b.INV_NO).length) {
+                                        <table class="ah-dt ah-dt-jobs">
+                                          <thead>
+                                            <tr><th>Job no</th><th>Job date</th><th class="num">Income</th><th class="num">Expense</th><th class="num">Profit</th></tr>
+                                          </thead>
+                                          <tbody>
+                                            @for (j of billJobs(b.INV_NO); track j) {
+                                              <tr>
+                                                <td><a href="#" class="im-link" (click)="openJob(j.JOBNO, $event)" title="Open the Job Profit statement">{{ j.JOBNO }} <i class="fa fa-external-link" aria-hidden="true"></i></a></td>
+                                                <td>{{ j.JOB_DATE || '-' }}</td>
+                                                <td class="num">{{ rs(j.INCOME) }}</td>
+                                                <td class="num">{{ rs(j.EXPENSE) }}</td>
+                                                <td class="num" [class.ah-neg]="+j.PROFIT < 0">{{ rs(j.PROFIT) }}</td>
+                                              </tr>
+                                            }
+                                          </tbody>
+                                        </table>
+                                      }
+                                    </td>
+                                  </tr>
+                                }
+                              }
                             </tbody>
-                        </table>
-                    </div>
-                    <div class="ah-drill-note">
-                        <b>Paid on account</b> is money received with receipt types OA (on account), GR (general) or AO (against opening),
-                        which name no bill. It is set off client by client &mdash; one client's money never reduces another client's dues.
-                        Income on a job counts every invoice on that job, whoever it was billed to, as the Job Profit statement does.
-                    </div>
-                
-}
-
-                <!-- ===================== MARGIN ===================== -->
-                @if (!drillBusy && drillKind === 'MARGIN' && drill.MARGIN; as d) {
-
-                    <div class="ah-story">
-                        <b>{{count(d.sum.JOBS)}} jobs</b> were opened this month; {{count(d.sum.BILLED_JOBS)}} of them are billed.
-                        Their income is <b>&#8377; {{short(d.sum.REVENUE)}}</b> and the cost booked on them is <b>&#8377; {{short(d.sum.COST)}}</b>,
-                        which leaves a GOP of <b>&#8377; {{short(d.sum.GOP)}}</b>.
-                        <ul class="ah-story-list">
-                            @if (+d.sum.NOCOST_JOBS > 0) {
-<li>
-                                <b>{{count(d.sum.NOCOST_JOBS)}} billed jobs have no cost booked yet</b> &mdash; &#8377; {{short(d.sum.NOCOST_REVENUE)}} of income with nothing set against it.
-                                This month's margin will come down as their purchase bills are entered.
-                            </li>
-}
-                            @if (+d.sum.UNBILLED_JOBS > 0) {
-<li>
-                                <b>{{count(d.sum.UNBILLED_JOBS)}} jobs are not billed yet</b>; &#8377; {{short(d.sum.UNBILLED_COST)}} has already been spent on them.
-                            </li>
-}
-                            @if (+d.sum.LOSS_JOBS > 0) {
-<li>
-                                <b>{{count(d.sum.LOSS_JOBS)}} billed jobs are at a loss</b>, &#8377; {{short(-d.sum.LOSS_VALUE)}} in total.
-                            </li>
-}
-                        </ul>
-                    </div>
-                    <div class="ah-sum">
-                        <div class="ah-sum-cell"><span>Income</span><b>&#8377; {{rs(d.sum.REVENUE)}}</b></div>
-                        <div class="ah-sum-op">&minus;</div>
-                        <div class="ah-sum-cell"><span>Cost booked on the jobs</span><b>&#8377; {{rs(d.sum.COST)}}</b></div>
-                        <div class="ah-sum-op">=</div>
-                        <div class="ah-sum-cell ah-sum-res"><span>GOP &mdash; the card ({{ d.sum.MARGIN_PCT === null ? '-' : d.sum.MARGIN_PCT }}%)</span><b>&#8377; {{rs(d.sum.GOP)}}</b></div>
-                    </div>
-
-                    <div class="ah-drill-h">By type of job</div>
-                    <div class="ah-late">
-                        @for (m of d.t1; track m) {
-<div class="ah-late-row">
-                            <span class="ah-late-k">{{ m.MODE_ }}</span>
-                            <span class="ah-late-track"><span class="ah-late-fill" [class.ah-late-old]="+m.GOP < 0" [style.width.%]="barW(m.GOP, d.maxBar)"></span></span>
-                            <span class="ah-late-n">{{count(m.JOBS)}} jobs</span>
-                            <span class="ah-late-v">&#8377; {{short(m.GOP)}} <span class="ah-dt-code">{{ m.MARGIN_PCT === null ? '' : m.MARGIN_PCT + '%' }}</span></span>
-                        </div>
-}
-                    </div>
-
-                    <div class="ah-drill-tools ah-view-switch">
-                        <button type="button" class="ah-chip" [class.on]="marginView === 'JOBS'" (click)="marginView = 'JOBS'">Jobs</button>
-                        <button type="button" class="ah-chip" [class.on]="marginView === 'CLIENTS'" (click)="marginView = 'CLIENTS'">Clients</button>
-                        <span class="ah-drill-hint">Clients: a job billed to several parties is split &mdash; each gets its own invoices and the cost of the charges it was billed for</span>
-                    </div>
-
-                    @if (marginView === 'JOBS') {
-
-                    <div class="ah-drill-h">Jobs <span class="ah-drill-hint">click a job number for its full Job Profit statement</span></div>
-                    <div class="ah-drill-tools">
-                        <button type="button" class="ah-chip" [class.on]="drillFilter === 'ALL'" (click)="drillFilter = 'ALL'">All ({{ marginCount('ALL') }})</button>
-                        <button type="button" class="ah-chip" [class.on]="drillFilter === 'LOSS'" (click)="drillFilter = 'LOSS'">At a loss ({{ marginCount('LOSS') }})</button>
-                        <button type="button" class="ah-chip" [class.on]="drillFilter === 'NOCOST'" (click)="drillFilter = 'NOCOST'">No cost booked yet ({{ marginCount('NOCOST') }})</button>
-                        <button type="button" class="ah-chip" [class.on]="drillFilter === 'UNBILLED'" (click)="drillFilter = 'UNBILLED'">Not billed yet ({{ marginCount('UNBILLED') }})</button>
-                        <input type="text" class="form-control ah-drill-search" [(ngModel)]="drillSearch" placeholder="Find a job or client">
-                        <button type="button" class="x-btn x-btn-classic" (click)="exportDrill('jobs')"><i class="fa fa-download" aria-hidden="true"></i> Export all jobs</button>
-                    </div>
-                    <div class="ah-drill-scroll">
-                        <table class="ah-dt">
-                            <thead>
-                                <tr>
-                                    <th class="ah-dt-sort" (click)="sortJobs('JOBNO')">Job no{{ sortMark('JOBNO') }}</th>
-                                    <th class="ah-dt-sort" (click)="sortJobs('JOB_YMD')">Job date{{ sortMark('JOB_YMD') }}</th>
-                                    <th class="ah-dt-sort" (click)="sortJobs('MODE_')">Type{{ sortMark('MODE_') }}</th>
-                                    <th class="ah-dt-sort ah-dt-wrap" (click)="sortJobs('CLIENTNAME')">Client (billed){{ sortMark('CLIENTNAME') }}</th>
-                                    <th>Billed</th>
-                                    <th class="num ah-dt-sort" (click)="sortJobs('INCOME')">Income{{ sortMark('INCOME') }}</th>
-                                    <th class="num ah-dt-sort" (click)="sortJobs('EXPENSE')">Expense{{ sortMark('EXPENSE') }}</th>
-                                    <th class="num ah-dt-sort" (click)="sortJobs('GOP')">GOP{{ sortMark('GOP') }}</th>
-                                    <th class="num ah-dt-sort" (click)="sortJobs('MARGIN_PCT')">Margin %{{ sortMark('MARGIN_PCT') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for (j of marginJobs(); track j) {
-<tr>
-                                    <td><a href="#" (click)="openJob(j.JOBNO, $event)" title="Open the Job Profit statement">{{ j.JOBNO }} <i class="fa fa-external-link" aria-hidden="true"></i></a></td>
+                          </table>
+                          @if (pgInfo(clientBills(c.CLIENTCODE), 'b:' + c.CLIENTCODE); as pi) {
+                            <div class="pg pg-inner">
+                              <span>Showing {{ pi.from }}&ndash;{{ pi.to }} of {{ count(pi.n) }}</span>
+                              @if (pi.pages > 1) {
+                                <span class="pg-btns">
+                                  <button type="button" class="btn sm" [disabled]="pi.p === 0" (click)="goPage('b:' + c.CLIENTCODE, pi.p - 1, $event)">&lsaquo; Prev</button>
+                                  <span class="pg-n">{{ pi.p + 1 }} / {{ pi.pages }}</span>
+                                  <button type="button" class="btn sm" [disabled]="pi.p >= pi.pages - 1" (click)="goPage('b:' + c.CLIENTCODE, pi.p + 1, $event)">Next &rsaquo;</button>
+                                </span>
+                              }
+                            </div>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  }
+                  @if (!drillClients().length) {
+                    <tr><td colspan="7" class="ah-dt-none">No client matches.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            @if (pgInfo(drillClients(), 'ovd'); as pi) {
+              <div class="pg">
+                <span>Showing {{ pi.from }}&ndash;{{ pi.to }} of {{ count(pi.n) }}</span>
+                @if (pi.pages > 1) {
+                  <span class="pg-btns">
+                    <button type="button" class="btn sm" [disabled]="pi.p === 0" (click)="goPage('ovd', pi.p - 1, $event)">&lsaquo; Prev</button>
+                    <span class="pg-n">{{ pi.p + 1 }} / {{ pi.pages }}</span>
+                    <button type="button" class="btn sm" [disabled]="pi.p >= pi.pages - 1" (click)="goPage('ovd', pi.p + 1, $event)">Next &rsaquo;</button>
+                  </span>
+                }
+              </div>
+            }
+            <div class="ah-drill-note">
+              <b>Paid on account</b> is money received with receipt types OA (on account), GR (general) or AO (against opening),
+              which name no bill. It is set off client by client &mdash; one client's money never reduces another client's dues.
+              Income on a job counts every invoice on that job, whoever it was billed to, as the Job Profit statement does.
+            </div>
+          }
+          <!-- ===================== MARGIN ===================== -->
+          @if (!drillBusy && drillKind === 'MARGIN' && drill.MARGIN; as d) {
+            <div class="ah-story">
+              <b>{{count(d.sum.JOBS)}} jobs</b> were opened this month; {{count(d.sum.BILLED_JOBS)}} of them are billed.
+              Their income is <b>&#8377; {{short(d.sum.REVENUE)}}</b> and the cost booked on them is <b>&#8377; {{short(d.sum.COST)}}</b>,
+              which leaves a GOP of <b>&#8377; {{short(d.sum.GOP)}}</b>.
+              <ul class="ah-story-list">
+                @if (+d.sum.NOCOST_JOBS > 0) {
+                  <li>
+                    <b>{{count(d.sum.NOCOST_JOBS)}} billed jobs have no cost booked yet</b> &mdash; &#8377; {{short(d.sum.NOCOST_REVENUE)}} of income with nothing set against it.
+                    This month's margin will come down as their purchase bills are entered.
+                  </li>
+                }
+                @if (+d.sum.UNBILLED_JOBS > 0) {
+                  <li>
+                    <b>{{count(d.sum.UNBILLED_JOBS)}} jobs are not billed yet</b>; &#8377; {{short(d.sum.UNBILLED_COST)}} has already been spent on them.
+                  </li>
+                }
+                @if (+d.sum.LOSS_JOBS > 0) {
+                  <li>
+                    <b>{{count(d.sum.LOSS_JOBS)}} billed jobs are at a loss</b>, &#8377; {{short(-d.sum.LOSS_VALUE)}} in total.
+                  </li>
+                }
+              </ul>
+            </div>
+            <div class="ah-sum">
+              <div class="ah-sum-cell"><span>Income</span><b>&#8377; {{rs(d.sum.REVENUE)}}</b></div>
+              <div class="ah-sum-op">&minus;</div>
+              <div class="ah-sum-cell"><span>Cost booked on the jobs</span><b>&#8377; {{rs(d.sum.COST)}}</b></div>
+              <div class="ah-sum-op">=</div>
+              <div class="ah-sum-cell ah-sum-res"><span>GOP &mdash; the card ({{ d.sum.MARGIN_PCT === null ? '-' : d.sum.MARGIN_PCT }}%)</span><b>&#8377; {{rs(d.sum.GOP)}}</b></div>
+            </div>
+            <div class="ah-drill-h">By type of job</div>
+            <div class="ah-late">
+              @for (m of d.t1; track m) {
+                <div class="ah-late-row">
+                  <span class="ah-late-k">{{ m.MODE_ }}</span>
+                  <span class="ah-late-track"><span class="ah-late-fill" [class.ah-late-old]="+m.GOP < 0" [style.width.%]="barW(m.GOP, d.maxBar)"></span></span>
+                  <span class="ah-late-n">{{count(m.JOBS)}} jobs</span>
+                  <span class="ah-late-v">&#8377; {{short(m.GOP)}} <span class="ah-dt-code">{{ m.MARGIN_PCT === null ? '' : m.MARGIN_PCT + '%' }}</span></span>
+                </div>
+              }
+            </div>
+            <div class="ah-drill-tools ah-view-switch">
+              <div class="im-seg">
+                <button type="button" [class.on]="marginView === 'JOBS'" (click)="marginView = 'JOBS'">Jobs</button>
+                <button type="button" [class.on]="marginView === 'CLIENTS'" (click)="marginView = 'CLIENTS'">Clients</button>
+              </div>
+              <span class="ah-drill-hint">Clients: a job billed to several parties is split &mdash; each gets its own invoices and the cost of the charges it was billed for</span>
+            </div>
+            @if (marginView === 'JOBS') {
+              <div class="ah-drill-h">Jobs <span class="ah-drill-hint">click a job number for its full Job Profit statement</span></div>
+              <div class="ah-drill-tools">
+                <div class="im-seg">
+                  <button type="button" [class.on]="drillFilter === 'ALL'" (click)="drillFilter = 'ALL'; drillPg = {}">All ({{ marginCount('ALL') }})</button>
+                  <button type="button" [class.on]="drillFilter === 'LOSS'" (click)="drillFilter = 'LOSS'; drillPg = {}">At a loss ({{ marginCount('LOSS') }})</button>
+                  <button type="button" [class.on]="drillFilter === 'NOCOST'" (click)="drillFilter = 'NOCOST'; drillPg = {}">No cost booked yet ({{ marginCount('NOCOST') }})</button>
+                  <button type="button" [class.on]="drillFilter === 'UNBILLED'" (click)="drillFilter = 'UNBILLED'; drillPg = {}">Not billed yet ({{ marginCount('UNBILLED') }})</button>
+                </div>
+                <input type="text" class="ah-drill-search" [(ngModel)]="drillSearch" (ngModelChange)="drillPg = {}" placeholder="Find a job or client">
+                <button type="button" class="im-btn im-btn-g" (click)="exportDrill('jobs')"><i class="fa fa-download" aria-hidden="true"></i> Export all jobs</button>
+              </div>
+              <div class="ah-drill-scroll">
+                <table class="ah-dt">
+                  <thead>
+                    <tr>
+                      <th class="ah-dt-sort" (click)="sortJobs('JOBNO')">Job no{{ sortMark('JOBNO') }}</th>
+                      <th class="ah-dt-sort" (click)="sortJobs('JOB_YMD')">Job date{{ sortMark('JOB_YMD') }}</th>
+                      <th class="ah-dt-sort" (click)="sortJobs('MODE_')">Type{{ sortMark('MODE_') }}</th>
+                      <th class="ah-dt-sort ah-dt-wrap" (click)="sortJobs('CLIENTNAME')">Client (billed){{ sortMark('CLIENTNAME') }}</th>
+                      <th>Billed</th>
+                      <th class="num ah-dt-sort" (click)="sortJobs('INCOME')">Income{{ sortMark('INCOME') }}</th>
+                      <th class="num ah-dt-sort" (click)="sortJobs('EXPENSE')">Expense{{ sortMark('EXPENSE') }}</th>
+                      <th class="num ah-dt-sort" (click)="sortJobs('GOP')">GOP{{ sortMark('GOP') }}</th>
+                      <th class="num ah-dt-sort" (click)="sortJobs('MARGIN_PCT')">Margin %{{ sortMark('MARGIN_PCT') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (j of pageOf(marginJobs(), 'jobs'); track j) {
+                      <tr>
+                        <td><a href="#" class="im-link" (click)="openJob(j.JOBNO, $event)" title="Open the Job Profit statement">{{ j.JOBNO }} <i class="fa fa-external-link" aria-hidden="true"></i></a></td>
+                        <td>{{ j.JOB_DATE || '-' }}</td>
+                        <td>{{ j.MODE_ }}</td>
+                        <td class="ah-dt-wrap">
+                          {{ j.CLIENTNAME || '-' }}
+                          @if (j.SHIPPERNAME && j.SHIPPERNAME !== j.CLIENTNAME) {
+                            <div class="ah-dt-code">cargo of {{ j.SHIPPERNAME }}</div>
+                          }
+                        </td>
+                        <td>
+                          @if (isTrue(j.IS_BILLED)) {
+                            <span>{{ j.LAST_BILLED || 'Yes' }}</span>
+                          }
+                          @if (!isTrue(j.IS_BILLED)) {
+                            <span class="ah-neg">Not yet</span>
+                          }
+                        </td>
+                        <td class="num">{{ rs(j.INCOME) }}</td>
+                        <td class="num">
+                          {{ rs(j.EXPENSE) }}
+                          @if (isTrue(j.IS_BILLED) && +j.EXPENSE === 0) {
+                            <span class="im-chip dash ah-dt-flag" title="No cost booked yet - the profit on this job is provisional">no cost yet</span>
+                          }
+                        </td>
+                        <td class="num" [class.ah-neg]="+j.GOP < 0"><b>{{ rs(j.GOP) }}</b></td>
+                        <td class="num">{{ j.MARGIN_PCT === null ? '-' : j.MARGIN_PCT + '%' }}</td>
+                      </tr>
+                    }
+                    @if (!marginJobs().length) {
+                      <tr><td colspan="9" class="ah-dt-none">No job matches.</td></tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+              @if (pgInfo(marginJobs(), 'jobs'); as pi) {
+                <div class="pg">
+                  <span>Showing {{ pi.from }}&ndash;{{ pi.to }} of {{ count(pi.n) }}</span>
+                  @if (pi.pages > 1) {
+                    <span class="pg-btns">
+                      <button type="button" class="btn sm" [disabled]="pi.p === 0" (click)="goPage('jobs', pi.p - 1, $event)">&lsaquo; Prev</button>
+                      <span class="pg-n">{{ pi.p + 1 }} / {{ pi.pages }}</span>
+                      <button type="button" class="btn sm" [disabled]="pi.p >= pi.pages - 1" (click)="goPage('jobs', pi.p + 1, $event)">Next &rsaquo;</button>
+                    </span>
+                  }
+                </div>
+              }
+            }
+            <!-- ===== by client, from the split ===== -->
+            @if (marginView === 'CLIENTS') {
+              <div class="ah-drill-h">Clients <span class="ah-drill-hint">click a client for its share of each job</span></div>
+              <div class="ah-drill-tools">
+                <input type="text" class="ah-drill-search" [(ngModel)]="drillSearch" (ngModelChange)="drillPg = {}" placeholder="Find a client">
+              </div>
+              <div class="ah-drill-scroll">
+                <table class="ah-dt">
+                  <thead>
+                    <tr>
+                      <th class="ah-dt-wrap">Client</th>
+                      <th class="num">Jobs</th>
+                      <th class="num">Income</th>
+                      <th class="num">Expense</th>
+                      <th class="num">GOP</th>
+                      <th class="num">Margin %</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (c of pageOf(marginClients(), 'mcli'); track c) {
+                      <tr class="ah-dt-click" (click)="toggleMarginClient(c.CLIENTCODE)" [class.ah-dt-open]="marginOpenClient === c.CLIENTCODE">
+                        <td class="ah-dt-wrap">
+                          <i class="fa" [ngClass]="marginOpenClient === c.CLIENTCODE ? 'fa-caret-down' : 'fa-caret-right'" aria-hidden="true"></i>
+                          {{ c.CLIENTNAME }}
+                          @if (+c.SHARED_JOBS > 0) {
+                            <span class="im-chip dash ah-dt-flag" title="Jobs also billed to another party - this client carries only its share">{{ c.SHARED_JOBS }} shared</span>
+                          }
+                        </td>
+                        <td class="num">{{ count(c.JOBS) }}</td>
+                        <td class="num">{{ rs(c.REVENUE) }}</td>
+                        <td class="num">
+                          {{ rs(c.COST) }}
+                          @if (+c.UNMATCHED_COST > 0.5) {
+                            <span class="im-chip dash ah-dt-flag" title="Cost with no matching charge on the job, shared by income">{{ rs(c.UNMATCHED_COST) }} unmatched</span>
+                          }
+                        </td>
+                        <td class="num" [class.ah-neg]="+c.GOP < 0"><b>{{ rs(c.GOP) }}</b></td>
+                        <td class="num">{{ c.MARGIN_PCT === null ? '-' : c.MARGIN_PCT + '%' }}</td>
+                      </tr>
+                      @if (marginOpenClient === c.CLIENTCODE) {
+                        <tr class="ah-dt-sub">
+                          <td colspan="6">
+                            <table class="ah-dt ah-dt-inner">
+                              <thead>
+                                <tr><th>Job no</th><th>Job date</th><th>Type</th><th class="num">Income</th><th class="num">Expense</th><th class="num">GOP</th><th class="num">Margin %</th></tr>
+                              </thead>
+                              <tbody>
+                                @for (j of clientShares(c.CLIENTCODE); track j) {
+                                  <tr>
+                                    <td>
+                                      <a href="#" class="im-link" (click)="openJob(j.JOBNO, $event)" title="Open the Job Profit statement">{{ j.JOBNO }} <i class="fa fa-external-link" aria-hidden="true"></i></a>
+                                      @if (+j.CLIENTS_ON_JOB > 1) {
+                                        <span class="im-chip ah-dt-flag" title="This job was billed to {{ j.CLIENTS_ON_JOB }} parties; this row is this client's share">split {{ j.CLIENTS_ON_JOB }} ways</span>
+                                      }
+                                    </td>
                                     <td>{{ j.JOB_DATE || '-' }}</td>
                                     <td>{{ j.MODE_ }}</td>
-                                    <td class="ah-dt-wrap">
-                                        {{ j.CLIENTNAME || '-' }}
-                                        @if (j.SHIPPERNAME && j.SHIPPERNAME !== j.CLIENTNAME) {
-<div class="ah-dt-code">cargo of {{ j.SHIPPERNAME }}</div>
-}
-                                    </td>
-                                    <td>
-                                        @if (isTrue(j.IS_BILLED)) {
-<span>{{ j.LAST_BILLED || 'Yes' }}</span>
-}
-                                        @if (!isTrue(j.IS_BILLED)) {
-<span class="ah-dt-red">Not yet</span>
-}
-                                    </td>
                                     <td class="num">{{ rs(j.INCOME) }}</td>
-                                    <td class="num">
-                                        {{ rs(j.EXPENSE) }}
-                                        @if (isTrue(j.IS_BILLED) && +j.EXPENSE === 0) {
-<span class="ah-dt-flag" title="No cost booked yet - the profit on this job is provisional">no cost yet</span>
-}
-                                    </td>
-                                    <td class="num" [class.ah-dt-red]="+j.GOP < 0" [class.ah-dt-green]="+j.GOP > 0"><b>{{ rs(j.GOP) }}</b></td>
+                                    <td class="num">{{ rs(j.EXPENSE) }}</td>
+                                    <td class="num" [class.ah-neg]="+j.GOP < 0">{{ rs(j.GOP) }}</td>
                                     <td class="num">{{ j.MARGIN_PCT === null ? '-' : j.MARGIN_PCT + '%' }}</td>
-                                </tr>
-}
-                                @if (!marginJobs().length) {
-<tr><td colspan="9" class="ah-dt-none">No job matches.</td></tr>
-}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-}
-
-                    <!-- ===== by client, from the split ===== -->
-                    @if (marginView === 'CLIENTS') {
-
-                        <div class="ah-drill-h">Clients <span class="ah-drill-hint">click a client for its share of each job</span></div>
-                        <div class="ah-drill-tools">
-                            <input type="text" class="form-control ah-drill-search" [(ngModel)]="drillSearch" placeholder="Find a client">
-                        </div>
-                        <div class="ah-drill-scroll">
-                            <table class="ah-dt">
-                                <thead>
-                                    <tr>
-                                        <th class="ah-dt-wrap">Client</th>
-                                        <th class="num">Jobs</th>
-                                        <th class="num">Income</th>
-                                        <th class="num">Expense</th>
-                                        <th class="num">GOP</th>
-                                        <th class="num">Margin %</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (c of marginClients(); track c) {
-
-                                        <tr class="ah-dt-click" (click)="toggleMarginClient(c.CLIENTCODE)" [class.ah-dt-open]="marginOpenClient === c.CLIENTCODE">
-                                            <td class="ah-dt-wrap">
-                                                <i class="fa" [ngClass]="marginOpenClient === c.CLIENTCODE ? 'fa-caret-down' : 'fa-caret-right'" aria-hidden="true"></i>
-                                                {{ c.CLIENTNAME }}
-                                                @if (+c.SHARED_JOBS > 0) {
-<span class="ah-dt-flag" title="Jobs also billed to another party - this client carries only its share">{{ c.SHARED_JOBS }} shared</span>
-}
-                                            </td>
-                                            <td class="num">{{ count(c.JOBS) }}</td>
-                                            <td class="num">{{ rs(c.REVENUE) }}</td>
-                                            <td class="num">
-                                                {{ rs(c.COST) }}
-                                                @if (+c.UNMATCHED_COST > 0.5) {
-<span class="ah-dt-flag" title="Cost with no matching charge on the job, shared by income">{{ rs(c.UNMATCHED_COST) }} unmatched</span>
-}
-                                            </td>
-                                            <td class="num" [class.ah-dt-red]="+c.GOP < 0" [class.ah-dt-green]="+c.GOP > 0"><b>{{ rs(c.GOP) }}</b></td>
-                                            <td class="num">{{ c.MARGIN_PCT === null ? '-' : c.MARGIN_PCT + '%' }}</td>
-                                        </tr>
-                                        @if (marginOpenClient === c.CLIENTCODE) {
-<tr class="ah-dt-sub">
-                                            <td colspan="6">
-                                                <table class="ah-dt ah-dt-inner">
-                                                    <thead>
-                                                        <tr><th>Job no</th><th>Job date</th><th>Type</th><th class="num">Income</th><th class="num">Expense</th><th class="num">GOP</th><th class="num">Margin %</th></tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @for (j of clientShares(c.CLIENTCODE); track j) {
-<tr>
-                                                            <td>
-                                                                <a href="#" (click)="openJob(j.JOBNO, $event)" title="Open the Job Profit statement">{{ j.JOBNO }} <i class="fa fa-external-link" aria-hidden="true"></i></a>
-                                                                @if (+j.CLIENTS_ON_JOB > 1) {
-<span class="ah-dt-flag ah-dt-split" title="This job was billed to {{ j.CLIENTS_ON_JOB }} parties; this row is this client's share">split {{ j.CLIENTS_ON_JOB }} ways</span>
-}
-                                                            </td>
-                                                            <td>{{ j.JOB_DATE || '-' }}</td>
-                                                            <td>{{ j.MODE_ }}</td>
-                                                            <td class="num">{{ rs(j.INCOME) }}</td>
-                                                            <td class="num">{{ rs(j.EXPENSE) }}</td>
-                                                            <td class="num" [class.ah-dt-red]="+j.GOP < 0" [class.ah-dt-green]="+j.GOP > 0">{{ rs(j.GOP) }}</td>
-                                                            <td class="num">{{ j.MARGIN_PCT === null ? '-' : j.MARGIN_PCT + '%' }}</td>
-                                                        </tr>
-}
-                                                    </tbody>
-                                                </table>
-                                            </td>
-                                        </tr>
-}
-                                    
-}
-                                    @if (!marginClients().length) {
-<tr><td colspan="6" class="ah-dt-none">No client matches.</td></tr>
-}
-                                </tbody>
+                                  </tr>
+                                }
+                              </tbody>
                             </table>
-                        </div>
-                    
-}
-
-                    <div class="ah-drill-note">
-                        Jobs opened from the 1st of this month. Income is from the invoices on each job (net of GST); expense is the purchase bills,
-                        payments and journal entries booked against the job number. The same rows make up the GOP and Margin cards.
-                    </div>
-                
-}
-            </div>
-        </div>
-    </div>
-}
-
-    @if (info) {
-<div class="ah-modal-back" (mousedown)="closeOnBackdrop($event)">
-        <div class="x-card ah-help ah-explain" (click)="$event.stopPropagation()" role="dialog" aria-modal="true"
-             [style.transform]="'translate(' + dragX + 'px, ' + dragY + 'px)'">
-            <div class="x-card-head ah-drag-handle" (mousedown)="startDrag($event)" title="Drag to move">
-                <span class="ah-kpi-ico ah-ico-blue ah-explain-ico"><i class="fa" [ngClass]="icons[info]" aria-hidden="true"></i></span>
-                <h2 class="x-card-title">{{titles[info]}}</h2>
-                <button type="button" class="x-btn x-btn-classic x-iconbtn ah-close" (click)="info = ''" title="Close">
-                    <i class="fa fa-times" aria-hidden="true"></i>
-                </button>
-            </div>
-            <div class="x-card-body ah-explain-body">
-                <div class="ah-explain-h">What it means</div>
-                <p class="ah-explain-text">{{explain[info]}}</p>
-                @if (gap(info)) {
-<div class="ah-explain-gap">
-                    <div class="ah-explain-h ah-explain-h-gap"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Where the gap is</div>
-                    <p class="ah-explain-text">{{gap(info)}}</p>
+                          </td>
+                        </tr>
+                      }
+                    }
+                    @if (!marginClients().length) {
+                      <tr><td colspan="6" class="ah-dt-none">No client matches.</td></tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+              @if (pgInfo(marginClients(), 'mcli'); as pi) {
+                <div class="pg">
+                  <span>Showing {{ pi.from }}&ndash;{{ pi.to }} of {{ count(pi.n) }}</span>
+                  @if (pi.pages > 1) {
+                    <span class="pg-btns">
+                      <button type="button" class="btn sm" [disabled]="pi.p === 0" (click)="goPage('mcli', pi.p - 1, $event)">&lsaquo; Prev</button>
+                      <span class="pg-n">{{ pi.p + 1 }} / {{ pi.pages }}</span>
+                      <button type="button" class="btn sm" [disabled]="pi.p >= pi.pages - 1" (click)="goPage('mcli', pi.p + 1, $event)">Next &rsaquo;</button>
+                    </span>
+                  }
                 </div>
-}
+              }
+            }
+            <div class="ah-drill-note">
+              Jobs opened from the 1st of this month. Income is from the invoices on each job (net of GST); expense is the purchase bills,
+              payments and journal entries booked against the job number. The same rows make up the GOP and Margin cards.
             </div>
+          }
         </div>
+      </div>
     </div>
-}
-
-    <!-- ================= HOW TO READ (modal, from the ? button) ================= -->
-    @if (helpOpen) {
-<div class="ah-modal-back" (click)="helpOpen = false">
-    <div class="x-card ah-help" (click)="$event.stopPropagation()">
-        <div class="x-card-head">
-            <i class="fa fa-info-circle" aria-hidden="true"></i>
-            <h2 class="x-card-title">How to read this page</h2>
-            <span class="ah-head-sub">every figure in plain words. The icon on any card opens the same note.</span>
-            <button type="button" class="x-btn x-btn-classic x-iconbtn ah-close" (click)="helpOpen = false" title="Close">
-                <i class="fa fa-times" aria-hidden="true"></i>
-            </button>
+  }
+  <!-- ================= EXPLANATION POPUP (any icon on the page) ================= -->
+  @if (info) {
+    <div class="ah-modal-back" (mousedown)="closeOnBackdrop($event)">
+      <div class="im-card ah-help ah-explain" (click)="$event.stopPropagation()" role="dialog" aria-modal="true"
+        [style.transform]="'translate(' + dragX + 'px, ' + dragY + 'px)'">
+        <div class="im-card-h ah-drag-handle" (mousedown)="startDrag($event)" title="Drag to move">
+          <div class="ah-h">
+            <span class="ah-ico ah-ico-static"><i class="fa" [ngClass]="icons[info]" aria-hidden="true"></i></span>
+            <h2>{{titles[info]}}</h2>
+          </div>
+          <button type="button" class="im-btn im-btn-g ah-close" (click)="info = ''" title="Close" aria-label="Close">
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
         </div>
-        <div class="x-card-body ah-help-grid">
-            <div class="ah-help-item"><b>Month to date</b><span>From the 1st of this month up to today. "Last month" means the same number of days in the previous month, so the comparison is fair.</span></div>
-            <div class="ah-help-item"><b>Invoiced</b><span>Total of tax invoices raised in the period, GST included. Proforma invoices are not counted.</span></div>
-            <div class="ah-help-item"><b>Collected</b><span>Receipts and journal adjustments applied against invoices in the period. Money received but not yet matched to a bill is not here.</span></div>
-            <div class="ah-help-item"><b>Outstanding</b><span>What all clients still owe today, after receipts and credit notes already applied. A balance, not a monthly figure.</span></div>
-            <div class="ah-help-item"><b>Overdue</b><span>The part of Outstanding that has crossed the client's credit period. Follow these up first.</span></div>
-            <div class="ah-help-item"><b>Ageing</b><span>Outstanding split by days since the invoice date. Green is fresh; red has been unpaid for more than 180 days.</span></div>
-            <div class="ah-help-item"><b>Jobs opened</b><span>Shipments registered in the period, by mode. Billed means at least one tax invoice exists on the job; Unbilled means none yet.</span></div>
-            <div class="ah-help-item"><b>GOP</b><span>Gross operating profit: billed value minus purchase cost on jobs opened in the period. Costs are often booked before the sale invoice, so early in the month GOP can look low or negative.</span></div>
-            <div class="ah-help-item"><b>Margin</b><span>GOP as a percentage of revenue. 20% means 20 rupees kept from every 100 rupees billed.</span></div>
-            <div class="ah-help-item"><b>Cash position</b><span>What clients owe us minus what we owe suppliers, both as of today. Supplier bills are read for the last 12 months; older unpaid ones are treated as dead data.</span></div>
-            <div class="ah-help-item"><b>Cash forecast</b><span>Open amounts on both sides grouped by when they fall due, net of unapplied receipts and supplier advances. "Already overdue" is due now and equals the Overdue card. Where a supplier bill has no credible due date, 30 days from the bill date is assumed.</span></div>
-            <div class="ah-help-item"><b>Days to collect / pay</b><span>How long invoices and supplier bills of the last 90 days took to settle, weighted by value. If we pay faster than we collect, the gap is funded from our own cash.</span></div>
-            <div class="ah-help-item"><b>Clients to ask about</b><span>Overdue clients ranked by money unpaid for over 180 days. "Pays in" is their actual settlement time against the agreed credit period.</span></div>
-            <div class="ah-help-item"><b>Earned but not collected</b><span>Invoices waiting for authorisation (the same list as the Authorisation screen, for this branch), proformas not converted, shipments still unbilled after 15 days, and receipts not matched to a bill. Each line opens the screen that clears it.</span></div>
-            <div class="ah-help-item"><b>Change pills</b><span>Green means better than last month, red means worse. For Overdue and Cost, going up is red.</span></div>
-            <div class="ah-help-item"><b>As of</b><span>Figures are computed once and reused for 10 minutes. Refresh recomputes them now.</span></div>
-            <div class="ah-help-item"><b>Source</b><span>All numbers use the same rules as the Finance Dashboard, so the two agree for the same period.</span></div>
+        <div class="ah-explain-body">
+          <div class="ah-explain-h">What it means</div>
+          <p class="ah-explain-text">{{explain[info]}}</p>
+          @if (gap(info)) {
+            <div class="ah-explain-gap">
+              <div class="ah-explain-h"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Where the gap is</div>
+              <p class="ah-explain-text">{{gap(info)}}</p>
+            </div>
+          }
         </div>
+      </div>
     </div>
-    </div>
-}
+  }
 </div>
 }

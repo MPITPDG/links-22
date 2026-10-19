@@ -1,14 +1,27 @@
-<div class="modal-header" style="background-color: #62bada;height: 30px;font-family: Verdana;
-    font-size: 15px;display:flex;align-items:center;justify-content:space-between;">
-  <strong>INVOICE DETAIL VIEW</strong>
-  <!--  Switch to the new audit layout for the same invoice. Both are live while the design
-        is being agreed; neither replaces the other yet.                                  -->
-  <button type="button" (click)="showNew()"
-          style="border:1px solid #2F80ED;background:#fff;color:#1C6DD0;border-radius:4px;
-                 padding:1px 9px;font-size:12px;font-family:Verdana;cursor:pointer;">
-    New view &rarr;
-  </button>
-</div>
+<!-- Finance view popup: page kit header + legacy content restyled in place (.x-legacy, recipe 3,
+     ported from MPERPNG-20). Markup below is the original apart from the removed coloured title
+     band and inline colours; every binding and handler is unchanged. Links-only: the
+     "New view" switch to the audit layout (showNew) and the INV_CURRATE1 cell. -->
+<div class="im-page cp-page">
+  <div class="cp-head">
+    <div class="ph">
+      <div>
+        <h1>Invoice detail view</h1>
+        <p>General, job, billing and charge details of the tax invoice.</p>
+        <div class="cp-chips">
+          <span class="chip solid">Invoice {{INV_NO || '—'}}</span>
+          <span class="chip">{{INV_DATE}}</span>
+          @if (SUPPLYTYPE) { <span class="chip">{{SUPPLYTYPE}}</span> }
+        </div>
+      </div>
+      <div class="tools">
+        <!--  Switch to the new audit layout for the same invoice. Both are live while the design
+              is being agreed; neither replaces the other yet.                                  -->
+        <button type="button" class="btn g" (click)="showNew()">New view &rarr;</button>
+      </div>
+    </div>
+  </div>
+  <div class="cp-body x-legacy im-entry">
 <div class="modal-body">
   <div class="row no-gutters">
     <div class="col-1"></div>
@@ -303,5 +316,7 @@
     <div class="col-1"></div>
   </div>
 </div>
-<div class="modal-footer" style="background-color: #62bada;height: 30px;">
+<div class="modal-footer" style="height: 30px">
+</div>
+  </div>
 </div>

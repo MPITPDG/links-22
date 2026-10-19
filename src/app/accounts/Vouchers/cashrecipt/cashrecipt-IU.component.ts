@@ -9,6 +9,7 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
 @Component({
   selector: 'app-cashrecipt-IU',
   templateUrl: './cashrecipt-IU.component.html',
+  styleUrls: ['../vouchers-page.css'],
   styles: [],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false

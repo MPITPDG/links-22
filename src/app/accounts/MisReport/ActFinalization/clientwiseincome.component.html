@@ -1,83 +1,55 @@
-<div class="animated fadeIn" >  
-    @if (displayType=='SEARCH') {
-<div class="row no-gutters" >
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{Header}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Accounts -> MIS -> Account finalization -> Clientwise income tax / supplierwise expense (route Mode).
+  Download-only: ExportData() -> ACC_MIS_INCOME_TAX, workbook built client-side. The legacy
+  displayType == 'SEARCH' guard is kept.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Header }}</h1>
+      <p>{{ PageType }} for one account and period &middot; downloads an Excel workbook</p>
     </div>
-}
-    @if (displayType=='SEARCH') {
-<div class="row no-gutters">
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
+  </div>
 
-                <tr>
-                    <td class="col-form-span-heading" colspan="6"> <b>{{PageType}}</b> </td>
-           </tr>
-           <tr class="trbg">
-            <td  class="width150">
-                <span  class="col-form-span-label"><b>City</b> </span><span
-                class="col-form-span-error">*</span>
-            </td>
-            <td colspan="3">
-              
-                <div class="leftlabel">
-                    <span class="col-form-span-label">
-                        <input type="radio" name="radioDisplay" value="ALL" [(ngModel)]="CITYCODE" />&nbsp;All </span>&nbsp;&nbsp;&nbsp;&nbsp;
-                    <span class="col-form-span-label">
-                        <input type="radio" name="radioDisplay" value="1" [(ngModel)]="CITYCODE"  />&nbsp;Only {{CITYNAME}}</span>
-                </div>
-            </td>
-        </tr>
-                <tr>
-                    <td >
-                        <span  class="col-form-span-label"><b>Account </b> </span><span
-                        class="col-form-span-error">*</span>
-                    </td>
-
-                            <td colspan="3" >
-                               <ng-select   [items]="AccountList" bindLabel="ACCTNAME"
-                               bindValue="ACCTCODE"  [(ngModel)]="Account" (ngModelChange)="GetAccountName($event)"
-                               class="custom" placeholder="--Please Select--">
-                                </ng-select>
-                            </td>
-                </tr>
-                <tr>
-
-                    <td><span class="col-form-span-label"><b>From</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                <td>
-                    <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)"  [options]="myDatePickerOptions"
-                        class="form-control"  [selDate]="FromDate"    ></my-date-picker>
-                </td>
-                    <td><span class="col-form-span-label"><b>To </b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td><my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)"  [options]="myDatePickerOptions"
-                            class="form-control"  [selDate]="ToDate"   ></my-date-picker>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="6" class="centerlabel">
-                        <button class="btn btn-sm btn-primary" type="submit" (click)="ExportData()" > <span
-                                class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
-                                Export To Excel </span></button>&nbsp;
-                    </td>
-                </tr>
-            </table>
+  <div class="card sec">
+    <div class="card-h"><h2>Account and period</h2><span class="meta"><b>*</b> required</span></div>
+    <div class="fields">
+      <div class="fld full">
+        <label>City <span class="req">*</span></label>
+        <div class="fk-opts">
+          <label><input type="radio" name="radioDisplay" value="ALL" [(ngModel)]="CITYCODE" /> All</label>
+          <label><input type="radio" name="radioDisplay" value="1" [(ngModel)]="CITYCODE" /> Only {{CITYNAME}}</label>
         </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
+      </div>
+      <div class="fld full">
+        <label>Account <span class="req">*</span></label>
+        <ng-select [items]="AccountList" bindLabel="ACCTNAME" bindValue="ACCTCODE" [(ngModel)]="Account" (ngModelChange)="GetAccountName($event)"
+          class="custom" placeholder="--Please Select--"></ng-select>
+      </div>
+      <div class="fld full">
+        <label>Quick period</label>
+        <div class="fk-seg">
+          @for (p of periods; track p.key) {
+            <button type="button" [class.on]="period === p.key" (click)="setPeriod(p.key)">{{ p.label }}</button>
+          }
         </div>
+      </div>
+      <div class="fld">
+        <label>From <span class="req">*</span></label>
+        <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event); period = ''" [options]="myDatePickerOptions" [selDate]="FromDate"></my-date-picker>
+      </div>
+      <div class="fld">
+        <label>To <span class="req">*</span></label>
+        <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event); period = ''" [options]="myDatePickerOptions" [selDate]="ToDate"></my-date-picker>
+      </div>
     </div>
-}
+    <div class="fk-note">The report downloads as an Excel file; nothing is listed on this screen.</div>
+  </div>
+
+  <div class="bar">
+    <span class="note">The output is an Excel file; nothing is listed on this screen.</span>
+    <div class="r">
+      @if (displayType=='SEARCH') {<button class="btn p" type="submit" (click)="ExportData()">Export to Excel</button>}
+    </div>
+  </div>
 </div>
-

@@ -6,7 +6,9 @@ import { LoginService } from '../../shared/service/loginService';
 @Component({
   selector: 'app-invoice-view',
   templateUrl: './invoice-view.component.html',
-  styles: [],
+  // Recipe 3 (from MPERPNG-20): page shell + legacy content restyled in place (.x-legacy.im-entry,
+  // global kit). The two view-popup stylesheets are component-local :host ::ng-deep rules.
+  styleUrls: ['../export/consign-popup.css', './acc-popup-view.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -66,17 +68,18 @@ export class InvoiceViewComponent implements OnInit {
     this._dataService.getData("Accounts/ACC_invoice_view", jsonmaster)
       .subscribe((data: any) => {
     //    console.log(data)
-       if(data.Table[0].STATUS=="#100"){
-      this.datatabl_1=data.Table1
-       this.datatabl_2=data.Table2
-       this.datatabl_3=data.Table3
-       this.datatabl_4=data.Table4
-       this.datatabl_5=data.Table5
-       this.datatabl_6=data.Table6
-       this.datatabl_7=data.Table7
-       this.datatabl_8=data.Table8
-       this.datatabl_9=data.Table9
-       this.datatabl_10=data.Table10
+       // fail soft: a reply without the status / header tables leaves the empty view, loader off
+       if(data && data.Table && data.Table[0] && data.Table[0].STATUS=="#100" && data.Table2 && data.Table2[0]){
+      this.datatabl_1=data.Table1 || []
+       this.datatabl_2=data.Table2 || []
+       this.datatabl_3=data.Table3 || []
+       this.datatabl_4=data.Table4 || []
+       this.datatabl_5=data.Table5 || []
+       this.datatabl_6=data.Table6 || []
+       this.datatabl_7=data.Table7 || []
+       this.datatabl_8=data.Table8 || []
+       this.datatabl_9=data.Table9 || []
+       this.datatabl_10=data.Table10 || []
  
        this.INV_NO=data.Table2[0].INV_NO
        this.INV_DATE=data.Table2[0].INV_DATE
@@ -103,7 +106,7 @@ export class InvoiceViewComponent implements OnInit {
        this.loaderService.display(false)
        }
        else{this.loaderService.display(false);}
-      })
+      }, () => this.loaderService.display(false))
   }
   /*  The same invoice in the new audit layout, kept alongside this one so the
       two can be compared before anything is retired.                       */

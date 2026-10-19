@@ -1,83 +1,57 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{PageName|uppercase}}</strong>
-                           
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Accounts -> MIS -> Job profit -> Consignee wise.
+  Download-only: Exporttoexcel() posts the request and downloads the generated file
+  (downloadFile -> DataService.postAndGetResponsezip). Handlers unchanged; the consignee
+  (change) now tolerates clearing the select.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ PageName | titlecase }}</h1>
+      <p>Job profit for a consignee by mode and period &middot; downloads a file</p>
     </div>
-    <div class="row no-gutters">
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr >
-                    <td  >
-                       <span class="col-form-span-label"><b>Consignee :</b> </span></td>
-                    <td colspan="3">
-                        <ng-select   [items]="ConsigneeList" bindLabel="con_name" 
-                               bindValue="concode"  [(ngModel)]="consignee"   (change)="GetconsigneeName($event.con_name)"
-                               class="custom width300" placeholder="--All--"> 
-                                </ng-select>
-            
-                    </td>
-                </tr>
-     
-                <tr >
-                    <td  >
-                       <span class="col-form-span-label"><b>Mode :</b> </span></td>
-                    <td  colspan="3" style="text-align: left;">
-                       
-                   
-                        <div style="display: inline-flex;" class="col-form-span-label">
-                            <input type="radio"  name="modetype_radio" value='SEA' (change)="getmodevalue(modetype)"
-                                [(ngModel)]="modetype"  >&nbsp;<b>Sea  </b>
-                                &nbsp;<input type="radio"name="modetype_radio" value='AIR' (change)="updateDtlable(modetype)"
-                                [(ngModel)]="modetype" >&nbsp;<b>Air  </b>
-                                &nbsp;
-                        </div>
-                       
-                    </td>
-                </tr>
-               
-                <tr >
-                    <td  >
-                       <span class="col-form-span-label"><b>Date :</b> </span></td>
-                    <td colspan="3" style="text-align: left;">
-                        <div style="display: inline-flex;">
-                            <span class="col-form-span-label">From &nbsp;</span>
-                            <my-date-picker name="FromDate" [options]="myDatePickerOptions" 
-                                [(ngModel)]="FromDate" ></my-date-picker> &nbsp;
-                            <span class="col-form-span-label">To &nbsp;</span>
+  </div>
 
-                            <my-date-picker name="ToDate" [options]="myDatePickerOptions"
-                                [(ngModel)]="ToDate" ></my-date-picker>
-                        </div>
-                    </td>
-
-                </tr>
-              
-                <tr  >
-                    <td colspan="6" class="centerlabel">
-                   
-                            <button class="btn btn-sm btn-primary" type="submit" (click)="Exporttoexcel()">
-                                <span class="col-form-span-label"><i class="fa fa-file-excel-o"></i> Export to Excel</span>
-                               </button> 
-                             
-                <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
-                        (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
-                    </td>
-                    </tr>
-            </table>
+  <div class="card sec">
+    <div class="card-h"><h2>Consignee, mode and period</h2><span class="meta"><b>*</b> required</span></div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Consignee</label>
+        <ng-select [items]="ConsigneeList" bindLabel="con_name" bindValue="concode" [(ngModel)]="consignee" (change)="GetconsigneeName($event?.con_name)"
+          class="custom" placeholder="--All--"></ng-select>
+      </div>
+      <div class="fld full">
+        <label>Mode</label>
+        <div class="fk-opts">
+          <label><input type="radio" name="modetype_radio" value="SEA" (change)="getmodevalue(modetype)" [(ngModel)]="modetype"> Sea</label>
+          <label><input type="radio" name="modetype_radio" value="AIR" (change)="updateDtlable(modetype)" [(ngModel)]="modetype"> Air</label>
         </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
+      </div>
+      <div class="fld full">
+        <label>Quick period</label>
+        <div class="fk-seg">
+          @for (p of periods; track p.key) {
+            <button type="button" [class.on]="period === p.key" (click)="setPeriod(p.key)">{{ p.label }}</button>
+          }
         </div>
+      </div>
+      <div class="fld">
+        <label>From</label>
+        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate" (dateChanged)="period = ''"></my-date-picker>
+      </div>
+      <div class="fld">
+        <label>To</label>
+        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate" (dateChanged)="period = ''"></my-date-picker>
+      </div>
     </div>
+    <div class="fk-note">The file is generated on the server and downloads automatically; nothing is listed on this screen.</div>
+  </div>
+
+  <div class="bar">
+    <span class="note">The output is an Excel file; nothing is listed on this screen.</span>
+    <div class="r">
+      <button class="btn g" type="reset" (click)="Reset(); period = ''">Reset</button>
+      <button class="btn p" type="submit" (click)="Exporttoexcel()">Export to Excel</button>
+    </div>
+  </div>
 </div>

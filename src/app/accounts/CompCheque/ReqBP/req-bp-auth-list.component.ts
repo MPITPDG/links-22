@@ -12,10 +12,11 @@ import { DatePipe } from '@angular/common';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 
 @Component({
-  selector: 'app-req-bp-auth-list',
-  templateUrl: './req-bp-auth-list.component.html',
-  styles: [],
-  providers: [DatePipe],
+    selector: 'app-req-bp-auth-list',
+    templateUrl: './req-bp-auth-list.component.html',
+    // Page kit is global (src/styles/kit); kit-cheque scopes cheque-page.css.
+    host: { class: 'kit-cheque' },
+    providers: [DatePipe],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -29,6 +30,8 @@ export class ReqBPAuthListComponent implements OnInit {
   order: string = 'ENTRYDT1';
   reverse: boolean = true;
   PageActual: number = 1;
+  readonly pageSize = 10;
+  page: number = 1;
   newarray: any=[];
   entry_nos: string='';
   chk_authflg: string='';
@@ -176,14 +179,16 @@ export class ReqBPAuthListComponent implements OnInit {
     this.showModal_ListReject=false
   }
   getCheckboxValues(event, entryno,chkflag,authdate) {
-    var index = this.newarray.findIndex(x => x.ENTRYNO == entryno);
+    // entries are stored as { EntryNo }, so match on that (x.ENTRYNO never matched, and
+    // splice(-1, 1) then dropped the last selected request instead of the unticked one)
+    var index = this.newarray.findIndex(x => x.EntryNo == entryno);
     if (event) {
       let obj = {
         EntryNo: entryno,    
       }
       this.newarray.push(obj);
     }
-    else {
+    else if (index >= 0) {
       this.newarray.splice(index, 1);
     }
   }
@@ -217,7 +222,9 @@ export class ReqBPAuthListComponent implements OnInit {
   //   this.exportser.exportExcel(this.details, 'ChequePrint');
   // }
   exp_exl(){
-
+    // nothing to export; and start from an empty sheet each time (rows used to pile up)
+    if (!this.DataList || !this.DataList.length) { return; }
+    this.details = [];
     this.DataList.forEach((row: any) => {
       this.details.push(Object.values(row))
     })
@@ -254,4 +261,32 @@ export class ReqBPAuthListComponent implements OnInit {
     window.open('./#/popup/Account-Request-Bank-Payment-print/' + entryno + '/' , "BPRequest View", toolbar);
 }
 
+
+  // ---------- list: same filter + sort as the old ReqBPFilter / orderBy pipes, 10/page ----------
+  get Filtered(): Array<any> {
+    const q = (this.searchString || '').trim().toLowerCase();
+    let list: Array<any> = this.DataList || [];
+    if (q) {
+      list = list.filter((r: any) => [r.ENTRYNO, r.CREATEDBY, r.ENTRYDT, r.CHEQUEDT, r.PAYEENAME, r.AMOUNT, r.USERNAME, r.TYPE, r.SUP_INV_DT]
+        .some(v => String(v == null ? '' : v).toLowerCase().indexOf(q) >= 0));
+    }
+    return this.orderPipe.transform(list, this.order, this.reverse, true);
+  }
+  get pageCount(): number { return Math.max(1, Math.ceil(this.Filtered.length / this.pageSize)); }
+  get curPage(): number { return Math.min(this.page, this.pageCount); }
+  get pageRows(): Array<any> { const s = (this.curPage - 1) * this.pageSize; return this.Filtered.slice(s, s + this.pageSize); }
+  get rangeStart(): number { return this.Filtered.length ? (this.curPage - 1) * this.pageSize + 1 : 0; }
+  get rangeEnd(): number { return Math.min(this.curPage * this.pageSize, this.Filtered.length); }
+  get pageList(): number[] {
+    const n = this.pageCount, p = this.curPage;
+    if (n <= 7) { return Array.from({ length: n }, (_, i) => i + 1); }
+    const out: number[] = [1];
+    const lo = Math.max(2, p - 1), hi = Math.min(n - 1, p + 1);
+    if (lo > 2) { out.push(0); }
+    for (let i = lo; i <= hi; i++) { out.push(i); }
+    if (hi < n - 1) { out.push(0); }
+    out.push(n);
+    return out;
+  }
+  goPage(p: number) { if (p >= 1 && p <= this.pageCount) { this.page = p; } }
 }

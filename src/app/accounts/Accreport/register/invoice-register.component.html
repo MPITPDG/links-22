@@ -1,61 +1,48 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{PageName|uppercase}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Accounts -> Reports -> Register -> {{PageName}} (invoice / cashbook / purchase / brokerage /
+  storage / credit note / EXPWOP, chosen by the route's PageType).
+  Download-only: expt_exl() / expt_exl_details() fetch the rows and build the workbook
+  client-side (ExportexcelService). Nothing is displayed on screen.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ PageName }}</h1>
+      <p>Date-wise register for the current financial year &middot; downloads an Excel workbook</p>
     </div>
-    <div class="row no-gutters">
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
+  </div>
 
-                <tr>
-                    <td class="col-form-span-heading" colspan="4" style="text-align: left;" >
-                        <b>Date Wise</b>
-                    </td>
-                </tr>   
-                <tr>
-                  
-                    <td ><span class="col-form-span-label"><b>From</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                <td  style="text-align: left;">              
-                    <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate"  (dateChanged)="InvoiceDateChanged($event,'F')"  ></my-date-picker>
-                </td>
-                    <td><span class="col-form-span-label"><b>To </b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td  style="text-align: left;">              
-                        <my-date-picker name="ToDate" [options]="myDatePickerOptions"  [(ngModel)]="ToDate"  (dateChanged)="InvoiceDateChanged($event,'T')"></my-date-picker>
-                    </td>
-                </tr>
-        
-
-                <tr>
-                    <td colspan="6" class="centerlabel">
-                        @if (PageType=='Invoice') {
-<button class="btn btn-sm btn-primary" type="submit" (click)="expt_exl_details()"> <span
-                                class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
-                                Export To Excel Details</span></button>
-}&nbsp;
-                                <button class="btn btn-sm btn-primary" type="submit" (click)="expt_exl()"> <span
-                                    class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
-                                    Export To Excel </span></button>&nbsp;
-                        <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
-                                (click)="clear();"><i class="fa fa-ban"></i>Clear</span></button>
-                    </td>
-                </tr>
-            </table>
+  <div class="card sec">
+    <div class="card-h"><h2>Date wise</h2><span class="meta"><b>*</b> required &middot; within the financial year</span></div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Quick period</label>
+        <div class="fk-seg">
+          @for (p of periods; track p.key) {
+            <button type="button" [class.on]="period === p.key" (click)="setPeriod(p.key)">{{ p.label }}</button>
+          }
         </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
+      </div>
+      <div class="fld">
+        <label>From <span class="req">*</span></label>
+        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate" (dateChanged)="InvoiceDateChanged($event,'F'); period = ''"></my-date-picker>
+      </div>
+      <div class="fld">
+        <label>To <span class="req">*</span></label>
+        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate" (dateChanged)="InvoiceDateChanged($event,'T'); period = ''"></my-date-picker>
+      </div>
     </div>
-   
+    <div class="fk-note">The register downloads as an Excel file.@if (PageType=='Invoice') { Export to Excel details adds the account-wise breakdown.}</div>
+  </div>
+
+  <div class="bar">
+    <span class="note">Dates must fall inside your financial year.</span>
+    <div class="r">
+      <button class="btn g" type="reset" (click)="clear(); period = ''">Clear</button>
+      @if (PageType=='Invoice') {
+        <button class="btn g" type="submit" (click)="expt_exl_details()">Export to Excel details</button>
+      }
+      <button class="btn p" type="submit" (click)="expt_exl()">Export to Excel</button>
+    </div>
+  </div>
 </div>

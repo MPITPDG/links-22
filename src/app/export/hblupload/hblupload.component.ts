@@ -9,7 +9,7 @@ import { IMyDpOptions } from 'mydatepicker';
 @Component({
     selector: 'app-export-uploadhbl',
     templateUrl: './hblupload.component.html',
-    styles: [],
+    styleUrls: ['./hblupload.component.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -32,7 +32,7 @@ import { IMyDpOptions } from 'mydatepicker';
         };
     @ViewChild('inputFile',{static:false}) myInputVariable: ElementRef;
     fromdate;todate;
-    Header:string="HBL UPLOAD";
+    Header:string="HBL upload";
     filesToUpload: Array<File>;
     selectedFileNames: string[] = [];
     FileName:string;

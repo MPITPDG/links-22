@@ -14,6 +14,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-userprofilesearch',
     templateUrl: 'userprofile-search.component.html',
+    styleUrls: ['../admin-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -22,6 +23,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 export class userprofilesearch implements OnInit  {
     config: any; 
     Reqlist:any=[];
+    searchString: string = '';   // client-side filter (userfilerpipe); presentation only
       
     constructor(
         private _activatedRoute: ActivatedRoute,
@@ -41,9 +43,9 @@ export class userprofilesearch implements OnInit  {
         this.loaderService.display(true);
         this._dataService.getAll("Admin/Fill_UserPopulate")
         .subscribe((data: any) => {
-             this.Reqlist=data.Table;
+             this.Reqlist=data?.Table || [];   // fail soft: no Table -> empty state
              this.loaderService.display(false);
-        });
+        }, () => { this.Reqlist = []; this.loaderService.display(false); });
         this.config = {
             itemsPerPage: 25,
             currentPage: 1,

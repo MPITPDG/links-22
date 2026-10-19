@@ -1,23 +1,159 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <!--<div class="col-sm-3">
-        </div>
-        <div class="col-sm-6">
-        </div>
-        <div class="col-sm-3">
-        </div>-->
-		<div class="selectormodule open">
-			<ul>
-				@for (obj of moduleData; track obj) {
-<li [ngStyle]="obj.listyle">
-					<label for="{{ 'c'+ obj.id}}"  [ngStyle]="obj.labelstyle" (click)="modules(obj.moduleid, obj.url)">
-						<i class="{{obj.icon}}"></i><br />
-						<b><u>{{obj.name}}</u></b>
-					</label>
-				</li>
-}
-			</ul>
-			<button>MODULES</button>
-		</div>
-    </div>
+<!--
+  Module picker (ported from MPERPNG-20; Links' module list). Left: title, search and the modules grouped by purpose.
+  Right: the segmented donut, one segment per module; hovering either side
+  highlights the same module in both and describes it in the donut's centre.
+
+  Entering a module or a screen always goes through modules(moduleid, url), so
+  E-Doc still opens in a new tab, unfinished modules still say so, and Links'
+  own access checks are exactly what they were.
+-->
+<div class="mp-page">
+  <app-hub-steps current="module" />
+
+  <div class="mp-main">
+  <div class="mp-shell">
+
+    <!-- left -->
+    <section class="mp-side">
+      <h1 class="mp-heading">Modules</h1>
+      <p class="mp-lede">Pick where to work, or search for a screen directly.</p>
+
+      <button type="button" class="mp-search" (click)="openPalette()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+        <span>Search screens</span>
+        <kbd class="mp-kbd">Ctrl K</kbd>
+      </button>
+
+      <div class="mp-groups">
+        @for (g of groups; track g.key) {
+          @if (modulesIn(g.key).length) {
+            <div class="mp-group">
+              <div class="mp-group-head">
+                <span class="mp-dot" [style.background]="g.color"></span>
+                {{ g.label }}
+              </div>
+              @for (seg of modulesIn(g.key); track seg.m.moduleid) {
+                <button type="button" class="mp-item"
+                        [class.is-hover]="hovered === seg.m" [class.is-soon]="isSoon(seg.m)"
+                        (mouseenter)="hovered = seg.m" (mouseleave)="hovered = null"
+                        (focus)="hovered = seg.m" (blur)="hovered = null"
+                        (click)="modules(seg.m.moduleid, seg.m.url)">
+                  <span class="mp-item-icon" [style.--c]="g.color"><i [class]="iconClass(seg.m)" aria-hidden="true"></i></span>
+                  <span class="mp-item-name">{{ seg.m.name }}</span>
+                  @if (isSoon(seg.m)) { <span class="mp-chip">Soon</span> }
+                  @else if (isExternal(seg.m)) { <span class="mp-chip">New tab</span> }
+                  @else {
+                    <svg class="mp-item-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+                  }
+                </button>
+              }
+            </div>
+          }
+        }
+      </div>
+    </section>
+
+    <!-- right -->
+    <section class="mp-stage">
+      <svg class="mp-donut" viewBox="-10 -10 420 420" role="group" aria-label="Modules">
+        @for (seg of segments; track seg.m.moduleid) {
+          <g class="mp-seg" tabindex="0" role="button"
+             [class.is-soon]="isSoon(seg.m)"
+             [class.is-hover]="hovered === seg.m"
+             [class.is-dim]="hovered && hovered !== seg.m"
+             [attr.aria-label]="seg.m.name + ', ' + seg.group + (isSoon(seg.m) ? ', coming soon' : '')"
+             [attr.transform]="hovered === seg.m && !isSoon(seg.m) ? 'translate(' + seg.dx + ' ' + seg.dy + ')' : null"
+             (mouseenter)="hovered = seg.m" (mouseleave)="hovered = null"
+             (focus)="hovered = seg.m" (blur)="hovered = null"
+             (click)="modules(seg.m.moduleid, seg.m.url)"
+             (keydown.enter)="modules(seg.m.moduleid, seg.m.url)">
+            <path [attr.d]="seg.d" [attr.fill]="seg.color" class="mp-seg-path" />
+            <foreignObject [attr.x]="seg.lx - 40" [attr.y]="seg.ly - 22" width="80" height="44" class="mp-seg-fo">
+              <div class="mp-seg-label">
+                <i [class]="iconClass(seg.m)" aria-hidden="true"></i>
+                <span>{{ seg.m.name }}</span>
+              </div>
+            </foreignObject>
+          </g>
+        }
+      </svg>
+
+      <div class="mp-center">
+        @if (hoveredSeg; as h) {
+          <div class="mp-center-in">
+            <span class="mp-center-group" [style.color]="h.color">{{ h.group }}</span>
+            <span class="mp-center-title">{{ h.m.name }}</span>
+            <span class="mp-center-desc">{{ isSoon(h.m) ? 'Coming soon' : h.desc }}</span>
+          </div>
+        } @else {
+          <div class="mp-center-in">
+            <img class="mp-center-logo" src="assets/img/Untitled-1.png" alt="" />
+            <span class="mp-center-brand">Links Group</span>
+            <span class="mp-center-desc">Hover a module to explore</span>
+          </div>
+        }
+      </div>
+    </section>
+
+  </div>
+  </div>
 </div>
+
+<!-- command palette -->
+@if (paletteOpen) {
+  <div class="mp-scrim" (click)="closePalette()">
+    <div class="mp-palette" role="dialog" aria-modal="true" aria-label="Search modules and screens" (click)="$event.stopPropagation()">
+
+      <div class="mp-pal-field">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+        <input #paletteInput class="mp-pal-input" type="text" autocomplete="off" spellcheck="false"
+               placeholder="Search modules and screens"
+               [value]="paletteQuery"
+               (input)="onPaletteInput($any($event.target).value)"
+               (keydown.arrowdown)="movePalette(1, $event)"
+               (keydown.arrowup)="movePalette(-1, $event)"
+               (keydown.enter)="choosePalette()" />
+        <kbd class="mp-kbd">Esc</kbd>
+      </div>
+
+      <div class="mp-pal-list">
+        @for (it of paletteItems; track $index; let i = $index) {
+          @if (i === 0 && it.kind === 'module') { <div class="mp-pal-group">Modules</div> }
+          @if (it.kind === 'screen' && (i === 0 || paletteItems[i - 1].kind === 'module')) { <div class="mp-pal-group">Screens</div> }
+
+          <button type="button" class="mp-pal-item" [id]="'mp-pal-' + i"
+                  [class.is-active]="i === paletteIndex"
+                  [class.is-soon]="it.kind === 'module' && isSoon(it.ref)"
+                  (mouseenter)="paletteIndex = i"
+                  (click)="choosePalette(it)">
+            @if (it.kind === 'module') {
+              <span class="mp-pal-icon" [style.--c]="colorOf(it.ref)"><i [class]="iconClass(it.ref)" aria-hidden="true"></i></span>
+              <span class="mp-pal-label">{{ it.ref.name }}</span>
+              @if (isSoon(it.ref)) { <span class="mp-pal-meta">Coming soon</span> }
+              @else if (isExternal(it.ref)) { <span class="mp-pal-meta">New tab</span> }
+            } @else {
+              <span class="mp-pal-icon mp-pal-icon--screen">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" /></svg>
+              </span>
+              <span class="mp-pal-label">{{ it.ref.label }}</span>
+              <span class="mp-pal-meta">{{ it.ref.path }}</span>
+            }
+            <svg class="mp-pal-enter" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 10 4 15l5 5" /><path d="M20 4v7a4 4 0 0 1-4 4H4" /></svg>
+          </button>
+        }
+        @if (paletteQuery && paletteItems.length === 0) {
+          <div class="mp-pal-empty">
+            <span class="mp-pal-empty-title">No results</span>
+            <span>Nothing matches "{{ paletteQuery }}".</span>
+          </div>
+        }
+      </div>
+
+      <div class="mp-pal-foot">
+        <span class="mp-pal-hint"><kbd class="mp-kbd">↑</kbd><kbd class="mp-kbd">↓</kbd> to navigate</span>
+        <span class="mp-pal-hint"><kbd class="mp-kbd">↵</kbd> to open</span>
+        <span class="mp-pal-hint mp-pal-hint--end">{{ screens.length }} screens</span>
+      </div>
+    </div>
+  </div>
+}

@@ -9,7 +9,7 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-ProfitandLossStmt',
     templateUrl: './profitandlossstmt.component.html',
-    styleUrls: ['./profitandlossstmt.component.css'],
+    host: { class: 'kit-accreport' }, // Links: import-page + accreport-page are global (src/styles/kit)
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

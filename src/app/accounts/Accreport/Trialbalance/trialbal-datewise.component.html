@@ -1,70 +1,52 @@
-<div class="animated fadeIn" >  
-    <div class="row no-gutters" >
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{Header}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Accounts -> Reports -> Trial balance -> Date wise.
+  Download-only: ExportToExcel() -> TrialBalance_Datewise, then routes to
+  /accounts/report/ReportDownload/:pkid where the generated file is fetched.
+  DownLoad() is an empty legacy stub, kept.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Trial balance &middot; date wise</h1>
+      <p>Opening, movement and closing balance per ledger for a period &middot; downloads an Excel file</p>
     </div>
-    <div class="row no-gutters" >
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td class="col-form-span-heading" colspan="6"> <b>TRIAL BALANCE - DATE WISE</b> </td>
-           </tr>
-           <tr>
-            <td><span class="col-form-span-label"><b>From</b> </span><span class="col-form-span-error">*</span>
-            </td>
-            <td style="text-align: left;">
-               
-                <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)"  [options]="myDatePickerOptions"
-                class="form-control"  [selDate]="FromDate"    ></my-date-picker>
-            </td>
-            <td><span class="col-form-span-label"><b>To </b> </span><span class="col-form-span-error">*</span>
-            </td>
-            <td style="text-align: left;">
-                <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)"  [options]="myDatePickerOptions"
-                class="form-control"  [selDate]="ToDate"   ></my-date-picker>
-            </td>
-        </tr>
-                <tr >
-                    <td  class="width150">
-                        <span  class="col-form-span-label"><b>Branch</b> </span><span
-                        class="col-form-span-error">*</span>
-                    </td>
-                    <td colspan="4">
-                      
-                        <div class="leftlabel">
-                            <span class="col-form-span-label">
-                                <input type="radio" name="radioDisplay" value="1" [(ngModel)]="Branch" />&nbsp;{{City}} </span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <span class="col-form-span-label">
-                                <input type="radio" name="radioDisplay" value="ALL" [(ngModel)]="Branch"  />&nbsp;All</span>
-                        </div>
-                    </td>
-                </tr>
-                                
-                <tr>
-                    <td colspan="6" class="centerlabel">
-                        <button class="btn btn-sm btn-primary" type="submit" (click)="ExportToExcel()" > <span
-                                class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
-                                Export To Excel </span></button>&nbsp;
-                                <button class="btn btn-sm btn-primary" type="submit" (click)="DownLoad()" > <span
-                                    class="col-form-span-label"><i class="fa fa-download"></i>
-                                    Download </span></button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-    </div>
-</div>
+  </div>
 
+  <div class="card sec">
+    <div class="card-h"><h2>Period and branch</h2><span class="meta"><b>*</b> required</span></div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Quick period</label>
+        <div class="fk-seg">
+          @for (p of periods; track p.key) {
+            <button type="button" [class.on]="period === p.key" (click)="setPeriod(p.key)">{{ p.label }}</button>
+          }
+        </div>
+      </div>
+      <div class="fld">
+        <label>From <span class="req">*</span></label>
+        <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event); period = ''" [options]="myDatePickerOptions" [selDate]="FromDate"></my-date-picker>
+      </div>
+      <div class="fld">
+        <label>To <span class="req">*</span></label>
+        <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event); period = ''" [options]="myDatePickerOptions" [selDate]="ToDate"></my-date-picker>
+      </div>
+      <div class="fld full">
+        <label>Branch <span class="req">*</span></label>
+        <div class="fk-opts">
+          <label><input type="radio" name="radioDisplay" value="1" [(ngModel)]="Branch" /> {{ City }}</label>
+          <label><input type="radio" name="radioDisplay" value="ALL" [(ngModel)]="Branch" /> All</label>
+        </div>
+      </div>
+    </div>
+    <div class="fk-note">The report is generated on the server and opens on the Report download page. It is not displayed here.</div>
+  </div>
+
+  <div class="bar">
+    <span class="note">Defaults to your financial year.</span>
+    <div class="r">
+      <button class="btn g" type="submit" (click)="DownLoad()">Download</button>
+      <button class="btn p" type="submit" (click)="ExportToExcel()">Export to Excel</button>
+    </div>
+  </div>
+</div>

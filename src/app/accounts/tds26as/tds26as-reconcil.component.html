@@ -1,291 +1,166 @@
-<div class="t26-page">
-
-  <!-- ========================================================= -->
-  <!-- UPLOAD FORM                                               -->
-  <!-- ========================================================= -->
+<!--
+  Accounts -> 26AS TDS reconciliation.
+  Upload: boxed choose-file area (#inputFile, onFileChange) -> upload() posts to Accounts/Upload26ASFile.
+  Result: statement totals, All / Matched / Unmatched tabs (activeTab, filteredList), unmatched rows
+  map to a client (ng-select + saveMapping), Txns opens the drill-down (openDetail).
+  Export uses the existing Tds26asExportService (Exporttoxl); User guide opens assets/help/tds26as-guide.html.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Header }}</h1>
+      <p>Match Form 26AS TDS credits against the clients invoiced in the financial year
+        @if (displayType=='LIST' && batchInfo) { &middot; PAN {{batchInfo.PANNO}} &middot; FY {{batchInfo.FINYEAR}} &middot; {{batchInfo.FILENAME}} }</p>
+    </div>
+    <div class="tools">
+      <button class="btn g" type="button" (click)="openGuide()">User guide</button>
+      @if (displayType=='LIST') {
+        <button class="btn g" type="button" (click)="Exporttoxl()">Export</button>
+        <button class="btn g" type="button" (click)="clearStatement()">Clear statement</button>
+        <button class="btn p" type="button" (click)="uploadNew()">Upload new statement</button>
+      }
+    </div>
+  </div>
 
   @if (displayType=='SEARCH') {
-<div class="t26-card upload-card">
-
-    <div class="card-heading">
-      <i class="fa fa-cloud-upload"></i> {{Header}} — Upload Statement
-      <button class="t26-btn t26-btn--ghost t26-heading-btn" type="button" (click)="openGuide()">
-        <i class="fa fa-question-circle"></i> User Guide
-      </button>
-    </div>
-
-    <div class="t26-help">
-      Download the Form 26AS "Text" file from the TRACES / income-tax e-filing portal and upload it
-      here unchanged (an .xlsx conversion of the same statement also works). Only PART-I
-      (TDS deducted by your customers) is read. Re-uploading the same PAN + financial year
-      replaces the earlier upload; your saved TAN&rarr;client mappings are kept.
-    </div>
-
-    <div class="clean-row-layout">
-      <div class="clean-field clean-file">
-        <label>26AS Statement File <span class="t26-req">*</span></label>
-        <input
-          type="file"
-          #inputFile
-          class="t26-file"
-          accept=".txt,.xlsx"
-          (change)="onFileChange($event)">
+    <div class="card sec">
+      <div class="card-h"><h2>Upload statement</h2><span class="meta"><b>*</b> required</span></div>
+      <div class="fk-note nb">
+        Download the Form 26AS "Text" file from the TRACES / income-tax e-filing portal and upload it here unchanged
+        (an .xlsx conversion of the same statement also works). Only PART-I (TDS deducted by your customers) is read.
+        Re-uploading the same PAN + financial year replaces the earlier upload; your saved TAN&rarr;client mappings are kept.
       </div>
-
-      <div class="clean-actions">
-        <button class="t26-btn t26-btn--primary" type="button" (click)="upload()">
-          <i class="fa fa-cloud-upload"></i> Upload &amp; Reconcile
-        </button>
+      <div class="fk-pad">
+        <div class="fk-drop">
+          <div>
+            <div class="t">26AS statement file <span class="req">*</span></div>
+            <div class="h">{{ selfilename ? 'Selected: ' + selfilename : '.txt or .xlsx' }}</div>
+          </div>
+          <input type="file" #inputFile accept=".txt,.xlsx" (change)="onFileChange($event)">
+        </div>
+      </div>
+    </div>
+    <div class="bar">
+      <span class="note">{{ selfilename || 'No file chosen' }}</span>
+      <div class="r">
         @if (summaryList.length > 0) {
-<button class="t26-btn t26-btn--ghost" type="button" (click)="displayType='LIST'">
-          <i class="fa fa-arrow-circle-left"></i> Back to last statement
-        </button>
-}
+          <button class="btn g" type="button" (click)="displayType='LIST'">Back to last statement</button>
+        }
+        <button class="btn p" type="button" (click)="upload()">Upload &amp; reconcile</button>
       </div>
     </div>
-
-    @if (selfilename) {
-<div class="t26-fileinfo">
-      <span class="t26-chip"><i class="fa fa-file-text-o"></i> {{selfilename}}</span>
-    </div>
-}
-
-  </div>
-}
-
-  <!-- ========================================================= -->
-  <!-- RECONCILIATION RESULT                                     -->
-  <!-- ========================================================= -->
+  }
 
   @if (displayType=='LIST') {
-
-
-    <div class="t26-topbar">
-      <div class="t26-topbar-left">
-        <span class="t26-page-title">{{Header}}</span>
-        @if (batchInfo) {
-<span class="t26-meta">
-          PAN {{batchInfo.PANNO}} &middot; FY {{batchInfo.FINYEAR}} &middot; {{batchInfo.FILENAME}}
-        </span>
-}
-      </div>
-      <div class="t26-topbar-right">
-        <button class="t26-btn t26-btn--ghost" type="button" (click)="openGuide()">
-          <i class="fa fa-question-circle"></i> User Guide
-        </button>
-        <button class="t26-btn t26-btn--ghost" type="button" (click)="Exporttoxl()">
-          <i class="fa fa-file-excel-o"></i> Export
-        </button>
-        <button class="t26-btn t26-btn--danger" type="button" (click)="clearStatement()">
-          <i class="fa fa-trash-o"></i> Clear Statement
-        </button>
-        <button class="t26-btn t26-btn--primary" type="button" (click)="uploadNew()">
-          <i class="fa fa-cloud-upload"></i> Upload New Statement
-        </button>
-      </div>
-    </div>
-
-    <!-- statement-level totals -->
     @if (summaryList.length > 0) {
-<div class="t26-summary-strip">
-      <div class="t26-stat">
-        <span class="t26-stat-label">26AS Amount Credited</span>
-        <span class="t26-stat-value">{{totAmtCredited | number:'1.2-2'}}</span>
+      <div class="fk-kpis">
+        <div class="card fk-kpi"><div class="k">26AS amount credited</div><div class="v">{{totAmtCredited | number:'1.2-2'}}</div></div>
+        <div class="card fk-kpi"><div class="k">26AS TDS deposited</div><div class="v">{{totTdsDeposited | number:'1.2-2'}}</div></div>
+        <div class="card fk-kpi"><div class="k">FY invoiced (matched clients)</div><div class="v">{{totInvoiced | number:'1.2-2'}}</div></div>
+        <div class="card fk-kpi"><div class="k">Deductors matched</div><div class="v">{{matchedCount}} / {{summaryList.length}}</div></div>
       </div>
-      <div class="t26-stat">
-        <span class="t26-stat-label">26AS TDS Deposited</span>
-        <span class="t26-stat-value">{{totTdsDeposited | number:'1.2-2'}}</span>
-      </div>
-      <div class="t26-stat">
-        <span class="t26-stat-label">FY Invoiced (matched clients)</span>
-        <span class="t26-stat-value">{{totInvoiced | number:'1.2-2'}}</span>
-      </div>
-    </div>
-}
+    }
 
-    <div class="t26-view-toggle">
-      <button class="toggle-btn" type="button" [class.active]="activeTab=='ALL'" (click)="activeTab='ALL'">
-        All <span class="toggle-count">{{summaryList.length}}</span>
-      </button>
-      <button class="toggle-btn" type="button" [class.active]="activeTab=='MATCHED'" (click)="activeTab='MATCHED'">
-        <i class="fa fa-check"></i> Matched <span class="toggle-count">{{matchedCount}}</span>
-      </button>
-      <button class="toggle-btn" type="button" [class.active]="activeTab=='UNMATCHED'" (click)="activeTab='UNMATCHED'">
-        <i class="fa fa-exclamation-triangle"></i> Unmatched <span class="toggle-count">{{unmatchedCount}}</span>
-      </button>
-    </div>
-
-    <div class="t26-card t26-table-card">
-      <div class="t26-table-wrap">
-        <table class="t26-table">
+    <div class="card sec">
+      <div class="toolbar">
+        <div class="fk-seg fk-tabs">
+          <button type="button" [class.on]="activeTab=='ALL'" (click)="activeTab='ALL'">All &middot; {{summaryList.length}}</button>
+          <button type="button" [class.on]="activeTab=='MATCHED'" (click)="activeTab='MATCHED'">Matched &middot; {{matchedCount}}</button>
+          <button type="button" [class.on]="activeTab=='UNMATCHED'" (click)="activeTab='UNMATCHED'">Unmatched &middot; {{unmatchedCount}}</button>
+        </div>
+        <span class="count">{{ filteredList.length }} deductors</span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
           <thead>
-            <tr class="col-head">
-              <th>#</th>
-              <th>Deductor (as per 26AS)</th>
-              <th>TAN</th>
-              <th>Matched Client</th>
-              <th class="ctr">Match</th>
-              <th class="num">Amount Credited</th>
-              <th class="num">TDS Deposited</th>
-              <th class="num">FY Invoiced</th>
-              <th class="num">Difference</th>
-              <th class="ctr">Txns</th>
+            <tr>
+              <th>#</th><th>Deductor (as per 26AS)</th><th>TAN</th><th>Matched client</th><th>Match</th>
+              <th class="num">Amount credited</th><th class="num">TDS deposited</th><th class="num">FY invoiced</th><th class="num">Difference</th><th class="num">Txns</th>
             </tr>
           </thead>
           <tbody>
-            @for (row of filteredList; track row) {
-<tr>
-              <td>{{row.SRNO}}</td>
-              <td>{{row.DEDUCTOR_NAME}}</td>
-              <td class="mono">{{row.TAN}}</td>
-              <td>
-                @if (row.MATCHTYPE) {
-<span>{{row.CLIENT_NAME || row.EXP_CODE}}</span>
-}
-                @if (!row.MATCHTYPE) {
-<ng-select
-                  class="t26-map-select"
-                  [items]="clientList"
-                  bindLabel="TEXTFIELD"
-                  bindValue="VALUEFIELD"
-                  [(ngModel)]="row.selExp"
-                  [appendTo]="'body'"
-                  placeholder="Map to client...">
-                </ng-select>
-}
-              </td>
-              <td class="ctr">
-                @if (row.MATCHTYPE=='TAN') {
-<span class="t26-badge t26-badge--tan">TAN</span>
-}
-                @if (row.MATCHTYPE=='NAME') {
-<span class="t26-badge t26-badge--name">NAME</span>
-}
-                @if (row.MATCHTYPE=='MANUAL') {
-<span class="t26-badge t26-badge--manual">MANUAL</span>
-}
-                @if (!row.MATCHTYPE) {
-<button class="t26-btn t26-btn--mini" type="button" (click)="saveMapping(row)">
-                  <i class="fa fa-save"></i> Save
-                </button>
-}
-              </td>
-              <td class="num">{{row.TOT_AMTCREDITED | number:'1.2-2'}}</td>
-              <td class="num">{{row.TOT_TDSDEPOSITED | number:'1.2-2'}}</td>
-              <td class="num">
-                @if (row.MATCHTYPE) {
-<span>{{row.FY_INVOICED | number:'1.2-2'}}</span>
-}
-                @if (!row.MATCHTYPE) {
-<span class="muted">&mdash;</span>
-}
-              </td>
-              <td class="num">
-                @if (row.MATCHTYPE) {
-<span
-                      [class.diff-pos]="row.DIFFERENCE > 0.005"
-                      [class.diff-neg]="row.DIFFERENCE < -0.005">
-                  {{row.DIFFERENCE | number:'1.2-2'}}
-                </span>
-}
-                @if (!row.MATCHTYPE) {
-<span class="muted">&mdash;</span>
-}
-              </td>
-              <td class="ctr">
-                <a href="javascript:void(0)" class="t26-link" (click)="openDetail(row)">{{row.TXNCOUNT}}</a>
-              </td>
-            </tr>
-}
+            @for (row of filteredList; track $index) {
+              <tr>
+                <td>{{row.SRNO}}</td>
+                <td>{{row.DEDUCTOR_NAME}}</td>
+                <td class="mono">{{row.TAN}}</td>
+                <td>
+                  @if (row.MATCHTYPE) { {{row.CLIENT_NAME || row.EXP_CODE}} }
+                  @else {
+                    <ng-select [items]="clientList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="row.selExp" [appendTo]="'body'" placeholder="Map to client..."></ng-select>
+                  }
+                </td>
+                <td>
+                  @if (row.MATCHTYPE=='TAN') { <span class="chip solid">TAN</span> }
+                  @if (row.MATCHTYPE=='NAME') { <span class="chip"><span class="dot"></span>Name</span> }
+                  @if (row.MATCHTYPE=='MANUAL') { <span class="chip dash">Manual</span> }
+                  @if (!row.MATCHTYPE) { <button class="btn g" type="button" (click)="saveMapping(row)">Save</button> }
+                </td>
+                <td class="num">{{row.TOT_AMTCREDITED | number:'1.2-2'}}</td>
+                <td class="num">{{row.TOT_TDSDEPOSITED | number:'1.2-2'}}</td>
+                <td class="num">@if (row.MATCHTYPE) { {{row.FY_INVOICED | number:'1.2-2'}} } @else { <span class="sub-t">&mdash;</span> }</td>
+                <td class="num">@if (row.MATCHTYPE) { <span [class.fk-strong]="row.DIFFERENCE > 0.005 || row.DIFFERENCE < -0.005">{{row.DIFFERENCE | number:'1.2-2'}}</span> } @else { <span class="sub-t">&mdash;</span> }</td>
+                <td class="num"><button type="button" class="btn g" (click)="openDetail(row)">{{row.TXNCOUNT}}</button></td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="10">Nothing on this tab.</td></tr>
+            }
           </tbody>
         </table>
-
-        @if (filteredList.length === 0) {
-<div class="t26-empty">
-          <i class="fa fa-inbox"></i> Nothing on this tab.
-        </div>
-}
       </div>
     </div>
-
-  
-}
-
-  <!-- ========================================================= -->
-  <!-- DRILL-DOWN MODAL                                          -->
-  <!-- ========================================================= -->
+  }
 
   @if (showModal_Detail) {
-<div class="t26-modal-backdrop" (click)="closeDetail()"></div>
-}
-  @if (showModal_Detail) {
-<div class="t26-modal">
-    <div class="t26-modal-head">
-      <span>{{detailDeductor?.DEDUCTOR_NAME}} <span class="mono">({{detailDeductor?.TAN}})</span></span>
-      <button class="t26-btn t26-btn--ghost" type="button" (click)="closeDetail()">
-        <i class="fa fa-times"></i> Close
-      </button>
-    </div>
-    <div class="t26-modal-body">
-
-      <div class="t26-modal-col">
-        <div class="t26-modal-subhead">26AS Transactions ({{detailList.length}})</div>
-        <div class="t26-table-wrap t26-modal-scroll">
-          <table class="t26-table">
-            <thead>
-              <tr class="col-head">
-                <th>#</th><th>Section</th><th class="ctr">Txn Date</th><th class="ctr">Status</th>
-                <th class="ctr">Booked On</th><th class="num">Amount</th><th class="num">TDS</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (d of detailList; track d) {
-<tr>
-                <td>{{d.SRNO}}</td>
-                <td>{{d.SECTION}}</td>
-                <td class="ctr">{{d.TXNDATE}}</td>
-                <td class="ctr">{{d.BOOKINGSTATUS}}</td>
-                <td class="ctr">{{d.BOOKINGDATE}}</td>
-                <td class="num">{{d.AMTCREDITED | number:'1.2-2'}}</td>
-                <td class="num">{{d.TDSDEPOSITED | number:'1.2-2'}}</td>
-              </tr>
-}
-            </tbody>
-          </table>
+    <div class="fk-modal-back" (click)="closeDetail()">
+      <div class="card fk-modal fk-modal-wide" (click)="$event.stopPropagation()">
+        <div class="card-h">
+          <h2>{{detailDeductor?.DEDUCTOR_NAME}} <span class="mono">({{detailDeductor?.TAN}})</span></h2>
+          <span class="tb-r"><button class="btn g" type="button" (click)="closeDetail()">Close</button></span>
         </div>
-      </div>
-
-      <div class="t26-modal-col">
-        <div class="t26-modal-subhead">
-          FY Invoices — {{detailDeductor?.CLIENT_NAME || 'not matched yet'}} ({{detailInvList.length}})
-        </div>
-        <div class="t26-table-wrap t26-modal-scroll">
-          <table class="t26-table">
-            <thead>
-              <tr class="col-head">
-                <th>Invoice No</th><th class="ctr">Date</th><th class="num">Amount (INR)</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (inv of detailInvList; track inv) {
-<tr>
-                <td class="mono">{{inv.INV_NO}}</td>
-                <td class="ctr">{{inv.INV_DATE}}</td>
-                <td class="num">{{inv.INV_INRAMT | number:'1.2-2'}}</td>
-              </tr>
-}
-            </tbody>
-          </table>
-          @if (detailInvList.length === 0) {
-<div class="t26-empty">
-            <i class="fa fa-inbox"></i> No invoices found for this client in the FY.
+        <div class="fk-2col fk-pad">
+          <div>
+            <div class="fk-lbl">26AS transactions ({{detailList.length}})</div>
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead><tr><th>#</th><th>Section</th><th>Txn date</th><th>Status</th><th>Booked on</th><th class="num">Amount</th><th class="num">TDS</th></tr></thead>
+                <tbody>
+                  @for (d of detailList; track $index) {
+                    <tr>
+                      <td>{{d.SRNO}}</td>
+                      <td>{{d.SECTION}}</td>
+                      <td>{{d.TXNDATE}}</td>
+                      <td>{{d.BOOKINGSTATUS}}</td>
+                      <td>{{d.BOOKINGDATE}}</td>
+                      <td class="num">{{d.AMTCREDITED | number:'1.2-2'}}</td>
+                      <td class="num">{{d.TDSDEPOSITED | number:'1.2-2'}}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
           </div>
-}
+          <div>
+            <div class="fk-lbl">FY invoices &middot; {{detailDeductor?.CLIENT_NAME || 'not matched yet'}} ({{detailInvList.length}})</div>
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead><tr><th>Invoice no.</th><th>Date</th><th class="num">Amount (INR)</th></tr></thead>
+                <tbody>
+                  @for (inv of detailInvList; track $index) {
+                    <tr>
+                      <td class="mono">{{inv.INV_NO}}</td>
+                      <td>{{inv.INV_DATE}}</td>
+                      <td class="num">{{inv.INV_INRAMT | number:'1.2-2'}}</td>
+                    </tr>
+                  } @empty {
+                    <tr><td class="empty" colspan="3">No invoices found for this client in the FY.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
-
     </div>
-  </div>
-}
-
+  }
 </div>

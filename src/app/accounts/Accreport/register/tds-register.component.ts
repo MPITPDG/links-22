@@ -33,10 +33,11 @@ export interface TdsRegisterLine {
     BILLNO?: string;
 }
 
+import { FinPager, FinChart, finBars, finNum, finAmt, finByKey } from '../fin-kit';
 @Component({
     selector: 'app-tds-register',
     templateUrl: './tds-register.component.html',
-    styleUrls: ['./tds-register.component.css'],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -270,8 +271,9 @@ export class TdsRegisterComponent implements OnInit {
         this.summary = this.Party ? this.rawSummary.filter(s => s.PARTYCODE === this.Party) : this.rawSummary;
         this.totTdsOn = r2(tOn); this.totDr = r2(tDr); this.totCr = r2(tCr);
         this.totBalText = this.balText(this.signed(tDr, tCr));
-        this.partyCount = parties.size;
+                this.partyCount = parties.size;
         this.rowCount = rows.length;
+        this.buildView();
     }
 
     summaryAmtText(s: any): string {
@@ -297,4 +299,23 @@ export class TdsRegisterComponent implements OnInit {
             + this.FromDate + '_' + this.ToDate;
         this._exportService.export(meta, this.lines, this.summary.map(s => ({ ...s, AMTTEXT: this.summaryAmtText(s) })), name);
     }
+
+    // ---- redesign: detail paged 10 parties per page (a party's heads/rows/subtotals stay together),
+    //      summary paged 10/page, TDS-by-party chart. Display only; totals are the fields above. ----
+    partyPager = new FinPager<TdsRegisterLine[]>(10);
+    sumPager = new FinPager<any>(10);
+    chart: FinChart | null = null;
+    fmt = finAmt;
+    buildView() {
+        const groups: TdsRegisterLine[][] = [];
+        for (const l of this.lines) {
+            if (l.KIND === 'party' || !groups.length) { groups.push([]); }
+            groups[groups.length - 1].push(l);
+        }
+        this.partyPager.set(groups);
+        this.sumPager.set(this.summary);
+        const items = finByKey(this.summary, s => s.PARTYNAME, s => Math.abs(finNum(s.NETAMT)));
+        this.chart = items.length ? finBars(items) : null;
+    }
+    pagedLines(): TdsRegisterLine[] { return ([] as TdsRegisterLine[]).concat(...this.partyPager.paged); }
 }

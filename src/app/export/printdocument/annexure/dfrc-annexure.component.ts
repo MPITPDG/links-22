@@ -5,6 +5,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-print-document-annexure-dfrc',
     templateUrl: 'dfrc-annexure.component.html',
+    styleUrls: ['./annexure-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -33,7 +34,7 @@ export class DfrcAnnexureComponent implements OnInit {
         this._dataService.Common("Export/AnnexureDfrcPopulateData", _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                if (data.Table.length > 0) {
+                if (data && data.Table && data.Table.length > 0) {
                     this.dtDfrc = data.Table;
                 }
                 else {

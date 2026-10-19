@@ -12,7 +12,7 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-receivable-anyoneclient-ageing',
     templateUrl: './rcbl-anyoneClnt-ageing.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -88,6 +88,7 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
     this.outstandList=data.Table1;   
     this.UnAdjAmtList=data.Table3;
     this.advList=data.Table5;
+    this.dataForExcel = []; // reset: rows used to accumulate across exports
     this.outstandList.forEach((row: any) => {
         this.dataForExcel.push(Object.values(row))
         });

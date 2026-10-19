@@ -1,242 +1,159 @@
-<div class="animated fadeIn">
-    <div class="container">
-        <!-- <div class="row" *ngIf="Searchdata_list.length==0"> -->
-            @if (displayType=='SEARCH') {
-<div class="row">
-            <div class="col-sm-3"></div>
-            <div class="col-sm-6">
-                <table class="table table-bordered table-sm-new bgwhite" style="font-family:  Verdana;font-size: 12px;">
-                    <tbody style='height:30px'>
-                        <tr>
-                            <td class="col-form-span-heading" colspan="5">
-                                CHEQUE REPORT
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="col-form-span-label width100">
-                                <input type="radio" name="exampleRadios" value='No' [(ngModel)]="exampleRadios1">&nbsp;
-                                Cheque No wise
-                            </td>
-                            <td >
-                                <span class="col-form-span-label width150"><b>From No</b> </span>
-                               
-                            </td> 
-                             <td>
-                                <input type="text" class="form-control width100" [(ngModel)]="FromNo" [disabled]="exampleRadios1 != 'No'">
-                            </td>  
-                              <td > 
-                                <span class="col-form-span-label width150"><b>To No</b> </span>   
-                               
-                                      </td>
-                                      <td>
-                                        <input type="text" class="form-control width100" [(ngModel)]="ToNo" [disabled]="exampleRadios1 != 'No'">
-                                      </td>
-                        </tr>
-                        
-                     
-                        <tr>
-                            <td class="col-form-span-label width100">
+<!--
+  Cheque report.
+  Monochrome page kit (import-page.css + ../cheque-page.css). Opens with every cheque of the
+  last 30 days (date-wise, All). Cheque-no / date radios, status radios, searchlist(), resetlist(),
+  the Excel export (ExportToExcel, now labelled Export) and the Req BP / BP popups are unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Cheque report</h1>
+      <p>Company cheques by number range or date, printed, cancelled or reprinted</p>
+    </div>
+  </div>
 
-
-                                <input type="radio" name="exampleRadios" id="exampleRadios1" value="Date"
-                                    [(ngModel)]="exampleRadios1"> Date Wise
-                            </td>
-
-                            <td>
-                                <span class="col-form-span-label width150"><b>Start Date</b> </span>
-                                <span class="col-form-span-error">*</span>
-                            </td>
-                            <td>
-                                <my-date-picker name="StartDate" [options]="myDatePickerOptions"
-                                    [(ngModel)]="startdate" [disabled]="exampleRadios1 != 'Date'">
-                                </my-date-picker>
-                            </td>
-                            <td>
-                                <span class="col-form-span-label width150"><b>End Date</b> </span>
-                                <span class="col-form-span-error">*</span>
-                            </td>
-                            <td>
-                                <my-date-picker name="EndDate" [options]="myDatePickerOptions"
-                                    [(ngModel)]="enddate" [disabled]="exampleRadios1 != 'Date'">
-                                </my-date-picker>
-                            </td>
-
-                        </tr>
-                        <tr rowspan="2">
-                            <td>
-
-                            </td>
-                            <td class="col-form-span-label">
-                                <input type="radio"  name="exampleRadios2" id="rdbPrint" value="P"
-                                [(ngModel)]="exampleRadios2"> Printed
-                            </td>
-                            <td class="col-form-span-label">
-                                <input type="radio" name="exampleRadios2" id="rdbCancelled" value="C"
-                                [(ngModel)]="exampleRadios2"> Cancelled
-                            </td>
-                            <td class="col-form-span-label" colspan="2">
-                                <input type="radio" name="exampleRadios2" id="rdbCanReprint" value="CR"
-                                [(ngModel)]="exampleRadios2"> Cancelled and Reprinted
-                            </td>
-                           
-                        </tr>
-                        <tr>
-                            <td>
-
-                            </td>
-                            <td class="col-form-span-label" colspan="2">
-                                <input type="radio" name="exampleRadios2" id="rdbCanNotReprint" value="CN"
-                                [(ngModel)]="exampleRadios2"> Cancelled But not Reprinted
-                            </td>
-                            <td class="col-form-span-label" colspan="2">
-                                <input type="radio" name="exampleRadios2" id="rdbAll" value="B"
-                                [(ngModel)]="exampleRadios2"> All
-                            </td>
-                        </tr>
-                      
-                        <tr>
-                            <td colspan="5" class="centerlabel">
-                                <button class="btn btn-sm btn-success" type="submit" (click)="searchlist()"><span
-                                        class="col-form-span-label"><i class="fa fa-search"></i> Search</span></button>
-                                <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
-                                        (click)="resetlist();"><i class="fa fa-ban"></i> Reset</span></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-            </div>
-
-            <div class="col-sm-3"></div>        </div>
-}
-  
-                         @if (displayType=='LIST') {
-<div class="row xyscroll " >
-                            <div class="col-12">
-                                <table class="table table-sm-new table-responsive-sm table-bordered"  >
-                                    <thead>
-                                        <tr class="title-head formheading">
-                                            <th colspan="7">
-                                                {{searchHeaderText}}
-                                                <button class="btn btn-sm btn-primary" type="submit" (click)="ExportToExcel()" > <span
-                                                    class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
-                                                    Export To Excel </span></button>&nbsp;
-                                                <a href="javascript:void(0);" (click)="displayType='SEARCH';Searchdata_list=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
-                                            </th>
-                                        </tr>
-                                        <tr class="title-head formheading">
-                                          
-                                            <th class="col-form-span-label" align="center">CHEQUE NO</th>
-                                            <th class="col-form-span-label" align="center">CHEQUE DATE</th>
-                                            <th class="col-form-span-label" align="center">PAYEE NAME</th>
-                                            <th class="col-form-span-label" align="center">CHEQUE AMOUNT</th>
-                                            <th class="col-form-span-label" align="center">	TYPE</th>
-                                            <th class="col-form-span-label" align="center">REQ BP NO</th>
-                                            <th class="col-form-span-label" align="center">	REQ BP DATE</th>
-                                            <th class="col-form-span-label" align="center">BP NO</th>
-                                             <th class="col-form-span-label" align="center">BP DATE</th>
-                                             <th class="col-form-span-label" align="center">REQUESTED BY</th>
-                                             <th class="col-form-span-label" align="center">AUTHORISED BY</th>
-                                             <th class="col-form-span-label" align="center">AUTHORISED DATE</th>
-                                              <th class="col-form-span-label" align="center">PRINTED BY</th>
-                                             <th class="col-form-span-label" align="center">PRINTED ON</th>
-                                             @if ( chequetype == 'C' || chequetype == 'CR' || chequetype == 'B') {
-<th class="col-form-span-label" align="center">REASON</th>
-}
-                                             @if ( chequetype == 'C' || chequetype == 'CR' || chequetype == 'B') {
-<th class="col-form-span-label" align="center">REPRINTED CHEQUE</th>
-}
-                                             @if ( chequetype == 'C' || chequetype == 'CR' || chequetype == 'B') {
-<th class="col-form-span-label" align="center">REPRINTED BY</th>
-}
-                                             @if ( chequetype == 'C' || chequetype == 'CR' || chequetype == 'B') {
-<th class="col-form-span-label" align="center">REPRINTED ON</th>
-}
-                                             <th class="col-form-span-label" align="center">STATUS</th>
-                                        </tr>
-                                    </thead>
-                                    @if (Searchdata_list.length > 0) {
-<tbody>
-                                        @for (data of Searchdata_list; track data) {
-<tr>
-                                             <td><span
-                                                class="col-form-span-label" >{{data.CHEQUENO}}</span>
-                                            </td> 
-                                           <td><span
-                                                    class="col-form-span-label">{{data.CHEQUEDATE}}</span>
-                                            </td>
-
-                                            <td><span
-                                                    class="col-form-span-label">{{data.PAYEENAME}}</span>
-                                            </td>
-                                            <td><span
-                                                    class="col-form-span-label">{{data.CHEQUEAMOUNT}}</span>
-                                            </td>                             
-                                            <td><span
-                                                class="col-form-span-label">{{data.TYPE}}</span>
-                                        </td>
-                                        <td><span
-                                            class="col-form-span-label anchor-link" (click)="ViewReqBPPrint(data.REQBPNO)">{{data.REQBPNO}}</span>
-                                        </td>
-                                        <td><span
-                                        class="col-form-span-label">{{data.REQBPDATE}}</span>
-                                         </td>
-                                        <td><span
-                                            class="col-form-span-label anchor-link" (click)="ViewBPPrint(data.BPNO)">{{data.BPNO}}</span>
-                                        </td>
-                                        <td><span
-                                             class="col-form-span-label">{{data.BPDATE}}</span>
-                                        </td> 
-                                             <td><span
-                                              class="col-form-span-label">{{data.REQUESTEDBY}}</span>
-                                             </td>
-                                         <td><span
-                                            class="col-form-span-label">{{data.AUTHORISEDBY}}</span>
-                                         </td>
-                                         <td><span
-                                            class="col-form-span-label">{{data.AUTHORISEDDATE}}</span>
-                                        </td>
-                                             <td><span
-                                                 class="col-form-span-label">{{data.PRINTEDBY}}</span>
-                                               </td>
-                                                             <td><span
-                                               class="col-form-span-label">{{data.PRINTEDON}}</span>
-                                                 </td>
-                                         @if ( chequetype == 'C' || chequetype == 'CR' || chequetype == 'B') {
-<td><span
-                                                class="col-form-span-label">{{data.REASON}}</span>
-                                        </td>
-}
-                                        @if ( chequetype == 'C' || chequetype == 'CR' || chequetype == 'B') {
-<td><span
-                                                 class="col-form-span-label">{{data.REPRINTEDCHEQUE}}</span>
-                                           </td>
-}
-                                           @if ( chequetype == 'C' || chequetype == 'CR'|| chequetype == 'B') {
-<td><span
-                                            class="col-form-span-label">{{data.REPRINTEDBY}}</span>
-                                        </td>
-}
-                                        @if ( chequetype == 'C' || chequetype == 'CR' || chequetype == 'B') {
-<td><span
-                                            class="col-form-span-label">{{data.REPRINTEDON}}</span>
-                                        </td>
-}
-                                        <td ><span
-                                            class="col-form-span-label">{{data.STATUS}}</span>
-                                    </td>
-                                        </tr>
-}
-                                        <tr>
-                                            <td colspan="19">
-                                                <span class="col-form-span-label"><b>{{Searchdata_list.length}}  Records found</b></span>
-                                            </td>
-
-                                        </tr>
-                                </tbody>
-}</table>
-                            </div>
-                        </div>
-}
-            </div>
+  <div class="card">
+    <div class="fields">
+      <div class="fld full">
+        <label>Search by</label>
+        <div class="v-radios">
+          <label><input type="radio" name="exampleRadios" value='No' [(ngModel)]="exampleRadios1"> Cheque no.</label>
+          <label><input type="radio" name="exampleRadios" id="exampleRadios1" value="Date" [(ngModel)]="exampleRadios1"> Date</label>
         </div>
+      </div>
+      @if (exampleRadios1 == 'No') {
+        <div class="fld">
+          <label>From no.</label>
+          <input type="text" [(ngModel)]="FromNo" [disabled]="exampleRadios1 != 'No'" (keyup.enter)="searchlist()">
+        </div>
+        <div class="fld">
+          <label>To no.</label>
+          <input type="text" [(ngModel)]="ToNo" [disabled]="exampleRadios1 != 'No'" (keyup.enter)="searchlist()">
+        </div>
+      } @else {
+        <div class="fld">
+          <label>Start date <span class="req">*</span></label>
+          <my-date-picker name="StartDate" [options]="myDatePickerOptions"
+            [(ngModel)]="startdate" [disabled]="exampleRadios1 != 'Date'">
+          </my-date-picker>
+        </div>
+        <div class="fld">
+          <label>End date <span class="req">*</span></label>
+          <my-date-picker name="EndDate" [options]="myDatePickerOptions"
+            [(ngModel)]="enddate" [disabled]="exampleRadios1 != 'Date'">
+          </my-date-picker>
+        </div>
+      }
+      <div class="fld full">
+        <label>Cheques</label>
+        <div class="v-radios">
+          <label><input type="radio" name="exampleRadios2" id="rdbPrint" value="P" [(ngModel)]="exampleRadios2"> Printed</label>
+          <label><input type="radio" name="exampleRadios2" id="rdbCancelled" value="C" [(ngModel)]="exampleRadios2"> Cancelled</label>
+          <label><input type="radio" name="exampleRadios2" id="rdbCanReprint" value="CR" [(ngModel)]="exampleRadios2"> Cancelled and reprinted</label>
+          <label><input type="radio" name="exampleRadios2" id="rdbCanNotReprint" value="CN" [(ngModel)]="exampleRadios2"> Cancelled but not reprinted</label>
+          <label><input type="radio" name="exampleRadios2" id="rdbAll" value="B" [(ngModel)]="exampleRadios2"> All</label>
+        </div>
+      </div>
+      <div class="fld full">
+        <label>Filter results</label>
+        <div class="v-pair">
+          <input type="text" [(ngModel)]="Quick" (ngModelChange)="page = 1" placeholder="Cheque no., payee, BP no., requested / printed by, status">
+          <button class="btn p" type="submit" (click)="searchlist()">Search</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <span>
+        <span class="count">{{ Filtered.length }} {{ Filtered.length === 1 ? 'cheque' : 'cheques' }}</span>
+        @if (searchHeaderText) { <span class="sub-t"> {{ searchHeaderText }}</span> }
+      </span>
+      <span class="tb-r">
+        <button class="btn g" type="reset" (click)="resetlist(); Quick = ''; Searchdata_list = []; page = 1">Clear</button>
+        <button class="btn g" type="button" (click)="ExportToExcel()" [disabled]="!Searchdata_list?.length">Export</button>
+      </span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Cheque no.</th>
+            <th>Cheque date</th>
+            <th>Payee name</th>
+            <th class="num">Cheque amount</th>
+            <th>Type</th>
+            <th>Req BP no.</th>
+            <th>Req BP date</th>
+            <th>BP no.</th>
+            <th>BP date</th>
+            <th>Requested by</th>
+            <th>Authorised by</th>
+            <th>Authorised date</th>
+            <th>Printed by</th>
+            <th>Printed on</th>
+            @if (showCancelCols) {
+              <th>Reason</th>
+              <th>Reprinted cheque</th>
+              <th>Reprinted by</th>
+              <th>Reprinted on</th>
+            }
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+            <tr><td class="empty" [attr.colspan]="showCancelCols ? 19 : 15">Loading cheques…</td></tr>
+          } @else if (loadError) {
+            <tr><td class="empty" [attr.colspan]="showCancelCols ? 19 : 15">The report could not be loaded. Try Search again.</td></tr>
+          } @else {
+            @for (data of pageRows; track data) {
+              <tr>
+                <td class="mono">{{data.CHEQUENO}}</td>
+                <td>{{data.CHEQUEDATE}}</td>
+                <td>{{data.PAYEENAME}}</td>
+                <td class="num">{{data.CHEQUEAMOUNT}}</td>
+                <td>{{data.TYPE}}</td>
+                <td><a class="lnk" (click)="ViewReqBPPrint(data.REQBPNO)">{{data.REQBPNO}}</a></td>
+                <td>{{data.REQBPDATE}}</td>
+                <td><a class="lnk" (click)="ViewBPPrint(data.BPNO)">{{data.BPNO}}</a></td>
+                <td>{{data.BPDATE}}</td>
+                <td>{{data.REQUESTEDBY}}</td>
+                <td>{{data.AUTHORISEDBY}}</td>
+                <td>{{data.AUTHORISEDDATE}}</td>
+                <td>{{data.PRINTEDBY}}</td>
+                <td>{{data.PRINTEDON}}</td>
+                @if (showCancelCols) {
+                  <td>{{data.REASON}}</td>
+                  <td class="mono">{{data.REPRINTEDCHEQUE}}</td>
+                  <td>{{data.REPRINTEDBY}}</td>
+                  <td>{{data.REPRINTEDON}}</td>
+                }
+                <td>
+                  @if (data.STATUS) { <span class="chip">{{data.STATUS}}</span> }
+                </td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" [attr.colspan]="showCancelCols ? 19 : 15">No cheques match. Change the search above.</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ Filtered.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="curPage <= 1" (click)="goPage(curPage - 1)" aria-label="Previous page">‹</button>
+        @for (p of pageList; track $index) {
+          @if (p === 0) {
+            <span class="gap">…</span>
+          } @else {
+            <button type="button" [class.on]="p === curPage" (click)="goPage(p)">{{ p }}</button>
+          }
+        }
+        <button type="button" [disabled]="curPage >= pageCount" (click)="goPage(curPage + 1)" aria-label="Next page">›</button>
+      </div>
+    </div>
+  </div>
+</div>

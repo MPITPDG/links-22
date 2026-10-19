@@ -1,536 +1,431 @@
-﻿<div class="animated fadeIn">	
-	<div class="row">
-		<div class="col-sm-12">
-			
-			<div class="row">
-				
-				<div class="col-md-12">
-					
-					<tabset #containerTabs class="tab-container">
-						
-						<div class="tab-content">									
-							<!--  -->
-							<tab heading="Container" class="tab-pane active"   >
-								
-								<div class="col-md-8">
-									<table class="table table-bordered table-sm-new">
-										
-										<tr>
-											<td class="col-form-span-heading"  colspan="4">
-												<span class="col-form-span-label" >{{vsldet}}</span>
-												<button class="btn btn-sm btn-warning" style="float: right;" (click)="back();"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to List</u></span></button>
-											</td>		
-																			
-										</tr>
-										<tr>
-											<td>
-												<span class="col-form-span-label ">Vessel Agent<span class="col-form-span-error">*</span></span>
-											</td>
-											<td colspan="3">
-												<select class="form-control width500"  [(ngModel)]="Vslagt" (change)="onfillshipline($event.target.value)">
-													<option value="">Please select</option>
-													@for (d of vslAgent; track d) {
-<option value={{d.AGT_CODE}}>{{d.AGT_NAME}}</option>
-}
-												</select>
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<span class="col-form-span-label">Shpg. Line<span class="col-form-span-error">*</span></span>
-											</td>
-											<td colspan="3">
-												<select class="form-control width500"  [(ngModel)]="Vslshpgline">
-													<option value="">Please select</option>
-													@for (d of vslshpline; track d) {
-<option value={{d.AGT_LINER}}>{{d.LINER_NAME}}</option>
-}
-												</select>
-											</td>
-										</tr>
-										
-										<tr>
-											<td>
-												<span class="col-form-span-label ">Container No.<span class="col-form-span-error">*</span></span>
-											</td>
-											<td >
-												<input [(ngModel)]="Containerno" type="text"    class="form-control width180" maxlength="20" placeholder="Containerno">
-											</td>
-											
-											<td>
-												<span class="col-form-span-label">Container Size<span class="col-form-span-error">*</span></span>
-											</td>
-											<td>
-												<div class="form-check form-check-inline">
-													<select class="form-control width50 form-check-inline"  [(ngModel)]="cntsize">
-														<option value="20">20</option>
-														<option value="40">40</option>
-													</select>
-													<select class="form-control width50 form-check-inline"  [(ngModel)]="cntsize1">
-														<option value="F">F</option>
-														<option value="H">H</option>
-														<option value="G">GOH</option>
-														<option value="R">RFR</option>
-														<option value="P">PAL</option>
-														<option value="O">OPN</option>
-														<option value="L">LCL</option>
-													</select>
-													
-												</div>
-												
-											</td>
-										</tr>	
-										<tr>
-											<td> <span class="col-form-span-label ">Status Container</span></td>
-											<td>
-												<select class="form-control width100"  [(ngModel)]="contstatus">
-													<option value="LCL/FCL">LCL/FCL </option>
-													<option value="FCL/FCL">FCL/FCL </option>
-													<option value="LCL/LCL">LCL/LCL </option>
-													<option value="FCL/LCL">FCL/LCL </option>
-													<option value="GROUPAGE">GROUPAGE </option>
-													
-												</select>
-											</td>
-											<td><span class="col-form-span-label ">Destination Port</span></td>
-											<td>
-												<select class="form-control width150"  [(ngModel)]="destport">
-													<option value="">Please select</option>												 
-													@for (d of city; track d) {
-<option value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
-}
-												</select>
-											</td>									 
-										</tr>
-										<tr>
-											<td><span class="col-form-span-label ">Move Type</span></td>
-											<td><select class="form-control width80"  [(ngModel)]="Movetype">
-												<option value="">Please select</option>
-												<option value="CY/CY">CY/CY</option>
-												<option value="CFS/CY">CFS/CY</option>	
-												<option value="CFS/CFS">CFS/CFS</option>	
-											</select>
-											</td>
-										</tr>
-										<tr>
-											<td > <span class="col-form-span-label ">Steamer Agent Seal No</span></td>
-											<td> <input [(ngModel)]="SteAgtSealno" type="text"    class="form-control width180" maxlength="20" ></td>
-											<td><span class="col-form-span-label ">H.Stuffed</span></td>
-											<td>
-												<select class="form-control width50"  [(ngModel)]="hstuffed">
-													<option value="YES">YES</option>
-													<option value="NO">NO</option>												 
-												</select>
-											</td>									 
-										</tr>
-										<tr>
-											<td> <span class="col-form-span-label ">Where</span></td>
-											<td>
-												<input [(ngModel)]="stufwhere" type="text"  class="form-control width180" maxlength="40"  >
-												<input [(ngModel)]="stufwhere2" type="text"  class="form-control width180" maxlength="40"  >
-												<input [(ngModel)]="stufwhere3" type="text"  class="form-control width180" maxlength="40"  >											
-												<select class="form-control width150"  [(ngModel)]="stufcity">
-													<option value="">Please select</option>
-													@for (d of city; track d) {
-<option value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
-}
-												</select>
-											</td>
-											<td colspan="2"><span class="col-form-span-label fontcolorRed ">If it is H. Stuffed then
-												<br />
-												please mention the detail stuffing address and
-												<br />
-												if it is not H. Stuffed then
-												<br />
-											please mention where it is stuffed i.e. CFS, ICD etc</span></td>
-											
-										</tr>
-										<tr>
-											<td> <span class="col-form-span-label ">Custom Seal No</span></td>
-											<td><input [(ngModel)]="CustSealNo" type="text"    class="form-control width180" maxlength="20" ></td>
-											<td><span class="col-form-span-label ">FREIGHT</span></td>
-											<td>
-												<select class="form-control width50" (click)="onchangeFreight($event.target.value)"   [(ngModel)]="freight">
-													<option value="PP">PP</option>
-													<option value="CC">CC</option>												 
-												</select>
-											</td>									 
-										</tr>
-										<tr>
-											<td colspan="2">  </td>
-											
-											<td><input type="radio"  [disabled]="freightEnable"    (checked)= "LINERCONTRACT=='L'" (click)="radioonclick('L')"  name="rlist" /><span class="col-form-span-label ">Payable to shpg line</span></td>
-											<td><input type="radio"  [disabled]="freightEnable" (checked)="LINERCONTRACT =='S'" (click)="radioonclick('S')" name="rlist" /><span class="col-form-span-label ">As per Service Contract </span>
-											</td>									 
-										</tr>
-										<tr>
-											<td rowspan="2" > <span class="col-form-span-label ">Charges</span></td>										
-											<td><span class="col-form-span-label ">FREIGHT</span></td>
-											<td > 
-												<select class="form-control width150"  [(ngModel)]="frtCurency">
-													<option value="">Please select</option>
-													@for (d of currency; track d) {
-<option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
-}
-												</select>
-											</td>
-											<td>
-												<input [(ngModel)]="frtCurChargs" type="text" [disabled]= "freightRateEnable"   class="form-control width180" maxlength="18"  >
-											</td>									 
-										</tr>
-										
-										<tr>
-											<td> <span class="col-form-span-label ">BAF</span></td>
-											<td> 
-												<select class="form-control width150"  [(ngModel)]="BAFCurency">
-													<option value="">Please select</option>
-													@for (d of currency; track d) {
-<option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
-}
-												</select>
-											</td>
-											<td>
-												<input [(ngModel)]="BAFCurChargs" type="text"  [disabled]= "freightRateEnable"    class="form-control width180" maxlength="18"  >
-											</td>									 
-										</tr>
-										<tr>
-											<td><span class="col-form-span-label ">Booking Carrier No</span></td>
-											<td><input [(ngModel)]="BcarrierNo" type="text"    class="form-control width180" maxlength="18"  ></td>
-											<td><span class="col-form-span-label ">Booking Carrier Confirm Dt</span></td>
-											<td><my-date-picker   [options]="myDatePickerOptions" [(ngModel)]="Bcarrierdt" required></my-date-picker></td>										
-										</tr>
-										<tr>
-											<td rowspan="2"><span class="col-form-span-label ">Other Charges</span></td>
-											<td> <input [(ngModel)]="ThcName" type="text"    class="form-control width180" maxlength="20"  ></td>
-											<td>
-												<select class="form-control width150"  [(ngModel)]="ThcCurency">
-													<option value="">Please select</option>
-													@for (d of currency; track d) {
-<option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
-}
-												</select>
-											</td>
-											<td>
-												<input [(ngModel)]="ThcCurChargs" type="text"    class="form-control width180" maxlength="18" >
-											</td>
-										</tr>
-										<tr>										
-											<td> <input [(ngModel)]="otherName" type="text"    class="form-control width180" maxlength="20"  ></td>
-											<td>
-												<select class="form-control width150"  [(ngModel)]="OtherCurency">
-													<option value="">Please select</option>
-													@for (d of currency; track d) {
-<option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
-}
-												</select>
-											</td>
-											<td>
-												<input [(ngModel)]="otherCurChargs" type="text"    class="form-control width180" maxlength="18"  >
-											</td>
-										</tr>
-										<tr>
-											<td ><span class="col-form-span-label">Contract<span class="col-form-span-error">*</span></span></td>
-											<td colspan="3"><select class="form-control width150"  [(ngModel)]="contract">
-												<option value="">Please select</option>
-												<option value="1">Link Cargo </option>
-												<option value="2">Client</option>
-												 
-											</select></td>
-										</tr>
-										<tr>
-											<td class="col-form-span-heading" colspan="4">
-												Exchange Rate
-											</td>
-										</tr>
-										<tr>
-											<td colspan="4">
-												<table>
-													<tr >
-														<td class="col-form-span-heading "></td>
-														<td class="col-form-span-heading " ><span class="col-form-span-heading ">CURRENCY</span></td>
-														<td class="col-form-span-heading "><span class="col-form-span-heading ">VALUE</span></td>
-														<td class="col-form-span-heading "></td>	
-														<td class="col-form-span-heading "><span class="col-form-span-heading ">CURRENCY</span></td>
-														<td class="col-form-span-heading "><span class="col-form-span-heading ">VALUE</span></td>	
-													</tr>
-													<tr>
-														<td><span class="col-form-span-heading ">ORIGIN PORT<span class="col-form-span-error">*</span></span></td>
-														<td>
-															<select class="form-control width150"  [(ngModel)]="OCUR1">
-																<option value="">Please select</option>
-																@for (d of currency; track d) {
-<option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
-}
-															</select>
-														</td>
-														<td><input [(ngModel)]="OCURRate1" type="text"    class="form-control width180" maxlength="10"  ></td>	
-														<td>=</td>
-														<td>
-															<select class="form-control width150"  [(ngModel)]="OCUR2">
-																<option value="">Please select</option>
-																@for (d of currency; track d) {
-<option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
-}
-															</select>
-														</td>
-														<td><input [(ngModel)]="OCURRate2" type="text"    class="form-control width180" maxlength="10"  > </td>
-													</tr>
-													<tr>
-														<td><span class="col-form-span-heading ">DESTINATION PORT</span></td>
-														<td>
-															<select class="form-control width150"  [(ngModel)]="DCUR1">
-																<option value="">Please select</option>
-																@for (d of currency; track d) {
-<option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
-}
-															</select> 
-														</td>
-														<td><input [(ngModel)]="DCURRate1" type="text"    class="form-control width180" maxlength="10"  ></td>	
-														<td>=</td>
-														<td>
-															<select class="form-control width150"  [(ngModel)]="DCUR2">
-																<option value="">Please select</option>
-																@for (d of currency; track d) {
-<option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
-}
-															</select>
-														</td>
-														<td><input [(ngModel)]="DCURRate2" type="text"    class="form-control width180" maxlength="10"  ></td>
-													</tr>
-												</table>
-											</td>
-										</tr>
-										<tr>
-											<td><span class="col-form-span-label ">Remark</span></td>										
-											<td colspan="3"><textarea [(ngModel)]="remark" class="form-control width500"  rows="3" cols="100" maxlength="500" ></textarea>
-											</td>										
-										</tr>
-										<tr>
-											<td colspan="4">
-												<div class="card-footer rightlabel">
-													
-													<button class="btn btn-sm btn-success   " type="submit" id="btnAgtAdd" name="btnAgtAdd" [disabled]="buttonStatus" (click)="AddEditContainer()"><i class="fa fa-dot-circle-o" ></i> Submit</button>
-													<button class="btn btn-sm btn-danger   " type="reset" id="btnAgtRest" name="btnAgtrest" (click)="ResetAll()"><i class="fa fa-ban"></i> Reset</button>
-													
-												</div>
-											</td>
-										</tr>
-									</table>								
-								</div>
-								
-							</tab>
-							<!-- -->
-							<tab heading="CLP" class="tab-pane"    >
-								<table class="table table-bordered table-sm-new">
-									<tr>
-										<td class="col-form-span-heading"  colspan="23"  >
-											<span class="col-form-span-label" >{{clpHeader}}</span>
-											<button class="btn btn-sm btn-warning" style="float: right;" (click)="back();"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to List</u></span></button>
-										</td> 										
-									</tr> 
-									<tr  class="bakgrdskyBlue">
-										<!-- <td></td> -->
-										<td rowspan="3"  ><span class="col-form-span-label font-weight-bold ">Expt No.</span></td>
-										<td colspan="5" class="centerlabel"> <span class="col-form-span-label font-weight-bold  ">Total</span></td>
-										<td colspan="5" class="centerlabel"> <span class="col-form-span-label font-weight-bold ">Available</span></td>
-										<td colspan="6" class="centerlabel"> <span class="col-form-span-label font-weight-bold ">This Container</span></td>
-										<td rowspan="3"><span class="col-form-span-label font-weight-bold ">Color<br>Code</span></td>
-										<td rowspan="3"><span class="col-form-span-label font-weight-bold">Container No <br> If Required</span></td>
-									</tr>
-									<tr >
-										<td colspan="5"><span class="col-form-span-label font-weight-bold"></span></td>
-										<td colspan="5"><span class="col-form-span-label font-weight-bold"></span></td>
-										<td ><input type="text" [(ngModel)]="pkgs" class="form-control" disabled/></td>
-										<td ><input type="text" [(ngModel)]="cbm" class="form-control" disabled/></td>
-										<td ><input type="text" [(ngModel)]="pcs" class="form-control" disabled/></td>
-										<td ><input type="text" [(ngModel)]="grwt" class="form-control" disabled/></td>
-										<td ><input type="text" [(ngModel)]="netwt" class="form-control" disabled/></td>
-										<td ><input type="text" [(ngModel)]="CLP" class="form-control" disabled/></td>
-									</tr>
-									<tr class="bakgrdliteBlue">
-										<!-- <td  ><span class="col-form-span-label font-weight-bold">Select</span></td> -->
-										<!-- <td></td> -->
-										<td><span class="col-form-span-label font-weight-bold">pkgs</span></td>
-										<td><span class="col-form-span-label font-weight-bold">CBM</span></td>
-										<td><span class="col-form-span-label font-weight-bold">Pcs</span></td>
-										<td><span class="col-form-span-label font-weight-bold">GrWt</span></td>
-										<td><span class="col-form-span-label font-weight-bold">NetWt</span></td>
-										
-										<td><span class="col-form-span-label font-weight-bold">pkgs</span></td>
-										<td><span class="col-form-span-label font-weight-bold">CBM</span></td>
-										<td><span class="col-form-span-label font-weight-bold">Pcs</span></td>
-										<td><span class="col-form-span-label font-weight-bold">GrWt</span></td>
-										<td><span class="col-form-span-label font-weight-bold">NetWt</span></td>
-										
-										<td><span class="col-form-span-label font-weight-bold">pkgs</span></td>
-										<td><span class="col-form-span-label font-weight-bold">CBM</span></td>
-										<td><span class="col-form-span-label font-weight-bold">Pcs</span></td>
-										<td><span class="col-form-span-label font-weight-bold">GrWt</span></td>
-										<td><span class="col-form-span-label font-weight-bold">NetWt</span></td>
-										<td><span class="col-form-span-label font-weight-bold">CLP Sq.</span></td>
-									</tr>
-									@for (obj of containerClp; track obj) {
-<tr>
-										
-										
-										<!-- <td   class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.EXPTNO"  >{{obj.EXPTNO}}</td> -->
-										<!-- <td>
-											<span class="col-form-span-label"> 
-											<input type="checkbox" [(ngModel)]="obj.TRANS_TYPE"> 
-											</span>											
-										</td> -->
-										<td>
-											<span class="col-form-span-label"> 
-												{{obj.EXPTNO}}
-											</span>											
-										</td>
-										<td class="col-form-span-label">{{obj.TOTAL_NOOFPKGS}}</td>
-										<td class="col-form-span-label">{{obj.TOTAL_CBM}}</td>
-										<td class="col-form-span-label">{{obj.TOTAL_NO_OF_PCS}}</td>
-										<td class="col-form-span-label">{{obj.TOTAL_NO_GR_WT}}</td>
-										<td class="col-form-span-label">{{obj.TOTAL_NO_NET_WT}}</td>
-										<td class="col-form-span-label">{{obj.AVAILABLE_NOOFPKGS}}</td>
-										<td class="col-form-span-label">{{obj.AVAILABLE_CBM}}</td>
-										<td class="col-form-span-label">{{obj.AVAILABLE_NO_OF_PCS}}</td>
-										<td class="col-form-span-label">{{obj.AVAILABLE_NO_GR_WT}}</td>
-										<td class="col-form-span-label">{{obj.AVAILABLE_NO_NET_WT}}</td>
-										<td><input type="text" [(ngModel)]="obj.THIS_CONTAINER_NOOFPKGS" class="form-control" (change)="selectionChange('THIS_CONTAINER_NOOFPKGS')" /></td>
-										<td><input type="text" [(ngModel)]="obj.THIS_CONTAINER_CBM" class="form-control" (change)="selectionChange('THIS_CONTAINER_CBM')"/></td>
-										<td><input type="text" [(ngModel)]="obj.THIS_CONTAINER_NO_OF_PCS" class="form-control" (change)="selectionChange('THIS_CONTAINER_NO_OF_PCS')"/></td>
-										<td><input type="text" [(ngModel)]="obj.THIS_CONTAINER_NO_GR_WT" class="form-control"  (change)="selectionChange('THIS_CONTAINER_NO_GR_WT')"/></td>
-										<td><input type="text" [(ngModel)]="obj.THIS_CONTAINER_NO_NET_WT" class="form-control"  (change)="selectionChange('THIS_CONTAINER_NO_NET_WT')"/></td>
-										<td><input type="text" [(ngModel)]="obj.THIS_CONTAINER_NO_CLP_SEQ" class="form-control" maxlength="2" /></td>
-										<td><input type="text" [(ngModel)]="obj.COLOUR_CODE" class="form-control"/></td>
-										<td> <select class="form-control width80"  [(ngModel)]="obj.CONTAINER_NO">
-											<option value="">Please select</option>
-											@for (d of containerNoClp; track d) {
-<option value={{d.CONTAINERNO}}>{{d.CONTAINERNO}}</option>
-}
-										</select> </td>
-										
-									</tr>
-}
-									<tr>
-										<td class="col-form-span-heading"  colspan="23">
-											<span class="col-form-span-label centerlabel"> 
-												<input type="checkbox" [(ngModel)]="verified" [disabled]="verifiedflg != ''"  > Verified    
-											</span>	
-										</td>
-									</tr>
-									<tr>
-										<td colspan="23">
-											<div class="card-footer rightlabel">
-												
-												<button class="btn btn-sm btn-success   " type="submit" id="btnAgtAdd" name="btnAgtAdd" [disabled]="buttonStatus" (click)="addContainerCLP()"><i class="fa fa-dot-circle-o" ></i> Submit</button>
-												<button class="btn btn-sm btn-danger   " type="reset" id="btnAgtRest" name="btnAgtrest" (click)="ResetAll()"><i class="fa fa-ban"></i> Reset</button>
-												
-											</div>
-										</td>
-									</tr>
-								</table>
-							</tab>
-							
-							<tab heading ="No of Pallet">
-								<div class="col-md-8">
-									<table class="table table-bordered table-sm-new">
-										<tr>
-											<td class="col-form-span-heading"  colspan="2"  >
-												<span class="col-form-span-label" >No Of Pallets</span>
-												<button class="btn btn-sm btn-warning" style="float: right;" (click)="back();"><span class="col-form-span-label"><u><i class="fa fa-arrow-circle-left"></i>&nbsp;Back to List</u></span></button>
-											</td> 
-										</tr>
-										<tr>
-											<td>
-												<span class="col-form-span-label ">Containerno</span>
-											</td>
-											<td colspan="">
-												<span class="col-form-span-label" >{{P_Containerno}}</span>
-											</td>
-										</tr>
-										<tr>
-											<td class="col-form-span-heading"  colspan="2"    >
-												<span class="col-form-span-label" >{{p_header}}</span>
-											</td> 
-										</tr> 
-										<tr class="bakgrdliteBlue">
-											
-											<td><span class="col-form-span-label font-weight-bold">Exporter</span></td>
-											<td><span class="col-form-span-label font-weight-bold">No of Pallets</span></td>
-										</tr>
-										@for (obj of P_List; track obj) {
-<tr>
-											<td class="col-form-span-label">{{obj.CON_NAME}}</td>
-											<td><input type="text" [(ngModel)]="obj.NO_OF_PALLETS" class="form-control"/></td>
-										</tr>
-}
-										<tr>
-											<td colspan="4">
-												<div class="card-footer rightlabel">													
-													<button class="btn btn-sm btn-success" type="submit" id="btnAgtAdd" name="btnAgtAdd" [disabled]="buttonStatus" (click)="AddPallets()"><i class="fa fa-dot-circle-o" ></i> Submit</button>
-													 												
-												</div>
-											</td>
-										</tr>
-									</table>
-								</div>
-							</tab>
-							<!--<tab heading ="Container Transfer">
-								<div class="col-md-8">
-									<table class="table table-bordered table-sm-new">
-										<tr>
-											<td class="col-form-span-heading"  colspan="4"    >
-												<span class="col-form-span-label" >{{T_header}}</span>
-											</td> 
-										</tr> 
-										<tr *ngFor="let obj of T_List">
-											<td class="col-form-span-label">{{obj.Containerno}}</td>
-											<td class="col-form-span-label">{{obj.Exptno}}</td>
-											<td class="col-form-span-label">{{obj.Tot_pkgs}}</td>
-											<td class="col-form-span-label">{{obj.Tot_Cbm}}</td>
-										</tr>
-										<tr>
-											<td>
-												<span class="col-form-span-label ">New Vessel</span>
-											</td>
-											<td colspan="3">
-												<select class="form-control width500"  [(ngModel)]="T_vessel" (change)="onfillshipline($event.target.value)">
-													<option value="">Please select</option>
-													<option *ngFor="let d of vslAgent" value={{d.AGT_CODE}}>{{d.AGT_NAME}}</option>
-												</select>
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<span class="col-form-span-label ">Vessel Agent</span>
-											</td>
-											<td colspan="3">
-												<select class="form-control width500"  [(ngModel)]="T_Vslagt" (change)="onfillshipline($event.target.value)">
-													<option value="">Please select</option>
-													<option *ngFor="let d of vslAgent" value={{d.AGT_CODE}}>{{d.AGT_NAME}}</option>
-												</select>
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<span class="col-form-span-label ">Shpg Line</span>
-											</td>
-											<td colspan="3">
-												<select class="form-control width500"  [(ngModel)]="T_shpgline" (change)="onfillshipline($event.target.value)">
-													<option value="">Please select</option>
-													<option *ngFor="let d of vslAgent" value={{d.AGT_CODE}}>{{d.AGT_NAME}}</option>
-												</select>
-											</td>
-										</tr>
-									</table>
-								</div>
-							</tab>-->
-						</div>
-					</tabset>
-				</div>
-				
-				
-				
-			</div>
-		</div>
-	</div>
-</div>																																		
+﻿<!--
+  Container - add / edit, CLP and pallet count. Page kit recipe 2
+  (src/styles/kit/import-page.css), ported from MPERPNG-20. Every [(ngModel)],
+  id, name, (click) / (change) is unchanged, and so are the Links-only size
+  options (RFR / PAL / OPN / LCL) and the "Link Cargo" contract. <tabset> /
+  <tab> (ngx-bootstrap) stay: the .ts drives them through
+  @ViewChild('containerTabs', {static: true}) (tabs[i].active / .disabled), so
+  the tabset is never inside an @if. The tab strip is reskinned in
+  exp-sp-container-page.css.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Container</h1>
+      <p>Container details, CLP and pallet count</p>
+    </div>
+    <div class="tools">
+      <button class="btn g" type="button" (click)="back();">Back to list</button>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <tabset #containerTabs>
+
+      <!-- ================= container ================= -->
+      <tab heading="Container" class="tab-pane active">
+        <div class="card-h">
+          <h2>{{ vsldet || 'New container' }}</h2>
+          <span class="meta"><b>*</b> required</span>
+        </div>
+
+        <div class="fields">
+          <div class="fld">
+            <label>Vessel agent <span class="req">*</span></label>
+            <select [(ngModel)]="Vslagt" (change)="onfillshipline($event.target.value)">
+              <option value="">Please select</option>
+              @for (d of vslAgent; track d) {
+                <option value={{d.AGT_CODE}}>{{d.AGT_NAME}}</option>
+              }
+            </select>
+          </div>
+          <div class="fld">
+            <label>Shpg. line <span class="req">*</span></label>
+            <select [(ngModel)]="Vslshpgline">
+              <option value="">Please select</option>
+              @for (d of vslshpline; track d) {
+                <option value={{d.AGT_LINER}}>{{d.LINER_NAME}}</option>
+              }
+            </select>
+          </div>
+          <div class="fld">
+            <label>Container no. <span class="req">*</span></label>
+            <input [(ngModel)]="Containerno" type="text" maxlength="20" placeholder="Container no." />
+          </div>
+          <div class="fld">
+            <label>Container size <span class="req">*</span></label>
+            <div class="row2">
+              <select class="sz" [(ngModel)]="cntsize">
+                <option value="20">20</option>
+                <option value="40">40</option>
+              </select>
+              <select [(ngModel)]="cntsize1">
+                <option value="F">F</option>
+                <option value="H">H</option>
+                <option value="G">GOH</option>
+                <option value="R">RFR</option>
+                <option value="P">PAL</option>
+                <option value="O">OPN</option>
+                <option value="L">LCL</option>
+              </select>
+            </div>
+          </div>
+          <div class="fld">
+            <label>Status of container</label>
+            <select [(ngModel)]="contstatus">
+              <option value="LCL/FCL">LCL/FCL </option>
+              <option value="FCL/FCL">FCL/FCL </option>
+              <option value="LCL/LCL">LCL/LCL </option>
+              <option value="FCL/LCL">FCL/LCL </option>
+              <option value="GROUPAGE">GROUPAGE </option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>Destination port</label>
+            <select [(ngModel)]="destport">
+              <option value="">Please select</option>
+              @for (d of city; track d) {
+                <option value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
+              }
+            </select>
+          </div>
+          <div class="fld">
+            <label>Move type</label>
+            <select [(ngModel)]="Movetype">
+              <option value="">Please select</option>
+              <option value="CY/CY">CY/CY</option>
+              <option value="CFS/CY">CFS/CY</option>
+              <option value="CFS/CFS">CFS/CFS</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>Steamer agent seal no.</label>
+            <input [(ngModel)]="SteAgtSealno" type="text" maxlength="20" />
+          </div>
+          <div class="fld">
+            <label>H. stuffed</label>
+            <select [(ngModel)]="hstuffed">
+              <option value="YES">YES</option>
+              <option value="NO">NO</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>Custom seal no.</label>
+            <input [(ngModel)]="CustSealNo" type="text" maxlength="20" />
+          </div>
+          <div class="fld full">
+            <label>Where</label>
+            <div class="row2">
+              <input [(ngModel)]="stufwhere" type="text" maxlength="40" />
+              <input [(ngModel)]="stufwhere2" type="text" maxlength="40" />
+              <input [(ngModel)]="stufwhere3" type="text" maxlength="40" />
+              <select [(ngModel)]="stufcity">
+                <option value="">Please select</option>
+                @for (d of city; track d) {
+                  <option value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
+                }
+              </select>
+            </div>
+            <p class="note-t">If it is H. stuffed, give the detailed stuffing address; if not, say where it is stuffed, i.e. CFS, ICD etc.</p>
+          </div>
+          <div class="fld">
+            <label>Freight</label>
+            <select (click)="onchangeFreight($event.target.value)" [(ngModel)]="freight">
+              <option value="PP">PP</option>
+              <option value="CC">CC</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>Freight terms</label>
+            <div>
+              <label class="opt"><input type="radio" [disabled]="freightEnable" (checked)="LINERCONTRACT=='L'" (click)="radioonclick('L')" name="rlist" /> Payable to shpg line</label>
+              <label class="opt"><input type="radio" [disabled]="freightEnable" (checked)="LINERCONTRACT =='S'" (click)="radioonclick('S')" name="rlist" /> As per service contract</label>
+            </div>
+          </div>
+          <div class="fld full">
+            <label>Charges</label>
+            <div class="row2">
+              <span>Freight</span>
+              <select [(ngModel)]="frtCurency">
+                <option value="">Please select</option>
+                @for (d of currency; track d) {
+                  <option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+                }
+              </select>
+              <input [(ngModel)]="frtCurChargs" type="text" [disabled]="freightRateEnable" maxlength="18" />
+              <span>BAF</span>
+              <select [(ngModel)]="BAFCurency">
+                <option value="">Please select</option>
+                @for (d of currency; track d) {
+                  <option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+                }
+              </select>
+              <input [(ngModel)]="BAFCurChargs" type="text" [disabled]="freightRateEnable" maxlength="18" />
+            </div>
+          </div>
+          <div class="fld">
+            <label>Booking carrier no.</label>
+            <input [(ngModel)]="BcarrierNo" type="text" maxlength="18" />
+          </div>
+          <div class="fld">
+            <label>Booking carrier confirm dt</label>
+            <my-date-picker [options]="myDatePickerOptions" [(ngModel)]="Bcarrierdt" required></my-date-picker>
+          </div>
+          <div class="fld full">
+            <label>Other charges</label>
+            <div class="row2">
+              <input [(ngModel)]="ThcName" type="text" maxlength="20" placeholder="Name" />
+              <select [(ngModel)]="ThcCurency">
+                <option value="">Please select</option>
+                @for (d of currency; track d) {
+                  <option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+                }
+              </select>
+              <input [(ngModel)]="ThcCurChargs" type="text" maxlength="18" placeholder="Amount" />
+            </div>
+          </div>
+          <div class="fld full">
+            <label>&nbsp;</label>
+            <div class="row2">
+              <input [(ngModel)]="otherName" type="text" maxlength="20" placeholder="Name" />
+              <select [(ngModel)]="OtherCurency">
+                <option value="">Please select</option>
+                @for (d of currency; track d) {
+                  <option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+                }
+              </select>
+              <input [(ngModel)]="otherCurChargs" type="text" maxlength="18" placeholder="Amount" />
+            </div>
+          </div>
+          <div class="fld">
+            <label>Contract <span class="req">*</span></label>
+            <select [(ngModel)]="contract">
+              <option value="">Please select</option>
+              <option value="1">Link Cargo </option>
+              <option value="2">Client</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card-h"><h2>Exchange rate</h2></div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Currency</th>
+                <th>Value</th>
+                <th></th>
+                <th>Currency</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="lbl">Origin port <span class="req">*</span></td>
+                <td>
+                  <select [(ngModel)]="OCUR1">
+                    <option value="">Please select</option>
+                    @for (d of currency; track d) {
+                      <option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+                    }
+                  </select>
+                </td>
+                <td><input [(ngModel)]="OCURRate1" type="text" maxlength="10" /></td>
+                <td>=</td>
+                <td>
+                  <select [(ngModel)]="OCUR2">
+                    <option value="">Please select</option>
+                    @for (d of currency; track d) {
+                      <option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+                    }
+                  </select>
+                </td>
+                <td><input [(ngModel)]="OCURRate2" type="text" maxlength="10" /></td>
+              </tr>
+              <tr>
+                <td class="lbl">Destination port</td>
+                <td>
+                  <select [(ngModel)]="DCUR1">
+                    <option value="">Please select</option>
+                    @for (d of currency; track d) {
+                      <option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+                    }
+                  </select>
+                </td>
+                <td><input [(ngModel)]="DCURRate1" type="text" maxlength="10" /></td>
+                <td>=</td>
+                <td>
+                  <select [(ngModel)]="DCUR2">
+                    <option value="">Please select</option>
+                    @for (d of currency; track d) {
+                      <option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+                    }
+                  </select>
+                </td>
+                <td><input [(ngModel)]="DCURRate2" type="text" maxlength="10" /></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="fields">
+          <div class="fld full top">
+            <label>Remark</label>
+            <textarea [(ngModel)]="remark" rows="3" cols="100" maxlength="500"></textarea>
+          </div>
+        </div>
+
+        <div class="bar in-card">
+          <span class="note">Nothing is saved until you choose Submit.</span>
+          <div class="r">
+            <button class="btn g" type="reset" id="btnAgtRest" name="btnAgtrest" (click)="ResetAll()">Reset</button>
+            <button class="btn p" type="submit" id="btnAgtAdd" name="btnAgtAdd" [disabled]="buttonStatus" (click)="AddEditContainer()">Submit</button>
+          </div>
+        </div>
+      </tab>
+
+      <!-- ================= CLP ================= -->
+      <tab heading="CLP" class="tab-pane">
+        <div class="card-h">
+          <h2>{{ clpHeader || 'CLP' }}</h2>
+        </div>
+
+        <div class="tbl-wrap">
+          <table class="tbl nowrap">
+            <thead>
+              <tr>
+                <th rowspan="3">Expt no.</th>
+                <th colspan="5" class="grp">Total</th>
+                <th colspan="5" class="grp">Available</th>
+                <th colspan="6" class="grp">This container</th>
+                <th rowspan="3" class="sep">Colour code</th>
+                <th rowspan="3">Container no. if required</th>
+              </tr>
+              <tr>
+                <th colspan="5" class="sep"></th>
+                <th colspan="5" class="sep"></th>
+                <th class="sep"><input type="text" [(ngModel)]="pkgs" disabled /></th>
+                <th><input type="text" [(ngModel)]="cbm" disabled /></th>
+                <th><input type="text" [(ngModel)]="pcs" disabled /></th>
+                <th><input type="text" [(ngModel)]="grwt" disabled /></th>
+                <th><input type="text" [(ngModel)]="netwt" disabled /></th>
+                <th><input type="text" [(ngModel)]="CLP" disabled /></th>
+              </tr>
+              <tr>
+                <th class="sep">Pkgs</th>
+                <th>CBM</th>
+                <th>Pcs</th>
+                <th>Gr wt</th>
+                <th>Net wt</th>
+                <th class="sep">Pkgs</th>
+                <th>CBM</th>
+                <th>Pcs</th>
+                <th>Gr wt</th>
+                <th>Net wt</th>
+                <th class="sep">Pkgs</th>
+                <th>CBM</th>
+                <th>Pcs</th>
+                <th>Gr wt</th>
+                <th>Net wt</th>
+                <th>CLP sq.</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (obj of containerClp; track obj) {
+                <tr>
+                  <td class="mono">{{obj.EXPTNO}}</td>
+                  <td class="num sep">{{obj.TOTAL_NOOFPKGS}}</td>
+                  <td class="num">{{obj.TOTAL_CBM}}</td>
+                  <td class="num">{{obj.TOTAL_NO_OF_PCS}}</td>
+                  <td class="num">{{obj.TOTAL_NO_GR_WT}}</td>
+                  <td class="num">{{obj.TOTAL_NO_NET_WT}}</td>
+                  <td class="num sep">{{obj.AVAILABLE_NOOFPKGS}}</td>
+                  <td class="num">{{obj.AVAILABLE_CBM}}</td>
+                  <td class="num">{{obj.AVAILABLE_NO_OF_PCS}}</td>
+                  <td class="num">{{obj.AVAILABLE_NO_GR_WT}}</td>
+                  <td class="num">{{obj.AVAILABLE_NO_NET_WT}}</td>
+                  <td class="sep"><input type="text" [(ngModel)]="obj.THIS_CONTAINER_NOOFPKGS" (change)="selectionChange('THIS_CONTAINER_NOOFPKGS')" /></td>
+                  <td><input type="text" [(ngModel)]="obj.THIS_CONTAINER_CBM" (change)="selectionChange('THIS_CONTAINER_CBM')" /></td>
+                  <td><input type="text" [(ngModel)]="obj.THIS_CONTAINER_NO_OF_PCS" (change)="selectionChange('THIS_CONTAINER_NO_OF_PCS')" /></td>
+                  <td><input type="text" [(ngModel)]="obj.THIS_CONTAINER_NO_GR_WT" (change)="selectionChange('THIS_CONTAINER_NO_GR_WT')" /></td>
+                  <td><input type="text" [(ngModel)]="obj.THIS_CONTAINER_NO_NET_WT" (change)="selectionChange('THIS_CONTAINER_NO_NET_WT')" /></td>
+                  <td><input type="text" [(ngModel)]="obj.THIS_CONTAINER_NO_CLP_SEQ" maxlength="2" /></td>
+                  <td class="sep"><input type="text" [(ngModel)]="obj.COLOUR_CODE" /></td>
+                  <td>
+                    <select [(ngModel)]="obj.CONTAINER_NO">
+                      <option value="">Please select</option>
+                      @for (d of containerNoClp; track d) {
+                        <option value={{d.CONTAINERNO}}>{{d.CONTAINERNO}}</option>
+                      }
+                    </select>
+                  </td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="19">No consignments to stuff in this container.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="fields">
+          <div class="fld full">
+            <label>Verified</label>
+            <label class="opt"><input type="checkbox" [(ngModel)]="verified" [disabled]="verifiedflg != ''" /> CLP verified</label>
+          </div>
+        </div>
+
+        <div class="bar in-card">
+          <span class="note">Nothing is saved until you choose Submit.</span>
+          <div class="r">
+            <button class="btn g" type="reset" id="btnAgtRest" name="btnAgtrest" (click)="ResetAll()">Reset</button>
+            <button class="btn p" type="submit" id="btnAgtAdd" name="btnAgtAdd" [disabled]="buttonStatus" (click)="addContainerCLP()">Submit</button>
+          </div>
+        </div>
+      </tab>
+
+      <!-- ================= pallets ================= -->
+      <tab heading="No of Pallet">
+        <div class="card-h">
+          <h2>{{ p_header || 'No. of pallets' }}</h2>
+        </div>
+
+        <div class="fields">
+          <div class="fld">
+            <label>Container no.</label>
+            <span class="mono">{{ P_Containerno }}</span>
+          </div>
+        </div>
+
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Exporter</th>
+                <th>No. of pallets</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (obj of P_List; track obj) {
+                <tr>
+                  <td>{{obj.CON_NAME}}</td>
+                  <td><input type="text" [(ngModel)]="obj.NO_OF_PALLETS" /></td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="2">No exporters in this container.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="bar in-card">
+          <span class="note">Nothing is saved until you choose Submit.</span>
+          <div class="r">
+            <button class="btn p" type="submit" id="btnAgtAdd" name="btnAgtAdd" [disabled]="buttonStatus" (click)="AddPallets()">Submit</button>
+          </div>
+        </div>
+      </tab>
+
+    </tabset>
+  </div>
+</div>

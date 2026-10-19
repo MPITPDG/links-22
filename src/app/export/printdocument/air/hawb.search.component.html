@@ -1,62 +1,39 @@
-﻿<div class="row">
-	<div class="col-sm-12">
-		<div class="card">
-			<div class="card-header formheading">
-			   <strong>Export - Master HAWB NO</strong>
-			</div>
-		</div>
-	</div>
+﻿<!--
+  Hosted inside hawb.component.html's .im-page card. Ported from MPERPNG-20; MP's extra
+  "Print Hawb" button (popup /popup/hawbprint) is not carried: that popup does not exist in Links.
+  The Print button still opens the same legacy ASPX URL as before (printData() unchanged).
+-->
+<div class="card-h"><h2>Export - Master HAWB No</h2></div>
+
+<div class="fields" style="padding:14px 16px;">
+
+  <div class="fld">
+    <label>HAWB No. <span class="req">*</span></label>
+    <div>
+      <input type="text" [(ngModel)]="hawbno" [OnlyNumber]="true" [maxlength]="15"
+             (keyup.enter)="searchData()" />
+      @if (error == 1) {
+        <p class="hint" style="color:var(--faint);">Invalid Hawb Number*</p>
+      }
+    </div>
+  </div>
+
+  <div class="fld">
+    <label>HAWB Date. <span class="req">*</span></label>
+    <div>
+      <my-date-picker name="hawbdate" [options]="myDatePickerOptions" [(ngModel)]="hawbdate"></my-date-picker>
+      @if (error == 2) {
+        <p class="hint" style="color:var(--faint);">Hawb date can not blank*</p>
+      }
+    </div>
+  </div>
+
 </div>
-<div class="row">
-	<div class="col-sm-2">
-	</div>
-	<div class="col-sm-8">
-		<table class="table table-sm-new bgwhite">
-			<tr class="title-head formheading">
-				<td colspan="6">
-					<span class="col-form-span-label"><strong>HAWB DETAILS </strong></span>
-				</td>
-			</tr>
-		</table>
-		<table class="table table-sm-new bgwhite">
-			<tr class="title-head trbg">
-				<td class="right-text">
-					<span class="col-form-span-label">HAWB No.</span><span class="col-form-span-error">*</span>
-				</td>
-				<td class="width130">
-					<input type="text" [(ngModel)]="hawbno" class="form-control width120" [OnlyNumber]="true" [maxlength]="15" />
-				</td>
-				<td class="width300">
-					@if (error == 1) {
-<span class="col-form-span-error">Invalid Hawb Number*</span>
-}
-				</td>
-			</tr>
-			<tr class="title-head trbg">
-				<td class="right-text">
-					<span class="col-form-span-label">HAWB Date.</span><span class="col-form-span-error">*</span>
-				</td>
-				<td class="width130">
-					<my-date-picker name="hawbdate" [options]="myDatePickerOptions" [(ngModel)]="hawbdate"></my-date-picker>
-				</td>
-				<td class="width300">
-					@if (error == 2) {
-<span class="col-form-span-error">Hawb date can not blank*</span>
-}
-				</td>
-			</tr>
-			<tr class="title-head trbg">
-				<td colspan="3" class="centerlabel">
-					<button type="button" name="searchButton" class="btn btn-sm btn-info" (click)="searchData();">
-						<span class="col-form-span-label"><i class="fa fa-search"></i>Search</span>
-					</button>
-					<button type="button" name="printButton" class="btn btn-sm btn-warning" (click)="printData();">
-						<span class="col-form-span-label"><i class="fa fa-print"></i> Print</span>
-					</button>
-				</td>
-			</tr>
-		</table>
-	</div>
-	<div class="col-sm-2">
-	</div>
+
+<div class="bar" style="margin:0;">
+  <span class="note"></span>
+  <span class="r">
+    <button type="button" class="btn g" name="searchButton" (click)="searchData();">Search</button>
+    <button type="button" class="btn p" name="printButton" (click)="printData();">Print</button>
+  </span>
 </div>

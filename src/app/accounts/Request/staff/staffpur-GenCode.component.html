@@ -1,93 +1,97 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-      <div class="col-sm-12">
-        <div class="card">
-          <div class="card-header formheading">
-            <strong>{{strheader}}</strong>
-          </div>
-        </div>
+<!--
+  India Accounts - generate PI / JV from verified requests (recipe 1).
+  Kit: global .im-page kit (src/styles/kit) + purchase/purchase-page.css. The per-row Generate button
+  (GenerateCodeJVCPSRPI -> ACC_GENERATE_FINAL_CODE_CPJVPI, then Print() opens the popup print route)
+  and the code link (ViewData -> popup view route) are unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{strheader}}</h1>
+      <p>Verified requests waiting for a final voucher number</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="toolbar">
+      <span class="count">{{ Filtered.length }} {{ Filtered.length === 1 ? 'request' : 'requests' }}</span>
+      <span class="tb-r">
+        <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!Filtered.length">Export</button>
+      </span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Req code</th>
+            <th>Requested by</th>
+            <th>Requested on</th>
+            @if (Status == 'SRPI' || Status == 'RPI') {
+              <th class="num">Amount</th>
+            }
+            @if (Status == 'JVREQ') {
+              <th class="num">Debit</th>
+              <th class="num">Credit</th>
+            }
+            <th>Authorised by</th>
+            <th>Authorised on</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+            <tr><td class="empty" colspan="10">Loading requests…</td></tr>
+          } @else if (loadError) {
+            <tr><td class="empty" colspan="10">The list could not be loaded. Reload the page to try again.</td></tr>
+          } @else {
+            @for (obj of pageRows; track $index) {
+              <tr>
+                <td>
+                  @if (obj.AUTHORISESTATUS) { <span class="chip"><span class="dot"></span>{{obj.AUTHORISESTATUS}}</span> }
+                </td>
+                <td class="mono"><a class="lnk" (click)="ViewData(obj.REQCODE,obj.PSTATUS)">{{obj.REQCODE}}</a></td>
+                <td>{{obj.REQUESTEDBY}}</td>
+                <td>{{obj.REQUESTEDON}}</td>
+                @if (obj.PSTATUS == 'SRPI' || obj.PSTATUS == 'RPI') {
+                  <td class="num">{{obj.AMOUNT}}</td>
+                }
+                @if (obj.PSTATUS == 'JVREQ') {
+                  <td class="num">{{obj.DEBIT|number:'2.2-4'}}</td>
+                  <td class="num">{{obj.CREDIT|number:'2.2-4'}}</td>
+                }
+                <td>{{obj.AUTHORISEDBY}}</td>
+                <td>{{obj.AUTHORISATIONDATE}}</td>
+                <td class="act">
+                  <button type="button" (click)="GenerateCodeJVCPSRPI(obj.REQCODE,obj.PSTATUS,obj.AUTHORISATIONSTATUS,obj.ISGEN_RIGHTS)">
+                    @if (obj.ISGEN_RIGHTS !='1' && obj.PSTATUS =='JVREQ') { Locked }
+                    @if (obj.ISGEN_RIGHTS =='1' && obj.PSTATUS =='JVREQ') { Generate }
+                    @if (obj.PSTATUS =='RCP' || obj.PSTATUS =='RPI' || obj.PSTATUS =='SRPI') { Generate }
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="10">Nothing waiting to be generated.</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ Filtered.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="page <= 1" (click)="goPage(page - 1)" aria-label="Previous page">‹</button>
+        @for (p of pageList; track $index) {
+          @if (p === 0) {
+            <span class="gap">…</span>
+          } @else {
+            <button type="button" [class.on]="p === page" (click)="goPage(p)">{{ p }}</button>
+          }
+        }
+        <button type="button" [disabled]="page >= pageCount" (click)="goPage(page + 1)" aria-label="Next page">›</button>
       </div>
     </div>
-    <div class="row no-gutters" >
-      <div class="col-md-1">
-        </div>
-      <div   class="col-md-10" style="overflow-y: auto;height: 500px;">
-        <table  class="table table-bordered table-sm-new bgwhite table-hover" >
-          <thead>
-           
-            <tr class="col-form-span-heading" style="white-space:nowrap;">
-              <th  class="col-form-span-label"> GENERATE </th>
-              <th class="col-form-span-label">
-                STATUS
-              </th>
-              <th class="col-form-span-label">
-                REQ CODE
-              </th>
-              <th class="col-form-span-label" >
-                REQUESTED BY 
-              </th>
-              <th class="col-form-span-label" >
-                REQUESTED ON 
-              </th>
-              @if ( Status == 'SRPI' || Status == 'RPI') {
-<th class="col-form-span-label" >
-                AMOUNT 
-              </th>
-}
-              @if ( Status == 'JVREQ') {
-<th class="col-form-span-label" >
-                DEBIT 
-              </th>
-}
-              @if (Status == 'JVREQ') {
-<th class="col-form-span-label" >
-               CREDIT
-              </th>
-}
-              <th class="col-form-span-label" >
-                AUTHORISED BY 
-              </th>
-              <th class="col-form-span-label" >
-                AUTHORISED ON 
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bgwhite">
-            @for (obj of datatable ; track obj) {
-<tr     >
-              <td >  <button class="btn btn-sm btn-success" type="submit" (click)="GenerateCodeJVCPSRPI(obj.REQCODE,obj.PSTATUS,obj.AUTHORISATIONSTATUS,obj.ISGEN_RIGHTS)"> @if (obj.ISGEN_RIGHTS !='1' && obj.PSTATUS =='JVREQ') {
-<span
-                class="col-form-span-label"><i  class="fa fa-lock"></i>lock</span>
-}
-                @if (obj.ISGEN_RIGHTS =='1' && obj.PSTATUS =='JVREQ') {
-<span class="col-form-span-label"><i  class="fa fa-laptop"></i>Generate</span>
-}
-                @if (obj.PSTATUS =='RCP' || obj.PSTATUS =='RPI' || obj.PSTATUS =='SRPI') {
-<span class="col-form-span-label"> <i  class="fa fa-laptop"></i>Generate</span>
-}</button> </td>
-              <td class="col-form-span-label" >{{obj.AUTHORISESTATUS}}</td>
-              <td class="col-form-span-label link-label"  (click)="ViewData(obj.REQCODE,obj.PSTATUS)"><u> {{obj.REQCODE}}</u> </td> 
-              <td class="col-form-span-label">{{obj.REQUESTEDBY}}</td>
-              <td class="col-form-span-label">{{obj.REQUESTEDON}}</td>
-              @if ( obj.PSTATUS == 'SRPI' || obj.PSTATUS == 'RPI') {
-<td class="col-form-span-label">{{obj.AMOUNT}}</td>
-}
-              @if ( obj.PSTATUS == 'JVREQ') {
-<td class="col-form-span-label" style="text-align: right;">{{obj.DEBIT|number:'2.2-4'}}</td>
-}
-              @if ( obj.PSTATUS == 'JVREQ') {
-<td class="col-form-span-label" style="text-align: right;">{{obj.CREDIT|number:'2.2-4'}}</td>
-}
-              <td class="col-form-span-label" >{{obj.AUTHORISEDBY}}</td>
-              <td class="col-form-span-label" >{{obj.AUTHORISATIONDATE}}</td>
-              
-            </tr>
-}
-          </tbody>
-       
-        </table>
-          </div>
-      <div class="col-md-1">
-      </div>
-    </div>           
-  </div>  
+  </div>
+</div>

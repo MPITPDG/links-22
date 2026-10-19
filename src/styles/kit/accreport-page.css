@@ -1,0 +1,136 @@
+/* ----------------------------------------------------------------
+   Links port (Phase 1): GLOBAL page-kit stylesheet, registered in
+   angular.json `styles` after src/tailwind.css.
+   Source: MPERPNG-20 src/app/accounts/Accreport/accreport-page.css
+   Area add-on. In MP: styleUrls [import-page.css, accreport-page.css].
+   In Links: put class "kit-accreport" on the component host (e.g.
+   host: { class: 'kit-accreport' }) or on a wrapper around the .im-page root.
+   .kit-accreport stands in for MP's [_nghost-*] so specificity is unchanged.
+   Every rule stays under its root class, so no legacy screen is affected.
+   Do not edit by hand without mirroring MP; regenerate from MP instead.
+   ---------------------------------------------------------------- */
+/* ============================================================
+   India Accounts page additions on top of src/app/import/import-page.css.
+   Used by Accreport, MisReport, Authorisation, UnAuthorisation, tds26as,
+   uploadbankreconcil and Master/BankReconcil. Monochrome only.
+   ============================================================ */
+.kit-accreport .im-page .sec { margin-bottom: 16px; }
+.kit-accreport .im-page .fk-alert { padding: 12px 16px; margin-bottom: 16px; color: var(--soft); }
+.kit-accreport .im-page .fk-note { padding: 10px 16px; color: var(--soft); font-size: 12px; border-top: 1px solid var(--line); }
+
+/* filter grid: auto-fit columns, labels above (filters) */
+.kit-accreport .im-page .filters.fk-f { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.kit-accreport .im-page .filters.fk-f .f.w2 { grid-column: span 2; }
+.kit-accreport .im-page .filters.fk-f .f.act { display: flex; gap: 8px; align-items: end; }
+
+/* radio / checkbox option groups */
+.kit-accreport .im-page .fk-opts { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; min-height: 32px; }
+.kit-accreport .im-page .fk-opts label { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--ink); margin: 0; cursor: pointer; }
+.kit-accreport .im-page .fk-opts input[type="radio"],
+.kit-accreport .im-page .fk-opts input[type="checkbox"],
+.kit-accreport .im-page table.tbl input[type="checkbox"] { accent-color: var(--mp-primary, #0A0A0A); width: 14px; height: 14px; margin: 0; }
+.kit-accreport .im-page .fk-inline { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.kit-accreport .im-page .fk-inline > span { color: var(--soft); font-size: 12px; }
+.kit-accreport .im-page .fk-inline > input,
+.kit-accreport .im-page .fk-inline > my-date-picker,
+.kit-accreport .im-page .fk-inline > select { flex: 1 1 140px; min-width: 120px; }
+.kit-accreport .im-page .fld .ng-select,
+.kit-accreport .im-page .f .ng-select { width: 100%; }
+
+/* segmented period presets */
+.kit-accreport .im-page .fk-seg { display: flex; border: 1px solid var(--edge); border-radius: 4px; overflow: hidden; height: 32px; }
+.kit-accreport .im-page .fk-seg button { flex: 1; font: inherit; font-size: 12px; font-weight: 600; border: 0; background: var(--mp-surface, #fff); color: var(--ink); cursor: pointer; border-right: 1px solid var(--edge); padding: 0 8px; white-space: nowrap; }
+.kit-accreport .im-page .fk-seg button:last-child { border-right: 0; }
+.kit-accreport .im-page .fk-seg button.on { background: var(--mp-primary, var(--ink)); color: var(--mp-primary-fg, #fff); }
+.kit-accreport .im-page .fk-seg button:disabled { color: var(--faint); cursor: not-allowed; }
+
+/* KPI tiles */
+.kit-accreport .im-page .fk-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.kit-accreport .im-page .fk-kpi { padding: 12px 14px; }
+.kit-accreport .im-page .fk-kpi .k { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); font-weight: 600; }
+.kit-accreport .im-page .fk-kpi .v { font-family: var(--ex-font, Inter, system-ui, -apple-system, "Segoe UI", sans-serif); font-size: 24px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; line-height: 1.15; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kit-accreport .im-page .fk-kpi .v .u,
+.kit-accreport .im-page .fk-kpi .v small { font-size: .56em; font-weight: 500; letter-spacing: 0; color: var(--soft); margin: 0 .12em; }
+.kit-accreport .im-page .fk-kpi .s { font-size: 11.5px; color: var(--faint); margin-top: 2px; }
+
+/* chart */
+.kit-accreport .im-page .fk-chart { position: relative; padding: 14px 16px 8px; }
+.kit-accreport .im-page .fk-chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.kit-accreport .im-page .fk-chart .gl { stroke: var(--line); stroke-width: 1; }
+.kit-accreport .im-page .fk-chart .ax { font-size: 10px; fill: var(--faint); font-family: var(--num); }
+.kit-accreport .im-page .fk-chart .fb { fill: var(--mp-primary, var(--ink)); }
+.kit-accreport .im-page .fk-chart .fb.neg { fill: #9E9E9E; }
+.kit-accreport .im-page .fk-chart .empty { padding: 30px; text-align: center; color: var(--faint); }
+
+/* horizontal share bars (age buckets etc.) */
+.kit-accreport .im-page .fk-hbars { padding: 12px 16px; display: grid; gap: 8px; }
+.kit-accreport .im-page .fk-hbar { display: grid; grid-template-columns: 150px 1fr 130px; gap: 10px; align-items: center; font-size: 12.5px; }
+.kit-accreport .im-page .fk-hbar .t { height: 10px; background: var(--band); border-radius: 2px; overflow: hidden; }
+.kit-accreport .im-page .fk-hbar .t div { height: 100%; background: var(--mp-primary, var(--ink)); }
+.kit-accreport .im-page .fk-hbar .n { font-family: var(--num); text-align: right; }
+
+/* skeletons */
+.kit-accreport .im-page .fk-skel { height: 12px; border-radius: 3px; background: linear-gradient(90deg, #EDEDED 25%, #F7F7F7 50%, #EDEDED 75%); background-size: 200% 100%; animation: fk-sh 1.2s infinite linear; margin: 4px 0; }
+.kit-accreport .im-page .fk-skel.h24 { height: 24px; }
+.kit-accreport .im-page .fk-skel.w40 { width: 40%; }
+.kit-accreport .im-page .fk-skel.w60 { width: 60%; }
+.kit-accreport .im-page .fk-skel.chart { height: 180px; }
+@keyframes fk-sh { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* table extras */
+.kit-accreport .im-page table.tbl td.num,
+.kit-accreport .im-page table.tbl th.num { text-align: right; font-family: var(--num); white-space: nowrap; }
+.kit-accreport .im-page table.tbl tr.tot td { font-weight: 600; background: var(--band); border-top: 1px solid var(--edge); }
+.kit-accreport .im-page table.tbl tr.grp td { font-weight: 600; background: var(--ground); }
+.kit-accreport .im-page table.tbl td.ck,
+.kit-accreport .im-page table.tbl th.ck { width: 34px; text-align: center; }
+.kit-accreport .im-page table.tbl td .btn { height: 26px; padding: 0 10px; font-size: 12px; }
+.kit-accreport .im-page table.tbl td input:not([type="checkbox"]):not([type="radio"]),
+.kit-accreport .im-page table.tbl td select { height: 28px; min-width: 90px; }
+.kit-accreport .im-page .fk-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* boxed choose-file area */
+.kit-accreport .im-page .fk-drop { border: 1px dashed var(--edge); background: var(--ground); border-radius: 6px; padding: 18px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+.kit-accreport .im-page .fk-drop .t { font-weight: 600; }
+.kit-accreport .im-page .fk-drop .h { font-size: 12px; color: var(--faint); }
+.kit-accreport .im-page .fk-drop input[type="file"] { font: inherit; font-size: 12.5px; max-width: 100%; }
+
+@media (max-width: 900px) {
+    .kit-accreport .im-page .filters.fk-f .f.w2 { grid-column: auto; }
+    .kit-accreport .im-page .fk-hbar { grid-template-columns: 100px 1fr 100px; }
+}
+.kit-accreport .im-page .f > label > input[type="radio"] { accent-color: var(--mp-primary, #0A0A0A); margin: 0 4px 0 0; vertical-align: -2px; }
+.kit-accreport .im-page .fk-lbl { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); font-weight: 600; min-width: 96px; }
+.kit-accreport .im-page .fld > label > input[type="radio"] { accent-color: var(--mp-primary, #0A0A0A); margin: 0 4px 0 0; vertical-align: -2px; }
+.kit-accreport .im-page .fld > div > * + * { margin-top: 6px; }
+.kit-accreport .im-page .btn.fk-tog { height: 22px; width: 22px; padding: 0; justify-content: center; font-family: var(--num); }
+.kit-accreport .im-page table.tbl td.fk-wrap { white-space: pre-wrap; min-width: 260px; }
+.kit-accreport .im-page .fk-modal-back { position: fixed; inset: 0; background: rgba(10, 10, 10, .35); z-index: 1050; display: flex; align-items: flex-start; justify-content: center; padding: 60px 16px; overflow: auto; }
+.kit-accreport .im-page .fk-modal { width: min(900px, 100%); margin: 0; }
+.kit-accreport .im-page .fk-modal-bar { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--line); }
+.kit-accreport .im-page .fk-inline > input.fk-hm { flex: 0 0 48px; min-width: 48px; width: 48px; text-align: center; }
+.kit-accreport .im-page tr.fk-click { cursor: pointer; }
+.kit-accreport .im-page .fk-sub { color: var(--soft); font-size: 12px; }
+.kit-accreport .im-page table.tbl td a.btn { height: 26px; padding: 0 10px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; }
+.kit-accreport .im-page table.tbl tr.fk-subtot td { font-weight: 600; border-top: 1px dashed var(--edge); }
+.kit-accreport .im-page .fk-seg.fk-tabs { display: inline-flex; min-width: 280px; }
+.kit-accreport .im-page table.tbl td.fd-sub { background: var(--ground); padding: 8px 12px 12px 28px; }
+.kit-accreport .im-page input.fk-search { height: 30px; width: 240px; }
+
+/* ---- appended: two-column statements, wide draggable modal, equation KPIs ---- */
+.kit-accreport .im-page .fk-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.kit-accreport .im-page .fk-2col > .card { margin-bottom: 0; }
+.kit-accreport .im-page .fk-modal.fk-modal-wide { width: min(1100px, 100%); }
+.kit-accreport .im-page .card-h.fk-drag { cursor: move; user-select: none; }
+.kit-accreport .im-page .fk-kpis.fk-eq { margin: 0; gap: 0; }
+.kit-accreport .im-page .fk-kpis.fk-eq .fk-kpi { border-right: 1px solid var(--line); }
+.kit-accreport .im-page .fk-kpis.fk-eq .fk-kpi:last-child { border-right: 0; }
+@media (max-width: 1000px) { .kit-accreport .im-page .fk-2col { grid-template-columns: 1fr; } }
+.kit-accreport .im-page .fk-pad { padding: 12px 16px; }
+.kit-accreport .im-page .fk-strong { font-weight: 700; }
+.kit-accreport .im-page .fk-note.nb { border-top: 0; border-bottom: 1px solid var(--line); }
+.kit-accreport .im-page th.sort { cursor: pointer; user-select: none; white-space: nowrap; }
+.kit-accreport .im-page .fk-ro { min-height: 32px; display: flex; align-items: center; padding: 0 10px; border: 1px dashed var(--edge); border-radius: 4px; background: var(--fill); color: var(--soft); font-size: 13px; }
+.kit-accreport .im-page table.tbl tr.fk-sel td { background: var(--band); font-weight: 600; }
+.kit-accreport .im-page table.tbl tr.fk-dim td { color: var(--faint); }
+.kit-accreport .im-page .fk-kpis.fk-eq.fk-eq-2 { border-top: 1px solid var(--line); }

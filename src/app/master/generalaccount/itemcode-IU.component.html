@@ -1,185 +1,114 @@
-<div class="animated fadeIn">
-	<div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>{{Header| uppercase}}</strong>
-                </div>
-            </div>
-        </div>
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{Header| uppercase}}</h1>
+      <p>Item code master</p>
     </div>
-    <div class="row">
-		<div class="col-sm-3">
-		</div>
-		<div class="col-sm-6">
-							
-            <table class="table table-bordered table-sm-new bgwhite">    
-                <tr>
-                    <td><span class="col-form-span-label"><b>Company</b> </span><span class="col-form-span-error">*</span></td>        
-                    <td colspan="3">
-                        <select class="form-control width300"  [(ngModel)]="company" (change)="selectionChange($event.target.value)">
-                            <option value="">Please select</option>
-                            @for (d of Companylist; track d) {
-<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
-}
-                        </select>
-                    </td> 
-                    
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>City</b> </span><span class="col-form-span-error">*</span></td>        
-                    <td>
-                        <select class="form-control width300"  [(ngModel)]="city" >
-                            <option value="">Please select</option>
-                            @for (d of Citylist; track d) {
-<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
-}
-                        </select>
-                    </td> 
-                    
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Account Name</b> </span><span class="col-form-span-error">*</span></td>        
-                    <td colspan="3">
-                        <select class="form-control width300"  [(ngModel)]="accountname" (change)="bindlist($event.target.value)">
-                            <option value="">Please select</option>
-                            @for (d of AccountNamelist; track d) {
-<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
-}
-                        </select>
-                      
-                    </td> 
-                    
-                </tr>
-                <tr  >
-                    <td colspan="4" class="centerlabel"><button class="btn btn-sm btn-success" type="submit" (click)="showItem()"> <i class="fa fa-dot-circle-o" ></i> <span class="col-form-span-label"> Show</span></button></td>
-                </tr>
-                   
-                    <!--div class="c"ol-sm-6 xyscroll" *ngIf="ItemList.length>0"-->
-                       <tr>
-                        <td colspan="4">
-                            @if (ItemList.length>0) {
-<table class="table table-hover">
-                                <tr>
-                                   
-                                    <td><span class="col-form-span-label"><b>Item Name </b> </span><span class="col-form-span-error">*</span></td>         
-                                    <td colspan="2">  <input [(ngModel)]="SItemName" type="text"    class="form-control width300"   > </td>    
-                                    <td><button class="btn btn-sm btn-success" type="submit" (click)="SearchItem()"> <span class="col-form-span-label"><i class="fa fa-plus" ></i> Search</span></button></td>
-                                
-                            </tr>
-                            <tr>
-                                <!-- <div class="centerlabel"> -->
-                                    <td colspan="4" class="centerlabel">
-                                        <span class="col-form-span-label">
-                                            <input type="radio" name="radioAccountName" value="B" [(ngModel)]="ItemNameType"  />&nbsp;BEGIN WITH</span>&nbsp;&nbsp;
-                                        <span class="col-form-span-label">
-                                            <input type="radio" name="radioAccountName" value="A" [(ngModel)]="ItemNameType"  />&nbsp;ANY WHERE</span>           
-                                    </td>
-                                    
-                                <!-- </div> -->
-                            </tr>
-                            </table>
-}
-                            </td>
-                       </tr>
-                        <!-- <td colspan="4">
-                            <table class="table table-bordered table-sm-new bgwhite">
-                               
-                                <tr>
-                                    <div class="centerlabel">
-                                        <span class="col-form-span-label">
-                                            <input type="radio" name="radioAccountName" value="B" [(ngModel)]="AccountNameType"  />&nbsp;Begin with</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                                        <span class="col-form-span-label">
-                                            <input type="radio" name="radioAccountName" value="A" [(ngModel)]="AccountNameType"  />&nbsp;Any Where IN</span>
-                                    </div>
-                                </tr>
-                            </table>
-                        </td>      -->
-                        <tr>  
-                            <td colspan="4" height="95px">
-                        @if (ItemList.length>0) {
-<table class="table table-hover">
-                          
-                            <thead>
-                              
-                            
-                                <tr class="col-form-span-heading" style="white-space:nowrap;">
-                                   
-                                    <th class="col-form-span-label">ITEM NAME</th>
-                                    <th class="col-form-span-label">EXPIRE DATE</th>
-                                    <th class="col-form-span-label">REMARKS</th>
-                                   
-                                    
-                                                                          
-                                </tr>
-                             </thead>
-                            <tbody class="bgwhite">
-                                @for (obj of ItemList; track obj) {
-<tr>
-                                    
-                                    <!--td><span class="col-form-span-label anchor-link" (click)="ListOnclick(obj.ITEMCODE)" >{{obj.ITEMNAME}}</span></td-->
-                                    <td class="col-form-span-label" (click)="ListOnclick(obj.ITEMCODE)">{{obj.ITEMNAME}}</td>  
-                                    <td class="col-form-span-label">{{obj.EXPIREDATE}}</td>  
-                                     <td class="col-form-span-label">{{obj.REMARKS}}</td>     
-                                     
-                                    
-                                </tr>
-}
-                              
-                            </tbody>
-                            <!-- <tr  *ngIf="ItemList.length>0">
-                                <td colspan="4" class="col-form-span-heading">{{ItemList.length}} <b>records found</b>  </td>  
-                                
-                            </tr>    -->
-                        </table>
-}
-                    </td>
-                   
-                    <!--/div-->
-                </tr>    
-                @if (accountname!='') {
-<tr   >
-                    <td colspan="4" class="col-form-span-heading">{{ItemList.length}} <b>Record(s) found</b>  </td>  
-                    
-                </tr>
-}   
-                <tr >
-                    <td colspan="4">
-                        @if (accountname!='') {
-<table class="table table-hover" >
-                            <tr>
-                            <td><span class="col-form-span-label"><b>Item Name </b> </span><span class="col-form-span-error">*</span></td>         
-                        <td colspan="3">  <input [(ngModel)]="ItemName" type="text"    class="form-control width300"   > </td> 
-                </tr> 
-                      
-                <tr>
-                    <td > 
-                        <span class="col-form-span-label"><b>Expire Date</b> </span>
-                        <span class="col-form-span-error">*</span>
-                    </td>         
-                    <td >   
-                        <my-date-picker name="ExpireDate" [options]="myDatePickerOptions" [(ngModel)]="ExpireDate"></my-date-picker>
-                    </td>          
-                </tr>
-                
-                <tr>
-                    <td><span class="col-form-span-label"><b>Remark </b> </span></td>         
-                    <td colspan="3">  <input [(ngModel)]="Remark" type="text"    class="form-control width300"   > </td>   
-            </tr>
-                        </table>
-}
-                    </td>
-              
-                <tr >
-                    <td colspan="4"  class="centerlabel">                                
-                        <button class="btn btn-sm btn-success" type="submit" (click)="AddMain()"> <i class="fa fa-dot-circle-o" ></i><span class="col-form-span-label"> {{text}}</span></button>
-                        <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="RestMain();"><i class="fa fa-ban"></i> Reset</span></button>
-                    </td>
-                </tr>
-            </table>
-            </div>
-    </div>
-    <div class="col-sm-3">
-    </div>
+  </div>
 
+  <div class="card sec">
+    <div class="card-h"><h2>Select Account</h2></div>
+    <div class="fields">
+      <div class="fld">
+        <label>Company <span class="req">*</span></label>
+        <select class="form-control" [(ngModel)]="company" (change)="selectionChange($event.target.value)">
+          <option value="">Please select</option>
+          @for (d of Companylist; track d) {
+            <option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>City <span class="req">*</span></label>
+        <select class="form-control" [(ngModel)]="city">
+          <option value="">Please select</option>
+          @for (d of Citylist; track d) {
+            <option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Account Name <span class="req">*</span></label>
+        <select class="form-control" [(ngModel)]="accountname" (change)="bindlist($event.target.value)">
+          <option value="">Please select</option>
+          @for (d of AccountNamelist; track d) {
+            <option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+          }
+        </select>
+      </div>
     </div>
+    <div class="foot">
+      <button class="btn p" type="submit" (click)="showItem()">Show</button>
+    </div>
+  </div>
+
+  @if (ItemList.length>0) {
+    <div class="card sec">
+      <div class="card-h"><h2>Search Item</h2></div>
+      <div class="fields">
+        <div class="fld">
+          <label>Item Name <span class="req">*</span></label>
+          <input [(ngModel)]="SItemName" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label></label>
+          <span>
+            <label style="font-weight:normal;"><input type="radio" name="radioAccountName" value="B" [(ngModel)]="ItemNameType"> Begin with</label>
+            <label style="font-weight:normal;"><input type="radio" name="radioAccountName" value="A" [(ngModel)]="ItemNameType"> Any where</label>
+          </span>
+        </div>
+      </div>
+      <div class="foot">
+        <button class="btn p" type="submit" (click)="SearchItem()">Search</button>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>ITEM NAME</th>
+              <th>EXPIRE DATE</th>
+              <th>REMARKS</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (obj of ItemList; track obj) {
+              <tr>
+                <td class="lnk" (click)="ListOnclick(obj.ITEMCODE)" style="cursor:pointer;">{{obj.ITEMNAME}}</td>
+                <td>{{obj.EXPIREDATE}}</td>
+                <td>{{obj.REMARKS}}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  @if (accountname!='') {
+    <div class="card sec">
+      <div class="card-h"><h2>{{ItemList.length}} Record(s) found</h2></div>
+      <div class="fields">
+        <div class="fld">
+          <label>Item Name <span class="req">*</span></label>
+          <input [(ngModel)]="ItemName" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Expire Date <span class="req">*</span></label>
+          <my-date-picker name="ExpireDate" [options]="myDatePickerOptions" [(ngModel)]="ExpireDate"></my-date-picker>
+        </div>
+        <div class="fld">
+          <label>Remark</label>
+          <input [(ngModel)]="Remark" type="text" class="form-control">
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose {{text}}.</span>
+    <div class="r">
+      <button class="btn g" type="reset" (click)="RestMain();">Reset</button>
+      <button class="btn p" type="submit" (click)="AddMain()">{{text}}</button>
+    </div>
+  </div>
+</div>

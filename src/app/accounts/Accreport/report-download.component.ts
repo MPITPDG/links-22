@@ -9,10 +9,11 @@ import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/shared/service/dataService';
 import { DomSanitizer } from '@angular/platform-browser';
 import {Configuration}  from '../../app.constants'
+import { FinPager } from './fin-kit';
 @Component({
   selector: 'app-ReportDownload',
   templateUrl: './report-download.component.html',
-  styles: [],
+  host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -95,8 +96,13 @@ this.fn_ReportHistory(this.PKID)
           }
           this._dataService.getData("Accounts/REPORT_LOG_FILL", jsonview)
             .subscribe((data: any) => {
-             this.DTTableHistory=data.Table2;
+                          this.DTTableHistory=data.Table2;
+             this.histPager.set(this.DTTableHistory);
                         
             });
       }
+
+      // ---- redesign: 10/page pager for the history list (display only) ----
+      histPager = new FinPager<any>(10);
+      histPage() { return this.histPager.paged; }
 }

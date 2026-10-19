@@ -1,112 +1,105 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-      <div class="col-sm-12">
-        <div class="card">
-          <div class="card-header formheading">
-            <strong>Authorise Journal Voucher Request List</strong>
-          </div>
-        </div>
+<!--
+  Authorise journal voucher requests.
+  Monochrome page kit. Views (Unverified / Verified / Rejected), the select-all and per-row
+  checkboxes, Verify / Reject and the #/popup/Account-JV-View window are unchanged.
+  Select-all ticks every request in the current view, not only the visible page.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Authorise JV requests</h1>
+      <p>Verify or reject journal voucher requests; open a request number to view it</p>
+    </div>
+    <div class="tools">
+      <button type="button" class="btn" [class.p]="hidebtnrow == 'U'" [class.g]="hidebtnrow != 'U'" (click)="getdataforauth(); page = 1">Unverified</button>
+      <button type="button" class="btn" [class.p]="hidebtnrow == 'V'" [class.g]="hidebtnrow != 'V'" (click)="VerifiedDataList('V'); page = 1">Verified</button>
+      <button type="button" class="btn" [class.p]="hidebtnrow == 'R'" [class.g]="hidebtnrow != 'R'" (click)="VerifiedDataList('R'); page = 1">Rejected</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="fields">
+      <div class="fld full">
+        <label>Filter</label>
+        <input type="text" [(ngModel)]="Quick" (ngModelChange)="page = 1" placeholder="Request code, requested by, authorised by or date" />
       </div>
     </div>
-    <div class="row no-gutters" >
-      <div class="col-md-1">
-        
-      </div>
-      <div   class="col-md-10" style="overflow-y: auto;height: 500px;">
-        <table  class="table table-bordered table-sm-new bgwhite table-hover" >
-          <thead>
-           
-            <tr class="col-form-span-heading" style="white-space:nowrap;">
-              @if ( FLAG != 'VIEW') {
-<th class="col-form-span-label"><input type="checkbox"  [(ngModel)]='checkbox' (change)="checkAll($event)" /> &nbsp; </th>
-}
-          
-              <th class="col-form-span-label">
-                REQ CODE
-              </th>
-              <th class="col-form-span-label" >
-                REQUESTED ON 
-              </th>
-              <th class="col-form-span-label" >
-                REQUESTED BY 
-              </th>
-              <th class="col-form-span-label" >
-                DEBIT 
-              </th>
-              <th class="col-form-span-label" >
-                CREDIT 
-              </th>
-              <th class="col-form-span-label" >
-                AUTHORISED BY 
-              </th>
-              <th class="col-form-span-label" >
-                AUTHORISED ON 
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bgwhite">
-            @for (obj of Unauthlist ; track obj) {
-<tr
-               
-              >
-              @if ( FLAG != 'VIEW') {
-<td class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.Checked"
-                  (ngModelChange)="getCheckboxValues($event,obj.REQCODE)"> &nbsp; </td>
-}
-        
-               <td class="col-form-span-label link-label"  (click)="ViewJVData(obj.REQCODE)"><u> {{obj.REQCODE}}</u> </td> 
-              <!-- <td class="col-form-span-label link-label" (click)="srpinvoiceviewdata(obj.REQCODE,FLAG,authstatus)">{{obj.REQCODE}}</td> -->
-              <td class="col-form-span-label">{{obj.REQUESTEDON}}</td>
-              <td class="col-form-span-label">{{obj.REQUESTEDBY}}</td>
-              <td class="col-form-span-label" style="text-align: right;">{{obj.DEBIT|number:'2.2-4'}}</td>
-              <td class="col-form-span-label" style="text-align: right;">{{obj.CREDIT|number:'2.2-4'}}</td>
-              <td class="col-form-span-label" >{{obj.AUTHORISEDBY}}</td>
-              <td class="col-form-span-label" >{{obj.AUTHORISATIONDATE}}</td>
-            </tr>
-}
-          </tbody>
-        
-          <tr >
-               @if ((hidebtnrow =='U' || hidebtnrow == 'M')) {
-<td  colspan="8" class="right-text pr-2">
-                <button class="btn btn-sm btn-success" type="submit" (click)="Verify()"> <span
-                  class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Verified</span></button>
-                  <button class="btn btn-sm btn-success" type="submit" (click)="rejectdata()"> <span
-                    class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Reject</span></button>
-                       <!-- <button class="btn btn-sm btn-success" *ngIf=" hidebtnrow =='U' " type="submit" (click)="Passdatatomanagement()"> <span
-                  class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Management</span></button> -->
-                 
-            </td>
-}
-          </tr>
-        
-        </table>
-        <table class="table table-bordered table-sm-new bgwhite table-hover">
+
+    <div class="toolbar">
+      <span>
+        <span class="count">{{ Filtered.length }} {{ Filtered.length === 1 ? 'request' : 'requests' }}</span>
+        <span class="sub-t"> {{ viewLabel }}</span>
+        @if (FLAG != 'VIEW') {
+          <span class="sub-t"> · {{ newArray.length }} selected (select-all covers every request in this view)</span>
+        }
+      </span>
+      <span class="tb-r">
+        <button class="btn g" type="button" (click)="Quick = ''; page = 1">Clear</button>
+        <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!Filtered.length">Export</button>
+      </span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
           <tr>
-            <td colspan="10" class="right-text pr-2">
-         
-           <span class="col-form-span-label link-label" (click)="VerifiedDataList('V')" ><b><u>Verified</u></b></span>&nbsp;&nbsp;
-           <span class="col-form-span-label link-label" (click)="getdataforauth()" ><b><u>UnVerified</u></b></span>&nbsp;&nbsp;
-           <span class="col-form-span-label link-label" (click)="VerifiedDataList('R')" ><b><u>Rejected</u></b></span>&nbsp;&nbsp;
-           <!-- <span class="col-form-span-label link-label" (click)="VerifiedDataList('M')" ><b><u>Management</u></b></span>&nbsp;&nbsp; -->
-          
-         </td>
-       </tr>
-        </table> 
-        
-     
+            @if (FLAG != 'VIEW') {
+              <th><input type="checkbox" [(ngModel)]='checkbox' (change)="checkAll($event)" /></th>
+            }
+            <th>Req code</th>
+            <th>Requested on</th>
+            <th>Requested by</th>
+            <th class="num">Debit</th>
+            <th class="num">Credit</th>
+            <th>Authorised by</th>
+            <th>Authorised on</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (obj of pageRows; track obj) {
+            <tr>
+              @if (FLAG != 'VIEW') {
+                <td><input type="checkbox" [(ngModel)]="obj.Checked"
+                  (ngModelChange)="getCheckboxValues($event,obj.REQCODE)"></td>
+              }
+              <td><a class="lnk" (click)="ViewJVData(obj.REQCODE)">{{obj.REQCODE}}</a></td>
+              <td>{{obj.REQUESTEDON}}</td>
+              <td>{{obj.REQUESTEDBY}}</td>
+              <td class="num">{{obj.DEBIT|number:'2.2-4'}}</td>
+              <td class="num">{{obj.CREDIT|number:'2.2-4'}}</td>
+              <td>{{obj.AUTHORISEDBY}}</td>
+              <td>{{obj.AUTHORISATIONDATE}}</td>
+            </tr>
+          } @empty {
+            <tr><td class="empty" [attr.colspan]="FLAG != 'VIEW' ? 8 : 7">No requests {{ viewLabel }}.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ Filtered.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="page <= 1" (click)="goPage(page - 1)" aria-label="Previous page">‹</button>
+        @for (p of pageList; track $index) {
+          @if (p === 0) {
+            <span class="gap">…</span>
+          } @else {
+            <button type="button" [class.on]="p === page" (click)="goPage(p)">{{ p }}</button>
+          }
+        }
+        <button type="button" [disabled]="page >= pageCount" (click)="goPage(page + 1)" aria-label="Next page">›</button>
       </div>
-      <div class="col-md-1">
+    </div>
+  </div>
+
+  @if ((hidebtnrow =='U' || hidebtnrow == 'M')) {
+    <div class="bar">
+      <span class="note">Tick requests, then Verify or Reject. You will be asked to confirm.</span>
+      <div class="r">
+        <button class="btn g" type="submit" (click)="rejectdata()">Reject</button>
+        <button class="btn p" type="submit" (click)="Verify()">Verify</button>
       </div>
-      <!-- <div class="col-md-1">
-       </div>
-       <div class="col-md-10" >
-        <strong>Total Records :  {{rowcount}}</strong>
-       </div>
-       <div class="col-md-1">
-      </div> -->
-    </div>           
-  </div>  
-   
-  
- 
+    </div>
+  }
+</div>

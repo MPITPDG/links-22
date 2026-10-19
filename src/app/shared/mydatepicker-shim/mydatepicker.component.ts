@@ -64,9 +64,9 @@ function toMyDateModel(date: Date, format: string): IMyDateModel {
             display: inline-flex;
             align-items: stretch;
             vertical-align: middle;
-            border: 1px solid #ced4da;
+            border: 1px solid var(--mp-line, #ced4da);
             border-radius: 4px;
-            background: #fff;
+            background: var(--mp-surface, #fff);
             overflow: hidden;
         }
         .mydp-shim-input {
@@ -79,9 +79,9 @@ function toMyDateModel(date: Date, format: string): IMyDateModel {
         .mydp-shim-input:focus { box-shadow: none; }
         .mydp-shim-btn {
             border: 0;
-            border-left: 1px solid #ced4da;
+            border-left: 1px solid var(--mp-line, #ced4da);
             border-radius: 0;
-            background: #f0f0f0;
+            background: var(--mp-band, #f0f0f0);
             cursor: pointer;
             padding: 0 8px;
             display: inline-flex;

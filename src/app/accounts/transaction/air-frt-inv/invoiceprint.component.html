@@ -1,64 +1,86 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{Header|uppercase}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Air Freight Invoice - Generate list. Monochrome page kit (import-page.css + air-frt-inv-page.css).
+  Data load, the View handler and its navigation are unchanged; chrome only.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Air Freight Invoice</h1>
+      <p>MAWBs ready for the air freight invoice and profit-share purchase - open one to generate.</p>
     </div>
-    <div class="row no-gutters">
-        <div class="col-12 pl-2 pr-2" >
-            <table class="table table-bordered table-sm-new bgwhite table-hover"  >
-                <thead>             
-                  <tr class="col-form-span-heading" >
-                    <th class="col-form-span-label">View</th>
-                    <th class="col-form-span-label">Invoice Date</th>
-                    <th class="col-form-span-label">EURO 1=INR</th>
-                    <th class="col-form-span-label">MAWB No.</th>
-                    <th class="col-form-span-label">MAWB DT</th>
-                    <th class="col-form-span-label">PLAN FLT DT</th>
-                    <th class="col-form-span-label">MAWB FRT</th>
-                    <th class="col-form-span-label">MAWB GW</th>
-                    <th class="col-form-span-label">MAWB  CW</th>
-                    <th class="col-form-span-label">MAWB RATE</th>
-                    <th class="col-form-span-label">HAWB No.</th>
-                    <th class="col-form-span-label">CW GW</th>
-                    <th class="col-form-span-label">HAWB RATE</th>
-                    <th class="col-form-span-label">Console No.</th>              
-                  </tr>
-                </thead>
-                <tbody>
-                    @for (data of tabledata0; track data) {
-<tr  >
-                        <td class="col-form-span-label">
-                            <button class="btn btn-sm btn-primary" type="submit" (click)="viewdetail(data.ID,data.MAWBNO)">
-                                <span class="col-form-span-label"><i class="fa fa-search"></i> View</span>
-                               </button> 
-                        </td>
-                        <td class="col-form-span-label"><span>{{data.INV_DATE}}</span></td>
-                        <td class="col-form-span-label"><span>{{data.EXCH_RATE}}</span></td>
-                        <td class="col-form-span-label"><span>{{data.MAWBNO}}</span></td>
-                        <td class="col-form-span-label"><span>{{data.MAWBDT}}</span></td>
-                        <td class="col-form-span-label"><span>{{data.PLAN_FLIGHTDT}}</span></td>
-                        <td class="col-form-span-label" [innerHtml]="data.MAWB_FRT"></td>
-                        <td class="col-form-span-label" [innerHtml]="data.MAWB_GW"></td>
-                        <td class="col-form-span-label" [innerHtml]="data.MAWB_CW"></td>
-                        <td class="col-form-span-label" [innerHtml]="data.MAWB_RATE"></td>
-                        <td class="col-form-span-label" [innerHtml]="data.HAWBNO" ></td>
-                        <td class="col-form-span-label" [innerHtml]="data.HAWB_CW_GW"></td>
-                        <td class="col-form-span-label"    [innerHtml]="data.HAWB_RATE" ></td>
-                        <td class="col-form-span-label"><span>{{data.CONSOLENO}}</span></td>
+  </div>
 
-                    </tr>
-}
-                </tbody>
-            </table>
-        </div>
+  <div class="toolbar">
+    <span class="count">@if (loading) { Loading… } @else { {{allRows.length}} MAWB(s) }</span>
+    <div class="tb-r">
+      <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!allRows.length"><i class="fa fa-download"></i> Export</button>
     </div>
-</div> 
+  </div>
+
+  <div class="card sec">
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>View</th>
+            <th>Invoice Date</th>
+            <th class="num">EURO 1=INR</th>
+            <th>MAWB No.</th>
+            <th>MAWB DT</th>
+            <th>Plan Flt DT</th>
+            <th>MAWB FRT</th>
+            <th class="num">MAWB GW</th>
+            <th class="num">MAWB CW</th>
+            <th class="num">MAWB Rate</th>
+            <th>HAWB No.</th>
+            <th class="num">CW GW</th>
+            <th class="num">HAWB Rate</th>
+            <th>Console No.</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (data of pageRows; track data) {
+            <tr>
+              <td>
+                <button class="btn g" type="submit" (click)="viewdetail(data.ID,data.MAWBNO)"><i class="fa fa-search"></i> View</button>
+              </td>
+              <td>{{data.INV_DATE}}</td>
+              <td class="num">{{data.EXCH_RATE}}</td>
+              <td class="mono">{{data.MAWBNO}}</td>
+              <td>{{data.MAWBDT}}</td>
+              <td>{{data.PLAN_FLIGHTDT}}</td>
+              <td [innerHtml]="data.MAWB_FRT"></td>
+              <td class="num" [innerHtml]="data.MAWB_GW"></td>
+              <td class="num" [innerHtml]="data.MAWB_CW"></td>
+              <td class="num" [innerHtml]="data.MAWB_RATE"></td>
+              <td class="mono" [innerHtml]="data.HAWBNO"></td>
+              <td class="num" [innerHtml]="data.HAWB_CW_GW"></td>
+              <td class="num" [innerHtml]="data.HAWB_RATE"></td>
+              <td class="mono">{{data.CONSOLENO}}</td>
+            </tr>
+          }
+          @if (!loading && !loadError && !allRows.length) {
+            <tr><td colspan="14" class="empty">No MAWB is waiting for an air freight invoice.</td></tr>
+          }
+          @if (loadError) {
+            <tr><td colspan="14" class="empty">Could not load the list: {{loadError}}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+          <div class="pager">
+            <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ allRows.length }}</b></span>
+            <div class="pages">
+              <button type="button" [disabled]="pg <= 1" (click)="goPage(pg - 1)" aria-label="Previous page">‹</button>
+              @for (p of pageList; track $index) {
+                @if (p === 0) {
+                  <span class="gap">…</span>
+                } @else {
+                  <button type="button" [class.on]="p === pg" (click)="goPage(p)">{{ p }}</button>
+                }
+              }
+              <button type="button" [disabled]="pg >= pageCount" (click)="goPage(pg + 1)" aria-label="Next page">›</button>
+            </div>
+          </div>
+  </div>
+</div>

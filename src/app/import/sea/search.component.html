@@ -1,201 +1,205 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>Search</strong>
-                </div>
-            </div>
-        </div>
+<!--
+  Import sea - search. Page kit recipe 1 (.im-page, global kit src/styles/kit/import-page.css),
+  mirrored from MPERPNG-20 src/app/import/sea/search.component.html.
+  "Search by" is the old radio group (name="check", same values) bound to the existing Type
+  variable; the All / Under clearance radios are the per-type selects (same names). The
+  search()/getData() flow is unchanged: validate -> Import/Report_Search; one row navigates to
+  update-data, several rows list here. On open the last 30 days are listed (SearchType '2').
+  A response without a Table (the Links proc returns no result set for types 2-7 until its
+  fix is deployed) reads as "no results".
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Sea imports</h1>
+      <p>Search sea import jobs by code, date, importer, bill to, vessel, agent or G.L. date</p>
     </div>
-    @if (displayType=='SEARCH') {
-<div class="row">
-        <div class="col-sm-3">
-        </div>
-        <div class="col-sm-6">
-            <table class="table table-sm-new bgwhite">
-                <tr class="trbg">
-                    <td class="width150">
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="CODE" [(ngModel)]="Type" />&nbsp;Import Code</span>
-                    </td>
-                    <td class="width130">
-                        <input type="text" [(ngModel)]="ImportCode" class="form-control" [maxlength]="15" [OnlyNumber]="true" [disabled]="Type!='CODE'"
-                        />
-                    </td>
-                    <td>
-                        <button type="button" name="printButton" class="btn btn-sm btn-primary" (click)="search();" [disabled]="Type!='CODE'">
-                            <span class="col-form-span-label">
-                                <i class="fa fa-print"></i> Print</span>
-                        </button>
-                    </td>
-                </tr>
-                <tr class="trbg">
-                    <td>
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="DATE" [(ngModel)]="Type" />&nbsp;Import Date Wise</span>
-                    </td>
-                    <td>
-                        <span class="col-form-span-label">From</span>
-                        <my-date-picker name="ImportFromDate" [options]="myDatePickerOptions" [(ngModel)]="ImportFromDate" [disabled]="Type!='DATE'"></my-date-picker>
-                    </td>
-                    <td>
-                        <span class="col-form-span-label">To</span>
-                        <my-date-picker name="ImportToDate" [options]="myDatePickerOptions" [(ngModel)]="ImportToDate" [disabled]="Type!='DATE'"></my-date-picker>
-                    </td>
-                </tr>
-                <tr class="trbg">
-                    <td>
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="IMPORTER" [(ngModel)]="Type" />&nbsp;Importer</span>
-                    </td>
-                    <td colspan="2">
-                        <ng-select [items]="ImporterList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="Importer"
-                            class="form-control" [disabled]="Type!='IMPORTER'">
-                        </ng-select>
-                        <div class="centerlabel">
-                            <span class="col-form-span-label">
-                                <input type="radio" name="radioImporter" value="All" [(ngModel)]="ImporterType"  [disabled]="Type!='IMPORTER'"/>&nbsp;All</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <span class="col-form-span-label">
-                                <input type="radio" name="radioImporter" value="UC" [(ngModel)]="ImporterType"  [disabled]="Type!='IMPORTER'"/>&nbsp;Under Clearence</span>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="trbg">
-                    <td>
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="BILLTO" [(ngModel)]="Type" />&nbsp;Bill To</span>
-                    </td>
-                    <td colspan="2">
-                        <ng-select [items]="BillToList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="BillTo"
-                            class="form-control" [disabled]="Type!='BILLTO'">
-                        </ng-select>
-                        <div class="centerlabel">
-                            <span class="col-form-span-label">
-                                <input type="radio" name="radioBillTo" value="All" [(ngModel)]="BillToType"  [disabled]="Type!='BILLTO'"/>&nbsp;All</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <span class="col-form-span-label">
-                                <input type="radio" name="radioBillTo" value="UC" [(ngModel)]="BillToType"  [disabled]="Type!='BILLTO'"/>&nbsp;Under Clearence</span>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="trbg">
-                    <td>
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="VESSEL" [(ngModel)]="Type" />&nbsp;Vessel Name</span>
-                    </td>
-                    <td colspan="2">
-                        <ng-select [items]="VesselList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="Vessel"
-                            class="form-control" [disabled]="Type!='VESSEL'">
-                        </ng-select>
-                        <div class="centerlabel">
-                            <span class="col-form-span-label">
-                                <input type="radio" name="radioVessel" value="All" [(ngModel)]="VesselType"  [disabled]="Type!='VESSEL'"/>&nbsp;All</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <span class="col-form-span-label">
-                                <input type="radio" name="radioVessel" value="UC" [(ngModel)]="VesselType"  [disabled]="Type!='VESSEL'"/>&nbsp;Under Clearence</span>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="trbg">
-                    <td>
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="AGENT" [(ngModel)]="Type" />&nbsp;Agent Name</span>
-                    </td>
-                    <td colspan="2">
-                        <ng-select [items]="AgentList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="Agent"
-                            class="form-control" [disabled]="Type!='AGENT'">
-                        </ng-select>
-                        <div class="centerlabel">
-                            <span class="col-form-span-label">
-                                <input type="radio" name="radioAgent" value="All" [(ngModel)]="AgentType"  [disabled]="Type!='AGENT'"/>&nbsp;All</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <span class="col-form-span-label">
-                                <input type="radio" name="radioAgent" value="UC" [(ngModel)]="AgentType"  [disabled]="Type!='AGENT'"/>&nbsp;Under Clearence</span>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="trbg">
-                    <td>
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="GL" [(ngModel)]="Type" />&nbsp;G.L Date Wise</span>
-                    </td>
-                    <td>
-                        <span class="col-form-span-label">From</span>
-                        <my-date-picker name="GlFromDate" [options]="myDatePickerOptions" [(ngModel)]="GlFromDate" [disabled]="Type!='GL'"></my-date-picker>
-                    </td>
-                    <td>
-                        <span class="col-form-span-label">To</span>
-                        <my-date-picker name="GlToDate" [options]="myDatePickerOptions" [(ngModel)]="GlToDate" [disabled]="Type!='GL'"></my-date-picker>
-                    </td>
-                </tr>
-                <tr class="trbg centerlabel">
-                    <td colspan="3">
-                        <button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="search();">
-                            <span class="col-form-span-label">
-                                <i class="fa fa-search"></i> Search</span>
-                        </button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-3">
-        </div>
+    <div class="tools">
+      <button class="btn p" type="button" routerLink="/import/sea/entry-data">+ New import</button>
     </div>
-}
-    @if (displayType=='LIST') {
-<div class="row">
-        <div class="col-sm-12 xyscroll" style="height:300px;">
-            <table class="table table-sm-new table-bordered bgwhite">
-                <thead>
-                    <tr class="title-head formheading">
-                        <th colspan="8">
-                            {{searchHeaderText}}
-                            <a href="javascript:void(0);" (click)="displayType='SEARCH';searchList=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
-                        </th>
-                    </tr>
-                    <tr class="title-head formheading">
-                        <th>Import Code</th>
-                        <th>Import Date</th>
-                        <th>Importer</th>
-                        <th>Vessel</th>
-                        <th>Agent</th>
-                        <th>Desc of Goods</th>
-                        <th>No. of Pkgs.</th>
-                        <th>Gross Weight</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (obj of searchList; track obj) {
-<tr>
-                        <td>
-                            <span class="col-form-span-label">
-                                <a href="javascript:void(0);" (click)="redirectToEdit(obj['pk_ImpoterId'])">{{obj["Import Code"]}}</a>
-                            </span>
-                        </td>
-                        <td>
-                            <span class="col-form-span-label">{{obj["Import Date"]}}</span>
-                        </td>
-                        <td>
-                            <span class="col-form-span-label">{{obj["Importer"]}}</span>
-                        </td>
-                        <td>
-                            <span class="col-form-span-label">{{obj["Vessel"]}}</span>
-                        </td>
-                        <td>
-                            <span class="col-form-span-label">{{obj["Agent"]}}</span>
-                        </td>
-                        <td>
-                            <span class="col-form-span-label">{{obj["Desc of Goods"]}}</span>
-                        </td>
-                        <td>
-                            <span class="col-form-span-label">{{obj["No. of Pkgs."]}}</span>
-                        </td>
-                        <td>
-                            <span class="col-form-span-label">{{obj["Gross Weight"]}}</span>
-                        </td>
-                    </tr>
-}
-                </tbody>
-            </table>
+  </div>
+
+  <div class="card sec">
+    <div class="filters">
+      <div class="f">
+        <label for="selType">Search by</label>
+        <select id="selType" name="check" [(ngModel)]="Type">
+          <option value="CODE">Import code</option>
+          <option value="DATE">Import date range</option>
+          <option value="IMPORTER">Importer</option>
+          <option value="BILLTO">Bill to</option>
+          <option value="VESSEL">Vessel name</option>
+          <option value="AGENT">Agent name</option>
+          <option value="GL">G.L. date range</option>
+        </select>
+      </div>
+
+      @if (Type === 'CODE') {
+        <div class="f">
+          <label for="txtImportCode">Import code</label>
+          <input type="text" id="txtImportCode" name="txtImportCode" [(ngModel)]="ImportCode" [maxlength]="15" [OnlyNumber]="true" placeholder="15-digit code" (keyup.enter)="search()" />
         </div>
+      }
+      @if (Type === 'DATE') {
+        <div class="f">
+          <label>From</label>
+          <my-date-picker name="ImportFromDate" [options]="myDatePickerOptions" [(ngModel)]="ImportFromDate"></my-date-picker>
+        </div>
+        <div class="f">
+          <label>To</label>
+          <my-date-picker name="ImportToDate" [options]="myDatePickerOptions" [(ngModel)]="ImportToDate"></my-date-picker>
+        </div>
+      }
+      @if (Type === 'IMPORTER') {
+        <div class="f">
+          <label for="selImporter">Importer</label>
+          <ng-select id="selImporter" [items]="ImporterList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="Importer" class="custom"></ng-select>
+        </div>
+        <div class="f">
+          <label for="selImporterClearance">Status</label>
+          <select id="selImporterClearance" name="radioImporter" [(ngModel)]="ClearanceType">
+            <option value="All">All</option>
+            <option value="UC">Under clearance</option>
+          </select>
+        </div>
+      }
+      @if (Type === 'BILLTO') {
+        <div class="f">
+          <label for="selBillTo">Bill to</label>
+          <ng-select id="selBillTo" [items]="BillToList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="BillTo" class="custom"></ng-select>
+        </div>
+        <div class="f">
+          <label for="selBillToClearance">Status</label>
+          <select id="selBillToClearance" name="radioBillTo" [(ngModel)]="ClearanceType">
+            <option value="All">All</option>
+            <option value="UC">Under clearance</option>
+          </select>
+        </div>
+      }
+      @if (Type === 'VESSEL') {
+        <div class="f">
+          <label for="selVessel">Vessel name</label>
+          <ng-select id="selVessel" [items]="VesselList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="Vessel" class="custom"></ng-select>
+        </div>
+        <div class="f">
+          <label for="selVesselClearance">Status</label>
+          <select id="selVesselClearance" name="radioVessel" [(ngModel)]="ClearanceType">
+            <option value="All">All</option>
+            <option value="UC">Under clearance</option>
+          </select>
+        </div>
+      }
+      @if (Type === 'AGENT') {
+        <div class="f">
+          <label for="selAgent">Agent name</label>
+          <ng-select id="selAgent" [items]="AgentList" bindLabel="DATATEXTFIELD" bindValue="DATAVALUEFIELD" placeholder="--Select--" [(ngModel)]="Agent" class="custom"></ng-select>
+        </div>
+        <div class="f">
+          <label for="selAgentClearance">Status</label>
+          <select id="selAgentClearance" name="radioAgent" [(ngModel)]="ClearanceType">
+            <option value="All">All</option>
+            <option value="UC">Under clearance</option>
+          </select>
+        </div>
+      }
+      @if (Type === 'GL') {
+        <div class="f">
+          <label>G.L. from</label>
+          <my-date-picker name="GlFromDate" [options]="myDatePickerOptions" [(ngModel)]="GlFromDate"></my-date-picker>
+        </div>
+        <div class="f">
+          <label>G.L. to</label>
+          <my-date-picker name="GlToDate" [options]="myDatePickerOptions" [(ngModel)]="GlToDate"></my-date-picker>
+        </div>
+      }
+
+      <div class="f">
+        <button class="btn p" type="button" name="submitButton" (click)="search()">Search</button>
+      </div>
+      @if (Type === 'CODE') {
+        <div class="f">
+          <button class="btn g" type="button" name="printButton" (click)="search()" [disabled]="Type!='CODE'"><i class="fa fa-print" aria-hidden="true"></i> Print</button>
+        </div>
+      }
     </div>
-}
+
+    <div class="toolbar">
+      <span>
+        <span class="count">{{ List.length }} {{ List.length === 1 ? 'import' : 'imports' }}</span>
+        @if (displayType === 'LIST') {
+          <span class="sub-t"> · {{ searchHeaderText }}</span>
+        } @else if (defaultLoaded) {
+          <span class="sub-t"> in the last 30 days</span>
+        }
+      </span>
+      <span class="tb-r">
+        @if (displayType === 'LIST') {
+          <button class="btn g" type="button" (click)="backToSearch()">Back to search</button>
+        }
+        <button class="btn g" type="button" (click)="clear()">Clear</button>
+        <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!List.length">Export CSV</button>
+      </span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Import code</th>
+            <th>Import date</th>
+            <th>Importer</th>
+            <th>Vessel / ETA</th>
+            <th>Agent</th>
+            <th>Desc of goods</th>
+            <th class="num">No. of pkgs</th>
+            <th class="num">Gross weight</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (noRights && displayType === 'SEARCH') {
+            <tr><td class="empty" colspan="8">The rights check for this login did not pass, so the search lists and the last 30 days were not loaded. Search by import code still works.</td></tr>
+          } @else if (loading) {
+            <tr><td class="empty" colspan="8">Loading imports…</td></tr>
+          } @else if (loadError) {
+            <tr><td class="empty" colspan="8">Could not load imports. Try Search again.</td></tr>
+          } @else {
+            @for (obj of pageRows; track $index) {
+              <tr>
+                <td class="mono"><a class="lnk" href="javascript:void(0);" (click)="redirectToEdit(obj['pk_ImpoterId'])">{{ obj["Import Code"] }}</a></td>
+                <td>{{ obj["Import Date"] }}</td>
+                <td>
+                  {{ obj._importerName }}
+                  @if (obj._importerCity) { <div class="sub-t">{{ obj._importerCity }}</div> }
+                </td>
+                <td>
+                  @if (obj._vesselName) { {{ obj._vesselName }} @if (obj._vesselEta) { <span class="sub-t"> · {{ obj._vesselEta }}</span> } } @else { <span class="sub-t">—</span> }
+                </td>
+                <td>{{ obj["Agent"] }}</td>
+                <td>{{ obj["Desc of Goods"] }}</td>
+                <td class="num mono">{{ obj["No. of Pkgs."] }}</td>
+                <td class="num mono">{{ obj["Gross Weight"] }}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="8">{{ displayType === 'SEARCH' && defaultLoaded ? 'No imports in the last 30 days.' : 'No imports match these filters.' }}</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ List.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="page <= 1" (click)="goPage(page - 1)" aria-label="Previous page">‹</button>
+        @for (p of pageList; track $index) {
+          @if (p === 0) {
+            <span class="gap">…</span>
+          } @else {
+            <button type="button" [class.on]="p === page" (click)="goPage(p)">{{ p }}</button>
+          }
+        }
+        <button type="button" [disabled]="page >= pageCount" (click)="goPage(page + 1)" aria-label="Next page">›</button>
+      </div>
+    </div>
+  </div>
 </div>

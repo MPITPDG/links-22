@@ -1,58 +1,54 @@
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-header formheading">
-                <strong>TRACKING AIR BOOKING</strong>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-sm-3">
-    </div>
-    <div class="col-sm-6">
-        <table class="table table-bordered table-sm-new bgwhite">
-            <tr>
-                <td class="width180">
-                    <input type="radio" value="Consignee" name="rbType" [(ngModel)]="Type" />
-                    <span class="col-form-span-label"><b>Consignee Name :</b></span>
-                </td>
-                <td colspan="3">
-                    <ng-select [items]="ConsigneeList" bindLabel="CON_NAME" bindValue="CON_CODE" placeholder="--Select--" [(ngModel)]="Consignee" class="form-control" [disabled]="Type=='Sourcing'">
-                    </ng-select>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="radio" value="Sourcing" name="rbType" [(ngModel)]="Type" />
-                    <span class="col-form-span-label"><b>Sourcing Agent :</b></span>
-                </td>
-                <td colspan="3">
-                    <ng-select [items]="SourcingAgentList" bindLabel="EXP_NAME" bindValue="EXP_CODE" placeholder="--Select--" [(ngModel)]="SourcingAgent" class="form-control" [disabled]="Type=='Consignee'">
-                    </ng-select>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="col-form-span-label"><b>Shipment From (Origin) :</b></span>
-                </td>
-                <td colspan="3">
-                    <ng-select [items]="CityList" bindLabel="cityname" bindValue="citycode" placeholder="--Select--" [(ngModel)]="Shipment" class="form-control">
-                    </ng-select>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="4" class="centerlabel">
-                    <button class="btn btn-sm btn-success" type="button" (click)="onSearch()">
-                        <span class="col-form-span-label">
-                            <i class="fa fa-download"></i>&nbsp; Export To Excel
-                        </span>
-                    </button>
-                </td>
+﻿<div class="im-page">
 
-            </tr>
-        </table>
+  <div class="ph">
+    <div>
+      <h1>Tracking Air Booking</h1>
+      <p>Choose a consignee or sourcing agent, then export.</p>
     </div>
-    <div class="col-sm-3">
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Report criteria</h2>
     </div>
+
+    <div class="fields">
+
+      <div class="fld">
+        <label class="radio">
+          <input type="radio" value="Consignee" name="rbType" [(ngModel)]="Type" />
+          Consignee Name
+        </label>
+        <ng-select [items]="ConsigneeList" bindLabel="CON_NAME" bindValue="CON_CODE" placeholder="--Select--"
+                   [(ngModel)]="Consignee" [disabled]="Type=='Sourcing'">
+        </ng-select>
+      </div>
+
+      <div class="fld">
+        <label class="radio">
+          <input type="radio" value="Sourcing" name="rbType" [(ngModel)]="Type" />
+          Sourcing Agent
+        </label>
+        <ng-select [items]="SourcingAgentList" bindLabel="EXP_NAME" bindValue="EXP_CODE" placeholder="--Select--"
+                   [(ngModel)]="SourcingAgent" [disabled]="Type=='Consignee'">
+        </ng-select>
+      </div>
+
+      <div class="fld">
+        <label>Shipment From (Origin)</label>
+        <ng-select [items]="CityList" bindLabel="cityname" bindValue="citycode" placeholder="--Select--"
+                   [(ngModel)]="Shipment">
+        </ng-select>
+      </div>
+
+    </div>
+
+    <div class="toolbar">
+      <span class="note" style="padding:0;">Report is generated as an Excel file and downloaded directly — there is no on-screen preview.</span>
+      <div class="tb-r">
+        <button type="button" class="btn p" (click)="onSearch()">Export to Excel</button>
+      </div>
+    </div>
+  </div>
+
 </div>

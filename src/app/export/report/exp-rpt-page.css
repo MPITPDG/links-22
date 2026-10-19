@@ -1,0 +1,67 @@
+/* ============================================================
+   Export report forms (EP-Copy sheet/excel, DSR, Tonnage, Shipment
+   Status, Cargo On Hand) -- additions on top of import-page.css.
+   All six pages are filter-only forms with no on-screen result rows
+   (server-side Excel / print generation), so they use the kit's card
+   + fld two-column layout with a sticky action bar, monochrome.
+   ============================================================ */
+
+:host ::ng-deep .im-page.xr-page .fld.full {
+    grid-column: 1 / -1;
+}
+
+/* radio "chips" -- keeps the existing <input type="radio"> + (click) handlers,
+   just restyles the label row to match the kit's chip look */
+:host ::ng-deep .im-page.xr-page .xr-radios {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
+    min-height: 32px;
+}
+
+:host ::ng-deep .im-page.xr-page .xr-radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--ink);
+    cursor: pointer;
+}
+
+:host ::ng-deep .im-page.xr-page .xr-radio input[type="radio"] {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--mp-primary, var(--ink));
+    cursor: pointer;
+    margin: 0;
+}
+
+:host ::ng-deep .im-page.xr-page .xr-radio.disabled {
+    color: var(--faint);
+}
+
+:host ::ng-deep .im-page.xr-page textarea {
+    font: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    background: var(--mp-surface, #fff);
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    padding: 6px 10px;
+    width: 100%;
+    min-height: 64px;
+    resize: vertical;
+}
+
+:host ::ng-deep .im-page.xr-page textarea:disabled {
+    border-style: dashed;
+    background: var(--fill);
+    color: var(--soft);
+}
+
+:host ::ng-deep .im-page.xr-page textarea:focus {
+    outline: 2px solid var(--mp-primary, var(--ink));
+    outline-offset: -1px;
+    border-color: var(--mp-primary, var(--ink));
+}

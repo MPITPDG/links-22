@@ -1,101 +1,83 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>{{Header| uppercase}}</strong>
-                </div>
-            </div>
-        </div>
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{Header| uppercase}}</h1>
+      <p>Master request search</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="filters">
+      <div class="f full">
+        <label>Search for Text</label>
+        <input [(ngModel)]="Srchname" type="text" (keyup.enter)="Search()">
+      </div>
+      <div class="f">
+        <label>Match</label>
+        <span>
+          <input type="radio" [checked]="searchwith=='begin'" (change)="searchwith='After'"> Begin with
+          <input type="radio" [checked]="searchwith=='anywhere'" (change)="searchwith='anywhere'"> Anywhere in
+        </span>
+      </div>
+      <div class="f">
+        <button class="btn p" type="submit" (click)="Search()">Search</button>
+        <button class="btn g" type="reset" (click)="Cancel();">Cancel</button>
+      </div>
     </div>
 
-<div class="row">
-    <div class="col-sm-1">  </div>
-    <div class="col-sm-10">
-        <table class="table table-bordered table-sm-new bgwhite">               
-            <tr >
-                <td class="col-form-span-heading   " colspan="4">
-                    Exporter Details
-                </td>
-            </tr>
-            <tr>   
-                <td><span class="col-form-span-label" ><b>Search for Text:</b> </span></td>         
-                <td colspan="3"  style="display: flex;">   <span class="col-form-span-label"> <input [(ngModel)]="Srchname" type="text"    class="form-control width300"   >  </span>
-                    <span class="col-form-span-label"><input type="radio"   [checked]="searchwith=='begin'" (change)="searchwith='After'" /><b>Begin with</b> </span> 
-                    <span class="col-form-span-label"><input type="radio"   [checked]="searchwith=='anywhere'" (change)="searchwith='anywhere'" /><b>Anywhere in  </b> </span>
-                    <button class="btn btn-sm btn-success" type="submit" (click)="Search()"> <span class="col-form-span-label"><i class="fa fa-search" ></i> Search</span></button>
-                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Cancel();"><i class="fa fa-ban"></i> Cancel</span></button>
-                </td> 
-                  
-            </tr>
-            @if (Reqlist.length > 0) {
-<tr>
-                <td colspan="4">
-                    <table class="table table-sm-new bgwhite">
-                        <thead>
-                            <tr class="title-head formheading">
-                                <th></th>
-                                <th>CODE</th>
-                                <th>EORI #</th>
-                                <th>PAN NO.</th>
-                                <th>GST NO.</th>
-                                <th>NAME</th>
-                                <th>CITY</th>
-                                <th>COUNTRY</th>
-                                <th>USER</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (obj of Reqlist  | paginate: config; track obj) {
-<tr>
+    @if (Reqlist.length > 0) {
+      <div class="toolbar">
+        <span class="count">{{ Reqlist.length }} {{ Reqlist.length === 1 ? 'record' : 'records' }}</span>
+        <span class="tb-r">
+          <button class="btn g" type="button" (click)="delete();">Delete</button>
+        </span>
+      </div>
 
-                                <td class="centerlabel">
-                                    <span class="col-form-span-label"> 
-                                        <input type="checkbox" [(ngModel)]="obj.CHK" (change)="chkonchange(obj.CHK,obj.CODE)"/>
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="col-form-span-label anchor-link" (click)="ListOnclick(obj.CODE)" style="cursor:pointer;">{{obj.CODE}}</span>
-                                </td>
-                                <td>
-                                    <span class="col-form-span-label">{{obj.EORI}}</span>
-                                </td>
-                                <td>
-                                    <span class="col-form-span-label">{{obj.PANNO}}</span>
-                                </td>
-                                <td>
-                                    <span class="col-form-span-label">{{obj.GSTNO}}</span>
-                                </td>
-                                <td>
-                                    <span class="col-form-span-label">{{obj.NAME}}</span>
-                                </td>
-                                <td>
-                                    <span class="col-form-span-label">{{obj.CITY}}</span>
-                                </td>
-                                <td>
-                                    <span class="col-form-span-label">{{obj.COUNTRY}}</span>
-                                </td>
-                                <td>
-                                    <span class="col-form-span-label">{{obj.USER}}</span>
-                                </td>
-                            </tr>
-}
-                        
-                        </tbody>
-                    </table>
-                    <pagination-controls (pageChange)="pageChanged($event)"></pagination-controls> 
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th></th>
+              <th>CODE</th>
+              <th>NAME</th>
+              <th>EORI #</th>
+              <th>PAN NO.</th>
+              <th>GST NO.</th>
+              <th>CITY</th>
+              <th>COUNTRY</th>
+              <th>USER</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (obj of Reqlist | paginate: config; track obj) {
+              <tr>
+                <td class="act">
+                  <input type="checkbox" [(ngModel)]="obj.CHK" (change)="chkonchange(obj.CHK,obj.CODE)">
                 </td>
-            </tr>
-}
-            @if (Reqlist.length > 0) {
-<tr>
-                <td colspan="4"><button class="btn btn-sm btn-danger" type="delete"> <span class="col-form-span-label" (click)="delete();"><i class="fa fa-trash"></i> Delete</span></button></td>
-            </tr>
-}
-            </table>
-    </div>
-    <div class="col-sm-1">  </div>
-</div>
-        
-        
+                <td><a class="lnk" (click)="ListOnclick(obj.CODE)">{{obj.CODE}}</a></td>
+                <td>{{obj.NAME}}</td>
+                <td>{{obj.EORI}}</td>
+                <td>{{obj.PANNO}}</td>
+                <td>{{obj.GSTNO}}</td>
+                <td>{{obj.CITY}}</td>
+                <td>{{obj.COUNTRY}}</td>
+                <td>{{obj.USER}}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <pagination-controls (pageChange)="pageChanged($event)"></pagination-controls>
+      </div>
+    } @else {
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <tbody>
+            <tr><td class="empty">No records to show. Enter search text above and choose Search.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
 </div>

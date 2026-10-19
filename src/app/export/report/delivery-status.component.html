@@ -1,77 +1,78 @@
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-header formheading">
-                <strong>Delivery Status </strong>
-            </div>
-        </div>
+<!--
+  Export -> Report -> Delivery Status (search-criteria form; Search downloads
+  an Excel workbook from Export/Generate_Delivery_Status -- there is no
+  browsable on-screen result grid, so this page is the filter card only, on
+  the Import page kit).
+-->
+<div class="im-page erp-page">
+  <div class="ph">
+    <div>
+      <h1>Delivery Status</h1>
+      <p>Search delivery status by mode, city, consignee and date range.</p>
     </div>
-</div>
-<div class="row">
-    <div class="col-sm-3">
-    </div>
-    <div class="col-sm-6">
-        <table class="table table-bordered table-sm-new bgwhite">
-            <tr>
-                <td>
-                    <span class="col-form-span-label">MODE:</span>
-                </td>
-                <td colspan="3">
-                    <input type="radio" value="0.CONSIGNEE LINER CONTRACT" name="rbReportType" [(ngModel)]="ReportType" />
-                    <span class="col-form-span-label">CONSIGNEE LINER CONTRACT</span>
-                    <br/>
-                    <input type="radio" value="1.OUR LINER CONTRACT" name="rbReportType" [(ngModel)]="ReportType" />
-                    <span class="col-form-span-label">OUR LINER CONTRACT</span>
-                    <br/>
-                    <input type="radio" value="2.BOTH (All Contract)" name="rbReportType" [(ngModel)]="ReportType" />
-                    <span class="col-form-span-label">BOTH (All Contract)</span>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="col-form-span-label">City :</span>
-                </td>
-                <td colspan="3">
-                    <ng-select [items]="CityList" bindLabel="cityname" bindValue="citycode" placeholder="--Select City--" [(ngModel)]="City" class="form-control">
-                    </ng-select>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="col-form-span-label">Consignee :</span>
-                </td>
-                <td colspan="3">
-                    <ng-select [items]="ConsigneeList" bindLabel="con_name" bindValue="con_code" placeholder="--Show All--" [(ngModel)]="Consignee"
-                        class="form-control">
-                    </ng-select>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="col-form-span-label">From Date:</span>
-                </td>
-                <td>
-                    <my-date-picker name="abcd" [options]="myDatePickerOptions" [(ngModel)]="FromDate"></my-date-picker>
-                </td>
-                <td>
-                    <span class="col-form-span-label">To Date:</span>
-                </td>
-                <td>
-                    <my-date-picker name="abcd" [options]="myDatePickerOptions" [(ngModel)]="ToDate"></my-date-picker>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="4" class="col-form-span-heading centerlabel">
-                    <button class="btn btn-sm btn-success" type="button" (click)="onSearch()">
-                        <span class="col-form-span-label">
-                            <i class="fa fa-search"></i>&nbsp; Search
-                        </span>
-                    </button>
-                </td>
+  </div>
 
-            </tr>
-        </table>
+  <div class="card">
+    <div class="card-h"><h2>Search criteria</h2></div>
+
+    <div class="filters erp-filters">
+      <div class="f full">
+        <label>Mode</label>
+        <div class="erp-opts stack">
+          <label class="erp-opt" [class.on]="ReportType === '0.CONSIGNEE LINER CONTRACT'">
+            <input type="radio" value="0.CONSIGNEE LINER CONTRACT" name="rbReportType" [(ngModel)]="ReportType" />
+            CONSIGNEE LINER CONTRACT
+          </label>
+          <label class="erp-opt" [class.on]="ReportType === '1.OUR LINER CONTRACT'">
+            <input type="radio" value="1.OUR LINER CONTRACT" name="rbReportType" [(ngModel)]="ReportType" />
+            OUR LINER CONTRACT
+          </label>
+          <label class="erp-opt" [class.on]="ReportType === '2.BOTH (All Contract)'">
+            <input type="radio" value="2.BOTH (All Contract)" name="rbReportType" [(ngModel)]="ReportType" />
+            BOTH (All Contract)
+          </label>
+        </div>
+      </div>
+
+      <div class="f">
+        <label for="dsCity">City</label>
+        <ng-select id="dsCity" class="custom" [items]="CityList" bindLabel="cityname" bindValue="citycode"
+                   placeholder="--Select City--" [(ngModel)]="City">
+        </ng-select>
+      </div>
+
+      <div class="f">
+        <label for="dsConsignee">Consignee</label>
+        <ng-select id="dsConsignee" class="custom" [items]="ConsigneeList" bindLabel="con_name" bindValue="con_code"
+                   placeholder="--Show All--" [(ngModel)]="Consignee">
+        </ng-select>
+      </div>
+
+      <div class="f full">
+        <label>Date range</label>
+        <div class="erp-presets">
+          <button type="button" (click)="setPreset(0)">This month</button>
+          <button type="button" (click)="setPreset(3)">Last 3 months</button>
+          <button type="button" (click)="setPreset(12)">Last 12 months</button>
+        </div>
+      </div>
+
+      <div class="f">
+        <label>From Date</label>
+        <my-date-picker name="abcd" [options]="myDatePickerOptions" [(ngModel)]="FromDate"></my-date-picker>
+      </div>
+
+      <div class="f">
+        <label>To Date</label>
+        <my-date-picker name="abcd" [options]="myDatePickerOptions" [(ngModel)]="ToDate"></my-date-picker>
+      </div>
     </div>
-    <div class="col-sm-3">
+
+    <div class="toolbar erp-actions">
+      <span class="sub-t">Search downloads an Excel workbook of the delivery status.</span>
+      <span class="tb-r">
+        <button class="btn p" type="button" (click)="onSearch()">Search</button>
+      </span>
     </div>
+  </div>
 </div>

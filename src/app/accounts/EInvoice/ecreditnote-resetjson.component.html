@@ -1,80 +1,125 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-      <div class="col-sm-12">
-        <div class="card">
-          <div class="card-header formheading">
-            <strong>{{subheader}}</strong>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row no-gutters">
-      <!-- <div class="col-md-1 col-lg-1 col-12">
-      </div> -->
-      <div class="col-md-12  col-lg-12 col-12" style="overflow-y: auto;height: 460px;">
-        <table class="table table-bordered table-sm-new bgwhite ">
-          <thead>
-            
-            <tr  style="white-space:nowrap;">
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;">  <input type="checkbox"  [(ngModel)]='checkbox' (change)="checkAll($event)" /> &nbsp;  </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> JSON FILENAME </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> Crt No   </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;" > Crt date </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;" > Client   </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;" > Supply Type   </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"  > Taxable Amt   </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> Non Taxable Amt  </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> IGST </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> CGST  </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> SGST  </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> RoundOff Amt  </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> Total Amount  </th>
-            </tr>
-          </thead>
-          <tbody class="bgwhite">
-            @for (obj of resetjsonlist ; track obj) {
-<tr
-                [ngClass]="{ 'disabled-row': obj.SUPTYPE === 'B2CS' }"
-              >
-              <td class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.Checked" [id]="i" [value]="i"
-                  (ngModelChange)="getCheckboxValues($event,obj.FK_JSON_ID,obj.ID,obj.INV_NO,i)"> &nbsp; </td>
-              <td [attr.disabled]="obj.SUPTYPE === 'B2CS'  ? true : null" class="col-form-span-label">{{obj.JSONFILENAME}}</td>
-              <td class="col-form-span-label" >{{obj.INV_NO}}</td>
-              <td class="col-form-span-label">{{obj.INV_DATE}}</td>
-              <td class="col-form-span-label">{{obj.CLIENT}}</td>
-              <td [ngClass]="{
-                'col-form-span-label': true,
-                'green-text': obj.SUPTYPE === 'B2B' || obj.SUPTYPE === 'EXPWOP' || obj.SUPTYPE === 'SEZWOP'
-              }" class="col-form-span-label">{{obj.SUPTYPE}}</td>
-              <td class="col-form-span-label">{{obj.TAXABLEAMT}}</td>
-              <td class="col-form-span-label">{{obj.NONTAXABLEAMT}}</td>
-              <td class="col-form-span-label">{{obj.IGST}}</td>
-              <td class="col-form-span-label">{{obj.CGST}}</td>
-              <td class="col-form-span-label">{{obj.SGST}}</td>
-              <td class="col-form-span-label">{{obj.ROUNDOFFAMT}}</td>
-              <td class="col-form-span-label">{{obj.TOTALAMT}}</td>
-            </tr>
-}
-          </tbody>
-         
-        </table>
-  
-      </div>
-      <!-- <div class="col-md-1  col-lg-1 col-12">
-      </div> -->
-    
-    </div>
-    <div class="row no-gutters">
-      <!-- <div class="col-md-1 col-lg-1 col-12">
-      </div> -->
-      <div class="col-md-12  col-lg-12 col-12" style="display: flex;
-      justify-content: flex-end;
-      margin-left: auto;
-      margin-right: 0;">
-        <button class="btn btn-sm btn-success" type="submit" (click)="ResetJson()"> <span
-          class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Reset</span></button>
-      </div>
-      <!-- <div class="col-md-1 col-lg-1 col-12">
-      </div> -->
+<!--
+  E-Credit note - reset JSON for credit notes whose JSON file was already created.
+  Monochrome page kit (import-page.css + einvoice-page.css). Row checkboxes, the header box,
+  getCheckboxValues() (ticking a row selects its whole JSON batch) and ResetJson() are
+  unchanged; the filter and 10-per-page pager are display-only.
+-->
+<div class="im-page ei-page">
+  <div class="ph">
+    <div>
+      <h1>E-Credit note · reset JSON</h1>
+      <p>{{ subheader }}</p>
     </div>
   </div>
+
+  @if (grid.notice) {
+    <div class="ei-notice" [class.err]="grid.notice.kind === 'err'" role="status">
+      <div>
+        <h3>{{ grid.notice.title }}</h3>
+        <p>{{ grid.notice.text }}</p>
+      </div>
+      <button type="button" class="ei-x" (click)="grid.notice = null">Dismiss</button>
+    </div>
+  }
+
+  <div class="card sec">
+    <div class="ei-filters">
+      <div class="f">
+        <label for="eiFind">Find</label>
+        <input id="eiFind" type="text" [(ngModel)]="grid.text" (ngModelChange)="grid.onFilter()" placeholder="JSON file, credit note no., client or supply type" />
+      </div>
+      <div class="f ei-meta">
+        <span>JSON created <b>{{ resetjsonlist?.length || 0 }}</b></span>
+        <span>Selected batch <b>{{ JsonId || '—' }}</b></span>
+      </div>
+      <div class="f">
+        <button class="btn g" type="button" (click)="GetResetJsonList()">Refresh</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <span>
+        <span class="count">{{ grid.filtered.length }} {{ grid.filtered.length === 1 ? 'credit note' : 'credit notes' }}</span>
+        <span class="sub-t"> · {{ grid.checkedCount }} selected · ticking a row selects its whole JSON file; the header box clears the selection</span>
+      </span>
+      <span class="tb-r">
+        <button class="btn g" type="button" (click)="grid.clear()">Clear</button>
+        <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!grid.filtered.length">Export</button>
+      </span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th class="ei-chk"><input type="checkbox" [(ngModel)]='checkbox' (change)="checkAll($event)" aria-label="Clear selection" /></th>
+            <th>JSON file name</th>
+            <th>Crt no</th>
+            <th>Crt date</th>
+            <th>Client</th>
+            <th>Supply type</th>
+            <th class="num">Taxable amt</th>
+            <th class="num">Non taxable amt</th>
+            <th class="num">IGST</th>
+            <th class="num">CGST</th>
+            <th class="num">SGST</th>
+            <th class="num">Round-off amt</th>
+            <th class="num">Total amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (grid.loading) {
+            <tr><td class="empty" colspan="13">Loading JSON-created credit notes…</td></tr>
+          } @else if (grid.loadError) {
+            <tr><td class="empty" colspan="13">Could not load the list: {{ grid.loadError }}</td></tr>
+          } @else {
+            @for (obj of grid.pageRows; track obj) {
+              <tr [ngClass]="{ 'disabled-row': obj.SUPTYPE === 'B2CS' }" [class.ei-on]="obj.Checked">
+                <td class="ei-chk"><input type="checkbox" [(ngModel)]="obj.Checked" [id]="i" [value]="i"
+                  (ngModelChange)="getCheckboxValues($event,obj.FK_JSON_ID,obj.ID,obj.INV_NO,i)"></td>
+                <td [attr.disabled]="obj.SUPTYPE === 'B2CS'  ? true : null" class="mono">{{obj.JSONFILENAME}}</td>
+                <td class="mono">{{obj.INV_NO}}</td>
+                <td>{{obj.INV_DATE}}</td>
+                <td>{{obj.CLIENT}}</td>
+                <td>
+                  <span class="chip" [class.solid]="obj.SUPTYPE === 'B2B' || obj.SUPTYPE === 'EXPWOP' || obj.SUPTYPE === 'SEZWOP'">{{obj.SUPTYPE}}</span>
+                </td>
+                <td class="num">{{obj.TAXABLEAMT}}</td>
+                <td class="num">{{obj.NONTAXABLEAMT}}</td>
+                <td class="num">{{obj.IGST}}</td>
+                <td class="num">{{obj.CGST}}</td>
+                <td class="num">{{obj.SGST}}</td>
+                <td class="num">{{obj.ROUNDOFFAMT}}</td>
+                <td class="num">{{obj.TOTALAMT}}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="13">{{ grid.text ? 'No credit notes match this filter.' : 'No credit note JSON files to reset.' }}</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <span>Showing <b>{{ grid.rangeStart }}–{{ grid.rangeEnd }}</b> of <b>{{ grid.filtered.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="grid.page <= 1" (click)="grid.goPage(grid.page - 1)" aria-label="Previous page">‹</button>
+        @for (p of grid.pageList; track $index) {
+          @if (p === 0) {
+            <span class="gap">…</span>
+          } @else {
+            <button type="button" [class.on]="p === grid.page" (click)="grid.goPage(p)">{{ p }}</button>
+          }
+        }
+        <button type="button" [disabled]="grid.page >= grid.pageCount" (click)="grid.goPage(grid.page + 1)" aria-label="Next page">›</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">{{ grid.checkedCount }} selected{{ JsonId ? ' · JSON batch ' + JsonId : '' }}</span>
+    <div class="r">
+      <button class="btn p" type="button" (click)="ResetJson()">Reset JSON</button>
+    </div>
+  </div>
+</div>

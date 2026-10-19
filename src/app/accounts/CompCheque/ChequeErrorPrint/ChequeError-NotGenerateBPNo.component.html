@@ -1,41 +1,30 @@
-<div class="animated fadeIn">
-    <div class="container">
-        <!-- <div class="row" *ngIf="Searchdata_list.length==0"> -->
-            <div class="row" >
-            <div class="col-sm-3"></div>
-            <div class="col-sm-6">
-                <table class="table table-bordered table-sm-new bgwhite" style="font-family:  Verdana;font-size: 12px;">
-                    <tbody style='height:30px'>
-                        <tr>
-                            <td class="col-form-span-heading" colspan="5">
-                                REPRINT EXISTING CHEQUE - REQUEST ASSIGNED BUT NOT PRINTED
-                            </td>
-                        </tr>
-                        <tr>
-                          
-                            <td >
-                                <span class="col-form-span-label width150"><b>Cheque No</b> </span>
-                               
-                            </td> 
-                             <td>
-                                <input type="text" class="form-control width100" [(ngModel)]="ChequeNo" >
-                            </td>  
-                            <td  class="centerlabel">
-                                <button class="btn btn-block btn-primary" type="submit" (click)="PrintData()"><span
-                                        class="col-form-span-label"><i class="fa fa-search"></i> Search</span></button>
-                               
-                            </td>
-                           
-                        </tr>
-                  
-                    </tbody>
-                </table>
+<!--
+  Cheque error print - reprint a cheque whose request was assigned but no BP number was generated.
+  Recipe 4 (print): only this on-screen chrome is restyled. PrintData() calls
+  Acc__ChequePrintError_Report and opens the legacy
+  frm_Acc_CompCheq_RePrintCheque_AssignReqNo_NotGenerate_BPNo_Print.aspx in a popup window;
+  that URL and the printed cheque are unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Cheque error print</h1>
+      <p>Reprint an existing cheque whose request was assigned but never printed</p>
+    </div>
+  </div>
 
-            </div>
-
-            <div class="col-sm-3"></div>   
-             </div>
-  
-                       
-            </div>
+  <div class="card sec">
+    <div class="fields">
+      <div class="fld full">
+        <label>Cheque no.</label>
+        <div class="v-pair">
+          <input type="text" [(ngModel)]="ChequeNo" (keyup.enter)="PrintData()">
+          <button class="btn p" type="submit" (click)="PrintData()">Search &amp; print</button>
         </div>
+      </div>
+    </div>
+    <div class="v-actions">
+      <span class="v-note">The cheque opens in the legacy print window.</span>
+    </div>
+  </div>
+</div>

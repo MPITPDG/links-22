@@ -1,86 +1,69 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>DELETE EXISTING CONTAINER</strong>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-2">
-        </div>
-        <div class="col-sm-8">
-            <table class="table table-bordered table-sm-new bgwhite" style="border: 1px solid gray;">
-                <tbody>
-                     <!-- <tr>
-                        <td colspan="5" style="background-color:lightgrey ">
-                         <span class="col-form-span-label"><b>Container Search</b></span></td>
-                      </tr> -->
-                      <tr>
-                        <td class="width120">
-                        <span class="col-form-span-label">Container No.:</span></td>
-                
-                            <td ><input type="text"  style="border-radius: 5px;" maxlength="13" class="form-control width150"
-                             [(ngModel)]="containerno"  ></td>
-                            <td style="text-align: left;">
-                                <button class="btn btn-sm btn-success"  type="submit" id="search" name="search" 
-                                 (click)="search()" ><span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Search</span></button>
-                            </td>
-                             <td>
-                                <button class="btn btn-sm btn-danger"  type="reset" id="delete" name="delete"  [disabled]='disabledeletebtn'
-                                 (click)="DeleteContainer()" ><span class="col-form-span-label"><i class="fa fa-trash" ></i> Delete</span></button>
-                            </td>
-                            <td style="width:150px;"></td>
-                     </tr>
-                   <tr>
-                    <td colspan="5" style="text-align: center;">
-                            <span class="col-form-span-label" style="color: red;"> <b> {{msg}}</b></span>
-                    </td>
-                   </tr>
-                   @if (containerlist.length>0) {
-<tr>
-                    <td colspan="5">
-                         <hr >
-                    </td>
-                   </tr>
-}
-                   
-                     <tr>
-                        <td colspan="4">
-                            
-                         @if (containerlist.length>0) {
-<table class="table table-responsive-sm table-bordered"   >
-                        <thead>
-                            <tr class="bakgrdliteBlue">
-                             
-                                <th class="col-form-span-label  font-weight-bold headerwhite">Container No</th>
-                                <th  class="col-form-span-label  font-weight-bold headerwhite">Expt No</th>
-                               
-                            </tr>
-                        </thead>
-                         <tbody  >
-                            @for (obj of containerlist; track obj) {
-<tr>
-                             
-                               <td><span class="col-form-span-label" > {{obj.CONTAINERNO}}</span></td>
-                               <td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
-                            
-                            </tr>
-}
-                        </tbody>  
-                      </table>
-}
-                    
-                        </td>
-                     </tr>
-               </tbody>
-            </table>
-        </div>
-        <div class="col-sm-2">
-        </div>
-    </div>
+<!--
+  Delete container (Links-only, no MP reference). Approved mock m4, recipe
+  "list + bar": GLOBAL page kit (src/styles/kit/import-page.css, root .im-page)
+  plus delete_container.component.css for the mock-only helpers.
+  Behaviour is unchanged: the same [(ngModel)], ids / names, (click)s, Search
+  and Delete calls (Export/EXP_CONTAINER_UPDATE_EXISTCONTAINER), the browser
+  confirm() and alert()s, and Delete stays disabled until a search succeeds
+  (disabledeletebtn). The status text (msg) moved from the red line into the
+  toolbar above the grid; "Delete" reads "Delete container" (same handler).
+-->
+<div class="im-page">
+  <div class="crumb">Export / Container / Delete container</div>
+  <div class="ph">
     <div>
+      <h1>Delete container</h1>
+      <p>Remove a container entered by mistake and unlink it from its export jobs</p>
+    </div>
+  </div>
 
+  <div class="card">
+    <div class="filters f-del">
+      <div class="f">
+        <label for="dc-containerno">Container no.</label>
+        <input id="dc-containerno" name="dc-containerno" type="text" class="mono" maxlength="13" [(ngModel)]="containerno">
+      </div>
+      <div class="f">
+        <button class="btn p" type="submit" id="search" name="search" (click)="search()">Search</button>
+      </div>
+    </div>
+
+    @if (msg || containerlist.length>0) {
+    <div class="toolbar">
+      <span>
+        @if (containerlist.length>0) {
+        <span class="count">{{containerlist.length}} export {{containerlist.length == 1 ? 'job' : 'jobs'}}</span>
+        }
+        @if (msg) {
+        <span class="sub-t">{{containerlist.length>0 ? ' · ' : ''}}{{msg}}</span>
+        }
+      </span>
+    </div>
+    }
+
+    @if (containerlist.length>0) {
+    <div class="tbl-wrap">
+      <table class="tbl w-s">
+        <thead>
+          <tr><th>Container no.</th><th>Expt no.</th></tr>
+        </thead>
+        <tbody>
+          @for (obj of containerlist; track obj) {
+          <tr>
+            <td class="mono">{{obj.CONTAINERNO}}</td>
+            <td class="mono">{{obj.EXPTNO}}</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </div>
+
+  <div class="bar">
+    <span class="note">Delete asks once more, then removes the container from every job it is linked to. It cannot be undone.</span>
+    <div class="r">
+      <button class="btn p" type="reset" id="delete" name="delete" [disabled]='disabledeletebtn' (click)="DeleteContainer()">Delete container</button>
+    </div>
+  </div>
 </div>

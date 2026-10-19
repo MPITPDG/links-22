@@ -1,483 +1,270 @@
-<div class="br-page">
-
-  <!-- ========================================================= -->
-  <!-- SEARCH                                                    -->
-  <!-- ========================================================= -->
+<!--
+  Accounts -> Bank reconciliation -> Upload statement search.
+  Search (bank + period, search()) -> four tabs (changeTab): Reconcil, UnReconcil, Our Bank Ledger,
+  Mismatched Data. Sorting via sortBy / sortIcon; UnReconcil + Our Bank Ledger rows are paired
+  manually (selectBankRow / selectLedgerRow -> link panel -> confirmLink); Mismatched rows are ticked
+  with a clearance date (getCheckboxValues) and submitted with BankRecUpdate(). Export: Exporttoxl().
+  Links port of the MPERPNG-20 layout (kit .im-page + host class kit-accreport); .ts is Links' own
+  (fail-soft Table4/5, prepareMismatchList, manual-link flow and Acc_CashBook_BankRecousillation_UpdateNew unchanged).
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Header }}</h1>
+      <p>{{ displayType=='LIST' ? Subheader : 'Uploaded bank statements matched against the ledger, with manual linking and clearance dates' }}</p>
+    </div>
+    @if (displayType=='LIST') {
+      <div class="tools">
+        <span class="chip">{{lbltxt}} {{valuetxt}}</span>
+        <button class="btn g" type="button" (click)="displayType='SEARCH';reconcildataList=[];unreconcildataList=[]">Back to search</button>
+        <button class="btn g" type="button" (click)="Exporttoxl();">Export to Excel</button>
+      </div>
+    }
+  </div>
 
   @if (displayType=='SEARCH') {
-<div class="br-card search-card">
-
-    <div class="card-heading">
-      <i class="fa fa-search"></i> {{Header}}
+    <div class="card sec">
+      <div class="card-h"><h2>Bank and period</h2><span class="meta"><b>*</b> required</span></div>
+      <div class="filters fk-f">
+        <div class="f w2">
+          <label>Bank account <span class="req">*</span></label>
+          <ng-select [items]="BankList" bindLabel="acctname" bindValue="acctcodename" [(ngModel)]="ourbank" [appendTo]="'body'" placeholder="Select bank account"></ng-select>
+        </div>
+        <div class="f">
+          <label>From <span class="req">*</span></label>
+          <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)" [options]="myDatePickerOptions" [selDate]="FromDate"></my-date-picker>
+        </div>
+        <div class="f">
+          <label>To <span class="req">*</span></label>
+          <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)" [options]="myDatePickerOptions" [selDate]="ToDate"></my-date-picker>
+        </div>
+        <div class="f act">
+          <button class="btn g" type="button" (click)="reset()">Reset</button>
+          <button class="btn p" type="button" (click)="search()">Search</button>
+        </div>
+      </div>
     </div>
-
-    <div class="clean-row-layout">
-
-      <div class="clean-field clean-bank">
-        <label>Bank Account <span class="br-req">*</span></label>
-        <ng-select
-          [items]="BankList"
-          bindLabel="acctname"
-          bindValue="acctcodename"
-          [(ngModel)]="ourbank"
-          [appendTo]="'body'"
-          placeholder="Select Bank Account">
-        </ng-select>
-      </div>
-
-      <div class="clean-field clean-date">
-        <label>From <span class="br-req">*</span></label>
-        <my-date-picker
-          name="FromDate"
-          (dateChanged)="FromDateChanged($event)"
-          [options]="myDatePickerOptions"
-          [selDate]="FromDate"
-          class="search-date-control">
-        </my-date-picker>
-      </div>
-
-      <div class="clean-field clean-date">
-        <label>To <span class="br-req">*</span></label>
-        <my-date-picker
-          name="ToDate"
-          (dateChanged)="ToDateChanged($event)"
-          [options]="myDatePickerOptions"
-          [selDate]="ToDate"
-          class="search-date-control">
-        </my-date-picker>
-      </div>
-
-      <div class="clean-actions">
-        <button class="br-btn br-btn--primary" type="button" (click)="search()">
-          <i class="fa fa-search"></i> Search
-        </button>
-        <button class="br-btn br-btn--ghost" type="button" (click)="reset()">
-          <i class="fa fa-undo"></i> Reset
-        </button>
-      </div>
-
-    </div>
-  </div>
-}
-
-  <!-- ========================================================= -->
-  <!-- RESULT                                                    -->
-  <!-- ========================================================= -->
+  }
 
   @if (displayType=='LIST') {
-
-
-    <div class="br-topbar">
-      <div class="br-topbar-left">
-        <span class="br-page-title">{{Header}}</span>
-        <span class="br-meta">{{Subheader}}</span>
-      </div>
-      <div class="br-topbar-right">
-        <span class="br-record-chip">{{lbltxt}} {{valuetxt}}</span>
-        <button class="br-btn br-btn--export" type="button" (click)="Exporttoxl();">
-          <i class="fa fa-file-excel-o"></i> Export to Excel
-        </button>
-        <button class="br-btn br-btn--ghost" type="button"
-                (click)="displayType='SEARCH';reconcildataList=[];unreconcildataList=[]">
-          <i class="fa fa-arrow-circle-left"></i> Back to search
-        </button>
-      </div>
-    </div>
-
-    <!-- TABS -->
-    <div class="br-view-toggle">
-      <button class="toggle-btn" type="button"
-              [class.active]="activeTab=='Reconcil'"
-              (click)="changeTab('Reconcil')">
-        <i class="fa fa-check"></i> Reconcil
-        <span class="toggle-count">{{reconcilrecord}}</span>
-      </button>
-      <button class="toggle-btn" type="button"
-              [class.active]="activeTab=='UnReconcil'"
-              (click)="changeTab('UnReconcil')">
-        <i class="fa fa-exclamation-triangle"></i> UnReconcil
-        <span class="toggle-count">{{unreconcilrecord}}</span>
-      </button>
-      <button class="toggle-btn" type="button"
-              [class.active]="activeTab=='Our Bank Ledger'"
-              (click)="changeTab('Our Bank Ledger')">
-        <i class="fa fa-book"></i> Our Bank Ledger
-        <span class="toggle-count">{{ledgerdatarecord}}</span>
-      </button>
-      <button class="toggle-btn" type="button"
-              [class.active]="activeTab=='Mismatched Data'"
-              (click)="changeTab('Mismatched Data')">
-        <i class="fa fa-random"></i> Mismatched Data
-        <span class="toggle-count">{{mismatchedrecord}}</span>
-      </button>
-    </div>
-
-    <!-- ===================== TAB 1 : RECONCIL ===================== -->
-    @if (activeTab=='Reconcil') {
-<div class="br-card br-table-card">
-      <div class="br-table-wrap">
-        <table class="br-table grouped-head">
-          <thead>
-            <tr class="grp-head">
-              <th colspan="4">Bank Statement Data</th>
-              <th colspan="7" class="grp-start">Ledger Data</th>
-            </tr>
-            <tr class="col-head">
-              <th class="sortable" (click)="sortBy('reconcil', reconcildataList, 'BANKREFNO', 'str')">Bank Ref No <i class="fa" [ngClass]="sortIcon('reconcil','BANKREFNO')"></i></th>
-              <th class="num sortable" (click)="sortBy('reconcil', reconcildataList, 'DEPOSIT', 'num')">Deposit <i class="fa" [ngClass]="sortIcon('reconcil','DEPOSIT')"></i></th>
-              <th class="num sortable" (click)="sortBy('reconcil', reconcildataList, 'WITHDRAWAL', 'num')">Withdrawal <i class="fa" [ngClass]="sortIcon('reconcil','WITHDRAWAL')"></i></th>
-              <th class="ctr sortable" (click)="sortBy('reconcil', reconcildataList, 'CLEARANCEDT', 'date')">Clearance Dt <i class="fa" [ngClass]="sortIcon('reconcil','CLEARANCEDT')"></i></th>
-              <th class="grp-start sortable" (click)="sortBy('reconcil', reconcildataList, 'USERBANKREFNO', 'str')">Bank Ref No <i class="fa" [ngClass]="sortIcon('reconcil','USERBANKREFNO')"></i></th>
-              <th class="sortable" (click)="sortBy('reconcil', reconcildataList, 'ENTRYNO', 'str')">Entry No <i class="fa" [ngClass]="sortIcon('reconcil','ENTRYNO')"></i></th>
-              <th class="ctr sortable" (click)="sortBy('reconcil', reconcildataList, 'ENTRYDT', 'date')">Entry Date <i class="fa" [ngClass]="sortIcon('reconcil','ENTRYDT')"></i></th>
-              <th class="ctr sortable" (click)="sortBy('reconcil', reconcildataList, 'ENTRYTYPE', 'str')">Type <i class="fa" [ngClass]="sortIcon('reconcil','ENTRYTYPE')"></i></th>
-              <th class="num sortable" (click)="sortBy('reconcil', reconcildataList, 'AMOUNT', 'num')">Amount <i class="fa" [ngClass]="sortIcon('reconcil','AMOUNT')"></i></th>
-              <th class="num sortable" (click)="sortBy('reconcil', reconcildataList, 'DEDUCTION', 'num')">Deduction <i class="fa" [ngClass]="sortIcon('reconcil','DEDUCTION')"></i></th>
-              <th class="ctr sortable" (click)="sortBy('reconcil', reconcildataList, 'CLEARANCEDT', 'date')">Clearance Dt <i class="fa" [ngClass]="sortIcon('reconcil','CLEARANCEDT')"></i></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (data of reconcildataList; track data) {
-<tr>
-              <td class="mono">{{data.BANKREFNO || '—'}}</td>
-              <td class="num">
-                @if (data.DEPOSIT > 0) {
-<span class="cr-amt">{{data.DEPOSIT | number:'1.2-2'}}</span>
-}
-                @if (!(data.DEPOSIT > 0)) {
-<span class="muted">—</span>
-}
-              </td>
-              <td class="num">
-                @if (data.WITHDRAWAL > 0) {
-<span class="dr-amt">{{data.WITHDRAWAL | number:'1.2-2'}}</span>
-}
-                @if (!(data.WITHDRAWAL > 0)) {
-<span class="muted">—</span>
-}
-              </td>
-              <td class="ctr">{{data.CLEARANCEDT || '—'}}</td>
-              <td class="mono grp-start">{{data.USERBANKREFNO || '—'}}</td>
-              <td class="mono">{{data.ENTRYNO || '—'}}</td>
-              <td class="ctr">{{data.ENTRYDT || '—'}}</td>
-              <td class="ctr">
-                @if (data.ENTRYTYPE=='BR') {
-<span class="br-badge br-badge--br">BR</span>
-}
-                @if (data.ENTRYTYPE=='BP') {
-<span class="br-badge br-badge--bp">BP</span>
-}
-                @if (data.ENTRYTYPE!='BR' && data.ENTRYTYPE!='BP') {
-<span class="muted">—</span>
-}
-              </td>
-              <td class="num">
-                @if (data.AMOUNT) {
-<span>{{data.AMOUNT | number:'1.2-2'}}</span>
-}
-                @if (!data.AMOUNT) {
-<span class="muted">—</span>
-}
-              </td>
-              <td class="num">
-                @if (data.DEDUCTION) {
-<span>{{data.DEDUCTION | number:'2.2-4'}}</span>
-}
-                @if (!data.DEDUCTION) {
-<span class="muted">—</span>
-}
-              </td>
-              <td class="ctr">{{data.CLEARANCEDT || '—'}}</td>
-            </tr>
-}
-          </tbody>
-        </table>
-
-        @if (reconcildataList.length === 0) {
-<div class="br-empty">
-          <i class="fa fa-inbox"></i>
-          No reconciled items in this period.
+    <div class="card sec">
+      <div class="toolbar">
+        <div class="fk-seg fk-tabs">
+          <button type="button" [class.on]="activeTab=='Reconcil'" (click)="changeTab('Reconcil')">Reconcil &middot; {{reconcilrecord}}</button>
+          <button type="button" [class.on]="activeTab=='UnReconcil'" (click)="changeTab('UnReconcil')">UnReconcil &middot; {{unreconcilrecord}}</button>
+          <button type="button" [class.on]="activeTab=='Our Bank Ledger'" (click)="changeTab('Our Bank Ledger')">Our bank ledger &middot; {{ledgerdatarecord}}</button>
+          <button type="button" [class.on]="activeTab=='Mismatched Data'" (click)="changeTab('Mismatched Data')">Mismatched data &middot; {{mismatchedrecord}}</button>
         </div>
-}
-      </div>
-    </div>
-}
-
-    <!-- ===================== TAB 2 : UNRECONCIL ===================== -->
-    @if (activeTab=='UnReconcil') {
-<div class="br-card br-table-card">
-
-      <div class="br-tabletools">
-        <input type="text" [(ngModel)]="bankFilter" class="br-filter"
-               placeholder="Filter by Bank Ref No / Amount...">
-        <span class="br-hint">
-          Select a row here, then its match on <b>Our Bank Ledger</b>, to link them manually.
-        </span>
+        @if (activeTab=='UnReconcil') {
+          <span class="fk-inline">
+            <input type="text" [(ngModel)]="bankFilter" class="fk-search" placeholder="Filter by bank ref no. / amount">
+            <span>Select a row here, then its match on <b>Our bank ledger</b>, to link them.</span>
+          </span>
+        }
+        @if (activeTab=='Our Bank Ledger') {
+          <span class="fk-inline">
+            <input type="text" [(ngModel)]="ledgerFilter" class="fk-search" placeholder="Filter by entry no. / bank ref no. / amount">
+            <span>Select a row here to pair with your selection on <b>UnReconcil</b>.</span>
+          </span>
+        }
       </div>
 
-      <div class="br-table-wrap">
-        <table class="br-table single-head">
-          <thead>
-            <tr class="col-head">
-              <th class="chk-col"></th>
-              <th class="sortable" (click)="sortBy('unreconcil', unreconcildataList, 'BANKREFNO', 'str')">Bank Ref No <i class="fa" [ngClass]="sortIcon('unreconcil','BANKREFNO')"></i></th>
-              <th class="num sortable" (click)="sortBy('unreconcil', unreconcildataList, 'DEPOSIT', 'num')">Deposit <i class="fa" [ngClass]="sortIcon('unreconcil','DEPOSIT')"></i></th>
-              <th class="num sortable" (click)="sortBy('unreconcil', unreconcildataList, 'WITHDRAWAL', 'num')">Withdrawal <i class="fa" [ngClass]="sortIcon('unreconcil','WITHDRAWAL')"></i></th>
-              <th class="ctr sortable" (click)="sortBy('unreconcil', unreconcildataList, 'CLEARANCEDT', 'date')">Clearance Date <i class="fa" [ngClass]="sortIcon('unreconcil','CLEARANCEDT')"></i></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (data of filteredUnreconcilList; track data) {
-<tr [class.row-selected]="data._linkSelected">
-              <td class="chk-col">
-                <input type="checkbox" [ngModel]="data._linkSelected" (ngModelChange)="selectBankRow(data)">
-              </td>
-              <td class="mono">{{data.BANKREFNO || '—'}}</td>
-              <td class="num">
-                @if (data.DEPOSIT > 0) {
-<span class="cr-amt">{{data.DEPOSIT | number:'1.2-2'}}</span>
-}
-                @if (!(data.DEPOSIT > 0)) {
-<span class="muted">—</span>
-}
-              </td>
-              <td class="num">
-                @if (data.WITHDRAWAL > 0) {
-<span class="dr-amt">{{data.WITHDRAWAL | number:'1.2-2'}}</span>
-}
-                @if (!(data.WITHDRAWAL > 0)) {
-<span class="muted">—</span>
-}
-              </td>
-              <td class="ctr">{{data.CLEARANCEDT || '—'}}</td>
-            </tr>
-}
-          </tbody>
-        </table>
-
-        @if (filteredUnreconcilList.length === 0) {
-<div class="br-empty">
-          <i class="fa fa-check-circle"></i>
-          No matching records.
+      @if (activeTab=='Reconcil') {
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr class="grp"><th colspan="4">Bank statement</th><th colspan="7">Ledger</th></tr>
+              <tr>
+                <th class="sort" (click)="sortBy('reconcil', reconcildataList, 'BANKREFNO', 'str')">Bank ref no. <i class="fa" [ngClass]="sortIcon('reconcil','BANKREFNO')"></i></th>
+                <th class="num sort" (click)="sortBy('reconcil', reconcildataList, 'DEPOSIT', 'num')">Deposit <i class="fa" [ngClass]="sortIcon('reconcil','DEPOSIT')"></i></th>
+                <th class="num sort" (click)="sortBy('reconcil', reconcildataList, 'WITHDRAWAL', 'num')">Withdrawal <i class="fa" [ngClass]="sortIcon('reconcil','WITHDRAWAL')"></i></th>
+                <th class="sort" (click)="sortBy('reconcil', reconcildataList, 'CLEARANCEDT', 'date')">Clearance date <i class="fa" [ngClass]="sortIcon('reconcil','CLEARANCEDT')"></i></th>
+                <th class="sort" (click)="sortBy('reconcil', reconcildataList, 'USERBANKREFNO', 'str')">Bank ref no. <i class="fa" [ngClass]="sortIcon('reconcil','USERBANKREFNO')"></i></th>
+                <th class="sort" (click)="sortBy('reconcil', reconcildataList, 'ENTRYNO', 'str')">Entry no. <i class="fa" [ngClass]="sortIcon('reconcil','ENTRYNO')"></i></th>
+                <th class="sort" (click)="sortBy('reconcil', reconcildataList, 'ENTRYDT', 'date')">Entry date <i class="fa" [ngClass]="sortIcon('reconcil','ENTRYDT')"></i></th>
+                <th class="sort" (click)="sortBy('reconcil', reconcildataList, 'ENTRYTYPE', 'str')">Type <i class="fa" [ngClass]="sortIcon('reconcil','ENTRYTYPE')"></i></th>
+                <th class="num sort" (click)="sortBy('reconcil', reconcildataList, 'AMOUNT', 'num')">Amount <i class="fa" [ngClass]="sortIcon('reconcil','AMOUNT')"></i></th>
+                <th class="num sort" (click)="sortBy('reconcil', reconcildataList, 'DEDUCTION', 'num')">Deduction <i class="fa" [ngClass]="sortIcon('reconcil','DEDUCTION')"></i></th>
+                <th class="sort" (click)="sortBy('reconcil', reconcildataList, 'CLEARANCEDT', 'date')">Clearance date <i class="fa" [ngClass]="sortIcon('reconcil','CLEARANCEDT')"></i></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (data of reconcildataList; track $index) {
+                <tr>
+                  <td class="mono">{{data.BANKREFNO || '—'}}</td>
+                  <td class="num">@if (data.DEPOSIT > 0) { {{data.DEPOSIT | number:'1.2-2'}} } @else { <span class="sub-t">—</span> }</td>
+                  <td class="num">@if (data.WITHDRAWAL > 0) { {{data.WITHDRAWAL | number:'1.2-2'}} } @else { <span class="sub-t">—</span> }</td>
+                  <td>{{data.CLEARANCEDT || '—'}}</td>
+                  <td class="mono">{{data.USERBANKREFNO || '—'}}</td>
+                  <td class="mono">{{data.ENTRYNO || '—'}}</td>
+                  <td>{{data.ENTRYDT || '—'}}</td>
+                  <td>@if (data.ENTRYTYPE=='BR') { <span class="chip solid">BR</span> } @else if (data.ENTRYTYPE=='BP') { <span class="chip">BP</span> } @else { <span class="sub-t">—</span> }</td>
+                  <td class="num">@if (data.AMOUNT) { {{data.AMOUNT | number:'1.2-2'}} } @else { <span class="sub-t">—</span> }</td>
+                  <td class="num">@if (data.DEDUCTION) { {{data.DEDUCTION | number:'2.2-4'}} } @else { <span class="sub-t">—</span> }</td>
+                  <td>{{data.CLEARANCEDT || '—'}}</td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="11">No reconciled items in this period.</td></tr>
+              }
+            </tbody>
+          </table>
         </div>
-}
-      </div>
-    </div>
-}
+      }
 
-    <!-- ===================== TAB 3 : OUR BANK LEDGER ===================== -->
-    @if (activeTab=='Our Bank Ledger') {
-<div class="br-card br-table-card">
-
-      <div class="br-tabletools">
-        <input type="text" [(ngModel)]="ledgerFilter" class="br-filter"
-               placeholder="Filter by Entry No / Bank Ref No / Amount...">
-        <span class="br-hint">
-          Select a row here to pair with your selection on <b>UnReconcil</b>.
-        </span>
-      </div>
-
-      <div class="br-table-wrap">
-        <table class="br-table single-head">
-          <thead>
-            <tr class="col-head">
-              <th class="chk-col"></th>
-              <th class="sortable" (click)="sortBy('ledger', ledgerdata_list, 'USERBANKREFNO', 'str')">Bank Ref No <i class="fa" [ngClass]="sortIcon('ledger','USERBANKREFNO')"></i></th>
-              <th class="sortable" (click)="sortBy('ledger', ledgerdata_list, 'ENTRYNO', 'str')">Entry No <i class="fa" [ngClass]="sortIcon('ledger','ENTRYNO')"></i></th>
-              <th class="ctr sortable" (click)="sortBy('ledger', ledgerdata_list, 'ENTRYDT', 'date')">Entry Date <i class="fa" [ngClass]="sortIcon('ledger','ENTRYDT')"></i></th>
-              <th class="ctr sortable" (click)="sortBy('ledger', ledgerdata_list, 'ENTRYTYPE', 'str')">Type <i class="fa" [ngClass]="sortIcon('ledger','ENTRYTYPE')"></i></th>
-              <th class="num sortable" (click)="sortBy('ledger', ledgerdata_list, 'AMOUNT', 'num')">Amount <i class="fa" [ngClass]="sortIcon('ledger','AMOUNT')"></i></th>
-              <th class="num sortable" (click)="sortBy('ledger', ledgerdata_list, 'DEDUCTION', 'num')">Deduction <i class="fa" [ngClass]="sortIcon('ledger','DEDUCTION')"></i></th>
-              <th class="ctr sortable" (click)="sortBy('ledger', ledgerdata_list, 'CLEARANCEDT', 'date')">Clearance Date <i class="fa" [ngClass]="sortIcon('ledger','CLEARANCEDT')"></i></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (data of filteredLedgerList; track data) {
-<tr [class.row-selected]="data._linkSelected">
-              <td class="chk-col">
-                <input type="checkbox" [ngModel]="data._linkSelected" (ngModelChange)="selectLedgerRow(data)">
-              </td>
-              <td class="mono">{{data.USERBANKREFNO || '—'}}</td>
-              <td class="mono">{{data.ENTRYNO || '—'}}</td>
-              <td class="ctr">{{data.ENTRYDT || '—'}}</td>
-              <td class="ctr">
-                @if (data.ENTRYTYPE=='BR') {
-<span class="br-badge br-badge--br">BR</span>
-}
-                @if (data.ENTRYTYPE=='BP') {
-<span class="br-badge br-badge--bp">BP</span>
-}
-                @if (data.ENTRYTYPE!='BR' && data.ENTRYTYPE!='BP') {
-<span class="muted">—</span>
-}
-              </td>
-              <td class="num">
-                @if (data.AMOUNT) {
-<span>{{data.AMOUNT | number:'1.2-2'}}</span>
-}
-                @if (!data.AMOUNT) {
-<span class="muted">—</span>
-}
-              </td>
-              <td class="num">
-                @if (data.DEDUCTION) {
-<span>{{data.DEDUCTION | number:'2.2-4'}}</span>
-}
-                @if (!data.DEDUCTION) {
-<span class="muted">—</span>
-}
-              </td>
-              <td class="ctr">{{data.CLEARANCEDT || '—'}}</td>
-            </tr>
-}
-          </tbody>
-        </table>
-
-        @if (filteredLedgerList.length === 0) {
-<div class="br-empty">
-          <i class="fa fa-book"></i>
-          No matching records.
+      @if (activeTab=='UnReconcil') {
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th class="ck"></th>
+                <th class="sort" (click)="sortBy('unreconcil', unreconcildataList, 'BANKREFNO', 'str')">Bank ref no. <i class="fa" [ngClass]="sortIcon('unreconcil','BANKREFNO')"></i></th>
+                <th class="num sort" (click)="sortBy('unreconcil', unreconcildataList, 'DEPOSIT', 'num')">Deposit <i class="fa" [ngClass]="sortIcon('unreconcil','DEPOSIT')"></i></th>
+                <th class="num sort" (click)="sortBy('unreconcil', unreconcildataList, 'WITHDRAWAL', 'num')">Withdrawal <i class="fa" [ngClass]="sortIcon('unreconcil','WITHDRAWAL')"></i></th>
+                <th class="sort" (click)="sortBy('unreconcil', unreconcildataList, 'CLEARANCEDT', 'date')">Clearance date <i class="fa" [ngClass]="sortIcon('unreconcil','CLEARANCEDT')"></i></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (data of filteredUnreconcilList; track $index) {
+                <tr [class.fk-sel]="data._linkSelected">
+                  <td class="ck"><input type="checkbox" [ngModel]="data._linkSelected" (ngModelChange)="selectBankRow(data)"></td>
+                  <td class="mono">{{data.BANKREFNO || '—'}}</td>
+                  <td class="num">@if (data.DEPOSIT > 0) { {{data.DEPOSIT | number:'1.2-2'}} } @else { <span class="sub-t">—</span> }</td>
+                  <td class="num">@if (data.WITHDRAWAL > 0) { {{data.WITHDRAWAL | number:'1.2-2'}} } @else { <span class="sub-t">—</span> }</td>
+                  <td>{{data.CLEARANCEDT || '—'}}</td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="5">No matching records.</td></tr>
+              }
+            </tbody>
+          </table>
         </div>
-}
-      </div>
-    </div>
-}
+      }
 
-    <!-- ===================== TAB 4 : MISMATCHED DATA ===================== -->
-    @if (activeTab=='Mismatched Data') {
-<div class="br-card br-table-card">
-      <div class="br-table-wrap">
-        <table class="br-table single-head">
-          <thead>
-            <tr class="col-head">
-              <th class="chk-col"></th>
-              <th class="ctr sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'DATE', 'date')">Bank Date <i class="fa" [ngClass]="sortIcon('mismatch','DATE')"></i></th>
-              <th class="sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'ENTRYNO', 'str')">Entry No <i class="fa" [ngClass]="sortIcon('mismatch','ENTRYNO')"></i></th>
-              <th class="ctr sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'ENTRYDT', 'date')">Entry Date <i class="fa" [ngClass]="sortIcon('mismatch','ENTRYDT')"></i></th>
-              <th class="num sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'ERPAMOUNT', 'num')">Erp Amt <i class="fa" [ngClass]="sortIcon('mismatch','ERPAMOUNT')"></i></th>
-              <th class="num sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'BANKAMOUNT', 'num')">Bank Amt <i class="fa" [ngClass]="sortIcon('mismatch','BANKAMOUNT')"></i></th>
-              <th class="sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'BANKREFNO', 'str')">Bank Ref No <i class="fa" [ngClass]="sortIcon('mismatch','BANKREFNO')"></i></th>
-              <th class="sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'ERPREFNO', 'str')">Erp Ref No <i class="fa" [ngClass]="sortIcon('mismatch','ERPREFNO')"></i></th>
-              <th class="ctr sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'STATUS', 'str')">Mismatch <i class="fa" [ngClass]="sortIcon('mismatch','STATUS')"></i></th>
-              <th class="ctr sortable" (click)="sortBy('mismatch', mismatchupdate_list, 'CLEARANCEDATE', 'date')">Clearing Date <i class="fa" [ngClass]="sortIcon('mismatch','CLEARANCEDATE')"></i></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (data of mismatchupdate_list; track data) {
-<tr [class.disabled]="data.ENTRYNO === ''">
-              <td class="chk-col">
-                <input type="checkbox" [(ngModel)]="data.CHECKED"
-                       (ngModelChange)="getCheckboxValues($event,data.ENTRYNO,data.BANKREFNO,$safeNavigationMigration(data.CLEARANCEDATE?.formatted),data,data.ERPID)">
-              </td>
-              <td class="ctr">{{data.DATE || '—'}}</td>
-              <td class="mono">{{data.ENTRYNO || '—'}}</td>
-              <td class="ctr">{{data.ENTRYDT || '—'}}</td>
-              <td class="num">{{data.ERPAMOUNT | number:'2.2-4'}}</td>
-              <td class="num">{{data.BANKAMOUNT | number:'2.2-4'}}</td>
-              <td class="mono">{{data.BANKREFNO || '—'}}</td>
-              <td>
-                <input [(ngModel)]="data.ERPREFNO" disabled type="text" maxlength="40"
-                       class="br-inline-input">
-              </td>
-              <td class="ctr">
-                <span class="status-pill"
-                      [ngClass]="{'red': data.STATUS === 'MISMATCH REF NO',
-                                  'green': data.STATUS === 'MATCHED',
-                                  'blue': data.STATUS === 'MATCH BUT CLDT NOT UPDATED',
-                                  'grey': data.STATUS !== 'MISMATCH REF NO' && data.STATUS !== 'MATCHED' && data.STATUS !== 'MATCH BUT CLDT NOT UPDATED'}">
-                  {{data.STATUS}}
-                </span>
-              </td>
-              <td class="ctr">
-                <my-date-picker name="dtbld" [options]="myDatePickerOptions"
-                                [(ngModel)]="data.CLEARANCEDATE"
-                                (dateChanged)="onDateChanged($event, data)"
-                                class="cell-date-control">
-                </my-date-picker>
-              </td>
-            </tr>
-}
-          </tbody>
-        </table>
-
-        @if (mismatchupdate_list.length === 0) {
-<div class="br-empty">
-          <i class="fa fa-random"></i>
-          No mismatched entries.
+      @if (activeTab=='Our Bank Ledger') {
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th class="ck"></th>
+                <th class="sort" (click)="sortBy('ledger', ledgerdata_list, 'USERBANKREFNO', 'str')">Bank ref no. <i class="fa" [ngClass]="sortIcon('ledger','USERBANKREFNO')"></i></th>
+                <th class="sort" (click)="sortBy('ledger', ledgerdata_list, 'ENTRYNO', 'str')">Entry no. <i class="fa" [ngClass]="sortIcon('ledger','ENTRYNO')"></i></th>
+                <th class="sort" (click)="sortBy('ledger', ledgerdata_list, 'ENTRYDT', 'date')">Entry date <i class="fa" [ngClass]="sortIcon('ledger','ENTRYDT')"></i></th>
+                <th class="sort" (click)="sortBy('ledger', ledgerdata_list, 'ENTRYTYPE', 'str')">Type <i class="fa" [ngClass]="sortIcon('ledger','ENTRYTYPE')"></i></th>
+                <th class="num sort" (click)="sortBy('ledger', ledgerdata_list, 'AMOUNT', 'num')">Amount <i class="fa" [ngClass]="sortIcon('ledger','AMOUNT')"></i></th>
+                <th class="num sort" (click)="sortBy('ledger', ledgerdata_list, 'DEDUCTION', 'num')">Deduction <i class="fa" [ngClass]="sortIcon('ledger','DEDUCTION')"></i></th>
+                <th class="sort" (click)="sortBy('ledger', ledgerdata_list, 'CLEARANCEDT', 'date')">Clearance date <i class="fa" [ngClass]="sortIcon('ledger','CLEARANCEDT')"></i></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (data of filteredLedgerList; track $index) {
+                <tr [class.fk-sel]="data._linkSelected">
+                  <td class="ck"><input type="checkbox" [ngModel]="data._linkSelected" (ngModelChange)="selectLedgerRow(data)"></td>
+                  <td class="mono">{{data.USERBANKREFNO || '—'}}</td>
+                  <td class="mono">{{data.ENTRYNO || '—'}}</td>
+                  <td>{{data.ENTRYDT || '—'}}</td>
+                  <td>@if (data.ENTRYTYPE=='BR') { <span class="chip solid">BR</span> } @else if (data.ENTRYTYPE=='BP') { <span class="chip">BP</span> } @else { <span class="sub-t">—</span> }</td>
+                  <td class="num">@if (data.AMOUNT) { {{data.AMOUNT | number:'1.2-2'}} } @else { <span class="sub-t">—</span> }</td>
+                  <td class="num">@if (data.DEDUCTION) { {{data.DEDUCTION | number:'2.2-4'}} } @else { <span class="sub-t">—</span> }</td>
+                  <td>{{data.CLEARANCEDT || '—'}}</td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="8">No matching records.</td></tr>
+              }
+            </tbody>
+          </table>
         </div>
-}
-      </div>
-    </div>
-}
+      }
 
-    <!-- ===================== MANUAL LINK PANEL ===================== -->
+      @if (activeTab=='Mismatched Data') {
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th class="ck"></th>
+                <th class="sort" (click)="sortBy('mismatch', mismatchupdate_list, 'DATE', 'date')">Bank date <i class="fa" [ngClass]="sortIcon('mismatch','DATE')"></i></th>
+                <th class="sort" (click)="sortBy('mismatch', mismatchupdate_list, 'ENTRYNO', 'str')">Entry no. <i class="fa" [ngClass]="sortIcon('mismatch','ENTRYNO')"></i></th>
+                <th class="sort" (click)="sortBy('mismatch', mismatchupdate_list, 'ENTRYDT', 'date')">Entry date <i class="fa" [ngClass]="sortIcon('mismatch','ENTRYDT')"></i></th>
+                <th class="num sort" (click)="sortBy('mismatch', mismatchupdate_list, 'ERPAMOUNT', 'num')">ERP amt <i class="fa" [ngClass]="sortIcon('mismatch','ERPAMOUNT')"></i></th>
+                <th class="num sort" (click)="sortBy('mismatch', mismatchupdate_list, 'BANKAMOUNT', 'num')">Bank amt <i class="fa" [ngClass]="sortIcon('mismatch','BANKAMOUNT')"></i></th>
+                <th class="sort" (click)="sortBy('mismatch', mismatchupdate_list, 'BANKREFNO', 'str')">Bank ref no. <i class="fa" [ngClass]="sortIcon('mismatch','BANKREFNO')"></i></th>
+                <th class="sort" (click)="sortBy('mismatch', mismatchupdate_list, 'ERPREFNO', 'str')">ERP ref no. <i class="fa" [ngClass]="sortIcon('mismatch','ERPREFNO')"></i></th>
+                <th class="sort" (click)="sortBy('mismatch', mismatchupdate_list, 'STATUS', 'str')">Mismatch <i class="fa" [ngClass]="sortIcon('mismatch','STATUS')"></i></th>
+                <th class="sort" (click)="sortBy('mismatch', mismatchupdate_list, 'CLEARANCEDATE', 'date')">Clearing date <i class="fa" [ngClass]="sortIcon('mismatch','CLEARANCEDATE')"></i></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (data of mismatchupdate_list; track $index) {
+                <tr [class.fk-dim]="data.ENTRYNO === ''">
+                  <td class="ck">
+                    <input type="checkbox" [(ngModel)]="data.CHECKED"
+                      (ngModelChange)="getCheckboxValues($event,data.ENTRYNO,data.BANKREFNO,$safeNavigationMigration(data.CLEARANCEDATE?.formatted),data,data.ERPID)">
+                  </td>
+                  <td>{{data.DATE || '—'}}</td>
+                  <td class="mono">{{data.ENTRYNO || '—'}}</td>
+                  <td>{{data.ENTRYDT || '—'}}</td>
+                  <td class="num">{{data.ERPAMOUNT | number:'2.2-4'}}</td>
+                  <td class="num">{{data.BANKAMOUNT | number:'2.2-4'}}</td>
+                  <td class="mono">{{data.BANKREFNO || '—'}}</td>
+                  <td><input [(ngModel)]="data.ERPREFNO" disabled type="text" maxlength="40"></td>
+                  <td>
+                    @switch (data.STATUS) {
+                      @case ('MATCHED') { <span class="chip solid">{{data.STATUS}}</span> }
+                      @case ('MISMATCH REF NO') { <span class="chip dash">{{data.STATUS}}</span> }
+                      @case ('MATCH BUT CLDT NOT UPDATED') { <span class="chip"><span class="dot"></span>{{data.STATUS}}</span> }
+                      @default { <span class="chip">{{data.STATUS}}</span> }
+                    }
+                  </td>
+                  <td>
+                    <my-date-picker name="dtbld" [options]="myDatePickerOptions" [(ngModel)]="data.CLEARANCEDATE" (dateChanged)="onDateChanged($event, data)"></my-date-picker>
+                  </td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="10">No mismatched entries.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
     @if (selectedBankLink || selectedLedgerLink) {
-<div class="link-panel">
-
-      <div class="link-side">
-        <span class="link-side-label">Bank Statement Side</span>
-        @if (selectedBankLink) {
-<span class="link-side-val">
-          {{selectedBankLink.BANKREFNO}} &nbsp;·&nbsp;
-          {{(selectedBankLink.DEPOSIT > 0 ? selectedBankLink.DEPOSIT : selectedBankLink.WITHDRAWAL) | number:'1.2-2'}}
-        </span>
-}
-        @if (!selectedBankLink) {
-<span class="link-side-val empty">
-          select a row on “UnReconcil”
-        </span>
-}
+      <div class="card sec">
+        <div class="card-h"><h2>Manual link</h2><span class="meta"><button type="button" class="btn g" (click)="clearLinkSelection()">Clear</button></span></div>
+        <div class="fields">
+          <div class="fld">
+            <label>Bank statement side</label>
+            <div class="fk-ro">
+              @if (selectedBankLink) { {{selectedBankLink.BANKREFNO}} &middot; {{(selectedBankLink.DEPOSIT > 0 ? selectedBankLink.DEPOSIT : selectedBankLink.WITHDRAWAL) | number:'1.2-2'}} }
+              @else { select a row on "UnReconcil" }
+            </div>
+          </div>
+          <div class="fld">
+            <label>Ledger side</label>
+            <div class="fk-ro">
+              @if (selectedLedgerLink) { {{selectedLedgerLink.ENTRYNO}} &middot; {{selectedLedgerLink.AMOUNT | number:'1.2-2'}} }
+              @else { select a row on "Our bank ledger" }
+            </div>
+          </div>
+          @if (selectedBankLink && selectedLedgerLink) {
+            <div class="fld">
+              <label>Clearance date</label>
+              <my-date-picker name="linkClearanceDate" [options]="myDatePickerOptions" [(ngModel)]="linkClearanceDate" (dateChanged)="onLinkDateChanged($event)"></my-date-picker>
+            </div>
+            <div class="fld">
+              <label></label>
+              <button class="btn p" type="button" (click)="confirmLink()">Link these two</button>
+            </div>
+          }
+        </div>
       </div>
+    }
 
-      <i class="fa fa-arrows-h link-arrow"></i>
-
-      <div class="link-side">
-        <span class="link-side-label">Ledger Side</span>
-        @if (selectedLedgerLink) {
-<span class="link-side-val">
-          {{selectedLedgerLink.ENTRYNO}} &nbsp;·&nbsp;
-          {{selectedLedgerLink.AMOUNT | number:'1.2-2'}}
-        </span>
-}
-        @if (!selectedLedgerLink) {
-<span class="link-side-val empty">
-          select a row on “Our Bank Ledger”
-        </span>
-}
+    <div class="bar">
+      <span class="note">Submit saves the ticked mismatched rows and manual links.</span>
+      <div class="r">
+        <button class="btn g" type="button" (click)="Reset();">Reset</button>
+        <button class="btn p" type="button" (click)="BankRecUpdate()" [disabled]="disablesubmitbtn">Submit</button>
       </div>
-
-      <div class="link-actions">
-        @if (selectedBankLink && selectedLedgerLink) {
-
-          <label>Clearance Date</label>
-          <my-date-picker name="linkClearanceDate" [options]="myDatePickerOptions"
-                          [(ngModel)]="linkClearanceDate"
-                          (dateChanged)="onLinkDateChanged($event)"
-                          class="cell-date-control">
-          </my-date-picker>
-          <button class="br-btn br-btn--primary" type="button" (click)="confirmLink()">
-            <i class="fa fa-link"></i> Link These Two
-          </button>
-        
-}
-        <span class="link-clear" (click)="clearLinkSelection()">clear</span>
-      </div>
-
     </div>
-}
-
-    <!-- ===================== FOOTER ===================== -->
-    <div class="br-footer">
-      <button class="br-btn br-btn--primary" type="button"
-              (click)="BankRecUpdate()" [disabled]="disablesubmitbtn">
-        <i class="fa fa-dot-circle-o"></i> Submit
-      </button>
-      <button class="br-btn br-btn--danger" type="button" (click)="Reset();">
-        <i class="fa fa-ban"></i> Reset
-      </button>
-    </div>
-
-  
-}
-
+  }
 </div>

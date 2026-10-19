@@ -7,20 +7,11 @@ import { LoginService } from 'src/app/shared/service/loginService';
 import { ToastCommonService } from 'src/app/shared/service/toastService';
 
 @Component({
-  selector: 'app-print-cheque',
-  templateUrl: './print-cheque.component.html',
-  styles: [`
-.class1{
-  color:red;
-  font-weight:bold;
-  font-family:sans-serif
-}
-.class2{
-  font-weight:bold;
-  color:green;
-  font-family:sans-serif
-}
-`],
+    selector: 'app-print-cheque',
+    templateUrl: './print-cheque.component.html',
+    // class1 / class2 (cheque not available / available) now live in cheque-page.css, monochrome
+    // Page kit is global (src/styles/kit); kit-cheque scopes cheque-page.css.
+    host: { class: 'kit-cheque' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -35,6 +26,9 @@ export class PrintChequeComponent implements OnInit {
   showModal_ChequenoList: boolean = false
   PageActual: number = 1;
   p2: number = 1;
+  readonly pageSize = 10;
+  page: number = 1;
+  Quick: string = '';
   HDPOAMT: any;
   HDNEFTAMT: any;
   HDRTGSAMT: any;
@@ -783,5 +777,44 @@ export class PrintChequeComponent implements OnInit {
     let theLeft = (screen.width / 2) - (780 / 2);
     let toolbar = 'resizable=no,scrollbars=no,width=800,height=450,status=no,left=' + theLeft + ',top=' + theTop;
     window.open('./#/popup/Account-Request-Bank-Payment-print/' +  No + '/', "Request Bank Payment View", toolbar);
+  }
+
+  // ---------- list: quick filter, 10/page pager, CSV export (presentation only) ----------
+  get Filtered(): Array<any> {
+      const q = (this.Quick || '').trim().toLowerCase();
+      const list: Array<any> = (this.searvhptintlist) || [];
+      if (!q) { return list; }
+      return list.filter((r: any) => [r.PRINTSTATUS, r.ENTRYNO, r.CHEQUENO, r.CHEQUETYPE, r.PAYEENAME, r.CHEQUEDT, r.AMOUNT, r.RequestedBy, r.ENTRYDT, r.BANKREFNO].some(v => String(v == null ? '' : v).toLowerCase().indexOf(q) >= 0));
+  }
+  get pageCount(): number { return Math.max(1, Math.ceil(this.Filtered.length / this.pageSize)); }
+  get curPage(): number { return Math.min(this.page, this.pageCount); }
+  get pageRows(): Array<any> { const s = (this.curPage - 1) * this.pageSize; return this.Filtered.slice(s, s + this.pageSize); }
+  get rangeStart(): number { return this.Filtered.length ? (this.curPage - 1) * this.pageSize + 1 : 0; }
+  get rangeEnd(): number { return Math.min(this.curPage * this.pageSize, this.Filtered.length); }
+  get pageList(): number[] {
+      const n = this.pageCount, p = this.curPage;
+      if (n <= 7) { return Array.from({ length: n }, (_, i) => i + 1); }
+      const out: number[] = [1];
+      const lo = Math.max(2, p - 1), hi = Math.min(n - 1, p + 1);
+      if (lo > 2) { out.push(0); }
+      for (let i = lo; i <= hi; i++) { out.push(i); }
+      if (hi < n - 1) { out.push(0); }
+      out.push(n);
+      return out;
+  }
+  goPage(p: number) { if (p >= 1 && p <= this.pageCount) { this.page = p; } }
+  exportCsv() {
+      const head = ['Status', 'Entry no', 'Cheque no', 'Cheque type', 'Payee name', 'Pay date', 'Amount', 'Requested by', 'Requested on', 'Bank ref no'];
+      const rows = this.Filtered.map((r: any) => [r.PRINTSTATUS, r.ENTRYNO, r.CHEQUENO, r.CHEQUETYPE, r.PAYEENAME, r.CHEQUEDT, r.AMOUNT, r.RequestedBy, r.ENTRYDT, r.BANKREFNO]);
+      const q = (v: any) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+      const csv = [head, ...rows].map((l: any[]) => l.map(q).join(',')).join('\r\n');
+      const d = new Date();
+      const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'cheques-to-print' + '-' + stamp + '.csv';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 0);
   }
 }

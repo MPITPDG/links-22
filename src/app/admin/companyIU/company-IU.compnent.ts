@@ -15,6 +15,7 @@ import { Configuration } from '../../app.constants';
 @Component({
     selector: 'app-Companycreation',
     templateUrl: 'company-IU.compnent.html',
+    styleUrls: ['../admin-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

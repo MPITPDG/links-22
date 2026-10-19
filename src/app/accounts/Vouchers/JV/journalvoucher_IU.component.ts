@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { iif } from 'rxjs';
 @Component({
     templateUrl: 'journalvoucher_IU.component.html',
+    styleUrls: ['../vouchers-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

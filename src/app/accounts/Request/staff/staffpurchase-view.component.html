@@ -1,209 +1,152 @@
-      <table class="table table-bordered table-sm-new bgwhite">
-        <tr>
-          <td class="col-form-span-heading " colspan="4">
-            General Details
-          </td>
-        </tr>
-        <tr>
-          <td><span class="col-form-span-label"><b>Purchase No </b> </span></td>
-          <td> <span class="col-form-span-label">{{PUR_CODE}}</span> </td>
-          <td><span class="col-form-span-label"><b>Purchase Date </b> </span></td>
-          <td><span class="col-form-span-label">{{PUR_DATE}}</span> </td>
-        </tr>
-        <tr>
-            <td><span class="col-form-span-label"><b>Narration </b> </span></td>
-            <td colspan="3"> <span class="col-form-span-label">{{REMARKS}}</span> </td>
-        </tr>
-        <tr>
-          <td class="col-form-span-heading  " colspan="4">
-            Staff Details
-          </td>
-        </tr>
-        <tr>
-            <td><span class="col-form-span-label"><b>Staff Name </b> </span></td>
-            <td> <span class="col-form-span-label">{{PUR_SUPPLIERNAME}}</span> </td>
-            
-        </tr>
-        <tr>
-            <td class="col-form-span-heading " colspan="2">
-                Passing Details 
-            </td>
-            <td  colspan="2"
-              class="col-form-span-label"> 
-              <span class="col-form-span-label" ><b>IsPassed</b>  </span>  
-              <input type="checkbox" disabled="disabled" [(ngModel)]="IsPassed">
-          </td>
-          </tr>
+<!--
+  India Accounts - staff purchase request view / verify (recipe 2). Shown inside the authorisation
+  modal (app-staffpurchase-view) and on the SRPIView route. Kit: global .im-page kit +
+  purchase/purchase-page.css. Every binding, the flag == 'EDIT' / 'VIEW' conditions, Addchildrcrd(),
+  SaveVerify(), abortModal() and jobprofitreport() are unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Staff purchase request</h1>
+      <p>{{ flag == 'EDIT' ? 'Check the lines, adjust pass amounts, then verify' : 'Read-only view of the request' }}</p>
+    </div>
+    <div class="tools">
+      @if (PUR_CODE) {
+        <span class="chip solid">{{PUR_CODE}}</span>
+      }
+    </div>
+  </div>
+
+  <div class="form-layout">
+    <div>
+      <div class="card sec">
+        <div class="card-h"><h2>General</h2></div>
+        <div class="aside">
+          <div class="row"><span>Purchase no.</span><b>{{PUR_CODE}}</b></div>
+          <div class="row"><span>Purchase date</span><b>{{PUR_DATE}}</b></div>
+          <div class="row"><span>Staff</span><b>{{PUR_SUPPLIERNAME}}</b></div>
+          <div class="row"><span>Narration</span><b>{{REMARKS}}</b></div>
+        </div>
+      </div>
+    </div>
+    <aside class="aside">
+      <div class="card sec">
+        <div class="card-h">
+          <h2>Passing</h2>
+          <label class="pu-flag"><span>Passed</span><input type="checkbox" disabled="disabled" [(ngModel)]="IsPassed"></label>
+        </div>
+        <div class="row"><span>Passed by</span><b>{{PASSEDBYPERSON}}</b></div>
+        <div class="row"><span>Passed amount</span><b class="mono">{{PASSEDAMOUNT}}</b></div>
+        <div class="row"><span>Invoice amount</span><b class="mono">{{SUPINVAMT}}</b></div>
+        <div class="row"><span>Voucher no.</span><b>{{VOUCHERNO}}</b></div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h"><h2>Account lines</h2></div>
+    @if (flag != 'VIEW') {
+      <div class="fields">
+        @if ( flag != 'Y' && flag == 'EDIT') {
+          <div class="fld full">
+            <label>Account</label>
+            <input type="text" [value]="ACCTNAME || ''" disabled>
+          </div>
+        }
+        @if ( flag == 'EDIT') {
+          <div class="fld">
+            <label>Amount</label>
+            <input type="text" class="num" [value]="Amount ?? ''" disabled>
+          </div>
+          <div class="fld">
+            <label>Deduction</label>
+            <input type="text" class="num" [value]="Deduction ?? ''" disabled>
+          </div>
+          <div class="fld">
+            <label>Job no.</label>
+            <input type="text" [value]="JobNo ?? ''" disabled>
+          </div>
+          <div class="fld">
+            <label>Pass amount</label>
+            <input [(ngModel)]="actpassedamount" type="text" class="num" maxlength="40">
+          </div>
+        }
+        <div class="fld full">
+          <label>Line narration</label>
+          <input [(ngModel)]="ActNarration" type="text" maxlength="40">
+        </div>
+      </div>
+      @if ( flag == 'EDIT') {
+        <div class="pu-add">
+          <button class="btn p" type="button" (click)="Addchildrcrd()">{{txtchild}}</button>
+        </div>
+      }
+    }
+    @if ( flag == 'VIEW') {
+      <div class="aside">
+        <div class="row"><span>Item</span><b>{{ItemName}}</b></div>
+      </div>
+    }
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
           <tr>
-            <td><span class="col-form-span-label"><b>Passed By </b> </span></td>
-            <td> <span class="col-form-span-label">{{PASSEDBYPERSON}}</span> </td>
-            <td><span class="col-form-span-label"><b>Passed Amount </b> </span></td>
-            <td><span class="col-form-span-label">{{PASSEDAMOUNT}}</span> </td>
+            <th>Account</th>
+            <th class="num">Amount</th>
+            <th class="num">Deduction</th>
+            <th class="num">Pass amt</th>
+            <th>Item</th>
+            <th>Job no.</th>
+            <th>Narration</th>
+            @if ( flag == 'EDIT') {
+              <th></th>
+            }
           </tr>
-          <tr>
-              <td><span class="col-form-span-label"><b>Invoice Amount </b> </span></td>
-              <td> <span class="col-form-span-label">{{SUPINVAMT}}</span> </td>
-              <td><span class="col-form-span-label"><b>Voucher No. </b> </span></td>
-              <td> <span class="col-form-span-label">{{VOUCHERNO}}</span> </td>
-          </tr>
-         
-        <tr>
-          <td class="col-form-span p-1" colspan="4">
-          </td>
-        </tr>
-        <td class="col-form-span-heading " colspan="4">
-            Account Details 
-        </td>
-        @if ( flag != 'Y' &&  flag == 'EDIT') {
-<tr>
-          <td><span class="col-form-span-label"><b>Account Name</b> </span><span class="col-form-span-error">*</span></td>
-          <td colspan="3">
-            <span class="col-form-span-label">{{ACCTNAME}}</span>  
-              <!-- <ng-select [items]="AccountNameList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
-              [(ngModel)]="AccountName" [disabled]="disable_Accountname" class="custom " placeholder="--Select--">
-          </ng-select> -->
-
-          </td>
-      </tr>
-}
-      @if ( flag == 'VIEW') {
-<tr>
-          <td><span class="col-form-span-label"><b>Item</b> </span><span class="col-form-span-error">*</span></td>
-          <td colspan="3">
-            <span class="col-form-span-label">{{ItemName}}</span>
-              <!-- <ng-select [items]="Allitemlist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Item"
-              class="custom " [disabled]="disable_Item" placeholder="--Select--">
-          </ng-select> -->
-          </td>
-      </tr>
-}
-      @if ( flag == 'EDIT') {
-<tr>
-          <td><span class="col-form-span-label"><b> Amount</b> </span><span class="col-form-span-error">*</span></td>
-          <td> <span class="col-form-span-label">{{Amount}}</span> </td>
-          <!-- <td >  <input [(ngModel)]="Amount"  [disabled]="disable_Amount" type="text"    class="form-control width150" maxlength="40" > </td> -->
-          <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
-          <!-- <td >  <input [(ngModel)]="Deduction"  type="text"    class="form-control width150" maxlength="40" > </td> -->
-          <td> <span class="col-form-span-label">{{Deduction}}</span> </td>
-      </tr>
-}
-      @if ( flag == 'EDIT') {
-<tr>
-          <td><span class="col-form-span-label"><b> Job No</b> </span><span class="col-form-span-error">*</span></td>
-          <td> <span class="col-form-span-label">{{JobNo}}</span> </td>
-          <!-- <td >  <input [(ngModel)]="JobNo" type="text" [disabled]="disable_JobNo"  class="form-control width150" maxlength="40" > </td> -->
-          <td><span class="col-form-span-label"><b>Pass Amount</b> </span></td>
-          <td >  <input [(ngModel)]="actpassedamount"  type="text"    class="form-control width150" maxlength="40" > </td>
-
-      </tr>
-}
-      @if ( flag != 'VIEW') {
-<tr>
-          <td><span class="col-form-span-label"><b>Narration</b> </span></td>
-          <td colspan="3">
-              <input [(ngModel)]="ActNarration" type="text"    class="form-control width500" maxlength="40" >
-          </td>
-      </tr>
-}
-
-      @if ( flag == 'EDIT') {
-<tr>
-          <td colspan="4"  class="centerlabel">
-              <button class="btn btn-sm btn-success" type="submit" (click)="Addchildrcrd()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{txtchild}}</span></button>
-              <!-- <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Resetchildrcrd();"><i class="fa fa-ban"></i> Reset</span></button> -->
-          </td>
-      </tr>
-}
-      <tr>
-
-      </tr>
-      <tr >
-
-          <td><span class="col-form-span-heading"><b> Net Total</b> </span></td>
-          @if ( flag == 'EDIT') {
-<td colspan="3">  <input [(ngModel)]="NetAmt" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
-}
-          @if ( flag == 'VIEW') {
-<td colspan="3"> <span class="col-form-span-label">{{NetAmt}}</span> </td>
-}
-  </tr>
-
-  <tr>
-      <td><span class="col-form-span-label"><b> Amount</b> </span></td>
-      @if ( flag == 'EDIT') {
-<td>  <input [(ngModel)]="NetAmount" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
-}
-      @if ( flag == 'VIEW') {
-<td> <span class="col-form-span-label">{{NetAmount}}</span> </td>
-}
-      <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
-      @if ( flag == 'EDIT') {
-<td>  <input [(ngModel)]="Netdeduction" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
-}
-      @if ( flag == 'VIEW') {
-<td> <span class="col-form-span-label">{{Netdeduction}}</span> </td>
-}
-  </tr>
-  <!-- <tr>
-      <td colspan="4"  class="centerlabel">
-          <button class="btn btn-sm btn-success" type="submit" (click)="Add_Main()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{text}}</span></button>
-         
-      </td>
-  </tr> -->
-        <tr>
-          <td colspan="4">
-            <table class="table table-bordered table-sm-new bgwhite ">
-              <thead>
-                <tr class="col-form-span-heading ">
-                  @if ( flag == 'EDIT') {
-<th  class="col-form-span-label" ></th>
-}
-                  <th class="col-form-span-label">Account Name</th>
-                  <th class="col-form-span-label">Amount</th>
-                  <th class="col-form-span-label">Deduction</th>
-                  <th class="col-form-span-label">Pass Amt</th>
-                  <th class="col-form-span-label">Item</th>
-                  <th class="col-form-span-label">Job No</th>
-                  <th class="col-form-span-label">Narration </th>
-                 
-                </tr>
-              </thead>
-              <tbody>
-                @for (data of datatabl_1; track data) {
-<tr>
-                  @if ( flag == 'EDIT') {
-<td class="centerlabel">
-                    <i class="fa fa-pencil" (click)="Editchildrecd(data.ID)" ></i>
-                    &nbsp;
-                    <i class="fa fa-trash" (click)="deletechildrecd(data.ID,obj.ACC_PURCHASEDTLS_ID)"></i>
+        </thead>
+        <tbody>
+          @for (data of datatabl_1; track data) {
+            <tr>
+              <td><span [innerHtml]="data.ACCOUNT_NAME"></span></td>
+              <td class="num">{{data.AMOUNT}}</td>
+              <td class="num">{{data.DEDUCTION}}</td>
+              <td class="num">{{data.SRPIPASSAMOUNT}}</td>
+              <td>{{data.ITEM}}</td>
+              <td class="mono"><a class="lnk" (click)="jobprofitreport(data.JOBNO)">{{data.JOBNO}}</a></td>
+              <td>{{data.NARRATION}}</td>
+              @if ( flag == 'EDIT') {
+                <td class="act">
+                  <button type="button" (click)="Editchildrecd(data.ID)">Edit</button>
                 </td>
-}
-                <td><span class="col-form-span-label"  [innerHtml]="data.ACCOUNT_NAME"> </span></td>
-                  <td class="col-form-span-label">{{data.AMOUNT}}</td>
-                  <td class="col-form-span-label">{{data.DEDUCTION}}</td>
-                  <td class="col-form-span-label">{{data.SRPIPASSAMOUNT}}</td>
-                  <td class="col-form-span-label">{{data.ITEM}}</td>
-                  <td class="col-form-span-label anchor-link" (click)="jobprofitreport(data.JOBNO)">{{data.JOBNO}}</td>
-                  <td class="col-form-span-label">{{data.NARRATION}}</td>
-                </tr>
-}
-            
-              </tbody>
-            </table>
-          </td>
-        </tr>
-        <tr  >
-          <td colspan="4"  class="centerlabel">
-              @if ( flag == 'EDIT') {
-<button class="btn btn-sm btn-success" type="submit" (click)="SaveVerify()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{text}}</span></button>
-}
-              @if ( flag == 'EDIT') {
-<button class="btn btn-sm btn-danger" (click)="abortModal()"><span class="col-form-span-label"><i class="fa fa-ban"
-                aria-hidden="true"></i> Abort</span></button>
-}
-                
-          </td>
-      </tr>
-        
+              }
+            </tr>
+          } @empty {
+            <tr><td class="empty" colspan="8">No account lines.</td></tr>
+          }
+        </tbody>
       </table>
-  
+    </div>
+    <div class="pu-totals">
+      @if ( flag == 'EDIT') {
+        <div class="t"><span>Amount</span><input [(ngModel)]="NetAmount" disabled="disabled" type="text" class="num" maxlength="40"></div>
+        <div class="t"><span>Deduction</span><input [(ngModel)]="Netdeduction" disabled="disabled" type="text" class="num" maxlength="40"></div>
+        <div class="t grand"><span>Net total</span><input [(ngModel)]="NetAmt" disabled="disabled" type="text" class="num" maxlength="40"></div>
+      }
+      @if ( flag == 'VIEW') {
+        <div class="t"><span>Amount</span><b class="mono">{{NetAmount}}</b></div>
+        <div class="t"><span>Deduction</span><b class="mono">{{Netdeduction}}</b></div>
+        <div class="t grand"><span>Net total</span><b class="mono">{{NetAmt}}</b></div>
+      }
+    </div>
+  </div>
+
+  @if ( flag == 'EDIT') {
+    <div class="bar">
+      <span class="note">Verifying saves the pass amounts shown above.</span>
+      <div class="r">
+        <button class="btn g" type="button" (click)="abortModal()">Abort</button>
+        <button class="btn p" type="button" (click)="SaveVerify()">{{text}}</button>
+      </div>
+    </div>
+  }
+</div>

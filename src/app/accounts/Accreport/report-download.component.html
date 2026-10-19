@@ -1,138 +1,146 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-      <div class="col-sm-12">
-        <div class="card">
-          <div class="card-header formheading">
-            <strong>Report Log View</strong>
-          </div>
-        </div>
-      </div>
+<!--
+  Accounts -> Reports -> Report log view (/accounts/report/ReportDownload/:LogID).
+  Every server-generated report lands here. Data: Accounts/REPORT_LOG_SCRIPT (by log id) or
+  REPORT_LOG_FILL (history). The Download links are unchanged: a plain <a download> to
+  rptdownloadurl + 'ExportToExcel/output/<FILENAME> (Configuration.rpturl) that also calls
+  fn_Download() to mark the file downloaded. Clicking an in-process row refreshes it, as before.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Report log view</h1>
+      <p>Background reports you have queued &middot; download the file once it is ready</p>
     </div>
-    <div class="row no-gutters" >
-      <div class="col-sm-12 col-md-1 col-lg-1">  </div>
-      <div class="col-sm-12 col-md-10 col-lg-10 ">
-        <!-- <div class="col  yscroll" style="height:250px;" >  -->
-          <table class="table table-bordered table-sm-new  "  >
-            <thead class="title-head formheading" >
-          
-              <tr  style="white-space:nowrap;">
-                <th class="col-form-span-label"  >  &nbsp; </th>
-                <th class="col-form-span-label"   > STATUS </th>
-                <th class="col-form-span-label"  > REPORT NAME </th>
-                <th class="col-form-span-label"  >SEARCH CRITERIA </th>
-                <th class="col-form-span-label"   >STARTED </th>
-                <th class="col-form-span-label"  > COMPLETED </th>
-                <th class="col-form-span-label"   > USER NAME </th>
-              </tr>
-            </thead>
-            <tbody class="bgwhite">
-            
-              @for (obj of DTTablelog3; track obj) {
-  
-                @if (obj.STATUS=='IN PROCESS') {
-<tr (click)="fn_InProcess(obj.PKID)"> 
-                    <td class="col-form-span-label"><div align="Center"> {{obj.PERCENTAGE}} % </div>   </td>
-                    <td class="col-form-span-label"><i class="fa fa-tasks" aria-hidden="true"></i>     </td>
-                    <td class="col-form-span-label">{{obj.REPORTNAME}}</td>
-                    
-                    <td class="col-form-span-label">{{obj.SEARCHCRITERIA}}</td>
-                    <td class="col-form-span-label">{{obj.STARTED}}</td>
-                    <td class="col-form-span-label">{{obj.COMPLETED}}</td>
-                    <td class="col-form-span-label">{{obj.USERNAME}}</td>
-                </tr>
-}
-                
-                @if (obj.STATUS=='DOWNLOAD PENDING') {
-<tr > 
-                  <td class="col-form-span-label">
-                    <a href="{{rptdownloadurl}}ExportToExcel/output/{{obj.FILENAME}}"  (click)="fn_Download(obj.PKID,obj.MODE)"  download="{{obj.FILENAME}}">
-                      <i class="fa fa-cloud-download"></i>
-                    Download
-                    </a>
-                    <!-- <a href="http://localhost:45896//DATA//ExportToExcel//output//{{obj.FILENAME}}"  (click)="fn_Download(obj.PKID,obj.MODE)"  download="Download">
-                      <i class="fa fa-cloud-download"></i>
-                    Download
-                    </a> -->
-                    <!-- <button class="btn btn-sm btn-success" type="submit" (click)="fn_Download(obj.PKID,obj.MODE)"> <span   class="col-form-span-label"><i class="fa fa-cloud-download"></i>Download</span></button>    -->
-                  </td>
-                  <td class="col-form-span-label"><i class="fa fa-tasks" aria-hidden="true"></i></td>
-                  <td class="col-form-span-label">{{obj.REPORTNAME}}</td>
-                  <td class="col-form-span-label">{{obj.SEARCHCRITERIA}}</td>
-                  <td class="col-form-span-label">{{obj.STARTED}}</td>
-                  <td class="col-form-span-label">{{obj.COMPLETED}}</td>
-                  <td class="col-form-span-label">{{obj.USERNAME}}</td>
-              </tr>
-}
-              @if (obj.STATUS=='CANCELLED') {
-<tr> 
-                <td class="col-form-span-label"><i class="fa fa-ban" aria-hidden="true" ></i>     </td>
-                <td class="col-form-span-label">{{obj.STATUS}} </td>
-                <td class="col-form-span-label">{{obj.REPORTNAME}}</td>
-                <td class="col-form-span-label">{{obj.SEARCHCRITERIA}}</td>
-                <td class="col-form-span-label">{{obj.STARTED}}</td>
-                <td class="col-form-span-label">{{obj.COMPLETED}}</td>
-                <td class="col-form-span-label">{{obj.USERNAME}}</td>
-              </tr>
-}
-             
-}    
-             @for (obj of DTTableHistory; track obj) {
-  
-              @if (Mode=='HISTROY') {
-<tr> 
-                @if (obj.STATUS=='COMPLETED') {
-<td class="col-form-span-label"><a href="{{rptdownloadurl}}ExportToExcel/output/{{obj.FILENAME}}"  (click)="fn_Download(obj.PKID,obj.MODE)"
-                  download="{{obj.FILENAME}}"><i class="fa fa-cloud-download"></i>
-                  Download
-                </a>
-                  <!-- <button class="btn btn-sm btn-success" type="submit" (click)="fn_Download(obj.PKID,obj.MODE)"> <span   class="col-form-span-label"><i class="fa fa-cloud-download"></i>Download</span></button>    -->
-                </td>
-}
-                @if (obj.STATUS=='CANCELLED') {
-<td  class="col-form-span-label"><i class="fa fa-ban" aria-hidden="true" ></i> 
-               
-                  <!-- <button class="btn btn-sm btn-success" type="submit" (click)="fn_Download(obj.PKID,obj.MODE)"> <span   class="col-form-span-label"><i class="fa fa-cloud-download"></i>Download</span></button>    -->
-                </td>
-}
-                <td class="col-form-span-label">{{obj.STATUS}} </td>
-                <td class="col-form-span-label">{{obj.REPORTNAME}}</td>
-                <td class="col-form-span-label">{{obj.SEARCHCRITERIA}}</td>
-                <td class="col-form-span-label">{{obj.STARTED}}</td>
-                <td class="col-form-span-label">{{obj.COMPLETED}}</td>
-                <td class="col-form-span-label">{{obj.USERNAME}}</td>
-              </tr>
-}
-            
-}               
-          </tbody></table>
-          
-        <table class="table table-bordered table-sm-new yscroll "    >         
-          <tbody class="bgwhite">
-            @for (obj of DTTablelog1; track obj) {
-<tr  >              
-              <td class="col-form-span-label"  >{{obj.REPORTHEADER}}</td> 
-            </tr>
-}
-          </tbody>         
-        </table>
-        <div class="col yscroll" style="height:250px;" >
-              <table class="table table-bordered table-sm-new"     >         
-                <tbody class="bgwhite">
-                  @for (obj of DTTablelog2; track obj) {
-<tr  >              
-                    <td class="col-form-span-label" style="color:green ;"  >{{obj.DATETIMEST}}</td> 
-                    <td class="col-form-span-label" style="color:green ;">{{obj.STEPNAME}} <br>
-                        {{obj.REMARKS}}
-                    </td> 
-                  </tr>
-}
-                </tbody> 
-              </table>  
-        </div>
-     
+    @if (Mode != 'HISTROY') {
+      <div class="tools">
+        <button class="btn g" type="button" (click)="fn_InProcess(PKID)">Refresh status</button>
       </div>
-
-      <div class="col-sm-12 col-md-1 col-lg-1">  </div>
-    </div>
+    }
   </div>
-  
+
+  <div class="card sec">
+    <div class="toolbar">
+      <span><span class="count">{{ Mode == 'HISTROY' ? (DTTableHistory?.length || 0) + ' reports in history' : (DTTablelog3?.length || 0) + ' reports' }}</span></span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Status</th>
+            <th>Report name</th>
+            <th>Search criteria</th>
+            <th>Started</th>
+            <th>Completed</th>
+            <th>User name</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (Mode != 'HISTROY' && !DTTablelog3) {
+            <tr><td class="empty" colspan="7">Loading report status&hellip;</td></tr>
+          }
+          @for (obj of DTTablelog3; track $index) {
+            @if (obj.STATUS=='IN PROCESS') {
+              <tr (click)="fn_InProcess(obj.PKID)" class="fk-click" title="Refresh">
+                <td class="num">{{obj.PERCENTAGE}} %</td>
+                <td><span class="chip dash">In process</span></td>
+                <td>{{obj.REPORTNAME}}</td>
+                <td>{{obj.SEARCHCRITERIA}}</td>
+                <td>{{obj.STARTED}}</td>
+                <td>{{obj.COMPLETED}}</td>
+                <td>{{obj.USERNAME}}</td>
+              </tr>
+            }
+            @if (obj.STATUS=='DOWNLOAD PENDING') {
+              <tr>
+                <td><a class="btn p" href="{{rptdownloadurl}}ExportToExcel/output/{{obj.FILENAME}}" (click)="fn_Download(obj.PKID,obj.MODE)" download="{{obj.FILENAME}}">Download</a></td>
+                <td><span class="chip solid">Ready</span></td>
+                <td>{{obj.REPORTNAME}}</td>
+                <td>{{obj.SEARCHCRITERIA}}</td>
+                <td>{{obj.STARTED}}</td>
+                <td>{{obj.COMPLETED}}</td>
+                <td>{{obj.USERNAME}}</td>
+              </tr>
+            }
+            @if (obj.STATUS=='CANCELLED') {
+              <tr>
+                <td></td>
+                <td><span class="chip">{{obj.STATUS | titlecase}}</span></td>
+                <td>{{obj.REPORTNAME}}</td>
+                <td>{{obj.SEARCHCRITERIA}}</td>
+                <td>{{obj.STARTED}}</td>
+                <td>{{obj.COMPLETED}}</td>
+                <td>{{obj.USERNAME}}</td>
+              </tr>
+            }
+          }
+          @if (Mode=='HISTROY') {
+            @for (obj of histPage(); track $index) {
+              <tr>
+                <td>
+                  @if (obj.STATUS=='COMPLETED') {
+                    <a class="btn g" href="{{rptdownloadurl}}ExportToExcel/output/{{obj.FILENAME}}" (click)="fn_Download(obj.PKID,obj.MODE)" download="{{obj.FILENAME}}">Download</a>
+                  }
+                </td>
+                <td><span class="chip" [class.solid]="obj.STATUS=='COMPLETED'">{{obj.STATUS | titlecase}}</span></td>
+                <td>{{obj.REPORTNAME}}</td>
+                <td>{{obj.SEARCHCRITERIA}}</td>
+                <td>{{obj.STARTED}}</td>
+                <td>{{obj.COMPLETED}}</td>
+                <td>{{obj.USERNAME}}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="7">{{ DTTableHistory ? 'No reports in your history.' : 'Loading history…' }}</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (Mode=='HISTROY' && histPager.rows.length > histPager.size) {
+      <div class="pager">
+        <span>Showing <b>{{ histPager.from }}&ndash;{{ histPager.to }}</b> of <b>{{ histPager.rows.length }}</b></span>
+        <div class="pages">
+          <button type="button" [disabled]="histPager.page === 1" (click)="histPager.go(histPager.page - 1)" aria-label="Previous page">&lsaquo;</button>
+          @for (p of histPager.numbers; track $index) {
+            @if (p === '...') { <span class="gap">&hellip;</span> }
+            @else { <button type="button" [class.on]="p === histPager.page" (click)="histPager.go(p)">{{ p }}</button> }
+          }
+          <button type="button" [disabled]="histPager.page === histPager.total" (click)="histPager.go(histPager.page + 1)" aria-label="Next page">&rsaquo;</button>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (DTTablelog1?.length || DTTablelog2?.length) {
+    <div class="card sec">
+      <div class="card-h">
+        <h2>Progress log</h2>
+        <span class="meta">
+          @for (obj of DTTablelog1; track $index) {
+            <span>{{obj.REPORTHEADER}} </span>
+          }
+        </span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Step</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (obj of DTTablelog2; track $index) {
+              <tr>
+                <td class="mono">{{obj.DATETIMEST}}</td>
+                <td>{{obj.STEPNAME}}@if (obj.REMARKS) {<br><span class="fk-sub">{{obj.REMARKS}}</span>}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="2">No steps logged yet.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

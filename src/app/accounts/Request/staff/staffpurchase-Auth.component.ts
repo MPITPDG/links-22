@@ -10,6 +10,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 
 @Component({
   templateUrl: 'staffpurchase-Auth.component.html',
+    styleUrls: ['../../purchase/purchase-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -39,6 +40,9 @@ export class StaffPurchaseAuth implements OnInit {
     Status:string;
          datatabl_1=[]
          STRTXT:any=[];  
+    // ---------- page state (additive: pager, export) ----------
+    readonly pageSize = 10;
+    page: number = 1;
     constructor(
       private _router: Router,
       private _dataService: DataService,
@@ -90,6 +94,8 @@ export class StaffPurchaseAuth implements OnInit {
           this.srpidata = data.Table;
           this.dataTable=data.Table;
           this.loaderService.display(false)
+        }, () => {
+          this.loaderService.display(false)
         })
     }
     abortdata(){
@@ -120,7 +126,8 @@ export class StaffPurchaseAuth implements OnInit {
       }
     }
     getCheckboxValues(event, data) {
-      var index = this.newArray.findIndex(x => x.REQCODE == data);
+      // was x.REQCODE: the entries are { inoiceno }, so index was -1 and splice(-1,1) removed the wrong request
+      var index = this.newArray.findIndex(x => x.inoiceno == data);
       if (event) {
         let obj = {
           inoiceno: data
@@ -128,7 +135,7 @@ export class StaffPurchaseAuth implements OnInit {
         //this.STRTXT = this.STRTXT + ","  +  data  
         this.newArray.push(obj);
       }
-      else {
+      else if (index >= 0) {
         this.newArray.splice(index, 1);
       }
     }
@@ -307,4 +314,72 @@ Verify()
       });   
       }
 }
+
+    /** rows shown by the pager: the current authorisation list */
+    get Filtered(): Array<any> {
+      return Array.isArray(this.srpidata) ? this.srpidata : [];
+    }
+
+    exportCsv() {
+      this.downloadCsv('purchase-request-authorisation',
+        ['Req code', 'Requested on', 'Requested by', 'Amount', 'Authorised by', 'Authorised on'],
+        this.Filtered.map(r => [r.REQCODE, r.REQUESTEDON, r.REQUESTEDBY, r.AMOUNT, r.AUTHORISEDBY, r.AUTHORISATIONDATE]));
+    }
+
+    // ---------- pagination (10 / page) ----------
+    get pageCount(): number {
+        return Math.max(1, Math.ceil(this.Filtered.length / this.pageSize));
+    }
+
+    get pageRows(): Array<any> {
+        // the list is replaced by several handlers; never point past its last page
+        if (this.page > this.pageCount) { this.page = this.pageCount; }
+        const start = (this.page - 1) * this.pageSize;
+        return this.Filtered.slice(start, start + this.pageSize);
+    }
+
+    get rangeStart(): number {
+        return this.Filtered.length ? (this.page - 1) * this.pageSize + 1 : 0;
+    }
+
+    get rangeEnd(): number {
+        return Math.min(this.page * this.pageSize, this.Filtered.length);
+    }
+
+    /** page numbers with 0 standing in for an ellipsis */
+    get pageList(): number[] {
+        const n = this.pageCount, p = this.page;
+        if (n <= 7) { return Array.from({ length: n }, (_, i) => i + 1); }
+        const out: number[] = [1];
+        const lo = Math.max(2, p - 1), hi = Math.min(n - 1, p + 1);
+        if (lo > 2) { out.push(0); }
+        for (let i = lo; i <= hi; i++) { out.push(i); }
+        if (hi < n - 1) { out.push(0); }
+        out.push(n);
+        return out;
+    }
+
+    goPage(p: number) {
+        if (p >= 1 && p <= this.pageCount) { this.page = p; }
+    }
+
+    /** client-side CSV of every filtered row: UTF-8 BOM, quoted */
+    private downloadCsv(name: string, head: string[], rows: any[][]) {
+        const q = (v: any) => {
+            const s = (v === null || v === undefined) ? '' : String(v);
+            return '"' + s.replace(/"/g, '""') + '"';
+        };
+        const csv = [head, ...rows].map(line => line.map(q).join(',')).join('\r\n');
+        const d = new Date();
+        const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+        const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name + '-' + stamp + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
 }

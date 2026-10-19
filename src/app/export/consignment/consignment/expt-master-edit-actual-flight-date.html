@@ -1,519 +1,306 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <strong>AIR SHIPMENT DETAILS</strong>
-                        </div>
-                    </div>
-                </div>
+<div class="im-page cs-form">
+
+  <!--
+    Export - actual flight date (/export/Consignment/edit-actual-flight-date/:exptno, also
+    hostable in the edit hub's route drawer via [exptnoInput]). Ported from MPERPNG-20:
+    recipe 2 on the page kit; submit() and every binding unchanged.
+    Links-only kept: MAWB destination and the two transhipment ports are native selects
+    ("--select--" = ''), exactly as before.
+  -->
+  <div class="ph">
+    <div>
+      <h1>Actual flight date</h1>
+      <p class="mono">Export no. {{ExptNo}}</p>
+      @if (displayData!==undefined) {
+        <div class="cs-chips">
+          <span class="chip solid">Air shipment</span>
+          @if (transtype == 'Direct') { <span class="chip"><span class="dot"></span>Direct</span> }
+          @if (transtype != 'Direct') { <span class="chip dash">Transhipment</span> }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- loading / error state -->
+  @if (displayData==undefined && loadError=='') {
+    <div class="card sec">
+      <div class="cs-empty">Loading…</div>
+    </div>
+  }
+
+  @if (displayData==undefined && loadError!='') {
+    <div class="card sec">
+      <div class="cs-empty">
+        <b>{{loadError}}</b>
+        <div class="cs-empty-act">
+          <button type="button" class="btn g" routerLink="/export/Consignment/edit">Back</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (displayData!==undefined) {
+  <div>
+
+    <!-- shipments that will be updated along with this one -->
+    @if (exptNoList.length>0) {
+      <div class="cs-note">
+        <b>All information will be automatically updated in the following exports</b>
+        <div class="cs-nolist">
+          @for (obj of exptNoList; track $index) {
+            <span class="mono">{{obj.EXPTNO}}</span>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ================= shipment ================= -->
+    <div class="card sec">
+      <div class="card-h"><h2>Shipment</h2></div>
+      <div class="fields">
+        <div class="fld">
+          <label>Export No.</label>
+          <span class="lockv mono">{{ExptNo}}</span>
+        </div>
+        <div class="fld">
+          <label>Document Received</label>
+          <span class="lockv mono">{{displayData?.EXPT_DOCRECD}}</span>
+        </div>
+        <div class="fld">
+          <label>Shipper Name</label>
+          <span class="lockv">{{displayData?.EXP_NAME}}</span>
+        </div>
+        <div class="fld">
+          <label>Consignee</label>
+          <span class="lockv">{{displayData?.CON_NAME}}</span>
+        </div>
+        <div class="fld">
+          <label>Invoice No.</label>
+          <span class="lockv mono">{{displayData?.EXPT_INVNO}} @if (displayData?.EXPT_INVDATE) { <span>&middot; {{displayData?.EXPT_INVDATE}}</span> }</span>
+        </div>
+        <div class="fld">
+          <label>GRI No.</label>
+          <span class="lockv mono">{{displayData?.EXPT_GRINO}} @if (displayData?.EXPT_GRIDATE) { <span>&middot; {{displayData?.EXPT_GRIDATE}}</span> }</span>
+        </div>
+        <div class="fld full">
+          <label>Order No.</label>
+          <span class="lockv mono">{{displayData?.ORDERNO+ '-' +displayData?.EXPT_NOOFPCS}}</span>
+        </div>
+        <div class="fld">
+          <label>Total Packages</label>
+          <span class="lockv">{{displayData?.EXPT_NOOFPKGS + ' ' + displayData?.EXPT_TYPEOFPKGS}}</span>
+        </div>
+        <div class="fld">
+          <label>Total Pieces</label>
+          <span class="lockv">{{displayData?.EXPT_NOOFPCS + ' ' + displayData?.EXPT_TYPEOFPCS}}</span>
+        </div>
+        <div class="fld">
+          <label>Carting Date</label>
+          <span class="lockv">{{displayData?.CARTEDDT}}</span>
+        </div>
+        <div class="fld">
+          <label>Prealert Sent</label>
+          <span class="lockv">{{displayData?.PREALERTDT}}</span>
+        </div>
+        @if (CityCode==DAC) {
+          <div class="fld">
+            <label>Sub Agent</label>
+            <ng-select class="custom" [items]="dhakaSubAgentList" bindLabel="SUP_NAME" bindValue="SUP_CODE" placeholder="--Select Sub Agent--"
+             [(ngModel)]="dhakaSubAgent">
+            </ng-select>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- ================= flight ================= -->
+    <div class="card sec">
+      <div class="card-h"><h2>Flight</h2></div>
+      <div class="fields">
+        <div class="fld">
+          <label>Airline Name</label>
+          <span class="lockv">{{displayData?.AIRLINENAME}}</span>
+        </div>
+        <div class="fld">
+          <label>Planned Flight No.</label>
+          <span class="lockv mono">{{displayData?.FLIGHTNO}}</span>
+        </div>
+        <div class="fld">
+          <label>Planned Flight Date</label>
+          <span class="lockv mono">{{displayData?.FLIGHTDT}}</span>
+        </div>
+      </div>
+
+      <div class="cs-subsec">
+        <div class="cs-sub">Actual departure</div>
+
+        <div class="fields">
+          <!-- already recorded: read-only -->
+          @if (displayData?.ACTUALFLIGHTNO != '') {
+            <div class="fld">
+              <label>Flight No.</label>
+              <span class="lockv mono">{{ACTUALFLIGHTNO}}</span>
             </div>
+          }
+
+          @if (displayData?.ACTUALFLIGHTDT != '') {
+            <div class="fld">
+              <label>Flight Date</label>
+              <span class="lockv mono">{{ACTUALFLIGHTDT}}</span>
+            </div>
+          }
+
+          <!-- not yet recorded: editable -->
+          @if (displayData?.ACTUALFLIGHTNO == '') {
+            <div class="fld">
+              <label>Flight No.</label>
+              <input type="textbox" placeholder="e.g. QR8625" [(ngModel)]="ACTUALFLIGHTNO" />
+            </div>
+          }
+
+          @if (displayData?.ACTUALFLIGHTDT == '') {
+            <div class="fld">
+              <label>Flight Date</label>
+              <my-date-picker name="ACTUALFLIGHTDT" [options]="myDatePickerOptions" [(ngModel)]="ACTUALFLIGHTDT"></my-date-picker>
+            </div>
+          }
         </div>
+      </div>
     </div>
-    <div class="row">
-        <div class="col-sm-2">
-        </div>
-        @if (displayData==undefined) {
-<div class="col-sm-8 centerlabel"><img src="assets/img/loading.gif"/></div>
-}
-        @if (displayData!==undefined) {
-<div class="col-sm-8">
-            <table class="table table-bordered table-sm-new">
-                <tbody class="bgwhite">
-                    <tr>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>Export No.</b>
-                            </span>
-                        </td>
-                        <td colspan="6">
-                            <span class="col-form-span-label">{{ExptNo}}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>Shipper Name</b>
-                            </span>
-                        </td>
-                        <td colspan="2">
-                            <span class="col-form-span-label">{{displayData?.EXP_NAME}}</span>
-                        </td>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>Consignee</b>
-                            </span>
-                        </td>
-                        <td colspan="2">
-                            <span class="col-form-span-label">{{displayData?.CON_NAME}}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>Document Received Date</b>
-                            </span>
-                        </td>
-                        <td colspan="6">
-                            <span class="col-form-span-label">{{displayData?.EXPT_DOCRECD}}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="width75">
-                            <span class="col-form-span-label">
-                                <b>Inv No.</b>
-                            </span>
-                        </td>
-                        <td class="width140">
-                            <span class="col-form-span-label">{{displayData?.EXPT_INVNO}}</span>
-                        </td>
-                        <td class="width60">
-                            <span class="col-form-span-label">
-                                <b>Date</b>
-                            </span>
-                        </td>
-                        <td class="width60">
-                            <span class="col-form-span-label">{{displayData?.EXPT_INVDATE}}</span>
-                        </td>
-                        <td class="width75">
-                            <span class="col-form-span-label">
-                                <b>Gri No.</b>
-                            </span>
-                        </td>
-                        <td class="width100">
-                            <span class="col-form-span-label">{{displayData?.EXPT_GRINO}}</span>
-                        </td>
-                        <td class="width60">
-                            <span class="col-form-span-label">
-                                <b>Date</b>
-                            </span>
-                        </td>
-                        <td class="width60">
-                            <span class="col-form-span-label">{{displayData?.EXPT_GRIDATE}}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>Total No. of Packages</b>
-                            </span>
-                        </td>
-                        <td colspan="2">
-                            <span class="col-form-span-label">{{displayData?.EXPT_NOOFPKGS + ' ' + displayData?.EXPT_TYPEOFPKGS}}</span>
-                        </td>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>Total No. of Pieces</b>
-                            </span>
-                        </td>
-                        <td colspan="2">
-                            <span class="col-form-span-label">{{displayData?.EXPT_NOOFPCS + ' ' + displayData?.EXPT_TYPEOFPCS}}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>Order No.</b>
-                            </span>
-                        </td>
-                        <td colspan="6">
-                            <span class="col-form-span-label">{{displayData?.ORDERNO+ '-' +displayData?.EXPT_NOOFPCS}}</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <table class="table table-bordered table-sm-new">
-                <tbody class="bgwhite">
-                    @if (exptNoList.length>0) {
-<tr [ngStyle]="{ 'color': 'red'}">
-                        <td colspan="8">
-                            <span class="col-form-span-label">
-                                <b>ALL INFORMATION WILL BE AUTOMATICALLY GET UPDATED IN THE FOLLOWING EXPORTS</b>
-                            </span>
-                        </td>
-                    </tr>
-}
-                    @if (exptNoList.length>0) {
-<tr [ngStyle]="{ 'color': 'red'}">
-                        <td colspan="2" [ngStyle]="{ 'width': '20%'}">
-                            <span class="col-form-span-label">
-                                <b>Export No.</b>
-                            </span>
-                        </td>
-                        <td colspan="6">
-                            @for (obj of exptNoList; track obj; let isLast = $last) {
-<span class="col-form-span-label">
-                                <b>{{obj.EXPTNO}}</b>
-                                @if (!isLast) {
-<br />
-}
-                            </span>
-}
-                        </td>
-                    </tr>
-}
-                    @if (CityCode==DAC) {
-<tr class="trbg">
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>SubAgent</b>
-                            </span>
-                        </td>
-                        <td colspan="6">
-                            <ng-select [items]="dhakaSubAgentList" bindLabel="SUP_NAME" bindValue="SUP_CODE" placeholder="--Select Sub Agent--" [(ngModel)]="dhakaSubAgent"
-                                class="form-control width200">
-                            </ng-select>
-                        </td>
-                    </tr>
-}
-                    <tr>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>Carting Date</b>
-                            </span>
-                        </td>
-                        <td colspan="6">
-                            <span class="col-form-span-label">{{displayData?.CARTEDDT}}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>Prealert sent on</b>
-                            </span>
-                        </td>
-                        <td colspan="6">
-                            <span class="col-form-span-label">{{displayData?.PREALERTDT}}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>Airline Name</b>
-                            </span>
-                        </td>
-                        <td colspan="6">
-                            <span class="col-form-span-label">{{displayData?.AIRLINENAME}}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>Planned Flight No.</b>
-                            </span>
-                        </td>
-                        <td colspan="2" [ngStyle]="{ 'width': '30%'}">
-                            <span class="col-form-span-label">{{displayData?.FLIGHTNO}}</span>
-                        </td>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>Planned Flight Date</b>
-                            </span>
-                        </td>
-                        <td colspan="2">
-                            <span class="col-form-span-label">{{displayData?.FLIGHTDT}}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="8">
-                            <table class="table table-bordered table-sm-new">
-                                <tbody class="trbg">
-                                    <tr>
-                                        <td colspan="8">
-                                            <span class="col-form-span-label">
-                                                <b>ACTUAL</b>
-                                            </span>
-                                        </td>
-                                    </tr>
-                                  
-                                    @if (displayData?.ACTUALFLIGHTNO != '') {
-<tr >
-                                        <td colspan="2" [ngStyle]="{ 'width' : '20%'}">
-                                            <span class="col-form-span-label">
-                                                <b>Flight No.</b>
-                                            </span>
-                                        </td>
-                                        <td colspan="6">
-                                            <span class="col-form-span-label">{{ACTUALFLIGHTNO}}</span>
-                                        </td>
-                                    </tr>
-}
-                                    @if (displayData?.ACTUALFLIGHTDT != '') {
-<tr >
-                                        <td colspan="2">
-                                            <span class="col-form-span-label">
-                                                <b>Flight Date</b>
-                                            </span>
-                                        </td>
-                                        <td colspan="6">
-                                                <span class="col-form-span-label">{{ACTUALFLIGHTDT}}</span>
-                                           
-                                        </td>
-                                    </tr>
-}
-                                    @if (displayData?.ACTUALFLIGHTNO == '') {
-<tr >
-                                        <td colspan="2" [ngStyle]="{ 'width' : '20%'}">
-                                            <span class="col-form-span-label">
-                                                <b>Flight No.</b>
-                                            </span>
-                                        </td>
-                                        <td colspan="6">
-                                            <input type="textbox" class="form-control width100" [(ngModel)]="ACTUALFLIGHTNO" />
-                                        </td>
-                                    </tr>
-}
-                                    @if (displayData?.ACTUALFLIGHTDT == '') {
-<tr >
-                                        <td colspan="2">
-                                            <span class="col-form-span-label">
-                                                <b>Flight Date</b>
-                                            </span>
-                                        </td>
-                                        <td colspan="6">
-                                             <my-date-picker name="ACTUALFLIGHTDT" [options]="myDatePickerOptions" [(ngModel)]="ACTUALFLIGHTDT"></my-date-picker> 
-                                        </td>
-                                    </tr>
-}
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>MAWB No.</b>
-                            </span>
-                        </td>
-                        <td colspan="2">
-                            <span class="col-form-span-label">{{displayData?.AEROBILLNO}}</span>
-                        </td>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>MAWB Date</b>
-                            </span>
-                        </td>
-                        <td colspan="2">
-                            <span class="col-form-span-label">{{displayData?.AEROBILLDT}}</span>
-                        </td>
-                    </tr>
-                    <tr class="trbg">
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>CO2 Emission Level</b>
-                            </span>
-                        </td>
-                        <td colspan="6">
-                            <span class="col-form-span-label" [ngStyle]="{'display': 'inline-flex'}">
-                                <input type="textbox" class="form-control width100" [(ngModel)]="CoEmissionLevel" />
-                                <b>KG</b>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>MAWB Destination</b>
-                            </span>
-                        </td>
-                        <td colspan="2">
-                            <!-- <span class="col-form-span-label">{{displayData?.MAWBDEST}}</span> -->
-                            <!-- <span class="col-form-span-label">
-                                    <ng-select [items]="commoncities"
-                                    bindLabel="CITY_COUNTRY"
-                                    bindValue="CITY_CODE"
-                                    placeholder="--Select--"
-                                    [(ngModel)]="MAWBDEST"
-                                    class="form-control"
-                                    >
-                         </ng-select> -->
 
-                         <select class="form-control " [(ngModel)]="MAWBDEST">
-                            <option value="">--select--</option>
-                             @for (d of commoncities; track d) {
-<option value={{d.CITY_CODE}}>{{d.CITY_COUNTRY}}</option>
-}
-                        </select>
-
-                            
-                        </td>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>MAWB Freight</b>
-                            </span>
-                        </td>
-                        <td colspan="2">
-                            <!-- <span class="col-form-span-label">{{displayData?.MAWBFRT}}</span> -->
-                            <!-- <ng-select [items]="[{VALUEFIELD: 'PP', TEXTFIELD: 'PP'},{VALUEFIELD: 'CC', TEXTFIELD: 'CC'}]"
-											   bindLabel="TEXTFIELD"
-											   bindValue="VALUEFIELD"
-											   placeholder="--Select--"
-											   [(ngModel)]="MAWBFRT"
-											   class="form-control">
-                            </ng-select> -->
-                            
-                            <select class="form-control width90" [(ngModel)]="MAWBFRT" >
-                                <option value="null">--</option>
-                                <option value="PP">PP</option>
-                                <option value="CC">CC</option>				 	 
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>House AWB No.</b>
-                            </span>
-                        </td>
-                        <td colspan="2">
-                            <span class="col-form-span-label">{{displayData?.HOUSEBILLNO}}</span>
-                        </td>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>House AWB Date</b>
-                            </span>
-                        </td>
-                        <td colspan="2">
-                            <span class="col-form-span-label">{{displayData?.HOUSEBILLDT}}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <!-- <td colspan="8" class="centerlabel trbg">
-                            <span class="col-form-span-label">
-                                <b>{{ (displayData?.TRANSPORT1) ? 'Direct' : 'Transhipment'}}</b>
-                            </span>
-                        </td> -->
-                        <td colspan="8" class="width150">
-                                <input type="radio" name="TransType" [checked]="transtype == 'Direct'" value="Direct"  (click)="transType('Direct')"/><span class="col-form-span-label">Direct</span>
-                                <input type="radio" name="TransType" [checked]="transtype == 'Trans'" value="Trans" (click)="transType('Trans')"/><span class="col-form-span-label">Transhipment</span>
-                            </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>Transhipment Port1</b>
-                            </span>
-                        </td>
-                        <td colspan="6">
-                            <!-- <span class="col-form-span-label">{{displayData?.TRANSPORT1}}</span> -->
-                            <!-- <ng-select [items]="commoncities"
-											   bindLabel="CITY_COUNTRY"
-											   bindValue="CITY_CODE"
-											   placeholder="--Select--"
-											   [(ngModel)]="transportone"
-											   class="form-control"
-											   [disabled]="transtype == 'Direct'"
-											   >
-                                    </ng-select> -->
-                            <select class="form-control " [(ngModel)]="transportone"  [disabled]="transtype == 'Direct'">
-                                <option value="">--select--</option>
-                                    @for (d of commoncities; track d) {
-<option value={{d.CITY_CODE}}>{{d.CITY_COUNTRY}}</option>
-}
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>Flight No.</b>
-                            </span>
-                        </td>
-                        <td colspan="2">
-                            <!-- <span class="col-form-span-label">{{displayData?.FLIGHTNO1}}</span> -->
-                            <input type="textbox" class="form-control " [(ngModel)]="fltno1" />
-                        </td>
-                        <td>
-                            <span class="col-form-span-label">
-                                <b>ETD</b>
-                            </span>
-                        </td>
-                        <td>
-                            <!-- <span class="col-form-span-label">{{displayData?.ETDPORT1}}</span> -->
-                            <my-date-picker name="etdonedt" [options]="myDatePickerOptions" [(ngModel)]="etdonedt" [disabled]="transtype == 'Direct'"></my-date-picker>
-                        </td>
-                        <td>
-                            <span class="col-form-span-label">
-                                <b>ETA</b>
-                            </span>
-                        </td>
-                        <td>
-                            <!-- <span class="col-form-span-label">{{displayData?.ETAPORT1}}</span> -->
-                            <my-date-picker name="etatwodt" [options]="myDatePickerOptions" [(ngModel)]="etaonedt" [disabled]="transtype == 'Direct'"></my-date-picker>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>Transhipment Port2</b>
-                            </span>
-                        </td>
-                        <td colspan="6">
-                            <!-- <span class="col-form-span-label">{{displayData?.TRANSPORT2}}</span> -->
-                            <!-- <ng-select [items]="commoncities"
-											   bindLabel="CITY_COUNTRY"
-											   bindValue="CITY_CODE"
-											   placeholder="--Select--"
-											   [(ngModel)]="transporttwo"
-											   class="form-control"
-											   [disabled]="transtype == 'Direct'"
-											   >
-                            </ng-select> -->
-                            <select class="form-control " [(ngModel)]="transporttwo"  [disabled]="transtype == 'Direct'">
-                                <option value="">--select--</option>
-                                    @for (d of commoncities; track d) {
-<option value={{d.CITY_CODE}}>{{d.CITY_COUNTRY}}</option>
-}
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <span class="col-form-span-label">
-                                <b>Flight No.</b>
-                            </span>
-                        </td>
-                       
-                            <!-- <span class="col-form-span-label">{{displayData?.FLIGHTNO2}}</span> -->
-                            
-                                 <td colspan="2"><input type="text" [(ngModel)]="fltno2" class="form-control"/>
-                         
-
-                        
-                        <td>
-                            <span class="col-form-span-label">
-                                <b>ETD</b>
-                            </span>
-                        </td>
-                        <td class="width100">
-                            <!-- <span class="col-form-span-label">{{displayData?.ETDPORT2}}</span> -->
-                            <my-date-picker name="etdtwodt" [options]="myDatePickerOptions" [(ngModel)]="etdtwodt" [disabled]="transtype == 'Direct'"></my-date-picker>
-                        </td>
-                        <td>
-                            <span class="col-form-span-label">
-                                <b>ETA</b>
-                            </span>
-                        </td>
-                        <td class="width100">
-                            <!-- <span class="col-form-span-label">{{displayData?.ETAPORT2}}</span> -->
-                            <my-date-picker name="etatwodt" [options]="myDatePickerOptions" [(ngModel)]="etatwodt" [disabled]="transtype == 'Direct'"></my-date-picker>
-                        </td>
-                    </tr>
-                    <tr class="trbg centerlabel">
-                        <td colspan="8">
-                            <button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="submit();" #submitButton>
-                                <span class="col-form-span-label">
-                                    <i class="fa fa-pencil-square-o"></i>&nbsp;Submit</span>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    <!-- ================= airway bill ================= -->
+    <div class="card sec">
+      <div class="card-h"><h2>Airway Bill</h2></div>
+      <div class="fields">
+        <div class="fld">
+          <label>MAWB No.</label>
+          <span class="lockv mono">{{displayData?.AEROBILLNO}}</span>
         </div>
-}
-        <div class="col-sm-2">
+        <div class="fld">
+          <label>MAWB Date</label>
+          <span class="lockv mono">{{displayData?.AEROBILLDT}}</span>
         </div>
+        <div class="fld">
+          <label>House AWB No.</label>
+          <span class="lockv mono">{{displayData?.HOUSEBILLNO}}</span>
+        </div>
+        <div class="fld">
+          <label>House AWB Date</label>
+          <span class="lockv mono">{{displayData?.HOUSEBILLDT}}</span>
+        </div>
+      </div>
+
+      <div class="cs-subsec">
+        <div class="cs-sub">Editable</div>
+
+        <div class="fields">
+          <div class="fld">
+            <label>CO2 Emission Level</label>
+            <span class="cs-inline">
+              <input type="textbox" class="cs-w28" [(ngModel)]="CoEmissionLevel" />
+              <span class="cs-unit">KG</span>
+            </span>
+          </div>
+
+          <div class="fld">
+            <label>MAWB Freight</label>
+            <select [(ngModel)]="MAWBFRT">
+              <option value="null">--</option>
+              <option value="PP">PP</option>
+              <option value="CC">CC</option>
+            </select>
+          </div>
+
+          <div class="fld full">
+            <label>MAWB Destination</label>
+            <select [(ngModel)]="MAWBDEST">
+              <option value="">--select--</option>
+              @for (d of commoncities; track d) {
+                <option value={{d.CITY_CODE}}>{{d.CITY_COUNTRY}}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- ================= routing ================= -->
+    <div class="card sec">
+      <div class="card-h"><h2>Routing</h2></div>
+      <div class="cs-pad">
+
+        <div class="cs-opts">
+          <label class="cs-opt">
+            <input type="radio" name="TransType" [checked]="transtype == 'Direct'" value="Direct" (click)="transType('Direct')" /> Direct
+          </label>
+          <label class="cs-opt">
+            <input type="radio" name="TransType" [checked]="transtype == 'Trans'" value="Trans" (click)="transType('Trans')" /> Transhipment
+          </label>
+        </div>
+
+        <div class="cs-leg" [class.cs-dim]="transtype == 'Direct'">
+          <div class="cs-sub">Transhipment leg 1</div>
+          <div class="fields">
+            <div class="fld">
+              <label>Port</label>
+              <select [(ngModel)]="transportone" [disabled]="transtype == 'Direct'">
+                <option value="">--select--</option>
+                @for (d of commoncities; track d) {
+                  <option value={{d.CITY_CODE}}>{{d.CITY_COUNTRY}}</option>
+                }
+              </select>
+            </div>
+            <div class="fld">
+              <label>Flight No.</label>
+              <input type="textbox" [(ngModel)]="fltno1" />
+            </div>
+            <div class="fld">
+              <label>ETD</label>
+              <my-date-picker name="etdonedt" [options]="myDatePickerOptions" [(ngModel)]="etdonedt" [disabled]="transtype == 'Direct'"></my-date-picker>
+            </div>
+            <div class="fld">
+              <label>ETA</label>
+              <my-date-picker name="etatwodt" [options]="myDatePickerOptions" [(ngModel)]="etaonedt" [disabled]="transtype == 'Direct'"></my-date-picker>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-leg" [class.cs-dim]="transtype == 'Direct'">
+          <div class="cs-sub">Transhipment leg 2</div>
+          <div class="fields">
+            <div class="fld">
+              <label>Port</label>
+              <select [(ngModel)]="transporttwo" [disabled]="transtype == 'Direct'">
+                <option value="">--select--</option>
+                @for (d of commoncities; track d) {
+                  <option value={{d.CITY_CODE}}>{{d.CITY_COUNTRY}}</option>
+                }
+              </select>
+            </div>
+            <div class="fld">
+              <label>Flight No.</label>
+              <input type="text" [(ngModel)]="fltno2" />
+            </div>
+            <div class="fld">
+              <label>ETD</label>
+              <my-date-picker name="etdtwodt" [options]="myDatePickerOptions" [(ngModel)]="etdtwodt" [disabled]="transtype == 'Direct'"></my-date-picker>
+            </div>
+            <div class="fld">
+              <label>ETA</label>
+              <my-date-picker name="etatwodt" [options]="myDatePickerOptions" [(ngModel)]="etatwodt" [disabled]="transtype == 'Direct'"></my-date-picker>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bar">
+      <span class="note">Updates this export and the exports listed above.</span>
+      <div class="r">
+        @if (!inline) { <button type="button" class="btn g" routerLink="/export/Consignment/edit">Abort</button> }
+        <button type="button" name="submitButton" class="btn p" (click)="submit();" #submitButton>Update</button>
+      </div>
+    </div>
+  </div>
+  }
 </div>

@@ -1,0 +1,130 @@
+/* ----------------------------------------------------------------
+   Links port (Phase 1): GLOBAL page-kit stylesheet, registered in
+   angular.json `styles` after src/tailwind.css.
+   Source: MPERPNG-20 src/app/import/import-entry.css
+   Root classes .x-legacy.im-entry (both on the same root element, as on every MP
+   consumer). MP's `:host ::ng-deep .x-legacy X` is written `.x-legacy.im-entry X`
+   (same specificity) so these Import-only rules cannot reach other .x-legacy
+   screens. The @import of export-legacy-content.css is dropped: that file is
+   loaded globally, immediately before this one.
+   Every rule stays under its root class, so no legacy screen is affected.
+   Do not edit by hand without mirroring MP; regenerate from MP instead.
+   ---------------------------------------------------------------- */
+/* ============================================================
+   Import Air / Sea entry screens, restyled in place.
+   Both screens keep their legacy table markup; the root div carries .x-legacy so the
+   Export stylesheet that restyles the same class vocabulary (table-sm-new,
+   col-form-span-label, ng-select, my-date-picker...) applies unchanged. Only what
+   Import has and Export's editors don't lives below.
+   ============================================================ */
+:root .x-legacy.im-entry {
+    /* export-theme.css defines this on the export shell, which Import doesn't load */
+    --ex-font: Inter, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--ex-font);
+    padding-bottom: 0;
+    /* the page scrolls in <main>; a scroll box here would trap the sticky action bar */
+    overflow: visible !important;
+}
+
+/* the yellow service-type strip (Ex-works / Customs / Freight) */
+.x-legacy.im-entry .bgyellow {
+    background: transparent !important;
+}
+
+.x-legacy.im-entry .fa-trash-o,
+.x-legacy.im-entry .fa-pencil-square-o,
+.x-legacy.im-entry .fa-edit {
+    color: var(--lg-ink);
+    cursor: pointer;
+}
+
+.x-legacy.im-entry .im-link {
+    color: var(--lg-ink);
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.x-legacy.im-entry .im-note {
+    border: 1px solid var(--lg-edge);
+    padding: 6px 10px;
+    color: var(--lg-ink-soft);
+}
+
+/* Abort / Submit pinned bottom right, same bar as the Export drawer */
+.x-legacy.im-entry .im-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 16px;
+    margin: 0 -1px;
+    background: var(--lg-sheet);
+    border-top: 1px solid var(--lg-edge);
+}
+
+/* section bands (tr.trheader) were a solid cyan bar - pale grey band like every heading */
+.x-legacy.im-entry tr.trheader,
+.x-legacy.im-entry tr.trheader > td,
+.x-legacy.im-entry tr.trheader > th {
+    background: var(--lg-band) !important;
+    color: var(--lg-ink) !important;
+}
+
+.x-legacy.im-entry tr.trheader .col-form-span-label,
+.x-legacy.im-entry tr.trheader span,
+.x-legacy.im-entry tr.trheader strong {
+    color: var(--lg-ink) !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-size: 11.5px;
+}
+
+/* the global "custom" ng-select paints values navy */
+.x-legacy.im-entry .ng-select .ng-value-label,
+.x-legacy.im-entry .ng-select .ng-placeholder,
+.x-legacy.im-entry .ng-select input {
+    color: var(--lg-ink) !important;
+}
+
+/* The form sat in a col-sm-10 between two empty col-sm-1 gutters: use the full width. */
+:root .x-legacy.im-entry .row > .col-sm-1:empty {
+    display: none;
+}
+
+:root .x-legacy.im-entry .row > .col-sm-10 {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+.x-legacy.im-entry .ng-select .ng-select-container,
+.x-legacy.im-entry .ng-select .ng-select-container * {
+    color: var(--lg-ink) !important;
+}
+
+.x-legacy.im-entry button[uibtn][variant="outline"] {
+    border-color: var(--mp-primary, var(--lg-ink));
+}
+
+/* the add icon inherits ink from the legacy label rule and vanishes on the black button */
+.x-legacy.im-entry button[uibtn][variant="default"] i {
+    color: var(--lg-sheet) !important;
+}
+
+/* "back to search" link on the LIST header row of the search screens - was an inline
+   style="float:right;text-decoration:underline;color:red" */
+.x-legacy.im-entry .im-back-link {
+    float: right;
+}
+
+/* Search-result rows that navigate on click (Exchange Rate / Airline / Vessel master
+   search grids) - was an inline style="cursor:pointer" with no visual affordance */
+.x-legacy.im-entry tr.im-row-link {
+    cursor: pointer;
+}
+
+.x-legacy.im-entry tr.im-row-link:hover > td {
+    background: var(--lg-line-soft);
+}

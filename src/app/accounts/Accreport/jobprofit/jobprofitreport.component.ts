@@ -8,10 +8,11 @@ import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/shared/service/dataService';
 import { JobprofitserviceService } from 'src/app/shared/service/jobprofitservice.service';
 import { environment } from 'src/environments/environment';
+import { FIN_PERIODS, FinPeriod, finRange, finDp } from '../fin-kit';
 @Component({
   selector: 'app-jobprofitreport',
   templateUrl: './jobprofitreport.component.html',
-  styles: [],
+  host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -229,4 +230,15 @@ export class JobprofitreportComponent implements OnInit {
     this.paydate = ""
     this.searchtype= "singlejob"
   }
+
+    // ---- redesign: quick period presets for the date-wise option (same picker model shape) ----
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.from_datewise = finDp(r.from, this.myDatePickerOptions.dateFormat);
+        this.to_datewise = finDp(r.to, this.myDatePickerOptions.dateFormat);
+    }
 }

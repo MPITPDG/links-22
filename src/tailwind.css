@@ -265,3 +265,67 @@ body {
 @apply bg-background text-foreground;
 }
 }
+/* ===== Application theme (ThemeService) =====================================
+   --mp-* default to Classic; ThemeService writes the chosen palette inline on
+   <html> and sets data-theme / data-theme-scope. Classic = no attributes. */
+:root {
+  --mp-sidebar: #0A0A0A; --mp-sidebar-fg: #DEDEDE; --mp-sidebar-accent: #262626; --mp-sidebar-accent-fg: #FFFFFF;
+  --mp-primary: #0A0A0A; --mp-primary-fg: #FFFFFF; --mp-accent: #6B6B6B;
+  --mp-bg: #FAFAFA; --mp-surface: #FFFFFF; --mp-ink: #0A0A0A; --mp-soft: #6B6B6B;
+  --mp-line: #DADADA; --mp-band: #F3F3F3; --mp-strong: #BDBDBD; --mp-danger: #C62828;
+  --mp-primary-soft: #EFEFEF; --mp-accent-soft: #E8E8E8;
+  --mp-chart-1: #0A0A0A; --mp-chart-2: #6B6B6B; --mp-chart-3: #9E9E9E; --mp-chart-4: #C8C8C8; --mp-chart-5: #DADADA;
+  /* late / critical emphasis on dashboards: ink in Classic, the palette's danger otherwise */
+  --mp-late: #0A0A0A;
+}
+html[data-theme]:not([data-theme-scope="chrome"]) { --mp-late: var(--mp-danger); }
+/* chrome: header, sidebar, primary + destructive buttons (both scopes) */
+html[data-theme] .theme-gray {
+  --sidebar: var(--mp-sidebar);
+  --sidebar-foreground: var(--mp-sidebar-fg);
+  --sidebar-accent: var(--mp-sidebar-accent);
+  --sidebar-accent-foreground: var(--mp-sidebar-accent-fg);
+  --primary: var(--mp-primary);
+  --primary-foreground: var(--mp-primary-fg);
+  --destructive: var(--mp-danger);
+}
+/* whole application */
+html[data-theme]:not([data-theme-scope="chrome"]) .theme-gray {
+  --border: var(--mp-line);
+  --input: var(--mp-strong);
+  --ring: var(--mp-primary);
+  --accent: var(--mp-band);
+  --secondary: var(--mp-band);
+  --muted: var(--mp-band);
+  --background: var(--mp-bg);
+  --foreground: var(--mp-ink);
+}
+/* Header/menu only: scoped stylesheets must stay Classic, so reset the page
+   tokens they read back to the greys (chrome tokens above still apply). */
+html[data-theme-scope="chrome"] .theme-gray > :not(header) {
+  --mp-bg: #FAFAFA; --mp-surface: #FFFFFF; --mp-ink: #0A0A0A; --mp-soft: #6B6B6B;
+  --mp-line: #DADADA; --mp-band: #F3F3F3; --mp-strong: #BDBDBD;
+  --mp-primary: #0A0A0A; --mp-primary-fg: #FFFFFF; --mp-accent: #6B6B6B;
+  --mp-primary-soft: #EFEFEF; --mp-accent-soft: #E8E8E8; --mp-danger: #C62828;
+  --mp-chart-1: #0A0A0A; --mp-chart-2: #6B6B6B; --mp-chart-3: #9E9E9E; --mp-chart-4: #C8C8C8; --mp-chart-5: #DADADA;
+}
+/* legacy Bootstrap pages (scope 'app' only) */
+html[data-theme]:not([data-theme-scope="chrome"]) .btn-primary,
+html[data-theme]:not([data-theme-scope="chrome"]) .btn-dark {
+  background-color: var(--mp-primary) !important; border-color: var(--mp-primary) !important; color: var(--mp-primary-fg) !important;
+}
+html[data-theme]:not([data-theme-scope="chrome"]) .bg-dark,
+html[data-theme]:not([data-theme-scope="chrome"]) .badge-dark {
+  background-color: var(--mp-primary) !important; color: var(--mp-primary-fg) !important;
+}
+html[data-theme]:not([data-theme-scope="chrome"]) .table thead th,
+html[data-theme]:not([data-theme-scope="chrome"]) .thead-dark th {
+  background-color: var(--mp-band) !important; color: var(--mp-ink) !important; border-color: var(--mp-line) !important;
+}
+html[data-theme]:not([data-theme-scope="chrome"]) .page-item.active .page-link {
+  background-color: var(--mp-primary) !important; border-color: var(--mp-primary) !important; color: var(--mp-primary-fg) !important;
+}
+html[data-theme]:not([data-theme-scope="chrome"]) a[href]:not(.btn):not([class*="bg-"]):not([class*="text-"]):not(:where(header, aside, nav, [role="menu"]) a) { color: var(--mp-primary); }
+html[data-theme]:not([data-theme-scope="chrome"]) .nav-tabs .nav-link.active {
+  border-color: var(--mp-line) var(--mp-line) var(--mp-surface) !important; border-top: 2px solid var(--mp-primary) !important;
+}

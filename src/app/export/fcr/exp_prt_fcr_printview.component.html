@@ -1,56 +1,71 @@
-﻿<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-body">
-				<div class="row">
-					<div class="col-md-2"></div>
-					<div class="col-md-8">		
-						
-						@if (Type=='F') {
-<app-fcr-printview   [hbltype]="Type">	</app-fcr-printview >
-}
-						@if (Type=='M') {
-<app-mto-printview  [hbltype]="Type" >	</app-mto-printview >
-}
-						
-					</div>  
-					<div class="col-md-2"></div>  
-				</div>
-			</div>         
-		</div>
-		<div class="card-footer rightlabel">
-			
-			<!-- <button class="btn btn-sm btn-success" type="submit"   [disabled]="buttonStatus" (click)="printUpdate()"   ><i class="fa fa-dot-circle-o" ></i> Update</button>
-			<button class="btn btn-m btn-success" type="submit" [disabled]="buttonStatus" (click)="Printdraft()" ><i class="fa fa-dot-circle-o"   ></i> Draftprint</button>			
-			<button class="btn btn-sm btn-danger" type="reset"   [disabled]="buttonStatus" (click)="Print()"><i class="fa fa-print "></i> Print</button>
-			&nbsp;&nbsp;<input type="checkbox"  [(ngModel)]="expressbill" (change)="checkValue($event)"   >
-			<span class="col-form-span-label "><b>Express Bill </b></span> -->
-			<table style="width:450px;" align="center" >
-				<tr>
-					<td>
-						<button class="btn btn-sm btn-success" type="submit"   [disabled]="buttonStatus" (click)="printUpdate()"   ><i class="fa fa-dot-circle-o" ></i> Update</button>
-					</td>
-					<td>
-						<button class="btn btn-m btn-success" type="submit" [disabled]="buttonStatus" (click)="Printdraft()" ><i class="fa fa-dot-circle-o"   ></i> Draftprint</button><td>
-					</td>
-					<td>
-					<button class="btn btn-sm btn-danger" type="reset"   [disabled]="buttonStatus" (click)="Print()"><i class="fa fa-print "></i> Print</button>
-					</td>
-					<td>
-						<input type="checkbox"  [(ngModel)]="expressbill" (change)="checkValue($event)"   >
-					<span class="col-form-span-label "><b>Express Bill </b></span>
-					</td>
-					<td>
-						<!-- <select class="form-control width125" [(ngModel)]="WaterMarkoption" style="border-radius: 7px;">
-							<option value="">--Please select--</option>
-							<option value="1">With Watermark</option>
-							<option value="0">Without Watermark</option>
-						</select> -->
-						<input type="checkbox"  [(ngModel)]="WaterMarkoption" (change)="getwatermarkvalue($event)"   >
-						<span class="col-form-span-label "><b>with watermark </b></span>
-					</td>
-				</tr>
-			</table>
-		</div>
-	</div>
+﻿<!--
+  Export -> House B/L / FCR / MTO editor (host). Page kit recipe 2, ported from
+  MPERPNG-20 (fcr-form.css). The FCR and MTO forms are the inline templates in
+  exp_prt_fcr_printview.component.ts.
+  Links keeps its own options and print path: Express Bill and watermark
+  checkboxes, Update / Draft print / Print through the existing handlers
+  (the .aspx print). MP's SeaWay Bill option and HTML print are not ported.
+-->
+<div class="im-page">
+
+  <div class="ph">
+    <div>
+      <h1>{{ pageTitle }}</h1>
+      <p>Enter the document details, update, then take a draft or the final print.</p>
+      <div class="chips">
+        @if (DocNo) {
+          <span class="chip">{{ DocNo }}</span>
+        }
+        @if (typeLabel) {
+          <span class="chip dash">{{ typeLabel }}</span>
+        }
+        @if (ISPRINT == '1') {
+          <span class="chip solid">Printed</span>
+        }
+      </div>
+    </div>
+    @if (Type == 'M') {
+      <div class="letterhead"><img src="assets/img/Export/MTO_Header.jpg" alt="MTO letterhead"></div>
+    } @else if (Type == 'F' || Type == 'H') {
+      <div class="letterhead"><img src="assets/img/Export/FCR_header.jpg" alt="FCR letterhead"></div>
+    }
+  </div>
+
+  @if (Type == 'F' || Type == 'H') {
+    <app-fcr-printview [hbltype]="Type"></app-fcr-printview>
+  } @else if (Type == 'M') {
+    <app-mto-printview [hbltype]="Type"></app-mto-printview>
+  } @else {
+    <div class="card sec">
+      <div class="state">
+        <h3>No House B/L selected</h3>
+        <p>
+          This screen edits and prints a House B/L, FCR or MTO that was generated on the
+          House B/L screen. Open one from there to continue.
+        </p>
+        <button class="btn p" type="button" (click)="goToForm()">Go to House B/L</button>
+      </div>
+    </div>
+  }
+
+  @if (Type == 'F' || Type == 'H' || Type == 'M') {
+    <div class="bar">
+      <span class="note" style="display:flex;align-items:center;gap:16px;margin:0;">
+        <label style="display:inline-flex;align-items:center;gap:6px;margin:0;">
+          <input type="checkbox" [(ngModel)]="expressbill" (change)="checkValue($event)">
+          <span><b>Express Bill</b></span>
+        </label>
+        <label style="display:inline-flex;align-items:center;gap:6px;margin:0;">
+          <input type="checkbox" [(ngModel)]="WaterMarkoption" (change)="getwatermarkvalue($event)">
+          <span><b>With watermark</b></span>
+        </label>
+      </span>
+      <span class="r">
+        <button class="btn g" type="button" [disabled]="buttonStatus || !docLoaded" (click)="printUpdate()">Update</button>
+        <button class="btn g" type="button" [disabled]="buttonStatus || !docLoaded" (click)="Printdraft()">Draft print</button>
+        <button class="btn p" type="button" [disabled]="buttonStatus || !docLoaded" (click)="Print()">Print</button>
+      </span>
+    </div>
+  }
+
 </div>

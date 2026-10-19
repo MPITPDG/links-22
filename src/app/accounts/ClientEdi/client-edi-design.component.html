@@ -1,134 +1,141 @@
-<div class="container-fluid p-2">
-
-  <!-- Single Controls Row -->
-  <div class="controls-row mb-2">
-    <div class="d-flex align-items-center">
-      
-      <!-- Title -->
-      <h2 class="mb-0 fw-semibold me-3 title-text">
-        <i class="fa fa-file-text me-1 text-primary"></i>
-        Bajaj EDI Pending Billing List
-      </h2>
-      
-      <!-- Search Box -->
-      <div class="search-box me-2">
-        <i class="fa fa-search search-icon"></i>
-        <input 
-          class="form-control form-control-sm" 
-          type="search" 
-          [(ngModel)]="searchString" 
-          autocomplete="off"
-          placeholder="Search...">
-      </div>
-      
-      <!-- Action Buttons -->
-      <button 
-        class="btn btn-sm btn-success me-1" 
-        (click)="GenerateEdiInvoice()"
-        [disabled]="!hasSelectedItems()">
-        <i class="fa fa-file-excel-o me-1"></i>Generate Excel
-      </button>
-      <button 
-        class="btn btn-sm btn-primary" 
-        (click)="GenerateEditxtInvoice()"
-        [disabled]="!hasSelectedItems()">
-        <i class="fa fa-file-text-o me-1"></i>Generate Text
-      </button>
-
+<!--
+  Accounts -> Client EDI -> Bill generate (Links-only screen, no MP reference).
+  List recipe on the page kit (.im-page + host class kit-accreport), Generate text / Generate Excel pinned
+  bottom right. Behaviour is unchanged: ACC_CLIENT_EDI_GETINVOICEDATA list (showdata), clientedifilterpipe
+  search on work order no., the tick / select-all / grey-row rules exactly as before (inline expressions
+  kept verbatim), viewinvoice(inv), GenerateEdiInvoice() / GenerateEditxtInvoice().
+  Status chip + "why", invoice parts and the counts are display-only helpers (edi*) derived from the
+  fields the list already returns; they change no tick rule.
+-->
+<div class="im-page">
+  <div class="crumb">Accounts / Client EDI / Bill generate</div>
+  <div class="ph">
+    <div>
+      <h1>Bajaj EDI pending billing</h1>
+      <p>Work orders whose BOL alert has gone out but whose bills have not been sent to Bajaj. Tick work orders, then generate the files.</p>
     </div>
   </div>
 
-  <!-- Data Table -->
-  @if (displayType=='LIST') {
-<div>
-    <div class="card shadow-sm border-0">
-      <div class="card-body p-0">
-        
-        <!-- Loading State -->
-        <!-- <div *ngIf="isLoading" class="text-center p-4">
-          <div class="spinner-border text-primary" role="status"></div>
-          <p class="mt-2 text-muted small">Loading...</p>
-        </div> -->
+  <div class="card">
+    <div class="filters f-del">
+      <div class="f">
+        <label for="ce-search">Work order no.</label>
+        <input id="ce-search" name="ce-search" class="mono" type="search" [(ngModel)]="searchString" autocomplete="off" placeholder="Search">
+      </div>
+    </div>
 
-        <!-- Data Table -->
-        @if (workOrders.length > 0) {
-<div 
-             class="table-scroll-container">
-          <table class="table mb-0 modern-data-table">
+    @if (displayType=='LIST') {
+      @if (workOrders.length > 0) {
+        <div class="toolbar">
+          <span class="ce-counts">
+            <span class="count">{{ workOrders.length }} pending work orders</span>
+            <span class="chip"><span class="dot"></span>{{ ediReadyCount() }} ready</span>
+            <span class="chip dash">{{ workOrders.length - ediReadyCount() }} waiting</span>
+          </span>
+          <span class="tb-r"><span class="sub-t">{{ ediTickedCount() }} ticked</span></span>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl edi">
             <thead>
               <tr>
-                <th class="sticky-check-col text-center">
-                  <input 
-                    type="checkbox" 
-                    class="form-check-input"
+                <th class="ck">
+                  <input
+                    type="checkbox"
+                    aria-label="Tick all ready work orders"
                     [(ngModel)]="selectAll"
                     (change)="onSelectAllChange()">
                 </th>
-                <th>Work Order No</th>
-                <th>WO Date</th>
+                <th>Work order no.</th>
+                <th>WO date</th>
                 <th>Client</th>
-                <th>Ship Bill No</th>
-                <th>Ship Bill Date</th>
-                <th>Sailing Date</th>
-                <th>Invoice No</th>
+                <th>Ship bill no.</th>
+                <th>Ship bill date</th>
+                <th>Sailing date</th>
+                <th>Invoices</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
               @for (order of workOrders | clientedifilterpipe: searchString; track order) {
-<tr
-                  [class.row-disabled]="!(order.ISIRNDONE == 1 
-                  && order.ISBOL_SENT == 1 
-                  && order.ISAUTHODONE == 0) && order.BILLTYPEFLAG == 1">
-                
-                <td class="sticky-check-col text-center">
-                  <input 
-                    type="checkbox"
-                    class="form-check-input"
-                    [(ngModel)]="order.checked"
-                    (change)="onWOSelectChange()"
-                    [disabled]="!(order.ISIRNDONE == 1 
-                    && order.ISBOL_SENT == 1 
-                    && order.ISAUTHODONE !== 0 && order.BILLTYPEFLAG == 1)">
-                </td>
-                
-                <td [title]="order.WORKORDERNO">
-                  <span class="text-primary fw-semibold"><b>{{ order.WORKORDERNO }}</b></span>
-                </td>
-                <td [title]="order.WORKORDERDT">{{ order.WORKORDERDT }}</td>
-                <td [title]="order.CLIENT">{{ order.CLIENT }}</td>
-                <td [title]="order.SHIPBILLNO">{{ order.SHIPBILLNO }}</td>
-                <td [title]="order.SHIPBILLDT">{{ order.SHIPBILLDT }}</td>
-                <td [title]="order.SAILING">{{ order.SAILING }}</td>
-                <td class="invoice-cell">
-                  <div class="invoice-list">
-                    @for (inv of order.INVOICENO?.split('<br>'); track inv) {
+                <tr
+                  [class.fk-dim]="!(order.ISIRNDONE == 1
+                  && order.ISBOL_SENT == 1
+                  && order.ISAUTHODONE == 0) && order.BILLTYPEFLAG == 1"
+                  [class.upd]="order.checked">
 
-                      <span class="invoice-link" (click)="viewinvoice(inv)" [title]="inv">
-                        {{ inv }}
-                      </span>
-                    
-}
-                  </div>
-                </td>
-              </tr>
-}
+                  <td class="ck">
+                    <input
+                      type="checkbox"
+                      [attr.aria-label]="'Tick work order ' + order.WORKORDERNO"
+                      [(ngModel)]="order.checked"
+                      (change)="onWOSelectChange()"
+                      [disabled]="!(order.ISIRNDONE == 1
+                      && order.ISBOL_SENT == 1
+                      && order.ISAUTHODONE !== 0 && order.BILLTYPEFLAG == 1)">
+                  </td>
+
+                  <td class="mono" [title]="order.WORKORDERNO"><b>{{ order.WORKORDERNO }}</b></td>
+                  <td [title]="order.WORKORDERDT">{{ order.WORKORDERDT }}</td>
+                  <td [title]="order.CLIENT">{{ order.CLIENT }}</td>
+                  <td class="mono" [title]="order.SHIPBILLNO">{{ order.SHIPBILLNO }}</td>
+                  <td [title]="order.SHIPBILLDT">{{ order.SHIPBILLDT }}</td>
+                  <td [title]="order.SAILING">@if (order.SAILING) { {{ order.SAILING }} } @else {<span class="sub-t">—</span>}</td>
+                  <td>
+                    <div class="invs">
+                      @for (inv of order.INVOICENO?.split('<br>'); track inv) {
+                        @let p = ediInv(inv);
+                        <span class="inv">
+                          <button type="button" class="lnk" (click)="viewinvoice(inv)" [title]="inv">{{ p.no }}</button>
+                          @if (p.type) {<span class="chip">{{ p.type }}</span>}
+                          @if (p.dt || p.amt) {<span class="sub-t">{{ p.dt }}@if (p.dt && p.amt) { · }{{ p.amt }}</span>}
+                        </span>
+                      }
+                    </div>
+                  </td>
+                  <td class="st">
+                    @if (ediReady(order)) {
+                      <span class="chip"><span class="dot"></span>Ready</span>
+                    } @else {
+                      <span class="chip dash">Waiting</span><span class="why">{{ ediWhy(order) }}</span>
+                    }
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
-}
-
-        <!-- No Data State -->
-        @if (!isLoading && (!workOrders || workOrders.length === 0)) {
-<div 
-             class="text-center p-4">
-          <i class="fa fa-inbox fa-2x text-muted mb-2"></i>
-          <p class="text-muted mb-0 small">No work orders found.</p>
+        <div class="pager">
+          @if (ediShownCount() > 0) {
+            <span>Showing <b>1–{{ ediShownCount() }}</b> of <b>{{ ediShownCount() }}</b></span>
+          } @else {
+            <span>No work order matches the search</span>
+          }
+          <div class="pages"><button type="button" disabled aria-label="Previous page">‹</button><button type="button" class="on">1</button><button type="button" disabled aria-label="Next page">›</button></div>
         </div>
-}
+      }
 
-      </div>
+      <!-- No Data State (condition unchanged) -->
+      @if (!isLoading && (!workOrders || workOrders.length === 0)) {
+        <div class="ce-empty">No work orders found.</div>
+      }
+    }
+  </div>
+
+  <div class="bar">
+    <span class="note">
+      @if (ediTickedCount() > 0) {
+        {{ ediTickedCount() }} ticked. Generate Excel downloads one zip with the CHA and freight bills (Excel and text) and a log; those work orders then leave the list.
+      } @else {
+        Nothing ticked. Tick work orders, then generate the files.
+      }
+    </span>
+    <div class="r">
+      <button class="btn g" type="button"
+        (click)="GenerateEditxtInvoice()"
+        [disabled]="!hasSelectedItems()">Generate text</button>
+      <button class="btn p" type="button"
+        (click)="GenerateEdiInvoice()"
+        [disabled]="!hasSelectedItems()">Generate Excel</button>
     </div>
   </div>
-}
-
 </div>

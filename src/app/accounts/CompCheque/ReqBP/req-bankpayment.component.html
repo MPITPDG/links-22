@@ -1,431 +1,326 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{Header| uppercase}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Request bank payment - add / edit.
+  Monochrome page kit (import-page.css + ../cheque-page.css). Every [(ngModel)], handler, disabled
+  toggle, total binding (NetTotal / TotalAmount / TotalDeduction) and the TDS modal are unchanged.
+  Links: Save is disabled while isSaving (double-submit guard); GST rate stays hidden.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Header | titlecase }}</h1>
+      <p>Request a company cheque / bank payment, with TDS and GST per line, for authorisation</p>
     </div>
-    <div class="row no-gutters">
-        <div class="col-sm-12 col-md-2 col-lg-2">
-        </div>
-        <div class="col-sm-12 col-md-8 col-lg-8 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td class="col-form-span-heading" colspan="4">
-                        <b> General Details</b>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Entry No</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td> <input [(ngModel)]="EntryNo" type="text" disabled="disabled" class="form-control width150"
-                            maxlength="40"> </td>
-
-                    <td><span class="col-form-span-label"><b>Entry Date</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td>
-                        <my-date-picker name="EntryDate"  (dateChanged)=getentrydate($event) [options]="myDatePickerOptionsInv"
-                            [selDate]="EntryDate"></my-date-picker>
-                    </td>
-                </tr>
-                <tr>
-
-                    <td><span class="col-form-span-label"><b>Narration</b> </span></td>
-                    <td colspan="3"> <input [(ngModel)]="Narration" type="text" class="form-control width700"
-                            [maxlength]="250"> </td>
-                </tr>
-
-                <tr>
-                    <td class="col-form-span-heading" colspan="4">
-                        <b>Cheque Details</b>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Cheque Type</b> </span></td>
-                    <td>
-                        <select class="form-control width200" [(ngModel)]="ChequeType" (change)="chequeEvent($event.target.value)">
-                            <option value="0">Please select</option>
-                            <option selected="selected" value="CHQ">CHEQUE</option>
-                            <option value="Y">NOT OVER</option>
-                            <option value="PO">PAY ORDER</option>
-                            <option value="DD">DEMAND DRAFT</option>
-                            <option value="NEFT">NEFT</option>
-                            <option value="RTGS">RTGS</option>
-                        </select>
-                    </td>
-                    <td colspan="2">
-                        <span class="col-form-span-label" style="color: #d32e28;"><b>{{labelbind}}</b></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Cheque No.</b> </span><span
-                            class="col-form-span-error">*</span>
-                    </td>
-                    <td>
-                        <input [(ngModel)]="ChequeNo" [OnlyNumber]="true" type="text" class="form-control width150"
-                            maxlength="7">
-                    </td>
-                    <td><span class="col-form-span-label"><b>CHQ Pay By dt</b> </span></td>
-                    <td>
-                        <my-date-picker name="ChequeDate" [options]="myDatePickerOptionsInv" [selDate]="ChequeDate" (dateChanged)=getchqdate($event)>
-                        </my-date-picker>
-                    </td>
-
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Our bank</b> </span></td>
-                    <td>
-                        <select class="form-control width250" [(ngModel)]="OurBank" (change)="GetOurBankName($event)">
-                            <option value="0">Please select</option>
-                            @for (d of OurBankList; track d) {
-<option value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
-}
-
-                        </select>
-                    </td>
-
-                    <td><span class="col-form-span-label"><b>Bank Name</b> </span></td>
-                    <td> <input [(ngModel)]="BankName" type="text" class="form-control width150" maxlength="40"> </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Payee Name</b> </span></td>
-                    <td colspan="3"> <input [(ngModel)]="PayeeName" type="text" class="form-control width700"
-                            maxlength="150"> </td>
-
-                </tr>
-                <tr>
-                    <td class="col-form-span-heading" colspan="4">
-                        <b>Accounts Details</b>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Account Name</b> </span><span class="col-form-span-error">*</span></td>
-                    <td colspan="3">
-                        <ng-select [items]="AccountNameList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
-                            [(ngModel)]="AccountName" (change)="GetActName($event.ACCTCODENAME)" class="custom "
-                            placeholder="--Select--">
-                        </ng-select>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Item</b> </span><span class="col-form-span-error">*</span></td>
-                    <td colspan="3">
-                        <ng-select [items]="ItemList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Item"
-                            class="custom " placeholder="--Select--">
-                        </ng-select>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b> TDS Applicable</b> </span><span
-                            class="col-form-span-error">*</span>
-                    </td>
-                    <td style=" display: flex; ">
-                        <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
-                            <select class="form-control width150"  [(ngModel)]="TDSApplicable"   >
-                            <option value="">--Please select--</option>
-                            <option value="Y">Y</option>
-                            <option value="N">N</option>
-                           </select>
-
-                </td>
-                <td  class="col-form-span-heading" colspan="2">
-
-                    <div style="display: flex;float: left;" >
-                        <span class="col-form-span-label" style="color: crimson;"><b>{{chktdslbl}}</b> </span>
-                        <span class="col-form-span-label"> <input type="checkbox"
-                              [(ngModel)]="chkIsTDS"  [disabled]='disablecheckbox'
-                                /> </span>
-                    </div>
-                </td>
-
-
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>GST Applicable</b> </span></td>
-                    <td style=" display: flex; ">
-                        <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
-                            <select class="form-control width150"  [(ngModel)]="GSTApplicable"   >
-                                <option  value="" >-- Please Select --</option>
-                                <option value="1">Y</option>
-                                <option value="0" >N</option>
-                                <option value="2" >RCM</option>
-                           </select>
-                    </td>
-                    <!-- <td><span class="col-form-span-label"><b>GST Rate</b> </span></td>
-                    <td style=" display: flex; ">
-                        
-                            <select class="form-control width150"  [(ngModel)]="gstrate"   >
-                                <option value="0">--Please select--</option>
-                                <option *ngFor="let d of gstratelist"  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
-                           </select>
-                    </td> -->
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Entry Type</b> </span><span class="col-form-span-error">*</span></td>
-                    <td>
-                        <ng-select [items]="entrytable" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
-                            [(ngModel)]="EntryType" class="custom " placeholder="--Select--">
-                        </ng-select>
-                    </td>
-                    <td><span class="col-form-span-label"><b>Department</b> </span></td>
-                    <td>
-                        <select class="form-control width150" [(ngModel)]="Department"
-                            (change)="GetDepartmentName($event)">
-                            <option value="0">Please select</option>
-                            @for (d of Departmentlist; track d) {
-<option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
-}
-
-                        </select>
-                    </td>
-
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Bill No</b> </span></td>
-                    <td> <input [(ngModel)]="BillNo" type="text" [OnlyNumber]="true" (change)="fnBillNoChk()" class="form-control width150"
-                            maxlength="15"> </td>
-
-                    <td><span class="col-form-span-label"><b> Job No</b> </span><span
-                            class="col-form-span-error">*</span>
-                    </td>
-                    <td> <input [(ngModel)]="JobNo" [OnlyNumber]="true" type="text"
-                            (blur)="ValidateJobNo()" class="form-control width150" maxlength="15">
-                    </td>
-
-
-
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b> Amount</b> </span><span
-                            class="col-form-span-error">*</span>
-                    </td>
-                    <td> <input [(ngModel)]="Amount" type="text" [OnlyNumber]="true"
-                            class="form-control width150" maxlength="40"> </td>
-
-                    <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
-                    <td> <input [(ngModel)]="Deduction" [OnlyNumber]="true" type="text"
-                            class="form-control width150" maxlength="40"> </td>
-
-                </tr>
-
-                <tr>
-                    <td><span class="col-form-span-label"><b>Narration</b> </span></td>
-                    <td colspan="3">
-                        <input [(ngModel)]="ShortNarration" type="text" class="form-control width500" maxlength="200">
-                    </td>
-                </tr>
-
-                <tr>
-                    <td colspan="4" class="centerlabel">
-                        <button class="btn btn-sm btn-success" type="submit" (click)="Addchildrcrd()"> <span
-                                class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>
-                                {{txtchild}}</span></button>
-                        <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
-                                (click)="Resetchildrcrd();"><i class="fa fa-ban"></i> Reset</span></button>
-                                <button class="btn btn-sm btn-success" type="submit" [disabled]='disabletdsbtn'> <span class="col-form-span-label"
-                                    (click)="!disabletdsbtn && OpenTdsModal();"><i class="fa fa-dot-circle-o"></i> Cal TDS</span></button>
-                                    <button class="btn btn-sm btn-danger" type="reset"  [disabled]='disableresetbtn'> <span class="col-form-span-label"
-                                     (click)="!disableresetbtn && ResetTDS()"><i class="fa fa-ban"></i> Reset TDS</span></button>
-                    </td>
-                </tr>
-
-                <tr>
-
-                    <td><span class="col-form-span-heading"><b> Net Total</b> </span></td>
-                    <td> <input [(ngModel)]="NetTotal" disabled="disabled" type="text" class="form-control width150"
-                            maxlength="40"> </td>
-
-                    <td colspan="2"></td>
-                </tr>
-
-                <tr>
-                    <td><span class="col-form-span-label"><b> Amount</b> </span></td>
-                    <td> <input [(ngModel)]="TotalAmount" disabled="disabled" type="text" class="form-control width150"
-                            maxlength="40"> </td>
-
-                    <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
-                    <td> <input [(ngModel)]="TotalDeduction" disabled="disabled" type="text"
-                            class="form-control width150" maxlength="40"> </td>
-
-                </tr>
-                <tr>
-                    <td colspan="4">
-                        <div class="row xyscroll" style="width:800px;">
-                            <div class="col-12">
-                            @if (Accountlist.length>0) {
-<table class="table table-responsive-sm table-bordered">
-                                <thead>
-                                    <tr class="bakgrdliteBlue">
-                                        <th class="col-form-span-label"></th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">Account Name</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">Amount</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">Deduction</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">Entry Type</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">TDS</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">GST</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">Item</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">Department</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">Bill No</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">Job No</th>
-                                        <th class="col-form-span-label font-weight-bold headerwhite">Narration</th>
-                                    </tr>
-                                </thead>
-                                @if (Accountlist.length>0) {
-<tbody>
-                                    @for (obj of Accountlist; track obj) {
-<tr>
-                                        <td class="centerlabel">
-                                            <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)"></i>
-                                            &nbsp;
-                                            <i class="fa fa-trash" (click)="deletechildrecd(obj.ID,obj.ACC_BANKDTLS_ID)"></i>
-                                        </td>
-                                        <td><span class="col-form-span-label" [innerHtml]="obj.ACCOUNT_NAME"> </span>
-                                        </td>
-                                        <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>
-                                        <td><span class="col-form-span-label">{{obj.DEDUCTION}}</span></td>
-                                        <td><span class="col-form-span-label">{{obj.ET}}</span></td>
-                                        <td><span class="col-form-span-label">{{obj.IS_TDS}}</span></td>
-                                        <td><span class="col-form-span-label">{{obj.GST}}</span></td>
-                                        <td><span class="col-form-span-label">{{obj.ITEM}}</span></td>
-                                        <td><span class="col-form-span-label">{{obj.DEPARTMENT}}</span></td>
-                                        <td><span class="col-form-span-label">{{obj.BILLNO}}</span></td>
-                                        <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
-                                        <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
-                                    </tr>
-}
-                                </tbody>
-}
-                            </table>
-}
-                        </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="4" class="centerlabel">
-                        <button class="btn btn-sm btn-success" type="submit" [disabled]="isSaving" (click)="Add_Main()"> <span
-                                class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> {{text}}</span></button>
-                        <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
-                                (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
-                    </td>
-                </tr>
-
-
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-2 col-lg-2">
-        </div>
+    <div class="tools">
+      @if (EntryNo) {
+        <span class="chip solid">{{ EntryNo }}</span>
+      } @else {
+        <span class="chip dash">New</span>
+      }
     </div>
+  </div>
 
-</div>
-<div class="modal" [style.display]="showModal_TDS ? 'block' : 'none' "  >
-    <div class="modal-dialog modal-lg" role="document" style="width: 700px;">
-        <div class="modal-content">
-            <div class="card-header formheading">
-                <!-- <h5 class="modal-title">TDS Details</h5> -->
-                <strong>TDS Details</strong>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col" style="height:400px;overflow-y: auto; ">
-                        <table class="table table-bordered table-sm-new bgwhite">
-                            <tr>
-                                <td colspan="6">
-                                    <!-- <input type="text" [(ngModel)]="term"
-                                        style="float: right;width: 200px;font-family: verdana;font-size:11px;padding: 1px;"
-                                        placeholder="Search by Job Number"> -->
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <thead style="text-align: center;">
-                                        <tr>
-                                            <th class="col-form-span-label"></th>
-                                            <th class="col-form-span-label">Acct Name.</th>
-                                            <th class="col-form-span-label">Section</th>
-                                            <th class="col-form-span-label">LDC Limit</th>
-                                            <th class="col-form-span-label">Utilized Amt</th>
-                                            <th class="col-form-span-label">LDC Rate %</th>
-                                            <th class="col-form-span-label">Base Rate %</th>
-                                            <th class="col-form-span-label">BP Amt</th>
-                                            <th class="col-form-span-label">TDS Amount</th>
-                                            <th class="col-form-span-label">Remarks</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                           @for (obj of TDSList ; track obj) {
-<tr>
-                                            <td class="col-form-span-label">
-                                                <input type="checkbox" [(ngModel)]="obj.Checked" [id]="i" [value]="i" [disabled]="obj.Disabled"
-                                                     (ngModelChange)="getCheckedTDSData($event,obj.TDSACCTID,obj.RATE,obj.TDSAMOUNT,obj.AMOUNT,obj.ITEMCODE,obj.NARRATION,obj.RATETYPE,obj.LDCRATE,obj.ACCTID,obj.OFFLAG)">
-                                                &nbsp;
-                                            </td>
-                                            <td class="col-form-span-label">{{obj.ACCTNAME}}</td>
-                                            <td class="col-form-span-label">{{obj.SECTIONNAME}}</td>
-                                            <td class="col-form-span-label">{{obj.TDS_LIMIT_AMT}}</td>
-                                            <td class="col-form-span-label">{{obj.UTIAMT}}</td>
-                                            <td class="col-form-span-label">{{obj.LDCRATE}}</td>
-                                            <td class="col-form-span-label">{{obj.RATE}}</td>
-                                            <td class="col-form-span-label">{{obj.AMOUNT}}</td>
-                                            <td class="col-form-span-label">{{obj.TDSAMOUNT}}</td>
-                                            <td class="col-form-span-label">{{obj.NARRATION}}</td>
-
-
-                                        </tr>
-}
-
-
-                        </tbody>
-                    </td>
-                </tr>
-                        </table>
-                         <table class="table table-bordered table-sm-new bgwhite">
-                            <td colspan="9" align="center">
-                                <tr >
-                                    <td colspan="5"><span class="col-form-span-label">Total BP Amount :  </span>
-                                        <span class="col-form-span-label"><b>{{totpiamt}}</b> </span>
-                                    </td>
-                                    <td align="right" colspan="4"><span class="col-form-span-label">Selected Amount  :  </span>
-                                        <span class="col-form-span-label"><b>{{seltaxableamt}}</b> </span>
-                                    </td>
-                                    <td>
-                                        <thead style="text-align: center;">
-                                            <tr>
-                                              <th class="col-form-span-label">Section</th>
-                                              <th class="col-form-span-label">Total Tds Amount</th>
-                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            @for (obj of TotalTDSList ; track obj) {
-<tr>
-                                             <td class="col-form-span-label"><b>{{obj.SECTIONNAME}}</b></td>
-                                             <td class="col-form-span-label"><b>{{obj.TOTTDSAMOUNT}}</b></td>
-                                         </tr>
-}
-                                         </tbody>
-                                    </td>
-                                </tr>
-
-                            </td>
-                         </table>
-                    </div>
-                </div>
-                <div class="card-header formheading" style="height:25px" >
-                    <button class="btn btn-sm btn-danger" style="float: right;" type="reset"> <span class="col-form-span-label"
-                        (click)="closeTdsModal()"><i class="fa fa-ban"></i>
-                        Close</span></button>
-                    <button class="btn btn-sm btn-success" style="float: right;" type="submit" (click)="AddtdsDetails()"> <span
-                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Add</span></button>
-
-                </div>
-            </div>
-        </div>
+  <div class="card sec">
+    <div class="card-h">
+      <h2>General details</h2>
+      <span class="meta"><b>*</b> required</span>
     </div>
+    <div class="fields">
+      <div class="fld">
+        <label>Entry no. <span class="req">*</span></label>
+        <input [(ngModel)]="EntryNo" type="text" disabled="disabled" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Entry date <span class="req">*</span></label>
+        <my-date-picker name="EntryDate" (dateChanged)=getentrydate($event) [options]="myDatePickerOptionsInv"
+          [selDate]="EntryDate"></my-date-picker>
+      </div>
+      <div class="fld full">
+        <label>Narration</label>
+        <input [(ngModel)]="Narration" type="text" [maxlength]="250">
+      </div>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Cheque details</h2>
+      @if (labelbind) {
+        <span class="meta"><b>{{labelbind}}</b></span>
+      }
+    </div>
+    <div class="fields">
+      <div class="fld">
+        <label>Cheque type</label>
+        <select [(ngModel)]="ChequeType" (change)="chequeEvent($event.target.value)">
+          <option value="0">Please select</option>
+          <option selected="selected" value="CHQ">CHEQUE</option>
+          <option value="Y">NOT OVER</option>
+          <option value="PO">PAY ORDER</option>
+          <option value="DD">DEMAND DRAFT</option>
+          <option value="NEFT">NEFT</option>
+          <option value="RTGS">RTGS</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label>Cheque no. <span class="req">*</span></label>
+        <input [(ngModel)]="ChequeNo" [OnlyNumber]="true" type="text" maxlength="7">
+      </div>
+      <div class="fld">
+        <label>Cheque pay-by date</label>
+        <my-date-picker name="ChequeDate" [options]="myDatePickerOptionsInv" [selDate]="ChequeDate" (dateChanged)=getchqdate($event)>
+        </my-date-picker>
+      </div>
+      <div class="fld">
+        <label>Our bank</label>
+        <select [(ngModel)]="OurBank" (change)="GetOurBankName($event)">
+          <option value="0">Please select</option>
+          @for (d of OurBankList; track d) {
+            <option value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Bank name</label>
+        <input [(ngModel)]="BankName" type="text" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Payee name</label>
+        <input [(ngModel)]="PayeeName" type="text" maxlength="150">
+      </div>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Account line</h2>
+      <span class="meta">{{ txtchild === 'Update' ? 'Editing a line' : 'Add a line to the grid below' }}</span>
+    </div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Account name <span class="req">*</span></label>
+        <ng-select [items]="AccountNameList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
+          [(ngModel)]="AccountName" (change)="GetActName($event.ACCTCODENAME)" class="custom "
+          placeholder="--Select--">
+        </ng-select>
+      </div>
+      <div class="fld full">
+        <label>Item <span class="req">*</span></label>
+        <ng-select [items]="ItemList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Item"
+          class="custom " placeholder="--Select--">
+        </ng-select>
+      </div>
+      <div class="fld">
+        <label>TDS applicable <span class="req">*</span></label>
+        <select [(ngModel)]="TDSApplicable">
+          <option value="">--Please select--</option>
+          <option value="Y">Y</option>
+          <option value="N">N</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label>{{ chktdslbl || 'TDS' }}</label>
+        <div class="v-radios">
+          <label><input type="checkbox" [(ngModel)]="chkIsTDS" [disabled]='disablecheckbox' /> {{ chkIsTDS ? 'Yes' : 'No' }}</label>
+        </div>
+      </div>
+      <div class="fld">
+        <label>GST applicable</label>
+        <select [(ngModel)]="GSTApplicable">
+          <option value="">-- Please Select --</option>
+          <option value="1">Y</option>
+          <option value="0">N</option>
+          <option value="2">RCM</option>
+        </select>
+      </div>
+      <!-- Links: the GST rate picker is hidden on this screen (commented out in Links before the restyle). -->
+      <div class="fld">
+        <label>Entry type <span class="req">*</span></label>
+        <ng-select [items]="entrytable" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+          [(ngModel)]="EntryType" class="custom " placeholder="--Select--">
+        </ng-select>
+      </div>
+      <div class="fld">
+        <label>Department</label>
+        <select [(ngModel)]="Department" (change)="GetDepartmentName($event)">
+          <option value="0">Please select</option>
+          @for (d of Departmentlist; track d) {
+            <option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Bill no.</label>
+        <input [(ngModel)]="BillNo" type="text" [OnlyNumber]="true" (change)="fnBillNoChk()" maxlength="15">
+      </div>
+      <div class="fld">
+        <label>Job no. <span class="req">*</span></label>
+        <input [(ngModel)]="JobNo" [OnlyNumber]="true" type="text" (blur)="ValidateJobNo()" maxlength="15">
+      </div>
+      <div class="fld">
+        <label>Amount <span class="req">*</span></label>
+        <input [(ngModel)]="Amount" type="text" [OnlyNumber]="true" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Deduction</label>
+        <input [(ngModel)]="Deduction" [OnlyNumber]="true" type="text" maxlength="40">
+      </div>
+      <div class="fld full">
+        <label>Line narration</label>
+        <input [(ngModel)]="ShortNarration" type="text" maxlength="200">
+      </div>
+    </div>
+    <div class="v-actions">
+      <button class="btn p" type="submit" (click)="Addchildrcrd()">{{txtchild}} line</button>
+      <button class="btn g" type="reset" (click)="Resetchildrcrd();">Reset line</button>
+      <span class="sp"></span>
+      <button class="btn g" type="submit" [disabled]='disabletdsbtn' (click)="!disabletdsbtn && OpenTdsModal();">Calculate TDS</button>
+      <button class="btn g" type="reset" [disabled]='disableresetbtn' (click)="!disableresetbtn && ResetTDS()">Reset TDS</button>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Lines</h2>
+      <span class="meta">{{ Accountlist.length }} {{ Accountlist.length === 1 ? 'line' : 'lines' }}</span>
+    </div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Net total</label>
+        <input [(ngModel)]="NetTotal" disabled="disabled" type="text" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Amount</label>
+        <input [(ngModel)]="TotalAmount" disabled="disabled" type="text" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Deduction</label>
+        <input [(ngModel)]="TotalDeduction" disabled="disabled" type="text" maxlength="40">
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Account name</th>
+            <th class="num">Amount</th>
+            <th class="num">Deduction</th>
+            <th>Entry type</th>
+            <th>TDS</th>
+            <th>GST</th>
+            <th>Item</th>
+            <th>Department</th>
+            <th>Bill no.</th>
+            <th>Job no.</th>
+            <th>Narration</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (obj of Accountlist; track obj) {
+            <tr>
+              <td class="act l">
+                <button type="button" (click)="Editchildrecd(obj.ID)">Edit</button>
+                <button type="button" (click)="deletechildrecd(obj.ID,obj.ACC_BANKDTLS_ID)">Delete</button>
+              </td>
+              <td><span [innerHtml]="obj.ACCOUNT_NAME"></span></td>
+              <td class="num">{{obj.AMOUNT}}</td>
+              <td class="num">{{obj.DEDUCTION}}</td>
+              <td>{{obj.ET}}</td>
+              <td>{{obj.IS_TDS}}</td>
+              <td>{{obj.GST}}</td>
+              <td>{{obj.ITEM}}</td>
+              <td>{{obj.DEPARTMENT}}</td>
+              <td class="mono">{{obj.BILLNO}}</td>
+              <td class="mono">{{obj.JOBNO}}</td>
+              <td>{{obj.NARRATION}}</td>
+            </tr>
+          } @empty {
+            <tr><td class="empty" colspan="12">No lines yet. Add one above.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose {{text}}.</span>
+    <div class="r">
+      <button class="btn g" type="reset" (click)="Reset();">Reset</button>
+      <button class="btn p" type="submit" [disabled]="isSaving" (click)="Add_Main()">{{text}}</button>
+    </div>
+  </div>
+
+  <!-- TDS -->
+  <div class="modal v-modal v-modal-lg" [style.display]="showModal_TDS ? 'block' : 'none'">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="card-h">
+          <h2>TDS details</h2>
+          <span class="meta">Total BP amount <b>{{totpiamt}}</b> · Selected amount <b>{{seltaxableamt}}</b></span>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Acct name</th>
+                <th>Section</th>
+                <th class="num">LDC limit</th>
+                <th class="num">Utilized amt</th>
+                <th class="num">LDC rate %</th>
+                <th class="num">Base rate %</th>
+                <th class="num">BP amt</th>
+                <th class="num">TDS amount</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (obj of TDSList; track obj) {
+                <tr>
+                  <td>
+                    <input type="checkbox" [(ngModel)]="obj.Checked" [id]="'tds' + $index" [value]="$index" [disabled]="obj.Disabled"
+                      (ngModelChange)="getCheckedTDSData($event,obj.TDSACCTID,obj.RATE,obj.TDSAMOUNT,obj.AMOUNT,obj.ITEMCODE,obj.NARRATION,obj.RATETYPE,obj.LDCRATE,obj.ACCTID,obj.OFFLAG)">
+                  </td>
+                  <td>{{obj.ACCTNAME}}</td>
+                  <td>{{obj.SECTIONNAME}}</td>
+                  <td class="num">{{obj.TDS_LIMIT_AMT}}</td>
+                  <td class="num">{{obj.UTIAMT}}</td>
+                  <td class="num">{{obj.LDCRATE}}</td>
+                  <td class="num">{{obj.RATE}}</td>
+                  <td class="num">{{obj.AMOUNT}}</td>
+                  <td class="num">{{obj.TDSAMOUNT}}</td>
+                  <td>{{obj.NARRATION}}</td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="10">No TDS lines.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Section</th>
+                <th class="num">Total TDS amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (obj of TotalTDSList; track obj) {
+                <tr>
+                  <td><b>{{obj.SECTIONNAME}}</b></td>
+                  <td class="num"><b>{{obj.TOTTDSAMOUNT}}</b></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="v-actions">
+          <span class="sp"></span>
+          <button class="btn g" type="reset" (click)="closeTdsModal()">Close</button>
+          <button class="btn p" type="submit" (click)="AddtdsDetails()">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

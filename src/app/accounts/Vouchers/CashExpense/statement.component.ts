@@ -9,6 +9,7 @@ import { ToastCommonService } from 'src/app/shared/service/toastService';
 @Component({
   selector: 'app-statement',
   templateUrl: './statement.component.html',
+  styleUrls: ['../vouchers-page.css'],
   styles: [],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
@@ -30,8 +31,8 @@ Display="1"
   public myDatePickerOptions: IMyDpOptions = {
     dateFormat: 'dd-mmm-yyyy',
     inline: false,
-    height: '18px',
-    width: '180px',
+    height: '30px',
+    width: '100%',
     componentDisabled: false,
     selectionTxtFontSize: '12px',
     editableDateField: false,

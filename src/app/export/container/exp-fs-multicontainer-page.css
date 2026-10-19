@@ -1,0 +1,60 @@
+/* ----------------------------------------------------------------
+   Factory stuffing, multi-container - Add and Edit (Links-only screens,
+   approved mock m5): screen-level additions on top of the GLOBAL page kit
+   (src/styles/kit/import-page.css, root .im-page) and consignment-page.css
+   (host class kit-consignment). Only the mock-only helpers the kit does not
+   carry; monochrome, no new colours.
+     1. .fields.ovf: the kit clips a field grid (overflow: hidden) to trim the
+        outer cell rules; the vessel ng-select must open its list past it.
+     2. .pair: two selects side by side in one field cell (size + type).
+     3. .w-240: a short select in a full-width row.
+     4. .mono inputs: numbers in the numeric face (kit-consignment's .mono
+        sets the family; keep the size the kit uses for table numbers).
+     5. grid: left-aligned row actions, the row being edited / last saved
+        (tr.upd) and rows still carrying a CONTAINERNO placeholder (tr.dim).
+   ---------------------------------------------------------------- */
+
+/* 1. let the ng-select dropdown escape the field grid */
+.im-page .fields.ovf {
+    overflow: visible;
+}
+
+/* 2. paired selects */
+.im-page .pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+}
+
+/* 3. short select */
+.im-page select.w-240 {
+    max-width: 240px;
+}
+
+/* 4. numeric face */
+.im-page input.mono,
+.im-page select.mono {
+    font-family: var(--num);
+    font-size: 12.5px;
+}
+
+/* 5. grid */
+.im-page table.tbl td.mono {
+    white-space: nowrap;
+}
+
+.im-page td.act.l {
+    text-align: left;
+}
+
+.im-page td.act.l button {
+    margin: 0 4px 0 0;
+}
+
+.im-page table.tbl tr.dim:not(.upd) td {
+    color: var(--soft);
+}
+
+.im-page table.tbl tr.upd td {
+    background: var(--mp-accent-soft, #EBEBEB);
+}

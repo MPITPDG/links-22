@@ -1,133 +1,117 @@
-﻿<div class="animated fadeIn">
-	<div class="row">
-		<div class="col-sm-2">
-		</div>
-		<div class="col-sm-8">
-			<app-shipment-progress-common-view [ExptNo]="ExptNo"></app-shipment-progress-common-view>
-			<table class="table table-bordered table-sm-new">
-				<tr class="trbg">
-					<td colspan="8"><span class="col-form-span-label"><b>DESTINATION DOCUMENTS DETAILS</b></span></td>
-				</tr>
-			</table>
-			@if (docRecdList.length>0) {
-<table class="table table-bordered table-sm-new">
-				<tr class="trbg">
-					<td colspan="8"><span class="col-form-span-label"><b>DOCUMENTS RECEIVED</b></span></td>
-				</tr>
-			</table>
-}
-			@if (docRecdList.length>0) {
-<table class="table table-bordered table-sm-new">
-				<thead>
-					<tr class="trbg">
-						<th class="width100"><span class="col-form-span-label"></span></th>
-						<th><span class="col-form-span-label">DOCUMENT NAME</span></th>
-						<th><span class="col-form-span-label">RECD DATE</span></th>
-					</tr>
-				</thead>
-				<tbody>
-					@for (obj of docRecdList; track obj) {
-<tr>
-						<td class="width100"><span class="col-form-span-label">{{obj.DOCCODE}}</span></td>
-						<td><span class="col-form-span-label">{{obj.DOCUMENT}}</span></td>
-						<td><span class="col-form-span-label">{{obj.RECDDT}}</span></td>
-					</tr>
-}
-				</tbody>
-			</table>
-}
-			<table class="table table-bordered table-sm-new">
-				<tr class="trbg">
-					<td colspan="8"><span class="col-form-span-label"><b>OTHER DOCUMENTS</b></span></td>
-				</tr>
-			</table>
-			@if (mainList.length>0) {
-<table class="table table-bordered table-sm-new">
-				<thead>
-					<tr class="trbg">
-						<th class="width100"><span class="col-form-span-label"></span></th>
-						<th class="centerlabel" colspan="3"><span class="col-form-span-label">DOCUMENT NAME</span></th>
-						<th class="centerlabel width100" colspan="2"><span class="col-form-span-label">RECD</span></th>
-						<th class="centerlabel width80"><span class="col-form-span-label">CALL FOR</span></th>
-						<th class="centerlabel width80"><span class="col-form-span-label">NA</span></th>
-					</tr>
-				</thead>
-				<tbody>
-					@for (obj of mainList; track obj) {
-<tr>
-						<td class="width100"><span class="col-form-span-label">{{obj.DOCCODE}}</span></td>
-						<td colspan="3"><span class="col-form-span-label">{{obj.DOCUMENT}}</span></td>
-						<td class="centerlabel">
-							<span class="col-form-span-label">
-								<input type="radio" name="{{obj.DOCCODE}}" value="{{'R'+obj.DOCCODE}}" [(ngModel)]="obj.RECD" (change)="obj.CALL=null;obj.NA=null;obj.RECDDT=null" />
-							</span>
-						</td>
-						<td [ngClass]="(obj.RECD !== null && obj.RECDDT === null)? 'width100 bgred' : 'width100'">
-							<my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="obj.RECDDT" [disabled]="obj.RECD == null"></my-date-picker>
-						</td>
-						<td class="centerlabel">
-							<span class="col-form-span-label">
-								<input type="radio" name="{{obj.DOCCODE}}" value="{{'C'+obj.DOCCODE}}" [(ngModel)]="obj.CALL" (change)="obj.RECD=null;obj.NA=null;obj.RECDDT=null" />
-							</span>
-						</td>
-						<td class="centerlabel">
-							<span class="col-form-span-label">
-								<input type="radio" name="{{obj.DOCCODE}}" value="{{'N'+obj.DOCCODE}}" [(ngModel)]="obj.NA" (change)="obj.RECD=null;obj.CALL=null;obj.RECDDT=null" />
-							</span>
-						</td>
-					</tr>
-}
-				</tbody>
-			</table>
-}
-			@if (IsDocumentSent) {
-<table class="table table-bordered table-sm-new">
-				<tr class="trbg">
-					<td colspan="8"><span class="col-form-span-label"><b>DOCUMENT SENT TO CONSIGNEE</b></span></td>
-				</tr>
-			</table>
-}
-			@if (IsDocumentSent) {
-<table class="table table-bordered table-sm-new">
-				<tr>
-					<td class="width150"><span class="col-form-span-label">Date</span></td>
-					<td colspan="3">
-						<my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="Date"></my-date-picker>
-					</td>
-					<td class="width150"><span class="col-form-span-label">Courier No.</span></td>
-					<td colspan="3">
-						<input type="text" [(ngModel)]="CourierNo" class="form-control" [maxlength]="40" />
-					</td>
-				</tr>
-				<tr>
-					<td class="width150"><span class="col-form-span-label">Remark</span></td>
-					<td colspan="7">
-						<textarea rows="2" class="form-control" [(ngModel)]="Remark" [maxlength]="400"></textarea>
-					</td>
-				</tr>
-			</table>
-}
-			<table class="table table-bordered table-sm-new">
-				@if (ErrorMessage != '') {
-<tr class="trbg centerlabel">
-					<td colspan="8">
-						<span class="col-form-span-error">{{ErrorMessage}}</span>
-					</td>
-				</tr>
-}
-				<tr class="trbg centerlabel">
-					<td colspan="8">
-						<button type="button" name="submitButton" class="btn btn-l btn-success" (click)="submit();" [disabled]="ErrorMessage != ''" #submitButton>
-							<span class="col-form-span-label"><app-font-changer [fontIndex]="'14'"></app-font-changer> Submit</span>
-						</button>
-						<button type="button" name="abortButton" class="btn btn-l btn-danger" (click)="abort();">
-							<span class="col-form-span-label"><app-font-changer [fontIndex]="'7'"></app-font-changer> Abort</span>
-						</button>
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div class="col-sm-2">
-		</div>
-	</div>
+﻿<!-- Shipment progress - destination documents. Import page kit, compact form; bindings unchanged. -->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Destination documents</h1>
+      <p>Track documents received, outstanding and sent to the consignee</p>
+    </div>
+    <div class="tools">
+      <span class="chip">{{ExptNo}}</span>
+    </div>
+  </div>
+
+  <app-shipment-progress-common-view [ExptNo]="ExptNo"></app-shipment-progress-common-view>
+
+  @if (docRecdList.length>0) {
+    <div class="card sec">
+      <div class="card-h"><h2>Documents received</h2><span class="meta">{{docRecdList.length}}</span></div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Document name</th>
+              <th>Recd date</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (obj of docRecdList; track obj) {
+              <tr>
+                <td class="mono">{{obj.DOCCODE}}</td>
+                <td>{{obj.DOCUMENT}}</td>
+                <td>{{obj.RECDDT}}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Other documents</h2>
+      @if (IsAllRecd == 'YES') { <span class="chip solid">All received</span> }
+      @if (IsAllRecd == 'NO') { <span class="chip dash">Outstanding</span> }
+    </div>
+    @if (mainList.length>0) {
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th colspan="3">Document name</th>
+              <th colspan="2">Recd</th>
+              <th>Call for</th>
+              <th>NA</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (obj of mainList; track obj) {
+              <tr>
+                <td class="mono">{{obj.DOCCODE}}</td>
+                <td colspan="3">{{obj.DOCUMENT}}</td>
+                <td class="chk">
+                  <input type="radio" name="{{obj.DOCCODE}}" value="{{'R'+obj.DOCCODE}}" [(ngModel)]="obj.RECD" (change)="obj.CALL=null;obj.NA=null;obj.RECDDT=null" />
+                </td>
+                <td [ngClass]="(obj.RECD !== null && obj.RECDDT === null)? 'miss' : ''">
+                  <my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="obj.RECDDT" [disabled]="obj.RECD == null"></my-date-picker>
+                </td>
+                <td class="chk">
+                  <input type="radio" name="{{obj.DOCCODE}}" value="{{'C'+obj.DOCCODE}}" [(ngModel)]="obj.CALL" (change)="obj.RECD=null;obj.NA=null;obj.RECDDT=null" />
+                </td>
+                <td class="chk">
+                  <input type="radio" name="{{obj.DOCCODE}}" value="{{'N'+obj.DOCCODE}}" [(ngModel)]="obj.NA" (change)="obj.RECD=null;obj.CALL=null;obj.RECDDT=null" />
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="sp-empty">No outstanding documents.</div>
+    }
+  </div>
+
+  @if (IsDocumentSent) {
+    <div class="card sec">
+      <div class="card-h"><h2>Sent to consignee</h2><span class="meta">dd/mm/yyyy</span></div>
+      <div class="fields">
+        <div class="fld">
+          <label>Date</label>
+          <my-date-picker name="mydatepicker" [options]="myDatePickerOptions" [(ngModel)]="Date"></my-date-picker>
+        </div>
+        <div class="fld">
+          <label>Courier no.</label>
+          <input type="text" [(ngModel)]="CourierNo" [maxlength]="40" />
+        </div>
+        <div class="fld full top">
+          <label>Remark</label>
+          <textarea rows="2" [(ngModel)]="Remark" [maxlength]="400"></textarea>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (ErrorMessage != '') {
+    <div class="sp-note">{{ErrorMessage}}</div>
+  }
+
+  <div class="bar">
+    <span class="note">Mark each outstanding document as received (with a date), called for, or not applicable.</span>
+    <div class="r">
+      <button type="button" name="abortButton" class="btn g" (click)="abort();"><app-font-changer [fontIndex]="'7'"></app-font-changer> Cancel</button>
+      <button type="button" name="submitButton" class="btn p" (click)="submit();" [disabled]="ErrorMessage != ''" #submitButton><app-font-changer [fontIndex]="'14'"></app-font-changer> Update</button>
+    </div>
+  </div>
 </div>

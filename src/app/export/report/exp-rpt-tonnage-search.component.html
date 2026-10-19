@@ -1,164 +1,126 @@
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3"></div>
-                    <div class="col-md-6">
-                        <table class="table table-bordered table-sm-new">
-                            <tbody style='height:30px'>
-                                <tr>
-                                    <td class="col-form-span-heading  centerlabel " colspan="4">
-                                        Tonnage
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span class="col-form-span-label ">Mode</span>
-                                    </td>
-                                    <td>
-                                        <span class="col-form-span-label">
-                                            <input type="radio" name="radiogroupM" (click)="ModeCheck('1')" [checked]="checkmode == '1'">&nbsp; Sea
-                                        </span>
-                                    </td>
-                                    <td colspan="2">
-                                        <span class="col-form-span-label">
-                                            <input type="radio" name="radiogroupM" (click)="ModeCheck('2')" [checked]="checkmode == '2'" />&nbsp; Air
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="col-form-span-heading" colspan="4">
-                                        <input type="radio" name="radiogroupD" (click)="mainchkDate('1')" [checked]="checkdate == '1'">&nbsp; Datewise
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span class="col-form-span-label ">From Date</span>
-                                    </td>
-                                    <td>
-                                        <my-date-picker name="dtfrm" [options]="myDatePickerOptions" [(ngModel)]="dtfrmt" required [disabled]=fddisable></my-date-picker>
-                                    </td>
-                                    <td>
-                                        <span class="col-form-span-label ">To Date</span>
-                                    </td>
-                                    <td>
-                                        <my-date-picker name="dtpto" [options]="myDatePickerOptions" [(ngModel)]="dtto" required [disabled]=fddisable></my-date-picker>
-                                    </td>
+﻿<!--
+  Export -> Report -> Tonnage.
+  Recipe 2 (form page): onexcelGeneration() downloads a server-generated
+  .xls (mode/date/subject drive the query), no on-screen result rows --
+  the API returns a file, not rows, so no client-side chart is possible
+  without changing the payload contract. Every ngModel / click handler kept.
+-->
+<div class="im-page xr-page">
+  <div class="ph">
+    <div>
+      <h1>Tonnage</h1>
+      <p>Filter shipments by mode, date range and origin/destination.</p>
+    </div>
+  </div>
 
-                                </tr>
-                                <tr>
-                                    <td class="col-form-span-heading" colspan="4">
-                                        <input type="radio" name="radiogroupD" (click)="mainchkDate('2')" [checked]="checkdate == '2'">&nbsp; Weekly
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <tr>
-                                        <td>
-                                            <span class="col-form-span-label ">Date</span>
-                                        </td>
-                                        <td colspan="3">
-                                            <my-date-picker name="dtfrm" [options]="myDatePickerOptions" [(ngModel)]="dtwkfrmt" required [disabled]=wkdisable></my-date-picker>
-                                        </td>
-                                    </tr>
-                                    <tr>
-
-                                        <td>
-                                            <span class="col-form-span-label">
-                                                <span class="col-form-span-label ">Origin</span>
-                                            </span>
-                                        </td>
-                                        <td colspan="3">
-                                            
-                                            <ng-select  class="form-control width250"
-                                                #select
-                                                [items]="listorigin"
-                                                [multiple]="true"                                                 
-                                                bindLabel="city_code"
-                                                bindValue="city_code"
-                                                [(ngModel)]="origin">
-                                        </ng-select>
-                                        
-                                        </td>
-                                    </tr>
-                                    <tr>
-
-                                        <td>
-                                            <span class="col-form-span-label">
-                                                <input type="radio" name="radiogroupS" (click)="mainSub('1')" [checked]="checkSub == '1'">&nbsp; Consignee
-                                            </span>
-                                        </td>
-                                        <td colspan="3">
-                                            <select class="form-control width250" [(ngModel)]="concode" [disabled]=condisable>
-                                                <option value="-1">Please select</option>
-                                                @for (d of listconcode; track d) {
-<option value={{d.con_code}}>{{d.con_name}}</option>
-}
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-
-                                        <td>
-                                            <span class="col-form-span-label">
-                                                <input type="radio" [disabled]=aldisableR name="radiogroupS" (click)="mainSub('2')" [checked]="checkSub == '2'">&nbsp; Airline
-                                            </span>
-                                        </td>
-                                        <td colspan="3">
-                                            <select class="form-control width250" [(ngModel)]="aline" [disabled]=aldisable>
-                                                <option value="-1">Please select</option>
-                                                @for (d of listAline; track d) {
-<option value={{d.AWB_PRIFIX}}>{{d.AIRLINE_NAME}}</option>
-}
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-
-                                        <td>
-                                            <span class="col-form-span-label">
-                                                <input type="radio" name="radiogroupS" (click)="mainSub('3')" [checked]="checkSub == '3'">&nbsp; Agent
-                                            </span>
-                                        </td>
-                                        <td colspan="3">
-                                            <select class="form-control width250" [(ngModel)]="SAgent" [disabled]=agtdisable>
-                                                <option value="-1">Please select</option>
-                                                @for (d of listAgent; track d) {
-<option value={{d.SUP_CODE}}>{{d.SUP_NAME}}</option>
-}
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-
-                                        <td>
-                                            <span class="col-form-span-label">
-                                                <span class="col-form-span-label ">Destination</span>
-                                            </span>
-                                        </td>
-                                        <td colspan="3">                                           
-                                            <ng-select  class="form-control width250"
-                                                #select
-                                                [items]="listdetport"
-                                                [multiple]="true"                                                 
-                                                bindLabel="city_name"
-                                                bindValue="city_code"
-                                                [(ngModel)]="dest">
-                                            </ng-select>                                    
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="3" class="centerlabel" >
-                                            <button class="btn btn-sm btn-success" type="Print"    (click)="onexcelGeneration()"> <i class=" fa fa-download"></i> Export to Excel</button>
-                                            
-                
-                                        </td>
-                                   </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div>
-                <div class="col-md-3"></div>
-            </div>
+  <div class="card sec">
+    <div class="card-h"><h2>Filters</h2></div>
+    <div class="fields">
+      <div class="fld">
+        <label>Mode</label>
+        <div class="xr-radios">
+          <label class="xr-radio">
+            <input type="radio" name="radiogroupM" (click)="ModeCheck('1')" [checked]="checkmode == '1'" /> Sea
+          </label>
+          <label class="xr-radio">
+            <input type="radio" name="radiogroupM" (click)="ModeCheck('2')" [checked]="checkmode == '2'" /> Air
+          </label>
         </div>
+      </div>
+
+      <div class="fld full">
+        <label class="xr-radio">
+          <input type="radio" name="radiogroupD" (click)="mainchkDate('1')" [checked]="checkdate == '1'" /> Datewise
+        </label>
+      </div>
+
+      <div class="fld">
+        <label>From Date</label>
+        <my-date-picker name="dtfrm" [options]="myDatePickerOptions" [(ngModel)]="dtfrmt" required [disabled]=fddisable></my-date-picker>
+      </div>
+
+      <div class="fld">
+        <label>To Date</label>
+        <my-date-picker name="dtpto" [options]="myDatePickerOptions" [(ngModel)]="dtto" required [disabled]=fddisable></my-date-picker>
+      </div>
+
+      <div class="fld full">
+        <label class="xr-radio">
+          <input type="radio" name="radiogroupD" (click)="mainchkDate('2')" [checked]="checkdate == '2'" /> Weekly
+        </label>
+      </div>
+
+      <div class="fld">
+        <label>Date</label>
+        <my-date-picker name="dtfrm" [options]="myDatePickerOptions" [(ngModel)]="dtwkfrmt" required [disabled]=wkdisable></my-date-picker>
+      </div>
+
+      <div class="fld">
+        <label>Origin</label>
+        <ng-select class="custom"
+          #select
+          [items]="listorigin"
+          [multiple]="true"
+          bindLabel="city_code"
+          bindValue="city_code"
+          [(ngModel)]="origin">
+        </ng-select>
+      </div>
+
+      <div class="fld">
+        <label class="xr-radio">
+          <input type="radio" name="radiogroupS" (click)="mainSub('1')" [checked]="checkSub == '1'" /> Consignee
+        </label>
+        <select [(ngModel)]="concode" [disabled]=condisable>
+          <option value="-1">Please select</option>
+          @for (d of listconcode; track d) {
+            <option value={{d.con_code}}>{{d.con_name}}</option>
+          }
+        </select>
+      </div>
+
+      <div class="fld">
+        <label class="xr-radio">
+          <input type="radio" [disabled]=aldisableR name="radiogroupS" (click)="mainSub('2')" [checked]="checkSub == '2'" /> Airline
+        </label>
+        <select [(ngModel)]="aline" [disabled]=aldisable>
+          <option value="-1">Please select</option>
+          @for (d of listAline; track d) {
+            <option value={{d.AWB_PRIFIX}}>{{d.AIRLINE_NAME}}</option>
+          }
+        </select>
+      </div>
+
+      <div class="fld">
+        <label class="xr-radio">
+          <input type="radio" name="radiogroupS" (click)="mainSub('3')" [checked]="checkSub == '3'" /> Agent
+        </label>
+        <select [(ngModel)]="SAgent" [disabled]=agtdisable>
+          <option value="-1">Please select</option>
+          @for (d of listAgent; track d) {
+            <option value={{d.SUP_CODE}}>{{d.SUP_NAME}}</option>
+          }
+        </select>
+      </div>
+
+      <div class="fld">
+        <label>Destination</label>
+        <ng-select class="custom"
+          #select
+          [items]="listdetport"
+          [multiple]="true"
+          bindLabel="city_name"
+          bindValue="city_code"
+          [(ngModel)]="dest">
+        </ng-select>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">Downloads an .xls file.</span>
+    <div class="r">
+      <button class="btn p" type="Print" (click)="onexcelGeneration()">Export to Excel</button>
+    </div>
+  </div>
+</div>

@@ -1,941 +1,687 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>{{Header| uppercase}}</strong>
-                </div>
+<!--
+  India accounts - proforma invoice (create / update).
+  Page kit recipe 2 (src/styles/kit/import-page.css + ./invoice-page.css), ported from
+  MPERPNG-20. Every [(ngModel)], handler, [disabled] state and calculation binding is
+  unchanged, including the Links currency locks (disablegeninvcur / disablegencurrate /
+  disablegencurrate1) and the Pay-by-date lock on modes 1, 2, 5 and 6. The Bootstrap tab
+  markup (ul.nav a[href="#zero"...], .tab-pane ids, data-toggle) is kept: the tabs are
+  switched by bootstrap.js.
+-->
+<div class="im-page inv-page">
+    <div class="ph">
+        <div>
+            <h1>Proforma invoice</h1>
+            <p>Add jobs, bill-to details and charges, then {{ Mainaddtext == 'Update' ? 'update' : 'submit' }} the proforma invoice.</p>
+            <div class="inv-chips">
+                <span class="chip" [class.solid]="invno">{{ invno || 'New proforma' }}</span>
+                <span class="chip">{{ jobdatalist?.length || 0 }} job(s)</span>
+                <span class="chip">{{ chargetable?.length || 0 }} charge line(s)</span>
             </div>
         </div>
     </div>
-    <div class="row no-gutters">
-        <div class="col-sm-12 col-md-1 col-lg-1"> </div>
-        <div class="col-sm-12 col-md-10 col-lg-10">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td><span class="col-form-span-label"><b>Proforma Inv No.</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td> <input type="text" class="form-control width180" [disabled]=true [(ngModel)]="invno"> </td>
-                    <td><span class="col-form-span-label"><b>Invoice dt.</b> </span></td>
-                    <td  style="text-align: left;">
-                        <my-date-picker name="invdate" [options]="myDatePickerOptionsInv"
-                            (dateChanged)="InvoiceDateChanged($event)" [selDate]="invdate">
-                        </my-date-picker>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="col-form-span-label "><b>Mode</b></span> </td>
-                    <td > 
-                        <select class="form-control width180" [(ngModel)]="mode" [disabled]="modecondition">
-                            <option value="">--Please select--</option>
-                            @for (d of table5_mode; track d) {
-<option value={{d.DTATVALUE}}>{{d.DTATTEXT}}</option>
-}
-                        </select>
-                    </td>
-                    <td> <span class="col-form-span-label "><b>Pay By Date :</b></span> </td>
-                    <td  style="text-align: left;">
-                        <my-date-picker name="paybydate" (dateChanged)="PayByDateDateChanged($event)" [options]="myDatePickerOptions" [selDate]="paybydate"
-                            [disabled]="mode=='1'||mode=='2'||mode=='5'||mode=='6'"></my-date-picker>
-                    </td>
-            </tr></table>
+
+    <div class="card sec">
+        <div class="card-h">
+            <h2>Proforma invoice</h2>
+            <span class="meta"><b>*</b> required</span>
         </div>
-        <div class="col-sm-12 col-md-1 col-lg-1"> </div>
+        <div class="fields">
+            <div class="fld">
+                <label>Proforma inv no. <span class="req">*</span></label>
+                <input type="text" [disabled]=true [(ngModel)]="invno">
+            </div>
+            <div class="fld">
+                <label>Invoice date <span class="req">*</span></label>
+                <my-date-picker name="invdate" [options]="myDatePickerOptionsInv"
+                    (dateChanged)="InvoiceDateChanged($event)" [selDate]="invdate">
+                </my-date-picker>
+            </div>
+            <div class="fld">
+                <label>Mode</label>
+                <select class="form-control" [(ngModel)]="mode" [disabled]="modecondition">
+                    <option value="">--Please select--</option>
+                    @for (d of table5_mode; track d) {
+                        <option value={{d.DTATVALUE}}>{{d.DTATTEXT}}</option>
+                    }
+                </select>
+            </div>
+            <div class="fld">
+                <label>Pay by date</label>
+                <my-date-picker name="paybydate" (dateChanged)="PayByDateDateChanged($event)" [options]="myDatePickerOptions" [selDate]="paybydate"
+                    [disabled]="mode=='1'||mode=='2'||mode=='5'||mode=='6'"></my-date-picker>
+            </div>
+        </div>
     </div>
-    <div class="row no-gutters">
-        <div class="col-sm-12 col-md-1 col-lg-1"> </div>
-        <div class="col-sm-12 col-md-10 col-lg-10">
-            <div class="tab" role="tabpanel">
-                <div class="bor">
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item"> 
-                            <a  class="nav-link active" id="zero-tab" data-toggle="tab" href="#zero">JobDetail</a>  
-                            <!-- <a   [ngClass]="{'activetab active' : value == 1 , 'nav-link' :value == 2 }" id="zero-tab" data-toggle="tab" href="#zero">JobDetail</a>  -->
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link " id="one-tab" data-toggle="tab" href="#one"  >General</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="two-tab" data-toggle="tab" href="#two"  >Charges</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="three-tab" data-toggle="tab" href="#three" >Enclosure</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="four-tab" data-toggle="tab" href="#four"  >Despatch</a>
-                        </li>
-                    </ul>
+
+    <div class="tab inv-tabs-wrap" role="tabpanel">
+        <ul class="nav nav-tabs inv-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="zero-tab" data-toggle="tab" href="#zero">Job detail <span class="inv-n">{{ jobdatalist?.length || 0 }}</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link " id="one-tab" data-toggle="tab" href="#one">General</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="two-tab" data-toggle="tab" href="#two">Charges <span class="inv-n">{{ chargetable?.length || 0 }}</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="three-tab" data-toggle="tab" href="#three">Enclosure <span class="inv-n">{{ enclosuretable?.length || 0 }}</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="four-tab" data-toggle="tab" href="#four">Despatch <span class="inv-n">{{ despach_table?.length || 0 }}</span></a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- JOB DETAIL -->
+            <div role="tabpanel" class="tab-pane active" id="zero">
+                <div class="card sec">
+                    <div class="card-h">
+                        <h2>Job detail</h2>
+                        <span class="meta">Pick jobs with Add, or edit a listed job</span>
+                    </div>
+                    <div class="fields">
+                        <div class="fld">
+                            <label>Job no.</label>
+                            <input type="text" maxlength="15"
+                                minlength="15" [(ngModel)]="jobno" [disabled]="jobno_disable" [OnlyNumber]="true">
+                        </div>
+                        <div class="fld"></div>
+                        @if (show_pkg_piece) {
+                            <div class="fld">
+                                <label>Packages <span class="req">*</span></label>
+                                <input type="text" [OnlyNumber]="true" [(ngModel)]="packages">
+                            </div>
+                            <div class="fld">
+                                <label>Prop. wt.</label>
+                                <input type="text" [OnlyNumber]="true" [(ngModel)]="propweight">
+                            </div>
+                        }
+                    </div>
+                    <div class="inv-addrow">
+                        <button class="btn g" type="button" (click)="resetjob()">Reset</button>
+                        @if (jobupdate) {
+                            <button class="btn p" type="button" (click)="updatejob()">Update job</button>
+                        }
+                        @if (addjob) {
+                            <button class="btn p" type="button" (click)="listjobpopup()">Add jobs</button>
+                        }
+                    </div>
+                    <div class="tbl-wrap">
+                        <table class="tbl">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Job no</th>
+                                    <th class="num">Packages</th>
+                                    <th class="num">Prop. wt</th>
+                                    <th>Inv number</th>
+                                    <th>BR/JV no</th>
+                                    <th>BR/JV client</th>
+                                    <th class="num">Adv. amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (obj of jobdatalist; track obj) {
+                                    <tr>
+                                        <td class="act inv-act">
+                                            <button type="button" title="Edit job" (click)="Editjob(obj)">Edit</button>
+                                            <button type="button" title="Remove job" (click)="deletejob(obj)">Remove</button>
+                                        </td>
+                                        <td class="mono">{{obj.INV_JOBNO}}</td>
+                                        <td class="num">{{obj.INV_PKGS}}</td>
+                                        <td class="num">{{obj.INV_GRWT}}</td>
+                                        <td><span class="lnk inv-link" [innerHTML]="obj.INV_STR" (click)="viewjob($event)"> </span></td>
+                                        <td>{{obj.BRJV_NO}}</td>
+                                        <td>{{obj.BRJV_CLIENT}}</td>
+                                        <td class="num">{{obj.ADV_AMOUNT}}</td>
+                                    </tr>
+                                }
+                                @if (!jobdatalist?.length) {
+                                    <tr>
+                                        <td colspan="8" class="empty">No jobs on this proforma yet. Use Add jobs.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="tab-content" style="height:400px;overflow-y:auto">
-                    <div role="tabpanel" class="tab-pane active"  id="zero"> 
-                        <!-- <div role="tabpanel" [ngClass]="{'tab-pane active' : value == 1 , 'tab-pane' :value == 2 }"  id="zero"> -->
-                        <div class="row">
-                            <div class="col">
+            </div>
 
-                                <table class="table table-bordered table-sm-new">
-                                    <tr>
-                                        <td>
-                                            <span class="col-form-span-label"><b>Job No.</b> </span>
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control width180" maxlength="15"
-                                                minlength="15" [(ngModel)]="jobno" [disabled]="jobno_disable" [OnlyNumber]="true">
-                                        </td>
-                                        <td colspan="2"></td>
-                                    </tr>
-                                    @if (show_pkg_piece) {
-<tr>
-                                        <td><span class="col-form-span-label"><b>Packages</b> </span><span
-                                                class="col-form-span-error">*</span></td>
-                                        <td> <input type="text" class="form-control width180"  [OnlyNumber]="true" [(ngModel)]="packages">
-                                        </td>
-                                        <td><span class="col-form-span-label"><b>Prop.Wt.</b> </span></td>
-                                        <div style="display: flex;">
-                                            <input type="text" class="form-control width180" [OnlyNumber]="true" [(ngModel)]="propweight">
-                                        </div>
-                                    </tr>
-}
-                                    <tr>
-                                        <td colspan="4" align="center">
-                                            <div style="margin: 0 auto;margin-top:3px;">
-                                                @if (addjob) {
-<span>
-                                                    <button class="btn btn-sm btn-success" type="submit"
-                                                        (click)="listjobpopup()"> <span class="col-form-span-label"><i
-                                                                class="fa fa-plus"></i> Add</span></button>
-                                                </span>
-}
-                                                @if (jobupdate) {
-<span>
-                                                    <button class="btn btn-sm btn-success" type="submit"
-                                                        (click)="updatejob()"> <span class="col-form-span-label"><i
-                                                                class="fa fa-plus"></i>
-                                                            Update</span></button>
-                                                </span>
-}
-                                                <button class="btn btn-sm btn-danger" type="submit"
-                                                    (click)="resetjob()"> <span class="col-form-span-label"><i
-                                                            class="fa fa-plus"></i> Reset</span></button>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td colspan="4">
-                                            <div class="row">
-                                                <div class="col">
-                                                    <table class="table table-responsive-sm table-bordered">
-                                                        <thead>
-                                                            <tr class="col-form-span-heading">
-                                                                <th class="width20 centerlabel"></th>
-
-                                                                <th class="width100 centerlabel"><span  class="col-form-span-label">Job No</span>
-                                                                </th>
-                                                                <th class="width100 centerlabel"><span  class="col-form-span-label">Packages</span></th>
-                                                                <th class="width100 centerlabel"><span class="col-form-span-label">Prop.Wt</span></th>
-                                                                <th class="width100 centerlabel"><span  class="col-form-span-label">INV Number</span> </th>
-                                                                <th class="width100 centerlabel"><span class="col-form-span-label">BR/JV NO</span></th>
-                                                                <th class="width100 centerlabel"><span class="col-form-span-label">BR/JV CLIENT</span>  </th>
-                                                                <th class="width100 centerlabel"><span class="col-form-span-label">ADV. AMOUNT</span>
-                                                                </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @for (obj of jobdatalist; track obj) {
-<tr>
-                                                                <td align="center">
-                                                                    <i class="fa fa-pencil" (click)="Editjob(obj)"></i>                                                                  
-                                                                    <i class="fa fa-trash" (click)="deletejob(obj)"></i>
-                                                                </td>
-                                                                <td><span class="col-form-span-label">{{obj.INV_JOBNO}}</span>  </td>
-                                                                <td><span  class="col-form-span-label">{{obj.INV_PKGS}}</span>  </td>
-                                                                <td><span  class="col-form-span-label">{{obj.INV_GRWT}}</span>  </td>
-                                                                <td><span class="col-form-span-label  anchor-link" [innerHtml]="obj.INV_STR" (click)="viewjob($event)"   > </span> </td>
-                                                                <td><span  class="col-form-span-label">{{obj.BRJV_NO}}</span>  </td>
-                                                                <td><span class="col-form-span-label">{{obj.BRJV_CLIENT}}</span> </td>
-                                                                <td><span class="col-form-span-label">{{obj.ADV_AMOUNT}}</span> </td>
-                                                            </tr>
-}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </table>
-
-                            </div>
+            <!-- GENERAL -->
+            <div role="tabpanel" class="tab-pane " id="one">
+                <div class="card sec">
+                    <div class="card-h">
+                        <h2>Bill to</h2>
+                        <span class="meta"><b>*</b> required</span>
+                    </div>
+                    <div class="fields">
+                        <div class="fld full">
+                            <label>Client <span class="req">*</span></label>
+                            <ng-select [items]="table_client" bindLabel="EXP_NAME_CITY"
+                                bindValue="EXP_CODE" (ngModelChange)="fillAddress($event)"
+                                [(ngModel)]="client" class="custom" placeholder="--Please Select--">
+                            </ng-select>
+                        </div>
+                        <div class="fld full">
+                            <label>Bill to address <span class="req">*</span></label>
+                            <ng-select [items]="updated_billaddress" bindLabel="DATATEXTFIELD"
+                                bindValue="DATAVALUEFIELD" [(ngModel)]="billaddress" class="custom"
+                                placeholder="--Please Select--">
+                            </ng-select>
+                        </div>
+                        <div class="fld full">
+                            <label>Document through <span class="req">*</span></label>
+                            <ng-select [items]="table2_document" bindLabel="EXP_NAME_CITY"
+                                bindValue="EXP_CODE" [(ngModel)]="document" class="custom"
+                                placeholder="--Please Select--">
+                            </ng-select>
+                        </div>
+                        <div class="fld">
+                            <label>Bill type</label>
+                            <select class="form-control" [(ngModel)]="billtype">
+                                <option value="">--Please select--</option>
+                                @for (d of table4_billtype; track d) {
+                                    <option value={{d.DTATVALUE}}>
+                                        {{d.DTATTEXT}}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="fld">
+                            <label>Advance received</label>
+                            <input class="inv-numin" maxlength="20" [OnlyNumber]="true" [(ngModel)]="Adv_rec">
                         </div>
                     </div>
-                    <div role="tabpanel" class="tab-pane " id="one">
-                        <div class="row">
-                            <div class="col">
-                                <table class="table table-bordered table-sm-new">
-                                    <tr>
-                                        <td>
-                                            <span class="col-form-span-label "><b>Client</b><span
-                                                    class="col-form-span-error">*</span></span>
-                                        </td>
-                                        <td colspan="3">
-                                            <ng-select [items]="table_client" bindLabel="EXP_NAME_CITY"
-                                                bindValue="EXP_CODE" (ngModelChange)="fillAddress($event)"
-                                                [(ngModel)]="client" class="custom" placeholder="--Please Select--">
-                                            </ng-select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span class="col-form-span-label "><b>Bill To Address</b><span
-                                                    class="col-form-span-error">*</span></span>
-                                        </td>
-                                        <td colspan="3">
-                                            <ng-select [items]="updated_billaddress" bindLabel="DATATEXTFIELD"
-                                                bindValue="DATAVALUEFIELD" [(ngModel)]="billaddress" class="custom"
-                                                placeholder="--Please Select--">
-                                            </ng-select>
-                                        </td>
+                </div>
 
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span class="col-form-span-label "><b>Document Through</b><span
-                                                    class="col-form-span-error">*</span></span>
-                                        </td>
-                                        <td colspan="3">
-                                            <ng-select [items]="table2_document" bindLabel="EXP_NAME_CITY"
-                                                bindValue="EXP_CODE" [(ngModel)]="document" class="custom"
-                                                placeholder="--Please Select--">
-                                            </ng-select>
-                                        </td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span class="col-form-span-label "><b>Bill Type</b></span>
-                                        </td>
-                                        <td>
-                                            <select class="form-control width180" [(ngModel)]="billtype">
-                                                <option value="">--Please select--</option>
-                                                @for (d of table4_billtype; track d) {
-<option value={{d.DTATVALUE}}>
-                                                    {{d.DTATTEXT}}</option>
-}
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <span class="col-form-span-label "><b>Advance Received</b></span>
-                                        </td>
-                                        <td>
-                                            <input class="form-control width180" maxlength="20" [OnlyNumber]="true" [(ngModel)]="Adv_rec">
-                                        </td>
-
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span class="col-form-span-label "><b>Invoice Currency</b><span
-                                                    class="col-form-span-error">*</span></span>
-                                        </td>
-                                        <td>
-                                            <select class="form-control width180" [(ngModel)]="currency" [disabled]="disablegeninvcur"
-                                                (ngModelChange)="GetCurrencyName($event)">
-                                                <option value="">Please select</option>
-                                                @for (d of table3_curreny; track d) {
-<option value={{d.cur_code}}>
-                                                    {{d.curname}}</option>
-}
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span class="col-form-span-label "><b>INR Rupees</b><span
-                                                class="col-form-span-error">*</span></span>
-                                        </td>
-                                        <td> <input class="form-control width120" maxlength="20" [OnlyNumber]="true"
-                                            (input)="onInput($event)"  (blur)="onBlur($event)"   [(ngModel)]="inv_currate" [disabled]="disablegencurrate">
-                                        </td>
-                                        <td align="center">
-                                            <span class="col-form-span-label"><b>={{currencyname}}</b><span
-                                                class="col-form-span-error">*</span></span>
-                                        </td>
-                                        <td>
-                                            <input class="form-control width120" [OnlyNumber]="true" maxlength="20"
-                                                [(ngModel)]="inv_currate1" [disabled]="disablegencurrate1">
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>
-                                            <span class="col-form-span-label "><b>Pkgs</b></span>
-                                        </td>
-                                        <td>
-                                            <div style="display: flex; ">
-
-                                                <input type="text" class="form-control width80 " [(ngModel)]="no_pkgs" [OnlyNumber]="true">
-                                                <select class="form-control width120" [(ngModel)]="pkgs">
-                                                    <option value="">--Please select--</option>
-                                                    @for (d of table6_pkgs; track d) {
-<option value={{d.UNIT_CODE}}>
-                                                        {{d.UNIT_NAME}}</option>
-}
-                                                </select>
-
-                                            </div>
-                                        </td>
-
-
-                                        <td> <span class="col-form-span-label "><b>Volume</b></span></td>
-                                        <td> <input class="form-control width180" maxlength="20" [OnlyNumber]="true" [(ngModel)]="volume">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span class="col-form-span-label "><b>Pieces</b></span>
-                                        </td>
-                                        <td>
-
-                                            <div style="display: flex;">
-                                                <input type="text" class="form-control  width80" [OnlyNumber]="true"
-                                                    [(ngModel)]="no_pieces">
-                                                <select class="form-control width120" [(ngModel)]="pieces">
-                                                    <option value="">--Please select--</option>
-                                                    @for (d of table7_pieces; track d) {
-<option value={{d.UNIT_CODE}}>
-                                                        {{d.UNIT_NAME}}</option>
-}
-                                                </select>
-                                            </div>
-                                        </td>
-                                        <td> <span class="col-form-span-label "><b>Weight in Kilo</b></span></td>
-                                        <td> <input class="form-control width180" maxlength="20" [OnlyNumber]="true" [(ngModel)]="weight">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span class="col-form-span-label "><b>Client Reference</b></span>
-                                        </td>
-                                        <td>
-                                            <input class="form-control width180" maxlength="20"
-                                                [(ngModel)]="client_ref">
-                                        </td>
-                                        <td colspan="2"></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span class="col-form-span-label "><b>Carrier</b></span>
-                                        </td>
-                                        <td colspan="3">
-                                            <input class="form-control width500" maxlength="100" [(ngModel)]="carrier">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td> <span class="col-form-span-label "><b>Goods :</b></span> </td>
-                                        <td colspan="3"> <input class="form-control width500" maxlength="250"
-                                                [(ngModel)]="goods">
-                                        </td>
-
-                                    </tr>
-                                    <tr>
-                                        <td> <span class="col-form-span-label "><b>MASTER (A.W.B./B/L) :</b></span>
-                                        </td>
-                                        <td> <input class="form-control width180" maxlength="20" [(ngModel)]="master">
-                                        </td>
-                                        <td> <span class="col-form-span-label "><b>MASTER (A.W.B./B/L) Date :</b></span>
-                                        </td>
-                                        <td>
-                                            <my-date-picker name="masterdate" [options]="myDatePickerOptions"
-                                                (dateChanged)="MasterDateChanged($event)" [selDate]="masterdate">
-                                            </my-date-picker>
-                                        </td>
-                                    </tr>
-                                    @if (mode==='5'|| mode==='6') {
-<tr>
-                                        <td> <span class="col-form-span-label "><b>BE No:</b></span>
-                                        </td>
-                                        <td> <input class="form-control width180" maxlength="20" [(ngModel)]="ship_billno">
-                                        </td>
-                                        <td> <span class="col-form-span-label "><b>BE Date :</b></span>
-                                        </td>
-                                        <td>
-                                            <my-date-picker name="shipbilldate" [options]="myDatePickerOptions"
-                                            (dateChanged)="shipbilldateChanged($event)" [selDate]="shipbilldate">
-                                        </my-date-picker>
-                                        </td>
-
-                                    </tr>
-} @else {
-
-                                        <tr>
-                                            <td> <span class="col-form-span-label "><b>Ship BillNo:</b></span>
-                                            </td>
-                                            <td> <input class="form-control width180" maxlength="20"
-                                                    [(ngModel)]="ship_billno">
-                                            </td>
-                                            <td> <span class="col-form-span-label "><b>Ship BillNo Date :</b></span>
-                                            </td>
-                                            <td>
-                                                <my-date-picker name="shipbilldate" [options]="myDatePickerOptions"
-                                                    (dateChanged)="shipbilldateChanged($event)"
-                                                    [selDate]="shipbilldate">
-                                                </my-date-picker>
-                                            </td>
-                                        </tr>
-                                    
-}
-                                    
-
-                                    <!-- <tr>
-                                <td> <span class="col-form-span-label "><b>Pay By Date :</b></span> </td>
-                                <td>
-                                    <my-date-picker name="paybydate" [options]="myDatePickerOptions" [selDate]="paybydate" [disabled]="mode=='1'||mode=='2'||mode=='5'||mode=='6'"></my-date-picker>
-                                </td>
-                                <td></td>
-                                <td></td>
-                            </tr> -->
-                                    <tr>
-                                        <td> <span class="col-form-span-label "><b>Client Cont. Executive :</b></span>
-                                        </td>
-                                        <td colspan="3">
-                                            <input class="form-control width200" [(ngModel)]="client_excutive">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td> <span class="col-form-span-label "><b>Narration</b></span> </td>
-                                        <td colspan="3">
-                                            <!-- (input)="Narrationarea()" -->
-                                            <textarea class="form-control" id="autoresizing" (change)="TextareaValueChange($event)"
-                                            placeholder="text" cols="50" rows="5" [innerHTML]="narration"></textarea>
-                                        </td>
-                                    </tr>
-                                </table>
-
-                            </div>
+                <div class="card sec">
+                    <div class="card-h">
+                        <h2>Currency</h2>
+                    </div>
+                    <div class="fields">
+                        <div class="fld">
+                            <label>Invoice currency <span class="req">*</span></label>
+                            <select class="form-control" [(ngModel)]="currency" [disabled]="disablegeninvcur"
+                                (ngModelChange)="GetCurrencyName($event)">
+                                <option value="">Please select</option>
+                                @for (d of table3_curreny; track d) {
+                                    <option value={{d.cur_code}}>
+                                        {{d.curname}}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="fld"></div>
+                        <div class="fld">
+                            <label>INR rupees <span class="req">*</span></label>
+                            <input class="inv-numin" maxlength="20" [OnlyNumber]="true"
+                                (input)="onInput($event)" (blur)="onBlur($event)" [(ngModel)]="inv_currate" [disabled]="disablegencurrate">
+                        </div>
+                        <div class="fld">
+                            <label>= {{currencyname}} <span class="req">*</span></label>
+                            <input class="inv-numin" [OnlyNumber]="true" maxlength="20"
+                                [(ngModel)]="inv_currate1" [disabled]="disablegencurrate1">
                         </div>
                     </div>
+                </div>
 
-                    <div role="tabpanel" class="tab-pane" id="two">
-                        <div class="row">
-                            <div class="col">
-                                <table class="table table-bordered table-sm-new">
+                <div class="card sec">
+                    <div class="card-h">
+                        <h2>Shipment</h2>
+                    </div>
+                    <div class="fields">
+                        <div class="fld">
+                            <label>Pkgs</label>
+                            <div class="inv-pair">
+                                <input type="text" class="inv-numin" [(ngModel)]="no_pkgs" [OnlyNumber]="true">
+                                <select class="form-control" [(ngModel)]="pkgs">
+                                    <option value="">--Please select--</option>
+                                    @for (d of table6_pkgs; track d) {
+                                        <option value={{d.UNIT_CODE}}>
+                                            {{d.UNIT_NAME}}</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="fld">
+                            <label>Volume</label>
+                            <input class="inv-numin" maxlength="20" [OnlyNumber]="true" [(ngModel)]="volume">
+                        </div>
+                        <div class="fld">
+                            <label>Pieces</label>
+                            <div class="inv-pair">
+                                <input type="text" class="inv-numin" [OnlyNumber]="true"
+                                    [(ngModel)]="no_pieces">
+                                <select class="form-control" [(ngModel)]="pieces">
+                                    <option value="">--Please select--</option>
+                                    @for (d of table7_pieces; track d) {
+                                        <option value={{d.UNIT_CODE}}>
+                                            {{d.UNIT_NAME}}</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="fld">
+                            <label>Weight in kilo</label>
+                            <input class="inv-numin" maxlength="20" [OnlyNumber]="true" [(ngModel)]="weight">
+                        </div>
+                        <div class="fld">
+                            <label>Client reference</label>
+                            <input maxlength="20" [(ngModel)]="client_ref">
+                        </div>
+                        <div class="fld">
+                            <label>Client cont. executive</label>
+                            <input [(ngModel)]="client_excutive">
+                        </div>
+                        <div class="fld full">
+                            <label>Carrier</label>
+                            <input maxlength="100" [(ngModel)]="carrier">
+                        </div>
+                        <div class="fld full">
+                            <label>Goods</label>
+                            <input maxlength="250" [(ngModel)]="goods">
+                        </div>
+                        <div class="fld">
+                            <label>Master (AWB / BL)</label>
+                            <input maxlength="20" [(ngModel)]="master">
+                        </div>
+                        <div class="fld">
+                            <label>Master (AWB / BL) date</label>
+                            <my-date-picker name="masterdate" [options]="myDatePickerOptions"
+                                (dateChanged)="MasterDateChanged($event)" [selDate]="masterdate">
+                            </my-date-picker>
+                        </div>
+                        @if (mode==='5'|| mode==='6') {
+                            <div class="fld">
+                                <label>BE no</label>
+                                <input maxlength="20" [(ngModel)]="ship_billno">
+                            </div>
+                            <div class="fld">
+                                <label>BE date</label>
+                                <my-date-picker name="shipbilldate" [options]="myDatePickerOptions"
+                                    (dateChanged)="shipbilldateChanged($event)" [selDate]="shipbilldate">
+                                </my-date-picker>
+                            </div>
+                        } @else {
+                            <div class="fld">
+                                <label>Ship bill no</label>
+                                <input maxlength="20"
+                                    [(ngModel)]="ship_billno">
+                            </div>
+                            <div class="fld">
+                                <label>Ship bill no date</label>
+                                <my-date-picker name="shipbilldate" [options]="myDatePickerOptions"
+                                    (dateChanged)="shipbilldateChanged($event)"
+                                    [selDate]="shipbilldate">
+                                </my-date-picker>
+                            </div>
+                        }
+                        <div class="fld full inv-top">
+                            <label>Narration</label>
+                            <!-- (input)="Narrationarea()" -->
+                            <textarea class="form-control" id="autoresizing" (change)="TextareaValueChange($event)"
+                                placeholder="text" cols="50" rows="5" [innerHTML]="narration"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                                    <tr>
-                                        <td class="col-form-span-label" style="font-weight: bold;">Charges Code </td>
-                                        <td colspan="3">
-                                            <ng-select [items]="table8_charge" bindLabel="CHARGE_DESC"
-                                                (ngModelChange)="GetChargeDesc($event)" bindValue="CHARGE_CODE"
-                                                [(ngModel)]="charge" class="custom" placeholder="--Please Select--">
-                                            </ng-select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="col-form-span-label" style="font-weight: bold;">Account Name
-                                        </td>
-                                        <td colspan="3">
-                                            <ng-select [items]="table9_account" [disabled]='disableaccount' bindLabel="ACCTNAME"
-                                                bindValue="ACCTCODE" [(ngModel)]="account"  (ngModelChange)="GetAcctname($event)" class="custom"
-                                                placeholder="--Please Select--">
-                                            </ng-select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="col-form-span-label" style="font-weight: bold;">Description </td>
-                                        <td>
-                                            <input type="text" class="form-control " [(ngModel)]="desc1">
-                                        </td>
-                                        <td class="col-form-span-label" style="font-weight: bold;">Description1
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control " [(ngModel)]="desc2">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="4">
-                                            <table class="table table-bordered table-sm-new">
-                                                <tr>
-                                                    <td class="col-form-span-label" style="font-weight: bold;">Tax </td>
-                                                    <td class="col-form-span-label" style="font-weight: bold;">Qty </td>
-                                                    <td class="col-form-span-label" style="font-weight: bold;">Rate/Qty </td>
-                                                    <td class="col-form-span-label" style="font-weight: bold;">Amt In Cur </td>
-                                                    <td class="col-form-span-label" style="font-weight: bold;">Cur Type </td>
-                                                    <td class="col-form-span-label" style="font-weight: bold;">Ex. Rate </td>
-                                                    <td class="col-form-span-label" style="font-weight: bold;">Amt(INR) </td>
-                                                    <td class="col-form-span-label" style="font-weight: bold;">Amt Taxable(INR)</td>
-                                                   
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <select class="form-control width80" [(ngModel)]="tax" [disabled]="disabletax">
-                                                            <option value="">Please select</option>
-                                                            <option value="N">N</option>
-                                                            <option value="G">G</option>
-                                                        </select> 
-                                                    </td>
-                                                    <td>
-                                                        <input type="text" class="form-control width60" [(ngModel)]="qty" [OnlyNumber]="true">
-                                                    </td>
-                                                    <td>
-                                                        <input type="text" class="form-control width60" [(ngModel)]="rateperqty" [OnlyNumber]="true">
-                                                    </td>
-                                                    <td>
-                                                        <input type="text" class="form-control width60" value={{Curamount}} 
-                                                            [disabled]=true>
-                                                    </td>
-                                                    <td>
-                                                        <select class="form-control width80" [(ngModel)]="currencytype"  (ngModelChange)="getexchangerate($event)">
-                                                            <option value="">Please select</option>
-                                                            @for (d of table13_currencytype; track d) {
-<option value={{d.DATAVALUE}}>
-                                                                {{d.DATATEXTVALUE}}</option>
-}
-            
-                                                        </select>
-                                                    </td>
-                                                    <td style=" display: flex;">
-                                                        <input type="text" class="form-control width80" [(ngModel)]="excrate" (ngModelChange)="Calcamount()" [disabled]='disableexrate' [OnlyNumber]="true"  >
-                                                        <span class="col-form-span-label" style="font-weight: bold;"> = INR</span>
-                                                    </td>
-                                                    <td>
-                                                        <input type="text" class="form-control width100" value={{amount}} 
-                                                            [disabled]=true>
-                                                    </td>
-                                                    <td>
-                                                        @if (tax==='G') {
-<span>
-                                                            <input type="text" class="form-control width120"
-                                                                [(ngModel)]="taxamount_G" [disabled]=true>
-                                                        </span>
-} @else {
-
-                                                            <input type="text" class="form-control width120"
-                                                                [(ngModel)]="taxamount_N" [disabled]=true>
-                                                        
-}
-                                                        
-                                                    </td>
-                                                  
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                    <!-- <tr>
-                                        <td class="col-form-span-label" style="font-weight: bold;">Charges Code </td>
-                                        <td colspan="3">
-                                            <ng-select [items]="table8_charge" bindLabel="CHARGE_DESC"
-                                                (ngModelChange)="GetChargeDesc($event)" bindValue="CHARGE_CODE"
-                                                [(ngModel)]="charge" class="custom" placeholder="--Please Select--">
-                                            </ng-select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="col-form-span-label" style="font-weight: bold;">Account Name
-                                        </td>
-                                        <td colspan="3">
-                                            <ng-select [items]="table9_account" bindLabel="ACCTNAME"
-                                                bindValue="ACCTCODE" [(ngModel)]="account" class="custom"
-                                                placeholder="--Please Select--">
-                                            </ng-select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="col-form-span-label" style="font-weight: bold;">Description </td>
-                                        <td>
-                                            <input type="text" class="form-control " [(ngModel)]="desc1">
-                                        </td>
-                                        <td class="col-form-span-label" style="font-weight: bold;">Description1
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control " [(ngModel)]="desc2">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="col-form-span-label" style="font-weight: bold;">Tax </td>
-                                        <td>
-                                            <select class="form-control width180" [(ngModel)]="tax">
-                                                <option value="">Please select</option>
-                                                <option value="N">N</option>
-                                                <option value="G">G</option>
-                                            </select> </td>
-                                        <td colspan="2"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="col-form-span-label" style="font-weight: bold;">Qty </td>
-
-                                        <td>
-                                            <input type="text" class="form-control width180" [(ngModel)]="qty" [OnlyNumber]="true">
-                                        </td>
-                                        <td class="col-form-span-label" style="font-weight: bold;">Rate/Qty
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control width180" [(ngModel)]="rateperqty" [OnlyNumber]="true">
-                                        </td>
-
-                                    </tr>
-                                    <tr>
-                                        <td class="col-form-span-label" style="font-weight: bold;">Currency Type </td>
-
-                                        <td>
-                                            <select class="form-control width180" [(ngModel)]="currencytype">
-                                                <option value="">Please select</option>
-                                                <option *ngFor="let d of table13_currencytype" value={{d.DATAVALUE}}>
+            <!-- CHARGES -->
+            <div role="tabpanel" class="tab-pane" id="two">
+                <div class="card sec">
+                    <div class="card-h">
+                        <h2>Charge line</h2>
+                        <span class="meta">Dashed boxes are computed</span>
+                    </div>
+                    <div class="fields">
+                        <div class="fld full">
+                            <label>Charges code <span class="req">*</span></label>
+                            <ng-select [items]="table8_charge" bindLabel="CHARGE_DESC"
+                                (ngModelChange)="GetChargeDesc($event)" bindValue="CHARGE_CODE"
+                                [(ngModel)]="charge" class="custom" placeholder="--Please Select--">
+                            </ng-select>
+                        </div>
+                        <div class="fld full">
+                            <label>Account name <span class="req">*</span></label>
+                            <ng-select [items]="table9_account" [disabled]='disableaccount' bindLabel="ACCTNAME"
+                                bindValue="ACCTCODE" [(ngModel)]="account" (ngModelChange)="GetAcctname($event)" class="custom"
+                                placeholder="--Please Select--">
+                            </ng-select>
+                        </div>
+                        <div class="fld">
+                            <label>Description <span class="req">*</span></label>
+                            <input type="text" class="form-control " [(ngModel)]="desc1">
+                        </div>
+                        <div class="fld">
+                            <label>Description 1</label>
+                            <input type="text" class="form-control " [(ngModel)]="desc2">
+                        </div>
+                    </div>
+                    <div class="tbl-wrap">
+                        <table class="tbl inv-entry">
+                            <thead>
+                                <tr>
+                                    <th>Tax <span class="req">*</span></th>
+                                    <th class="num">Qty <span class="req">*</span></th>
+                                    <th class="num">Rate/qty <span class="req">*</span></th>
+                                    <th class="num">Amt in cur</th>
+                                    <th>Cur type <span class="req">*</span></th>
+                                    <th class="num">Ex. rate (= INR)</th>
+                                    <th class="num">Amt (INR)</th>
+                                    <th class="num">Amt taxable (INR)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <select class="form-control" [(ngModel)]="tax" [disabled]="disabletax">
+                                            <option value="">Please select</option>
+                                            <option value="N">N</option>
+                                            <option value="G">G</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="inv-numin" [(ngModel)]="qty" [OnlyNumber]="true">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="inv-numin" [(ngModel)]="rateperqty" [OnlyNumber]="true">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="inv-numin" value={{Curamount}}
+                                            [disabled]=true>
+                                    </td>
+                                    <td>
+                                        <select class="form-control" [(ngModel)]="currencytype" (ngModelChange)="getexchangerate($event)">
+                                            <option value="">Please select</option>
+                                            @for (d of table13_currencytype; track d) {
+                                                <option value={{d.DATAVALUE}}>
                                                     {{d.DATATEXTVALUE}}</option>
-
-                                            </select>
-                                        </td>
-                                        <td class="col-form-span-label" style="font-weight: bold;">Exchange Rate
-                                        </td>
-                                        <td style=" display: flex;">
-                                            <input type="text" class="form-control width180" [(ngModel)]="excrate" [OnlyNumber]="true"  >
-                                            <span class="col-form-span-label" style="font-weight: bold;"> = INR</span>
-                                        </td>
-
-                                    </tr>
-                                    <tr>
-                                        <td class="col-form-span-label" style="font-weight: bold;">Amount
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control width180" value={{amount}} 
-                                                [disabled]=true>
-                                        </td>
-                                        <td class="col-form-span-label" style="font-weight: bold;">Amount Taxable
-                                        </td>
-                                        <td>
-                                            <span *ngIf="tax==='G'; else elseBlock1">
-                                                <input type="text" class="form-control width180"
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="inv-numin" [(ngModel)]="excrate" (ngModelChange)="Calcamount()" [disabled]='disableexrate' [OnlyNumber]="true">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="inv-numin" value={{amount}}
+                                            [disabled]=true>
+                                    </td>
+                                    <td>
+                                        @if (tax==='G') {
+                                            <span>
+                                                <input type="text" class="inv-numin"
                                                     [(ngModel)]="taxamount_G" [disabled]=true>
                                             </span>
-                                            <ng-template #elseBlock1>
-                                                <input type="text" class="form-control width180"
-                                                    [(ngModel)]="taxamount_N" [disabled]=true>
-                                            </ng-template>
-                                        </td>
-                                    </tr> -->
-                                    <tr>
-                                        <td colspan="4" align="center">
-                                            <button class="btn btn-sm btn-success" type="submit" (click)="addcharges()">
-                                                <span class="col-form-span-label"><i
-                                                        class="fa fa-dot-circle-o"></i>{{chargetext}}</span></button>
-                                            <button class="btn btn-sm btn-danger" type="reset"> <span
-                                                    class="col-form-span-label" (click)="resetcharges();"><i
-                                                        class="fa fa-ban"></i> Reset</span></button>
-                                             <button class="btn btn-sm btn-danger" type="reset"> <span
-                                                    class="col-form-span-label" (click)="resetCurcharges();"><i
-                                                       class="fa fa-ban"></i> Reset Cur Charges</span></button>           
-                                        </td>
-                                     
-                                    </tr>
-                                    <tr>
-                                        <td colspan="4">
-                                            <div class="row">
-                                                <div class="col">
-                                                    <table class="table table-responsive-sm table-bordered">
-                                                        <thead>
-                                                            <tr class="col-form-span-heading">
-                                                                <th  ></th>
-                                                                <th   align="center"><span  class="col-form-span-label"> Charge code</span></th>
-                                                                <th   align="center"><span  class="col-form-span-label"> Account Name</span> </th>
-                                                                <th   align="center"><span  class="col-form-span-label">  Charge Description</span></th>
-                                                                <th   align="center"> <span  class="col-form-span-label"> Tax</span> </th>
-                                                                <th   align="center"> <span  class="col-form-span-label"> Qty</span> </th>
-                                                                <th   align="center"> <span  class="col-form-span-label">Rate</span> </th>
-                                                                <th   align="center"> <span  class="col-form-span-label"> Currency</span> </th>
-                                                                <th   align="center"> <span  class="col-form-span-label">Ex.Rate</span> </th>
-                                                                <th   align="center"><span  class="col-form-span-label">Amount </span> </th>
-                                                                <th   align="center"><span  class="col-form-span-label">Taxable Amount </span> </th>
-                                                            </tr>
-                                                        </thead>
-                                                        @if (chargetable.length > 0) {
-<tbody>
-                                                            @for (data of chargetable; track data) {
-<tr>
-                                                                <td>
-                                                                    <i class="fa fa-pencil"
-                                                                        (click)="editcharge(data)"></i>
-                                                                    &nbsp;
-                                                                    <i class="fa fa-trash"
-                                                                        (click)="deletecharge(data)"></i>
-                                                                </td>
-                                                                <td><span  class="col-form-span-label">{{data.INV_CHRGCODE}}</span>  </td>
-                                                                <td><span class="col-form-span-label">{{data.ACCOUNT_NAME}}</span>   </td>
-                                                                <td><span  class="col-form-span-label">{{data.description1}}</span>  </td>
-                                                                <td><span  class="col-form-span-label">{{data.INV_TAXABLE}}</span>  </td>
-                                                                <td><span  class="col-form-span-label">{{data.INV_QTY}}</span>  </td>
-                                                                <td style="text-align: right;"  ><span  class="col-form-span-label">{{data.INV_RATE}}</span>   </td>
-                                                                <td><span  class="col-form-span-label">{{data.INV_CURRENCYNAME}}</span>  </td>
-                                                                <td style="text-align: right;"><span  class="col-form-span-label">{{data.INV_EXRATE}}</span>   </td>
-                                                                <!-- <td><span   class="col-form-span-label">{{data.INV_AMOUNT}}</span>  </td>
-                                                                <td><span   class="col-form-span-label">{{data.TAXABLEAMT}}</span>   </td> -->
-                                                                <td style="text-align: right;"><span   class="col-form-span-label">{{data.INV_INRAMT}}</span>  </td>
-                                                                <td style="text-align: right;"><span   class="col-form-span-label">{{data.TAXABLEAMTINR|number:'2.2-4'}}</span>   </td>
-                                                            </tr>
-}
-                                                    </tbody>
-}</table>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
+                                        } @else {
+                                            <input type="text" class="inv-numin"
+                                                [(ngModel)]="taxamount_N" [disabled]=true>
+                                        }
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-
-                    <div role="tabpanel" class="tab-pane" id="three">
-                        <div class="row">
-                            <div class="col">
-                                <table class="table table-bordered table-sm-new">
-                                    <tr>
-                                        <td>
-                                            <span class="col-form-span-label "><b>Enclosure code</b><span
-                                                    class="col-form-span-error">*</span></span>
-                                        </td>
-                                        <td colspan="3">
-                                            <select class="form-control" [(ngModel)]="enclose_code">
-                                                <option value="">--Please select--</option>
-                                                @for (d of Table11_enclose; track d) {
-<option value={{d.enc_code}}>
-                                                    {{d.enclosure}}</option>
-}
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span class="col-form-span-label "><b>Description </b><span
-                                                    class="col-form-span-error">*</span></span>
-                                        </td>
-                                        <td>
-                                            <input class="form-control width180" maxlength="20"
-                                                [(ngModel)]="enclose_desc">
-                                        </td>
-                                        <td>
-                                            <span class="col-form-span-label "><b>number</b><span
-                                                    class="col-form-span-error">*</span></span>
-                                        </td>
-                                        <td>
-                                            <input class="form-control width180" maxlength="20"
-                                                [(ngModel)]="enclose_number">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="4" align="center">
-                                            <button class="btn btn-sm btn-success" type="submit"
-                                                (click)="addenclosure()">
-                                                <span class="col-form-span-label"><i
-                                                        class="fa fa-dot-circle-o"></i>{{enclosuretext}}</span></button>
-                                            <button class="btn btn-sm btn-danger" type="reset"> <span
-                                                    class="col-form-span-label" (click)="resetenclosure();"><i
-                                                        class="fa fa-ban"></i> Reset</span></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="4">
-                                            <div class="row">
-                                                <div class="col">
-                                                    <table class="table table-responsive-sm table-bordered">
-                                                        <thead>
-                                                            <tr class="col-form-span-heading">
-                                                                <th class="centerlabel"><span class="col-form-span-label"></span></th>
-                                                                <th align="center"><span  class="col-form-span-label">Enclosure code</span></th>
-                                                                <th align="center"><span  class="col-form-span-label">  Description</span></th>
-                                                                <th align="center"><span  class="col-form-span-label">Number </span></th>
-                                                            </tr>
-                                                        </thead>
-                                                        @if (enclosuretable.length > 0) {
-<tbody>
-                                                            @for (data of enclosuretable; track data) {
-<tr>
-                                                                <td>  <i class="fa fa-pencil"   (click)="editenclosue(data)"></i>
-                                                                    &nbsp;
-                                                                    <i class="fa fa-trash"  (click)="deleteenclosur(data)"></i> </td>
-                                                                <td><span  class="col-form-span-label">{{data.INV_ENCLCODE}}</span>   </td>
-                                                                <td><span  class="col-form-span-label">{{data.INV_DESC}}</span> </td>
-                                                                <td><span  class="col-form-span-label">{{data.INV_NUMBER}}</span>  </td>
-                                                            </tr>
-}
-                                                    </tbody>
-}</table>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-
+                    <div class="inv-addrow">
+                        <button class="btn g" type="reset" (click)="resetCurcharges();">Reset cur charges</button>
+                        <button class="btn g" type="reset" (click)="resetcharges();">Reset</button>
+                        <button class="btn p" type="button" (click)="addcharges()">{{chargetext}}</button>
                     </div>
-
-                    <div role="tabpanel" class="tab-pane" id="four">
-                        <div class="row">
-                            <div class="col">
-                                <table class="table table-bordered table-sm-new">
-                                    <tr>
-                                        <td>
-                                            <span class="col-form-span-label "><b>Dispatch code</b><span
-                                                    class="col-form-span-error">*</span></span>
-                                        </td>
-                                        <td colspan="3">
-                                            <select class="form-control" [(ngModel)]="despachcode">
-                                                <option value="">--Please select--</option>
-                                                @for (d of Table12_despach; track d) {
-<option value={{d.des_code}}>
-                                                    {{d.Despatch_desc}}</option>
-}
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span class="col-form-span-label "><b>Description </b><span
-                                                    class="col-form-span-error">*</span></span>
-                                        </td>
-                                        <td>
-                                            <input class="form-control width180" maxlength="20"
-                                                [(ngModel)]="despach_desc">
-                                        </td>
-                                        <td>
-                                            <span class="col-form-span-label "><b>Number</b><span
-                                                    class="col-form-span-error">*</span></span>
-                                        </td>
-                                        <td>
-                                            <input class="form-control width180" maxlength="20"
-                                                [(ngModel)]="despach_no">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="4" align="center">
-                                            <button class="btn btn-sm btn-success" type="submit" (click)="despachadd()">
-                                                <span class="col-form-span-label"><i
-                                                        class="fa fa-dot-circle-o"></i>{{despatchtext}}</span></button>
-                                            <button class="btn btn-sm btn-danger" type="reset"> <span
-                                                    class="col-form-span-label" (click)="despachreset();"><i
-                                                        class="fa fa-ban"></i> Reset</span></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="4">
-                                            <div class="row">
-                                                <div class="col">
-                                                    <table class="table table-responsive-sm table-bordered">
-                                                        <thead>
-                                                            <tr class="title-head formheading">
-                                                                <th  ></th>
-                                                                <th   align="center">Dispatch  code</th>
-                                                                <th   align="center">    Description</th>
-                                                                <th   align="center">Number  </th>
-                                                            </tr>
-                                                        </thead>
-                                                        @if (despach_table.length >0) {
-<tbody>
-                                                            @for (data of despach_table; track data) {
-<tr>
-                                                                <td>
-                                                                    <i class="fa fa-pencil"
-                                                                        (click)="despachedit(data)"></i>
-                                                                    &nbsp;
-                                                                    <i class="fa fa-trash"
-                                                                        (click)="despachdelete(data)"></i>
-                                                                </td>
-                                                                <td><span  class="col-form-span-label">{{data.INV_DESPCODE}}</span>   </td>
-                                                                <td><span class="col-form-span-label">{{data.INV_DESC}}</span>  </td>
-                                                                <td><span class="col-form-span-label">{{data.INV_NUMBER}}</span>   </td>
-
-                                                    </tr>
-}</tbody>
-}</table>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
-                <div align="center" class="border p-1">
-                    <button class="btn btn-sm btn-success" type="submit" (click)="MainInvoice_submit()"> <span
-                            class="col-form-span-label"><i
-                                class="fa fa-dot-circle-o"></i>{{Mainaddtext}}</span></button>
-                    <button class="btn btn-sm btn-danger" type="submit" (click)="MainReset()"> <span
-                            class="col-form-span-label"><i class="fa fa-ban"></i>Reset</span></button>
+
+                <div class="card sec">
+                    <div class="card-h">
+                        <h2>Charges</h2>
+                        <span class="meta">{{ chargetable?.length || 0 }} line(s)</span>
+                    </div>
+                    <div class="tbl-wrap">
+                        <table class="tbl">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Charge code</th>
+                                    <th>Account name</th>
+                                    <th>Charge description</th>
+                                    <th>Tax</th>
+                                    <th class="num">Qty</th>
+                                    <th class="num">Rate</th>
+                                    <th>Currency</th>
+                                    <th class="num">Ex. rate</th>
+                                    <th class="num">Amount</th>
+                                    <th class="num">Taxable amount</th>
+                                </tr>
+                            </thead>
+                            @if (chargetable.length > 0) {
+                                <tbody>
+                                    @for (data of chargetable; track data) {
+                                        <tr>
+                                            <td class="act inv-act">
+                                                <button type="button" title="Edit charge" (click)="editcharge(data)">Edit</button>
+                                                <button type="button" title="Remove charge" (click)="deletecharge(data)">Remove</button>
+                                            </td>
+                                            <td class="mono">{{data.INV_CHRGCODE}}</td>
+                                            <td>{{data.ACCOUNT_NAME}}</td>
+                                            <td>{{data.description1}}</td>
+                                            <td>{{data.INV_TAXABLE}}</td>
+                                            <td class="num">{{data.INV_QTY}}</td>
+                                            <td class="num">{{data.INV_RATE}}</td>
+                                            <td>{{data.INV_CURRENCYNAME}}</td>
+                                            <td class="num">{{data.INV_EXRATE}}</td>
+                                            <td class="num">{{data.INV_INRAMT}}</td>
+                                            <td class="num">{{data.TAXABLEAMTINR|number:'2.2-4'}}</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            } @else {
+                                <tbody>
+                                    <tr>
+                                        <td colspan="11" class="empty">No charge lines yet. Fill the charge line above and add it.</td>
+                                    </tr>
+                                </tbody>
+                            }
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENCLOSURE -->
+            <div role="tabpanel" class="tab-pane" id="three">
+                <div class="card sec">
+                    <div class="card-h">
+                        <h2>Enclosure</h2>
+                        <span class="meta"><b>*</b> required</span>
+                    </div>
+                    <div class="fields">
+                        <div class="fld full">
+                            <label>Enclosure code <span class="req">*</span></label>
+                            <select class="form-control" [(ngModel)]="enclose_code">
+                                <option value="">--Please select--</option>
+                                @for (d of Table11_enclose; track d) {
+                                    <option value={{d.enc_code}}>
+                                        {{d.enclosure}}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="fld">
+                            <label>Description <span class="req">*</span></label>
+                            <input maxlength="20" [(ngModel)]="enclose_desc">
+                        </div>
+                        <div class="fld">
+                            <label>Number <span class="req">*</span></label>
+                            <input maxlength="20" [(ngModel)]="enclose_number">
+                        </div>
+                    </div>
+                    <div class="inv-addrow">
+                        <button class="btn g" type="reset" (click)="resetenclosure();">Reset</button>
+                        <button class="btn p" type="button" (click)="addenclosure()">{{enclosuretext}}</button>
+                    </div>
+                    <div class="tbl-wrap">
+                        <table class="tbl">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Enclosure code</th>
+                                    <th>Description</th>
+                                    <th>Number</th>
+                                </tr>
+                            </thead>
+                            @if (enclosuretable.length > 0) {
+                                <tbody>
+                                    @for (data of enclosuretable; track data) {
+                                        <tr>
+                                            <td class="act inv-act">
+                                                <button type="button" title="Edit enclosure" (click)="editenclosue(data)">Edit</button>
+                                                <button type="button" title="Remove enclosure" (click)="deleteenclosur(data)">Remove</button>
+                                            </td>
+                                            <td class="mono">{{data.INV_ENCLCODE}}</td>
+                                            <td>{{data.INV_DESC}}</td>
+                                            <td>{{data.INV_NUMBER}}</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            } @else {
+                                <tbody>
+                                    <tr><td colspan="4" class="empty">No enclosures.</td></tr>
+                                </tbody>
+                            }
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESPATCH -->
+            <div role="tabpanel" class="tab-pane" id="four">
+                <div class="card sec">
+                    <div class="card-h">
+                        <h2>Despatch</h2>
+                        <span class="meta"><b>*</b> required</span>
+                    </div>
+                    <div class="fields">
+                        <div class="fld full">
+                            <label>Dispatch code <span class="req">*</span></label>
+                            <select class="form-control" [(ngModel)]="despachcode">
+                                <option value="">--Please select--</option>
+                                @for (d of Table12_despach; track d) {
+                                    <option value={{d.des_code}}>
+                                        {{d.Despatch_desc}}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="fld">
+                            <label>Description <span class="req">*</span></label>
+                            <input maxlength="20" [(ngModel)]="despach_desc">
+                        </div>
+                        <div class="fld">
+                            <label>Number <span class="req">*</span></label>
+                            <input maxlength="20" [(ngModel)]="despach_no">
+                        </div>
+                    </div>
+                    <div class="inv-addrow">
+                        <button class="btn g" type="reset" (click)="despachreset();">Reset</button>
+                        <button class="btn p" type="button" (click)="despachadd()">{{despatchtext}}</button>
+                    </div>
+                    <div class="tbl-wrap">
+                        <table class="tbl">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Dispatch code</th>
+                                    <th>Description</th>
+                                    <th>Number</th>
+                                </tr>
+                            </thead>
+                            @if (despach_table.length >0) {
+                                <tbody>
+                                    @for (data of despach_table; track data) {
+                                        <tr>
+                                            <td class="act inv-act">
+                                                <button type="button" title="Edit despatch" (click)="despachedit(data)">Edit</button>
+                                                <button type="button" title="Remove despatch" (click)="despachdelete(data)">Remove</button>
+                                            </td>
+                                            <td class="mono">{{data.INV_DESPCODE}}</td>
+                                            <td>{{data.INV_DESC}}</td>
+                                            <td>{{data.INV_NUMBER}}</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            } @else {
+                                <tbody>
+                                    <tr><td colspan="4" class="empty">No despatch entries.</td></tr>
+                                </tbody>
+                            }
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-sm-12 col-md-1 col-lg-1"> </div>
     </div>
-</div>
 
-<div class="modal" [style.display]="showModal_ListJob ? 'block' : 'none'">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Modal title</h5>
+    <div class="bar">
+        <span class="note">{{ invno ? 'Proforma ' + invno : 'Not saved yet' }} · {{ chargetable?.length || 0 }} charge line(s)</span>
+        <div class="r">
+            <button class="btn g" type="button" (click)="MainReset()">Reset</button>
+            <button class="btn p" type="button" [disabled]="saving" (click)="MainInvoice_submit()">{{ saving ? 'Saving…' : Mainaddtext }}</button>
+        </div>
+    </div>
+
+    <!-- Job lookup -->
+    <div class="inv-modal" [style.display]="showModal_ListJob ? 'flex' : 'none'">
+        <div class="card inv-dlg">
+            <div class="card-h inv-dlg-h">
+                <h2>Select jobs</h2>
+                <input type="text" class="inv-dlg-search" [(ngModel)]="term" placeholder="Search by job number">
             </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col" style="height:400px;overflow-y: auto;">
-                        <table class="table table-bordered table-sm-new bgwhite">
-                            <tr>
-                                <td colspan="6">
-                                    <input type="text" [(ngModel)]="term"
-                                        style="float: right;width: 200px;font-family: verdana;font-size:11px;padding: 1px;"
-                                        placeholder="Search by Job Number">
-                                </td>
-                            </tr>
+            <div class="inv-dlg-b">
+                <table class="tbl">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Job no.</th>
+                            <th>Shipper name</th>
+                            <th>BR/JV no</th>
+                            <th>BR/JV client</th>
+                            <th class="num">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (obj of ListJob | filter: term ; track obj; let i = $index) {
                             <tr>
                                 <td>
-                                    <thead style="text-align: center;">
-                                        <tr>
-                                            <th class="col-form-span-label"></th>
-                                            <th class="col-form-span-label">JOb No.</th>
-                                            <th class="col-form-span-label">SHIIPER NAME</th>
-                                            <th class="col-form-span-label">BR/JV NO</th>
-                                            <th class="col-form-span-label">BR/JV CLIENT</th>
-                                            <th class="col-form-span-label">AMOUNT</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- <tr *ngFor="let obj of ListJob;let i = index | filterBy: userFilter"> -->
-                                        @for (obj of ListJob | filter: term ; track obj; let i = $index) {
-<tr>
-                                            <td class="col-form-span-label">
-                                                <input type="checkbox" [(ngModel)]="obj.Checked" [id]="i" [value]="i"
-                                                    (ngModelChange)="getCheckboxValues($event,obj.EXPTNO,obj.SHIPPER_CODE,i)">
-                                                &nbsp; </td>
-                                            <td class="col-form-span-label">{{obj.EXPTNO}}</td>
-                                            <td class="col-form-span-label">{{obj.SHIIPER_NAME}}</td>
-                                            <td class="col-form-span-label">{{obj.BRJV_NO}}</td>
-                                            <td class="col-form-span-label">{{obj.BRJV_CLIENT}}</td>
-                                            <td class="col-form-span-label">{{obj.AMOUNT}}</td>
-                                        </tr>
-}
-                                    </tbody>
+                                    <input type="checkbox" [(ngModel)]="obj.Checked" [id]="i" [value]="i"
+                                        (ngModelChange)="getCheckboxValues($event,obj.EXPTNO,obj.SHIPPER_CODE,i)">
                                 </td>
+                                <td class="mono">{{obj.EXPTNO}}</td>
+                                <td>{{obj.SHIIPER_NAME}}</td>
+                                <td>{{obj.BRJV_NO}}</td>
+                                <td>{{obj.BRJV_CLIENT}}</td>
+                                <td class="num">{{obj.AMOUNT}}</td>
                             </tr>
-                        </table>
-
-                    </div>
-                </div>
-                <div style="float: right;">
-                    <button class="btn btn-sm btn-success" type="submit" (click)="popup_listjob()"> <span
-                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Add</span></button>
-                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
-                            (click)="close()"><i class="fa fa-ban"></i>
-                            Close</span></button>
-                </div>
+                        }
+                        @if (!ListJob?.length) {
+                            <tr>
+                                <td colspan="6" class="empty">No jobs available.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="inv-dlg-f">
+                <button class="btn g" type="reset" (click)="close()">Close</button>
+                <button class="btn p" type="button" (click)="popup_listjob()">Add</button>
             </div>
         </div>
     </div>
-</div>
-<div class="modal" [style.display]="showModal_Remark ? 'block' : 'none'">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content ">
-            <div class="modal-body text-center">
-                <p [innerHtml]="REMARK1"></p>
-                <button type="button" class="btn btn-success" (click)="remarks_popup_select('YES')">YES</button>
-                <button type="button" class="btn btn-danger" (click)="remarks_popup_select('NO')">NO</button>
 
+    <!-- Remark confirmation -->
+    <div class="inv-modal" [style.display]="showModal_Remark ? 'flex' : 'none'">
+        <div class="card inv-dlg inv-dlg-sm">
+            <div class="card-h inv-dlg-h">
+                <h2>Confirm</h2>
+            </div>
+            <div class="inv-dlg-b inv-dlg-msg">
+                <p [innerHTML]="REMARK1"></p>
+            </div>
+            <div class="inv-dlg-f">
+                <button type="button" class="btn g" (click)="remarks_popup_select('NO')">No</button>
+                <button type="button" class="btn p" (click)="remarks_popup_select('YES')">Yes</button>
             </div>
         </div>
     </div>

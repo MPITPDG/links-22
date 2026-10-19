@@ -1,50 +1,32 @@
-<div class="animated fadeIn" >  
-    <div class="row no-gutters"  >
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{Header}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Accounts -> Reports -> Receivables -> Any one client, age-wise.
+  Download-only report: ExportToExcel() calls Acc_Rpt_Receivable_AgeWise_XL_35 and
+  builds the workbook client-side (ExportexcelService). Nothing is shown on screen.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Receivable ageing &middot; one client</h1>
+      <p>Bill outstanding by age bucket for a single client, as on {{ Ondate }} &middot; downloads an Excel workbook</p>
     </div>
-    <div class="row no-gutters" >
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td class="col-form-span-heading" colspan="6"> <b>BILL OUTSTANDING - RECEIVABLE AGEWISE</b> </td>
-           </tr>
-                <tr>
-                    <td class="width130">
-                        <span  class="col-form-span-label"><b>Client</b> </span><span
-                        class="col-form-span-error">*</span>
-                    </td>
-                            <td colspan="3" >
-                               <ng-select   [items]="AccountList" bindLabel="EXP_NAME_CITY"
-                               bindValue="EXP_CODE"  [(ngModel)]="Client"  (ngModelChange)="GetAccountName($event)"
-                               class="custom" placeholder="--Please Select--">
-                                </ng-select>
-                            </td>
-                </tr>
-                             <tr>
-                    <td colspan="6" class="centerlabel">
-                        <button class="btn btn-sm btn-primary" type="submit" (click)="ExportToExcel()" > <span
-                                class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
-                                Export To Excel </span></button>&nbsp;
-                             
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h"><h2>{{ Header | titlecase }}</h2><span class="meta"><b>*</b> required</span></div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Client <span class="req">*</span></label>
+        <ng-select [items]="AccountList" bindLabel="EXP_NAME_CITY" bindValue="EXP_CODE" [(ngModel)]="Client"
+          (ngModelChange)="GetAccountName($event)" class="custom" placeholder="--Please Select--"></ng-select>
+      </div>
     </div>
+    <div class="fk-note">This report downloads as an Excel file (outstanding bills with &lt;30 / 31&ndash;60 / 61&ndash;90 / 91&ndash;120 / 121&ndash;180 / &gt;180 day buckets, unadjusted receipts and advances). It is not displayed on screen.</div>
+  </div>
+
+  <div class="bar">
+    <span class="note">Financial year is taken from your login.</span>
+    <div class="r">
+      <button class="btn p" type="submit" (click)="ExportToExcel()">Export to Excel</button>
+    </div>
+  </div>
 </div>
-
-

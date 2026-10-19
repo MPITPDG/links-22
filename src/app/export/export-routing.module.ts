@@ -1,6 +1,5 @@
 ﻿import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { ExportComponent } from './export.component';
  
 const routes: Routes = [
     {
@@ -9,7 +8,14 @@ const routes: Routes = [
             title: 'Export'
         },
         children: [
-            { path: '', component: ExportComponent, data: { title: 'Home' } },           
+            // The module landing page is the Export Dashboard on /dashboard (as MP); /export and
+            // /export-home have no screen of their own. Child routes (/export/Consignment/...) are unchanged.
+            { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+            {
+                // Export > Today: job-state alerts (ported from MPERPNG-20).
+                path: 'today',
+                loadChildren: () => import('./today/export-today.module').then(m => m.ExportTodayModule),
+            },
               {
                 path: 'Consignment',
                 loadChildren: () => import('./consignment/consignment/expt-consignment-module').then(m => m.ExportConsignmentModule),

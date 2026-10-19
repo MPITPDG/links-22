@@ -10,10 +10,11 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { DatePipe } from '@angular/common';
 
+import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, finAmt, finByKey } from '../fin-kit';
 @Component({
     selector: 'app-ItemAccountStatement-search',
     templateUrl: './itemaccount-search.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' },
     providers: [DatePipe],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
@@ -134,7 +135,7 @@ import { DatePipe } from '@angular/common';
     }
     GetItemName(icode)  {
      let updateItem = this.ItemList.find(item => item.ITEMACCTCODE === icode);
-     this.ItemName=updateItem.ITEMACCTNAME;
+          this.ItemName=updateItem?.ITEMACCTNAME; // guarded: clearing the select passed undefined
     }
     Showdata(){
       this.loaderService.display(true);
@@ -185,9 +186,10 @@ import { DatePipe } from '@angular/common';
               this.currTotalcr=data.Table2[0].CRAMT + " Cr" ;
             }
             else {
-              this.currTotalcr=(data.Table2[0].CRAMT=="0.00")?"" :Math.abs(data.Table2[0].CRAMT) + " Cr";
+                            this.currTotalcr=(data.Table2[0].CRAMT=="0.00")?"" :Math.abs(data.Table2[0].CRAMT) + " Cr";
             }
-          });
+            this.failed = false; this.buildView();
+          }, () => { this.loaderService.display(false); this.failed = true; });
        //// this.ShowOutstanding();
         this.loaderService.display(false);
     }
@@ -444,5 +446,26 @@ import { DatePipe } from '@angular/common';
         else {
           return false;
         }  
+    }
+
+    // ---- redesign: period presets, pager, chart (display only) ----
+    failed = false;
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    pager = new FinPager<any>(10);
+    chart: FinChart | null = null;
+    fmt = finAmt;
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.FromDate = this._dataService.datechnge(r.from);
+        this.ToDate = this._dataService.datechnge(r.to);
+    }
+    buildView() {
+        const rows = this.SearchdataItemAct_list || [];
+        this.pager.set(rows);
+        const items = finByKey(rows, r => r.ITEMNAME, r => finNum(r.DRAMT) - finNum(r.CRAMT));
+        this.chart = items.length ? finBars(items) : null;
     }
 } 

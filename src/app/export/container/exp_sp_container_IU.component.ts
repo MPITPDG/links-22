@@ -2,7 +2,6 @@
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
 import { Router} from '@angular/router';
-import { ToasterService } from 'angular2-toaster';
 import { LoginService } from '../../shared/service/loginService';
 import { IMyDpOptions } from 'mydatepicker';
 import { ToastCommonService } from '../../shared/service/toastService';
@@ -13,6 +12,7 @@ import { TabsetComponent  } from 'ngx-bootstrap/tabs';
 @Component({
     selector: 'app-container-iu',
     templateUrl: 'exp_sp_container_IU.component.html',
+    styleUrls: ['./exp-sp-container-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -171,20 +171,20 @@ export class ExptSpContainerIU implements OnInit {
             const jsonExport = { vsl_rtno: this._vslsharedvataSerice.RtnosharedData, Port: this._vslsharedvataSerice.vslPortsharedData };
             this._dataService.Common(this.baseUrl, jsonExport)
                 .subscribe((data: any) => {
-                    if (data.Table[0].STATUS == 100) {
+                    if (data?.Table?.[0]?.STATUS == 100) {
                         this.containerlist = data.Table;
                         this.vsldet = "VESSEL: " + this.containerlist[0].VSL_NAME + " - ROTATION: " + this.containerlist[0].VSL_RTNO + "  -  VOYAGE: " + this.containerlist[0].VSL_VOYNO + " -  ETD: " + this.containerlist[0].ETD;
                         this.vslrotation = this.containerlist[0].VSL_RTNO;
                         this.vslport = this.containerlist[0].PORT;
                       
-                        this.vslAgent = data.Table1;
-                        this.city = data.Table2;
-                        this.currency = data.Table3;
-                        this.shpline = data.Table4;
+                        this.vslAgent = data.Table1 ?? [];
+                        this.city = data.Table2 ?? [];
+                        this.currency = data.Table3 ?? [];
+                        this.shpline = data.Table4 ?? [];
                         this.editmodeContainerfill();
                     }
                     else {                       
-                        this._toasterService.toast('error', 'Error', data.Table[0].STATUSTEXT);                         
+                        this._toasterService.toast('error', 'Error', data?.Table?.[0]?.STATUSTEXT);                         
                         this._loaderService.display(false);
                     }
                 });
@@ -197,7 +197,7 @@ export class ExptSpContainerIU implements OnInit {
             const jsonExport = { ContainerID: this._ContainerIUSharedDataService.ContainerID };
             this._dataService.Common(this.baseUrl, jsonExport)
                 .subscribe((data: any) => {
-                    if (data.Table[0].STATUS == 100) {
+                    if (data?.Table?.[0]?.STATUS == 100) {
                         this.Vslagt = data.Table[0].EXPT_AGENT;
                         this.onfillshipline(this.Vslagt);
                         this.Vslshpgline = data.Table[0].SHPGLINE;
@@ -251,13 +251,13 @@ export class ExptSpContainerIU implements OnInit {
             const jsonExportclp = { vsl_rtno: this._vslsharedvataSerice.RtnosharedData, Port: this._vslsharedvataSerice.vslPortsharedData, CONTAINERNO: this.Containerno, EXPT_AGENT: this.Vslagt, GUID: this._loginService.getLogin()[0].GUID ,cmpcode:  this._loginService.getLogin()[0].CMPCODE};
             this._dataService.Common(this.baseUrl, jsonExportclp)
                 .subscribe((data: any) => {
-                    if (data.Table[0].STATUS == 100) {
+                    if (data?.Table?.[0]?.STATUS == 100) {
                         this.clpVessel = data.Table;
                         this.clpHeader = "VESSEL: " + this.clpVessel[0].VSL_NAME + " - ROTATION: " + this.clpVessel[0].VSL_RTNO + "  -  VOYAGE: " + this.clpVessel[0].VSL_VOYNO + " -  ETD: " + this.clpVessel[0].ETD;
                         this.ClpRotation = this.clpVessel[0].VSL_RTNO;
                         this.verified = this.clpVessel[0].VERIFIED
                         this.verifiedflg = this.clpVessel[0].VERIFIED_FLAG
-                        this.containerClp = data.Table1;
+                        this.containerClp = data.Table1 ?? [];
                         var totpkgs =0;var totcbm =0;var totpcs =0; var totgrwt =0;var totnetwt =0;
                         for (let i=0;i<this.containerClp.length; i++){
                            this.cntrpkgs =this.containerClp[i].THIS_CONTAINER_NOOFPKGS;
@@ -282,7 +282,7 @@ export class ExptSpContainerIU implements OnInit {
                         this.pcs = totpcs;
                         this.grwt = totgrwt;
                         this.netwt = totnetwt;
-                        this.containerNoClp = data.Table2;
+                        this.containerNoClp = data.Table2 ?? [];
                         if (this.verified == "Y") {
                             this.LoadPallet();
                           //  this.disableEnable_Tab3();
@@ -291,7 +291,7 @@ export class ExptSpContainerIU implements OnInit {
                         this._loaderService.display(false);
                     }
                     else {                       
-                        this._toasterService.toast('error', 'Error', data.Table[0].STA_MSG);
+                        this._toasterService.toast('error', 'Error', data?.Table?.[0]?.STA_MSG);
                          this.disableEnable_clp();
                          this._loaderService.display(false);
                     }
@@ -305,11 +305,12 @@ export class ExptSpContainerIU implements OnInit {
         const jsonExportclp = { ContainerID: this._ContainerIUSharedDataService.ContainerID, ContainerNo: this.Containerno, vsl_rtno: this._vslsharedvataSerice.RtnosharedData, huhpnk:  this._loginService.getLogin()[0].CMP_USERENCCODE };
         this._dataService.Common(this.baseUrl, jsonExportclp)
             .subscribe((data: any) => {
-                if (data.Table[0].STATUS == 100) {
+                if (data?.Table?.[0]?.STATUS == 100) {
                    
-                    this.p_header = "VESSEL: " + data.Table1[0].VSL_NAME + " - ROTATION: " + data.Table1[0].VSL_RTNO + "  -  VOYAGE: " + data.Table1[0].VSL_VOYNO + " -  ETD: " + data.Table1[0].ETD;
-                    this.p_vslrtno = data.Table1[0].VSL_RTNO;                    
-                    this.P_List = data.Table2;
+                    const pv = data.Table1?.[0] ?? {};
+                    this.p_header = "VESSEL: " + pv.VSL_NAME + " - ROTATION: " + pv.VSL_RTNO + "  -  VOYAGE: " + pv.VSL_VOYNO + " -  ETD: " + pv.ETD;
+                    this.p_vslrtno = pv.VSL_RTNO;                    
+                    this.P_List = data.Table2 ?? [];
                    
                 }
                 
@@ -390,7 +391,7 @@ export class ExptSpContainerIU implements OnInit {
         };
         this._dataService.Common("Export/Export_container_IU", jsonExport)
             .subscribe((data: any) => {
-                if (data.Table[0].STATUS == "100") {
+                if (data?.Table?.[0]?.STATUS == "100") {
                     this._toasterService.toast('info', 'Complete', data.Table[0].STATUSTEXT);
                     this.buttonStatus = false;
                     this._vslsharedvataSerice.RtnosharedData = this.vslrotation;
@@ -402,7 +403,7 @@ export class ExptSpContainerIU implements OnInit {
                 }
                 else {
 
-                    this._toasterService.toast('error', 'Error', data.Table[0].STATUSTEXT);
+                    this._toasterService.toast('error', 'Error', data?.Table?.[0]?.STATUSTEXT);
                     this.buttonStatus = false;
                     this._loaderService.display(false);
                 }
@@ -516,7 +517,7 @@ export class ExptSpContainerIU implements OnInit {
                     this._dataService.Common(this.baseUrl, jsonExport)
                         .subscribe((data: any) => {
 
-                            if (data.Table[0].STATUS == "100") {
+                            if (data?.Table?.[0]?.STATUS == "100") {
                                 this._toasterService.toast('info', 'Complete', data.Table[0].STATUSTEXT);
                                 this.buttonStatus = false;
 
@@ -528,7 +529,7 @@ export class ExptSpContainerIU implements OnInit {
                             }
                             else {
 
-                                this._toasterService.toast('error', 'Error', data.Table[0].STATUSTEXT);
+                                this._toasterService.toast('error', 'Error', data?.Table?.[0]?.STATUSTEXT);
                                 this.buttonStatus = false;
                             }
                         }); 
@@ -558,7 +559,7 @@ export class ExptSpContainerIU implements OnInit {
         this._dataService.Common(this.baseUrl, jsonExport)
             .subscribe((data: any) => {
 
-                if (data.Table[0].STATUS == "100") {
+                if (data?.Table?.[0]?.STATUS == "100") {
                     this._toasterService.toast('info', 'Complete', data.Table[0].STATUSTEXT);
                     this.buttonStatus = false;
 
@@ -570,7 +571,7 @@ export class ExptSpContainerIU implements OnInit {
                 }
                 else {
 
-                    this._toasterService.toast('error', 'Error', data.Table[0].STATUSTEXT);
+                    this._toasterService.toast('error', 'Error', data?.Table?.[0]?.STATUSTEXT);
                     this.buttonStatus = false;
                 }
             });

@@ -1,243 +1,110 @@
-<div class="br-page">
-
-  <!-- ========================================================= -->
-  <!-- UPLOAD FORM                                               -->
-  <!-- ========================================================= -->
+<!--
+  Accounts -> Bank reconciliation -> Upload statement.
+  Form recipe: bank + statement period + boxed choose-file area (#inputFile, onFileChange), Upload in the
+  sticky bar (upload()). Result (displayType LIST): Reconciled / Unreconciled tabs over
+  reconcildataList / unreconcildataList, bank side vs ledger side. Back returns to the search (back()).
+  Links port of the MPERPNG-20 layout (kit .im-page + host class kit-accreport); .ts is Links' own
+  (xlsx period sniffing in onFileChange, period-mismatch confirm and UploadBnkReconcilFileV2 upload unchanged).
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ displayType=='LIST' ? 'Reconciliation result' : Header }}</h1>
+      <p>Upload a bank statement and match its lines against the ledger
+        @if (displayType=='LIST' && FromDate && ToDate) { &middot; {{FromDate}} &ndash; {{ToDate}} }</p>
+    </div>
+    @if (displayType=='LIST') {
+      <div class="tools"><button class="btn g" type="button" (click)="back()">Back to search</button></div>
+    }
+  </div>
 
   @if (displayType=='SEARCH') {
-<div class="br-card upload-card">
-
-    <div class="card-heading">
-      <i class="fa fa-cloud-upload"></i> {{Header}}
+    <div class="card sec">
+      <div class="card-h"><h2>Statement</h2><span class="meta"><b>*</b> required</span></div>
+      <div class="filters fk-f">
+        <div class="f w2">
+          <label>Bank account <span class="req">*</span></label>
+          <ng-select [items]="BankList" bindLabel="acctname" bindValue="acctcodename" [(ngModel)]="ourbank" [appendTo]="'body'" placeholder="Select bank account"></ng-select>
+        </div>
+        <div class="f">
+          <label>Statement from <span class="req">*</span></label>
+          <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)" [options]="myDatePickerOptions" [selDate]="FromDate"></my-date-picker>
+        </div>
+        <div class="f">
+          <label>Statement to <span class="req">*</span></label>
+          <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)" [options]="myDatePickerOptions" [selDate]="ToDate"></my-date-picker>
+        </div>
+      </div>
+      <div class="fk-pad">
+        <div class="fk-drop">
+          <div>
+            <div class="t">Statement file <span class="req">*</span></div>
+            <div class="h">
+              @if (selfilename) {
+                {{ selfilename }}
+                @if (stmtPeriodText) { &middot; file period: {{ stmtPeriodText }} }
+                @else { &middot; no date column recognised in this file, the period check will be skipped }
+              } @else { .csv, .xls or .xlsx }
+            </div>
+          </div>
+          <input type="file" #inputFile accept=".csv,.xls,.xlsx" (change)="onFileChange($event)">
+        </div>
+      </div>
     </div>
-
-    <div class="clean-row-layout">
-
-      <!-- BANK ACCOUNT -->
-      <div class="clean-field clean-bank">
-        <label>Bank Account <span class="br-req">*</span></label>
-        <ng-select
-          [items]="BankList"
-          bindLabel="acctname"
-          bindValue="acctcodename"
-          [(ngModel)]="ourbank"
-          [appendTo]="'body'"
-          placeholder="Select Bank Account">
-        </ng-select>
+    <div class="bar">
+      <span class="note">{{ selfilename || 'No file chosen' }}</span>
+      <div class="r">
+        <button class="btn g" type="button" (click)="back()">Back</button>
+        <button class="btn p" type="button" (click)="upload()">Upload</button>
       </div>
-
-      <!-- STATEMENT FROM -->
-      <div class="clean-field clean-date">
-        <label>Statement From <span class="br-req">*</span></label>
-        <my-date-picker
-          name="FromDate"
-          (dateChanged)="FromDateChanged($event)"
-          [options]="myDatePickerOptions"
-          [selDate]="FromDate"
-          class="search-date-control">
-        </my-date-picker>
-      </div>
-
-      <!-- STATEMENT TO -->
-      <div class="clean-field clean-date">
-        <label>Statement To <span class="br-req">*</span></label>
-        <my-date-picker
-          name="ToDate"
-          (dateChanged)="ToDateChanged($event)"
-          [options]="myDatePickerOptions"
-          [selDate]="ToDate"
-          class="search-date-control">
-        </my-date-picker>
-      </div>
-
-      <!-- FILE -->
-      <div class="clean-field clean-file">
-        <label>Statement File <span class="br-req">*</span></label>
-        <input
-          type="file"
-          #inputFile
-          class="br-file"
-          accept=".csv,.xls,.xlsx"
-          (change)="onFileChange($event)">
-      </div>
-
-      <!-- ACTIONS -->
-      <div class="clean-actions">
-        <button class="br-btn br-btn--primary" type="button" (click)="upload()">
-          <i class="fa fa-cloud-upload"></i> Upload
-        </button>
-        <button class="br-btn br-btn--ghost" type="button" (click)="back()">
-          <i class="fa fa-arrow-circle-left"></i> Back
-        </button>
-      </div>
-
     </div>
-
-    <!-- selected file + the period detected inside it -->
-    @if (selfilename) {
-<div class="br-fileinfo">
-      <span class="br-chip">
-        <i class="fa fa-file-excel-o"></i> {{selfilename}}
-      </span>
-      @if (stmtPeriodText) {
-<span class="br-chip">
-        <i class="fa fa-calendar"></i> File period: {{stmtPeriodText}}
-      </span>
-}
-      @if (!stmtPeriodText) {
-<span class="br-hint">
-        No date column recognised in this file — the period check will be skipped.
-      </span>
-}
-    </div>
-}
-
-  </div>
-}
-
-  <!-- ========================================================= -->
-  <!-- RESULT                                                    -->
-  <!-- ========================================================= -->
+  }
 
   @if (displayType=='LIST') {
-
-
-    <div class="br-topbar">
-      <div class="br-topbar-left">
-        <span class="br-page-title">Reconciliation Result</span>
-        @if (FromDate && ToDate) {
-<span class="br-meta">{{FromDate}} – {{ToDate}}</span>
-}
+    <div class="card sec">
+      <div class="toolbar">
+        <div class="fk-seg fk-tabs">
+          <button type="button" [class.on]="activeTab=='REC'" (click)="activeTab='REC'">Reconciled &middot; {{reconcilrecord}}</button>
+          <button type="button" [class.on]="activeTab=='UNREC'" (click)="activeTab='UNREC'">Unreconciled &middot; {{unreconcilrecord}}</button>
+        </div>
       </div>
-      <div class="br-topbar-right">
-        <button class="br-btn br-btn--ghost" type="button" (click)="back()">
-          <i class="fa fa-arrow-circle-left"></i> Back to search
-        </button>
-      </div>
-    </div>
-
-    <div class="br-view-toggle">
-      <button
-        class="toggle-btn"
-        type="button"
-        [class.active]="activeTab=='REC'"
-        (click)="activeTab='REC'">
-        <i class="fa fa-check"></i> Reconciled
-        <span class="toggle-count">{{reconcilrecord}}</span>
-      </button>
-      <button
-        class="toggle-btn"
-        type="button"
-        [class.active]="activeTab=='UNREC'"
-        (click)="activeTab='UNREC'">
-        <i class="fa fa-exclamation-triangle"></i> Unreconciled
-        <span class="toggle-count">{{unreconcilrecord}}</span>
-      </button>
-    </div>
-
-    <div class="br-card br-table-card">
-      <div class="br-table-wrap">
-
-        <table class="br-table">
+      <div class="tbl-wrap">
+        <table class="tbl">
           <thead>
-            <tr class="grp-head">
-              <th colspan="4">Bank Statement Data</th>
-              <th colspan="7" class="grp-start">Ledger Data</th>
+            <tr class="grp">
+              <th colspan="4">Bank statement</th>
+              <th colspan="7">Ledger</th>
             </tr>
-            <tr class="col-head">
-              <th>Bank Ref No</th>
-              <th class="num">Deposit</th>
-              <th class="num">Withdrawal</th>
-              <th class="ctr">Clearance Dt</th>
-              <th class="grp-start">Bank Ref No</th>
-              <th>Entry No</th>
-              <th class="ctr">Entry Date</th>
-              <th class="ctr">Type</th>
-              <th class="num">Amount</th>
-              <th class="num">Deduction</th>
-              <th class="ctr">Clearance Dt</th>
+            <tr>
+              <th>Bank ref no.</th><th class="num">Deposit</th><th class="num">Withdrawal</th><th>Clearance date</th>
+              <th>Bank ref no.</th><th>Entry no.</th><th>Entry date</th><th>Type</th><th class="num">Amount</th><th class="num">Deduction</th><th>Clearance date</th>
             </tr>
           </thead>
           <tbody>
-            @for (data of (activeTab=='REC' ? reconcildataList : unreconcildataList); track data) {
-<tr>
-
-              <!-- bank statement side -->
-              <td class="mono">{{data.BANKREFNO || '—'}}</td>
-              <td class="num">
-                @if (data.DEPOSIT > 0) {
-<span class="cr-amt">{{data.DEPOSIT | number:'1.2-2'}}</span>
-}
-                @if (!(data.DEPOSIT > 0)) {
-<span class="muted">—</span>
-}
-              </td>
-              <td class="num">
-                @if (data.WITHDRAWAL > 0) {
-<span class="dr-amt">{{data.WITHDRAWAL | number:'1.2-2'}}</span>
-}
-                @if (!(data.WITHDRAWAL > 0)) {
-<span class="muted">—</span>
-}
-              </td>
-              <td class="ctr">{{data.CLEARANCEDT || '—'}}</td>
-
-              <!-- ledger side -->
-              <td class="mono grp-start">{{data.USERBANKREFNO || '—'}}</td>
-              <td class="mono">{{data.ENTRYNO || '—'}}</td>
-              <td class="ctr">{{data.ENTRYDT || '—'}}</td>
-              <td class="ctr">
-                @if (data.ENTRYTYPE=='BR') {
-<span class="br-badge br-badge--br">BR</span>
-}
-                @if (data.ENTRYTYPE=='BP') {
-<span class="br-badge br-badge--bp">BP</span>
-}
-                @if (data.ENTRYTYPE!='BR' && data.ENTRYTYPE!='BP') {
-<span class="muted">—</span>
-}
-              </td>
-              <td class="num">
-                @if (data.AMOUNT) {
-<span>{{data.AMOUNT | number:'1.2-2'}}</span>
-}
-                @if (!data.AMOUNT) {
-<span class="muted">—</span>
-}
-              </td>
-              <td class="num">
-                @if (data.DEDUCTION) {
-<span>{{data.DEDUCTION | number:'1.2-2'}}</span>
-}
-                @if (!data.DEDUCTION) {
-<span class="muted">—</span>
-}
-              </td>
-              <td class="ctr">{{data.LCLEARANCEDT || '—'}}</td>
-
-            </tr>
-}
+            @for (data of (activeTab=='REC' ? reconcildataList : unreconcildataList); track $index) {
+              <tr>
+                <td class="mono">{{data.BANKREFNO || '—'}}</td>
+                <td class="num">@if (data.DEPOSIT > 0) { {{data.DEPOSIT | number:'1.2-2'}} } @else { <span class="sub-t">—</span> }</td>
+                <td class="num">@if (data.WITHDRAWAL > 0) { {{data.WITHDRAWAL | number:'1.2-2'}} } @else { <span class="sub-t">—</span> }</td>
+                <td>{{data.CLEARANCEDT || '—'}}</td>
+                <td class="mono">{{data.USERBANKREFNO || '—'}}</td>
+                <td class="mono">{{data.ENTRYNO || '—'}}</td>
+                <td>{{data.ENTRYDT || '—'}}</td>
+                <td>
+                  @if (data.ENTRYTYPE=='BR') { <span class="chip solid">BR</span> }
+                  @else if (data.ENTRYTYPE=='BP') { <span class="chip">BP</span> }
+                  @else { <span class="sub-t">—</span> }
+                </td>
+                <td class="num">@if (data.AMOUNT) { {{data.AMOUNT | number:'1.2-2'}} } @else { <span class="sub-t">—</span> }</td>
+                <td class="num">@if (data.DEDUCTION) { {{data.DEDUCTION | number:'1.2-2'}} } @else { <span class="sub-t">—</span> }</td>
+                <td>{{data.LCLEARANCEDT || '—'}}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="11">{{ activeTab=='REC' ? 'Nothing reconciled in this upload. Every statement line is on the Unreconciled tab.' : 'Nothing outstanding: every line matched.' }}</td></tr>
+            }
           </tbody>
         </table>
-
-        @if (activeTab=='REC' && reconcildataList.length === 0) {
-<div class="br-empty">
-          <i class="fa fa-inbox"></i>
-          Nothing reconciled in this upload. Every statement line is on the Unreconciled tab.
-        </div>
-}
-
-        @if (activeTab=='UNREC' && unreconcildataList.length === 0) {
-<div class="br-empty">
-          <i class="fa fa-check-circle"></i>
-          Nothing outstanding — every line matched.
-        </div>
-}
-
       </div>
     </div>
-
-  
-}
-
+  }
 </div>

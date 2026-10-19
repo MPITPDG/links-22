@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
 import { Router} from '@angular/router';
-import { ToasterService } from 'angular2-toaster';
 import { LoginService } from '../../shared/service/loginService';
 import { IMyDpOptions } from 'mydatepicker';
 import { ToastCommonService } from '../../shared/service/toastService';
@@ -12,6 +11,10 @@ import { ThemeService } from 'ng2-charts';
 @Component({
     selector: 'app-multicontainerFS-Edit',
     templateUrl: 'exp_fs_multicontainer_edit.component.html',
+    // Page kit is global (src/styles/kit): kit-consignment scopes consignment-page.css
+    // (banded card heads, .btn.sm, .cv-acts); the screen sheet adds the mock-only helpers.
+    host: { class: 'kit-consignment' },
+    styleUrls: ['./exp-fs-multicontainer-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

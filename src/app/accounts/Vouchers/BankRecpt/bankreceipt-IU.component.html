@@ -1,296 +1,256 @@
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-header formheading">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <strong>{{Header| uppercase}}</strong>
-                    </div>
-                </div>
-            </div>
+<!--
+  Bank receipt - add / edit.
+  Monochrome page kit (import-page.css + ../vouchers-page.css). Every [(ngModel)], handler,
+  disabled toggle, total binding (NetTotal / TotalAmount / TotalDeduction) and the bill-help
+  modal (showModal_ListBill) is unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Header | titlecase }}</h1>
+      <p>Money received into our bank, split across accounts, bills and jobs</p>
+    </div>
+    <div class="tools">
+      @if (EntryNo) {
+        <span class="chip solid">{{ EntryNo }}</span>
+      } @else {
+        <span class="chip dash">New</span>
+      }
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>General details</h2>
+      <span class="meta"><b>*</b> required</span>
+    </div>
+    <div class="fields">
+      <div class="fld">
+        <label>Entry no. <span class="req">*</span></label>
+        <input [(ngModel)]="EntryNo" type="text" disabled="disabled" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Entry date <span class="req">*</span></label>
+        <my-date-picker name="EntryDate" (dateChanged)="EntryDateChanged($event)" [options]="myDatePickerOptions" class="form-control" [selDate]="EntryDate"></my-date-picker>
+      </div>
+      <div class="fld full">
+        <label>Narration</label>
+        <!-- Links: narration is a textarea fed by TextareaValueChange (kept from the Links screen) -->
+        <textarea id="autoresizing" (change)="TextareaValueChange($event)"
+          placeholder="text" cols="50" rows="3" [innerHTML]="Narration"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Cheque details</h2>
+    </div>
+    <div class="fields">
+      <div class="fld">
+        <label>Cheque date</label>
+        <my-date-picker name="ChequeDate" [options]="myDatePickerOptions" class="form-control" [selDate]="ChequeDate"></my-date-picker>
+      </div>
+      <div class="fld">
+        <label>Cheque no.</label>
+        <input [(ngModel)]="ChequeNo" [OnlyNumber]="true" type="text" maxlength="40">
+      </div>
+      <div class="fld full">
+        <label>Our bank</label>
+        <select [(ngModel)]="OurBank" (change)="GetOurBankName($event)">
+          <option value="0">Please select</option>
+          @for (d of OurBankList; track d) {
+            <option value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Bank name</label>
+        <input [(ngModel)]="BankName" type="text" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Bank ref. no.</label>
+        <input [(ngModel)]="BankRefNo" type="text" maxlength="40">
+      </div>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Account line</h2>
+      <span class="meta">{{ txtchild === 'Update' ? 'Editing a line' : 'Add a line to the grid below' }}</span>
+    </div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Account name <span class="req">*</span></label>
+        <ng-select [items]="AccountNameList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
+          [(ngModel)]="AccountName" (change)="GetActName($event.ACCTCODENAME)" class="custom " placeholder="--Select--">
+        </ng-select>
+      </div>
+      <div class="fld full">
+        <label>Item <span class="req">*</span></label>
+        <ng-select [items]="ItemList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Item"
+          class="custom " placeholder="--Select--">
+        </ng-select>
+      </div>
+      <div class="fld">
+        <label>Entry type</label>
+        <select [disabled]='disableEntryType' [(ngModel)]="EntryType" (change)="listbillpopup($event.target.value)">
+          <option value="0">-- Select Type --</option>
+          <option value="AB1">Bill - Help</option>
+          <option value="AB">Bill - Manual</option>
+          <option value="AO">Opening Balance</option>
+          <option value="AD">Advance</option>
+          <option value="OA">On Account</option>
+          <option value="JB">JobNo</option>
+          <option value="PE">Purchase Entry</option>
+          <option value="GR">General</option>
+        </select>
+      </div>
+      <div class="fld">
+        <label>Department</label>
+        <select [(ngModel)]="Department" (change)="GetDepartmentName($event)">
+          <option value="0">--Please select--</option>
+          @for (d of Departmentlist; track d) {
+            <option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Bill no. <span class="req">*</span></label>
+        <input [(ngModel)]="BillNo" type="text" [OnlyNumber]="true" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Job no.</label>
+        <input [(ngModel)]="JobNo" [OnlyNumber]="true" type="text" (blur)="ValidateJobNo($event.target.value)" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Amount <span class="req">*</span></label>
+        <input [(ngModel)]="Amount" type="text" [OnlyNumber]="true" [disabled]='toggledebit' maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Deduction</label>
+        <input [(ngModel)]="Deduction" [OnlyNumber]="true" type="text" [disabled]='togglededuction' maxlength="40">
+      </div>
+      <div class="fld full">
+        <label>Line narration</label>
+        <input [(ngModel)]="ShortNarration" type="text" maxlength="40">
+      </div>
+    </div>
+    <div class="v-actions">
+      <button class="btn p" type="submit" (click)="Addchildrcrd()">{{txtchild}} line</button>
+      <button class="btn g" type="reset" (click)="Resetchild();">Reset line</button>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Lines</h2>
+      <span class="meta">{{ Accountlist.length }} {{ Accountlist.length === 1 ? 'line' : 'lines' }}</span>
+    </div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Net total</label>
+        <input [(ngModel)]="NetTotal" disabled="disabled" type="text" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Amount</label>
+        <input [(ngModel)]="TotalAmount" disabled="disabled" type="text" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Deduction</label>
+        <input [(ngModel)]="TotalDeduction" disabled="disabled" type="text" maxlength="40">
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Account name</th>
+            <th class="num">Amount</th>
+            <th class="num">Deduction</th>
+            <th>Item</th>
+            <th>Entry type</th>
+            <th>Job no.</th>
+            <th>Bill no.</th>
+            <th>Department</th>
+            <th>Narration</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (obj of Accountlist; track obj) {
+            <tr>
+              <td class="act l">
+                <button type="button" (click)="Editchildrecd(obj.ID)">Edit</button>
+                <button type="button" (click)="deletechildrecd(obj.ID,obj.ACC_BANKDTLS_ID)">Delete</button>
+              </td>
+              <td><span [innerHtml]="obj.ACCOUNT_NAME"></span></td>
+              <td class="num">{{obj.AMOUNT}}</td>
+              <td class="num">{{obj.DEDUCTION}}</td>
+              <td>{{obj.ITEM}}</td>
+              <td>{{obj.ET}}</td>
+              <td class="mono">{{obj.JOBNO}}</td>
+              <td class="mono">{{obj.BILLNO}}</td>
+              <td>{{obj.DEPARTMENT}}</td>
+              <td>{{obj.NARRATION}}</td>
+            </tr>
+          } @empty {
+            <tr><td class="empty" colspan="10">No lines yet. Add one above.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose {{text}}.</span>
+    <div class="r">
+      <button class="btn g" type="reset" (click)="Reset();">Reset</button>
+      <button class="btn p" type="submit" (click)="Add_Main()">{{text}}</button>
+    </div>
+  </div>
+
+  <div class="modal v-modal" [style.display]="showModal_ListBill ? 'block' : 'none'">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="card-h">
+          <h2>Bill details</h2>
+          <span class="meta">Client: <b>{{client}}</b></span>
         </div>
-    </div>
-</div>
-<div class="row no-gutters">
-    <div class="col-sm-12 col-md-2 col-lg-2">
-    </div>
-    <div class="col-sm-12 col-md-8 col-lg-8 ">
-        <table class="table table-bordered table-sm-new bgwhite">
-
-            <tr class="trheader">
-                <td class="col-form-span-label" style="color: whitesmoke;"  colspan="4">
-                    <b> General Details </b>
-                </td>
-            </tr>
-            <tr>
-
-                <td><span  class="col-form-span-label"><b>Entry No</b> </span><span class="col-form-span-error">*</span></td>
-                <td >  <input [(ngModel)]="EntryNo" type="text"   disabled="disabled" class="form-control width150" maxlength="40" > </td>
-                <td ><span class="col-form-span-label"><b>Entry Date</b> </span><span class="col-form-span-error">*</span>  </td>
-                <!-- <td>
-                    <my-date-picker name="EntryDate"  [disabled]='toggleentrydate' (dateChanged)="EntryDateChanged($event)" [options]="myDatePickerOptions" class="form-control" [selDate]="EntryDate" ></my-date-picker>
-                </td> -->
-                <td>
-                    <my-date-picker name="EntryDate"  (dateChanged)="EntryDateChanged($event)" [options]="myDatePickerOptions" class="form-control" [selDate]="EntryDate" ></my-date-picker>
-                </td>
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b>Narration</b> </span></td>
-                <td colspan="3">  
-                    <!-- <input [(ngModel)]="Narration" type="text"  class="form-control"  > -->
-                    <textarea class="form-control" id="autoresizing" (change)="TextareaValueChange($event)"
-                    placeholder="text" cols="50" rows="3" [innerHTML]="Narration"></textarea>
-                 </td>
-             </tr>
-             <tr class="trheader">
-                <td class="col-form-span-label" style="color: whitesmoke;"  colspan="4">
-                   <b> Cheque Details</b>
-                </td>
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b>Cheque Date</b> </span></td>
-                <td>
-                    <my-date-picker name="ChequeDate"  [options]="myDatePickerOptions" class="form-control" [selDate]="ChequeDate"  ></my-date-picker>
-                </td>
-                <td><span class="col-form-span-label"><b>Cheque No.</b> </span></td>
-                <td >  <input [(ngModel)]="ChequeNo"  [OnlyNumber]="true" type="text"   class="form-control width150" maxlength="40" > </td>
-
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b>Our Bank</b> </span></td>
-                <td colspan="3">
-                <select class="form-control width500"  [(ngModel)]="OurBank" (change)="GetOurBankName($event)" >
-                    <option value="0">Please select</option>
-                    @for (d of OurBankList; track d) {
-<option  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
-}
-                </select>
-            </td>
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b>Bank Name</b> </span></td>
-                <td >  <input [(ngModel)]="BankName"   type="text"   class="form-control width200" maxlength="40" > </td>
-
-                <td><span class="col-form-span-label"><b>Bank Ref. No.</b> </span></td> 
-                <td >  <input [(ngModel)]="BankRefNo"   type="text"   class="form-control width150" maxlength="40" > </td>
-            </tr>
-            <tr class="trheader">
-                <td class="col-form-span-label" style="color: whitesmoke;"  colspan="4">
-                   <b> Accounts Details</b>
-                </td>
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b>Account Name</b> </span><span class="col-form-span-error">*</span></td>
-                <td colspan="3">
-                    <ng-select [items]="AccountNameList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
-                    [(ngModel)]="AccountName" (change)="GetActName($event.ACCTCODENAME)" class="custom " placeholder="--Select--">
-                    </ng-select>
-                </td>
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b>Item</b> </span><span class="col-form-span-error">*</span></td>
-                <td colspan="2">
-
-                    <ng-select [items]="ItemList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Item"
-                    class="custom " placeholder="--Select--">
-                </ng-select>
-                </td>
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b> Entry Type</b> </span></td>
-                <td style=" display: flex; ">
-                    <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
-                        <select class="form-control width150"  [disabled]='disableEntryType'[(ngModel)]="EntryType" (change)="listbillpopup($event.target.value)"  >
-                        <option value="0">-- Select Type --</option>
-                        <option value="AB1">Bill - Help</option>
-                        <option value="AB">Bill - Manual</option>
-                        <option value="AO">Opening Balance</option>
-                        <option value="AD">Advance</option>
-                        <option value="OA">On Account</option>
-                        <option value="JB">JobNo</option>
-                        <option value="PE">Purchase Entry</option>
-                        <option value="GR">General</option>
-                        </select>
-
-            </td>
-                <td><span class="col-form-span-label"><b> Department</b> </span></td>
-                <td>
-                 <select class="form-control width150"  [(ngModel)]="Department" (change)="GetDepartmentName($event)" >
-                    <option value="0">Please select</option>
-                    @for (d of Departmentlist; track d) {
-<option  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
-}
-
-                </select>
-
-            </td>
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b> Bill No</b> </span><span class="col-form-span-error">*</span></td>
-                <td >  <input [(ngModel)]="BillNo" type="text"  [OnlyNumber]="true"   class="form-control width150" maxlength="40" > </td>
-                <td><span class="col-form-span-label"><b>Job No</b> </span></td>
-                <td >  <input [(ngModel)]="JobNo" [OnlyNumber]="true" type="text" (blur)="ValidateJobNo($event.target.value)"   class="form-control width150" maxlength="40" > </td>
-
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b> Amount</b> </span><span class="col-form-span-error">*</span></td>
-                <td >  <input [(ngModel)]="Amount" type="text"  [OnlyNumber]="true" [disabled]='toggledebit' class="form-control width150" maxlength="40" > </td>
-                <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
-                <td >  <input [(ngModel)]="Deduction" [OnlyNumber]="true" type="text"  [disabled]='togglededuction'   class="form-control width150" maxlength="40" > </td>
-
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b>Narration</b> </span></td>
-                <td colspan="3">
-                    <input [(ngModel)]="ShortNarration" type="text"    class="form-control width500" maxlength="40" >
-                </td>
-            </tr>
-            <tr>
-                <td colspan="4"  class="centerlabel">
-                    <button class="btn btn-sm btn-success" type="submit" (click)="Addchildrcrd()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{txtchild}}</span></button>
-                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Resetchild();"><i class="fa fa-ban"></i> Reset</span></button>
-                    <!-- <button class="btn btn-sm btn-danger" type="List"> <span class="col-form-span-label" (click)="Resetchildrcrd();"><i class="fa fa-ban"></i> List</span></button> -->
-                </td>
-            </tr>
-            <tr>
-
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b> Net Total</b> </span></td>
-                <td colspan="3" >  <input [(ngModel)]="NetTotal" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b> Amount</b> </span></td>
-                <td >  <input [(ngModel)]="TotalAmount" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
-                <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
-                <td >  <input [(ngModel)]="TotalDeduction" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
-            </tr>
-
-       <tr>
-        <td colspan="4">
-        <!-- <table class="table table-bordered table-sm-new bgwhite">
-            <tr>
-                 <td colspan="4" > style="width:615px;" -->
-                    <div class="row xyscroll" style="width:715px;"   >
-                        @if (Accountlist.length>0) {
-<table class="table table-responsive-sm table-bordered" >
-                            <thead>
-                                <tr class="bakgrdliteBlue">
-                                    <th  class="col-form-span-label font-weight-bold headerwhite" ></th>
-                                    <th class="col-form-span-label font-weight-bold headerwhite">Account Name</th>
-                                    <th  class="col-form-span-label font-weight-bold headerwhite">Amount</th>
-                                    <th  class="col-form-span-label font-weight-bold headerwhite">Deduction</th>
-                                    <th  class="col-form-span-label font-weight-bold headerwhite">Item</th>
-                                    <th  class="col-form-span-label font-weight-bold headerwhite">Entry Type </th>
-                                    <th class="col-form-span-label font-weight-bold headerwhite">Job No</th>
-                                    <th class="col-form-span-label font-weight-bold headerwhite">Bill No</th>
-                                    <th class="col-form-span-label font-weight-bold headerwhite">Department</th>
-                                    <th class="col-form-span-label font-weight-bold headerwhite">Narration</th>
-                                </tr>
-                            </thead>
-                             <tbody   >
-                                @for (obj of Accountlist; track obj) {
-<tr>
-                                    <td class="centerlabel">
-                                        <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)" ></i>
-                                        &nbsp;
-                                        <i class="fa fa-trash" (click)="deletechildrecd(obj.ID,obj.ACC_BANKDTLS_ID)"></i>
-                                    </td>
-                                   <td><span class="col-form-span-label"  [innerHtml]="obj.ACCOUNT_NAME"> </span></td>
-                                   <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>
-                                    <td><span class="col-form-span-label">{{obj.DEDUCTION}}</span></td>
-                                    <td><span class="col-form-span-label">{{obj.ITEM}}</span></td>
-                                    <td><span class="col-form-span-label">{{obj.ET}}</span></td>
-                                    <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
-                                    <td><span class="col-form-span-label">{{obj.BILLNO}}</span></td>
-                                    <td><span class="col-form-span-label">{{obj.DEPARTMENT}}</span></td>
-                                    <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
-                                </tr>
-}
-                            </tbody>
-                        </table>
-}
-                   </div>
-                 <!-- </td>
-            </tr>
-
-        </table>   -->
-
-    </td>
-</tr>
-<tr>
-    <td colspan="4"  class="centerlabel">
-        <button class="btn btn-sm btn-success" type="submit" (click)="Add_Main()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{text}}</span></button>
-        <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
-    </td>
-</tr>
- </table>
-    </div>
-   
-
-    <div class="col-sm-12 col-md-2 col-lg-2">
-    </div>
-</div>
-<div class="modal" [style.display]="showModal_ListBill ? 'block' : 'none'">
-    <div class="modal-dialog modal-mg" role="document"  >
-        <div class="modal-content " style="height:400px; width:500px;overflow-x: auto;">
-            <div class="modal-header">
-                <h5 class="modal-title">BILL DETAILS</h5>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <!-- <div class="col" style="height:400px;overflow-y: auto;" > -->
-                        <div class="col" style="height:300px;overflow-y: auto;" >
-                        <table class="table table-bordered table-sm-new bgwhite" align="center">
-                            <tr>
-                                <td><span class="col-form-span-label"><b> Client:  </b> </span>
-                                    <span class="col-form-span-label"><b>{{client}}</b></span>
-                                </td>
-                                 
-                            </tr>
-                            <tr>
-                                <td>
-                                    <thead style="text-align: center;">
-                                        <tr>
-                                            <th class="col-form-span-label"></th>
-                                            <th class="col-form-span-label">INVOICE NO.</th>
-                                            <th class="col-form-span-label">JOB NO.</th>
-                                            <th class="col-form-span-label">AMOUNT</th>
-                                            <!-- <th class="col-form-span-label">DEDUCTION</th>
-                                            <th class="col-form-span-label">NARRATION</th> -->
-                                        </tr>
-                                    </thead>
-                                    <tbody >
-                                       
-                                        @for (obj of ListBill ; track obj) {
-<tr>
-                                            <td class="col-form-span-label">
-                                                <input type="checkbox" [(ngModel)]="obj.CHECKED" [id]="i" [value]="i"
-                                                    (ngModelChange)="getCheckboxValues($event,obj.INV_NO,obj.INV_JOBNO,obj.TOTALAMT,obj.CLIENT)">
-                                                &nbsp; </td>
-                                            <td class="col-form-span-label">{{obj.INV_NO}}</td>
-                                            <td class="col-form-span-label">{{obj.INV_JOBNO}}</td>
-                                            <td class="col-form-span-label">{{obj.TOTALAMT}}</td>
-                                            <!-- <td class="col-form-span-label">{{obj.DEDUCTION}}</td>
-                                            <td class="col-form-span-label"> <input [(ngModel)]="obj.NARRATION"  type="text" maxlenght="40"  class="form-control width150" ></td> -->
-
-                                        </tr>
-}
-                                    </tbody>
-                                </td>
-                            </tr>
-                        </table>
-
-                    </div>
-                </div>
-                <div style="float: right;">
-                    <button class="btn btn-sm btn-success" type="submit" (click)="popup_listbill()"> <span
-                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Add</span></button>
-                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
-                            (click)="close()"><i class="fa fa-ban"></i>
-                            Close</span></button>
-                </div>
-            </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Invoice no.</th>
+                <th>Job no.</th>
+                <th class="num">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (obj of ListBill; track obj) {
+                <tr>
+                  <td>
+                    <input type="checkbox" [(ngModel)]="obj.CHECKED" [id]="'bill' + $index" [value]="$index"
+                      (ngModelChange)="getCheckboxValues($event,obj.INV_NO,obj.INV_JOBNO,obj.TOTALAMT,obj.CLIENT)">
+                  </td>
+                  <td class="mono">{{obj.INV_NO}}</td>
+                  <td class="mono">{{obj.INV_JOBNO}}</td>
+                  <td class="num">{{obj.TOTALAMT}}</td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="4">No open bills for this client.</td></tr>
+              }
+            </tbody>
+          </table>
         </div>
+        <div class="v-actions">
+          <span class="sp"></span>
+          <button class="btn g" type="reset" (click)="close()">Close</button>
+          <button class="btn p" type="submit" (click)="popup_listbill()">Add</button>
         </div>
+      </div>
+    </div>
+  </div>
 </div>

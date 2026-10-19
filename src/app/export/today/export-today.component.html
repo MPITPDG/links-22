@@ -1,0 +1,140 @@
+<div class="im-page">
+
+  <div class="ph">
+    <div>
+      <h1>Today</h1>
+      <p>Open alerts on your export jobs, most urgent first</p>
+    </div>
+    <div class="tools">
+      <button type="button" class="btn g" (click)="refresh(true)" [disabled]="loading()">Refresh</button>
+    </div>
+  </div>
+
+  <!-- ================= severity tiles ================= -->
+  <div class="td-tiles">
+    @for (t of tiles; track t.k) {
+      <button type="button" class="card td-tile" [class.on]="severity() === t.k"
+              (click)="toggleSeverity(t.k)" [attr.aria-pressed]="severity() === t.k"
+              [title]="'Show only ' + t.k + ' alerts'">
+        <div class="k">{{ t.label }} &middot; {{ t.k }}</div>
+        <div class="v">{{ count(t.k) }}</div>
+        <div class="td-bar"><span class="td-fill" [class]="'td-fill td-' + t.k" [style.width.%]="pct(t.k)"></span></div>
+        <div class="s">{{ pct(t.k) }}% of open alerts</div>
+      </button>
+    }
+  </div>
+
+  <div class="card sec">
+
+    <!-- ================= filters ================= -->
+    <div class="filters">
+      <div class="f">
+        <label for="tdSev">Severity</label>
+        <select id="tdSev" [ngModel]="severity()" (ngModelChange)="setSeverity($event)">
+          <option value="">All</option>
+          <option value="CRIT">CRIT</option>
+          <option value="WARN">WARN</option>
+          <option value="INFO">INFO</option>
+        </select>
+      </div>
+      <div class="f">
+        <label for="tdRule">Rule</label>
+        <select id="tdRule" [ngModel]="rule()" (ngModelChange)="setRule($event)">
+          <option value="">All rules</option>
+          @for (r of rules(); track r) { <option [value]="r">{{ r }}</option> }
+        </select>
+      </div>
+      <div class="f">
+        <label for="tdScope">Scope</label>
+        <select id="tdScope" [ngModel]="mineOnly() ? 'mine' : 'branch'" (ngModelChange)="setScope($event)">
+          <option value="mine">Mine only</option>
+          <option value="branch">Whole branch</option>
+        </select>
+      </div>
+      <div class="f f-wide">
+        <label for="tdText">Job / consignee</label>
+        <input id="tdText" type="text" [ngModel]="text()" (ngModelChange)="setText($event)" placeholder="Filter by job no. or consignee" />
+      </div>
+    </div>
+
+    <!-- ================= toolbar ================= -->
+    <div class="toolbar">
+      <span>
+        <span class="count">{{ rows().length }} {{ rows().length === 1 ? 'alert' : 'alerts' }}</span>
+        @if (!mineOnly()) { <span class="sub-t"> &middot; whole branch</span> }
+        @if (autoBranch()) { <span class="sub-t"> &middot; none on your own jobs, showing the branch</span> }
+      </span>
+      <span class="tb-r">
+        <button class="btn g" type="button" (click)="clear()">Clear</button>
+      </span>
+    </div>
+
+    <!-- ================= results ================= -->
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Severity</th>
+            <th>Job no.</th>
+            <th>Stage</th>
+            <th>Rule</th>
+            <th>Message</th>
+            <th class="num">Days idle</th>
+            <th>Owner</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading() && !rows().length) {
+            <tr><td class="empty" colspan="8">Loading alerts…</td></tr>
+          } @else {
+            @for (a of pageRows(); track a.alert_id) {
+              <tr>
+                <td>
+                  @if (a.severity === 'CRIT') { <span class="chip solid">CRIT</span> }
+                  @else if (a.severity === 'WARN') { <span class="chip"><span class="dot"></span>WARN</span> }
+                  @else { <span class="chip dash">INFO</span> }
+                </td>
+                <td class="mono"><a class="lnk" (click)="openJob(a)">{{ a.exptno }}</a>
+                  @if (a.consignee_name) { <div class="sub-t">{{ a.consignee_name }}</div> }</td>
+                <td>{{ a.stage }}</td>
+                <td class="mono" [title]="a.rule_description || ''">{{ a.rule_code }}</td>
+                <td>{{ a.message }}
+                  @if (a.vessel_name || a.etd) {
+                    <div class="sub-t">Vessel {{ a.vessel_name || '–' }}@if (a.etd) { &middot; ETD {{ day(a.etd) }} }</div>
+                  } @else if (a.vessel_unassigned) { <div class="sub-t">No vessel assigned</div> }
+                  @if (a.cargo_expected_dt) { <div class="sub-t">Cargo expected {{ day(a.cargo_expected_dt) }}</div> }
+                  @if (a.docs_pending_list) { <div class="sub-t">Docs pending: {{ a.docs_pending_list }}</div> }
+                </td>
+                <td class="num mono">{{ a.days_since_activity ?? '–' }}</td>
+                <td>{{ a.owner }}</td>
+                <td class="td-act">
+                  <button type="button" class="btn p" [title]="actionHint(a)" (click)="act(a)">{{ actionLabel(a) }}</button>
+                  <button type="button" class="btn g" (click)="acknowledge(a)">&#10003; Acknowledge</button>
+                </td>
+              </tr>
+            } @empty {
+              @if (offline()) {
+                <tr><td class="empty" colspan="8">Job alerts are not available yet: the server did not answer. Try Refresh later.</td></tr>
+              } @else {
+                <tr><td class="empty" colspan="8">Nothing needs attention right now.</td></tr>
+              }
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <span>Showing <b>{{ rangeStart() }}–{{ rangeEnd() }}</b> of <b>{{ rows().length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="page() <= 1" (click)="goPage(page() - 1)" aria-label="Previous page">‹</button>
+        @for (p of pageList(); track p) {
+          <button type="button" [class.on]="p === page()" (click)="goPage(p)">{{ p }}</button>
+        }
+        <button type="button" [disabled]="page() >= pageCount()" (click)="goPage(page() + 1)" aria-label="Next page">›</button>
+      </div>
+    </div>
+  </div>
+
+</div>

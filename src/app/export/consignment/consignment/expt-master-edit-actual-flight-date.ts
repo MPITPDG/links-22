@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Input, ChangeDetectionStrategy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DataService } from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
@@ -9,7 +9,8 @@ import { IMyDpOptions } from 'mydatepicker';
 @Component({
     selector: 'app-edit-actual-flight-date',
     templateUrl: 'expt-master-edit-actual-flight-date.html',
-    encapsulation: ViewEncapsulation.None,
+    // Page kit is global (src/styles/kit); kit-consignment scopes consignment-page.css.
+    host: { class: 'kit-consignment' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -57,6 +58,15 @@ export class EditActualFlightDateComponent implements OnInit {
     ACTUALFLIGHTDT:any=null;
     CONTAINERNO : string;
     CONTAINERNO_ETA :string ;
+    /** Shown instead of the form when the load fails or finds no MAWB (MP presentation). */
+    loadError: string = "";
+
+    // Lets the edit-hub drawer host this editor inline instead of routing to it (MP).
+    /** True when hosted inline (edit-hub drawer): the drawer owns closing, so no Abort here. */
+    inline: boolean = false;
+    @Input() set exptnoInput(value: string) {
+        if (value) { this.inline = true; this.ExptNo = value; this.loadError = ""; this.pageLoad(value); }
+    }
 
     constructor(
         private _dataService: DataService,
@@ -67,6 +77,8 @@ export class EditActualFlightDateComponent implements OnInit {
         private _disable: ButtonService) {
         this.CityCode = this._loginService.getLogin()[0].CITYCODE;
         this._route.params.subscribe(params => {
+            // Skip when hosted inline (edit-hub drawer): the exptno then arrives via @Input.
+            if (!params["exptno"]) { return; }
             this.ExptNo = params["exptno"];
             this.pageLoad(params["exptno"]);
         });
@@ -83,6 +95,11 @@ export class EditActualFlightDateComponent implements OnInit {
         };
         this._dataService.getData("Export/ExportEditActualFlightDateData", _jsonData)
             .subscribe((data: any) => {
+                // fail soft: a missing / empty Table is "no air shipment details"
+                if (!data || !Array.isArray(data.Table) || !data.Table.length) {
+                    this.loadError = "No air shipment details are available for this consignment. Generate the MAWB first.";
+                    return;
+                }
                 if (data.Table[0].AEROBILLNO != undefined) {
                     this.displayData = data.Table[0];
                     this.MAWBDEST=this.displayData.MAWBDEST;
@@ -114,10 +131,12 @@ export class EditActualFlightDateComponent implements OnInit {
                     this.dhakaSubAgentList = data.Table2;
                     this.commoncities=data.Table3;
                 } else {
+                    this.loadError = "No air shipment details are available for this consignment. Generate the MAWB first.";
                     this._toasterService.toast('error', 'Alert', data.Table[0].status + '<br/>' + data.Table[0].statusText);
                 }
             },
             (error) => {
+                this.loadError = "Air shipment details could not be loaded.";
                 this._toasterService.toast('error', 'Error', error.status + '<br/>' + error.statusText);
             });
     }

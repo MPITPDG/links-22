@@ -8,6 +8,14 @@ export class SharedDataSerice {
     exportEditViewData: any;
     vesselsharedData: any;
     jobcreationtype:any;
+
+    /**
+     * Export no. of a consignment saved a moment ago (ported from MPERPNG-20). The
+     * consignment workspace sets it right before it navigates to the search page; the
+     * search page reads it once on init (and clears it) to pin that job to the top of
+     * the recent list with a "Saved just now" chip.
+     */
+    justSavedExptno: string = '';
 }
 export class VesselSharedDataSerice {
     sharedData: any;// = "String from myService"

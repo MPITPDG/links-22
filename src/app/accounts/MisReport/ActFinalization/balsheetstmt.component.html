@@ -1,424 +1,173 @@
-<div class="br-page">
-
-  <!-- ========================================================= -->
-  <!-- SEARCH -->
-  <!-- ========================================================= -->
+<!--
+  Accounts -> MIS -> Account finalization -> Balance sheet.
+  Report recipe on the kit. Submit() loads the statement; liability / asset groups drill down
+  into ledgers (Toggle / GetLedgers), a ledger opens the draggable statement popup (OpenLedger,
+  StartDrag via HostListener). Exports are the existing Excel exports. No amount binding changed.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Header || 'Balance sheet' }}</h1>
+      <p>Liabilities and assets as on a date, grouped, with ledger drill-down
+        @if (cmpnyname) { &middot; {{ cmpnyname }} }</p>
+    </div>
+    @if (Searched) {
+      <div class="tools">
+        <button class="btn g" type="button" (click)="BackToSearch()">Back to search</button>
+        <button class="btn p" type="button" (click)="ExportStatement()">Export to Excel</button>
+      </div>
+    }
+  </div>
 
   @if (!Searched) {
-<div class="br-card search-card-clean">
-    <div class="clean-row-layout">
-
-      <!-- BRANCH -->
-      <div class="clean-field clean-branch">
-        <label>Branch <span class="br-req">*</span></label>
-        <select class="form-control" name="Branch" [(ngModel)]="Branch">
-          @for (b of BranchList; track b) {
-<option value="{{b.CITYCODE1}}">{{b.CITYNAME}}</option>
-}
-        </select>
+    <div class="card sec">
+      <div class="card-h"><h2>Date and branch</h2><span class="meta"><b>*</b> required</span></div>
+      <div class="filters fk-f">
+        <div class="f">
+          <label>Branch <span class="req">*</span></label>
+          <select name="Branch" [(ngModel)]="Branch">
+            @for (b of BranchList; track $index) {
+              <option value="{{b.CITYCODE1}}">{{b.CITYNAME}}</option>
+            }
+          </select>
+        </div>
+        <div class="f">
+          <label>From (FY start) <span class="req">*</span></label>
+          <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)" [options]="myDatePickerOptions" [selDate]="FromDate"></my-date-picker>
+        </div>
+        <div class="f">
+          <label>As on <span class="req">*</span></label>
+          <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)" [options]="myDatePickerOptions" [selDate]="ToDate"></my-date-picker>
+        </div>
+        <div class="f act">
+          <button class="btn p" type="button" (click)="Submit()">Submit</button>
+        </div>
       </div>
-
-      <!-- FROM DATE -->
-      <div class="clean-field clean-date">
-        <label>From (F.Y. Start) <span class="br-req">*</span></label>
-        <my-date-picker
-          name="FromDate"
-          (dateChanged)="FromDateChanged($event)"
-          [options]="myDatePickerOptions"
-          [selDate]="FromDate">
-        </my-date-picker>
-      </div>
-
-      <!-- AS ON -->
-      <div class="clean-field clean-date">
-        <label>As On <span class="br-req">*</span></label>
-        <my-date-picker
-          name="ToDate"
-          (dateChanged)="ToDateChanged($event)"
-          [options]="myDatePickerOptions"
-          [selDate]="ToDate">
-        </my-date-picker>
-      </div>
-
-      <!-- SUBMIT -->
-      <div class="clean-actions">
-        <button class="br-btn br-btn--primary" type="button" (click)="Submit()">
-          <i class="fa fa-search"></i> Submit
-        </button>
-      </div>
-
     </div>
-  </div>
-}
-
-  <!-- ========================================================= -->
-  <!-- RESULT -->
-  <!-- ========================================================= -->
+  }
 
   @if (Searched) {
-<div class="br-result-view">
-
-    <!-- TOP BAR -->
-
-    <div class="br-topbar">
-
-      <div class="br-topbar-title">
-        <span class="pl-title">{{ Header }}</span>
-        @if (cmpnyname) {
-<span class="pl-meta">{{ cmpnyname }}</span>
-}
-      </div>
-
-      <div class="br-topbar-right">
-        <button class="br-back-btn" type="button" (click)="BackToSearch()">
-          <i class="fa fa-arrow-left"></i> Back To Search
-        </button>
-        <button class="br-btn br-btn--export" type="button" (click)="ExportStatement()">
-          <i class="fa fa-file-excel-o"></i> Export To Excel
-        </button>
-      </div>
-
-    </div>
-
-    <!-- SUMMARY STRIP -->
-
     @if (Summary) {
-<div class="br-card recon-schedule">
-
-      <div class="recon-topline">
-
-        <div class="recon-title-group">
-          <span class="recon-schedule-title">Balance Sheet Summary</span>
-          <span class="recon-meta">As On {{ Summary.AS_ON_DATE }}</span>
-          <span class="recon-meta">{{ BranchLabel }}</span>
-        </div>
-
-        <span
-          class="recon-check-badge"
-          [ngClass]="Summary.DIFFERENCE_IN_OPENING == 0 ? 'ok' : 'warn'">
-
-          <i class="fa" [ngClass]="Summary.DIFFERENCE_IN_OPENING == 0 ? 'fa-check-circle' : 'fa-exclamation-triangle'"></i>
-          {{ Summary.DIFFERENCE_IN_OPENING == 0 ? 'BALANCED' : 'DIFFERENCE FOUND' }}
-
-        </span>
-
-      </div>
-
-      <div class="recon-equation">
-
-        <div class="recon-seg">
-          <span class="recon-seg-label">Capital</span>
-          <span class="recon-seg-val">{{ Summary.CAPITAL | number:'1.2-2' }}</span>
-        </div>
-
-        <div class="recon-seg">
-          <span class="recon-seg-label">P&amp;L A/c (Accumulated)</span>
-          <span class="recon-seg-val" [ngClass]="Summary.PL_ACCOUNT_ACCUMULATED >= 0 ? 'add' : 'less'">
-            {{ Summary.PL_ACCOUNT_ACCUMULATED | number:'1.2-2' }}
+      <div class="card sec">
+        <div class="card-h">
+          <h2>Summary</h2>
+          <span class="meta">
+            As on {{ Summary.AS_ON_DATE }} &middot; {{ BranchLabel }} &middot;
+            @if (Summary.DIFFERENCE_IN_OPENING == 0) { <span class="chip solid">Balanced</span> } @else { <span class="chip dash">Difference found</span> }
           </span>
         </div>
-
-        <div class="recon-seg recon-seg--result">
-          <span class="recon-seg-label">Difference In Opening</span>
-          <span class="recon-seg-val result" [ngClass]="Summary.DIFFERENCE_IN_OPENING != 0 ? 'less' : 'add'">
-            {{ Summary.DIFFERENCE_IN_OPENING | number:'1.2-2' }}
-          </span>
+        <div class="fk-kpis fk-eq">
+          <div class="fk-kpi"><div class="k">Capital</div><div class="v">{{ Summary.CAPITAL | number:'1.2-2' }}</div></div>
+          <div class="fk-kpi"><div class="k">P&amp;L a/c (accumulated)</div><div class="v">{{ Summary.PL_ACCOUNT_ACCUMULATED | number:'1.2-2' }}</div></div>
+          <div class="fk-kpi"><div class="k">Difference in opening</div><div class="v"><b>{{ Summary.DIFFERENCE_IN_OPENING | number:'1.2-2' }}</b></div></div>
         </div>
-
       </div>
+    }
 
-    </div>
-}
-
-    <!-- LIABILITIES / ASSETS (two-column drill-down) -->
-
-    <div class="bs-columns">
-
-      <!-- LIABILITIES -->
-      <div class="bs-column">
-        <div class="br-card br-table-card">
-
-          <div class="br-card-header">
-            <div class="br-card-title">
-              <i class="fa fa-balance-scale"></i>
-              Liabilities
-              <span class="br-hint">click a group to see its ledgers</span>
-            </div>
-            <span class="br-record-chip">{{ Liabilities.length }} Groups</span>
+    <div class="fk-2col">
+      @for (side of [{ t: 'Liabilities', rows: Liabilities }, { t: 'Assets', rows: Assets }]; track side.t) {
+        <div class="card sec">
+          <div class="toolbar">
+            <span><span class="count">{{ side.t }}</span><span class="sub-t"> &middot; {{ side.rows.length }} groups &middot; click a group to see its ledgers</span></span>
           </div>
-
-          <div class="br-table-wrap">
-            <table class="br-table">
-              <thead>
-                <tr>
-                  <th>Particulars</th>
-                  <th class="num">Amount</th>
-                </tr>
-              </thead>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th class="ck"></th><th>Particulars</th><th class="num">Amount</th></tr></thead>
               <tbody>
-                @for (r of Liabilities; track r) {
-
-
-                  <tr
-                    [ngClass]="IsTotalRow(r) ? 'pl-total-row' : 'pl-grp-row'"
-                    (click)="Toggle(r)">
-                    <td>
-                      @if (!IsTotalRow(r)) {
-<i
-                        class="fa pl-chevron"
-                       
-                        [ngClass]="IsExpanded(r) ? 'fa-minus-square-o' : 'fa-plus-square-o'">
-                      </i>
-}
-                      {{ r.GROUPNAME }}
-                    </td>
-                    <td class="num" [ngClass]="r.AMOUNT < 0 ? 'less' : ''">{{ r.AMOUNT | number:'1.2-2' }}</td>
+                @for (r of side.rows; track $index) {
+                  <tr [class.tot]="IsTotalRow(r)" [class.fk-click]="!IsTotalRow(r)" (click)="Toggle(r)">
+                    <td class="ck">@if (!IsTotalRow(r)) { {{ IsExpanded(r) ? '−' : '+' }} }</td>
+                    <td>{{ r.GROUPNAME }}</td>
+                    <td class="num">{{ r.AMOUNT | number:'1.2-2' }}</td>
                   </tr>
-
                   @if (IsExpanded(r)) {
-<tr class="pl-ledger-row">
-                    <td colspan="2">
-                      <div class="pl-ledger-wrap">
-                        <table class="br-table pl-ledger-table">
+                    <tr>
+                      <td colspan="3" class="fd-sub">
+                        <table class="tbl">
                           <thead>
-                            <tr>
-                              <th>Code</th>
-                              <th>Ledger Name</th>
-                              <th class="num">Opening</th>
-                              <th class="num">Debit</th>
-                              <th class="num">Credit</th>
-                              <th class="num">Closing</th>
-                            </tr>
+                            <tr><th>Code</th><th>Ledger name</th><th class="num">Opening</th><th class="num">Debit</th><th class="num">Credit</th><th class="num">Closing</th></tr>
                           </thead>
                           <tbody>
-                            @for (l of GetLedgers(r); track l) {
-<tr>
-                              <td>
-                                <a href="javascript:void(0)" class="anchor-link" (click)="OpenLedger(l)" title="Open Ledger Statement">
-                                  {{ l.CODE }}
-                                </a>
-                              </td>
-                              <td>
-                                <a href="javascript:void(0)" class="anchor-link" (click)="OpenLedger(l)" title="Open Ledger Statement">
-                                  {{ l.LEDGERNAME }}
-                                </a>
-                              </td>
-                              <td class="num">{{ l.OPENING | number:'1.2-2' }}</td>
-                              <td class="num dr-amt">{{ l.CUR_DR | number:'1.2-2' }}</td>
-                              <td class="num cr-amt">{{ l.CUR_CR | number:'1.2-2' }}</td>
-                              <td class="num" [ngClass]="l.CLOSING < 0 ? 'less' : ''">{{ l.CLOSING | number:'1.2-2' }}</td>
-                            </tr>
-}
+                            @for (l of GetLedgers(r); track $index) {
+                              <tr>
+                                <td><a href="javascript:void(0)" class="lnk" (click)="OpenLedger(l)" title="Open ledger statement">{{ l.CODE }}</a></td>
+                                <td><a href="javascript:void(0)" class="lnk" (click)="OpenLedger(l)" title="Open ledger statement">{{ l.LEDGERNAME }}</a></td>
+                                <td class="num">{{ l.OPENING | number:'1.2-2' }}</td>
+                                <td class="num">{{ l.CUR_DR | number:'1.2-2' }}</td>
+                                <td class="num">{{ l.CUR_CR | number:'1.2-2' }}</td>
+                                <td class="num">{{ l.CLOSING | number:'1.2-2' }}</td>
+                              </tr>
+                            }
                           </tbody>
                         </table>
-                      </div>
-                    </td>
-                  </tr>
-}
-
-                
-}
+                      </td>
+                    </tr>
+                  }
+                } @empty {
+                  <tr><td class="empty" colspan="3">No groups.</td></tr>
+                }
               </tbody>
             </table>
           </div>
-
         </div>
-      </div>
-
-      <!-- ASSETS -->
-      <div class="bs-column">
-        <div class="br-card br-table-card">
-
-          <div class="br-card-header">
-            <div class="br-card-title">
-              <i class="fa fa-university"></i>
-              Assets
-              <span class="br-hint">click a group to see its ledgers</span>
-            </div>
-            <span class="br-record-chip">{{ Assets.length }} Groups</span>
-          </div>
-
-          <div class="br-table-wrap">
-            <table class="br-table">
-              <thead>
-                <tr>
-                  <th>Particulars</th>
-                  <th class="num">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (r of Assets; track r) {
-
-
-                  <tr
-                    [ngClass]="IsTotalRow(r) ? 'pl-total-row' : 'pl-grp-row'"
-                    (click)="Toggle(r)">
-                    <td>
-                      @if (!IsTotalRow(r)) {
-<i
-                        class="fa pl-chevron"
-                       
-                        [ngClass]="IsExpanded(r) ? 'fa-minus-square-o' : 'fa-plus-square-o'">
-                      </i>
-}
-                      {{ r.GROUPNAME }}
-                    </td>
-                    <td class="num" [ngClass]="r.AMOUNT < 0 ? 'less' : ''">{{ r.AMOUNT | number:'1.2-2' }}</td>
-                  </tr>
-
-                  @if (IsExpanded(r)) {
-<tr class="pl-ledger-row">
-                    <td colspan="2">
-                      <div class="pl-ledger-wrap">
-                        <table class="br-table pl-ledger-table">
-                          <thead>
-                            <tr>
-                              <th>Code</th>
-                              <th>Ledger Name</th>
-                              <th class="num">Opening</th>
-                              <th class="num">Debit</th>
-                              <th class="num">Credit</th>
-                              <th class="num">Closing</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            @for (l of GetLedgers(r); track l) {
-<tr>
-                              <td>
-                                <a href="javascript:void(0)" class="anchor-link" (click)="OpenLedger(l)" title="Open Ledger Statement">
-                                  {{ l.CODE }}
-                                </a>
-                              </td>
-                              <td>
-                                <a href="javascript:void(0)" class="anchor-link" (click)="OpenLedger(l)" title="Open Ledger Statement">
-                                  {{ l.LEDGERNAME }}
-                                </a>
-                              </td>
-                              <td class="num">{{ l.OPENING | number:'1.2-2' }}</td>
-                              <td class="num dr-amt">{{ l.CUR_DR | number:'1.2-2' }}</td>
-                              <td class="num cr-amt">{{ l.CUR_CR | number:'1.2-2' }}</td>
-                              <td class="num" [ngClass]="l.CLOSING < 0 ? 'less' : ''">{{ l.CLOSING | number:'1.2-2' }}</td>
-                            </tr>
-}
-                          </tbody>
-                        </table>
-                      </div>
-                    </td>
-                  </tr>
-}
-
-                
-}
-              </tbody>
-            </table>
-          </div>
-
-        </div>
-      </div>
-
+      }
     </div>
-
-  </div>
-}
-
-  <!-- ========================================================= -->
-  <!-- LEDGER STATEMENT POPUP -->
-  <!-- ========================================================= -->
+  }
 
   @if (ShowLedger) {
-<div class="pl-overlay" (click)="CloseLedger()">
-    <div
-      class="br-card pl-modal"
-      (click)="$event.stopPropagation()"
-      [ngStyle]="{'transform': 'translate(' + DragX + 'px,' + DragY + 'px)'}">
-
-      <div class="pl-modal-head" (mousedown)="StartDrag($event)">
-
-        <div class="pl-modal-title">
-          <i class="fa fa-arrows"></i>
-          Ledger Statement : {{ LedgerTitle }}
+    <div class="fk-modal-back" (click)="CloseLedger()">
+      <div class="card fk-modal fk-modal-wide" (click)="$event.stopPropagation()" [ngStyle]="{'transform': 'translate(' + DragX + 'px,' + DragY + 'px)'}">
+        <div class="card-h fk-drag" (mousedown)="StartDrag($event)">
+          <h2>Ledger statement: {{ LedgerTitle }}</h2>
+          <span class="tb-r fk-actions">
+            <button type="button" class="btn g" (click)="ExportLedger()" (mousedown)="$event.stopPropagation()" [disabled]="LedgerLoading">Export to Excel</button>
+            <button type="button" class="btn p" (click)="CloseLedger()" (mousedown)="$event.stopPropagation()">Close</button>
+          </span>
         </div>
-
-        <div class="pl-modal-actions">
-          <button
-            type="button"
-            class="br-btn br-btn--export"
-            (click)="ExportLedger()"
-            (mousedown)="$event.stopPropagation()"
-            [disabled]="LedgerLoading">
-            <i class="fa fa-file-excel-o"></i> Export To Excel
-          </button>
-          <button
-            type="button"
-            class="br-btn br-btn--danger"
-            (click)="CloseLedger()"
-            (mousedown)="$event.stopPropagation()">
-            <i class="fa fa-close"></i> Close
-          </button>
-        </div>
-
-      </div>
-
-      <div class="pl-modal-body">
-
         @if (LedgerLoading) {
-<div class="pl-loading">
-          <i class="fa fa-spinner fa-spin"></i> Loading Ledger Statement ...
-        </div>
-}
-
+          <div class="fk-chart"><div class="fk-skel"></div><div class="fk-skel w60"></div><div class="fk-skel w40"></div></div>
+        }
         @if (!LedgerLoading) {
-<table class="br-table pl-ledger-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Number</th>
-              <th>Particulars</th>
-              <th class="num">Debit</th>
-              <th class="num">Credit</th>
-            </tr>
-          </thead>
-          <tbody>
-            @if (LedgerSummary) {
-<tr class="pl-summary-row">
-              <td colspan="4">OPENING BALANCE</td>
-              <td class="num">{{ LedgerSummary.OPBAL >= 0 ? (LedgerSummary.OPBAL | number:'1.2-2') : '' }}</td>
-              <td class="num">{{ LedgerSummary.OPBAL < 0 ? (LedgerSummary.OPBAL * -1 | number:'1.2-2') : '' }}</td>
-            </tr>
-}
-            @for (t of LedgerRows; track t) {
-<tr>
-              <td>{{ t.TRANSDATE }}</td>
-              <td>{{ t.TRANSTYPE }}</td>
-              <td>{{ t.TRANSCODE }}</td>
-              <td>{{ t.NARR }} {{ t.EXP_SNAME }} {{ t.SUP_SNAME }} {{ t.ACCTNAME }}</td>
-              <td class="num dr-amt">{{ t.DRAMT | number:'1.2-2' }}</td>
-              <td class="num cr-amt">{{ t.CRAMT | number:'1.2-2' }}</td>
-            </tr>
-}
-            @if (LedgerSummary) {
-<tr class="pl-summary-row">
-              <td colspan="4">CURRENT TOTAL</td>
-              <td class="num">{{ LedgerSummary.TLDR | number:'1.2-2' }}</td>
-              <td class="num">{{ LedgerSummary.TLCR | number:'1.2-2' }}</td>
-            </tr>
-}
-            @if (LedgerSummary) {
-<tr class="pl-summary-row">
-              <td colspan="4">CLOSING BALANCE</td>
-              <td class="num">{{ LedgerSummary.CLBAL >= 0 ? (LedgerSummary.CLBAL | number:'1.2-2') : '' }}</td>
-              <td class="num">{{ LedgerSummary.CLBAL < 0 ? (LedgerSummary.CLBAL * -1 | number:'1.2-2') : '' }}</td>
-            </tr>
-}
-          </tbody>
-        </table>
-}
-
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead>
+                <tr><th>Date</th><th>Type</th><th>Number</th><th>Particulars</th><th class="num">Debit</th><th class="num">Credit</th></tr>
+              </thead>
+              <tbody>
+                @if (LedgerSummary) {
+                  <tr class="tot">
+                    <td colspan="4">Opening balance</td>
+                    <td class="num">{{ LedgerSummary.OPBAL >= 0 ? (LedgerSummary.OPBAL | number:'1.2-2') : '' }}</td>
+                    <td class="num">{{ LedgerSummary.OPBAL < 0 ? (LedgerSummary.OPBAL * -1 | number:'1.2-2') : '' }}</td>
+                  </tr>
+                }
+                @for (t of LedgerRows; track $index) {
+                  <tr>
+                    <td>{{ t.TRANSDATE }}</td>
+                    <td>{{ t.TRANSTYPE }}</td>
+                    <td class="mono">{{ t.TRANSCODE }}</td>
+                    <td>{{ t.NARR }} {{ t.EXP_SNAME }} {{ t.SUP_SNAME }} {{ t.ACCTNAME }}</td>
+                    <td class="num">{{ t.DRAMT | number:'1.2-2' }}</td>
+                    <td class="num">{{ t.CRAMT | number:'1.2-2' }}</td>
+                  </tr>
+                }
+                @if (LedgerSummary) {
+                  <tr class="tot">
+                    <td colspan="4">Current total</td>
+                    <td class="num">{{ LedgerSummary.TLDR | number:'1.2-2' }}</td>
+                    <td class="num">{{ LedgerSummary.TLCR | number:'1.2-2' }}</td>
+                  </tr>
+                  <tr class="tot">
+                    <td colspan="4">Closing balance</td>
+                    <td class="num">{{ LedgerSummary.CLBAL >= 0 ? (LedgerSummary.CLBAL | number:'1.2-2') : '' }}</td>
+                    <td class="num">{{ LedgerSummary.CLBAL < 0 ? (LedgerSummary.CLBAL * -1 | number:'1.2-2') : '' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
       </div>
-
     </div>
-  </div>
-}
-
+  }
 </div>

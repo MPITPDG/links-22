@@ -1,260 +1,244 @@
-﻿<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-				<div class="card-header formheading">
-				   <strong>EXPORT CONSINGNMENT</strong>
-				</div>
-                <div class="card-body">
-				<div class="row">
-					<div class="col-sm-2">
-					</div>
-                    <div class="col-sm-8">
-                        <table class="table table-bordered table-striped table-sm-new">
-                            <tr>
-                                <td class="col-form-span-heading" colspan="4">
-                                    EXPORT CONSINGNMENT DETAILS
-                                </td>
-                            </tr>
-                            <tr>
-                                <td rowspan="2">
-                                    <span class="col-form-span-label">Mode<span class="col-form-span-error">*</span></span>
-                                </td>
-                                <td colspan="3">
-                                    <span class="col-form-span-label">
-									  <input type="radio" name="rbexporter" [checked]="rbexporter === 1" value="1" (click)="fill(1)"/> Exporter/Shipper
-									  <input type="hidden" name="shipper" [(ngModel)]="hdshipper"/>
-									</span>
-									<span class="col-form-span-label">
-									  <input type="radio" name="rbexporter"  [checked]="rbexporter === 2" value="2" (click)="fill(2)"/> Bill To
-									  <input type="hidden" name="expt_billto"  [(ngModel)]="hdexpt_billto"/>
-									</span>
-									<span class="col-form-span-label">
-									  <input type="radio" name="rbexporter"  [checked]="rbexporter === 3" value="3" (click)="fill(3)"/> Manufacture
-									  <input type="hidden" name="manufacturer"  [(ngModel)]="hdmanufacturer"/>
-									</span>
-                                </td>
-                            </tr>
-							<tr>
-                                <td colspan="3"  >                                    
-                                    <ng-select 
-                                               [items]="exporters"                                               
-                                               bindLabel="TEXTFIELD"                                         
-                                                
-											   bindValue="VALUEFIELD"											  
-											   [(ngModel)]="drpShipper"   
-											   (change)="drpfill(drpShipper)"
-                                               class="form-control" >
-                                    </ng-select>
-                                  
-                      
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="col-form-span-label">Exporter/Shipper<span class="col-form-span-error">*</span></span>
-                                </td>
-                                <td colspan="3">
-                                    <input type="text" id="txtshipper" class="form-control" [(ngModel)]="txtshipper" disabled />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="col-form-span-label">Bill To<span class="col-form-span-error">*</span></span>
-                                </td>
-                                <td colspan="3">
-                                    <input type="text" id="txtexpt_billto" class="form-control" [(ngModel)]="txtexpt_billto" disabled />
-                                </td>
-                            </tr>
-							<tr>
-                                <td>
-                                    <span class="col-form-span-label">Manufacturer</span>
-                                </td>
-                                <td colspan="3">
-                                    <input type="text" id="txtmanufacturer" [(ngModel)]="txtmanufacturer" class="form-control" disabled />
-                                </td>
-                            </tr>
-							<tr>
-                                <td class="col-form-span-heading">
-                                    <span class="col-form-span-label">Agent</span>
-                                </td>
-                                <td colspan="3">
-									<ng-select [items]="agents"
-											   bindLabel="TEXTFIELD"
-											   bindValue="VALUEFIELD"											    
-											   [(ngModel)]="drpAgent"
-											   class="form-control"
-											   >
-									</ng-select>
-                                </td>
-                            </tr>
-							 <!-- <tr *ngIf="City=='DAC'">
-                                <td class="col-form-span-heading">
-                                    <span class="col-form-span-label">Sub Agent</span>
-                                </td>
-                                <td colspan="3">
-									<ng-select [items]="subagents"
-											   bindLabel="TEXTFIELD"
-											   bindValue="VALUEFIELD"
-											   placeholder="--Select--"
-											   [(ngModel)]="drpSubAgent"
-											   class="form-control"
-											   >
-									</ng-select>
-                                </td>
-                            </tr>  -->
-                            <tr >
-                                <td class="col-form-span-heading">
-                                    <span class="col-form-span-label">Sales Person</span>
-                                </td>
-                                <td colspan="3">
-									<ng-select [items]="subagents"
-											   bindLabel="TEXTFIELD"
-											   bindValue="VALUEFIELD"
-											   placeholder="--Select--"
-											   [(ngModel)]="drpSubAgent"
-											   class="form-control"
-											   >
-									</ng-select>
-                                </td>
-                            </tr> 
-							<tr>
-                                <td colspan="4">
-                                    <input type="checkbox" id="chknotify"  class="col-form-span-label"  name="checkbox1" value="option1" (change)="onChangeNotify(chknotify)" [(ngModel)]="chknotify">
-									<span class="col-form-span-label">
-											Notify whether consignee & buyer are the same
-									</span>
-                                </td>
-                            </tr>
-							<tr>
-                                <td>
-                                    <span class="col-form-span-label" for="inline-radio1">
-									  <input type="radio" name="rbconsig" value="cons" [checked]="rbCons === 1" (click)="fill1(1)"> Consignee 
-									</span>
-									<span class="col-form-span-label" for="inline-radio2">
-									  <input type="radio" name="rbconsig" value="buy" [checked]="rbCons === 2" [disabled]="rbConsDisabled == 2" (click)="fill1(2)"> Buyer Name
-									</span>
-                                </td>
-                                <td colspan="3">
-									<ng-select [items]="consignees"
-											   bindLabel="TEXTFIELD"
-											   bindValue="VALUEFIELD"
-											    
-											   [(ngModel)]="drpexpt_consignee"
-											   class="form-control"
-											  (change)="consfill(drpexpt_consignee)"
-											   >
-                                    </ng-select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="col-form-span-label">Consignee<span class="col-form-span-error">*</span></span>
-                                </td>
-                                <td colspan="3">
-                                    <input type="text" id="txtConsignee" class="form-control" [(ngModel)]="txtConsignee" disabled />
-									<input type="hidden" name="shipper" [(ngModel)]="hdexpt_consignee" />
-                                </td>
-                            </tr>
-							<tr>
-                                <td>
-                                    <span class="col-form-span-label">Buyer Name<span class="col-form-span-error">*</span></span>
-                                </td>
-                                <td colspan="3">
-                                    <input type="text" id="txtBuyername" class="form-control"  [(ngModel)]="txtBuyername" disabled />
-									<input type="hidden" name="shipper" [(ngModel)]="hdexpt_buyer"/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="col-form-span-label">If consigned to bank<span class="col-form-span-error">*</span></span>
-                                </td>
-                                <td colspan="3">
-									<ng-select [items]="banks"
-											   bindLabel="TEXTFIELD"
-											   bindValue="VALUEFIELD"
-											   
-											   [(ngModel)]="drpBank"
-											   class="form-control"
-											   >
-									</ng-select>
-                                </td>
-                            </tr>
-							<tr>
-								<td style="background-color: yellowgreen; " >
-                                    <span class="col-form-span-label">Mode of Shipment</span>
-                                </td>
-                                <td colspan="3"  style="background-color: yellowgreen; " >
-                                    <span class="col-form-span-label" for="inline-radio1">
-									  <input type="radio" name="stuff" [checked]="rbstuff === 1" value="shipmentMode" (click)="vsl(1, 'SEA')">Factory Stuffing
-									</span>
-									<span class="col-form-span-label" for="inline-radio2">
-									  <input type="radio"  name="stuff" [checked]="rbstuff === 2" value="shipmentMode" (click)="vsl(2, 'SEA')">Docks/Godown Stuffing
-									</span>
-									<span class="col-form-span-label" for="inline-radio3">
-									  <input type="radio"  name="stuff" [checked]="rbstuff === 3" value="shipmentMode" (click)="vsl(3, 'AIR')"> Air Shipment
-									</span>
-                                </td>
-                            </tr>
-							@if (trSubAir == 'Y') {
-<tr class="col-form-span-heading">
-								<td>
-                                    <span class="col-form-span-label">Air Shipment</span>
-                                </td>
-                                <td colspan="3">
-                                    <span class="col-form-span-label" for="inline-radio1">
-									  <input type="radio" name="SubAir" value="0" [checked]="rbsubair === 0" (click)="subAir(0)" >Air [Normal Air]
-									</span>
-									<span class="col-form-span-label" for="inline-radio2">
-									  <input type="radio"  name="SubAir" value="1" [checked]="rbsubair === 1" (click)="subAir(1)">Differed Air
-                                    </span>
-                                    <span class="col-form-span-label" for="inline-radio2">
-                                        <input type="radio"  name="SubAir" value="2" [checked]="rbsubair === 2" (click)="subAir(2)">SEA-AIR
-                                    </span>
-                                </td>
-                            </tr>
-}
-                            <!-- <tr *ngIf="trSubSea == 'Y'" class="col-form-span-heading">
-								<td>
-                                    <span class="col-form-span-label">Sea Shipment</span>
-                                </td>
-                                <td colspan="3">
-                                    <span class="col-form-span-label" for="inline-radio1">
-									  <input type="radio" name="SubSea" value="0" [checked]="rbsubsea === 0" (click)="subSea(0)" >Sea [Normal Sea]
-									</span>
-									<span class="col-form-span-label" for="inline-radio2">
-									  <input type="radio"  name="SubSea" value="1" [checked]="rbsubsea === 2" (click)="subSea(2)">Sea-Air
-									</span>
-                                </td>
-                            </tr> -->
-                            <tr>
-                                <td>
-                                    <span class="col-form-span-label">Vessel Name<span class="col-form-span-error">*</span></span>
-                                </td>
-                                <td colspan="3">
-									<span class="form-control">{{dateNow}}</span>
-									<ng-select [items]="vessels"
-											   bindLabel="TEXTFIELD"
-											   bindValue="VALUEFIELD"
-											   
-											   [(ngModel)]="drpVessel"
-											   class="form-control"
-											   [disabled]="drpVesselDisabled == 1"
-											   >
-									</ng-select>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-					<div class="col-sm-2">
-					</div>
-					</div>
-                </div>
-                <div class="card-footer">
-                    <button type="button" class="btn btn-sm btn-primary" (click)="finalSubmit()"><span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Submit</span></button>
-                    <button type="reset" class="btn btn-sm btn-danger"><span class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
-                </div>
-            </div>
-        </div>
+﻿<!--
+  Export consignment - parties, consignee & shipment (ported from MPERPNG-20).
+  Hosted embedded in ConsgWorkspaceComponent (/export/Consignment/start). Every field
+  is a horizontal row - label in a fixed left column, control to its right - and the
+  three groups are cards on the one page. They keep their anchor ids (cst-parties /
+  cst-consignee / cst-shipment) so the workspace section nav can scroll to them, they
+  are never removed from the DOM, and Continue still calls finalSubmit() with exactly
+  the same validation. Links labels kept: "Sales Person" (drpSubAgent).
+-->
+<div class="cs-start" [class.im-page]="!embedded">
+
+  @if (!embedded) {
+    <div class="ph">
+      <div>
+        <h1>Export consignment</h1>
+        <p>Open a new consignment: who is shipping, who is receiving, and how it moves.</p>
+      </div>
     </div>
+  }
+
+    <div class="cs-sections">
+    <!-- ================= parties ================= -->
+    <section class="cs-anchor" id="cst-parties" [class.cs-open]="openSection === 'parties'">
+    <div class="card sec cs-card">
+      <div class="card-h"><h2>Parties</h2></div>
+      <div class="fields">
+
+      <div class="fld full">
+        <label>Mode <span class="req">*</span></label>
+        <div class="cs-opts">
+          <label class="cs-opt">
+            <input type="radio" name="rbexporter"
+                   [checked]="rbexporter === 1" value="1" (click)="fill(1)" />
+            Exporter / Shipper
+          </label>
+          <label class="cs-opt">
+            <input type="radio" name="rbexporter"
+                   [checked]="rbexporter === 2" value="2" (click)="fill(2)" />
+            Bill To
+          </label>
+          <label class="cs-opt">
+            <input type="radio" name="rbexporter"
+                   [checked]="rbexporter === 3" value="3" (click)="fill(3)" />
+            Manufacturer
+          </label>
+        </div>
+      </div>
+
+      <div class="fld">
+        <label>Select party</label>
+        <ng-select class="custom" [items]="exporters"
+                   bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                   [(ngModel)]="drpShipper" (change)="drpfill(drpShipper)"
+                   placeholder="--Select--">
+        </ng-select>
+      </div>
+
+      <!-- state carriers for the three party codes; kept in the DOM on purpose -->
+      <input type="hidden" name="shipper" [(ngModel)]="hdshipper" />
+      <input type="hidden" name="expt_billto" [(ngModel)]="hdexpt_billto" />
+      <input type="hidden" name="manufacturer" [(ngModel)]="hdmanufacturer" />
+
+        <div class="fld">
+          <label for="txtshipper">Exporter / Shipper <span class="req">*</span></label>
+          <input id="txtshipper" type="text" [(ngModel)]="txtshipper" disabled />
+        </div>
+        <div class="fld">
+          <label for="txtexpt_billto">Bill To <span class="req">*</span></label>
+          <input id="txtexpt_billto" type="text" [(ngModel)]="txtexpt_billto" disabled />
+        </div>
+        <div class="fld">
+          <label for="txtmanufacturer">Manufacturer</label>
+          <input id="txtmanufacturer" type="text" [(ngModel)]="txtmanufacturer" disabled />
+        </div>
+
+        <div class="fld">
+          <label>Agent</label>
+          <ng-select class="custom" [items]="agents"
+                     bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                     [(ngModel)]="drpAgent" placeholder="--Select--">
+          </ng-select>
+        </div>
+        <!-- Links: drpSubAgent is labelled "Sales Person" -->
+        <div class="fld">
+          <label>Sales Person</label>
+          <ng-select class="custom" [items]="subagents"
+                     bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                     [(ngModel)]="drpSubAgent" placeholder="--Select--">
+          </ng-select>
+        </div>
+
+    </div>
+    </div>
+
+    </section>
+
+    <!-- ================= consignee ================= -->
+    <section class="cs-anchor" id="cst-consignee" [class.cs-open]="openSection === 'consignee'">
+    <div class="card sec cs-card">
+      <div class="card-h"><h2>Consignee &amp; buyer</h2></div>
+      <div class="fields">
+
+      <div class="fld full">
+        <label>Consign to</label>
+        <div class="cs-opts">
+          <label class="cs-opt">
+            <input type="radio" name="rbconsig" value="cons"
+                   [checked]="rbCons === 1" (click)="fill1(1)" />
+            Consignee
+          </label>
+          <label class="cs-opt"
+                 [class.cs-dim]="rbConsDisabled == 2">
+            <input type="radio" name="rbconsig" value="buy"
+                   [checked]="rbCons === 2" [disabled]="rbConsDisabled == 2" (click)="fill1(2)" />
+            Buyer Name
+          </label>
+          <label class="cs-opt">
+            <input type="checkbox" id="chknotify" name="checkbox1"
+                   (change)="onChangeNotify(chknotify)" [(ngModel)]="chknotify" />
+            Same as consignee
+          </label>
+        </div>
+      </div>
+
+      <div class="fld">
+        <label>Select party</label>
+        <ng-select class="custom" [items]="consignees"
+                   bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                   [(ngModel)]="drpexpt_consignee" (change)="consfill(drpexpt_consignee)"
+                   placeholder="--Select--">
+        </ng-select>
+      </div>
+
+        <div class="fld">
+          <label for="txtConsignee">Consignee <span class="req">*</span></label>
+          <input id="txtConsignee" type="text" [(ngModel)]="txtConsignee" disabled />
+          <input type="hidden" name="hdconsignee" [(ngModel)]="hdexpt_consignee" />
+        </div>
+        <div class="fld">
+          <label for="txtBuyername">Buyer Name <span class="req">*</span></label>
+          <input id="txtBuyername" type="text" [(ngModel)]="txtBuyername" disabled />
+          <input type="hidden" name="hdbuyer" [(ngModel)]="hdexpt_buyer" />
+        </div>
+        <div class="fld">
+          <label>Consigned to bank <span class="req">*</span></label>
+          <ng-select class="custom" [items]="banks"
+                     bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                     [(ngModel)]="drpBank" placeholder="--Select--">
+          </ng-select>
+        </div>
+
+    </div>
+    </div>
+
+    </section>
+
+    <!-- ================= shipment ================= -->
+    <section class="cs-anchor" id="cst-shipment" [class.cs-open]="openSection === 'shipment'">
+    <div class="card sec cs-card">
+      <div class="card-h"><h2>Shipment</h2></div>
+      <div class="fields">
+
+      @if (locked) {
+        <div class="fld full">
+          <label>Locked</label>
+          <span class="lockv">The mode of shipment cannot be changed once the consignment details open. Use &ldquo;Edit parties &amp; shipment&rdquo; in the header to change it.</span>
+        </div>
+      }
+
+      <div class="fld full">
+        <label>Mode of Shipment</label>
+        <div class="cs-opts">
+          <label class="cs-opt">
+            <input type="radio" name="stuff" value="shipmentMode"
+                   [checked]="rbstuff === 1" [disabled]="locked" (click)="vsl(1, 'SEA')" />
+            Factory Stuffing
+          </label>
+          <label class="cs-opt">
+            <input type="radio" name="stuff" value="shipmentMode"
+                   [checked]="rbstuff === 2" [disabled]="locked" (click)="vsl(2, 'SEA')" />
+            Docks / Godown Stuffing
+          </label>
+          <label class="cs-opt">
+            <input type="radio" name="stuff" value="shipmentMode"
+                   [checked]="rbstuff === 3" [disabled]="locked" (click)="vsl(3, 'AIR')" />
+            Air Shipment
+          </label>
+        </div>
+      </div>
+
+      @if (trSubAir == 'Y') {
+        <div class="fld">
+          <label>Air Shipment</label>
+          <div class="cs-opts boxed">
+            <label class="cs-opt">
+              <input type="radio" name="SubAir" value="0"
+                     [checked]="rbsubair === 0" [disabled]="locked" (click)="subAir(0)" />
+              Air [Normal Air]
+            </label>
+            <label class="cs-opt">
+              <input type="radio" name="SubAir" value="1"
+                     [checked]="rbsubair === 1" [disabled]="locked" (click)="subAir(1)" />
+              Differed Air
+            </label>
+            <label class="cs-opt">
+              <input type="radio" name="SubAir" value="2"
+                     [checked]="rbsubair === 2" [disabled]="locked" (click)="subAir(2)" />
+              SEA-AIR
+            </label>
+          </div>
+        </div>
+      }
+
+      <div class="fld">
+        <label>Vessel Name <span class="req">*</span></label>
+        <ng-select class="custom" [items]="vessels"
+                   bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                   [(ngModel)]="drpVessel" placeholder="--Select--"
+                   [disabled]="drpVesselDisabled == 1 || locked">
+        </ng-select>
+      </div>
+
+    </div>
+    </div>
+
+    </section>
+    </div>
+
+    @if (!locked) {
+      <div class="bar">
+        <span class="note">The mode of shipment cannot be changed once the consignment details open.</span>
+        <div class="r">
+          @if (!embedded) {
+            <!-- Links' legacy Reset (type=reset, no enclosing form), kept on the un-embedded page only -->
+            <button type="reset" class="btn g">Reset</button>
+          }
+          <button type="button" class="btn p" (click)="finalSubmit()">
+            @if (embedded) { <span>Continue &#9656;</span> } @else { <span>Submit</span> }
+          </button>
+        </div>
+      </div>
+    }
+
 </div>

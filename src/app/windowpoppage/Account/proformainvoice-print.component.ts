@@ -30,6 +30,8 @@ import { LoginService } from '../../shared/service/loginService';
   font-family: Verdana,Arial;
 }
   `],
+    // Recipe 4: on-screen print chrome only (src/styles/kit/acc-print-chrome.css). #demo is untouched.
+    host: { class: 'kit-print' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

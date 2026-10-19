@@ -1,176 +1,142 @@
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-body"> 
-				<div class="row">
-					<div class="col-md-2"></div>
-					<div class="col-md-8">	
-						
-						<table class="table table-bordered table-sm-new">
-							<tbody style='height:30px'>
-								<tr>
-									<td class="col-form-span-heading"  colspan="4">
-										MASTER B/L
-									</td>
-								</tr>							
-								<tr>
-									<td  >
-										<span class="col-form-span-label ">Job No</span><span class="col-form-span-error">*</span>
-									</td>
-									<td colspan="2">
-										<input [(ngModel)]="exJobno" type="text"  maxlength="15" class="form-control width150">
-									</td>
-									
-									<td colspan="2" class="centerlabel" >
-										<button class="btn btn-sm btn-success" type="submit" id="btnSearch" name="btnSearch"    (click)="jobserch()"> <i class="fa fa-search"></i> Search</button>
-										@if (exptdt.length>0) {
-<button class="btn btn-sm btn-danger   " type="reset"     (click)="onprint()"><i class="fa fa-print "></i> Print</button>
-}
-			
-									</td>
-								</tr>
-							</tbody>
-							@if (exptdt.length>0) {
-<tbody>
-								<tr>
-									<td class="col-form-span-heading"  colspan="4">
-										LIST OF CONSIGNMENTS
-									</td>
-								</tr>
-								
-								 
-								<tr>
-									<td>
-										<span class="col-form-span-label ">Vessel </span>
-									</td>
-									<td>
-										<label class="col-form-span-label" >{{ VSL_NAME }}</label>	  
-									</td>						
-									
-									<td>
-										<span class="col-form-span-label "> Voyage</span>
-									</td>
-									<td>
-										<label class="col-form-span-label" >{{ VOYNO }}</label>	  
-									</td>							 
-								</tr>
-                                 
-                                <tr>
-                                        <td>
-												<span class="col-form-span-label "> Master B/LNo</span>
-												<span class="col-form-span-error">*</span>
-                                            </td>
-                                            <td>
-                                                    <input [(ngModel)]="mblno" type="text"  class="form-control width150">
-                                            </td>
-                                    <td>
-										<span class="col-form-span-label "> Master B/L Date</span><span class="col-form-span-error">*</span>
-									</td>
-									<td>
-										<my-date-picker name="mbldate" [options]="myDatePickerOptions" [(ngModel)]="mbldate" required></my-date-picker>
-									</td>
-                                </tr>
-								<tr>
-									<td>
-										<span class="col-form-span-label "> Freight Type</span><span class="col-form-span-error">*</span>
-									</td>
-									<td>
-										<select class="form-control width150"   [(ngModel)]="frttype">
-											<option value="-1">Please select</option>
-											<option value="CC">CC</option>
-											<option value="PP">PP</option>
-										</select>
-									</td>
-									<td>
-										<span class="col-form-span-label ">Freight Currency </span>
-									</td>
-									<td>
-										<select class="form-control width150" [(ngModel)]="currency">
-											<option value="-1">Please select</option>
-											@for (d of listCurreny; track d) {
-<option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
-}
-										</select>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<span class="col-form-span-label ">Freight Amount </span>
-									</td>
-									<td  >
-										<input [(ngModel)]="frtAmt" type="text"  class="form-control width150">
-									</td>
-									<td>
-										<span class="col-form-span-label "> Freight Type</span>
-									</td>
-									<td>
-										<select class="form-control width150"   [(ngModel)]="BLTYPE">
-											<option value="-1">Please select</option>
-											<option value="M">Master Bl</option>
-											<option value="S">Seaway Bill</option>
-										</select>
-									</td>
-								</tr>
-								 
-								
-								 
-								<tr>
-									<td class="col-form-span-heading"  colspan="4">
-                                            FOLLOWING CONSIGNMENT IN ABOVE VESSEL
-									</td>
-								</tr>
-								<tr>
-									@if (exptdt.length>0) {
-<td colspan="4">
-										
-										<table class="table table-hover">
-											<thead>
-												
-												<th class="col-form-span-label"   >Select</th>
-                                                <th class="col-form-span-label">Jobno</th>
-                                                <th class="col-form-span-label">Shipper</th>
-												<th class="col-form-span-label">Consignee</th>
-												<th class="col-form-span-label">Pkgs</th>												
-                                                <th class="col-form-span-label">Pcs</th>
-                                                <th class="col-form-span-label">grwt</th>
-											</thead>
-											 
-											<tbody>
-												@for (d of exptdt; track d) {
-<tr  >	
-													<td><input type="checkbox" [disabled]="JOBSELE" [(ngModel)]="d.SELETJOB" > </td>
-                                                    <td class="col-form-span-label">{{d.EXPTNO}}</td>
-                                                    <td class="col-form-span-label">{{d.SHIPPER}}</td>
-													<td class="col-form-span-label">{{d.CONSIGNEE}}</td>													 
-													<td class="col-form-span-label">{{d.PKGS}}</td>													
-													<td class="col-form-span-label">{{d.PCS}}</td>
-													<td class="col-form-span-label">{{d.GRWT}}</td>													
-												</tr>
-}
-											</tbody>
-										</table>									
-									</td>
-}
-								</tr>
-							</tbody>
-}
-						</table>
-					</div>
-					
-					<!-- <pre>{{exptdt | json}}</pre> -->
-				</div>
-				<div class="col-md-2"></div>
-			</div>
-		</div>
-		
-		@if (exptdt.length>0) {
-<div class="card-footer rightlabel ">
-			
-			<button class="btn btn-sm btn-success   " type="submit" id="btnAgtAdd" name="btnAgtAdd"   (click)="AddMbl()" ><i class="fa fa-dot-circle-o" ></i> Submit</button>
-			<button class="btn btn-sm btn-danger   " type="reset" id="btnAgtRest" name="btnAgtrest" (click)="ResetAll()"><i class="fa fa-ban"></i> Reset</button>
-			
-		</div>
-}
-	</div>
-	
+<!--
+  Export -> Print document -> Sea -> Master B/L (job search + generate).
+  Page kit recipe 2 (src/styles/kit/import-page.css), ported from MPERPNG-20.
+  Every [(ngModel)], jobserch() / onprint() / AddMbl() / ResetAll() unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Master B/L</h1>
+      <p>Search a job to generate the Master B/L.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h2>Master B/L</h2></div>
+
+    <div class="fields" style="padding:14px 16px;">
+      <div class="fld">
+        <label for="txtJobNo">Job No <span class="req">*</span></label>
+        <input id="txtJobNo" [(ngModel)]="exJobno" type="text" [maxlength]="15" />
+      </div>
+    </div>
+
+    <div class="bar" style="margin:0;">
+      <span class="note"></span>
+      <span class="r">
+        <button class="btn g" type="submit" id="btnSearch" name="btnSearch" (click)="jobserch()">Search</button>
+        @if (exptdt.length>0) {
+          <button class="btn g" type="reset" (click)="onprint()">Print</button>
+        }
+      </span>
+    </div>
+
+    @if (exptdt.length>0) {
+
+      <div class="card-h"><h2>List of consignments</h2></div>
+
+      <div class="fields" style="padding:14px 16px;">
+
+        <div class="fld">
+          <label>Vessel</label>
+          <span>{{ VSL_NAME }}</span>
+        </div>
+
+        <div class="fld">
+          <label>Voyage</label>
+          <span>{{ VOYNO }}</span>
+        </div>
+
+        <div class="fld">
+          <label for="txtMblNo">Master B/L No <span class="req">*</span></label>
+          <input id="txtMblNo" [(ngModel)]="mblno" type="text" />
+        </div>
+
+        <div class="fld">
+          <label>Master B/L Date <span class="req">*</span></label>
+          <my-date-picker name="mbldate" [options]="myDatePickerOptions" [(ngModel)]="mbldate" required></my-date-picker>
+        </div>
+
+        <div class="fld">
+          <label for="selFrtType">Freight Type <span class="req">*</span></label>
+          <select id="selFrtType" [(ngModel)]="frttype">
+            <option value="-1">Please select</option>
+            <option value="CC">CC</option>
+            <option value="PP">PP</option>
+          </select>
+        </div>
+
+        <div class="fld">
+          <label for="selCurrency">Freight Currency</label>
+          <select id="selCurrency" [(ngModel)]="currency">
+            <option value="-1">Please select</option>
+            @for (d of listCurreny; track d) {
+              <option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+            }
+          </select>
+        </div>
+
+        <div class="fld">
+          <label for="txtFrtAmt">Freight Amount</label>
+          <input id="txtFrtAmt" [(ngModel)]="frtAmt" type="text" />
+        </div>
+
+        <div class="fld">
+          <label for="selBlType">Freight Type</label>
+          <select id="selBlType" [(ngModel)]="BLTYPE">
+            <option value="-1">Please select</option>
+            <option value="M">Master Bl</option>
+            <option value="S">Seaway Bill</option>
+          </select>
+        </div>
+
+        <div class="fld full">
+          <span class="sub-t">FOLLOWING CONSIGNMENT IN ABOVE VESSEL</span>
+        </div>
+
+        <div class="fld full">
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Select</th>
+                  <th>Jobno</th>
+                  <th>Shipper</th>
+                  <th>Consignee</th>
+                  <th class="num">Pkgs</th>
+                  <th class="num">Pcs</th>
+                  <th class="num">Grwt</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (d of exptdt; track d) {
+                  <tr>
+                    <td><input type="checkbox" [disabled]="JOBSELE" [(ngModel)]="d.SELETJOB" /></td>
+                    <td class="mono">{{d.EXPTNO}}</td>
+                    <td>{{d.SHIPPER}}</td>
+                    <td>{{d.CONSIGNEE}}</td>
+                    <td class="num">{{d.PKGS}}</td>
+                    <td class="num">{{d.PCS}}</td>
+                    <td class="num">{{d.GRWT}}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bar" style="margin:0;">
+        <span class="note"></span>
+        <span class="r">
+          <button class="btn g" type="reset" id="btnAgtRest" name="btnAgtrest" (click)="ResetAll()">Reset</button>
+          <button class="btn p" type="submit" id="btnAgtAdd" name="btnAgtAdd" (click)="AddMbl()">Submit</button>
+        </span>
+      </div>
+
+    }
+
+  </div>
+
 </div>

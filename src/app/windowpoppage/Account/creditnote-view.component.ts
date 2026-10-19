@@ -5,9 +5,10 @@ import { ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../shared/service/loginService';
 
 @Component({
-  selector: 'app-creditnote-view',
-  templateUrl: './creditnote-view.component.html',
-  styles: [],
+    selector: 'app-creditnote-view',
+    templateUrl: './creditnote-view.component.html',
+    // import-page / import-entry are global (src/styles/kit); the popup shell sheets are local.
+    styleUrls: ['../export/consign-popup.css', './acc-popup-view.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

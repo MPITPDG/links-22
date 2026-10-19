@@ -1,37 +1,47 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>BP REQUEST VIEW BILL LIST   </strong>
-                </div>
-            </div>
+<!-- Finance view popup: page kit header + legacy content restyled in place (.x-legacy, recipe 3).
+     Markup below is the original apart from the removed coloured title band, inline colours
+     and uiBtn colour variants; every binding and handler is unchanged. -->
+<div class="im-page cp-page">
+  <div class="cp-head">
+    <div class="ph">
+      <div>
+        <h1>BP request bill list</h1>
+        <p>Bills attached to this bank payment request.</p>
+        <div class="cp-chips">
+          <span class="chip solid">Bill {{billno || '—'}}</span>
         </div>
+      </div>
     </div>
-    <div class="row no-gutters">
-        <div class="col-12 col-md-2 col-lg-2"> </div>
-        <div class="col-12 col-md-8 col-lg-8">
-            <table class="table table-bordered table-sm-new bgwhite">     
-                <thead> 
-                <tr class="col-form-span-heading">
-                    <th class="col-form-span-label">TRANSTYPE</th>
-                    <th class="col-form-span-label">TRANSCODE</th>
-                    <th class="col-form-span-label">DRAMT </th>
-                    <th class="col-form-span-label">CRAMT </th>                   
-                </tr>
-            </thead>
-            <tbody>
-                @for (data of bill_list; track data) {
-<tr>
-                    <td class="col-form-span-label">{{data.TRANSTYPE}}</td>
-                    <td class="col-form-span-label">{{data.TRANSCODE}}</td>
-                    <td class="col-form-span-label">{{data.DRAMT}}</td>
-                    <td class="col-form-span-label">{{data.CRAMT}}</td>
-                </tr>
-}
-                </tbody>
-            </table>
-        </div>
-        <div class="col-12 col-md-2 col-lg-2"> </div>
+  </div>
+  <div class="cp-body x-legacy im-entry">
+<div>
+  
+  <div class="row no-gutters">
+    <div class="col-12 col-md-2 col-lg-2"> </div>
+    <div class="col-12 col-md-8 col-lg-8">
+      <table class="table table-bordered table-sm-new bgwhite">
+        <thead>
+          <tr class="col-form-span-heading">
+            <th class="col-form-span-label">TRANSTYPE</th>
+            <th class="col-form-span-label">TRANSCODE</th>
+            <th class="col-form-span-label">DRAMT </th>
+            <th class="col-form-span-label">CRAMT </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (data of bill_list; track data) {
+            <tr>
+              <td class="col-form-span-label">{{data.TRANSTYPE}}</td>
+              <td class="col-form-span-label">{{data.TRANSCODE}}</td>
+              <td class="col-form-span-label">{{data.DRAMT}}</td>
+              <td class="col-form-span-label">{{data.CRAMT}}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
+    <div class="col-12 col-md-2 col-lg-2"> </div>
+  </div>
+</div>
+  </div>
 </div>

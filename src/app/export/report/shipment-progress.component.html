@@ -1,126 +1,93 @@
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-header formheading">
-                <strong>Shipment Progress Search</strong>
-            </div>
-        </div>
+<!--
+  Export -> Report -> Shipment Progress (search-criteria form; Search
+  downloads an Excel workbook from Export/Generate_Shipment_Progress -- there
+  is no browsable on-screen result grid, so this page is the filter card
+  only, on the Import page kit).
+-->
+<div class="im-page erp-page">
+  <div class="ph">
+    <div>
+      <h1>Shipment Progress</h1>
+      <p>Search shipment progress by mode, city, date range and milestone.</p>
     </div>
-</div>
-<div class="row">
-    <div class="col-sm-3">
-    </div>
-    <div class="col-sm-6">
-        <table class="table table-bordered table-sm-new bgwhite">
-            <tr>
-                <td>
-                    <span class="col-form-span-label"><b>MODE:</b></span>
-                </td>
-                <td colspan="3">
-                    <input type="radio" value="Sea" name="rbReportType" [(ngModel)]="ReportType" />
-                    <span class="col-form-span-label">Sea</span>
-                    <input type="radio" value="Air" name="rbReportType" [(ngModel)]="ReportType" />
-                    <span class="col-form-span-label">Air</span>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="col-form-span-label"><b>City :</b></span>
-                </td>
-                <td colspan="3">
-                    <ng-select [items]="CityList" bindLabel="cityname" bindValue="citycode1" placeholder="--Select City--" [(ngModel)]="City"
-                        class="form-control">
-                    </ng-select>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="col-form-span-label"><b>From Date:</b></span>
-                </td>
-                <td>
-                    <my-date-picker name="abcd" [options]="myDatePickerOptions" [(ngModel)]="FromDate"></my-date-picker>
-                </td>
-                <td>
-                    <span class="col-form-span-label"><b></b>To Date:</span>
-                </td>
-                <td>
-                    <my-date-picker name="abcd" [options]="myDatePickerOptions" [(ngModel)]="ToDate"></my-date-picker>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="col-form-span-label"><b>Entered Date</b></span>
-                </td>
-                <td colspan="3">
-                    <input type="radio" value="actual" name="rbDateType" [(ngModel)]="DateType" />
-                    <span class="col-form-span-label">Actual</span>
-                    <input type="radio" value="system" name="rbDateType" [(ngModel)]="DateType" />
-                    <span class="col-form-span-label">System</span>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="col-form-span-label"><b>Display Type</b></span>
-                </td>
-                <td colspan="3">
-                    <table class="table table-sm-new bgwhite">
-                        <tr>
-                            <td>
-                                <input type="radio" value="0" name="rbDisplayType" [(ngModel)]="DisplayType" />
-                                <span class="col-form-span-label">DocRecd On</span>
-                            </td>
-                            <td>
-                                <input type="radio" value="1" name="rbDisplayType" [(ngModel)]="DisplayType" />
-                                <span class="col-form-span-label">Approval Received On</span>
-                            </td>
-                            <td>
-                                <input type="radio" value="2" name="rbDisplayType" [(ngModel)]="DisplayType" />
-                                <span class="col-form-span-label">Shipping Bill Dt</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="radio" value="3" name="rbDisplayType" [(ngModel)]="DisplayType" />
-                                <span class="col-form-span-label">Custom Cleared On</span>
-                            </td>
-                            <td>
-                                <input type="radio" value="4" name="rbDisplayType" [(ngModel)]="DisplayType" />
-                                <span class="col-form-span-label">CargoRecd On</span>
-                            </td>
-                            <td>
-                                <input type="radio" value="5" name="rbDisplayType" [(ngModel)]="DisplayType" />
-                                <span class="col-form-span-label">EpCopy Received On</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="radio" value="6" name="rbDisplayType" [(ngModel)]="DisplayType" />
-                                <span class="col-form-span-label">Carting Date</span>
-                            </td>
-                            <td>
-                                <input type="radio" value="7" name="rbDisplayType" [(ngModel)]="DisplayType" />
-                                <span class="col-form-span-label">EpCopy Sent On</span>
-                            </td>
-                            <td>
-                                <input type="radio" value="8" name="rbDisplayType" [(ngModel)]="DisplayType" />
-                                <span class="col-form-span-label">Out of Charge Date </span>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="4" class="col-form-span-heading centerlabel">
-                    <button class="btn btn-sm btn-success" type="button" (click)="onSearch()">
-                        <span class="col-form-span-label">
-                            <i class="fa fa-search"></i>&nbsp; Search
-                        </span>
-                    </button>
-                </td>
+  </div>
 
-            </tr>
-        </table>
+  <div class="card">
+    <div class="card-h"><h2>Search criteria</h2></div>
+
+    <div class="filters erp-filters">
+      <div class="f full">
+        <label>Mode</label>
+        <div class="erp-opts">
+          <label class="erp-opt" [class.on]="ReportType === 'Sea'">
+            <input type="radio" value="Sea" name="rbReportType" [(ngModel)]="ReportType" />
+            Sea
+          </label>
+          <label class="erp-opt" [class.on]="ReportType === 'Air'">
+            <input type="radio" value="Air" name="rbReportType" [(ngModel)]="ReportType" />
+            Air
+          </label>
+        </div>
+      </div>
+
+      <div class="f">
+        <label for="spCity">City</label>
+        <ng-select id="spCity" [items]="CityList" bindLabel="cityname" bindValue="citycode1" placeholder="--Select City--" [(ngModel)]="City"
+            class="custom">
+        </ng-select>
+      </div>
+
+      <div class="f full">
+        <label>Date range</label>
+        <div class="erp-presets">
+          <button type="button" (click)="setPreset(0)">This month</button>
+          <button type="button" (click)="setPreset(3)">Last 3 months</button>
+          <button type="button" (click)="setPreset(12)">Last 12 months</button>
+        </div>
+      </div>
+
+      <div class="f">
+        <label>From Date</label>
+        <my-date-picker name="abcd" [options]="myDatePickerOptions" [(ngModel)]="FromDate"></my-date-picker>
+      </div>
+
+      <div class="f">
+        <label>To Date</label>
+        <my-date-picker name="abcd" [options]="myDatePickerOptions" [(ngModel)]="ToDate"></my-date-picker>
+      </div>
+
+      <div class="f full">
+        <label>Entered Date</label>
+        <div class="erp-opts">
+          <label class="erp-opt" [class.on]="DateType === 'actual'">
+            <input type="radio" value="actual" name="rbDateType" [(ngModel)]="DateType" />
+            Actual
+          </label>
+          <label class="erp-opt" [class.on]="DateType === 'system'">
+            <input type="radio" value="system" name="rbDateType" [(ngModel)]="DateType" />
+            System
+          </label>
+        </div>
+      </div>
+
+      <div class="f full">
+        <label>Display Type</label>
+        <div class="erp-opts">
+          @for (o of displayTypeOptions; track o.value) {
+            <label class="erp-opt" [class.on]="DisplayType === o.value">
+              <input type="radio" [value]="o.value" name="rbDisplayType" [(ngModel)]="DisplayType" />
+              {{ o.label }}
+            </label>
+          }
+        </div>
+      </div>
     </div>
-    <div class="col-sm-3">
+
+    <div class="toolbar erp-actions">
+      <span class="sub-t">Search downloads an Excel workbook of the shipment progress.</span>
+      <span class="tb-r">
+        <button class="btn p" type="button" (click)="onSearch()">Search</button>
+      </span>
     </div>
+  </div>
 </div>

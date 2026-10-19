@@ -1,0 +1,95 @@
+<div class="ts">
+  <div class="ts-hd">
+    <div>
+      <h1>Theme</h1>
+      <p>Pick a colour palette. Clicking a card previews it live across the app; Apply saves it for your login on every device.</p>
+    </div>
+    <span class="ts-sp"></span>
+    @if (userLabel) { <span class="ts-soft">Logged in as <b>{{ userLabel }}</b></span> }
+    <button type="button" class="ts-btn" (click)="back()" title="Return to where you came from">&#8592; Back to app</button>
+  </div>
+
+  <div class="ts-band">Palettes <span class="ts-band-n">{{ palettes.length }}</span></div>
+  <div class="ts-grid">
+    @for (p of palettes; track p.id) {
+      <button type="button" class="pc" [class.on]="p.id === selected()" (click)="pick(p.id)">
+        @if (p.id === theme.current()) { <span class="cur">CURRENT</span> }
+        <span class="sw">@for (c of p.sw; track $index) { <i [style.background]="c"></i> }</span>
+        <span class="pc-body">
+          <span class="pc-txt">
+            <span class="nm">{{ p.name }}</span>
+            <span class="src">{{ p.src }}</span>
+            <span class="hex">{{ p.sw.join(' ') }}</span>
+          </span>
+          <!-- tiny shell rendered in this palette's own colours -->
+          <span class="mini" [style.background]="p.t.bg" [style.border-color]="p.t.line">
+            <span class="mini-hd" [style.background]="p.t.sidebar"></span>
+            <span class="mini-row">
+              <span class="mini-sb" [style.background]="p.t.sidebar"><i [style.background]="p.t['sidebar-accent']"></i></span>
+              <span class="mini-main">
+                <span class="mini-t" [style.background]="p.t['primary-soft']" [style.border-color]="p.t.line"><b [style.background]="p.t.primary"></b></span>
+                <span class="mini-t" [style.background]="p.t.surface" [style.border-color]="p.t.line"><b [style.background]="p.t.primary"></b></span>
+                <span class="mini-bars">@for (c of p.chart.slice(0, 3); track $index) { <i [style.background]="c" [style.width.%]="90 - $index * 25"></i> }</span>
+              </span>
+            </span>
+          </span>
+        </span>
+      </button>
+    }
+  </div>
+
+  <div class="ts-band">Live preview &middot; {{ selectedName() }}</div>
+  <div class="lp">
+    <div class="lp-hd"><b>Links ERP</b><span class="ts-sp"></span><span>Export</span><span>Import</span><span>Accounts</span><span class="lp-av">LK</span></div>
+    <div class="lp-row">
+      <div class="lp-sb">
+        <span>Home</span><span class="on">Export dashboard</span><span>Jobs</span><span>Documents</span><span>Invoices</span><span>Reports</span>
+      </div>
+      <div class="lp-main">
+        <div class="lp-sec">Act now</div>
+        <div class="tiles">
+          <div class="t on"><div class="k">Needs attention</div><div class="v">12</div><div class="s">3 late</div></div>
+          <div class="t"><div class="k">Sails &le; 3 d</div><div class="v">4</div><div class="s">2 not documented</div></div>
+          <div class="t"><div class="k">Documented</div><div class="v">41%</div><div class="s">of open jobs</div></div>
+          <div class="t"><div class="k">Invoiced</div><div class="v">&euro; 84k</div><div class="s">this month</div></div>
+        </div>
+        <div class="fld">
+          <label>Period</label><select><option>Last 90 days</option></select>
+          <label>Agent</label><select><option>All agents</option></select>
+          <label>Search</label><input value="CYRILLUS" style="width:140px">
+          <button type="button" class="ts-btn pri">Search</button><button type="button" class="ts-btn">Reset</button>
+        </div>
+        <div class="lp-cols">
+          <table>
+            <thead><tr><th>Export no.</th><th>Consignee</th><th>Stage</th><th>ETD</th><th>Days</th></tr></thead>
+            <tbody>
+              <tr><td><span class="link">011012610001711</span></td><td>REACH &amp; COLOURS KFT</td><td><span class="chip">Job opened</span></td><td>today</td><td class="late">-3</td></tr>
+              <tr><td><span class="link">011012610001709</span></td><td>J BRAND INTERNATIONAL</td><td><span class="chip a">Containerised</span></td><td>today</td><td>0</td></tr>
+              <tr><td><span class="link">011012610001727</span></td><td>J BRAND INTERNATIONAL</td><td><span class="chip d">Late docs</span></td><td>tomorrow</td><td class="late">-1</td></tr>
+              <tr><td><span class="link">011012610001730</span></td><td>CYRILLUS SA</td><td><span class="chip">Job opened</span></td><td>03 Oct</td><td>2</td></tr>
+            </tbody>
+          </table>
+          <div class="chart">
+            <div class="pv-k">Shipments by agent</div>
+            @for (b of bars; track b.n; let i = $index) {
+              <div class="cb"><span>{{ b.n }}</span><span class="bar"><i [class]="'c' + (i + 1)" [style.width.%]="b.w"></i></span><b>{{ b.v }}</b></div>
+            }
+          </div>
+        </div>
+        <div class="pager"><span>1</span><span class="on">2</span><span>3</span><span class="ts-sp"></span><button type="button" class="ts-btn">Export CSV</button><button type="button" class="ts-btn pri">New job</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="opts">
+      <label><input type="radio" name="tsScope" [checked]="scope() === 'app'" (change)="setScope('app')"> Whole application</label>
+      <label><input type="radio" name="tsScope" [checked]="scope() === 'chrome'" (change)="setScope('chrome')"> Header and menu only</label>
+      <label><input type="checkbox" [checked]="remember()" (change)="setRemember($event)"> Remember for my login</label>
+    </div>
+    <span class="ts-sp"></span>
+    <span class="ts-soft">Current: <b>{{ appliedName() }}</b></span>
+    <button type="button" class="ts-btn" (click)="reset()">Back to Classic</button>
+    <button type="button" class="ts-btn pri" (click)="apply()">Apply {{ selectedName() }}</button>
+  </div>
+</div>

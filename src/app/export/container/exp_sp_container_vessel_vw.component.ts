@@ -5,7 +5,6 @@ import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
  
 import { Router} from '@angular/router';
-import { ToasterService } from 'angular2-toaster';
 import { LoginService } from '../../shared/service/loginService';
 import { IMyDpOptions } from 'mydatepicker';
 import { ToastCommonService } from '../../shared/service/toastService';
@@ -14,6 +13,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-container-iu',
     templateUrl: 'exp_sp_container_vessel_vw.component.html',
+    styleUrls: ['./exp-sp-container-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -104,7 +104,8 @@ export class ExptSpContVslvw implements OnInit {
      
         this._dataService.Common(this.baseUrl, jsonExport)
             .subscribe((data: any) => {
-                if (data.Table[0].STATUS == 100) {
+                // Fail soft: missing tables read as an empty vessel, never a crash.
+                if (data?.Table?.[0]?.STATUS == 100) {
                     this.vslRtno = data.Table[0].VSL_RTNO;
                     //this.vslName = data.Table1[0].VSL_NAME;
                     //this.vslVoyno = data.Table1[0].VSL_VOYNO;
@@ -112,22 +113,23 @@ export class ExptSpContVslvw implements OnInit {
                     //this.vslEtd = data.Table1[0].ETD;
                     //this.vslActDepart = data.Table1[0].SAILING;
 
-                    this.vsldetList = data.Table1;
+                    this.vsldetList = data.Table1 ?? [];
+                    const vsl = this.vsldetList[0] ?? {};
 
-                    this.VSL_NAMERot = this.vsldetList[0].VSL_NAME;
-                    this.VSL_VOYAGE_ETD = this.vsldetList[0].VSL_VOYAGE_ETD;
-                    this.PORT = this.vsldetList[0].PORT;
-                    this.ORIGINPORT = this.vsldetList[0].ORIGINPORT;
+                    this.VSL_NAMERot = vsl.VSL_NAME;
+                    this.VSL_VOYAGE_ETD = vsl.VSL_VOYAGE_ETD;
+                    this.PORT = vsl.PORT;
+                    this.ORIGINPORT = vsl.ORIGINPORT;
 
-                    this.vslLstCartdt = this.vsldetList[0].CARTING;
+                    this.vslLstCartdt = vsl.CARTING;
 
-                    this.vslActDepart = this.vsldetList[0].SAILING;
+                    this.vslActDepart = vsl.SAILING;
 
-                    this.contList = data.Table2;                    
+                    this.contList = data.Table2 ?? [];                    
 
-                    this.exJoblist = data.Table3;
+                    this.exJoblist = data.Table3 ?? [];
 
-                    this.orderList = data.Table4;
+                    this.orderList = data.Table4 ?? [];
                     this.loaderService.display(false);
                 }
                 else {

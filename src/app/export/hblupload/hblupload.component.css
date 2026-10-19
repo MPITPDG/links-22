@@ -1,0 +1,50 @@
+/* ----------------------------------------------------------------
+   Export - HBL upload: screen-level additions on top of the GLOBAL page kit
+   (src/styles/kit/import-page.css, root .im-page). Only the approved mock's
+   helpers that the kit does not carry live here (links-export-mocks.html #m1),
+   pulled in through styleUrls (emulated encapsulation). Monochrome only.
+     1. the Links my-date-picker shim host is inline-block; make it fill the cell.
+     2. the two-dates + two-buttons filter bar (.filters.f-hbl).
+     3. small kit gaps the mock fills (toolbar wrap, nowrap mono cells, req mark).
+   ---------------------------------------------------------------- */
+
+/* 1. date picker fills its filter cell */
+.im-page my-date-picker {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
+/* 2. filter bar: From, To, Reset, Download Excel */
+.im-page .filters.f-hbl {
+    grid-template-columns: minmax(0, 200px) minmax(0, 200px) auto auto;
+    justify-content: start;
+}
+
+.im-page .f {
+    min-width: 0;
+}
+
+.im-page .f label .req {
+    margin-left: 2px;
+}
+
+/* 3. kit gaps */
+.im-page .card {
+    min-width: 0;
+}
+
+.im-page .toolbar .tb-r {
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.im-page table.tbl td.mono {
+    white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+    .im-page .filters.f-hbl {
+        grid-template-columns: 1fr;
+    }
+}

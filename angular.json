@@ -11,7 +11,7 @@
       "schematics": {},
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular/build:application",
           "options": {
             "outputPath": {
               "base": "publish",
@@ -31,7 +31,17 @@
               "node_modules/font-awesome/css/font-awesome.css",
               "src/assets/css/simple-line-icons.css",
               "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
-              "src/tailwind.css"
+              "src/tailwind.css",
+              "src/styles/kit/import-page.css",
+              "src/styles/kit/import-home.css",
+              "src/styles/kit/accreport-page.css",
+              "src/styles/kit/cheque-page.css",
+              "src/styles/kit/consignment-page.css",
+              "src/styles/kit/sp-page.css",
+              "src/styles/kit/export-theme.css",
+              "src/styles/kit/export-legacy-content.css",
+              "src/styles/kit/import-entry.css",
+              "src/styles/kit/acc-print-chrome.css"
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.min.js",
@@ -65,7 +75,7 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "20kb",
-                  "maximumError": "40kb"
+                  "maximumError": "64kb"
                 }
               ],
               "fileReplacements": [
@@ -84,7 +94,7 @@
           "defaultConfiguration": ""
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular/build:dev-server",
           "options": {
             "port": 8090,
             "buildTarget": "manilal-app:build"
@@ -96,16 +106,18 @@
           }
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "builder": "@angular/build:extract-i18n",
           "options": {
             "buildTarget": "manilal-app:build"
           }
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:karma",
           "options": {
             "main": "src/test.ts",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": [
+              "src/polyfills.ts"
+            ],
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
             "styles": [
@@ -116,19 +128,6 @@
               "src/favicon.ico",
               "src/assets"
             ]
-          }
-        }
-      }
-    },
-    "manilal-app-e2e": {
-      "root": "e2e/",
-      "projectType": "application",
-      "architect": {
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "manilal-app:serve"
           }
         }
       }

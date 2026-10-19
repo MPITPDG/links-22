@@ -2,7 +2,6 @@ import { Component, TemplateRef, OnInit, ChangeDetectionStrategy } from '@angula
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
 import { Router } from '@angular/router';
-import { ToasterService } from 'angular2-toaster';
 import { LoginService } from '../../shared/service/loginService';
 
 import { ToastCommonService } from '../../shared/service/toastService';
@@ -13,6 +12,9 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({
   templateUrl: 'Invoice-UnAuth.component.html',
+    // List recipe (ported from MPERPNG-20): global .im-page kit + the accreport add-on, which
+    // Links loads globally under the host class (MP: styleUrls import-page.css + accreport-page.css).
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -89,6 +91,7 @@ export class invoiceUnAuth implements OnInit {
         });
 }
   getunauthdata() {
+    this.loading = true;
     const jsonmaster = {
       cmpid: this._loginService.getLogin()[0].CMPID,
       cmp_code: this._loginService.getLogin()[0].CMPCODE,
@@ -98,20 +101,23 @@ export class invoiceUnAuth implements OnInit {
     this._dataService.getData("Accounts/ACC_invoice_unauth_list", jsonmaster)
       .subscribe((data: any) => {
         console.log(data)
-        this.unauthtable = data.Table
+        this.unauthtable = (data && data.Table) || [];
+        this.newArray = []; this.checkbox = false; // fresh rows arrive unticked: drop the old selection so it is not re-sent
+        this.loading = false; this.failed = false
         this.loaderService.display(false)
-      })
+      }, () => { this.loading = false; this.failed = true; this.loaderService.display(false); })
   }
   getCheckboxValues(event, data) {
     console.log(event)
     var index = this.newArray.findIndex(x => x.inoiceno == data);
     if (event) {
+      if (index >= 0) { return; } // already selected: do not add it twice
       let obj = {
         inoiceno: data
       }
       this.newArray.push(obj);
     }
-    else {
+    else if (index >= 0) { // fixed: index -1 (row not in the selection) used to splice(-1) and drop the LAST-ticked row
       this.newArray.splice(index, 1);
     }
   }
@@ -253,6 +259,10 @@ export class invoiceUnAuth implements OnInit {
   //     })
   // }
 
+
+  // ---- redesign: list state (display only, from MPERPNG-20) ----
+  loading = true;
+  failed = false;
 }
 
 

@@ -1,145 +1,135 @@
-﻿<div class="row">
-	<div class="col-sm-12">
-		<div class="card">
-			<div class="card-header formheading centerlabel">
-			   <strong><u>CONSOLE AUTO PREALERT</u></strong>
-			</div>
-		</div>
-	</div>
-</div>
-@if (setLoader==0) {
-<div class="row">
-	<div class="col-sm-12 centerlabel">
-		<img src="assets/img/loading.gif" /><br />
-		<span class="col-form-span-label">Please wait until Pre-Alert send !</span>
-	</div>
-</div>
-}
-@if (setLoader==1) {
-<div class="row">
-	<div class="col-sm-12 centerlabel">
-		<img src="assets/img/loading.gif" /><br />
-		<span class="col-form-span-label">Pre-Alert Send Successfully. Please wait for Details.........</span>
-	</div>
-</div>
-}
-@if (setLoader==2) {
-<div class="row">
-	<div class="col-sm-12 centerlabel">
-		<span class="col-form-span-label">Timeout Error.........</span>
-	</div>
-</div>
-}
-<div class="row">
-	<div class="col-sm-12">
-		@if (consoleList.length > 0) {
-<div class="row y350heightscroll">
-			<table class="table table-bordered table-sm-new bgwhite">
-				<thead>
-					<tr class="title-head table-darkgreen-main">
-						<!-- <th>Sr no</th> -->
-						<th>ConsoleNo</th>
-						<th>ConsoleDate</th>
-						<th>SentFrom</th>
-						<th>Pkgs</th>
-						<th>Weight</th>
-						<th>Volume</th>
-						<th>CHBLWT</th>
-						<th>Agent_Name</th>
-					</tr>
-				</thead>
-				<tbody>
-					@for (objCon of consoleList; track objCon; let i = $index) {
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Console Auto Pre-Alert</h1>
+      <p>Pre-alert send status and console details</p>
+    </div>
+  </div>
 
-						<tr>
-							<!-- <td><span class="col-form-span-label"><strong>{{i + 1}})</strong></span></td> -->
-							<td><span class="col-form-span-label"><b>{{objCon.CONSOLENO}}</b></span></td>
-							<td><span class="col-form-span-label">{{objCon.CONSOLEDT}}</span></td>
-							<td><span class="col-form-span-label">{{objCon.SENTFROM}}</span></td>
-							<td><span class="col-form-span-label">{{objCon.NOOFPKGS}}</span></td>
-							<td><span class="col-form-span-label">{{objCon.WEIGHT}}</span></td>
-							<td><span class="col-form-span-label">{{objCon.VOLUME}}</span></td>
-							<td><span class="col-form-span-label">{{objCon.CHBLWT}}</span></td>
-							<td><span class="col-form-span-label">{{objCon.SUP_NAME}}</span></td>
-						</tr>
-						<tr>
-							<td>&nbsp;</td>
-							<td colspan="8">
-								<table class="table table-bordered table-sm-new bgwhite">
-									<thead>
-										<tr class="title-head table-darkgreen-main">
-											<th>JobNo.</th>
-											<th>Hawbno</th>
-											<th>Hawbdt</th>
-											<th>Pkgs</th>
-											<th>Weight</th>
-											<th>Volume</th>
-											<th>Impoter</th>
-											<th>Expoter</th>
-											<th>Export_JobNo</th>
-										</tr>
-									</thead>
-									<tbody>
-										@for (objJob of jobList; track objJob) {
+  <div class="card">
 
-											@if (objJob.JOB_CONSOLENO == objCon.CONSOLENO) {
-<tr>
-												<td><span class="col-form-span-label"><b>{{objJob.JOBNO}}</b></span></td>
-												<td><span class="col-form-span-label">{{objJob.HAWBNO}}</span></td>
-												<td><span class="col-form-span-label">{{objJob.HAWBDT}}</span></td>
-												<td><span class="col-form-span-label">{{objJob.NOOFPKGS}}</span></td>
-												<td><span class="col-form-span-label">{{objJob.WEIGHT}}</span></td>
-												<td><span class="col-form-span-label">{{objJob.VOLUME}}</span></td>
-												<td><span class="col-form-span-label">{{objJob.IMPOTER}}</span></td>
-												<td><span class="col-form-span-label">{{objJob.EXPOTER}}</span></td>
-												<td><span class="col-form-span-label">{{objJob.EXPTNO}}</span></td>
-											</tr>
-}
-											<tr>
-												<td>&nbsp;</td>
-												<td colspan="8">
-													<table class="table table-bordered table-sm-new bgwhite">
-														<thead>
-															<tr class="title-head table-darkgreen-main">
-																<th>OrderNo</th>
-																<th>Pcs</th>
-															</tr>
-														</thead>
-														<tbody>
-															@for (objOrder of orderList; track objOrder) {
+    @if (setLoader==0) {
+      <div class="toolbar">
+        <span class="count">Please wait until Pre-Alert send…</span>
+      </div>
+    }
+    @if (setLoader==1) {
+      <div class="toolbar">
+        <span class="count">Pre-Alert sent successfully</span>
+        <span class="sub-t">Please wait for details…</span>
+      </div>
+    }
+    @if (setLoader==2) {
+      <div class="toolbar">
+        <span class="count">Timeout error</span>
+      </div>
+    }
 
-																@if (objJob.JOB_CONSOLENO == objOrder.ORDER_CONSOLENO) {
-<tr>
-																	<td><span class="col-form-span-label">{{objOrder.ORDERNO}}</span></td>
-																	<td><span class="col-form-span-label">{{objOrder.NOOFPCS}}</span></td>
-																</tr>
-}
-															
-}
-														</tbody>
-													</table>
-												</td>
-											</tr>
-										
-}
-									</tbody>
-								</table>
-							</td>
-						</tr>
-					
-}
-				</tbody>
-			</table>
-		</div>
-}
-	</div>
+    @if (consoleList.length > 0) {
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>ConsoleNo</th>
+              <th>ConsoleDate</th>
+              <th>SentFrom</th>
+              <th class="num">Pkgs</th>
+              <th class="num">Weight</th>
+              <th class="num">Volume</th>
+              <th class="num">CHBLWT</th>
+              <th>Agent_Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (objCon of consoleList; track objCon; let i = $index) {
+              <tr>
+                <td class="mono">{{ objCon.CONSOLENO }}</td>
+                <td>{{ objCon.CONSOLEDT }}</td>
+                <td>{{ objCon.SENTFROM }}</td>
+                <td class="num mono">{{ objCon.NOOFPKGS }}</td>
+                <td class="num mono">{{ objCon.WEIGHT }}</td>
+                <td class="num mono">{{ objCon.VOLUME }}</td>
+                <td class="num mono">{{ objCon.CHBLWT }}</td>
+                <td>{{ objCon.SUP_NAME }}</td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+                <td colspan="7">
+                  <div class="tbl-wrap nested-tbl">
+                    <table class="tbl">
+                      <thead>
+                        <tr>
+                          <th>JobNo.</th>
+                          <th>Hawbno</th>
+                          <th>Hawbdt</th>
+                          <th class="num">Pkgs</th>
+                          <th class="num">Weight</th>
+                          <th class="num">Volume</th>
+                          <th>Impoter</th>
+                          <th>Expoter</th>
+                          <th>Export_JobNo</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (objJob of jobList; track objJob) {
+                          @if (objJob.JOB_CONSOLENO == objCon.CONSOLENO) {
+                            <tr>
+                              <td class="mono">{{ objJob.JOBNO }}</td>
+                              <td>{{ objJob.HAWBNO }}</td>
+                              <td>{{ objJob.HAWBDT }}</td>
+                              <td class="num mono">{{ objJob.NOOFPKGS }}</td>
+                              <td class="num mono">{{ objJob.WEIGHT }}</td>
+                              <td class="num mono">{{ objJob.VOLUME }}</td>
+                              <td>{{ objJob.IMPOTER }}</td>
+                              <td>{{ objJob.EXPOTER }}</td>
+                              <td>{{ objJob.EXPTNO }}</td>
+                            </tr>
+                          }
+                          <tr>
+                            <td>&nbsp;</td>
+                            <td colspan="8">
+                              <div class="tbl-wrap nested-tbl">
+                                <table class="tbl">
+                                  <thead>
+                                    <tr>
+                                      <th>OrderNo</th>
+                                      <th class="num">Pcs</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    @for (objOrder of orderList; track objOrder) {
+                                      @if (objJob.JOB_CONSOLENO == objOrder.ORDER_CONSOLENO) {
+                                        <tr>
+                                          <td>{{ objOrder.ORDERNO }}</td>
+                                          <td class="num mono">{{ objOrder.NOOFPCS }}</td>
+                                        </tr>
+                                      }
+                                    }
+                                  </tbody>
+                                </table>
+                              </div>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @if (consoleList.length > 0) {
+      <div class="toolbar">
+        <span class="count">{{ consoleList.length }} console{{ consoleList.length === 1 ? '' : 's' }} sent</span>
+        <span class="tb-r">
+          <button class="btn g" type="button" (click)="exitClick()">Exit</button>
+        </span>
+      </div>
+    }
+
+  </div>
 </div>
-@if (consoleList.length > 0) {
-<div class="row">
-	<div class="col-sm-12 centerlabel">
-		<button (click)="exitClick()" class="btn btn-sm btn-danger">
-			Exit&nbsp;<i class="fa fa-share-square"></i>
-		</button>
-	</div>
-</div>
-}

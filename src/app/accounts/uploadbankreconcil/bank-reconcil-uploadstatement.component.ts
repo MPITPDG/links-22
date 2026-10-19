@@ -11,7 +11,9 @@ import * as XLSX from 'xlsx';
 @Component({
     selector: 'app-bankreconcil-uploadstatement',
     templateUrl: './bank-reconcil-uploadstatement.component.html',
-    styleUrls: ['./bank-reconcil-uploadstatement.component.css'],
+    // MPERPNG-20 layout: the page kit (import-page / accreport-page) is GLOBAL in Links; the host class opts in.
+    styleUrls: [],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

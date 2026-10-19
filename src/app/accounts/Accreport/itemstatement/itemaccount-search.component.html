@@ -1,239 +1,175 @@
-<div class="animated fadeIn" >  
-    @if (displayType=='SEARCH') {
-<div class="row no-gutters" >
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{Header}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Accounts -> Reports -> Account wise item statement.
+  Report recipe: filter card + KPIs + chart + paginated table.
+  Data: Accounts/Acc_Rpt_AccountWise_ItemStatement_List (Showdata). Export keeps the existing
+  Excel export (ExportItemstatement). Advance modal: Print() opens a legacy popup, unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ PageName || 'Account wise item statement' }}</h1>
+      <p>Debit and credit per item for one account over a period</p>
     </div>
-}
-    @if (displayType=='SEARCH') {
-<div class="row no-gutters">
-        <div class="col-sm-12 col-md-3 col-lg-3">
+  </div>
+
+  <div class="card sec">
+    <div class="filters fk-f">
+      <div class="f w2">
+        <label>Account name @if (PageType=='Account') {<span class="req">*</span>}</label>
+        <ng-select [items]="ItemList" bindLabel="ITEMACCTNAME" bindValue="ITEMACCTCODE" [(ngModel)]="Item" (ngModelChange)="GetItemName($event)"
+          class="custom" placeholder="--Please Select--"></ng-select>
+      </div>
+      <div class="f w2">
+        <label>Period</label>
+        <div class="fk-seg">
+          @for (p of periods; track p.key) {
+            <button type="button" [class.on]="period === p.key" (click)="setPeriod(p.key)">{{ p.label }}</button>
+          }
         </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-
-                <tr>
-                    <td class="col-form-span-heading" colspan="6"> <b>{{PageName}}</b> </td>
-           </tr>
-                <tr>
-                    <td >
-                        <span  class="col-form-span-label"><b>Account Name</b> </span>@if (  PageType=='Account') {
-<span
-                        class="col-form-span-error">*</span>
-}
-                    </td>
-
-                            <td colspan="3" >
-                               <ng-select   [items]="ItemList" bindLabel="ITEMACCTNAME"
-                               bindValue="ITEMACCTCODE"  [(ngModel)]="Item" (ngModelChange)="GetItemName($event)"
-                               class="custom" placeholder="--Please Select--">
-                                </ng-select>
-                            </td>
-                </tr>
-                <tr>
-
-                    <td><span class="col-form-span-label"><b>From</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                <td>
-                    <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)"  [options]="myDatePickerOptions"
-                        class="form-control"  [selDate]="FromDate"    ></my-date-picker>
-                </td>
-                    <td><span class="col-form-span-label"><b>To </b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td>
-                        <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)"  [options]="myDatePickerOptions"
-                            class="form-control"  [selDate]="ToDate"   ></my-date-picker>
-                    </td>
-                </tr>
-
-
-                <tr>
-                    <td colspan="6" class="centerlabel">
-                        <button class="btn btn-sm btn-primary" type="submit" (click)="Showdata()" > <span
-                                class="col-form-span-label"><i class="fa fa-search"></i>
-                                Search </span></button>&nbsp;
-
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-
-
+      </div>
+      <div class="f">
+        <label>From <span class="req">*</span></label>
+        <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event); period = ''" [options]="myDatePickerOptions" [selDate]="FromDate"></my-date-picker>
+      </div>
+      <div class="f">
+        <label>To <span class="req">*</span></label>
+        <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event); period = ''" [options]="myDatePickerOptions" [selDate]="ToDate"></my-date-picker>
+      </div>
+      <div class="f act">
+        <button class="btn p" type="submit" (click)="Showdata()">Search</button>
+      </div>
     </div>
-}
-  
-    @if (displayType=='LIST') {
-<div class="row no-gutters"  >
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-		 <div class="col-sm-12 col-md-10 col-lg-10 ">
-                   <table class="table table-bordered table-sm-new bgwhite" >
-                <tr align="right" class="title-head formheading">
-                    <th  >
-                  <a href="javascript:void(0);" (click)="displayType='SEARCH';SearchdataItemAct_list=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
-                    </th>
-                </tr>
-                <tr><td colspan="9" class="centerlabel"><strong>{{searchHeaderText}}</strong></td>
-                </tr>
-                <tr>  <td colspan="9" class="centerlabel"><strong> {{ItemName}}</strong> </td>
-                </tr>
-               <tr><td colspan="9" class="centerlabel"><strong>{{SubHeader}}</strong> </td>
-               </tr>
-            </table>
-       
-		  <table class="table table-bordered table-sm-new bgwhite">
-				 <tr>
-                <td align="right">
-  <table  class="table table-bordered table-sm-new bgwhite" style="width:250px">    
-           <tr>
-            <td   class="col-form-span-label" align="right">Current Total:</td>
-            <td  class="col-form-span-label" align="right">{{currTotalDr}} </td>
-            <td   class="col-form-span-label" align="right">{{currTotalcr}}   </td>
+  </div>
+
+  @if (failed) {
+    <div class="card fk-alert">The statement could not be loaded. Try the search again.</div>
+  }
+
+  @if (displayType=='LIST') {
+    <div class="fk-kpis">
+      <div class="card fk-kpi"><div class="k">Items</div><div class="v">{{ SearchdataItemAct_list?.length || 0 }}</div></div>
+      <div class="card fk-kpi"><div class="k">Current total Dr</div><div class="v">{{ currTotalDr || '—' }}</div></div>
+      <div class="card fk-kpi"><div class="k">Current total Cr</div><div class="v">{{ currTotalcr || '—' }}</div></div>
+      <div class="card fk-kpi"><div class="k">Advance</div><div class="v">{{ AdvCrAmt }} {{ AdvDrAmt }}</div>
+        <div class="s"><a href="javascript:void(0);" class="lnk" (click)="AdvanceViewData()">View advance details</a></div></div>
+    </div>
+
+    <div class="card sec">
+      <div class="card-h"><h2>Debit &minus; credit by item</h2><span class="meta">top 12 &middot; grey = net credit</span></div>
+      <div class="fk-chart">
+        @if (chart) {
+          <svg [attr.viewBox]="'0 0 ' + chart.w + ' ' + chart.h" role="img" aria-label="Net by item">
+            @for (g of chart.grid; track $index) {
+              <line class="gl" [attr.x1]="chart.l" [attr.x2]="chart.w - 12" [attr.y1]="g.y" [attr.y2]="g.y"></line>
+              <text class="ax" [attr.x]="chart.l - 6" [attr.y]="g.y + 3" text-anchor="end">{{ g.label }}</text>
+            }
+            @for (b of chart.bars; track $index) {
+              <rect class="fb" [class.neg]="b.neg" [attr.x]="b.x" [attr.y]="b.y" [attr.width]="b.w" [attr.height]="b.h"><title>{{ b.label }}: {{ fmt(b.value, 2) }}</title></rect>
+              <text class="ax" [attr.x]="b.lx" [attr.y]="b.ly" text-anchor="middle">{{ b.label }}</text>
+            }
+          </svg>
+        } @else {
+          <div class="empty">Nothing to chart.</div>
+        }
+      </div>
+    </div>
+
+    <div class="card sec">
+      <div class="card-h">
+        <h2>{{searchHeaderText}}</h2>
+        <span class="meta">{{ItemName}} &middot; {{SubHeader}}</span>
+      </div>
+      <div class="toolbar">
+        <span><span class="count">{{ SearchdataItemAct_list?.length || 0 }} items</span></span>
+        <span class="tb-r">
+          <button class="btn g" type="button" (click)="displayType='SEARCH';SearchdataItemAct_list=[]">Clear results</button>
+          <button class="btn g" type="submit" (click)="ExportItemstatement()" [disabled]="!SearchdataItemAct_list?.length">Export</button>
+        </span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th class="num">Debit</th>
+              <th class="num">Credit</th>
             </tr>
-            <tr>   <td class="col-form-span-label anchor-link" (click)="AdvanceViewData()" align="right">Advance:  </td>
-                    <td class="col-form-span-label" align="right">{{AdvCrAmt}} </td>
-                    <td  class="col-form-span-label" align="right">{{AdvDrAmt}}</td>
+          </thead>
+          <tbody>
+            @for (data of pager.paged; track $index) {
+              <tr>
+                <td>{{data.ITEMNAME}}</td>
+                <td class="num">{{data.DRAMT}}</td>
+                <td class="num">{{data.CRAMT}}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="3">No items for this account in the period.</td></tr>
+            }
+            <tr class="tot">
+              <td>Current total</td>
+              <td class="num">{{currTotalDr}}</td>
+              <td class="num">{{currTotalcr}}</td>
             </tr>
-            </table>
-                </td>
+            <tr class="tot">
+              <td><a href="javascript:void(0);" class="lnk" (click)="AdvanceViewData()">Advance</a></td>
+              <td class="num">{{AdvCrAmt}}</td>
+              <td class="num">{{AdvDrAmt}}</td>
             </tr>
+          </tbody>
         </table>
-    </div>
-    
-    <div class="col-sm-12 col-md-1 col-lg-1">
-    </div>
-    </div>
-}
-    @if (displayType=='LIST') {
-<div class="row no-gutters"  >
-        <div class="col-sm-12 col-md-1 col-lg-1">
+      </div>
+      @if (pager.rows.length > pager.size) {
+        <div class="pager">
+          <span>Showing <b>{{ pager.from }}&ndash;{{ pager.to }}</b> of <b>{{ pager.rows.length }}</b></span>
+          <div class="pages">
+            <button type="button" [disabled]="pager.page === 1" (click)="pager.go(pager.page - 1)" aria-label="Previous page">&lsaquo;</button>
+            @for (p of pager.numbers; track $index) {
+              @if (p === '...') { <span class="gap">&hellip;</span> }
+              @else { <button type="button" [class.on]="p === pager.page" (click)="pager.go(p)">{{ p }}</button> }
+            }
+            <button type="button" [disabled]="pager.page === pager.total" (click)="pager.go(pager.page + 1)" aria-label="Next page">&rsaquo;</button>
+          </div>
         </div>
-        <div class="col-sm-12 col-md-10 col-lg-10 ">
+      }
+    </div>
+  }
 
-           
-            <div class="row  xyscroll"  style="height: 500px;">
-                <table class="table table-bordered table-sm-new table-striped " >
-                    <thead>
-                        <tr class="title-head formheading table-primary">
-                        
-                            <th class="col-form-span-label" align="center">ITEM</th>
-                            <th class="col-form-span-label" align="center">	Debit</th>
-                            <th class="col-form-span-label" align="center">Credit</th>                          
-                        </tr>
-                    </thead>
-                    @if (SearchdataItemAct_list.length > 0) {
-<tbody>
-                        @for (data of SearchdataItemAct_list; track data) {
-<tr>
-                            <td ><span  class="col-form-span-label" >{{data.ITEMNAME}}</span> </td> 
-                            <td  ><span class="col-form-span-label">{{data.DRAMT}}</span>  </td>                             
-                            <td  ><span class="col-form-span-label">{{data.CRAMT}}</span>  </td>
-                        </tr>
-}
-                        <tr> <td colspan="6" class="centerlabel">
-                            <button class="btn btn-sm btn-primary" type="submit" (click)="ExportItemstatement()" > <span
-                            class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
-                            Export To Excel </span></button>&nbsp;
-                        </td>
+  @if (showModal_Advance) {
+    <div class="fk-modal-back">
+      <div class="card fk-modal" role="dialog" aria-modal="true">
+        <div class="card-h"><h2>{{advheader}}</h2><span class="meta">Advance total <b>{{AdvTotal}}</b></span></div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Number</th>
+                <th>Date</th>
+                <th>Particulars</th>
+                <th class="num">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (data of AdvanceTable; track $index) {
+                <tr>
+                  <td>{{data.transtype}}</td>
+                  <td>{{data.Transcode}}</td>
+                  <td>{{data.Transdate}}</td>
+                  <td>{{data.exp_sname}},{{data.sup_sname}},{{data.acctname}}</td>
+                  <td class="num">{{data.cramt|number:'2.2-4'}}</td>
                 </tr>
-                    </tbody>
-}
-                </table>
-            </div>
-             
+              } @empty {
+                <tr><td class="empty" colspan="5">No advances.</td></tr>
+              }
+            </tbody>
+          </table>
         </div>
-        <div class="col-sm-12 col-md-1 col-lg-1">
+        <div class="fk-modal-bar">
+          <button class="btn g" type="button" (click)="close()">Close</button>
+          <button class="btn g" type="submit" (click)="expt_exlwithadv()">Export to Excel</button>
+          <button class="btn p" type="submit" (click)="Print()">Print</button>
         </div>
-        
-                      
+      </div>
     </div>
-}  
+  }
 </div>
-    <div class="modal" [style.display]="showModal_Advance ? 'block' : 'none'">
-        <div class="modal-dialog modal-lg" role="document"  >
-            <div class="modal-content " style="height:400px; width:800px;overflow-x: auto;">
-                <div class="modal-header">
-                    <!-- <h6 class="modal-title">ADVANCE DETAILS</h6> -->
-                </div>
-                <div class="modal-body">
-    
-                    <table class="table table-sm-new table-responsive-sm" >
-    
-                        <tr>
-                            <td colspan="6" class="centerlabel">
-                                <strong>{{advheader}}</strong>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="6" class="centerlabel">
-                                <!-- <strong> {{ClientName}}</strong> -->
-                            </td>
-                        </tr>
-                    </table>
-                    <div class="row">
-                        <!-- <div class="col" style="height:400px;overflow-y: auto;" > -->
-    
-                            <div class="col" >
-                                <table align="right" class="table  table-sm-new bgwhite" style="width:150px">
-                                    <tr>
-                                        <td align="right">
-                                        <span class="col-form-span-label">Advance Total:</span>
-                                        </td>
-                                        <td>
-                                        <span  class="col-form-span-label">{{AdvTotal}}</span>
-                                        </td>
-                                    </tr>
-                                </table>
-                                <table class="table table-bordered table-sm-new bgwhite ">
-                                    <thead>
-                                      <tr class="col-form-span-heading ">
-    
-                                        <th class="col-form-span-label"></th>
-                                        <th class="col-form-span-label">Number</th>
-                                        <th class="col-form-span-label">Date</th>
-                                        <th class="col-form-span-label">Particulars</th>
-                                        <th class="col-form-span-label">Amount</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      @for (data of AdvanceTable; track data) {
-<tr>
-                                        <td class="col-form-span-label">{{data.transtype}}</td>
-                                        <td class="col-form-span-label">{{data.Transcode}}</td>
-                                        <td class="col-form-span-label">{{data.Transdate}}</td>
-                                        <td class="col-form-span-label">{{data.exp_sname}},{{data.sup_sname}},{{data.acctname}}</td>
-                                        <td class="col-form-span-label">{{data.cramt|number:'2.2-4'}}</td>
-                                      </tr>
-}
-                                    </tbody>
-                                  </table>
-                                 <!-- KC <div style="float: center;"> -->
-                                    <table class="table table-bordered table-sm-new bgwhite ">
-                                        <tr>
-                                            <td colspan="4" align="center">
-                                                <button class="btn btn-sm btn-success" type="submit" (click)="Print()"> <span class="col-form-span-label"><i class="fa fa-print" ></i> Print</span></button>
-                                                <button class="btn btn-sm btn-success" type="submit" (click)="expt_exlwithadv()"> <span class="col-form-span-label"><i class="fa fa-file-excel-o" ></i> ExportToExcel</span></button>
-                                                <button class="btn btn-sm btn-danger" (click)="close()"><span class="col-form-span-label"><i class="fa fa-times" aria-hidden="true"></i> Close</span></button>
-                                            </td>
-                                        </tr>
-                                    </table>
-    
-                                <!-- </div> -->
-                        </div>
-                    </div>
-    
-                </div>
-            </div>
-        </div>
-    </div>

@@ -11,7 +11,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-export-booking',
     templateUrl: 'add.booking.component.html' ,
-    encapsulation: ViewEncapsulation.None,
+    styleUrls: ['./booking-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -114,9 +114,9 @@ export class AddBookingComponent implements OnInit {
         };
         this._dataService.getData("Export/OrderBookingDropdownFill", _jsonData)
             .subscribe((data: any) => {
-                this.ConsigneeList = data.Table;
-                this.ExporterList = data.Table1;
-                this.EdiGroupList = data.Table2;
+                this.ConsigneeList = data?.Table ?? [];
+                this.ExporterList = data?.Table1 ?? [];
+                this.EdiGroupList = data?.Table2 ?? [];
             });
     }
 
@@ -243,7 +243,7 @@ export class AddBookingComponent implements OnInit {
         this._dataService.Common("Export/OrderBookingAdd", _jsonData)
             .subscribe((data: any) => {
                 this._disable.enableButton(this.addButton);
-                if (data.Table[0].STATUS == "100") { alert("Booking saved successfully !");this.reset(); this.loaderService.display(false);}
+                if (data?.Table?.[0]?.STATUS == "100") { alert("Booking saved successfully !");this.reset(); this.loaderService.display(false);}
                 else { alert('Contact to administrator');this.loaderService.display(false); }
             });
     }
@@ -261,8 +261,9 @@ export class AddBookingComponent implements OnInit {
         this._dataService.Common("Export/OrderBookingSearch", _jsonData)
             .subscribe((data: any) => {
                 this._disable.enableButton(this.searchButton);
-                let responseData = data.Table;
-                if (responseData[0].STATUS == "100") {
+                // Fail soft: a reply without a Table reads as "no record found".
+                let responseData = data?.Table ?? [];
+                if (responseData[0]?.STATUS == "100") {
                     this.newButton.nativeElement.hidden = true;
                     this.OrderNoList = data.Table;
                     for (let i = 0; i < this.OrderNoList.length; i++) {
@@ -270,18 +271,18 @@ export class AddBookingComponent implements OnInit {
                         this.OrderNoList[i]["TYPESOFPIECES"] = 'PIECES';
                         this.OrderNoList[i]["HDPIECES"] = this.OrderNoList[i].QTY_PCS;
                     }
-                    this.ConsigneeList = data.Table1;
-                    this.HdMode = (data.Table2.length == 1) ? data.Table2[0].MODE : '';
-                    this.Mode.nativeElement.value = (data.Table2.length == 1) ? data.Table2[0].MODE : 'SEA';
+                    this.ConsigneeList = data.Table1 ?? [];
+                    this.HdMode = (data.Table2?.length == 1) ? data.Table2[0].MODE : '';
+                    this.Mode.nativeElement.value = (data.Table2?.length == 1) ? data.Table2[0].MODE : 'SEA';
                     this.ViewType = 'LIST';
                     this.loaderService.display(false);
                 } else {
-                    if (responseData[0].STMSG == "No record found ,New Booking click On New button!") {
+                    if (responseData[0]?.STMSG == "No record found ,New Booking click On New button!") {
                         this._toaster.toast("info", "Alert", "No record found ,New Booking click On New button!");
                         this.newButton.nativeElement.hidden = false;
                         this.loaderService.display(false);
                     } else {
-                        this._toaster.toast("info", "Alert", responseData[0].STMSG);
+                        this._toaster.toast("info", "Alert", responseData[0]?.STMSG ?? "No record found");
                         this.newButton.nativeElement.hidden = true;
                         this.loaderService.display(false);
                     }

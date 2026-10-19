@@ -6,6 +6,7 @@ import { IMyDpOptions } from 'mydatepicker';
 import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     templateUrl: 'chronology.component.html',
+    styleUrls: ['./export-report-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -53,7 +54,7 @@ export class ChrnologyReportComponent implements OnInit {
         this._loaderService.display(true);
         this._dataService.getData("Common/getCityList", {})
             .subscribe((data: any) => {
-                this.CityList = data.Table;
+                this.CityList = (data && data.Table) || [];
                 this.City = this._loginService.getLogin()[0].CITYCODE1;
                 //console.log("City ", data);
                 this._loaderService.display(false);
@@ -64,6 +65,20 @@ export class ChrnologyReportComponent implements OnInit {
             // .subscribe((data: any) => {
             //         this.listShipper=data.Table3
             // });
+    }
+
+    /** Presentation (from MPERPNG-20): period-preset buttons above From/To.
+     *  Sets the same my-date-picker models the pickers already use. */
+    setPreset(months: number) {
+        const to = new Date();
+        const from = new Date(to.getFullYear(), to.getMonth() - months, to.getDate());
+        this.FromDate = this._dataService.stringdttoArry(this.fmtDMY(from));
+        this.ToDate = this._dataService.stringdttoArry(this.fmtDMY(to));
+    }
+
+    private fmtDMY(d: Date): string {
+        const p = (n: number) => ('0' + n).slice(-2);
+        return p(d.getDate()) + '/' + p(d.getMonth() + 1) + '/' + d.getFullYear();
     }
 
     onSearch() {

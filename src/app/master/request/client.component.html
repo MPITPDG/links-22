@@ -1,602 +1,569 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>{{Header| uppercase}}</strong>
-                </div>
-            </div>
-        </div>
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{Header| uppercase}}</h1>
+      <p>Client / exporter master request</p>
     </div>
-    <div class="row">
-        <div class="col-sm-2">  </div>
-        <div class="col-sm-8">
-            <table class="table table-bordered table-sm-new bgwhite">               
-                <tr >
-                    <td class="col-form-span-heading   " colspan="4">
-                        Exporter Details
-                    </td>
-                </tr>
-                <tr>   
-                    <td><span class="col-form-span-label"><b>Short Name</b> </span><span class="col-form-span-error">*</span></td>         
-                    <td>  <input [(ngModel)]="ShrtName" type="text"    class="form-control width180"   >   </td> 
-                    <td><span class="col-form-span-label"><b>PAN No.</b> </span></td>         
-                    <td>  <input [(ngModel)]="panno" type="text"    class="form-control width180" maxlength="20" > </td>         
-                </tr>
-                
-                <!-- <tr >
-                    <td><span class="col-form-span-label"><b>Name</b> </span></td>         
-                    <td colspan="3" style=" display: flex; "  >                        
-                        <select class="form-control width70"  [(ngModel)]="title"  >
-                        <option value="Messrs">Messrs</option>
-                        <option value="Mr">Mr.</option>	
-                        <option value="Ms">Ms.</option>	
-                        <option value="Mrs">Mrs.</option>
-                        <option value="Miss">Miss.</option>
-                        <option value="Dr">Dr.</option>		
-                        </select> 
-                        <input [(ngModel)]="Name" type="text"    class="form-control width300"  >                      
-                    </td>        
-                </tr> -->
-                <tr>
-                    <td><span class="col-form-span-label"><b>Name</b> </span><span class="col-form-span-error">*</span></td> 
-                    <td  colspan="3" >
-                        <table class="table table-bordered table-sm-new bgwhite">               
-                            <tr >
-                                <td   style=" display: flex; "  >                        
-                                    <select class="form-control width70"  [(ngModel)]="title"  >
-                                   
-                                    <option value="Mr.">Mr.</option>	
-                                    <option value="Ms">Ms</option>	
-                                    <option value="Mrs.">Mrs.</option>
-                                    <option value="Miss">Miss</option>
-                                    <option value="Dr.">Dr.</option>	
-                                    <option value="Messrs">Messrs</option>	
-                                    </select> 
-                                    <input [(ngModel)]="Name" type="text"    class="form-control "    >                      
-                                </td>
-                            </tr>
-                        </table>
-                    </td> 
-                </tr >   
-                 <tr>
-                    <td><span class="col-form-span-label"><b>EORI #</b> </span></td>         
-                    <td> <input [(ngModel)]="EORIno" type="text"    class="form-control width180"   > </td> 
-                    <td> </td>         
-                    <td> <span class="col-form-span-label"><input type="checkbox"   [(ngModel)]="ISSEZCLIENT" (change)="checkValue(ISSEZCLIENT?'1':'')"     /><b>Is SEZ Client</b> </span> </td>             
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Credit Period Sea</b> </span></td>
-                    <td> <input [(ngModel)]="crperiodsea" type="text"    class="form-control width180"   > </td>
-                    <td><span class="col-form-span-label"><b>Credit Period Air</b> </span></td>
-                    <td> <input [(ngModel)]="crperiodair" type="text"    class="form-control width180"   > </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td   >
-                        <span class="col-form-span-label"><input type="checkbox"    [(ngModel)]="overseasagent" (change)="checkValueoverseas(overseasagent?'Y':'0')"  /><b>Is Overseas Agent</b> </span>
-                </td>
-                </tr>
-                <tr class="trheader">
-                    <td colspan="4"><span class="col-form-span-label"><b> DOCUMENTATION</b> </span></td>  
-                </tr>
-                <tr>   
-                    <td><span class="col-form-span-label"><b>Address 1</b> </span></td>         
-                    <td colspan="3">  <input [(ngModel)]="addrs1" type="text"    class="form-control width300" maxlength="40"   >   </td> 
-                       
-                </tr>
-                <tr>   
-                    <td><span class="col-form-span-label"><b>Address 2</b> </span></td>         
-                    <td>  <input [(ngModel)]="addrs2" type="text"    class="form-control  width250 "  maxlength="40"    >   </td> 
-                    <td><span class="col-form-span-label"><b>Address 3</b> </span></td>         
-                    <td>  <input [(ngModel)]="addrs3" type="text"    class="form-control width180"  maxlength="40"   > </td>         
-                </tr>
-                <tr>
-                   <td><span class="col-form-span-label"><b>Pincode Position</b> </span></td>        
-                    <td>
-                        <span class="col-form-span-label"><input type="radio"   [checked]="position=='After'" (change)="position='After'" /><b>After</b> </span> 
-                        <span class="col-form-span-label"><input type="radio"   [checked]="position=='Before'" (change)="position='Before'" /><b>Before</b> </span>
-                    </td>
-                    <td><span class="col-form-span-label"><b>Pincode</b> </span></td>         
-                    <td>  <input [(ngModel)]="Pincode" type="text"    class="form-control width180"   > </td>         
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>City</b> </span><span class="col-form-span-error">*</span></td>        
-                    <td>
-                        <select class="form-control width150"  [(ngModel)]="city" (change)="Countryfilter($event.target.value,'DOC')">
-                            <option value="">Please select</option>
-                            @for (d of Citylist; track d) {
-<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
-}
-                        </select>
-                    </td>
-                    <td><span class="col-form-span-label"><b>Country</b> </span></td>         
-                    <td>  <input disabled [(ngModel)]="country" type="text"    class="form-control width180"   > </td>         
-                </tr>
-                <tr class="trheader">
-                    <td colspan="4"><span class="col-form-span-label"><b>CORRESPONDENCE/INVOICING</b> </span> </td>
-                </tr>
-                <tr>   
-                        <td><span class="col-form-span-label"><b>Address 1</b> </span></td>         
-                        <td colspan="3">  <input [(ngModel)]="addrs21" type="text"    class="form-control width300"  maxlength="40"  >   </td> 
-                               
-                    </tr>
-                    <tr>   
-                        <td><span class="col-form-span-label"><b>Address 2</b> </span></td>         
-                        <td>  <input [(ngModel)]="addrs22" type="text"    class="form-control width250"   maxlength="40"  >   </td> 
-                        <td><span class="col-form-span-label"><b>Address 3</b> </span></td>         
-                        <td>  <input [(ngModel)]="addrs23" type="text"    class="form-control width180"   maxlength="40" > </td>         
-                    </tr>
-                    <tr>
-                       <td><span class="col-form-span-label"><b>Pincode Position</b> </span></td>        
-                        <td>
-                            <span class="col-form-span-label"><input type="radio"   [checked]="position2=='After'" (change)="position2='After'" /><b>After</b> </span> 
-                            <span class="col-form-span-label"><input type="radio"   [checked]="position2=='Before'" (change)="position2='Before'" /><b>Before</b> </span>
-                        </td>
-                        <td><span class="col-form-span-label"><b>Pincode</b> </span></td>         
-                        <td>  <input [(ngModel)]="Pincode2" type="text"    class="form-control width180"   > </td>         
-                    </tr>
-                    <tr>
-                        <td><span class="col-form-span-label"><b>City</b> </span><span class="col-form-span-error">*</span></td>        
-                        <td>
-                            <select class="form-control width150"  [(ngModel)]="city2" (change)="Countryfilter($event.target.value,'INV')">
-                                <option value="">Please select</option>
-                                @for (d of Citylist; track d) {
-<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
-}
-                            </select>
-                        </td>
-                        <td><span class="col-form-span-label"><b>State</b> </span></td>         
-                        <td>  <input [(ngModel)]="state" type="text"    class="form-control width180"   > </td>     
-                    </tr>
-                    <tr>
-                        <td><span class="col-form-span-label"><b>Country</b> <span class="col-form-span-error">*</span></span></td>         
-                        <td>  <input disabled [(ngModel)]="country2" type="text"    class="form-control width180"   > </td>     
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td class="col-form-span-heading   " colspan="4">
-                                <span class="col-form-span-label"><input type="checkbox"    [(ngModel)]="GST" (change)="checkValue(GST?'gst':'')"  /><b>GST DETAILS</b> </span>    
-                        </td>
-                    </tr>
-                    
-                        <tr>   
-                            <td><span class="col-form-span-label"><b>GST No.</b> </span><span class="col-form-span-error">*</span></td>         
-                            <td>  <input [(ngModel)]="GstNo" type="text"    class="form-control width180"   >   </td> 
-                            <td><span class="col-form-span-label"><b>ARN No</b> </span></td>         
-                            <td>  <input [(ngModel)]="ARNNo" type="text"    class="form-control width180"   > </td>         
-                        </tr>
-                        <tr>
-                           <td><span class="col-form-span-label"><b>Contact Person</b> </span></td>        
-                            <td  style=" display: flex; " >
-                                <select class="form-control width50"  [(ngModel)]="title1"  >
-                                    <option value="Mr">Mr.</option>	
-                                    <option value="Ms">Ms.</option>	
-                                    <option value="Mrs">Mrs.</option>
-                                    <option value="Miss">Miss.</option>
-                                    <option value="Dr">Dr.</option>
-                                </select>
-                                <input [(ngModel)]="person" type="text"    class="form-control width180"   > 
-                            </td>
-                            <td><span class="col-form-span-label"><b>Telephone No.</b> </span></td>         
-                            <td>  <input [(ngModel)]="telephone" type="text"    class="form-control width180"   > </td>         
-                        </tr>
-                        <tr>                             
-                            <td><span class="col-form-span-label"><b>Mobile No.</b> </span></td>         
-                            <td>  <input [(ngModel)]="mobile" type="text"    class="form-control width180"   > </td>  
-                            <td><span class="col-form-span-label"><b>E-Mail</b> </span></td>         
-                            <td>  <input   type="email"    class="form-control width180"   placeholder="Email"  [(ngModel)]="email" (change)="onChange(email)" > 
-                            </td>   
-                        </tr>
-                        <tr>
-                            <td colspan="4"  class="centerlabel">                                
-                                <button class="btn btn-sm btn-success" type="submit" (click)="Addcildrcrd()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{txtchild}}</span></button>
-                                <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Resetcildrcrd();"><i class="fa fa-ban"></i> Reset</span></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                @if (gstlist.length > 0) {
-<div class="row xyscroll">
-                                    <table class="table table-responsive-sm table-bordered"> 
-                                        <thead>
-                                            <tr class="col-form-span-heading">
-                                                <th class="width50 centerlabel"><span class="col-form-span-label"></span></th>
-                                                <th class="width100 centerlabel"><span class="col-form-span-label">Invoicing Address</span></th>
-                                                <th class="width100 centerlabel"><span class="col-form-span-label">GST No.</span></th>
-                                                <th class="width100 centerlabel"><span class="col-form-span-label">GST ARN No.</span></th>                                                     
-                                            </tr>
-                                        </thead>
-                                        @if (gstlist.length>0) {
-<tbody  >
-                                            @for (obj of gstlist; track obj) {
-<tr>
-                                                <td class="centerlabel">
-                                                    <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)" ></i>
-                                                    &nbsp;
-                                                    <i class="fa fa-trash" (click)="deletechildrecd(obj.ID)"></i>
-                                                </td>
-                                                <td><span class="col-form-span-label"  [innerHtml]="obj.INVADDRESS"> </span></td>
-                                                <td><span class="col-form-span-label">{{obj.GST_NO}}</span></td>
-                                                <td><span class="col-form-span-label">{{obj.GST_ARNNO}}</span></td>
-                                            </tr>
-}
-                                        </tbody>
-}
-                                    </table>
-                                </div>
-}
-                            </td>
-                        </tr> 
-                        <tr>                    
-                            <td colspan="4"  (click)="getcollapse(CHECK,'other')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">OTHER DETAILS</b></span></td>
-                        </tr>
-                        @if (CHECK==true) {
-<tr>
-                            <td  colspan="4">                                
-                                <table class="table table-bordered table-sm-new bgwhite" >
-                                     
-                                        <tr>                             
-                                                <td><span class="col-form-span-label"><b>State of origin of Export </b> </span></td>         
-                                                <td>  <input [(ngModel)]="SOexport" type="text"    class="form-control width180"   > </td>  
-                                                <td><span class="col-form-span-label"><b>Telephone No.(General) </b> </span></td>         
-                                                <td>  <input [(ngModel)]="telphone1" type="text"    class="form-control width180"   > </td>   
-                                            </tr>  
-                                            <tr>                             
-                                                <td><span class="col-form-span-label"><b>Fax No. (General) </b> </span></td>         
-                                                <td>  <input [(ngModel)]="faxno1" type="text"    class="form-control width180"   > </td>  
-                                                <td><span class="col-form-span-label"><b>Email (General) </b> </span></td>         
-                                                <td>  <input [(ngModel)]="email1" type="text"    class="form-control width180"  (change)="onChange(email1)"  > </td>   
-                                            </tr>  
-                    
-                                            <tr>                             
-                                                    <td><span class="col-form-span-label"><b> RBI Code </b> </span></td>         
-                                                    <td>  <input [(ngModel)]="rbicode" type="text"    class="form-control width180"   > </td>  
-                                                    <td><span class="col-form-span-label"><b> IM No.</b> </span></td>         
-                                                    <td>  <input [(ngModel)]="imno" type="text"    class="form-control width180"   > </td>   
-                                            </tr>  
-                                            <tr>                             
-                                                <td><span class="col-form-span-label"><b>IT No. </b> </span></td>         
-                                                <td>  <input [(ngModel)]="itno" type="text"    class="form-control width180"   > </td>  
-                                                <td><span class="col-form-span-label"><b> Banker Name</b> </span></td>         
-                                                <td>  <input [(ngModel)]="bankername" type="text"    class="form-control width180"   > </td>   
-                                            </tr>  
-                                            <tr>                             
-                                                <td><span class="col-form-span-label"><b>Custom P. No. </b> </span></td>         
-                                                <td>  <input [(ngModel)]="custpono" type="text"    class="form-control width180"   > </td>  
-                                                <td><span class="col-form-span-label"><b> IEC Code</b> </span></td>         
-                                                <td>  <input [(ngModel)]="ieccode" type="text"    class="form-control width180"   > </td>   
-                                            </tr>  
-                                            <tr>                             
-                                                <td><span class="col-form-span-label"><b>Exporthouse Cert. No. </b> </span></td>         
-                                                <td>  <input [(ngModel)]="exphouseno" type="text"    class="form-control width180"   > 
-                                                </td>  
-                                                <td><span class="col-form-span-label"><b> Exporthouse Cert. Dt. </b> </span></td>         
-                                                <td> <my-date-picker name="exphousedt" [options]="myDatePickerOptions" [(ngModel)]="exphousedt"  ></my-date-picker> 
-                                                 </td>   
-                                            </tr>  
-                                            <tr>                             
-                                                <td><span class="col-form-span-label"><b>Exporthouse Cert. Validty upto</b> </span></td>         
-                                                <td><my-date-picker name="exphouse" [options]="myDatePickerOptions" [(ngModel)]="exphouse"  ></my-date-picker> 
-                                                </td>  
-                                                <td><span class="col-form-span-label"><b> ITC Group Code</b> </span></td>         
-                                                <td>  <input [(ngModel)]="itcgrpcode" type="text"    class="form-control width180"   > </td> 
-                                            </tr>
-                                            <tr>                             
-                                                <td><span class="col-form-span-label"><b>Type of Exporter</b> </span></td>         
-                                                <td> <select class="form-control width150"  [(ngModel)]="typeexpo">
-                                                        <option value="(R) Merchant">(R)Merchant</option>
-                                                        <option value="(F) Manufacturer"> (F)Manufacturer</option>
-                                                    </select>   </td>  
-                                                <td><span class="col-form-span-label"><b> Type of Export House</b> </span></td>         
-                                                <td>
-                                                        <select class="form-control width150"  [(ngModel)]="typeexpohouse">
-                                                            <option  value="(EH) Export House">(EH)Export House</option>
-                                                            <option value="(SH) Star Trading House">(SH)Star Trading House</option>
-                                                            <option value="(SS) Super Star Trading House">(SS)Super Star Trading House</option>
-                                                            <option value="(SS) Super Star Trading House">(TH)Trading House</option>
-                                                            <option value="(NA) Not Applicable">(NA)Not Applicable</option>
-                                                        </select>
-                                                </td>   
-                                            </tr>
-                                        <tr>                             
-                                            <td><span class="col-form-span-label"><b>  </b> </span></td>         
-                                            <td> <select class="form-control width150"  [(ngModel)]="exp_typeb">
-                                                    <option value="(P) Private"> (P)Private</option>
-                                                    <option value="(G) Government"> (G)Government</option>
-                                                </select> </td>  
-                                            <td><span class="col-form-span-label"><b> SERVICE TAX No.</b> </span></td>         
-                                            <td>  <input [(ngModel)]="servtaxno" type="text"    class="form-control width180"   >   </td>   
-                                        </tr>
-                                        <tr>
-                                                <td><span class="col-form-span-label"><b>TAN No.</b> </span></td>         
-                                                <td>  <input [(ngModel)]="tanno" type="text"    class="form-control width180" (change)="Tanchange()"  >   </td>  
-                                                <td>  </td>
-                                                <td></td>
-                                        </tr>
-                                </table>
-                            </td>
-                        </tr>
-} 
-                        <tr>                    
-                            <td colspan="4"  (click)="getcollapse(CHECKB,'bank')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">BANK DETAILS</b></span></td>
-                        </tr>
-                        @if (CHECKB==true) {
-<tr>                        
-                            <td   colspan="4">                                
-                                <table class="table table-bordered table-sm-new bgwhite" >
-                                    <tr>                             
-                                        <td><span class="col-form-span-label"><b>Bank Address 1</b> </span></td>         
-                                        <td>  <input [(ngModel)]="bnkaddss1" type="text"    class="form-control width180"   > </td>  
-                                        <td><span class="col-form-span-label"><b>Bank Address 2</b> </span></td>         
-                                        <td>  <input [(ngModel)]="bnkaddss2" type="text"    class="form-control width180"   > </td>   
-                                    </tr>  
-                                    <tr>                             
-                                        <td><span class="col-form-span-label"><b>Accocunt No</b> </span></td>         
-                                        <td>  <input [(ngModel)]="bnkAcctno" type="text"    class="form-control width180"   > </td> 
-                                        <td><span class="col-form-span-label"><b>Authorised Dealer Code</b> </span></td>         
-                                        <td>  <input [(ngModel)]="bnkauthdealercode" type="text"    class="form-control width180"   > </td>                         
-                                    </tr>  
-                                    <tr>  
-                                        <td><span class="col-form-span-label"><b>RBI Waiver No.</b> </span></td>         
-                                        <td>  <input [(ngModel)]="RBIwaiverno" type="text"    class="form-control width180"   > </td> 
-                                        <td><span class="col-form-span-label"><b>Commissionrate</b> </span></td>         
-                                        <td>  <input [(ngModel)]="bnkCommissionrate" type="text"    class="form-control width180"   > </td>    
-                
-                                    </tr>  
-                                    <tr>  
-                                        <td><span class="col-form-span-label"><b>Division</b> </span></td>         
-                                        <td>  <input [(ngModel)]="bnkDivision" type="text"    class="form-control width180"   > </td> 
-                                        <td><span class="col-form-span-label"><b>Range</b> </span></td>         
-                                        <td>  <input [(ngModel)]="bnkRange" type="text"    class="form-control width180"   > </td>    
-                                    </tr>  
-                                    <tr>                             
-                                        <td><span class="col-form-span-label"><b>Account No.(in SBI)</b> </span></td>         
-                                        <td>  <input [(ngModel)]="bkacctnoSBI" type="text"    class="form-control width180"   > </td>   
-                                        <td> </td>         
-                                        <td>   </td>   
-                                    </tr>  
-                                </table>
-                            </td>
-                        </tr>
-}  
-                        <tr>                    
-                            <td colspan="4"  (click)="getcollapse(CHECKC1,'contact1')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">CONTACT 1 DETAILS</b></span></td>
-                        </tr>
-                        @if (CHECKC1==true) {
-<tr>                        
-                            <td   colspan="4">                                
-                                <table class="table table-bordered table-sm-new bgwhite" >
-                                <tr>  
-                                    <td><span class="col-form-span-label"><b>Name</b> </span></td>         
-                                    <td  style=" display: flex; " > <select class="form-control width50"  [(ngModel)]="Ctitle1"  >
-                                            <option value="Mr">Mr.</option>	
-                                            <option value="Ms">Ms.</option>	
-                                            <option value="Mrs">Mrs.</option>
-                                            <option value="Miss">Miss.</option>
-                                            <option value="Dr">Dr.</option>
-                                        </select>  
-                                        <input [(ngModel)]="Cname1" type="text" class="form-control width180"   > </td> 
-                                    <td><span class="col-form-span-label"><b>Designation</b> </span></td>         
-                                    <td>  <input [(ngModel)]="CDesignation1" type="text"    class="form-control width180"   > </td>    
-                                </tr>  
-                                <tr>  
-                                    <td><span class="col-form-span-label"><b>Telephone No. (Direct)</b> </span></td>         
-                                    <td>  <input [(ngModel)]="Ctelphone1" type="text"    class="form-control width180"   > </td> 
-                                    <td><span class="col-form-span-label"><b>FAX (Direct)</b> </span></td>         
-                                    <td>  <input [(ngModel)]="Cfaxno1" type="text"    class="form-control width180"   > </td>    
-                                </tr> 
-                                <tr>  
-                                    <td><span class="col-form-span-label"><b>Mobile No.</b> </span></td>         
-                                    <td>  <input [(ngModel)]="Cmobileno1" type="text"    class="form-control width180"   > </td> 
-                                    <td><span class="col-form-span-label"><b>E-Mail</b> </span></td>         
-                                    <td>  <input [(ngModel)]="Cemail1" type="text"    class="form-control width180"  (change)="onChange(Cemail1)"  > </td>    
-                                </tr> 
-                                </table>
-                            </td>
-                        </tr>
-}
-                         <!-- <tr class="trheader">
-                        <td colspan="4"> <span class="col-form-span-label"><b>  CONTACT 1 DETAILS</b> </span>  </td>
-                         </tr> -->
-                        <tr>                    
-                            <td colspan="4"  (click)="getcollapse(CHECKC2,'contact2')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">CONTACT 2 DETAILS</b></span></td>
-                        </tr>
-                        @if (CHECKC2==true) {
-<tr>                        
-                            <td   colspan="4">                                
-                                <table class="table table-bordered table-sm-new bgwhite" >
-                                    <tr>  
-                                        <td><span class="col-form-span-label"><b>Name</b> </span></td>         
-                                        <td  style=" display: flex; " > <select class="form-control width50"  [(ngModel)]="Ctitle2"  >
-                                                <option value="Mr">Mr.</option>	
-                                                <option value="Ms">Ms.</option>	
-                                                <option value="Mrs">Mrs.</option>
-                                                <option value="Miss">Miss.</option>
-                                                <option value="Dr">Dr.</option>
-                                            </select>  
-                                            <input [(ngModel)]="Cname2" type="text"    class="form-control width180"   > </td> 
-                                        <td><span class="col-form-span-label"><b>Designation</b> </span></td>         
-                                        <td>  <input [(ngModel)]="CDesignation2" type="text"    class="form-control width180"   > </td>    
-                                    </tr>  
-                                    <tr>  
-                                        <td><span class="col-form-span-label"><b>Telephone No. (Direct)</b> </span></td>         
-                                        <td>  <input [(ngModel)]="Ctelphone2" type="text"    class="form-control width180"   > </td> 
-                                        <td><span class="col-form-span-label"><b>FAX (Direct)</b> </span></td>         
-                                        <td>  <input [(ngModel)]="Cfaxno2" type="text"    class="form-control width180"   > </td>    
-                                    </tr> 
-                                    <tr>  
-                                        <td><span class="col-form-span-label"><b>Mobile No.</b> </span></td>         
-                                        <td>  <input [(ngModel)]="Cmobileno2" type="text"    class="form-control width180"   > </td> 
-                                        <td><span class="col-form-span-label"><b>E-Mail</b> </span></td>         
-                                        <td>  <input [(ngModel)]="Cemail2" type="text"    class="form-control width180"   (change)="onChange(Cemail2)"  > </td>    
-                                    </tr>     
-                                </table>
-                            </td>
-                        </tr>
-} 
-                    <tr>                    
-                        <td colspan="4"  (click)="getcollapse(CHECKC3,'contact3')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">CONTACT 3 DETAILS</b></span></td>
-                    </tr>
-                    @if (CHECKC3==true) {
-<tr>                        
-                        <td   colspan="4">                                
-                            <table class="table table-bordered table-sm-new bgwhite" >
-                                <tr>  
-                                    <td><span class="col-form-span-label"><b>Name</b> </span></td>         
-                                    <td  style=" display: flex; " > <select class="form-control width50"  [(ngModel)]="Ctitle3"  >
-                                            <option value="Mr">Mr.</option>	
-                                            <option value="Ms">Ms.</option>	
-                                            <option value="Mrs">Mrs.</option>
-                                            <option value="Miss">Miss.</option>
-                                            <option value="Dr">Dr.</option>
-                                        </select>  
-                                        <input [(ngModel)]="Cname3" type="text"    class="form-control width180"   > </td> 
-                                    <td><span class="col-form-span-label"><b>Designation</b> </span></td>         
-                                    <td>  <input [(ngModel)]="CDesignation3" type="text"    class="form-control width180"   > </td>    
-                                </tr>  
-                                <tr>  
-                                    <td><span class="col-form-span-label"><b>Telephone No. (Direct)</b> </span></td>         
-                                    <td>  <input [(ngModel)]="Ctelphone3" type="text"    class="form-control width180"   > </td> 
-                                    <td><span class="col-form-span-label"><b>FAX (Direct)</b> </span></td>         
-                                    <td>  <input [(ngModel)]="Cfaxno3" type="text"    class="form-control width180"   > </td>    
-                                </tr> 
-                                <tr>  
-                                    <td><span class="col-form-span-label"><b>Mobile No.</b> </span></td>         
-                                    <td>  <input [(ngModel)]="Cmobileno3" type="text"    class="form-control width180"   > </td> 
-                                    <td><span class="col-form-span-label"><b>E-Mail</b> </span></td>         
-                                    <td>  <input [(ngModel)]="Cemail3" type="text"    class="form-control width180"  (change)="onChange(Cemail3)"  > </td>    
-                                </tr> 
-                            </table>
-                        </td>
-                    </tr>
-}
-            
-                      
-                    <tr>                    
-                        <td colspan="4"  (click)="getcollapse(CHECKC4,'contact4')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">CONTACT 4 DETAILS</b></span></td>
-                    </tr>
-                    @if (CHECKC4==true) {
-<tr>                        
-                        <td   colspan="4">                                
-                            <table class="table table-bordered table-sm-new bgwhite" >
-                                <tr>  
-                                    <td><span class="col-form-span-label"><b>Name</b> </span></td>         
-                                    <td  style=" display: flex; " > <select class="form-control width50"  [(ngModel)]="Ctitle4"  >
-                                            <option value="Mr">Mr.</option>	
-                                            <option value="Ms">Ms.</option>	
-                                            <option value="Mrs">Mrs.</option>
-                                            <option value="Miss">Miss.</option>
-                                            <option value="Dr">Dr.</option>
-                                        </select>  
-                                        <input [(ngModel)]="Cname4" type="text"    class="form-control width180"   > </td> 
-                                    <td><span class="col-form-span-label"><b>Designation</b> </span></td>         
-                                    <td>  <input [(ngModel)]="CDesignation4" type="text"    class="form-control width180"   > </td>    
-                                </tr>  
-                                <tr>  
-                                    <td><span class="col-form-span-label"><b>Telephone No. (Direct)</b> </span></td>         
-                                    <td>  <input [(ngModel)]="Ctelphone4" type="text"    class="form-control width180"   > </td> 
-                                    <td><span class="col-form-span-label"><b>FAX (Direct)</b> </span></td>         
-                                    <td>  <input [(ngModel)]="Cfaxno4" type="text"    class="form-control width180"   > </td>    
-                                </tr> 
-                                <tr>  
-                                    <td><span class="col-form-span-label"><b>Mobile No.</b> </span></td>         
-                                    <td>  <input [(ngModel)]="Cmobileno4" type="text"    class="form-control width180"   > </td> 
-                                    <td><span class="col-form-span-label"><b>E-Mail</b> </span></td>         
-                                    <td>  <input [(ngModel)]="Cemail4" type="text"    class="form-control width180"  (change)="onChange(Cemail4)"   > </td>    
-                                </tr> 
-                            </table>
-                        </td>
-                    </tr>
-}
-                    <!-- <tr>                    
-                        <td colspan="4"  (click)="getcollapse(CHECKC5,'doc')" style="background-color: #1b8eb7;cursor: pointer;" ><span class="col-form-span-label"><b style=" color: white; ">DOCUMNET UPLOAD</b></span></td>
-                    </tr>
-                    <tr *ngIf ="CHECKC5==true">                        
-                        <td   colspan="4">                                
-                            <table class="table table-bordered table-sm-new bgwhite" >
-                                <tr>  
-                                        <td><span class="col-form-span-label"><b>Document Type</b> </span></td>         
-                                        <td colspan="3"> <select class="form-control width150"  [(ngModel)]="doctype"  >
-                                                <option value="PANC">PAN Copy</option>	
-                                                <option value="KYCC">KYC Copy</option>	
-                                                <option value="GSTC">GST Copy</option>                                                
-                                            </select> 
-                                        </td> 
-                                    </tr>
-                                <tr>
-                                    <td colspan="3">
-                                     
-                                        <input #fileUpload type="file" class="col-form-span-label" (change)="fileChangeEvent($event)" placeholder="Upload file..." multiple accept=".pdf" />
-                                    </td>                                     
-                                    <td>   <button class="btn btn-sm btn-success" type="upload" (click)="upload()"> <span class="col-form-span-label"><i class="fa fa-upload" ></i> Upload</span></button></td>
-                                </tr>
-                                <tr >
-                                    <td colspan="4">
-                                        <table class="table table-bordered table-sm-new bgwhite" >
-                                            <tr>  
-                                                <td><span class="col-form-span-label"><b>DOC TYPE</b> </span></td> 
-                                                <td><span class="col-form-span-label"><b>File Name</b> </span></td> 
-                                                <td><span class="col-form-span-label"><b>Actual File Name</b> </span></td>
-                                            </tr>
-                                            <tbody *ngIf="uploadResult.length>0">
-                                                 <tr *ngFor="let obj of uploadResult">
-                                                <td class="centerlabel">
-                                                     
-                                                    <i class="fa fa-trash" (click)="deletechildrecd(obj.PKID,obj.ACT_FILENAME)"></i>
-                                                </td>
-                                                <td><span class="col-form-span-label">{{obj.DOCTYPE}} </span></td>
-                                                <td><span class="col-form-span-label">{{obj.UPLOAD_FILENAME}}</span></td>
-                                                <td><span class="col-form-span-label">{{obj.ACT_FILENAME}}</span></td>
-                                            </tr>
-                                            </tbody>
-                                           
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr> -->
-                    <tr class="trheader">
-                        <td  colspan="4"><span class="col-form-span-label"><b>BRANCH LIST</b> </span> </td>
-                    </tr>                          
-                    <tr>
-                        <td colspan="4">
-                            <div class="row xyscroll" >
-                                    <table class="table table-responsive-sm table-bordered"> 
-                                        <thead>
-                                            <tr class="col-form-span-heading">
-                                                
-                                                <th class="width100 centerlabel"><span class="col-form-span-label">City</span></th>
-                                                <th class="width100 centerlabel"><span class="col-form-span-label">Exporter</span></th>
-                                                <th class="width100 centerlabel"><span class="col-form-span-label">Importer</span></th> 
-                                                <th class="width100 centerlabel"><span class="col-form-span-label">Sourcing Agent</span></th>                                                        
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                                @for (obj of citybranchlict; track obj; let i = $index) {
-<tr>                                                        
-                                                    <td><span class="col-form-span-label">{{obj.CITYNAME}}</span></td>
-                                                    <td><span class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.CLIENTLOC" (change)="chkonchange(obj.CITYCODE,obj.CLIENTLOC,'E')"/> </span></td>
-                                                    <td><span class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.CLIENTLOC1" (change)="chkonchange(obj.CITYCODE,obj.CLIENTLOC1,'I')"/></span></td>
-                                                    <td><span class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.CLIENTLOC2" (change)="chkonchange(obj.CITYCODE,obj.CLIENTLOC2,'S')"/></span></td>
-                                                </tr>
-}
-                                        </tbody>
+  </div>
 
-                                    </table>
-                            </div>
-                        </td>
-                    </tr> 
-                    <tr>
-                        <td colspan="4"  class="centerlabel">                                
-                            <button class="btn btn-sm btn-success" type="submit" (click)="Add_Main()"> <span class="col-form-span-label"><i class="fa fa-plus" ></i> {{text}}</span></button>
-                            <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="RestMain();"><i class="fa fa-ban"></i> Reset</span></button>
-                        </td>
-                    </tr>
-            </table>
+  <div class="card sec">
+    <div class="card-h"><h2>Exporter Details</h2></div>
+    <div class="fields">
+      <div class="fld">
+        <label>Short Name <span class="req">*</span></label>
+        <input [(ngModel)]="ShrtName" type="text" class="form-control">
+      </div>
+      <div class="fld">
+        <label>PAN No.</label>
+        <input [(ngModel)]="panno" type="text" class="form-control" maxlength="20">
+      </div>
+      <div class="fld full">
+        <label>Name <span class="req">*</span></label>
+        <div class="inl" style="display:flex; gap:8px;">
+          <select class="form-control" style="max-width:110px" [(ngModel)]="title">
+            <option value="Mr.">Mr.</option>
+            <option value="Ms">Ms</option>
+            <option value="Mrs.">Mrs.</option>
+            <option value="Miss">Miss</option>
+            <option value="Dr.">Dr.</option>
+            <option value="Messrs">Messrs</option>
+          </select>
+          <input [(ngModel)]="Name" type="text" class="form-control">
         </div>
-        <div class="col-sm-2">  </div>
+      </div>
+      <div class="fld">
+        <label>EORI #</label>
+        <input [(ngModel)]="EORIno" type="text" class="form-control">
+      </div>
+      <div class="fld">
+        <label><input type="checkbox" [(ngModel)]="ISSEZCLIENT" (change)="checkValue(ISSEZCLIENT?'1':'')"> Is SEZ Client</label>
+      </div>
+      <div class="fld">
+        <label>Credit Period Sea</label>
+        <input [(ngModel)]="crperiodsea" type="text" class="form-control">
+      </div>
+      <div class="fld">
+        <label>Credit Period Air</label>
+        <input [(ngModel)]="crperiodair" type="text" class="form-control">
+      </div>
+      <div class="fld">
+        <label><input type="checkbox" [(ngModel)]="overseasagent" (change)="checkValueoverseas(overseasagent?'Y':'0')"> Is Overseas Agent</label>
+      </div>
     </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h"><h2>Documentation</h2></div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Address 1</label>
+        <input [(ngModel)]="addrs1" type="text" class="form-control" maxlength="40">
+      </div>
+      <div class="fld full">
+        <label>Address 2</label>
+        <input [(ngModel)]="addrs2" type="text" class="form-control" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Address 3</label>
+        <input [(ngModel)]="addrs3" type="text" class="form-control" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Pincode Position</label>
+        <span><input type="radio" [checked]="position=='After'" (change)="position='After'"> After
+          <input type="radio" [checked]="position=='Before'" (change)="position='Before'"> Before</span>
+      </div>
+      <div class="fld">
+        <label>Pincode</label>
+        <input [(ngModel)]="Pincode" type="text" class="form-control">
+      </div>
+      <div class="fld">
+        <label>City <span class="req">*</span></label>
+        <select class="form-control" [(ngModel)]="city" (change)="Countryfilter($event.target.value,'DOC')">
+          <option value="">Please select</option>
+          @for (d of Citylist; track d) {
+            <option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Country</label>
+        <input disabled [(ngModel)]="country" type="text" class="form-control">
+      </div>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h"><h2>Correspondence / Invoicing</h2></div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Address 1</label>
+        <input [(ngModel)]="addrs21" type="text" class="form-control" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Address 2</label>
+        <input [(ngModel)]="addrs22" type="text" class="form-control" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Address 3</label>
+        <input [(ngModel)]="addrs23" type="text" class="form-control" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Pincode Position</label>
+        <span><input type="radio" [checked]="position2=='After'" (change)="position2='After'"> After
+          <input type="radio" [checked]="position2=='Before'" (change)="position2='Before'"> Before</span>
+      </div>
+      <div class="fld">
+        <label>Pincode</label>
+        <input [(ngModel)]="Pincode2" type="text" class="form-control">
+      </div>
+      <div class="fld">
+        <label>City <span class="req">*</span></label>
+        <select class="form-control" [(ngModel)]="city2" (change)="Countryfilter($event.target.value,'INV')">
+          <option value="">Please select</option>
+          @for (d of Citylist; track d) {
+            <option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>State</label>
+        <input [(ngModel)]="state" type="text" class="form-control">
+      </div>
+      <div class="fld">
+        <label>Country <span class="req">*</span></label>
+        <input disabled [(ngModel)]="country2" type="text" class="form-control">
+      </div>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2><input type="checkbox" [(ngModel)]="GST" (change)="checkValue(GST?'gst':'')"> GST DETAILS</h2>
+    </div>
+    <div class="fields">
+      <div class="fld">
+        <label>GST No. <span class="req">*</span></label>
+        <input [(ngModel)]="GstNo" type="text" class="form-control">
+      </div>
+      <div class="fld">
+        <label>ARN No</label>
+        <input [(ngModel)]="ARNNo" type="text" class="form-control">
+      </div>
+      <div class="fld full">
+        <label>Contact Person</label>
+        <div class="inl" style="display:flex; gap:8px;">
+          <select class="form-control" style="max-width:90px" [(ngModel)]="title1">
+            <option value="Mr">Mr.</option>
+            <option value="Ms">Ms.</option>
+            <option value="Mrs">Mrs.</option>
+            <option value="Miss">Miss.</option>
+            <option value="Dr">Dr.</option>
+          </select>
+          <input [(ngModel)]="person" type="text" class="form-control">
+        </div>
+      </div>
+      <div class="fld">
+        <label>Telephone No.</label>
+        <input [(ngModel)]="telephone" type="text" class="form-control">
+      </div>
+      <div class="fld">
+        <label>Mobile No.</label>
+        <input [(ngModel)]="mobile" type="text" class="form-control">
+      </div>
+      <div class="fld">
+        <label>E-Mail</label>
+        <input type="email" class="form-control" placeholder="Email" [(ngModel)]="email" (change)="onChange(email)">
+      </div>
+    </div>
+    <div class="foot">
+      <button class="btn p" type="submit" (click)="Addcildrcrd()">{{txtchild}}</button>
+      <button class="btn g" type="reset" (click)="Resetcildrcrd();">Reset</button>
+    </div>
+    @if (gstlist?.length > 0) {
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Invoicing Address</th>
+              <th>GST No.</th>
+              <th>GST ARN No.</th>
+            </tr>
+          </thead>
+          @if (gstlist?.length > 0) {
+            <tbody>
+              @for (obj of gstlist; track obj) {
+                <tr>
+                  <td class="act">
+                    <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)"></i>
+                    &nbsp;
+                    <i class="fa fa-trash" (click)="deletechildrecd(obj.ID)"></i>
+                  </td>
+                  <td [innerHtml]="obj.INVADDRESS"></td>
+                  <td>{{obj.GST_NO}}</td>
+                  <td>{{obj.GST_ARNNO}}</td>
+                </tr>
+              }
+            </tbody>
+          }
+        </table>
+      </div>
+    }
+  </div>
+
+  <div class="card sec">
+    <div class="coll-h" (click)="getcollapse(CHECK,'other')">
+      <h2>OTHER DETAILS</h2>
+      <span class="arrow">{{ CHECK==true ? '▲' : '▼' }}</span>
+    </div>
+    @if (CHECK==true) {
+      <div class="fields">
+        <div class="fld">
+          <label>State of origin of Export</label>
+          <input [(ngModel)]="SOexport" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Telephone No.(General)</label>
+          <input [(ngModel)]="telphone1" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Fax No. (General)</label>
+          <input [(ngModel)]="faxno1" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Email (General)</label>
+          <input [(ngModel)]="email1" type="text" class="form-control" (change)="onChange(email1)">
+        </div>
+        <div class="fld">
+          <label>RBI Code</label>
+          <input [(ngModel)]="rbicode" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>IM No.</label>
+          <input [(ngModel)]="imno" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>IT No.</label>
+          <input [(ngModel)]="itno" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Banker Name</label>
+          <input [(ngModel)]="bankername" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Custom P. No.</label>
+          <input [(ngModel)]="custpono" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>IEC Code</label>
+          <input [(ngModel)]="ieccode" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Exporthouse Cert. No.</label>
+          <input [(ngModel)]="exphouseno" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Exporthouse Cert. Dt.</label>
+          <my-date-picker name="exphousedt" [options]="myDatePickerOptions" [(ngModel)]="exphousedt"></my-date-picker>
+        </div>
+        <div class="fld">
+          <label>Exporthouse Cert. Validty upto</label>
+          <my-date-picker name="exphouse" [options]="myDatePickerOptions" [(ngModel)]="exphouse"></my-date-picker>
+        </div>
+        <div class="fld">
+          <label>ITC Group Code</label>
+          <input [(ngModel)]="itcgrpcode" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Type of Exporter</label>
+          <select class="form-control" [(ngModel)]="typeexpo">
+            <option value="(R) Merchant">(R)Merchant</option>
+            <option value="(F) Manufacturer"> (F)Manufacturer</option>
+          </select>
+        </div>
+        <div class="fld">
+          <label>Type of Export House</label>
+          <select class="form-control" [(ngModel)]="typeexpohouse">
+            <option value="(EH) Export House">(EH)Export House</option>
+            <option value="(SH) Star Trading House">(SH)Star Trading House</option>
+            <option value="(SS) Super Star Trading House">(SS)Super Star Trading House</option>
+            <option value="(SS) Super Star Trading House">(TH)Trading House</option>
+            <option value="(NA) Not Applicable">(NA)Not Applicable</option>
+          </select>
+        </div>
+        <div class="fld">
+          <label></label>
+          <select class="form-control" [(ngModel)]="exp_typeb">
+            <option value="(P) Private"> (P)Private</option>
+            <option value="(G) Government"> (G)Government</option>
+          </select>
+        </div>
+        <div class="fld">
+          <label>SERVICE TAX No.</label>
+          <input [(ngModel)]="servtaxno" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>TAN No.</label>
+          <input [(ngModel)]="tanno" type="text" class="form-control" (change)="Tanchange()">
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="card sec">
+    <div class="coll-h" (click)="getcollapse(CHECKB,'bank')">
+      <h2>BANK DETAILS</h2>
+      <span class="arrow">{{ CHECKB==true ? '▲' : '▼' }}</span>
+    </div>
+    @if (CHECKB==true) {
+      <div class="fields">
+        <div class="fld">
+          <label>Bank Address 1</label>
+          <input [(ngModel)]="bnkaddss1" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Bank Address 2</label>
+          <input [(ngModel)]="bnkaddss2" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Accocunt No</label>
+          <input [(ngModel)]="bnkAcctno" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Authorised Dealer Code</label>
+          <input [(ngModel)]="bnkauthdealercode" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>RBI Waiver No.</label>
+          <input [(ngModel)]="RBIwaiverno" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Commissionrate</label>
+          <input [(ngModel)]="bnkCommissionrate" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Division</label>
+          <input [(ngModel)]="bnkDivision" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Range</label>
+          <input [(ngModel)]="bnkRange" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Account No.(in SBI)</label>
+          <input [(ngModel)]="bkacctnoSBI" type="text" class="form-control">
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="card sec">
+    <div class="coll-h" (click)="getcollapse(CHECKC1,'contact1')">
+      <h2>CONTACT 1 DETAILS</h2>
+      <span class="arrow">{{ CHECKC1==true ? '▲' : '▼' }}</span>
+    </div>
+    @if (CHECKC1==true) {
+      <div class="fields">
+        <div class="fld full">
+          <label>Name</label>
+          <div class="inl" style="display:flex; gap:8px;">
+            <select class="form-control" style="max-width:90px" [(ngModel)]="Ctitle1">
+              <option value="Mr">Mr.</option>
+              <option value="Ms">Ms.</option>
+              <option value="Mrs">Mrs.</option>
+              <option value="Miss">Miss.</option>
+              <option value="Dr">Dr.</option>
+            </select>
+            <input [(ngModel)]="Cname1" type="text" class="form-control">
+          </div>
+        </div>
+        <div class="fld">
+          <label>Designation</label>
+          <input [(ngModel)]="CDesignation1" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Telephone No. (Direct)</label>
+          <input [(ngModel)]="Ctelphone1" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>FAX (Direct)</label>
+          <input [(ngModel)]="Cfaxno1" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Mobile No.</label>
+          <input [(ngModel)]="Cmobileno1" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>E-Mail</label>
+          <input [(ngModel)]="Cemail1" type="text" class="form-control" (change)="onChange(Cemail1)">
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="card sec">
+    <div class="coll-h" (click)="getcollapse(CHECKC2,'contact2')">
+      <h2>CONTACT 2 DETAILS</h2>
+      <span class="arrow">{{ CHECKC2==true ? '▲' : '▼' }}</span>
+    </div>
+    @if (CHECKC2==true) {
+      <div class="fields">
+        <div class="fld full">
+          <label>Name</label>
+          <div class="inl" style="display:flex; gap:8px;">
+            <select class="form-control" style="max-width:90px" [(ngModel)]="Ctitle2">
+              <option value="Mr">Mr.</option>
+              <option value="Ms">Ms.</option>
+              <option value="Mrs">Mrs.</option>
+              <option value="Miss">Miss.</option>
+              <option value="Dr">Dr.</option>
+            </select>
+            <input [(ngModel)]="Cname2" type="text" class="form-control">
+          </div>
+        </div>
+        <div class="fld">
+          <label>Designation</label>
+          <input [(ngModel)]="CDesignation2" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Telephone No. (Direct)</label>
+          <input [(ngModel)]="Ctelphone2" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>FAX (Direct)</label>
+          <input [(ngModel)]="Cfaxno2" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Mobile No.</label>
+          <input [(ngModel)]="Cmobileno2" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>E-Mail</label>
+          <input [(ngModel)]="Cemail2" type="text" class="form-control" (change)="onChange(Cemail2)">
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="card sec">
+    <div class="coll-h" (click)="getcollapse(CHECKC3,'contact3')">
+      <h2>CONTACT 3 DETAILS</h2>
+      <span class="arrow">{{ CHECKC3==true ? '▲' : '▼' }}</span>
+    </div>
+    @if (CHECKC3==true) {
+      <div class="fields">
+        <div class="fld full">
+          <label>Name</label>
+          <div class="inl" style="display:flex; gap:8px;">
+            <select class="form-control" style="max-width:90px" [(ngModel)]="Ctitle3">
+              <option value="Mr">Mr.</option>
+              <option value="Ms">Ms.</option>
+              <option value="Mrs">Mrs.</option>
+              <option value="Miss">Miss.</option>
+              <option value="Dr">Dr.</option>
+            </select>
+            <input [(ngModel)]="Cname3" type="text" class="form-control">
+          </div>
+        </div>
+        <div class="fld">
+          <label>Designation</label>
+          <input [(ngModel)]="CDesignation3" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Telephone No. (Direct)</label>
+          <input [(ngModel)]="Ctelphone3" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>FAX (Direct)</label>
+          <input [(ngModel)]="Cfaxno3" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Mobile No.</label>
+          <input [(ngModel)]="Cmobileno3" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>E-Mail</label>
+          <input [(ngModel)]="Cemail3" type="text" class="form-control" (change)="onChange(Cemail3)">
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="card sec">
+    <div class="coll-h" (click)="getcollapse(CHECKC4,'contact4')">
+      <h2>CONTACT 4 DETAILS</h2>
+      <span class="arrow">{{ CHECKC4==true ? '▲' : '▼' }}</span>
+    </div>
+    @if (CHECKC4==true) {
+      <div class="fields">
+        <div class="fld full">
+          <label>Name</label>
+          <div class="inl" style="display:flex; gap:8px;">
+            <select class="form-control" style="max-width:90px" [(ngModel)]="Ctitle4">
+              <option value="Mr">Mr.</option>
+              <option value="Ms">Ms.</option>
+              <option value="Mrs">Mrs.</option>
+              <option value="Miss">Miss.</option>
+              <option value="Dr">Dr.</option>
+            </select>
+            <input [(ngModel)]="Cname4" type="text" class="form-control">
+          </div>
+        </div>
+        <div class="fld">
+          <label>Designation</label>
+          <input [(ngModel)]="CDesignation4" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Telephone No. (Direct)</label>
+          <input [(ngModel)]="Ctelphone4" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>FAX (Direct)</label>
+          <input [(ngModel)]="Cfaxno4" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>Mobile No.</label>
+          <input [(ngModel)]="Cmobileno4" type="text" class="form-control">
+        </div>
+        <div class="fld">
+          <label>E-Mail</label>
+          <input [(ngModel)]="Cemail4" type="text" class="form-control" (change)="onChange(Cemail4)">
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="card sec">
+    <div class="card-h"><h2>Branch List</h2></div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>City</th>
+            <th>Exporter</th>
+            <th>Importer</th>
+            <th>Sourcing Agent</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (obj of citybranchlict; track obj; let i = $index) {
+            <tr>
+              <td>{{obj.CITYNAME}}</td>
+              <td><input type="checkbox" [(ngModel)]="obj.CLIENTLOC" (change)="chkonchange(obj.CITYCODE,obj.CLIENTLOC,'E')"></td>
+              <td><input type="checkbox" [(ngModel)]="obj.CLIENTLOC1" (change)="chkonchange(obj.CITYCODE,obj.CLIENTLOC1,'I')"></td>
+              <td><input type="checkbox" [(ngModel)]="obj.CLIENTLOC2" (change)="chkonchange(obj.CITYCODE,obj.CLIENTLOC2,'S')"></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose {{text}}.</span>
+    <div class="r">
+      <button class="btn g" type="reset" (click)="RestMain();">Reset</button>
+      <button class="btn p" type="submit" (click)="Add_Main()">{{text}}</button>
+    </div>
+  </div>
 </div>

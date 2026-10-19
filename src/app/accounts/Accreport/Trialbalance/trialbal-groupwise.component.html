@@ -1,44 +1,31 @@
-<div class="animated fadeIn" >  
-    <div class="row no-gutters" >
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{Header}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Accounts -> Reports -> Trial balance -> Group wise.
+  Download-only: ExportToExcel() fetches the data and builds the workbook client-side.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Trial balance &middot; group wise</h1>
+      <p>Balances rolled up by account group as on a date &middot; downloads an Excel file</p>
     </div>
-    <div class="row no-gutters" >
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td class="col-form-span-heading" colspan="6"> <b>TRIAL BALANCE - GROUP WISE</b> </td>
-           </tr>
-           <tr>
-            <td><span class="col-form-span-label"><b>Trial Balance Groupwise As On</b> </span><span class="col-form-span-error">*</span>
-            </td>
-            <td >
-                <my-date-picker name="AsonDate" (dateChanged)="AsOnDateChanged($event)"  [options]="myDatePickerOptionsInv"
-                            class="form-control"  [selDate]="AsonDate"   ></my-date-picker>
-             </td>
-           </tr>
-           <tr>
-                    <td colspan="6" class="centerlabel">
-                        <button class="btn btn-sm btn-primary" type="submit" (click)="ExportToExcel()" > <span
-                                class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
-                                Export To Excel </span></button>&nbsp;
-                              </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-    </div>
-</div>
+  </div>
 
+  <div class="card sec">
+    <div class="card-h"><h2>{{ Header | titlecase }}</h2><span class="meta"><b>*</b> required</span></div>
+    <div class="fields">
+      <div class="fld">
+        <label>As on <span class="req">*</span></label>
+        <my-date-picker name="AsonDate" (dateChanged)="AsOnDateChanged($event)" [options]="myDatePickerOptionsInv" [selDate]="AsonDate"></my-date-picker>
+      </div>
+      <div class="fld"></div>
+    </div>
+    <div class="fk-note">The workbook downloads directly; nothing is displayed on this screen.</div>
+  </div>
+
+  <div class="bar">
+    <span class="note">Balances as on the selected date.</span>
+    <div class="r">
+      <button class="btn p" type="submit" (click)="ExportToExcel()">Export to Excel</button>
+    </div>
+  </div>
+</div>

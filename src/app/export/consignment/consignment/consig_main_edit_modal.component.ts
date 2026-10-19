@@ -1,4 +1,4 @@
-﻿import { Component, Input, Output, ViewChild, EventEmitter, OnInit, OnChanges, ElementRef, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+﻿import { Component, Input, Output, ViewChild, EventEmitter, OnInit, OnChanges, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, HostBinding } from '@angular/core';
 import { DataService } from '../../../shared/service/dataService';
 import { LoginService } from '../../../shared/service/loginService';
 import { ToastCommonService } from '../../../shared/service/toastService';
@@ -14,6 +14,12 @@ import { environment } from '../../../../environments/environment';
 @Component({
     selector: 'app-consignment-edit-modal',
     templateUrl: 'consig_main_edit_modal.component.html',
+    // Drawer shell, ported from MPERPNG-20. Global page kit: import-page.css (.im-page on
+    // the dialog content), consignment-page.css (kit-consignment), export-theme.css tokens
+    // (kit-export, stands in for MP's :host import) and export-legacy-content.css
+    // (.x-legacy on the editor host). The screen stylesheet adds the drawer frame.
+    styleUrls: ['consig_main_edit_modal.component.css'],
+    host: { class: 'kit-export kit-consignment' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -44,6 +50,51 @@ export class ConsignmentEditModalComponent implements OnInit {
     @Input() exptno: string;
 
     title: string = "";
+
+    // ---- drawer presentation (from MPERPNG-20; no data or API calls) ----
+
+    // The drawer header shows the same module icon as the tile that opened it, so the
+    // editor stays identifiable once the hub is hidden behind the drawer.
+    moduleIcons: any = {
+        VIEW: 'buy.jpg',
+        SHIPCLEAR: 'registeruser16.jpg',
+        MAIN: '1265187760.png',
+        PORT: '1262723459.png',
+        INVOICE: 'home-features_why.gif',
+        ITC: '1265187760.png',
+        ORDER: '1264378617.png',
+        QUALITYCHECKING: '1264378617.png',
+        PKG: '1265278270.png',
+        MARKS_NUMBERS: '1265194537.png',
+        QUOTA: '1265194537.png',
+        DOC: 'company.png',
+        CONREMARK: 'contact.jpg',
+        MAWB: 'company.png',
+        HAWB: 'contact.jpg',
+        JOB: 'company.png',
+        EXPJOB: 'company.png',
+        CANCEL: '1265194537.png'
+    };
+
+    moduleIcon(): string {
+        return 'assets/icon/' + (this.moduleIcons[this.type] || 'buy.jpg');
+    }
+
+    /* Compact/Original layout switch for the three freight rating sheets.
+       Owned by the drawer so the control sits in the header beside the close button.
+       The flag is pushed down into each sheet as an @Input and lands on its host
+       element as .rating-classic, which is what export-rating.css gates the density
+       rules on (:host(.rating-classic) / :host(:not(.rating-classic))).
+       Not persisted, deliberately (as in MP). */
+    classicRating: boolean = false;
+
+    isRatingSheet(): boolean {
+        return this.type == 'MAWB' || this.type == 'HAWB' || this.type == 'EXPJOB' || this.type == 'JOB';
+    }
+
+    toggleRatingView() {
+        this.classicRating = !this.classicRating;
+    }
 
     constructor(private _toasterService: ToastCommonService,
         private _sharedconsig: SharedDataSerice,
@@ -101,7 +152,7 @@ export class ConsignmentEditModalComponent implements OnInit {
         else if (this.type == 'CONREMARK') { this.consigneeremarkEdit.validate(); }
         else if (this.type == 'MAWB') { this.mawbEdit.validate(); }
         else if (this.type == 'HAWB') { this.hawbEdit.validate(); }
-        else if (this.type == 'EXPJOB') { this.jobEdit.validate(); }
+        else if (this.type == 'EXPJOB' || this.type == 'JOB') { this.jobEdit.validate(); }
         else if (this.type == 'QUALITYCHECKING') { this.QualityChecking.validate(); }
         else if (this.type == 'CANCEL') { this.cancelshipedit.cancel_update(); }
     }
@@ -6974,10 +7025,14 @@ export class ConsigneeViewComponent implements OnInit {
     templateUrl: 'consign_main_mawb_rating.component.html',
     // styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
     // encapsulation: ViewEncapsulation.None,
+    styleUrls: ['export-rating.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class MAWBEditComponent   {
+    // Compact/Original layout switch, driven from the drawer header (export-rating.css).
+    @Input() @HostBinding('class.rating-classic') classicRating: boolean = false;
+
     /*  Called by the template (tariff freight change) but never implemented (pre-existing).
         Declared so the production (AOT) build compiles; it does nothing, as before.        */
     RatesChange(..._args: any[]): any { console.warn('MAWBEditComponent: RatesChange is not implemented on this page'); }
@@ -11881,10 +11936,13 @@ export class MAWBEditComponent   {
     templateUrl: 'consign_main_hawb_rating.component.html',
     // styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
     // encapsulation: ViewEncapsulation.None,
+    styleUrls: ['export-rating.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class HAWBEditComponent   {
+    // Compact/Original layout switch, driven from the drawer header (export-rating.css).
+    @Input() @HostBinding('class.rating-classic') classicRating: boolean = false;
 
     @Input() exptno: any;
     @Input() type: string;
@@ -16536,10 +16594,13 @@ tot_rate_net_cc_dc:any = null;
     templateUrl: 'consign_main_job_rating.component.html',
     // styleUrls: ['../../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
     // encapsulation: ViewEncapsulation.None,
+    styleUrls: ['export-rating.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class JobEditComponent implements OnChanges {
+    // Compact/Original layout switch, driven from the drawer header (export-rating.css).
+    @Input() @HostBinding('class.rating-classic') classicRating: boolean = false;
 
     @Input() exptno: any;
     @Input() type: string;

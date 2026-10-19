@@ -1,0 +1,318 @@
+/* ============================================================
+   Export Consignment - edit drawer shell. Ported from MPERPNG-20
+   (src/app/export/consignment/consignment/consig_main_edit_modal.component.css).
+
+   Links port notes:
+   - MP's `@import './export-theme.css'` and `@import './export-legacy-content.css'` are
+     dropped: both are global kit files here (src/styles/kit/*). The --ex-* tokens MP
+     put on :host come from the host class kit-export; the .x-legacy restyle keys on
+     the .dr-body.x-legacy wrapper in the template, exactly as in MP.
+   - MP's .cv-* (rewritten Consignment View), .ed-* / .fields (rewritten card editors)
+     and the stale .cx-header/.cx-body/.cx-footer rules are left out: Links keeps
+     every editor's original table markup (restyle in place, recipe R3), so those
+     selectors would match nothing.
+   - The drawer-frame rules are scoped to the drawer's own dialog with `>`: the Links
+     Port editor hosts its own nested bsModal (Calculate CBM), whose dialog must not be
+     turned into a second drawer.
+   The 17 editor components inside .dr-body keep their own markup; they are restyled
+   through scoped ::ng-deep rules on the global classes they already use.
+   ============================================================ */
+
+/* ---------- slide-in drawer frame ----------
+   The bsModal directive is untouched; show()/hide() still drive it. Only the dialog is
+   re-anchored to the right edge and slid in, matching the Finance Dashboard drill-down. */
+:host ::ng-deep .cx-drawer {
+    padding-right: 0 !important;
+}
+
+:host ::ng-deep .cx-drawer > .modal-dialog {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    width: 68vw;
+    min-width: 560px;
+    max-width: 1180px;
+    height: 100%;
+    transform: translateX(100%);
+    transition: transform .28s cubic-bezier(.32, .72, 0, 1);
+}
+
+:host ::ng-deep .cx-drawer.show > .modal-dialog,
+:host ::ng-deep .cx-drawer.in > .modal-dialog {
+    transform: translateX(0);
+}
+
+:host ::ng-deep .cx-drawer > .modal-dialog > .modal-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 0;
+    border-left: 1px solid var(--mp-line, #D2D2D2);
+    border-radius: 0;
+    box-shadow: -12px 0 32px rgba(0, 0, 0, .16);
+    overflow: hidden;
+    padding: 0;
+}
+
+@media (max-width: 900px) {
+    :host ::ng-deep .cx-drawer > .modal-dialog {
+        width: 100vw;
+        min-width: 0;
+    }
+}
+
+
+/* ============================================================
+   Kit drawer shell (.dr-*) and the kit look for the 17 editors.
+   The dialog content carries .im-page (import-page.css tokens + kit controls);
+   the editor host keeps .x-legacy so the table editors keep their ruled restyle.
+   Everything below loads after export-legacy-content.css, so it wins ties.
+   ============================================================ */
+:host ::ng-deep .cx-drawer > .modal-dialog > .modal-content.dr-shell {
+    background: var(--ground);
+}
+
+:host ::ng-deep .dr-head {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    background: var(--band, #F5F5F5);
+    border-bottom: 1px solid var(--edge, #D2D2D2);
+    color: var(--ink, #0A0A0A);
+}
+
+:host ::ng-deep .dr-icon {
+    width: 22px;
+    height: 22px;
+    flex: none;
+    object-fit: contain;
+    filter: grayscale(1);
+}
+
+:host ::ng-deep .dr-titlewrap {
+    margin-right: auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+:host ::ng-deep .dr-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--faint, #8C8C8C);
+}
+
+:host ::ng-deep .dr-title {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+:host ::ng-deep .dr-layout {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+:host ::ng-deep .dr-layoutnote {
+    font-size: 12px;
+    color: var(--soft, #565656);
+}
+
+:host ::ng-deep .dr-close {
+    width: 32px;
+    height: 32px;
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--edge, #D2D2D2);
+    border-radius: 4px;
+    background: var(--mp-surface, #fff);
+    color: var(--ink, #0A0A0A);
+    cursor: pointer;
+}
+
+:host ::ng-deep .dr-close:hover {
+    border-color: var(--mp-primary, var(--ink, #0A0A0A));
+}
+
+:host ::ng-deep .dr-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 16px 20px 300px;
+}
+
+/* pinned footer: Abort / Update bottom-right */
+:host ::ng-deep .dr-foot {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 10px 20px;
+    background: var(--mp-surface, #fff);
+    border-top: 1px solid var(--edge, #D2D2D2);
+}
+
+:host ::ng-deep .dr-foot .note {
+    margin-right: auto;
+    font-size: 12px;
+    color: var(--faint, #8C8C8C);
+}
+
+:host ::ng-deep .dr-foot .r {
+    display: flex;
+    gap: 8px;
+}
+
+/* date pickers inside the drawer must be able to overflow their cell; the body keeps
+   300px of bottom padding so a month can open on the last field */
+:host ::ng-deep .dr-body .mydp {
+    overflow: visible !important;
+}
+
+:host ::ng-deep .dr-body .mydp .selector {
+    z-index: 1200;
+    height: auto !important;
+}
+
+@media (max-width: 700px) {
+    :host ::ng-deep .dr-layoutnote,
+    :host ::ng-deep .dr-foot .note { display: none; }
+    :host ::ng-deep .dr-head { flex-wrap: wrap; padding: 10px 12px; }
+    :host ::ng-deep .dr-body { padding: 12px 12px 300px; }
+}
+
+/* ---------- kit cards inside the editor host (Order no. quality checking) ---------- */
+:host ::ng-deep .dr-body.x-legacy .card {
+    border: 1px solid var(--edge);
+    border-radius: 6px;
+    margin-bottom: 16px;
+    overflow: visible;
+}
+
+:host ::ng-deep .dr-body.x-legacy .card-h {
+    background: var(--band);
+    border-radius: 6px 6px 0 0;
+    padding: 10px 16px;
+}
+
+:host ::ng-deep .dr-body.x-legacy .card-h h2 {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+/* ---------- table editors read as kit cards ----------
+   Each legacy editor table becomes a ruled card: edge border, 6px corners,
+   the heading row as the card's grey band, label cells like .fld labels.
+   The three rating sheets are excluded: export-rating.css owns their density. */
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) table.table-sm-new {
+    border: 1px solid var(--edge);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 13px;
+}
+
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) table.table-sm-new td,
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) table.table-sm-new th {
+    padding: 8px 16px;
+    border-right: 1px solid var(--line) !important;
+    border-bottom: 1px solid var(--line) !important;
+}
+
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) table.table-sm-new td:last-child,
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) table.table-sm-new th:last-child {
+    border-right: 0 !important;
+}
+
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) table.table-sm-new tbody tr:last-child > td {
+    border-bottom: 0 !important;
+}
+
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) table.table-sm-new tbody tr:first-child > .col-form-span-heading:first-child,
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) table.table-sm-new thead tr:first-child > th:first-child {
+    border-top-left-radius: 6px;
+}
+
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) table.table-sm-new tbody tr:first-child > .col-form-span-heading:last-child,
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) table.table-sm-new thead tr:first-child > th:last-child {
+    border-top-right-radius: 6px;
+}
+
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) .col-form-span-heading,
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) .col-form-span-heading .col-form-span-label,
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) .col-form-span-heading span,
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) .col-form-span-heading strong {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .05em;
+}
+
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) .col-form-span-heading {
+    padding: 10px 16px !important;
+    border-bottom: 1px solid var(--line) !important;
+}
+
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) table td[class*="width"]:first-child {
+    width: 170px;
+}
+
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) table td[class*="width"] .col-form-span-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) thead th {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    color: var(--soft) !important;
+    background: var(--band) !important;
+}
+
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) .bgyellow,
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) [style*="background-color"] {
+    background: var(--band) !important;
+}
+
+/* legacy inputs take the kit box */
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) input.form-control,
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) select.form-control {
+    height: 32px;
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) input.form-control:disabled,
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) input.form-control[readonly],
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) select.form-control:disabled {
+    border-style: dashed;
+    background: var(--band);
+    color: var(--soft);
+}
+
+/* legacy buttons take the kit .btn metrics */
+:host ::ng-deep .dr-body.x-legacy > :not(app-consignment-mawb-edit):not(app-consignment-hawb-edit):not(app-consignment-job-edit) .btn {
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}

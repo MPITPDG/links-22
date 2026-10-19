@@ -10,7 +10,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import {BookingExportRoutingModule} from './booking-routing'
 import{ AddBookingComponent} from './add.booking.component';
 import {NewBookingComponent} from './new.booking.component'
-import {Bookingauthorisation} from './booking_orderNo_authorisation_component';
+import { BookingAuthorisationComponent } from './booking-authorisation.component';
+import { BookingAuthorisationService } from './booking-authorisation.service';
 @NgModule({
     imports: [BookingExportRoutingModule,
         FormsModule,
@@ -20,8 +21,8 @@ import {Bookingauthorisation} from './booking_orderNo_authorisation_component';
         MyDatePickerModule,
         NgSelectModule,
         SharedModule],
-    declarations: [AddBookingComponent,NewBookingComponent,Bookingauthorisation ],
-    providers: [],
+    declarations: [AddBookingComponent,NewBookingComponent,BookingAuthorisationComponent ],
+    providers: [BookingAuthorisationService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class BookingExportModule { }

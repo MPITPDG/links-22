@@ -63,24 +63,14 @@
                 },
                 {
                     menuid: "4", icon: "fa fa-truck", menuname: "Shipment Progress", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
-                        { menuid: "4.1", icon: "fa fa-caret-right", menuname: "Prepaid Frt Approved by Shipper", routerlink: "/export/shipment-progress/Prepaid-freight-apprvd-search", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                        { menuid: "4.2", icon: "fa fa-caret-right", menuname: "Shipping Bill Details", routerlink: "/export/shipment-progress/ship-bill-search", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                        { menuid: "4.3", icon: "fa fa-caret-right", menuname: "Receipt of cargo", routerlink: "/export/shipment-progress/receipt-cargo-with-job-no-search", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                        { menuid: "4.4", icon: "fa fa-caret-right", menuname: "Dimension", routerlink: "/export/shipment-progress/dimension-search", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                        { menuid: "4.5", icon: "fa fa-caret-right", menuname: "Approval Received", routerlink: "/export/shipment-progress/approval-received-search", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                        { menuid: "4.6", icon: "fa fa-caret-right", menuname: "Carting Sea", routerlink: "/export/shipment-progress/carting-sea", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                        { menuid: "4.7", icon: "fa fa-caret-right", menuname: "Carting Air", routerlink: "/export/shipment-progress/carting-air-search", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                        { menuid: "4.8", icon: "fa fa-caret-right", menuname: "Out Of Charge", routerlink: "/export/shipment-progress/out-of-charge-search", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                        { menuid: "4.9", icon: "fa fa-caret-right", menuname: "Destination Document", routerlink: "/export/shipment-progress/destination-document-search", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                        { menuid: "4.9", icon: "fa fa-caret-right", menuname: "Measurement", routerlink: "/export/shipment-progress/measurement-search", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                        { menuid: "4.11", icon: "fa fa-caret-right", menuname: "Pre Alert", routerlink: "/export/shipment-progress/prealert-sent-on-search", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                        { menuid: "4.12", icon: "fa fa-caret-right", menuname: "Bl Details", routerlink: "/export/shipment-progress/bl-details-search", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                        { menuid: "4.13", icon: "fa fa-caret-right", menuname: "Transfer Sea To Air", routerlink: "/export/shipment-progress/transfer-sea-to-air-search", ischild: 'n', parentid: 0, isactive: 1, data: [] },
+                        // As in MPERPNG-20: one workspace with a drawer per stage replaces the 15 per-stage
+                        // menu items (Prepaid freight, Shipping bill, Receipt of cargo, Dimension, Approval,
+                        // Carting sea/air, Out of charge, Destination doc, Measurement, Pre alert, BL details,
+                        // Sea to air, Pending shipment, Vessel transfer). Their URLs still resolve.
+                        { menuid: "4.1", icon: "fa fa-caret-right", menuname: "Shipment Progress Workspace", routerlink: "/export/shipment-progress/workspace", ischild: 'n', parentid: 0, isactive: 1, data: [] },
+                        { menuid: "4.2", icon: "fa fa-caret-right", menuname: "Bl Update", routerlink: "/export/shipment-progress/blupdate", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                         { menuid: "4.14", icon: "fa fa-caret-right", menuname: "Receipt Cargo", routerlink: "/export/shipment-progress/reciept-cargo-provision", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                         { menuid: "4.15", icon: "fa fa-caret-right", menuname: "Scan Docs Sent Date", routerlink: "/export/shipment-progress/scan-doc-sent", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                        { menuid: "4.16", icon: "fa fa-caret-right", menuname: "Pending Shipment", routerlink: "/export/shipment-progress/pending-shipment", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                        { menuid: "4.17", icon: "fa fa-caret-right", menuname: "Container Loading Confirmation", routerlink: "/export/shipment-progress/container-loading-confirmation", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                        { menuid: "4.18", icon: "fa fa-caret-right", menuname: "Job Vessel to vessel Transfer", routerlink: "/export/shipment-progress/vesselTransfer", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                         {
                             menuid: "4.19", icon: "fa fa-ship", menuname: "Container", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
                                 { menuid: "4.19.1", icon: "fa fa-caret-right", menuname: "Doc Stuffing", routerlink:   "/export/container/vessel-view", ischild: 'n', parentid: 0, isactive: 1, data: [] },
@@ -88,7 +78,7 @@
                                 { menuid: "4.19.3", icon: "fa fa-caret-right", menuname: "Factory Stuffing Auto", routerlink: "/export/container/containerFSauto", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                                 { menuid: "4.19.4", icon: "fa fa-caret-right", menuname: "Factory Stuffing Edit", routerlink: "/export/container/multicontainerFSedit", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                                 { menuid: "4.19.5", icon: "fa fa-caret-right", menuname: "Delete Container", routerlink: "/export/container/delete", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                               
+                                { menuid: "4.19.6", icon: "fa fa-caret-right", menuname: "Container Loading Confirmation", routerlink: "/export/shipment-progress/container-loading-confirmation", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                             ]
                         },
                        // { menuid: "4.19", icon: "fa fa-caret-right", menuname: "Container", routerlink: "/export/container/vessel-view", ischild: 'n', parentid: 0, isactive: 1, data: [] },
@@ -149,7 +139,6 @@
         {
             moduleid: "1", modulename: "Accounts", type: null, baseUrl: 'accounts',
             data: [
-                { menuid: "1", icon: "fa fa-home", menuname: "Home", routerlink: "/ap/dashboard", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                 { menuid: "2", icon: "fa fa-history", menuname: "Master", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
                     { menuid: "2.1", icon: "fa fa-plus-circle", menuname: "Bank Reconciliation", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
                         { menuid: "2.1.1", icon: "fa fa-search-plus", menuname: "Add/Edit", routerlink: "/accounts/Master/Reconcil/Add", ischild: 'n', parentid: 0, isactive: 1, data: [] },
@@ -488,7 +477,6 @@
         {
             moduleid: "4", modulename: "Import", type: null, baseUrl: 'import',
             data: [
-                { menuid: "1", icon: "fa fa-home", menuname: "Home", routerlink: "/import", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                 {
                     menuid: "2", icon: "fa fa-folder-o", menuname: "Master", routerlink: "/master", ischild: 'y', parentid: 0, isactive: 1, data: [
                         {
@@ -724,30 +712,9 @@
                 // ] },
 
             
-            ]  },
-       
-        {
-            moduleid: "2", modulename: "Module2", type: null, baseUrl: 'ap',
-            data: [
-                { menuid: "1", icon: "fa fa-users", menuname: "menu1", routerlink: "/ap/dashboard", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                { menuid: "2", icon: "fa fa-users", menuname: "menu1", routerlink: "/ap/dashboard", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                {
-                    menuid: "3", icon: "fa fa-users", menuname: "menu1", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
-                        {
-                            menuid: "3.1", icon: "fa fa-users", menuname: "menu1", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
-                                { menuid: "3.1.1", icon: "fa fa-users", menuname: "menu1", routerlink: "/ap/dashboard", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                                { menuid: "3.1.2", icon: "fa fa-users", menuname: "menu1", routerlink: "/ap/dashboard", ischild: 'n', parentid: 0, isactive: 1, data: [] }
-                            ]
-                        },
-                        { menuid: "3.2", icon: "fa fa-users", menuname: "menu1", routerlink: "/ap/dashboard", ischild: 'n', parentid: 0, isactive: 1, data: [] }
-                    ]
-                }
-            ]
-        }
-
-
-
-
+            ]  }
+        // The 'ap' placeholder menu (moduleid 2, "Module2") was removed: every entry pointed at
+        // an ap dashboard route Links never had, and no module tile selects moduleid 2.
     ]
     };
 }

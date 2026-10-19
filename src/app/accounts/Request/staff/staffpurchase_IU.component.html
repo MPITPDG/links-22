@@ -1,203 +1,180 @@
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-header formheading">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <strong>STAFF PURCHASE</strong>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  India Accounts - staff purchase request add / edit (recipe 2).
+  Kit: global .im-page kit (src/styles/kit) + purchase/purchase-page.css. Every [(ngModel)], handler, disabled flag
+  and amount/total binding is unchanged from the legacy template.
+  Links port: Submit / Reset still show only once the request has account lines.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Staff purchase request</h1>
+      <p>Staff expense with passing details and account lines</p>
     </div>
-</div>
-<div class="row">
-    <div class="col-sm-2 ">
+    <div class="tools">
+      @if (PurchaseNo && PurchaseNo.trim()) {
+        <span class="chip solid">{{ PurchaseNo }}</span>
+      } @else {
+        <span class="chip dash">New request</span>
+      }
     </div>
-    <div class="col-sm-8 ">
-          
-         <table class="table table-bordered table-sm-new bgwhite">
+  </div>
 
-            <tr class="trheader">
-                <td class="col-form-span-label"  colspan="4">
-                    <b> GENERAL DETAILS </b>
-                </td>
-            </tr>
-            <tr>
-                <td><span  class="col-form-span-label"><b>Purchase No</b> </span><span class="col-form-span-error">*</span></td>
-                <td >  <input [(ngModel)]="PurchaseNo" type="text"   disabled="disabled" class="form-control width150" maxlength="40" > </td>
-                <td ><span class="col-form-span-label"><b>Purchase Date</b> </span><span class="col-form-span-error">*</span>  </td>
-                <td>
-                    <my-date-picker name="PurchaseDate" [options]="myDatePickerOptions" class="form-control" [selDate]="PurchaseDate"></my-date-picker>
-                </td>
-
-                </tr>
-             <tr>
-                <td><span class="col-form-span-label"><b>Narration</b> </span></td>
-                <td colspan="3">  <input [(ngModel)]="Narration" type="text"  class="form-control"  > </td>
-             </tr>
-             <tr class="trheader">
-                <td class="col-form-span-label"  colspan="4">
-                    <b>STAFF DETAILS</b>
-                </td>
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b>Staff Name</b> </span><span class="col-form-span-error">*</span></td>
-                <td colspan="3">
-                   
-                    <ng-select [items]="Stafflist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="staff"
-                        class="custom " placeholder="--Select--">
-                    </ng-select>
-                </td>
-            </tr>
-            <tr class="trheader">
-                <td class="col-form-span-label"  colspan="2">
-                   <b> PASSING DETAILS</b>
-                </td>
-                <td class="col-form-span-label"  colspan="2">
-                    <span class="col-form-span-label" ><b>Passed</b>  </span> &nbsp;&nbsp;
-                    <span  > <input type="checkbox" [(ngModel)]="IsPassed"  (change)="changeEvent($event)"  /> </span>
-                </td>
-
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b>Passed By</b> </span></td>
-                <td >
-                    <select class="form-control width150"  [(ngModel)]="passedby" [disabled]='togglepassedby' >
-                        <option value="">Please select</option>
-                        @for (d of PassedBylist; track d) {
-<option  value={{d.CMPID}}>{{d.CMP_USERNAME}}</option>
-}
-                    </select>
-                </td>
-                <td><span class="col-form-span-label"><b>Passed Amount</b> </span><span class="col-form-span-error">*</span></td>
-                <td >  <input [(ngModel)]="PassedAmount" type="text" [OnlyNumber]="true" [disabled]='togglepamount'   class="form-control width150" maxlength="40" > </td>
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b>Invoice Amount</b> </span><span class="col-form-span-error">*</span></td>
-                <td >  <input [(ngModel)]="InvoiceAmount" type="text" [OnlyNumber]="true" [disabled]='toggleinvamount' class="form-control width150" maxlength="40" > </td>
-                <td><span class="col-form-span-label"><b>Voucher No</b> </span><span class="col-form-span-error">*</span></td>
-                <td >  <input [(ngModel)]="VoucherNo"   type="text" [disabled]='togglevno'  class="form-control width150" maxlength="40" > </td>
-
-            </tr>
-            <tr class="trheader">
-                <td class="col-form-span-label"  colspan="4">
-                   <b> ACCOUNTS DETAILS</b>
-                </td>
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b>Account Name</b> </span><span class="col-form-span-error">*</span></td>
-                <td colspan="3">
-                    
-                    <ng-select [items]="AccountNameList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
-                    [(ngModel)]="AccountName" (change)="GetActName($event.ACCTCODENAME)" class="custom " placeholder="--Select--">
-                </ng-select>
-
-                </td>
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b>Item</b> </span><span class="col-form-span-error">*</span></td>
-                <td colspan="3">
-                 
-                    <ng-select [items]="ItemList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Item"
-                    class="custom " placeholder="--Select--">
-                </ng-select>
-                </td>
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b> Amount</b> </span><span class="col-form-span-error">*</span></td>
-                <td >  <input [(ngModel)]="Amount" [OnlyNumber]="true" type="text"    class="form-control width150" maxlength="40" > </td>
-                <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
-                <td >  <input [(ngModel)]="Deduction" [OnlyNumber]="true" type="text"    class="form-control width150" maxlength="40" > </td>
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b> Job No</b> </span><span class="col-form-span-error">*</span></td>
-                <td >  <input [(ngModel)]="JobNo" type="text"  [OnlyNumber]="true"  class="form-control width150" maxlength="40" > </td>
-                <td><span class="col-form-span-label"><b>Pass Amount</b> </span></td>
-                <td >  <input [(ngModel)]="actpassedamount" [OnlyNumber]="true" type="text"    class="form-control width150" maxlength="40" > </td>
-            </tr>
-            <tr>
-                <td><span class="col-form-span-label"><b>Narration</b> </span></td>
-                <td colspan="3">
-                    <input [(ngModel)]="ActNarration" type="text"    class="form-control width500" maxlength="40" >
-                </td>
-            </tr>
-
-            <tr>
-                <td colspan="4"  class="centerlabel">
-                    <button class="btn btn-sm btn-success" type="submit" (click)="Addchildrcrd()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{txtchild}}</span></button>
-                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Resetchildrcrd();"><i class="fa fa-ban"></i> Reset</span></button>
-                </td>
-            </tr>
-            <tr>
-
-            </tr>
-            <tr >
-
-                <td><span class="col-form-span-heading"><b> Net Total</b> </span></td>
-                <td colspan="3">  <input [(ngModel)]="NetAmt" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
-        </tr>
-
-        <tr>
-            <td><span class="col-form-span-label"><b> Amount</b> </span></td>
-            <td >  <input [(ngModel)]="NetAmount" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
-            <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
-            <td >  <input [(ngModel)]="Netdeduction" disabled="disabled" type="text"    class="form-control width150" maxlength="40" > </td>
-        </tr>
-      
-       
-    </table>
-     @if (Accountlist.length>0) {
-<table class="table table-bordered table-sm-new bgwhite" >
-        <tr>
-            <td colspan="4" >
-                <div class="row xyscroll" style="width:625px;" >
-                    <table class="table table-responsive-sm table-bordered" > 
-                        <thead>
-                            <tr class="title-head formheading">
-                                <th  class="col-form-span-label" ></th>
-                                <th class="col-form-span-label">Account Name</th>
-                                <th  class="col-form-span-label">Amount</th>    
-                                <th  class="col-form-span-label">Deduction</th>    
-                                <th  class="col-form-span-label">Pass Amt</th>    
-                                <th  class="col-form-span-label">Item</th>  
-                                <th class="col-form-span-label">Job No</th> 
-                                <th class="col-form-span-label">Narration</th> 
-                            </tr>
-                        </thead>
-                        <tbody  >
-                            @for (obj of Accountlist; track obj) {
-<tr>
-                                <td class="centerlabel">
-                                    <i class="fa fa-pencil" (click)="Editchildrecd(obj.ID)" ></i>
-                                    &nbsp;
-                                    <i class="fa fa-trash" (click)="deletechildrecd(obj.ID,obj.ACC_PURCHASEDTLS_ID)"></i>
-                                </td>
-                               <td><span class="col-form-span-label"  [innerHtml]="obj.ACCOUNT_NAME"> </span></td>
-                               <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>
-                                <td><span class="col-form-span-label">{{obj.DEDUCTION}}</span></td>
-                                <td><span class="col-form-span-label">{{obj.SRPIPASSAMOUNT}}</span></td>
-                                <td><span class="col-form-span-label">{{obj.ITEM}}</span></td>
-                                <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
-                                <td><span class="col-form-span-label">{{obj.NARRATION}}</span></td>
-                            </tr>
-}
-                        </tbody>
-                    </table>
-                </div>
-            </td>
-        </tr> 
-        <tr>
-            <td colspan="4"  class="centerlabel">
-                <button class="btn btn-sm btn-success" type="submit" (click)="Add_Main()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{text}}</span></button>
-                <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
-            </td>
-        </tr>
-    </table>
-}
-</div>
-
-
-    <div class="col-sm-2">
+  <div class="card sec">
+    <div class="card-h">
+      <h2>General</h2>
+      <span class="meta"><b>*</b> required</span>
     </div>
+    <div class="fields">
+      <div class="fld">
+        <label>Purchase no. <span class="req">*</span></label>
+        <input [(ngModel)]="PurchaseNo" type="text" disabled="disabled" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Purchase date <span class="req">*</span></label>
+        <my-date-picker name="PurchaseDate" [options]="myDatePickerOptions" [selDate]="PurchaseDate"></my-date-picker>
+      </div>
+      <div class="fld full">
+        <label>Narration</label>
+        <input [(ngModel)]="Narration" type="text">
+      </div>
+      <div class="fld full">
+        <label>Staff <span class="req">*</span></label>
+        <ng-select [items]="Stafflist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="staff"
+          class="custom" placeholder="--Select--">
+        </ng-select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Passing</h2>
+      <label class="pu-flag">
+        <span>Passed</span>
+        <input type="checkbox" [(ngModel)]="IsPassed" (change)="changeEvent($event)" />
+      </label>
+    </div>
+    <div class="fields">
+      <div class="fld">
+        <label>Passed by</label>
+        <select [(ngModel)]="passedby" [disabled]='togglepassedby'>
+          <option value="">Please select</option>
+          @for (d of PassedBylist; track d) {
+            <option value={{d.CMPID}}>{{d.CMP_USERNAME}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Passed amount <span class="req">*</span></label>
+        <input [(ngModel)]="PassedAmount" type="text" [OnlyNumber]="true" [disabled]='togglepamount' class="num" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Invoice amount <span class="req">*</span></label>
+        <input [(ngModel)]="InvoiceAmount" type="text" [OnlyNumber]="true" [disabled]='toggleinvamount' class="num" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Voucher no. <span class="req">*</span></label>
+        <input [(ngModel)]="VoucherNo" type="text" [disabled]='togglevno' maxlength="40">
+      </div>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Account lines</h2>
+    </div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Account <span class="req">*</span></label>
+        <ng-select [items]="AccountNameList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
+          [(ngModel)]="AccountName" (change)="GetActName($event.ACCTCODENAME)" class="custom" placeholder="--Select--">
+        </ng-select>
+      </div>
+      <div class="fld full">
+        <label>Item <span class="req">*</span></label>
+        <ng-select [items]="ItemList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Item"
+          class="custom" placeholder="--Select--">
+        </ng-select>
+      </div>
+      <div class="fld">
+        <label>Amount <span class="req">*</span></label>
+        <input [(ngModel)]="Amount" [OnlyNumber]="true" type="text" class="num" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Deduction</label>
+        <input [(ngModel)]="Deduction" [OnlyNumber]="true" type="text" class="num" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Job no. <span class="req">*</span></label>
+        <input [(ngModel)]="JobNo" type="text" [OnlyNumber]="true" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Pass amount</label>
+        <input [(ngModel)]="actpassedamount" [OnlyNumber]="true" type="text" class="num" maxlength="40">
+      </div>
+      <div class="fld full">
+        <label>Line narration</label>
+        <input [(ngModel)]="ActNarration" type="text" maxlength="40">
+      </div>
+    </div>
+    <div class="pu-add">
+      <button class="btn p" type="button" (click)="Addchildrcrd()">{{txtchild}}</button>
+      <button class="btn g" type="button" (click)="Resetchildrcrd();">Reset line</button>
+    </div>
+
+    <div class="toolbar">
+      <span class="count">{{ Accountlist.length }} {{ Accountlist.length === 1 ? 'line' : 'lines' }}</span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Account</th>
+            <th class="num">Amount</th>
+            <th class="num">Deduction</th>
+            <th class="num">Pass amt</th>
+            <th>Item</th>
+            <th>Job no.</th>
+            <th>Narration</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (obj of Accountlist; track obj) {
+            <tr>
+              <td><span [innerHtml]="obj.ACCOUNT_NAME"></span></td>
+              <td class="num">{{obj.AMOUNT}}</td>
+              <td class="num">{{obj.DEDUCTION}}</td>
+              <td class="num">{{obj.SRPIPASSAMOUNT}}</td>
+              <td>{{obj.ITEM}}</td>
+              <td class="mono">{{obj.JOBNO}}</td>
+              <td>{{obj.NARRATION}}</td>
+              <td class="act">
+                <button type="button" (click)="Editchildrecd(obj.ID)">Edit</button>
+                <button type="button" (click)="deletechildrecd(obj.ID,obj.ACC_PURCHASEDTLS_ID)">Remove</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td class="empty" colspan="8">No account lines yet. Fill the fields above and add a line.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pu-totals">
+      <div class="t"><span>Amount</span><input [(ngModel)]="NetAmount" disabled="disabled" type="text" class="num" maxlength="40"></div>
+      <div class="t"><span>Deduction</span><input [(ngModel)]="Netdeduction" disabled="disabled" type="text" class="num" maxlength="40"></div>
+      <div class="t grand"><span>Net total</span><input [(ngModel)]="NetAmt" disabled="disabled" type="text" class="num" maxlength="40"></div>
+    </div>
+  </div>
+
+  <!-- Links: the save bar appears once the request has at least one account line (as before) -->
+  @if (Accountlist.length>0) {
+    <div class="bar">
+      <span class="note">Nothing is saved until you choose {{text}}.</span>
+      <div class="r">
+        <button class="btn g" type="button" (click)="Reset();">Reset</button>
+        <button class="btn p" type="button" (click)="Add_Main()">{{text}}</button>
+      </div>
+    </div>
+  }
 </div>

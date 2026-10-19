@@ -7,7 +7,7 @@ import { ToastCommonService } from '../../shared/service/toastService';
 @Component({
   selector: 'app-srpi-view',
   templateUrl: './srpi-view.component.html',
-  styles: [],
+  styleUrls: ['../export/consign-popup.css', './acc-popup-view.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

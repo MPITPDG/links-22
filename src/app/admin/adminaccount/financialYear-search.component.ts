@@ -85,10 +85,10 @@ export class financialYearsearch implements OnInit   {
         
          .subscribe((data: any) => {
          //if (data.Table[0].STATUS === "100") {
-           this.branchlist = data.Table;      
-           this.loaderService.display(false);             
-     
-   });
+           this.branchlist = data?.Table || [];   // fail soft: no Table -> empty state
+           this.loaderService.display(false);
+
+   }, () => { this.branchlist = []; this.loaderService.display(false); });
              
        }
        

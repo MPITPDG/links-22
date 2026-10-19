@@ -8,10 +8,11 @@ import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/shared/service/dataService';
 import { JobprofitserviceService } from 'src/app/shared/service/jobprofitservice.service';
 
+import { FIN_PERIODS, FinPeriod, finRange, finDp } from '../../Accreport/fin-kit';
 @Component({
     selector: 'app-agentjobprofit',
     templateUrl: './agent_jobprofit.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' }, // Links: import-page + accreport-page are global (src/styles/kit)
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -230,5 +231,16 @@ export class AgentJobprofitComponent implements OnInit {
         this.branch = ""
         this.paydate = ""
         this.searchtype = "CLIENT"
+    }
+
+    // ---- redesign: quick period presets (same selDate string format the pickers emit) ----
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.FromDate = finDp(r.from, this.myDatePickerOptions.dateFormat).formatted;
+        this.ToDate = finDp(r.to, this.myDatePickerOptions.dateFormat).formatted;
     }
 }

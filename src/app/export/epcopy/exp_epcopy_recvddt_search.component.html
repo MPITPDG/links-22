@@ -1,84 +1,110 @@
-<div class="animated fadeIn">
-	<div class="row">
-		<div class="col-sm-12">
-			<div class="card">
-				<div class="card-header formheading">
-				   <strong><u>{{headerType}}</u></strong>
-				</div>
-			</div>
-		</div>
+﻿<!--
+  Recipe 1 (list/search). Lookup-style search (Export No. / Ref No. / Ship Bill No.) —
+  results only appear after a search, same as the vessel search's server-filter variant.
+  The host wrapper class from the shared .im-page pattern isn't added at the outer <div>
+  because this component's .ts file also declares ExptEpcopyRecvddt (the drill-down
+  screen) and the brief says never to touch a .ts shared by several components; the
+  markup below still carries .im-page so the kit styling applies.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ headerType }}</h1>
+      <p>Find a consignment by export no., ref no. or shipping bill no.</p>
     </div>
-    <div class="row">
-		<div class="col-sm-3">
-		</div>
-		<div class="col-sm-6">
-			<table class="table table-sm-new">
-				<tr class="trbg">
-					<td class="width80"><span class="col-form-span-label"><b>Type</b></span></td>
-					<td colspan="2" >
-						<span class="col-form-span-label"><input type="radio" name="check"  (click)="changeType('ExportNo')" [checked]="checkType == 'ExportNo'"/>Export No.</span>&nbsp;&nbsp;
-                        <span class="col-form-span-label"><input type="radio" name="check"  (click)="changeType('RefNo')" [checked]="checkType == 'RefNo'"/>Ref No.</span>
-                        <span class="col-form-span-label"><input type="radio" name="check"  (click)="changeType('ShippingBill')" [checked]="checkType == 'ShippingBill'"/>Ship Bill No.</span>
-					</td>
-				</tr>
-				<tr class="trbg">
-					<td class="width90"><span class="col-form-span-label"><b>Values</b></span></td>
-					<td>
-						<input type="text" [(ngModel)]="SearchValue" class="form-control width120"/>
-					</td>
-					<td><span class="col-form-span-error">{{ErrorMessage}}</span></td>
-				</tr>
-				
-				<tr class="trbg centerlabel">
-					<td colspan="3">
-						<button type="button" name="searchButton" class="btn btn-l btn-primary" (click)="search();" #searchButton >
-							<span class="col-form-span-label"><app-font-changer [fontIndex]="'0'"></app-font-changer> Search</span>
-						</button>
-					</td>
-				</tr>
-				<tr></tr>
-			</table>
-		</div>
-		<div class="col-sm-3">
-		</div>
+  </div>
+
+  <div class="card">
+    <div class="filters">
+      <div class="f full">
+        <label>Type</label>
+        <div class="radio-row">
+          <label class="radio-opt">
+            <input type="radio" name="check" (click)="changeType('ExportNo')" [checked]="checkType == 'ExportNo'" />
+            Export No.
+          </label>
+          <label class="radio-opt">
+            <input type="radio" name="check" (click)="changeType('RefNo')" [checked]="checkType == 'RefNo'" />
+            Ref No.
+          </label>
+          <label class="radio-opt">
+            <input type="radio" name="check" (click)="changeType('ShippingBill')" [checked]="checkType == 'ShippingBill'" />
+            Ship Bill No.
+          </label>
+        </div>
+      </div>
+      <div class="f">
+        <label for="epcopy-searchvalue">Value</label>
+        <input id="epcopy-searchvalue" type="text" [(ngModel)]="SearchValue" (keyup.enter)="search()" />
+        @if (ErrorMessage) {
+          <span class="err-t">{{ ErrorMessage }}</span>
+        }
+      </div>
+      <div class="f">
+        <button class="btn p" type="button" name="searchButton" (click)="search();" #searchButton>Search</button>
+      </div>
     </div>
-    @if (searchList.length > 0) {
-<div class="row">
-		<div class="col-sm-12">
-			<br />
-			<table class="table table-bordered table-striped table-sm-new bgwhite">
-				<thead>
-					<tr class="title-head formheading" style="white-space: nowrap;">
-						<th>M.P.REFERENCE</th>
-						<th>SHIPPER NAME</th>
-						<th>CONSIGNEE NAME</th>
-						<th>TOTAL NO. OF PACKAGES</th>
-						<th>TOTAL NO. OF PIECES</th>
-						<th>ORDER NO./REF DETAILS</th>
-					</tr>
-				</thead>
-				<tbody>
-					@for (obj of searchList; track obj) {
-<tr (click)="rowClick(obj['M.P.REFERENCE'])" style="cursor: pointer;">
-						<td><span class="col-form-span-label">{{obj["exptno"]}}</span></td>
-						<td><span class="col-form-span-label">{{obj["exp_name"]}}</span></td>
-						<td><span class="col-form-span-label">{{obj["con_name"]}}</span></td>
-						<td><span class="col-form-span-label">{{obj["EXPT_NOOFPKGS"]}}</span></td>
-						<td><span class="col-form-span-label">{{obj["expt_noofpcs"]}}</span></td>
-						<td><span class="col-form-span-label">{{obj["Order_No_Style_Details"]}}</span></td>
-					</tr>
-}
-				</tbody>
-			</table>
-		</div>
-	</div>
-}
-	@if (searchListLength == -1) {
-<div class="row">
-		<div class="col-sm-12 centerlabel">
-			<br /><br />
-			<span class="col-form-span-label">No Record Found!</span>
-		</div>
-	</div>
-}
+
+    <div class="toolbar">
+      <span>
+        <span class="count">{{ searchList.length }} {{ searchList.length === 1 ? 'result' : 'results' }}</span>
+      </span>
+      <span class="tb-r">
+        <button class="btn g" type="button" (click)="clear()">Clear</button>
+        <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!searchList.length">Export</button>
+      </span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>M.P.Reference</th>
+            <th>Shipper Name</th>
+            <th>Consignee Name</th>
+            <th>Total No. of Packages</th>
+            <th>Total No. of Pieces</th>
+            <th>Order No./Ref Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+            <tr><td class="empty" colspan="6">Loading…</td></tr>
+          } @else if (searchListLength == -1) {
+            <tr><td class="empty" colspan="6">No Record Found!</td></tr>
+          } @else {
+            @for (obj of pageRows; track $index) {
+              <tr class="lnk-row" (click)="rowClick(obj['exptno'])">
+                <td class="mono">{{obj["exptno"]}}</td>
+                <td>{{obj["exp_name"]}}</td>
+                <td>{{obj["con_name"]}}</td>
+                <td class="num">{{obj["EXPT_NOOFPKGS"]}}</td>
+                <td class="num">{{obj["expt_noofpcs"]}}</td>
+                <td>{{obj["Order_No_Style_Details"]}}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="6">Search above to find a consignment.</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (searchList.length > pageSize) {
+      <div class="pager">
+        <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ searchList.length }}</b></span>
+        <div class="pages">
+          <button type="button" [disabled]="page <= 1" (click)="goPage(page - 1)" aria-label="Previous page">‹</button>
+          @for (p of pageList; track $index) {
+            @if (p === 0) {
+              <span class="gap">…</span>
+            } @else {
+              <button type="button" [class.on]="p === page" (click)="goPage(p)">{{ p }}</button>
+            }
+          }
+          <button type="button" [disabled]="page >= pageCount" (click)="goPage(page + 1)" aria-label="Next page">›</button>
+        </div>
+      </div>
+    }
+  </div>
 </div>

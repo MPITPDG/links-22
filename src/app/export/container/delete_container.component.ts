@@ -7,12 +7,8 @@ import { ActivatedRoute } from '@angular/router';
 import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     templateUrl: 'delete_container.component.html',
-    styles: [`
-    table, tr, td, th{
-         border: none;
-
-         }
-    `],
+    // Page kit is global (src/styles/kit/import-page.css); the screen sheet adds the mock-only helpers.
+    styleUrls: ['./delete_container.component.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

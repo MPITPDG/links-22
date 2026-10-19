@@ -8,10 +8,11 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 import { DatePipe } from '@angular/common';
+import { FIN_PERIODS, FinPeriod, finRange, finDp } from '../../Accreport/fin-kit';
 @Component({
     selector: 'app-InvPurchase',
     templateUrl: './invpurchase.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' }, // Links: import-page + accreport-page are global (src/styles/kit)
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -220,4 +221,15 @@ import { DatePipe } from '@angular/common';
       }
     })
   }   
+
+    // ---- redesign: quick period presets (same selDate string format the pickers emit) ----
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.FromDate = finDp(r.from, this.myDatePickerOptionsRpt.dateFormat).formatted;
+        this.ToDate = finDp(r.to, this.myDatePickerOptionsRpt.dateFormat).formatted;
+    }
 }       

@@ -10,7 +10,7 @@ import { ButtonService } from '../../shared/common-font-changer.directive';
 @Component({
     selector: 'app-export-order-new-booking',
     templateUrl: 'new.booking.component.html' ,
-    encapsulation: ViewEncapsulation.None,
+    styleUrls: ['./booking-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -155,13 +155,14 @@ export class NewBookingComponent implements OnInit {
         this._dataService.Common("Export/OrderBookingSearchList", _jsonData)
             .subscribe((data: any) => {
                 this._disable.enableButton(this.searchButton);
-                if (data.Table1[0].STATUS.split('#')[0] == '100') {
+                // Fail soft: a reply without Table1 is an empty list, not a crash.
+                if (data?.Table1?.[0]?.STATUS?.split('#')[0] == '100') {
                     this.addList = data.Table1;
                     this.listArea.nativeElement.hidden = false;
                 }
                 else {
-                    this.ErrorMessage = data.Table1[0].STATUS.split('#')[1];
-                    this.addList = data.Table1;
+                    this.ErrorMessage = data?.Table1?.[0]?.STATUS?.split('#')[1] ?? '';
+                    this.addList = data?.Table1 ?? [];
                     this.listArea.nativeElement.hidden = true;
                 }
             });
@@ -307,7 +308,7 @@ export class NewBookingComponent implements OnInit {
 
         this._dataService.Common("Export/OrderBookingInsertUpdate", _jsonData)
             .subscribe((data: any) => {
-                this.addList = data.Table1;
+                this.addList = data?.Table1 ?? [];
                 this._toaster.toast("success", "Alert", "Data Saved Successfully!!!");
             });
     }
@@ -432,9 +433,34 @@ export class NewBookingComponent implements OnInit {
         };
         this._dataService.getData("Export/OrderBookingDropdownFill", _jsonData)
             .subscribe((data: any) => {
-                this.ConsigneeList = data.Table;
-                this.ExporterList = data.Table1;
-                this.EdiGroupList = data.Table2;
+                this.ConsigneeList = data?.Table ?? [];
+                this.ExporterList = data?.Table1 ?? [];
+                this.EdiGroupList = data?.Table2 ?? [];
             });
+    }
+
+    // ---------- export (from MPERPNG-20) ----------
+    /** Downloads the results grid as CSV (UTF-8 with BOM so Excel keeps accents). */
+    exportCsv() {
+        const head = ['Order No.', 'Ref. No', 'JobNo', 'Shipper', 'Consignee', 'Pieces', 'Pcs Type', 'Pkgs',
+            'Booking On', 'DocsRecvdE', 'CargoRecvdE', 'ETD', 'ETA', 'Appr Extd', 'App. Dt', 'App. By'];
+        const rows = (this.addList || []).map((r: any) => [r.ORDERNO, r.STYLENO, r.EXPTNO, r.EXPORTER, r.CONNAME, r.PIECES, r.TYPEOFPCS,
+            r.PKGS, r.BOOKINGDT, r.DOCSEXPECT, r.CARGOEXPECT, r.ETDEXPECT, r.ETAEXPECT, r.APPROVALDT, r.ACTLAPPROVAL, r.ACTLAPPROVALBY]);
+        const q = (v: any) => {
+            const s = (v === null || v === undefined) ? '' : String(v);
+            return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+        };
+        const csv = [head, ...rows].map(line => line.map(q).join(',')).join('\r\n');
+        const d = new Date();
+        const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'booking-search-' + stamp + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 0);
     }
 }

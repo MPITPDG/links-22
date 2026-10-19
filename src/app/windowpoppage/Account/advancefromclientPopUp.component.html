@@ -1,78 +1,88 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>OUTSTANDING RECEIVABLE - ADVANCE FROM CLIENTS </strong>
-                </div>
-            </div>
+<!-- Finance view popup: page kit header + legacy content restyled in place (.x-legacy, recipe 3).
+     Markup below is the original apart from the removed coloured title band, inline colours
+     and uiBtn colour variants; every binding and handler is unchanged. -->
+<div class="im-page cp-page">
+  <div class="cp-head">
+    <div class="ph">
+      <div>
+        <h1>Advance from clients</h1>
+        <p>Outstanding receivable - advances received against this job.</p>
+        <div class="cp-chips">
+          <span class="chip solid">Job {{JobNo || '—'}}</span>
         </div>
+      </div>
     </div>
-    <div class="row no-gutters">
-        <div class="col-12 col-md-2 col-lg-2"> </div>
-        <div class="col-12 col-md-8 col-lg-8">
-            <table class="table table-bordered table-sm-new bgwhite">     
-              
+  </div>
+  <div class="cp-body x-legacy im-entry">
+<div>
+  
+  <div class="row no-gutters">
+    <div class="col-12 col-md-2 col-lg-2"> </div>
+    <div class="col-12 col-md-8 col-lg-8">
+      <table class="table table-bordered table-sm-new bgwhite">
 
-                    <thead>
-                        <!-- <tr class="title-head formheading">
-                            <th colspan="7" >
-                          <a href="javascript:void(0);" (click)="displayType='SEARCH';ClAdvList=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
-                            </th>
-                        </tr> -->
-                    <tr class="title-head formheading ">
-                            <th>Client Name</th>
-                            <th>Job No</th>
-                            <th>Type</th>
-                            <th>Trans Code</th>
-                            <th>Trans Date </th>
-                            <th>Dr Amt</th>
-                            <th>Cr Amt</th>
-                        </tr>   
-                   </thead>
-                    <tbody>
-                        @for (obj of ClAdvList; track obj) {
-<tr>
-                            <td><span class="col-form-span-label " style="cursor:pointer;">{{obj.CLIENTNAME}}</span></td>
-                           <td><span class="col-form-span-label anchor-link" (click)="OpenJobPrint(obj.JOBNO)" >{{obj.JOBNO.replace("'", "")}}</span></td>
-                           <td> <span class="col-form-span-label">{{obj.TYPE}}</span></td>
-                           <td> @if (obj.TYPE!='') {
-<span class="col-form-span-label anchor-link" (click)="OpenPrint(obj.TRANSCODE,obj.TYPE)">{{obj.TRANSCODE.replace("'", "")}}</span>
-}
-                            @if (obj.TYPE=='') {
-<span class="col-form-span-label " ><b>{{obj.TRANSCODE.replace("'", "")}}</b></span>
-} </td>
-                            <!-- <td> <span class="col-form-span-label">{{obj.TRANSDATE}}</span></td> -->
-                            <td>
-                                @if (obj.TYPE!='') {
-<span class="col-form-span-label ">{{obj.TRANSDATE}}</span>
-}
-                                @if (obj.TYPE=='') {
-<span class="col-form-span-label " ><b>{{obj.TRANSDATE}}</b></span>
-}
-                            </td>
-                            <td><span class="col-form-span-label">{{obj.DRAMT|number:'2.2-4'}}</span></td>
-                            <!-- <td><span class="col-form-span-label">{{obj.CRAMT|number:'2.2-4'}}</span></td> -->
-                            <td>
-                                @if (obj.TYPE!='') {
-<span class="col-form-span-label ">{{obj.CRAMT|number:'2.2-4'}}</span>
-}
-                                @if (obj.TYPE=='') {
-<span class="col-form-span-label " ><b>{{obj.CRAMT|number:'2.2-4'}}</b></span>
-}
-                            </td>
-                    </tr>
-}
-                    </tbody>
-                    <!-- <tr> <td colspan="7" class="centerlabel">
-                        <button class="btn btn-sm btn-primary" type="submit" (click)="ExportAdvfrmClnt()" > <span
-                        class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
-                        Export To Excel </span></button>&nbsp;
-                    </td>
-                 </tr> -->
-               
-            </table>
-        </div>
-        <div class="col-12 col-md-2 col-lg-2"> </div>
-    </div>
+
+        <thead>
+          <!-- <tr class="title-head formheading">
+          <th colspan="7" >
+            <a href="javascript:void(0);" (click)="displayType='SEARCH';ClAdvList=[]" style="float: right;text-decoration: underline">back to search</a>
+          </th>
+        </tr> -->
+        <tr class="title-head formheading ">
+          <th>Client Name</th>
+          <th>Job No</th>
+          <th>Type</th>
+          <th>Trans Code</th>
+          <th>Trans Date </th>
+          <th>Dr Amt</th>
+          <th>Cr Amt</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (obj of ClAdvList; track obj) {
+          <tr>
+            <td><span class="col-form-span-label " style="cursor:pointer">{{obj.CLIENTNAME}}</span></td>
+            <td><span class="col-form-span-label anchor-link" (click)="OpenJobPrint(obj.JOBNO)" >{{obj.JOBNO.replace("'", "")}}</span></td>
+            <td> <span class="col-form-span-label">{{obj.TYPE}}</span></td>
+            <td> @if (obj.TYPE!='') {
+              <span class="col-form-span-label anchor-link" (click)="OpenPrint(obj.TRANSCODE,obj.TYPE)">{{obj.TRANSCODE.replace("'", "")}}</span>
+            }
+            @if (obj.TYPE=='') {
+              <span class="col-form-span-label " ><b>{{obj.TRANSCODE.replace("'", "")}}</b></span>
+            } </td>
+            <!-- <td> <span class="col-form-span-label">{{obj.TRANSDATE}}</span></td> -->
+            <td>
+              @if (obj.TYPE!='') {
+                <span class="col-form-span-label ">{{obj.TRANSDATE}}</span>
+              }
+              @if (obj.TYPE=='') {
+                <span class="col-form-span-label " ><b>{{obj.TRANSDATE}}</b></span>
+              }
+            </td>
+            <td><span class="col-form-span-label">{{obj.DRAMT|number:'2.2-4'}}</span></td>
+            <!-- <td><span class="col-form-span-label">{{obj.CRAMT|number:'2.2-4'}}</span></td> -->
+            <td>
+              @if (obj.TYPE!='') {
+                <span class="col-form-span-label ">{{obj.CRAMT|number:'2.2-4'}}</span>
+              }
+              @if (obj.TYPE=='') {
+                <span class="col-form-span-label " ><b>{{obj.CRAMT|number:'2.2-4'}}</b></span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+      <!-- <tr> <td colspan="7" class="centerlabel">
+      <button class="btn g" type="submit" (click)="ExportAdvfrmClnt()" > <span
+        class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
+      Export To Excel </span></button>&nbsp;
+    </td>
+  </tr> -->
+
+</table>
+</div>
+<div class="col-12 col-md-2 col-lg-2"> </div>
+</div>
+</div>
+  </div>
 </div>

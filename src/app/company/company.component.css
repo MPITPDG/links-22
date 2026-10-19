@@ -1,0 +1,71 @@
+/*
+  Company picker - one centred column under the shared step row. Same type and
+  palette as the branch and module pages.
+
+  Page structure matches the other hub pages exactly - a flex column with
+  app-hub-steps first and the content filling the rest - so the step row sits
+  in the same place on all three and does not jump between pages.
+*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+@keyframes cp-spin { to { transform: rotate(360deg); } }
+
+:where(.cp-page), :where(.cp-page) * { box-sizing: border-box; }
+:where(.cp-page) :where(h1, p) { margin: 0; }
+:where(.cp-page) :where(button) { font-family: inherit; cursor: pointer; background: none; border: 0; padding: 0; color: inherit; text-align: left; }
+
+:host { display: block; }
+
+.cp-page {
+  min-height: calc(100vh - 56px);
+  display: flex; flex-direction: column;
+  background: #F6F7F9;
+  font-family: Inter, -apple-system, "Segoe UI", system-ui, sans-serif;
+  font-size: 14px; line-height: 1.5; color: var(--mp-ink, #111827);
+  -webkit-font-smoothing: antialiased;
+}
+
+.cp-main { flex: 1; display: grid; place-items: center; padding: 16px 32px 64px; }
+.cp-col { width: 100%; max-width: 460px; }
+
+.cp-heading { font-size: 32px; font-weight: 600; letter-spacing: -0.035em; line-height: 1.15; color: var(--mp-ink, #0F172A); text-align: center; }
+.cp-lede { margin-top: 6px; font-size: 14px; color: var(--mp-soft, #6B7280); text-align: center; }
+
+.cp-list { margin-top: 28px; display: flex; flex-direction: column; gap: 8px; }
+
+.cp-item {
+  width: 100%;
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 14px;
+  background: var(--mp-surface, #FFFFFF);
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 0 0 1px #EEF0F3;
+  transition: box-shadow .15s, transform .15s;
+}
+.cp-code {
+  min-width: 40px; height: 40px; padding: 0 8px;
+  display: grid; place-items: center;
+  border-radius: 11px;
+  font-size: 14px; font-weight: 600;
+  color: var(--mp-ink, #0F172A); background: var(--mp-band, #F3F4F6);
+  transition: background .15s, color .15s;
+}
+.cp-name { flex: 1; font-size: 15px; font-weight: 500; color: var(--mp-ink, #1F2937); line-height: 1.3; }
+.cp-arrow { color: #C4CAD4; transition: color .15s, transform .15s; }
+
+.cp-item:hover { box-shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 0 0 1px #DBE3EE, 0 12px 24px -16px rgba(15, 23, 42, .3); transform: translateY(-1px); }
+.cp-item:hover .cp-code { background: var(--mp-primary, #0F172A); color: var(--mp-primary-fg, #FFFFFF); }
+.cp-item:hover .cp-arrow { color: #3B82F6; transform: translateX(2px); }
+.cp-item:focus-visible { outline: none; box-shadow: 0 0 0 2px #3B82F6; }
+
+.cp-state { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; font-size: 13px; color: var(--mp-soft, #6B7280); }
+.cp-spinner { width: 14px; height: 14px; border: 2px solid var(--mp-line, #D1D5DB); border-top-color: #3B82F6; border-radius: 999px; animation: cp-spin 700ms linear infinite; }
+
+.cp-error {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 16px; border-radius: 12px;
+  background: #FEF2F2; box-shadow: inset 0 0 0 1px #FECACA; color: #DC2626;
+}
+.cp-error svg { margin-top: 2px; flex-shrink: 0; }
+.cp-error-title { font-size: 14px; font-weight: 600; }
+.cp-error-text { font-size: 13px; color: #B91C1C; margin-top: 2px; }

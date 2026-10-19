@@ -7,7 +7,7 @@ const routes: Routes = [
     {
         path: '',
         data: {
-            title: 'Vessel'
+            title: 'Misc Job Import'
         },
         children: [
             { path: '', component: MiscJobMasterImportComponent, data: { title: 'Home' } },

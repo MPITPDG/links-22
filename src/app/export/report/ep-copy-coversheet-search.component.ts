@@ -3,7 +3,6 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { AuthService } from '../../shared/service/authService';
 import { Router } from '@angular/router';
-import { ToasterService } from 'angular2-toaster';
 import { LoginService } from '../../shared/service/loginService';
 import { IMyDpOptions } from 'mydatepicker';
 import { ToastCommonService } from '../../shared/service/toastService';
@@ -13,6 +12,7 @@ import { environment } from '../../../environments/environment';
 @Component({
     selector: 'app-epcopy-rpt',
     templateUrl: 'ep-copy-coversheet-search.component.html',
+    styleUrls: ['./exp-rpt-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

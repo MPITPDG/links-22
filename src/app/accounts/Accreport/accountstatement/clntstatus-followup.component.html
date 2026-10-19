@@ -1,121 +1,84 @@
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-header formheading">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <strong>{{Header| uppercase}}</strong>
-                    </div>
-                </div>
-            </div>
+<!--
+  Accounts -> Reports -> Account statement -> Client status follow-up.
+  Recipe 2 form + history table. Add -> ACC_TRA_CLIENT_STATUS_FOLLOWUP_IU; picking a client loads
+  its follow-ups (ACC_TRA_CLIENT_STATUS_FOLLOWUP_GETDTLS). All bindings and validations unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Client status follow-up</h1>
+      <p>Record who is following up a client's outstanding, the current status, and when it was assigned</p>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h"><h2>Follow-up</h2><span class="meta"><b>*</b> required</span></div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Client name <span class="req">*</span></label>
+        <ng-select [items]="ClientNameList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="ClientName"
+          (change)="$event && GetFollowupdtls($event.VALUEFIELD)" class="custom" placeholder="--Select--"></ng-select>
+      </div>
+      <div class="fld">
+        <label>Assigned to <span class="req">*</span></label>
+        <input [(ngModel)]="AssignedTo" type="text" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>Assigned on <span class="req">*</span></label>
+        <div class="fk-inline">
+          <my-date-picker name="SurrenderedDate" [options]="myDatePickerOptions" [(ngModel)]="formData.ASSIGNDT.main"
+            (ngModelChange)="setTime('ASSIGNDT','main')"></my-date-picker>
+          <input type="text" class="fk-hm" placeholder="hh" [(ngModel)]="formData.ASSIGNDT.hour" maxlength="2" [OnlyNumber]="true"
+            (ngModelChange)="restrictHour01to24number('ASSIGNDT')" />
+          <span>:</span>
+          <input type="text" class="fk-hm" placeholder="mm" [(ngModel)]="formData.ASSIGNDT.minute" maxlength="2" [OnlyNumber]="true"
+            (ngModelChange)="restrictMinute00to60number('ASSIGNDT')" />
         </div>
+      </div>
+      <div class="fld full">
+        <label>Client status <span class="req">*</span></label>
+        <input [(ngModel)]="ClStatus" type="text">
+      </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-sm-3">
-    </div>
-    <div class="col-sm-7">
-         <table class="table table-bordered table-sm-new bgwhite">
+  </div>
 
-            <tr class="trheader">
-                <td class="col-form-span-label" style="color: whitesmoke;" colspan="4">
-                    <b> CLIENT FOLLOWUP STATUS </b>
-                </td>
+  <div class="card sec">
+    <div class="toolbar">
+      <span><span class="count">{{ clntflpList.length }} {{ clntflpList.length === 1 ? 'follow-up' : 'follow-ups' }}</span></span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Client name</th>
+            <th>Assigned to</th>
+            <th>Client status</th>
+            <th>Assigned on</th>
+            <th>Assigned by</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (obj of clntflpList; track $index) {
+            <tr>
+              <td [innerHtml]="obj.EXP_NAME"></td>
+              <td>{{obj.FOLLOW_ASSIGNTO}}</td>
+              <td>{{obj.CLIENT_STATUS}}</td>
+              <td>{{obj.ASSIGN_ON}}</td>
+              <td>{{obj.ASSIGN_BY}}</td>
             </tr>
-            <tr>
-                <td width="150px"><span class="col-form-span-label"><b>Client Name</b> </span><span class="col-form-span-error">*</span></td>
-                <td colspan="3">
-
-                    <ng-select [items]="ClientNameList" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
-                    [(ngModel)]="ClientName" (change)="GetFollowupdtls($event.VALUEFIELD)" class="custom " placeholder="--Select--">
-                </ng-select>
-
-                </td>
-            </tr>
-            <tr>
-
-                <td width="150px"><span  class="col-form-span-label"><b>Followup Assigned To</b> </span><span class="col-form-span-error">*</span></td>
-                <td colspan="3" >  <input [(ngModel)]="AssignedTo" type="text"    class="form-control width150" maxlength="40" > </td>
-             
-
-                </tr>
-             <tr>
-                <td width="150px"><span class="col-form-span-label"><b>Client Status</b> </span></td>
-                <td colspan="3">  <input [(ngModel)]="ClStatus" type="text"  class="form-control"  > </td>
-             </tr>
-
-
-            <!-- <tr>
-                <td width="150px"><span class="col-form-span-label"><b>Assigned On</b> </span><span class="col-form-span-error">*</span>  </td>
-               <td colspan="3">
-                   <my-date-picker name="AssignedDate"   [options]="myDatePickerOptions" [(ngModel)]="AssignedDate"></my-date-picker> 
-                  
-                </td>
-            
-            </tr> -->
-            <tr>
-                <td class="width150"><span class="col-form-span-label">Assigned On</span></td>
-                <!-- <td>
-                    <span class="col-form-span-label">{{AssignedDate}}</span>
-                </td>
-                <td ><span class="col-form-span-label">{{formData.ASSIGNDT.text}}</span></td> -->
-                <td>
-                    <div class="row">
-                        <my-date-picker name="SurrenderedDate" [options]="myDatePickerOptions" [(ngModel)]="formData.ASSIGNDT.main"
-                            (ngModelChange)="setTime('ASSIGNDT','main')"></my-date-picker>
-                        <input type="text" class="form-control width30" placeholder="hh" [(ngModel)]="formData.ASSIGNDT.hour"
-                            maxlength="2" [OnlyNumber]="true" (ngModelChange)="restrictHour01to24number('ASSIGNDT')" />:
-                        <input type="text" class="form-control width30" placeholder="mm" [(ngModel)]="formData.ASSIGNDT.minute"
-                            maxlength="2" [OnlyNumber]="true" (ngModelChange)="restrictMinute00to60number('ASSIGNDT')" />
-                    </div>
-                </td>
-            </tr> 
-            <tr>
-                <td colspan="4"  class="centerlabel">
-                    <button class="btn btn-sm btn-success" type="submit" (click)="Addrcrd()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{txtchild}}</span></button>
-                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Resetrcrd();"><i class="fa fa-ban"></i> Reset</span></button>
-                </td>
-            </tr>
-          
-
-        <tr>
-             <td colspan="4" >
-                <div class="row xyscroll"    > 
-                    @if (clntflpList.length>0) {
-<table class="table table-responsive-sm table-bordered"  >
-                        <thead>
-                            <tr class="bakgrdliteBlue">
-                             
-                                <th class="col-form-span-label  font-weight-bold headerwhite">Client Name</th>
-                                <th  class="col-form-span-label  font-weight-bold headerwhite">Assigned To</th>
-                                <th  class="col-form-span-label  font-weight-bold headerwhite">Client Status</th>
-                                <th  class="col-form-span-label  font-weight-bold headerwhite">Assigned On</th>
-                                <th  class="col-form-span-label  font-weight-bold headerwhite">Assigned By</th>
-                            </tr>
-                        </thead>
-                         <tbody  >
-                            @for (obj of clntflpList; track obj) {
-<tr>
-                            
-                               <td><span class="col-form-span-label"  [innerHtml]="obj.EXP_NAME"> </span></td>
-                               <td><span class="col-form-span-label">{{obj.FOLLOW_ASSIGNTO}}</span></td>
-                                <td><span class="col-form-span-label">{{obj.CLIENT_STATUS}}</span></td>
-                                <td><span class="col-form-span-label">{{obj.ASSIGN_ON}}</span></td>
-                                <td><span class="col-form-span-label">{{obj.ASSIGN_BY}}</span></td>
-                             
-                            </tr>
-}
-                        </tbody>  
-                    </table>
-}
-               </div> 
-             </td>
-        </tr>
-        
-    </table>   
+          } @empty {
+            <tr><td class="empty" colspan="5">{{ ClientName ? 'No follow-ups recorded for this client yet.' : 'Select a client to see its follow-ups.' }}</td></tr>
+          }
+        </tbody>
+      </table>
     </div>
+  </div>
 
-
-    <div class="col-sm-2">
+  <div class="bar">
+    <span class="note">Adding a follow-up refreshes the client's history.</span>
+    <div class="r">
+      <button class="btn g" type="reset" (click)="Resetrcrd();">Reset</button>
+      <button class="btn p" type="submit" (click)="Addrcrd()">{{txtchild}}</button>
     </div>
+  </div>
 </div>

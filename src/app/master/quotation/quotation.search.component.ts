@@ -10,7 +10,7 @@ import { IMyDpOptions } from 'mydatepicker';
 @Component({
   selector: 'app-quotation-search',
   templateUrl: './quotation.search.component.html',
-   styleUrls: ['./quotation.search.component.scss'],
+   styleUrls: ['./quotation-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -137,8 +137,8 @@ export class QuotationSearchComponent implements OnInit {
         this._dataService.getData("Admin/ADMIN_QUOTATION_SEARCHLIST", jsonmaster)
       .subscribe((data: any) => {
        // console.log(data)
-        this.quotationlist = data.Table
-        if(data.Table.length==0){
+        this.quotationlist = (data && data.Table) || [];
+        if(this.quotationlist.length==0){
           this._toasterService.toast('warning', 'warning', "No records found !");
         }
         this.displayType='LIST';
@@ -179,5 +179,26 @@ export class QuotationSearchComponent implements OnInit {
       this.enddate=""
       this.searchValue = "1";
     }
+
+  /** CSV of the loaded result rows (client side, no server call). Ported from MPERPNG-20. */
+  exportCsv() {
+    if (!this.quotationlist || !this.quotationlist.length) { return; }
+    const headers = ['Quotation No', 'Client', 'Origin', 'Shipment Mode', 'Shipment Type', 'Shipping/Airline'];
+    const rows = this.quotationlist.map((obj: any) => [
+      obj.QUOT_CODE, obj.EXP_SNAME, obj.CLIENT_ORIGIN, obj.SHIP_MODE, obj.SHIP_TYPE,
+      obj.SHIP_MODE == 'SEA' ? obj.SHIPPINGLINE : (obj.SHIP_MODE == 'AIR' ? obj.AIRLINENAME : '')
+    ]);
+    const esc = (v: any) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+    const csv = [headers.map(esc).join(','), ...rows.map(r => r.map(esc).join(','))].join('\r\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const dt = new Date();
+    const stamp = dt.getFullYear().toString() + String(dt.getMonth() + 1).padStart(2, '0') + String(dt.getDate()).padStart(2, '0');
+    a.href = url;
+    a.download = 'quotation-' + stamp + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
 }

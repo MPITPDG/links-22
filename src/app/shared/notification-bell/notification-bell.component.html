@@ -1,0 +1,117 @@
+<!--
+  Header notification bell (ported from MPERPNG-20). Sits to the left of the
+  branch/city button in both the full and header-footer layouts; the chromeless
+  popup shell has no header and therefore no bell.
+-->
+<div class="nb-root">
+
+  <button type="button" uiBtn variant="ghost" size="sm"
+          class="nb-trigger border border-white/20 !text-white hover:!bg-white/10 hover:border-white/30"
+          [attr.aria-label]="triggerLabel()"
+          [attr.aria-expanded]="open"
+          aria-haspopup="dialog"
+          [title]="triggerLabel()"
+          (click)="toggle($event)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-4 w-4">
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
+    @if (badgeCount() > 0) {
+      <span class="nb-badge" aria-hidden="true">{{ badgeCount() > 9 ? '9+' : badgeCount() }}</span>
+    }
+  </button>
+
+  @if (open) {
+    <div class="nb-panel" role="dialog" aria-modal="false" aria-label="Notifications">
+
+      <div class="nb-head">
+        <span class="nb-title">Notifications</span>
+        <span class="nb-count">{{ unreadCount() }} unread</span>
+        <span class="nb-spacer"></span>
+        <button type="button" class="nb-act" (click)="markAllRead()"
+                [disabled]="unreadCount() === 0">Mark all read</button>
+        <button type="button" class="nb-act" (click)="clearAll()"
+                [disabled]="items().length === 0">Clear all</button>
+      </div>
+
+      <!--
+        Job alerts (JobStateService) and ticket events (TicketService), as MP.
+        Both sections stay hidden while their endpoint returns nothing (or is
+        not deployed yet), so the panel is then the plain message list.
+      -->
+      @if (recentAlerts().length) {
+        <div class="nb-head nb-sub">
+          <span class="nb-title">Job alerts</span>
+          <span class="nb-count">{{ alertCount() }} need attention</span>
+          <span class="nb-spacer"></span>
+          <a class="nb-act" routerLink="/export/today" (click)="open = false">View all</a>
+        </div>
+        <div class="nb-list nb-alerts">
+          @for (a of recentAlerts(); track a.alert_id) {
+            <div class="nb-item nb-alert" role="button" tabindex="0"
+                 [title]="'Open job ' + a.exptno" (click)="openJob(a)" (keydown.enter)="openJob(a)">
+              <span class="nb-mark nb-sev" [class.nb-crit]="a.severity === 'CRIT'">{{ a.severity }}</span>
+              <div class="nb-body">
+                <div class="nb-item-title">{{ a.exptno }}</div>
+                <div class="nb-item-text">{{ a.message }}</div>
+                <div class="nb-when">{{ a.last_seen ? when($any(a.last_seen)) : '' }}</div>
+              </div>
+              <button type="button" class="nb-x nb-ack" title="Acknowledge"
+                      [attr.aria-label]="'Acknowledge alert on job ' + a.exptno"
+                      (click)="acknowledge(a, $event)">&#10003;</button>
+            </div>
+          }
+        </div>
+      }
+
+      @if (ticketEvents().length) {
+        <div class="nb-head nb-sub">
+          <span class="nb-title">Tickets</span>
+          <span class="nb-count">{{ ticketUnread() }} {{ ticketUnread() === 1 ? 'update' : 'updates' }}</span>
+          <span class="nb-spacer"></span>
+          <button type="button" class="nb-act" (click)="markTicketsSeen()"
+                  [disabled]="ticketUnread() === 0">Mark seen</button>
+          <a class="nb-act" routerLink="/tickets" (click)="open = false">View board</a>
+        </div>
+        <div class="nb-list nb-alerts">
+          @for (e of ticketEvents(); track e.event_id) {
+            <div class="nb-item nb-alert" [class.nb-unread]="unseen(e)" role="button" tabindex="0"
+                 [title]="'Open ticket ' + e.ticket_no" (click)="openTicket(e)" (keydown.enter)="openTicket(e)">
+              <span class="nb-mark nb-sev" [class.nb-crit]="unseen(e)">{{ ticketMark(e) }}</span>
+              <div class="nb-body">
+                <div class="nb-item-title">{{ e.ticket_no }} · {{ e.subject }}</div>
+                <div class="nb-item-text">{{ ticketLine(e) }}</div>
+                <div class="nb-when">{{ e.at ? when($any(e.at)) : '' }}</div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (recentAlerts().length || ticketEvents().length) {
+        <div class="nb-head nb-sub"><span class="nb-title">Messages</span></div>
+      }
+
+      <div class="nb-list">
+        @for (n of items(); track n.id) {
+          <div class="nb-item" [class.nb-unread]="!n.read">
+            <span class="nb-mark">{{ mark(n.type) }}</span>
+            <div class="nb-body">
+              <div class="nb-item-title">{{ n.title }}</div>
+              @if (n.body) { <div class="nb-item-text">{{ n.body }}</div> }
+              <div class="nb-when">{{ when(n.at) }}</div>
+            </div>
+            <button type="button" class="nb-x"
+                    [attr.aria-label]="'Dismiss notification: ' + (n.title || 'notification')"
+                    (click)="dismiss(n.id)">&times;</button>
+          </div>
+        } @empty {
+          <div class="nb-empty">No notifications yet</div>
+        }
+      </div>
+
+    </div>
+  }
+
+</div>

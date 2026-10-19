@@ -11,10 +11,11 @@ import { RegisterExportService } from './register-export.service';
 import { catchError } from 'rxjs/operators';
 import { EMPTY } from 'rxjs';
 
+import { FIN_PERIODS, FinPeriod, finRange, finDp } from '../fin-kit';
 @Component({
   selector: 'app-invoice-register',
   templateUrl: './invoice-register.component.html',
-  styles: [],
+  host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -385,4 +386,18 @@ export class InvoiceRegisterComponent implements OnInit {
    this.FromDate="";
    this.ToDate="";
   }
+
+    // ---- redesign: quick period presets (same my-date-picker model shape the pickers emit) ----
+    periods = FIN_PERIODS.filter(p => p.key !== 'custom');
+    period: string = '';
+    setPeriod(k: FinPeriod) {
+        const r = finRange(k);
+        if (!r) { return; }
+        this.period = k;
+        this.FromDate = finDp(r.from, this.myDatePickerOptions.dateFormat);
+        this.ToDate = finDp(r.to, this.myDatePickerOptions.dateFormat);
+        // run the legacy financial-year checks exactly as a manual pick would
+        this.InvoiceDateChanged(this.FromDate, 'F');
+        this.InvoiceDateChanged(this.ToDate, 'T');
+    }
 }

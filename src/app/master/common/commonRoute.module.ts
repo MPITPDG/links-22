@@ -5,6 +5,7 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { MyDatePickerModule } from 'mydatepicker';
 import {NgSelectModule} from '@ng-select/ng-select';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { SharedModule } from '../../shared/shared.module';
 import { CommonRouting } from './common.routing';
 import { Commonsearch} from './Common-Search.component';
 import  {bankConsigneemaster} from './Bank-Consignee.component'
@@ -14,7 +15,7 @@ import  {bankConsigneemaster} from './Bank-Consignee.component'
         CommonModule,
         TabsModule,
         MyDatePickerModule,
-        NgSelectModule,NgxPaginationModule ],
+        NgSelectModule,NgxPaginationModule, SharedModule ],
     declarations: [Commonsearch,bankConsigneemaster
     ],
     providers: [

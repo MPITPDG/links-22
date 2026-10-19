@@ -12,7 +12,7 @@ import { DatePipe } from '@angular/common';
 @Component({
     selector: 'app-Client-register',
     templateUrl: './clntreg.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' }, // Links: import-page + accreport-page are global (src/styles/kit)
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -78,12 +78,15 @@ import { DatePipe } from '@angular/common';
       }else {
       this.exportser.exportExceltry(reportData, this._loginService.getLogin()[0].CMP_USERNAME + "_Supplier_Register" );
     }
-      this.dataForExcel1=[];
+            this.dataForExcel1=[];
+      this.loaderService.display(false); // was never cleared on success
+      this.ErrorMessage = 'Download started. Check your browser downloads.';
     }
     else{
       this._toasterService.toast("warning","warning","No Record Found !")
       this.loaderService.display(false);
+      this.ErrorMessage = 'No records to export.';
     }
-  })
+  }, () => { this.loaderService.display(false); this.ErrorMessage = 'The register could not be exported. Try again.'; })
   }
 }

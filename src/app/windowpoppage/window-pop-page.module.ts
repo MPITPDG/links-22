@@ -45,13 +45,15 @@ import {QuoteAirPrintComponent} from './Quotation/quote-air-print.component';
 // import { ContainerjobviewComponent } from './importfra/container-jobview.component'
 // import {CalCbmViewComponent } from './export/calculatecbm-view.component';
 import { InvoiceViewModule } from '../accounts/transaction/invoice/invoice-view.module';
+import { SharedModule } from '../shared/shared.module';
 @NgModule({
     imports: [InvoiceViewModule, CommonModule,
         FormsModule,
         TabsModule,
         MyDatePickerModule,
         NgSelectModule,
-        WindowPopPageRoutingModule],
+        WindowPopPageRoutingModule,
+        SharedModule],
     declarations: [
         ExportConsignmentOrderSizeDetailComponent,
         InvoiceDetailsComponent,

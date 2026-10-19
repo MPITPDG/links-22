@@ -1,7 +1,6 @@
 ﻿import { Component, OnInit, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { Router} from '@angular/router';
-import { ToasterService } from 'angular2-toaster';
 import { LoginService } from '../../shared/service/loginService';
 import { ToastCommonService } from '../../shared/service/toastService';
 import { IMyDpOptions } from 'mydatepicker';
@@ -11,6 +10,7 @@ import { LoaderService } from '../../shared/service/loader.service';
 @Component({
     selector: 'app-transfer-carting-sea',
     templateUrl: 'carting-transfer-vessel.sp.component.html',
+    host: { class: 'kit-sp' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -48,21 +48,25 @@ export class TransfervslCartingSea implements OnInit, OnChanges {
         const jsonExport = { CITYCODE: this._loginService.getLogin()[0].CITYCODE};
         this._dataService.getData(this.baseUrl, jsonExport)
             .subscribe((data: any) => {
+                // Fail soft: a missing / empty Table leaves both pickers empty.
+                if (!(data && data.Table && data.Table.length > 0)) { this.loaderService.display(false); return; }
                 if (data.Table[0].STATUS == 100) {
                     this.vslnameList = data.Table;
-                    this.vslAgentlist = data.Table1;
-                    this.loaderService.display(false);      
+                    this.vslAgentlist = data.Table1 || [];
+                    this.loaderService.display(false);
                 } else {
                     this._toasterService.toast('error', 'Error', data.Table[0].statusText);
-                    this.loaderService.display(false);      
+                    this.loaderService.display(false);
                 }
-            });
+            }, () => { this.loaderService.display(false); });
     }
 
     onAgentSelect(RtNo) {
         let port: any = [];
         this.VslPortlist = this.vslnameList.filter((linerlist: any) => linerlist.RTNOPRT == RtNo);// this.vslnameList[0].VSL_PORT;
-         
+        // Fail soft: "Please select" (or an unknown vessel) has no row - clear the agents instead of throwing.
+        if (this.VslPortlist.length == 0) { this.Agentlist = []; return; }
+
     
         port = this.VslPortlist[0].RTNOPRT;
         this.VslPort = port.split("|")[1];

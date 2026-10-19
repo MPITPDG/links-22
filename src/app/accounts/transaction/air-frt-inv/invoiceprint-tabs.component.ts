@@ -8,71 +8,18 @@ import { LoginService } from 'src/app/shared/service/loginService';
 import { ToastCommonService } from 'src/app/shared/service/toastService';
 
 @Component({
-  selector: 'app-invoiceprint-tabs',
-  templateUrl: './invoiceprint-tabs.component.html',
-  styles: [`
-  .form-control {
-     padding:0px !important;
-     margin:0px !important;
-     height:20px !important;
-  }
-  a:hover,a:focus{
-      text-decoration: none;
-      outline: none;
-  }
-  .tab .nav-tabs {
-      border-bottom:0 none;
-  }
-  .tab .nav-tabs li{
-      margin-right: 10px;
-  }
-  .tab .nav-tabs li a{
-      position: relative;
-      padding: 5px;
-      color: #fff;
-      font-size: 11px;
-      z-index: 1;
-      font-family:verdana;
-      font-weight:bold
-  }
-  .tab .nav-tabs li a:hover{
-      background:transparent;
-      border:1px solid transparent;
-      color: #444;
-  }
-   .tab .nav-tabs li a:before{
-      content: "";
-      width:100%;
-      height:100%;
-      position:absolute;
-      bottom: 6px;
-      left:-1px;
-      font-size:11px;
-
-      background-color: #536c79;
-      border: 1px solid #d3d3d3;
-      border-bottom: 0px none;
-      border-radius: 10px 10px 0 0;
-      transform-origin: left center 0;
-      transform: perspective(3px) rotateX(5deg);
-      z-index:-1;
-  } 
-  .tab .nav-tabs li a.active:before{
-      background: #fff;
-  }
-  .tab .nav-tabs li a.active,
-  .tab .nav-tabs li a.active:focus,
-  .tab .nav-tabs li a.active:hover{
-      border:1px solid transparent;
-      background:transparent;
-      color: #212529;
-      z-index: 2;
-  }
-  `],
+    selector: 'app-invoiceprint-tabs',
+    templateUrl: './invoiceprint-tabs.component.html',
+    // Page kit is global (src/styles/kit); air-frt-inv-page.css is MP's area sheet, copied locally.
+    styleUrls: ['./air-frt-inv-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class InvoiceprintTabsComponent implements OnInit {
+  // UI-only: which tab is shown. Presentation state added for the monochrome
+  // segmented-tab restyle (replaces the bootstrap data-toggle="tab" markup);
+  // no data/behaviour change.
+  activeTab: string = 'zero';
   Header: string = "proforama airfreight invoice and share of profit Credit Note"
   SubHeader: string = "view invoice details"
   inv_no: "TRTRR"

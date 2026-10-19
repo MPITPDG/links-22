@@ -10,6 +10,7 @@ import { Configuration } from '../../../app.constants';
  
 @Component({
     templateUrl: 'staffpurchase_IU.component.html',
+    styleUrls: ['../../purchase/purchase-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

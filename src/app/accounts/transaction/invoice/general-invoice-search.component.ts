@@ -2,7 +2,6 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IMyDpOptions } from 'mydatepicker';
 import { DataService } from '../../../shared/service/dataService';
 import { AuthService } from '../../../shared/service/authService';
-import { ToasterService } from 'angular2-toaster';
 import { LoginService } from '../../../shared/service/loginService';
 import { ToastCommonService } from '../../../shared/service/toastService';
 import { LoaderService } from '../../../shared/service/loader.service';
@@ -15,27 +14,15 @@ import { FilterPipe } from 'ngx-filter-pipe';
 @Component({
   selector: 'app-general-invoice-search',
   templateUrl: './general-invoice-search.component.html',
-  styleUrls: ['./general-invoice-search.component.css'],
-  styles: [ `main{
-    position: absolute;
-    top: 110px;
-    left: 231px;
-    right: 0;
-    bottom: 0;
-    background: #f2f5fe;
-    padding: 1rem;
-  }
-  
-  #content{
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-    /* ---- invoice detail drawer ---- */
+  // Page kit recipe 1 (ported from MPERPNG-20): global .im-page kit (src/styles/kit) plus the
+  // component-local invoice-page.css. This page no longer uses the x-page theme (accounts-theme.css).
+  styleUrls: ['./invoice-page.css'],
+  styles: [`
+    /* ---- invoice detail drawer (monochrome) ---- */
     .iv-backdrop {
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(15, 23, 35, .45);
+        background: rgba(10, 10, 10, .45);
         z-index: 1040;
     }
     .iv-drawer {
@@ -44,8 +31,8 @@ import { FilterPipe } from 'ngx-filter-pipe';
         width: 74%;
         min-width: 620px;
         max-width: 1240px;
-        background: #F4F7FB;
-        box-shadow: -8px 0 28px rgba(15, 23, 35, .18);
+        background: var(--mp-band, #FAFAFA);
+        box-shadow: -8px 0 28px rgba(10, 10, 10, .18);
         z-index: 1041;
         overflow-y: auto;
     }
@@ -414,4 +401,49 @@ reset(){
   this.amount=""
   this.printall_date = ""
  }
+  /* ---- kit pager + export (from MPERPNG-20, additive). Rows are the loaded list after the
+     Links quick filter (term) and the column sort, as the old filter/orderBy/paginate pipes
+     gave them; select-all still covers every loaded row. ---- */
+  readonly pageSize = 25;
+  get filteredRows(): any[] {
+    const rows = this.Searchdata_list || [];
+    return this.term ? (this.filterPipe.transform(rows, this.term) || []) : rows;
+  }
+  get sortedRows(): any[] {
+    return this.orderPipe.transform(this.filteredRows, this.order, this.reverse, true) || [];
+  }
+  get pageCount(): number { return Math.max(1, Math.ceil(this.filteredRows.length / this.pageSize)); }
+  get pg(): number { return Math.min(Math.max(1, this.PageActual || 1), this.pageCount); }
+  get pageRows(): any[] { const st = (this.pg - 1) * this.pageSize; return this.sortedRows.slice(st, st + this.pageSize); }
+  get rangeStart(): number { return this.filteredRows.length ? (this.pg - 1) * this.pageSize + 1 : 0; }
+  get rangeEnd(): number { return Math.min(this.pg * this.pageSize, this.filteredRows.length); }
+  get pageList(): number[] {
+    const n = this.pageCount, p = this.pg;
+    if (n <= 7) { return Array.from({ length: n }, (_, i) => i + 1); }
+    const out: number[] = [1];
+    const lo = Math.max(2, p - 1), hi = Math.min(n - 1, p + 1);
+    if (lo > 2) { out.push(0); }
+    for (let i = lo; i <= hi; i++) { out.push(i); }
+    if (hi < n - 1) { out.push(0); }
+    out.push(n);
+    return out;
+  }
+  goPage(p: number) { if (p >= 1 && p <= this.pageCount) { this.PageActual = p; } }
+  exportCsv() {
+    const all = this.exampleRadios1 == '6';
+    const head = all ? ['Inv No', 'Inv Date', 'Client', 'Bill type', 'Total amt']
+                     : ['Inv No', 'Inv Date', 'Client', 'Bill type', 'Invoiced on', 'Authorised on', 'Authorised by'];
+    const rows = this.sortedRows.map(r => all ? [r.INV_NO, r.INV_DATE, r.EXP_NAME, r.INV_BILLTYPE, r.TOTALAMT]
+                     : [r.INV_NO, r.INV_DATE, r.EXP_NAME, r.INV_BILLTYPE, r.INVOICED_ON, r.AUTHORISEDON, r.AUTHORISEDBY]);
+    const q = (v: any) => '"' + ((v === null || v === undefined) ? '' : String(v)).replace(/"/g, '""') + '"';
+    const csv = [head, ...rows].map(line => line.map(q).join(',')).join('\r\n');
+    const d = new Date();
+    const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'invoices-' + stamp + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
 }

@@ -1,35 +1,43 @@
-﻿<div class="animated fadeIn">
-	<div class="row">
-		<div class="col-sm-3">
-		</div>
-		<div class="col-sm-6 centerlabel">
-			@if (loader) {
-<img src="assets/img/loading.gif" />
-}
-			@if (errorMessage!='') {
-<span>{{errorMessage}}</span>
-}
-			@if (companylist.length>0) {
-<div class="card">
-				<div class="card-body">
-					<table class="table table-responsive-sm table-borderless table-hover">
-						<tbody>
-							@for (d of companylist; track d) {
-<tr (click)="setCompany(d.CMP_CODE,d.CMP_NAME,d.IS_HBLISSUE,d.IS_HAWISSUE);">
-								<td [ngStyle]="{'cursor': 'pointer'}">
-									<div [ngStyle]="{'text-decoration': 'underline', 'text-align': 'left', 'color': '#0000ff', 'font-weight':'bold','font-size': '12px'}">
-										<i class="fa fa-angle-double-right"></i>&nbsp;{{ d.CMP_NAME }}
-									</div>
-								</td>
-							</tr>
-}
-						</tbody>
-					</table>
-				</div>
-			</div>
-}
-		</div>
-		<div class="col-sm-3">
-		</div>
-	</div>
+<!--
+  Company picker: step indicator in the shared top row, then one centred
+  column - title and the companies as a list.
+
+  Selection is unchanged - every row calls setCompany() with the same four
+  values, which stores the company and routes to /module, and a single-company
+  login is still sent straight through by ngOnInit.
+-->
+<div class="cp-page">
+  <app-hub-steps current="company" />
+
+  <div class="cp-main">
+    <section class="cp-col">
+      <h1 class="cp-heading">Company</h1>
+      <p class="cp-lede">Choose the company you're working under.</p>
+
+      <div class="cp-list">
+        @if (loader) {
+          <div class="cp-state"><span class="cp-spinner" aria-hidden="true"></span>Loading companies&hellip;</div>
+        }
+
+        @if (errorMessage != '') {
+          <div class="cp-error" role="alert">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M12 8v4" /><path d="M12 16h.01" /></svg>
+            <div>
+              <div class="cp-error-title">No company is set up for this branch</div>
+              <div class="cp-error-text">{{ errorMessage }}</div>
+            </div>
+          </div>
+        }
+
+        @for (d of companylist; track d.CMP_CODE) {
+          <button type="button" class="cp-item"
+                  (click)="setCompany(d.CMP_CODE,d.CMP_NAME,d.IS_HBLISSUE,d.IS_HAWISSUE);">
+            <span class="cp-code">{{ d.CMP_CODE }}</span>
+            <span class="cp-name">{{ d.CMP_NAME | titlecase }}</span>
+            <svg class="cp-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+          </button>
+        }
+      </div>
+    </section>
+  </div>
 </div>

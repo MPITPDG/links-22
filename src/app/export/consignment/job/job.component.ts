@@ -9,7 +9,7 @@ import {
 
 @Component({
     templateUrl: 'job.component.html',
-    encapsulation: ViewEncapsulation.None,
+    styleUrls: ['./job-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -82,7 +82,7 @@ export class JobComponent implements OnInit {
         };
         this._dataService.getData('Export/GetExportConsignmentJobClientData', jsonExport)
             .subscribe((data: any) => {
-                this.ClientNameList = data.Table;
+                this.ClientNameList = data?.Table ?? [];
             });
     }
 
@@ -102,7 +102,8 @@ export class JobComponent implements OnInit {
                 .subscribe((data: any) => {
                     this.viewType = 'WHS';
                     this._disable.enableButton(this.searchButton);
-                    if (data.Table.length > 0) {
+                    // Fail soft: a reply without a Table reads as "not found".
+                    if (data?.Table?.length > 0) {
                         this.SearchJobNo = '';
                         this.Id = data.Table[0].PK_ID;
                         this.JobNo = data.Table[0].JOBNO;
@@ -138,10 +139,11 @@ export class JobComponent implements OnInit {
                 .subscribe((data: any) => {
                     this._disable.enableButton(this.submitButton);
                   //  console.log(data);
-                    if (data.Table[0].STATUS.split('#')[0] == 100) {
-                        alert(data.Table[0].STATUS.split('#')[1]);
-                        this._toasterService.toast('success', 'Alert', data.Table[0].STATUS.split('#')[1]);
-                    } else if (data.Table[0].STATUS.split('#')[0] == 200) {
+                    const status = String(data?.Table?.[0]?.STATUS ?? '').split('#');
+                    if (Number(status[0]) == 100) {
+                        alert(status[1]);
+                        this._toasterService.toast('success', 'Alert', status[1]);
+                    } else if (Number(status[0]) == 200) {
                         this._toasterService.toast('info', 'Alert', 'Jobno is already Exists.');
                     }
                 });

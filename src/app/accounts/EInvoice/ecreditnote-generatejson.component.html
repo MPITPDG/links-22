@@ -1,96 +1,121 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-      <div class="col-sm-12">
-        <div class="card">
-          <div class="card-header formheading">
-            <strong>{{subheader}}</strong>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row no-gutters">
-      <!-- <div class="col-md-1 col-lg-1 col-12">
-      </div> -->
-      <div class="col-md-12  col-lg-12 col-12" style="overflow-y: auto;height: 460px;">
-        <table class="table table-bordered table-sm-new bgwhite ">
-          <thead>
-
-            <tr  style="white-space:nowrap;">
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;">  <input type="checkbox"  [(ngModel)]='checkbox' (change)="checkAll($event)" /> &nbsp;  </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> Crt No </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> Crt Date   </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;" > Client </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;" > Client GST No.  </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;" > Supply Type </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;" > Total Amount     </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"  > Taxable Amt   </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> Non Taxable Amt  </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> IGST </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> CGST  </th>
-              <th class="col-form-span-label"  style="  background-color: #004980; color: white;"> SGST  </th>
-            </tr>
-          </thead>
-          <tbody class="bgwhite">
-            @for (obj of EcreditnoteListtbl ; track obj) {
-<tr
-             
-              >
-              <td class="col-form-span-label"> <input type="checkbox" [(ngModel)]="obj.Checked"
-                  (ngModelChange)="getCheckboxValues($event,obj.INV_NO)"> &nbsp; </td>
-              <td class="col-form-span-label anchor-link " (click)="CreditNoteView(obj.INV_NO)">{{obj.INV_NO}}</td>
-              <td class="col-form-span-label" >{{obj.INV_DATE}}</td>
-              <td class="col-form-span-label">{{obj.CLIENT}}</td>
-              <td class="col-form-span-label">{{obj.EXP_GSTNO}}</td>
-              <td class="col-form-span-label">{{obj.SUPTYPE}}</td>
-              <td class="col-form-span-label" style="text-align: right;">{{obj.TOTALAMT|number:'2.2-4'}}</td>
-              <td class="col-form-span-label">{{obj.TAXABLEAMT}}</td>
-              <td class="col-form-span-label">{{obj.NONTAXABLEAMT}}</td>
-              <td class="col-form-span-label">{{obj.IGST}}</td>
-              <td class="col-form-span-label">{{obj.CGST}}</td>
-              <td class="col-form-span-label">{{obj.SGST}}</td>
-            </tr>
-}
-          </tbody>
-          <!-- <tr>
-            <td colspan="12" class="right-text pr-2">
-              <button class="btn btn-sm btn-success" type="submit" (click)="GenerateEInvoice()"> <span
-                  class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Generate</span></button>
-
-            </td>
-          </tr> -->
-          <!-- <tr>
-            <td colspan="8">
-              <div class="row justify-content-center no-gutters"
-                style="font-family:verdana;font-size: 11px;padding: 1px;">
-                <pagination-controls (pageChange)="PageActual=$event" autoHide="true"></pagination-controls>
-              </div>
-            </td>
-          </tr> -->
-        </table>
-
-      </div>
-      <!-- <div class="col-md-1  col-lg-1 col-12">
-      </div> -->
-
-    </div>
-    <div class="row no-gutters">
-      <!-- <div class="col-md-1 col-lg-1 col-12">
-      </div> -->
-      <div class="col-md-12  col-lg-12 col-12" style="display: flex;
-      justify-content: flex-end;
-      margin-left: auto;
-      margin-right: 0;">
-          <div class="col-md-4 col-lg-4 col-12" >
-            <span class="col-form-span-label" style="color: red;"><b>No. Of Rows Found:-{{NoofRows}}</b></span>
-          </div>     
-          <div class="col-md-8 col-lg-8 col-12" >
-            <button style="float: right;" class="btn btn-sm btn-success" type="submit" (click)="GenerateECreditNote()"> <span
-              class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Generate</span></button>
-          </div>    
-        
-       
-      </div>
-      <!-- <div class="col-md-1 col-lg-1 col-12">
-      </div> -->
+<!--
+  E-Invoice - generate JSON for pending credit notes.
+  Monochrome page kit (import-page.css + einvoice-page.css). The list, the row / header
+  checkboxes, GenerateECreditNote() and the JSON download are unchanged; the filter and the
+  10-per-page pager are display-only (select-all still ticks every row in the list).
+-->
+<div class="im-page ei-page">
+  <div class="ph">
+    <div>
+      <h1>E-Credit note · generate JSON</h1>
+      <p>{{ subheader }}</p>
     </div>
   </div>
+
+  @if (grid.notice) {
+    <div class="ei-notice" [class.err]="grid.notice.kind === 'err'" role="status">
+      <div>
+        <h3>{{ grid.notice.title }}</h3>
+        <p>{{ grid.notice.text }}</p>
+      </div>
+      <button type="button" class="ei-x" (click)="grid.notice = null">Dismiss</button>
+    </div>
+  }
+
+  <div class="card sec">
+    <div class="ei-filters">
+      <div class="f">
+        <label for="eiFind">Find</label>
+        <input id="eiFind" type="text" [(ngModel)]="grid.text" (ngModelChange)="grid.onFilter()" placeholder="Credit note no., client, GST no. or supply type" />
+      </div>
+      <div class="f ei-meta">
+        <span>No. of rows found <b>{{ NoofRows || 0 }}</b></span>
+        <span>Selected <b>{{ grid.checkedCount }}</b></span>
+      </div>
+      <div class="f">
+        <button class="btn g" type="button" (click)="GetECreditNoteList()">Refresh</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <span>
+        <span class="count">{{ grid.filtered.length }} {{ grid.filtered.length === 1 ? 'credit note' : 'credit notes' }}</span>
+        <span class="sub-t"> · {{ grid.checkedCount }} selected · the header box selects every pending credit note, on all pages</span>
+      </span>
+      <span class="tb-r">
+        <button class="btn g" type="button" (click)="grid.clear()">Clear</button>
+        <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!grid.filtered.length">Export</button>
+      </span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th class="ei-chk"><input type="checkbox" [(ngModel)]='checkbox' (change)="checkAll($event)" aria-label="Select all" /></th>
+            <th>Crt no</th>
+            <th>Crt date</th>
+            <th>Client</th>
+            <th>Client GST no.</th>
+            <th>Supply type</th>
+            <th class="num">Total amount</th>
+            <th class="num">Taxable amt</th>
+            <th class="num">Non taxable amt</th>
+            <th class="num">IGST</th>
+            <th class="num">CGST</th>
+            <th class="num">SGST</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (grid.loading) {
+            <tr><td class="empty" colspan="12">Loading pending credit notes…</td></tr>
+          } @else if (grid.loadError) {
+            <tr><td class="empty" colspan="12">Could not load the list: {{ grid.loadError }}</td></tr>
+          } @else {
+            @for (obj of grid.pageRows; track obj) {
+              <tr [class.ei-on]="obj.Checked">
+                <td class="ei-chk"><input type="checkbox" [(ngModel)]="obj.Checked"
+                  (ngModelChange)="getCheckboxValues($event,obj.INV_NO)"></td>
+                <td><a class="lnk mono" (click)="CreditNoteView(obj.INV_NO)">{{obj.INV_NO}}</a></td>
+                <td>{{obj.INV_DATE}}</td>
+                <td>{{obj.CLIENT}}</td>
+                <td class="mono">{{obj.EXP_GSTNO}}</td>
+                <td><span class="chip">{{obj.SUPTYPE}}</span></td>
+                <td class="num">{{obj.TOTALAMT|number:'2.2-4'}}</td>
+                <td class="num">{{obj.TAXABLEAMT}}</td>
+                <td class="num">{{obj.NONTAXABLEAMT}}</td>
+                <td class="num">{{obj.IGST}}</td>
+                <td class="num">{{obj.CGST}}</td>
+                <td class="num">{{obj.SGST}}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="12">{{ grid.text ? 'No pending credit notes match this filter.' : 'No credit notes are pending JSON generation.' }}</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <span>Showing <b>{{ grid.rangeStart }}–{{ grid.rangeEnd }}</b> of <b>{{ grid.filtered.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="grid.page <= 1" (click)="grid.goPage(grid.page - 1)" aria-label="Previous page">‹</button>
+        @for (p of grid.pageList; track $index) {
+          @if (p === 0) {
+            <span class="gap">…</span>
+          } @else {
+            <button type="button" [class.on]="p === grid.page" (click)="grid.goPage(p)">{{ p }}</button>
+          }
+        }
+        <button type="button" [disabled]="grid.page >= grid.pageCount" (click)="grid.goPage(grid.page + 1)" aria-label="Next page">›</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">{{ grid.checkedCount }} of {{ EcreditnoteListtbl?.length || 0 }} selected</span>
+    <div class="r">
+      <button class="btn p" type="button" (click)="GenerateECreditNote()">Generate JSON</button>
+    </div>
+  </div>
+</div>

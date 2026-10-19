@@ -9,6 +9,7 @@ import {companyIU} from './company-IU.compnent'
 import {companySearch} from './company-search.componet'
  import{companyIURoutingModule} from './company-IU-routing.module'
 import { NgxPaginationModule } from 'ngx-pagination';
+import { SharedModule } from '../../shared/shared.module';
 @NgModule({
   declarations: [companyIU ,companySearch],
   imports: [companyIURoutingModule,
@@ -17,7 +18,8 @@ import { NgxPaginationModule } from 'ngx-pagination';
     TabsModule,
     CommonModule,
     MyDatePickerModule,
-    NgSelectModule,NgxPaginationModule
+    NgSelectModule,NgxPaginationModule,
+    SharedModule
   ] ,providers: [
 	],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],

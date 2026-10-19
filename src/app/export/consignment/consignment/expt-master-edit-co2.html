@@ -1,0 +1,207 @@
+<div class="im-page cs-form">
+
+  <!--
+    Export - air shipment & CO2 (/export/Consignment/edit-co2/:exptno, also hostable in the edit
+    hub's route drawer via [exptnoInput]). Ported from MPERPNG-20. Recipe 2 on the page kit.
+    Only the CO2 emission level is editable; Submit posts Export/ExportEditCo2Update.
+  -->
+  <div class="ph">
+    <div>
+      <h1>Air shipment &amp; CO2</h1>
+      <p class="mono">Export no. {{ExptNo}}</p>
+    </div>
+  </div>
+
+  <div class="card sec">
+
+    @if (displayData==undefined && loadError=='') {
+      <div class="cs-empty">Loading…</div>
+    }
+    @if (displayData==undefined && loadError!='') {
+      <div class="cs-empty">
+        <b>{{loadError}}</b>
+        <div class="cs-empty-act">
+          <button type="button" class="btn g" routerLink="/export/Consignment/edit">Back</button>
+        </div>
+      </div>
+    }
+
+    @if (displayData!==undefined) {
+
+      <!-- ================= main ================= -->
+      <div class="card-h"><h2>Main</h2></div>
+      <div class="fields">
+        <div class="fld">
+          <label>Export No.</label>
+          <span class="lockv">{{ExptNo}}</span>
+        </div>
+        <div class="fld">
+          <label>Doc. Recvd On</label>
+          <span class="lockv">{{displayData?.EXPT_DOCRECD}}</span>
+        </div>
+        <div class="fld">
+          <label>Shipper Name</label>
+          <span class="lockv">{{displayData?.EXP_NAME}}</span>
+        </div>
+        <div class="fld">
+          <label>Consignee</label>
+          <span class="lockv">{{displayData?.CON_NAME}}</span>
+        </div>
+        <div class="fld">
+          <label>Inv No.</label>
+          <span class="lockv">{{displayData?.EXPT_INVNO}}</span>
+        </div>
+        <div class="fld">
+          <label>Date</label>
+          <span class="lockv">{{displayData?.EXPT_INVDATE}}</span>
+        </div>
+        <div class="fld">
+          <label>No.of Pkgs</label>
+          <span class="lockv">{{displayData?.EXPT_NOOFPKGS + ' ' + displayData?.EXPT_TYPEOFPKGS}}</span>
+        </div>
+        <div class="fld">
+          <label>No.of Pcs</label>
+          <span class="lockv">{{displayData?.EXPT_NOOFPCS + ' ' + displayData?.EXPT_TYPEOFPCS}}</span>
+        </div>
+        <div class="fld full">
+          <label>Order No.</label>
+          <span class="lockv">{{displayData?.ORDERNO+ '-' +displayData?.EXPT_NOOFPCS}}</span>
+        </div>
+      </div>
+
+      <!-- ================= downstream exports ================= -->
+      @if (exptNoList.length>0) {
+        <div class="cs-sub">Linked Exports</div>
+        <div class="fields">
+          <div class="fld full">
+            <b>ALL INFORMATION WILL BE AUTOMATICALLY GET UPDATED IN THE FOLLOWING EXPORTS</b>
+          </div>
+          <div class="fld full">
+            <label>Export No.</label>
+            <span class="mono" [innerHtml]="strexptno" [style.font-weight]="isBold ? 'bold' : 'bold'"></span>
+          </div>
+        </div>
+      }
+
+      <!-- ================= air shipment ================= -->
+      <div class="cs-sub">Air Shipment</div>
+      <div class="fields">
+        @if (CityCode==DAC) {
+          <div class="fld full">
+            <label>SubAgent</label>
+            <ng-select class="custom" [items]="dhakaSubAgentList" bindLabel="SUP_NAME" bindValue="SUP_CODE" placeholder="--Select Sub Agent--" [(ngModel)]="dhakaSubAgent">
+            </ng-select>
+          </div>
+        }
+        <div class="fld">
+          <label>Carting Date</label>
+          <span class="lockv">{{displayData?.CARTEDDT}}</span>
+        </div>
+        <div class="fld">
+          <label>Prealert sent on</label>
+          <span class="lockv">{{displayData?.PREALERTDT}}</span>
+        </div>
+        <div class="fld full">
+          <label>Airline Name</label>
+          <span class="lockv">{{displayData?.AIRLINENAME}}</span>
+        </div>
+        <div class="fld">
+          <label>Planned Flight No.</label>
+          <span class="lockv">{{displayData?.FLIGHTNO}}</span>
+        </div>
+        <div class="fld">
+          <label>Planned Flight Date</label>
+          <span class="lockv">{{displayData?.FLIGHTDT}}</span>
+        </div>
+        <div class="fld">
+          <label>Actual Flight No.</label>
+          <span class="lockv">{{ACTUALFLIGHTNO}}</span>
+        </div>
+        <div class="fld">
+          <label>Actual Flight Date</label>
+          <span class="lockv">{{ACTUALFLIGHTDT}}</span>
+        </div>
+        <div class="fld">
+          <label>MAWB No.</label>
+          <span class="lockv">{{displayData?.AEROBILLNO}}</span>
+        </div>
+        <div class="fld">
+          <label>MAWB Date</label>
+          <span class="lockv">{{displayData?.AEROBILLDT}}</span>
+        </div>
+        <div class="fld">
+          <label>CO2 Emission Level</label>
+          <span class="cs-inline">
+            <input type="textbox" class="cs-w28" [(ngModel)]="CoEmissionLevel" />
+            <span class="cs-unit">KG</span>
+          </span>
+        </div>
+        <div class="fld">
+          <label>MAWB Destination</label>
+          <span class="lockv">{{displayData?.MAWBDEST}}</span>
+        </div>
+        <div class="fld">
+          <label>MAWB Freight</label>
+          <span class="lockv">{{displayData?.MAWBFRT}}</span>
+        </div>
+        <div class="fld">
+          <label>House AWB No.</label>
+          <span class="lockv">{{displayData?.HOUSEBILLNO}}</span>
+        </div>
+        <div class="fld">
+          <label>House AWB Date</label>
+          <span class="lockv">{{displayData?.HOUSEBILLDT}}</span>
+        </div>
+      </div>
+
+      <!-- ================= transhipment ================= -->
+      <div class="cs-sub">{{ (displayData?.TRANSPORT1) ? 'Transhipment' : 'Direct' }}</div>
+      <div class="fields">
+        <div class="fld full">
+          <label>Transhipment Port1</label>
+          <span class="lockv">{{displayData?.TRANSPORT1}}</span>
+        </div>
+        <div class="fld">
+          <label>Flight No.</label>
+          <span class="lockv">{{displayData?.FLIGHTNO1}}</span>
+        </div>
+        <div class="fld">
+          <label>ETD</label>
+          <span class="lockv">{{displayData?.ETDPORT1}}</span>
+        </div>
+        <div class="fld">
+          <label>ETA</label>
+          <span class="lockv">{{displayData?.ETAPORT1}}</span>
+        </div>
+        <div class="fld full">
+          <label>Transhipment Port2</label>
+          <span class="lockv">{{displayData?.TRANSPORT2}}</span>
+        </div>
+        <div class="fld">
+          <label>Flight No.</label>
+          <span class="lockv">{{displayData?.FLIGHTNO2}}</span>
+        </div>
+        <div class="fld">
+          <label>ETD</label>
+          <span class="lockv">{{displayData?.ETDPORT2}}</span>
+        </div>
+        <div class="fld">
+          <label>ETA</label>
+          <span class="lockv">{{displayData?.ETAPORT2}}</span>
+        </div>
+      </div>
+    }
+
+  </div>
+
+  @if (displayData!==undefined) {
+    <div class="bar">
+      <span class="note">Updates the CO2 emission level of this export and any linked exports.</span>
+      <div class="r">
+        @if (!inline) { <button type="button" class="btn g" routerLink="/export/Consignment/edit">Abort</button> }
+        <button type="button" name="submitButton" class="btn p" [disabled]="saving" (click)="submit();" #submitButton>Update</button>
+      </div>
+    </div>
+  }
+
+</div>

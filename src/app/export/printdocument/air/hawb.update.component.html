@@ -1,154 +1,100 @@
-﻿<div class="row">
-	<div class="col-sm-12">
-		<div class="card">
-			<div class="card-header formheading">
-			   <strong>Export - HAWB NO</strong>
-			</div>
-		</div>
-	</div>
+﻿<!-- Hosted inside hawb.component.html's .im-page card. Ported from MPERPNG-20; bindings unchanged. -->
+<div class="card-h"><h2>Export - HAWB No</h2></div>
+
+<div class="fields" style="padding:14px 16px;">
+
+  @if (hawb_issue=='1') {
+    <div class="fld">
+      <label>HAWB No. <span class="req">*</span></label>
+      <span>{{hawbno}}</span>
+    </div>
+    <div class="fld">
+      <label>HAWB Date. <span class="req">*</span></label>
+      <my-date-picker name="mawbdate" [options]="myDatePickerOptions" [(ngModel)]="hawbdate" [disabled]="hawbno != ''"></my-date-picker>
+    </div>
+  } @else {
+    <div class="fld">
+      <label>HAWB No. <span class="req">*</span></label>
+      <input type="text" [(ngModel)]="hawbno" [OnlyNumber]="true" [maxlength]="15" />
+    </div>
+    <div class="fld">
+      <label>HAWB Date. <span class="req">*</span></label>
+      <my-date-picker name="mawbdate" [options]="myDatePickerOptions" [(ngModel)]="hawbdate" [disabled]="hawbno != ''"></my-date-picker>
+    </div>
+  }
+
+  <div class="fld">
+    <label>Freight Type <span class="req">*</span></label>
+    <select [(ngModel)]="FreightType">
+      <option value="-1">select</option>
+      <option value="CC">CC</option>
+      <option value="PP">PP</option>
+    </select>
+  </div>
+
+  <div class="fld">
+    <label>Freight Currency <span class="req">*</span></label>
+    <select [(ngModel)]="Fcurrency">
+      <option value="0">Please select</option>
+      @for (d of currencyList; track d) {
+        <option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
+      }
+    </select>
+  </div>
+
+  <div class="fld">
+    <label>Freight Amount <span class="req">*</span></label>
+    <input type="text" [(ngModel)]="FreightAmount" [OnlyNumber]="true" [maxlength]="11" />
+  </div>
+
 </div>
-<div class="row">
-	<div class="col-sm-2">
-	</div>
-	<div class="col-sm-8">
-		<table class="table table-bordered table-sm-new bgwhite">
-			@if (hawb_issue=='1') {
-<tr class="title-head trbg">
-				<td class="width150">
-					<span class="col-form-span-label">HAWB No.</span><span class="col-form-span-error">*</span>
-				</td>
-				<td colspan="2" >
-					<span  class="col-form-span-label">{{hawbno}}</span>					
-				</td>				 
-				<td class="width150">
-					<span class="col-form-span-label">HAWB Date.</span><span class="col-form-span-error">*</span>
-				</td>
-				<td colspan="2">
-					<my-date-picker name="mawbdate" [options]="myDatePickerOptions" [(ngModel)]="hawbdate" [disabled]="hawbno != ''"></my-date-picker>
-				</td>
-			</tr>
-} @else {
- 
-				<tr class="title-head trbg">
-					<td class="width150">
-						<span class="col-form-span-label">HAWB No.</span><span class="col-form-span-error">*</span>
-					</td>
-					<td colspan="2" >						 
-						 <input    type="text" [(ngModel)]="hawbno" class="form-control width120" [OnlyNumber]="true" [maxlength]="15" />
-					</td>					 
-					<td class="width150">
-						<span class="col-form-span-label">HAWB Date.</span><span class="col-form-span-error">*</span>
-					</td>
-					<td colspan="2">
-						<my-date-picker name="mawbdate" [options]="myDatePickerOptions" [(ngModel)]="hawbdate" [disabled]="hawbno != ''"></my-date-picker>
-					</td>
-				</tr>
-			
-}
-			
 
-			<tr class="title-head trbg">
-				<td class="width150">
-					<span class="col-form-span-label">Freight Type</span><span class="col-form-span-error">*</span>
-				</td>
-				<td colspan="2">
-					<!-- <ng-select [items]="[{VALUEFIELD: 'PP', TEXTFIELD: 'PP'},{VALUEFIELD: 'CC', TEXTFIELD: 'CC'}]"
-							   bindLabel="TEXTFIELD"
-							   bindValue="VALUEFIELD"
-							   placeholder="--Select--"
-							   [(ngModel)]="FreightType"
-							   class="form-control width120"
-							   >
-					</ng-select> -->
+@if (hawbnoList.length > 0) {
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>EXPT NO</th>
+          <th>Shipper</th>
+          <th>Consignee</th>
+          <th class="num">Pkgs</th>
+          <th class="num">Pcs</th>
+          <th class="num">Grwt</th>
+          <th class="num">Chrg.Wt</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (obj of hawbnoList; track obj) {
+          <tr>
+            <td class="mono">{{obj.EXPTNO}}</td>
+            <td>{{obj.SHIPPER}}</td>
+            <td>{{obj.CONSIGNEE}}</td>
+            <td class="num">{{obj.PKGS}}</td>
+            <td class="num">{{obj.PCS}}</td>
+            <td class="num">{{obj.GRWT}}</td>
+            <td class="num">{{obj.CHBLWT}}</td>
+          </tr>
+        }
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td class="num"><input type="text" style="height:26px;" [(ngModel)]="totalGrwt" [OnlyNumber]="true" [disabled]="true" /></td>
+          <td class="num"><input type="text" style="height:26px;" [(ngModel)]="totalChblwt" [OnlyNumber]="true" [disabled]="true" /></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+}
+@if (hawbnoList.length < 0) {
+  <p style="padding:12px 16px;color:var(--faint);text-align:center;">please wait data is loading.........</p>
+}
 
-					<select class="form-control width120"   [(ngModel)]="FreightType">
-						<option value="-1">select</option>
-						<option value="CC">CC</option>
-						<option value="PP">PP</option>
-					</select>
-				</td>
-				<td class="width150">
-					<span class="col-form-span-label">Freight Currency</span><span class="col-form-span-error">*</span>
-				</td>
-				<td colspan="2">
-					<!-- <ng-select [items]="currencyList"
-							   bindLabel="CUR_NAME"
-							   bindValue="CUR_CODE"
-							   placeholder="--Select--"
-							   [(ngModel)]="Fcurrency"
-							   class="form-control width300"
-							   >
-					</ng-select> -->
-					<select class="form-control width120"   [(ngModel)]="Fcurrency">
-						<option value="0">Please select</option>
-						@for (d of currencyList; track d) {
-<option value={{d.CUR_CODE}}>{{d.CUR_NAME}}</option>
-}
-					
-					</select>
-				</td>
-			</tr>
-			<tr class="title-head trbg">
-				<td class="width150">
-					<span class="col-form-span-label">Freight Amount</span><span class="col-form-span-error">*</span>
-				</td>
-				<td colspan="5">
-					<input type="text" [(ngModel)]="FreightAmount" class="form-control width120" [OnlyNumber]="true" [maxlength]="11" />
-				</td>
-			</tr>
-		</table>
-		@if (hawbnoList.length > 0) {
-<table class="table table-bordered table-sm-new bgwhite">
-			<thead>
-					<tr class="title-head formheading">
-						<th>EXPT NO</th>
-						<th>SHIPPER</th>
-						<th>CONSIGNEE</th>
-						<th>Pkgs</th>
-						<th>Pcs</th>
-						<th>Grwt</th>
-						<th>Chrg.Wt</th>
-					</tr>
-				</thead>
-				<tbody>
-					@for (obj of hawbnoList; track obj) {
-<tr>
-						<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
-						<td><span class="col-form-span-label">{{obj.SHIPPER}}</span></td>
-						<td><span class="col-form-span-label">{{obj.CONSIGNEE}}</span></td>
-						<td><span class="col-form-span-label">{{obj.PKGS}}</span></td>
-						<td><span class="col-form-span-label">{{obj.PCS}}</span></td>
-						<td><span class="col-form-span-label">{{obj.GRWT}}</span></td>
-						<td><span class="col-form-span-label">{{obj.CHBLWT}}</span></td>
-					</tr>
-}
-					<tr class="trbg">
-						<td><span class="col-form-span-label"></span></td>
-						<td><span class="col-form-span-label"></span></td>
-						<td><span class="col-form-span-label"></span></td>
-						<td><span class="col-form-span-label"></span></td>
-						<td><span class="col-form-span-label"></span></td>
-						<td><input type="text" [(ngModel)]="totalGrwt" class="form-control width75" [OnlyNumber]="true" [disabled]="true"/></td>
-						<td><input type="text" [(ngModel)]="totalChblwt" class="form-control width75" [OnlyNumber]="true" [disabled]="true"/></td>
-					</tr>
-				</tbody>
-		</table>
-}
-		@if (hawbnoList.length < 0) {
-<table class="table table-bordered table-sm-new bgwhite">
-			<tr><td colspan="6" class="centerlabel"><span class="col-form-span-error">please wait data is loading.........</span></td></tr>
-		</table>
-}
-		<table class="table table-bordered table-sm-new bgwhite">
-			<tr class="title-head trbg">
-				<td colspan="6" class="centerlabel">
-					<button type="button" name="submit" class="btn btn-sm btn-success" (click)="submit();">
-						<span class="col-form-span-label"><i class="fa fa-save"></i> Submit</span>
-					</button>
-				</td>
-			</tr>
-		</table>
-	</div>
-	<div class="col-sm-2">
-	</div>
+<div class="bar" style="margin:0;">
+  <span class="note"></span>
+  <span class="r">
+    <button type="button" class="btn p" name="submit" (click)="submit();">Submit</button>
+  </span>
 </div>

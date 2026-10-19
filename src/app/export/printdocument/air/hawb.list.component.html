@@ -1,80 +1,54 @@
-﻿<div class="row">
-	<div class="col-sm-12">
-		<div class="card">
-			<div class="card-header formheading">
-			   <strong>Export - Master HAWB NO</strong>
-			</div>
-		</div>
-	</div>
+﻿<!--
+  Hosted inside hawb.component.html's .im-page card. MP adds an "Agt Name" column (AGTNAME);
+  Links' USP_EXP_PRINTDOC_HAWBNO_PAGELOAD does not return it, so the column is left out here.
+-->
+<div class="card-h">
+  <h2>Export - Master HAWB No</h2>
+  <span class="meta">Shipper and Importer should be same — to select another shipper/importer, un-select the previous one.</span>
 </div>
-<br />
-<div class="row">
-	<div class="col-sm-12">
-		<table class="table table-bordered table-striped table-sm-new bgwhite">
-			<thead>
-				<tr class="title-head formheading">
-					<th colspan="3">List of Export Jobs</th>
-					<th colspan="5" class="right-text">
-						<strong>Note: </strong>
-						<span class="col-form-span-label red">
-							<u>Shipper and Importer</u> should be same !
-						</span>
-						<span class="col-form-span-label bghighlightblue">
-							(To select another <u>shipper and importer</u> un-select previous <u>shipper and importer</u>.)
-						</span>
-					</th>
-				</tr>
-			</thead>
-		</table>
-		<div class="row y350heightscroll">
-			<table class="table table-bordered table-striped table-sm-new bgwhite">
-				<thead>
-					<tr class="title-head formheading">
-						<th>Select</th>
-						<th>EXPT NO</th>
-						<th>SHIPPER</th>
-						<th>CONSIGNEE/Importer</th>
-						<th>Pkgs</th>
-						<th>Pcs</th>
-						<th>Grwt</th>
-						<th>Chrg.Wt</th>
-					</tr>
-				</thead>
-				<tbody>
-					@if (searchLength==0) {
-<tr><td colspan="8" class="centerlabel"><img src="assets/img/loading.gif" /></td></tr>
-}
-					@if (searchLength==-1) {
-<tr><td colspan="8" class="centerlabel"><span class="col-form-span-label">No Record Found!</span></td></tr>
-}
-					@for (obj of searchList; track obj) {
-<tr>
-						<td class="centerlabel">
-							<input type="checkbox" (checked)="obj.Select == true" [disabled]="obj.Disabled == true" (click)="validate(obj.EXPTNO, obj.SHIPPER, obj.CONSIGNEE)" />
-						</td>
-						<td><span class="col-form-span-label">{{obj.EXPTNO}}</span></td>
-						<td><span class="col-form-span-label">{{obj.SHIPPER}}</span></td>
-						<td><span class="col-form-span-label">{{obj.CONSIGNEE}}</span></td>
-						<td><span class="col-form-span-label">{{obj.PKGS}}</span></td>
-						<td><span class="col-form-span-label">{{obj.PCS}}</span></td>
-						<td><span class="col-form-span-label">{{obj.GRWT}}</span></td>
-						<td><span class="col-form-span-label">{{obj.CHBLWT}}</span></td>
-					</tr>
-}
-				</tbody>
-			</table>
-		</div>
-		<div class="row">
-			<div class="col-sm-8">
-				<br />
-				<span class="col-form-span-error">{{error}}</span>
-			</div>
-			<div class="col-sm-4 right-text"> 
-				<br />
-				<button type="button" name="submit" class="btn btn-sm btn-primary" (click)="submit();">
-					<span class="col-form-span-label"><i class="fa fa-save"></i> Submit</span>
-				</button>
-			</div>
-		</div>
-	</div>
+
+<div class="tbl-wrap">
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th>Select</th>
+        <th>EXPT NO</th>
+        <th>Shipper</th>
+        <th>Consignee/Importer</th>
+        <th class="num">Pkgs</th>
+        <th class="num">Pcs</th>
+        <th class="num">Grwt</th>
+        <th class="num">Chrg.Wt</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (searchLength==0) {
+        <tr><td class="empty" colspan="8">Loading…</td></tr>
+      }
+      @if (searchLength==-1) {
+        <tr><td class="empty" colspan="8">No record found.</td></tr>
+      }
+      @for (obj of searchList; track obj) {
+        <tr>
+          <td class="text-center">
+            <input type="checkbox" (checked)="obj.Select == true" [disabled]="obj.Disabled == true" (click)="validate(obj.EXPTNO, obj.SHIPPER, obj.CONSIGNEE)" />
+          </td>
+          <td class="mono">{{obj.EXPTNO}}</td>
+          <td>{{obj.SHIPPER}}</td>
+          <td>{{obj.CONSIGNEE}}</td>
+          <td class="num">{{obj.PKGS}}</td>
+          <td class="num">{{obj.PCS}}</td>
+          <td class="num">{{obj.GRWT}}</td>
+          <td class="num">{{obj.CHBLWT}}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<div class="bar" style="margin:0;">
+  <span class="note" style="color:var(--ink);">{{error}}</span>
+  <span class="r">
+    <button type="button" class="btn p" name="submit" (click)="submit();">Submit</button>
+  </span>
 </div>

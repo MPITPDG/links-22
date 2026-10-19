@@ -1,222 +1,197 @@
-﻿<div class="row">
-    <div class="col-sm-2">
-	</div>
-	<div class="col-sm-8">
-		<table class="table table-bordered table-sm-new bgwhite">
-			<tr>
-				<td class="col-form-span-heading" colspan="4">
-					VESSEL DETAILS
-				</td>
-			</tr>
-			 <tr> 
-				<td> 
-					<span class="col-form-span-label">Global Rotation No</span> 
-				</td> 
-				<td colspan="3"> <span class="col-form-span-label "><b>{{vslRtno}}</b></span>
-					<!-- <label class="col-md-3 form-control-label" [(ngModel)]="vslRtno"></label>-->
-				</td> 
-		   </tr> 
-			 <tr>
-				<td>
-					<span class="col-form-span-label ">Vessel Name</span><span class="col-form-span-error">*</span>
-				</td>
-				<td >
-					<input [(ngModel)]="vslname" type="text" id="txtvessel" name="txtvessel" class="form-control width180" placeholder="">
-				</td>
-		  
-				<td>
-					<span class="col-form-span-label">Voyage No</span><span class="col-form-span-error">*</span>
-				</td>
-				<td colspan="3">
-					<input type="text" [(ngModel)]="vslvoyno" id="txtvoyno" name="txtvoyno" class="form-control width180 " placeholder="">
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<span class="col-form-span-label">Short Name</span>
-				</td>
-				<td colspan="3">
-					<input type="text" [(ngModel)]="vslSname" id="txtVshortName" name="txtVshortName" class="form-control width180" placeholder="">
-				</td>
-			</tr>
-			<tr>
-				<td class="col-form-span-heading" colspan="4">Port Details</td>
-			</tr>
-			<tr>
-				<td>
-					<span class="col-form-span-label">Port of Calling</span><span class="col-form-span-error">*</span>
-				</td>
-				<td>
-					<select class="form-control width150" id="selePrt" name="selePrt" [(ngModel)]="Vslport">
-						<option value="-1">Please select</option>
-						 @for (d of ports; track d) {
-<option value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
-}
-					</select>
-				</td>
-				<td>
-					<span class="col-form-span-label">Rotation No.</span>
-				</td>
-				<td>
-					<input type="text" [(ngModel)]="VslRrotnNo" id="txtRtnoNo" name="txtVrtno" class="form-control width150  " placeholder="">
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<span class="col-form-span-label">Last Carting Date</span>
-				</td>
-				<td>
-					<my-date-picker name="dtLCD" [options]="myDatePickerOptions" [(ngModel)]="vslLCD" required></my-date-picker>
-				</td>
-				<td>
-					<span class="col-form-span-label">ETA</span>
-				</td>
-				<td>
-					<my-date-picker name="dtLCD" [options]="myDatePickerOptions" [(ngModel)]="Vsleta" required></my-date-picker>	
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<span class="col-form-span-label">Actual Arrival</span>
-				</td>
-				<td>      
-					<my-date-picker name="dtLCD" [options]="myDatePickerOptions" [(ngModel)]="VslArvldt" required></my-date-picker>
-					
-				</td>
-				<td>
-					<span class="col-form-span-label">ETD</span><span class="col-form-span-error">*</span>
-				</td>
-				<td>     
-					<my-date-picker name="dtLCD" [options]="myDatePickerOptions" [(ngModel)]="Vsletd" required></my-date-picker>
-					
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<span class="col-form-span-label">Actual Sailing</span>
-				</td> 
-				<td >
-					<my-date-picker name="dtAsail" [options]="myDatePickerOptions" [(ngModel)]="VslAsail" required></my-date-picker>
-				</td>
-				<td>
-				   <span class="col-form-span-label"> 
-						<input type="checkbox" [(ngModel)]="Vsldly" id="chkVsld" name="chkVsld" >&nbsp; Vessel Delayed
-				   </span>
-				   
-				</td>
-				<td>
-				  <span class="col-form-span-label">
-				   <input type="checkbox" [(ngModel)]="Vslnotcald" id="chkNtCall" name="chkNtCall"  >&nbsp; Not Called 
-				  </span>									
-				</td>
-			</tr>
-		 
-			 
-			<tr>
-				<td class="col-form-span-heading" colspan="4"> Agent Details </td>
-			</tr>
-			<tr>
-				<td>
-					<span class="col-form-span-label">Agent</span><span class="col-form-span-error">*</span>
-				</td>
-				<td>
-					<select class="form-control width200" id="seleAgnt" name="seleAgnt" (change)="onAgentSelect($event.target.value)" [(ngModel)]="VslAgent" >
-						<option value="0">Please select</option>
-						@for (a of Agents; track a) {
-<option value={{a.AGT_CODE}}>{{a.AGT_NAME}}</option>
-}
-					</select>
-				</td>
-				<td>
-					<span class="col-form-span-label">Shipping Line.</span><span class="col-form-span-error">*</span>
-				</td>
-				<td>
-					<select class="form-control width200" id="SeleShpLine" name="SeleShpLine" [(ngModel)]="VslspLine">
-						<option value="0">Please select</option>
-							@for (l of Arrliner; track l) {
-<option value={{l.LINER_CODE}}>{{l.LINER_NAME}}</option>
-}
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<span class="col-form-span-label">Carting Place</span>
-				</td>
-				<td>
-					<input type="text" id="txtCrtPlce" name="txtCrtPlce" class="form-control width150 " placeholder="" [(ngModel)]="Vslcrtpl">
-				</td>
-				<td>
-					<span class="col-form-span-label">Carting Clerk.</span>
-				</td>
-				<td>
-					<input type="text" id="txtcrtClrk" name="txtcrtClrk" class="form-control  width150" placeholder="" [(ngModel)]="Vslcrtclrk">
-				</td>
-			</tr>
-			<tr>
-				<td colspan="4" class="centerlabel" >
-					<button class="btn btn-sm btn-primary  center-block" type="submit" id="btnAgtAdd" name="btnAgtAdd" (click)="AddEdit_childRcd()"><span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{Addchild}}</span></button>
-					<button class="btn btn-sm btn-danger center-block" type="reset" id="btnAgtRest" name="btnAgtrest" (click)="Clear_childRcd()"><span class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
-				</td>
-			</tr>
-			<tr>
-				<td class="col-form-span-heading" colspan="4">
-					PORT AND AGENT DETAILS
-				</td>
-			</tr>
-		</table>
-		<div class="row xyscroll" style="height:150px;background-color: white;border-left: 1px solid #d5e5f5;">								
-			<table class="table table-bordered table-striped table-sm-new bgwhite">
-				<thead>
-					<tr class="title-head formheading">
-						<th class="col-form-span-label"></th>
-						<th class="col-form-span-label">Rotation</th>
-						<th class="col-form-span-label">Port</th>
-						<th class="col-form-span-label">ETA</th>
-						<th class="col-form-span-label">Arrival</th>
-						<th class="col-form-span-label">ETD</th>
-						<th class="col-form-span-label">Sailing</th>
-						<th class="col-form-span-label">Last Cart on</th>
-						<th class="col-form-span-label">Agent</th>
-						<th class="col-form-span-label">Shpg Line</th>
-						<th class="col-form-span-label">Carting</th>
-						<th class="col-form-span-label">Cart Clrek </th>
-					</tr>
-				</thead>
-				<tbody>
-					@for (prtAgt of SavPrtAgt; track prtAgt) {
-<tr>									 
-						<td>											
-							<i class="fa fa-pencil" (click)="Edit_prtAgtDtls(prtAgt.TBL_INDEXID)"></i>	
-							<i class="fa fa-trash" (click)="delete_prtagt(prtAgt.TBL_INDEXID)" ></i>											 
-						</td> 
-						<td><span class="col-form-span-label">{{prtAgt.ROTATION}}</span></td>
-						<td><span class="col-form-span-label">{{prtAgt.PORT}}</span></td>
-						<td><span class="col-form-span-label">{{prtAgt.ETA}}</span></td>
-						<td><span class="col-form-span-label">{{prtAgt.ARRIVAL}}</span></td>
-						<td><span class="col-form-span-label">{{prtAgt.ETD}}</span></td>
-						<td><span class="col-form-span-label">{{prtAgt.SAILING}}</span></td>
-						<td><span class="col-form-span-label">{{prtAgt.CARTING}}</span></td>
-						<td><span class="col-form-span-label">{{prtAgt.AGTNAME}}</span></td>
-						<td><span class="col-form-span-label">{{prtAgt.LINERNAME}}</span></td>
-						<td><span class="col-form-span-label">{{prtAgt.AGT_CARTPLACE}}</span></td>
-						<td><span class="col-form-span-label">{{prtAgt.AGT_CARTCLERK}}</span></td>
-						
-					</tr>
-}
-				</tbody>									
-			</table>
-		</div>
-		<table class="table table-bordered table-sm-new">
-			<tr>
-				<td class="col-form-span-heading right-text" colspan="4">
-					<button class="btn btn-sm btn-success" type="submit" id="btnAgtAdd" name="btnAgtAdd" (click)="AddVslMst()" ><span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> Submit</span></button>
-					<button class="btn btn-sm btn-danger" type="reset" id="btnAgtRest" name="btnAgtrest" (click)="ResetAll()"><span class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
-				</td>
-			</tr>
-		</table>
-	</div>
-	<div class="col-sm-2">
-	</div>
+﻿<!--
+  Export vessel master - add / edit. Page kit recipe 2 (src/styles/kit/import-page.css),
+  ported from MPERPNG-20. Every [(ngModel)], id, name and (click) is unchanged, as are
+  the my-date-picker controls and the SavPrtAgt grid. The agent picker is an ng-select
+  (as in MP); "-1" still means "no agent", so the payload is unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Vessel master</h1>
+      <p>Add a vessel call, its rotation and the port / agent schedule</p>
+    </div>
+    <div class="tools">
+      @if (vslRtno) {
+        <span class="chip">Global rotation no. <b>{{ vslRtno }}</b></span>
+      }
+      <button class="btn g" type="button" routerLink="/export/vessel/search">Back to vessels</button>
+    </div>
+  </div>
+
+  <div class="form-layout">
+    <div>
+      <div class="card sec">
+        <div class="card-h">
+          <h2>Vessel details</h2>
+          <span class="meta"><b>*</b> required</span>
+        </div>
+        <div class="fields">
+          <div class="fld">
+            <label for="txtvessel">Vessel name <span class="req">*</span></label>
+            <input type="text" id="txtvessel" name="txtvessel" [(ngModel)]="vslname" />
+          </div>
+          <div class="fld">
+            <label for="txtvoyno">Voyage no. <span class="req">*</span></label>
+            <input type="text" id="txtvoyno" name="txtvoyno" [(ngModel)]="vslvoyno" />
+          </div>
+          <div class="fld">
+            <label for="txtVshortName">Short name</label>
+            <input type="text" id="txtVshortName" name="txtVshortName" [(ngModel)]="vslSname" />
+          </div>
+        </div>
+      </div>
+
+      <div class="card sec">
+        <div class="card-h">
+          <h2>Port details</h2>
+          <span class="meta">dates as dd/mm/yyyy</span>
+        </div>
+        <div class="fields">
+          <div class="fld">
+            <label for="selePrt">Port of calling <span class="req">*</span></label>
+            <select id="selePrt" name="selePrt" [(ngModel)]="Vslport">
+              <option value="-1">Please select</option>
+              @for (d of ports; track d) {
+                <option value={{d.CITY_CODE}}>{{d.CITY_NAME}}</option>
+              }
+            </select>
+          </div>
+          <div class="fld">
+            <label for="txtRtnoNo">Rotation no.</label>
+            <input type="text" id="txtRtnoNo" name="txtVrtno" [(ngModel)]="VslRrotnNo" />
+          </div>
+          <div class="fld">
+            <label>Last carting date</label>
+            <my-date-picker name="dtLCD" [options]="myDatePickerOptions" [(ngModel)]="vslLCD" required></my-date-picker>
+          </div>
+          <div class="fld">
+            <label>ETA</label>
+            <my-date-picker name="dtLCD" [options]="myDatePickerOptions" [(ngModel)]="Vsleta" required></my-date-picker>
+          </div>
+          <div class="fld">
+            <label>Actual arrival</label>
+            <my-date-picker name="dtLCD" [options]="myDatePickerOptions" [(ngModel)]="VslArvldt" required></my-date-picker>
+          </div>
+          <div class="fld">
+            <label>ETD <span class="req">*</span></label>
+            <my-date-picker name="dtLCD" [options]="myDatePickerOptions" [(ngModel)]="Vsletd" required></my-date-picker>
+          </div>
+          <div class="fld">
+            <label>Actual sailing</label>
+            <my-date-picker name="dtAsail" [options]="myDatePickerOptions" [(ngModel)]="VslAsail" required></my-date-picker>
+          </div>
+          <div class="fld">
+            <label>Status</label>
+            <div class="vs-checks">
+              <label for="chkVsld"><input type="checkbox" id="chkVsld" name="chkVsld" [(ngModel)]="Vsldly" /> Vessel delayed</label>
+              <label for="chkNtCall"><input type="checkbox" id="chkNtCall" name="chkNtCall" [(ngModel)]="Vslnotcald" /> Not called</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card sec">
+        <div class="card-h">
+          <h2>Agent details</h2>
+        </div>
+        <div class="fields">
+          <div class="fld">
+            <label for="seleAgnt">Agent <span class="req">*</span></label>
+            <ng-select [items]="Agents"
+              bindLabel="AGT_NAME"
+              bindValue="AGT_CODE"
+              labelForId="seleAgnt"
+              class="custom"
+              [ngModel]="VslAgent == '-1' ? null : VslAgent"
+              (ngModelChange)="VslAgent = $event ?? '-1'"
+              (change)="onAgentSelect(VslAgent)"
+              placeholder="Please select">
+            </ng-select>
+          </div>
+          <div class="fld">
+            <label for="SeleShpLine">Shipping line <span class="req">*</span></label>
+            <select id="SeleShpLine" name="SeleShpLine" [(ngModel)]="VslspLine">
+              <option value="0">Please select</option>
+              @for (l of Arrliner; track l) {
+                <option value={{l?.LINER_CODE}}>{{l?.LINER_NAME}}</option>
+              }
+            </select>
+          </div>
+          <div class="fld">
+            <label for="txtCrtPlce">Carting place</label>
+            <input type="text" id="txtCrtPlce" name="txtCrtPlce" [(ngModel)]="Vslcrtpl" />
+          </div>
+          <div class="fld">
+            <label for="txtcrtClrk">Carting clerk</label>
+            <input type="text" id="txtcrtClrk" name="txtcrtClrk" [(ngModel)]="Vslcrtclrk" />
+          </div>
+        </div>
+        <div class="toolbar">
+          <span class="sub-t">Add the port / agent row, then Submit the vessel.</span>
+          <span class="tb-r">
+            <button class="btn g" type="reset" id="btnAgtRest" name="btnAgtrest" (click)="Clear_childRcd()">Clear row</button>
+            <button class="btn p" type="submit" id="btnAgtAdd" name="btnAgtAdd" (click)="AddEdit_childRcd()">{{ Addchild }}</button>
+          </span>
+        </div>
+      </div>
+
+      <div class="card sec">
+        <div class="card-h">
+          <h2>Port and agent details</h2>
+          <span class="meta">{{ SavPrtAgt?.length || 0 }} row(s)</span>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl nowrap">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Rotation</th>
+                <th>Port</th>
+                <th>ETA</th>
+                <th>Arrival</th>
+                <th>ETD</th>
+                <th>Sailing</th>
+                <th>Last cart on</th>
+                <th>Agent</th>
+                <th>Shpg line</th>
+                <th>Carting</th>
+                <th>Cart clerk</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (prtAgt of SavPrtAgt; track prtAgt) {
+                <tr>
+                  <td class="act">
+                    <button type="button" title="Edit" (click)="Edit_prtAgtDtls(prtAgt.TBL_INDEXID)">Edit</button>
+                    <button type="button" title="Delete" (click)="delete_prtagt(prtAgt.TBL_INDEXID)">Delete</button>
+                  </td>
+                  <td class="mono">{{ prtAgt.ROTATION }}</td>
+                  <td>{{ prtAgt.PORT }}</td>
+                  <td class="mono">{{ prtAgt.ETA }}</td>
+                  <td class="mono">{{ prtAgt.ARRIVAL }}</td>
+                  <td class="mono">{{ prtAgt.ETD }}</td>
+                  <td class="mono">{{ prtAgt.SAILING }}</td>
+                  <td class="mono">{{ prtAgt.CARTING }}</td>
+                  <td>{{ prtAgt.AGTNAME }}</td>
+                  <td>{{ prtAgt.LINERNAME }}</td>
+                  <td>{{ prtAgt.AGT_CARTPLACE }}</td>
+                  <td>{{ prtAgt.AGT_CARTCLERK }}</td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="12">No port or agent rows yet. Fill the details above and choose Add.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose Submit.</span>
+    <div class="r">
+      <button class="btn g" type="reset" id="btnAgtRest" name="btnAgtrest" (click)="ResetAll()">Reset</button>
+      <button class="btn p" type="submit" id="btnAgtAdd" name="btnAgtAdd" (click)="AddVslMst()">Submit</button>
+    </div>
+  </div>
 </div>
-	

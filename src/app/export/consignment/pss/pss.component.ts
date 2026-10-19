@@ -8,6 +8,7 @@ import {
 
 @Component({
     templateUrl: 'pss.component.html',
+    styleUrls: ['../job/job-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -44,7 +45,8 @@ export class PSSComponent implements OnInit {
             this._dataService.Common('Export/PssManage', jsonExport)
                 .subscribe((data: any) => {
                     this._disable.enableButton(this.searchButton);
-                    if (data.Table.length > 0) {
+                    // Fail soft: a reply without a Table reads as "not found".
+                    if (data?.Table?.length > 0) {
                         this.IsDisabled = true;
                         this.Pss = data.Table[0].EXPT_PSS;
                     } else {
@@ -67,10 +69,10 @@ export class PSSComponent implements OnInit {
         this._dataService.Common('Export/PssManage', jsonExport)
             .subscribe((data: any) => {
                 this._disable.enableButton(this.submitButton);
-                if (data.Table[0].STATUS == 100) {
+                if (data?.Table?.[0]?.STATUS == 100) {
                     this._toasterService.toast('success', 'Alert', "Export No [" + this.ExptNo + "] Updated Successfully!");
                 } else {
-                    this._toasterService.toast('info', 'Alert', data.Table[0].STATUSTEXT);
+                    this._toasterService.toast('info', 'Alert', data?.Table?.[0]?.STATUSTEXT ?? 'No reply from the server.');
                 }
             });
     }

@@ -15,6 +15,8 @@ import { ShipmentProgressReportComponent } from './shipment-progress.component';
 import { AirCargoStatusReportComponent } from './air-cargo-status.component';
 import { TrackingAirBookingReportComponent } from './tracking-air-booking.component';
 import { TrackingAirShipmentReportComponent } from './tracking-air-shipment.component';
+import { MissingDocsReportComponent } from './missing-docs.component';
+import { MissingDocsService } from './missing-docs.service';
 @NgModule({
     imports: [ReportExportRoutingModule,
         FormsModule,
@@ -32,9 +34,10 @@ import { TrackingAirShipmentReportComponent } from './tracking-air-shipment.comp
         ShipmentProgressReportComponent,
         AirCargoStatusReportComponent,
         TrackingAirBookingReportComponent,
-        TrackingAirShipmentReportComponent
+        TrackingAirShipmentReportComponent,
+        MissingDocsReportComponent
     ],
-    providers: [],
+    providers: [MissingDocsService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class ReportExportModule { }

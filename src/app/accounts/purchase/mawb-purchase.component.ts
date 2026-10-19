@@ -9,59 +9,7 @@ import { HttpClient } from '@angular/common/http';
   @Component({
     selector: 'app-mawb-purchase',
     templateUrl: './mawb-purchase.component.html',
-    styles: [`
-    a:hover,a:focus{
-        text-decoration: none;
-        outline: none;
-    }
-    .tab .nav-tabs {
-        border-bottom:0 none;
-    }
-    .tab .nav-tabs li{
-        margin-right: 10px;
-    }
-    .tab .nav-tabs li a{
-        position: relative;
-        padding: 4px;
-        color: #fff;
-        font-size: 11px;
-        z-index: 1;
-        font-family:verdana;
-        font-weight:bold
-    }
-    .tab .nav-tabs li a:hover{
-        background:transparent;
-        border:1px solid transparent;
-        color: #444;
-    }
-     .tab .nav-tabs li a:before{
-        content: "";
-        width:100%;
-        height:100%;
-        position:absolute;
-        bottom: 3px;
-        left:0px;
-        font-size:11px;
-        background-color: #379b50;
-        border: 1px solid #d3d3d3;
-        border-bottom: 0px none;
-        border-radius: 10px 10px 0 0;
-        transform-origin: left center 0;
-        transform: perspective(6px) rotateX(6deg);
-        z-index:-1;
-    } 
-    .tab .nav-tabs li a.active:before{
-        background: #fff;
-    }
-    .tab .nav-tabs li a.active,
-    .tab .nav-tabs li a.active:focus,
-    .tab .nav-tabs li a.active:hover{
-        border:1px solid transparent;
-        background:transparent;
-        color: #212529;
-        z-index: 2;
-    }
-    `],
+    styleUrls: ['./purchase-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

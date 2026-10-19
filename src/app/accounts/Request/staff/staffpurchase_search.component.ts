@@ -8,6 +8,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-accounts-transaction-purchase-search',
     templateUrl: 'staffpurchase_search.component.html',
+    styleUrls: ['../../purchase/purchase-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -15,8 +16,8 @@ export class StaffPurchaseSearchComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {
         dateFormat: 'dd-mmm-yyyy',
         inline: false,
-        height: '16px',
-        width: '120px',
+        height: '30px',
+        width: '100%',
         componentDisabled: false,
         selectionTxtFontSize: '12px',
         editableDateField: false,
@@ -45,6 +46,15 @@ export class StaffPurchaseSearchComponent implements OnInit {
     Amount: any = '';
     Day:any = null;
     Staff: any = null;
+
+    // ---------- page state (additive: default list, filter, pager, export) ----------
+    readonly pageSize = 10;
+    page: number = 1;
+    loading: boolean = false;
+    loadError: boolean = false;
+    /** true while the list shows the default "last 30 days" load, not a user search */
+    isDefaultList: boolean = false;
+    Quick: string = '';
     constructor(
         private _dataService: DataService,
         private _loginService: LoginService,
@@ -67,7 +77,10 @@ export class StaffPurchaseSearchComponent implements OnInit {
             .subscribe((data: any) => {
                 this._loaderService.display(false);
                 this.Stafflist= data.Table1;
-                          });
+                this.loadDefaultList();
+                          }, () => {
+                this._loaderService.display(false);
+            });
    
     }
 
@@ -192,7 +205,12 @@ export class StaffPurchaseSearchComponent implements OnInit {
                 else if (data.Table.length > 1) {
                     this.displayType = 'LIST';
                     this.searchList = data.Table;
+                    this.isDefaultList = false;
+                    this.Quick = '';
+                    this.page = 1;
                 }
+            }, () => {
+                this._loaderService.display(false);
             });
     }
 
@@ -220,5 +238,126 @@ export class StaffPurchaseSearchComponent implements OnInit {
         let theLeft = (screen.width / 2) - (780 / 2);
         let toolbar = 'resizable=no,scrollbars=no,width=800,height=450,status=no,left=' + theLeft + ',top=' + theTop;
         window.open('./#/popup/Account-Purchase-print/' + no + '/' + 'SRPI' + '/', "Staff Purchase Print", toolbar);
+    }
+
+    // ---------- default list on open ----------
+    /** Last 30 days through the same Date search (same endpoint and payload shape), without the
+        single-result redirect, so the page never opens empty. */
+    loadDefaultList() {
+        const to = new Date();
+        const from = new Date(to.getFullYear(), to.getMonth(), to.getDate() - 30);
+        const _jsonData = {
+            PUR_CODE: "",
+            FROMDATE: this.fmtDate(from),
+            TODATE: this.fmtDate(to),
+            PUR_SUPPLIER: "0",
+            PUR_INVNO: "",
+            PUR_JOBNO: "",
+            AMOUNT: "",
+            DISPLAYTYPE: this.Display,
+            Type: "Date",
+            STATUS: "SRPI",
+            citycode: this._loginService.getLogin()[0].CITYCODE,
+            cmp_code: this._loginService.getLogin()[0].CMPCODE,
+            year_id: this._loginService.getLogin()[0].FINANCIAL_YEAR.YEARID,
+            Fin_StartDate: this._loginService.getLogin()[0].FINANCIAL_YEAR.STARTDATE,
+            Fin_EndDate: this._loginService.getLogin()[0].FINANCIAL_YEAR.ENDDATE,
+            USERID: this._loginService.getLogin()[0].CMPID
+        };
+        this.loading = true;
+        this.loadError = false;
+        this._dataService.getData("Accounts/ACC_PURCHASE_SEARCH_RPI", _jsonData)
+            .subscribe((data: any) => {
+                this.loading = false;
+                this.searchList = (data && data.Table) ? data.Table : [];
+                this.isDefaultList = true;
+                this.Quick = '';
+                this.page = 1;
+            }, () => {
+                this.loading = false;
+                this.loadError = true;
+            });
+    }
+
+    /** same text the date picker's .formatted gives (dd-mmm-yyyy) */
+    private fmtDate(d: Date): string {
+        const m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return String(d.getDate()).padStart(2, '0') + '-' + m[d.getMonth()] + '-' + d.getFullYear();
+    }
+
+    clearResults() {
+        this.displayType = 'SEARCH';
+        this.searchList = [];
+        this.Quick = '';
+        this.page = 1;
+        this.isDefaultList = false;
+    }
+
+    get Filtered(): Array<any> {
+        const list: Array<any> = Array.isArray(this.searchList) ? this.searchList : [];
+        const q = (this.Quick || '').trim().toLowerCase();
+        if (!q) { return list; }
+        return list.filter(r => [r.PUR_CODE, r.PUR_DATE, r.SUPPLIER]
+            .some(v => String(v === undefined || v === null ? '' : v).toLowerCase().indexOf(q) >= 0));
+    }
+
+    exportCsv() {
+        this.downloadCsv('staff-purchases', ['Purchase code', 'Purchase date', 'Staff'],
+            this.Filtered.map(r => [r.PUR_CODE, r.PUR_DATE, r.SUPPLIER]));
+    }
+
+    // ---------- pagination (10 / page) ----------
+    get pageCount(): number {
+        return Math.max(1, Math.ceil(this.Filtered.length / this.pageSize));
+    }
+
+    get pageRows(): Array<any> {
+        const start = (this.page - 1) * this.pageSize;
+        return this.Filtered.slice(start, start + this.pageSize);
+    }
+
+    get rangeStart(): number {
+        return this.Filtered.length ? (this.page - 1) * this.pageSize + 1 : 0;
+    }
+
+    get rangeEnd(): number {
+        return Math.min(this.page * this.pageSize, this.Filtered.length);
+    }
+
+    /** page numbers with 0 standing in for an ellipsis */
+    get pageList(): number[] {
+        const n = this.pageCount, p = this.page;
+        if (n <= 7) { return Array.from({ length: n }, (_, i) => i + 1); }
+        const out: number[] = [1];
+        const lo = Math.max(2, p - 1), hi = Math.min(n - 1, p + 1);
+        if (lo > 2) { out.push(0); }
+        for (let i = lo; i <= hi; i++) { out.push(i); }
+        if (hi < n - 1) { out.push(0); }
+        out.push(n);
+        return out;
+    }
+
+    goPage(p: number) {
+        if (p >= 1 && p <= this.pageCount) { this.page = p; }
+    }
+
+    /** client-side CSV of every filtered row: UTF-8 BOM, quoted */
+    private downloadCsv(name: string, head: string[], rows: any[][]) {
+        const q = (v: any) => {
+            const s = (v === null || v === undefined) ? '' : String(v);
+            return '"' + s.replace(/"/g, '""') + '"';
+        };
+        const csv = [head, ...rows].map(line => line.map(q).join(',')).join('\r\n');
+        const d = new Date();
+        const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+        const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name + '-' + stamp + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 0);
     }
 }

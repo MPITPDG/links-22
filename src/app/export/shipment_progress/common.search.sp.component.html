@@ -1,83 +1,116 @@
-﻿<div class="animated fadeIn">
-	<div class="row">
-		<div class="col-sm-12">
-			<div class="card">
-				<div class="card-header formheading">
-				   <strong><u>{{headerType}}</u></strong>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-4">
-		</div>
-		<div class="col-sm-4">
-			<table class="table table-sm-new">
-				<tr class="trbg">
-					<td class="width90"><span class="col-form-span-label"><b>Type</b></span></td>
-					<td colspan="2">
-						<span class="col-form-span-label"><input type="radio" name="check"  (click)="changeType('EXPORT_NO')" [checked]="checkType == 'EXPORT_NO'"/>Export No.</span>&nbsp;&nbsp;
-						<span class="col-form-span-label"><input type="radio" name="check"  (click)="changeType('ORDER_NO')" [checked]="checkType == 'ORDER_NO'"/>Order No.</span>&nbsp;&nbsp;
-						<span class="col-form-span-label"><input type="radio" name="check"  (click)="changeType('REF_NO')" [checked]="checkType == 'REF_NO'"/>Ref No.</span>
-					</td>
-				</tr>
-				<tr class="trbg">
-					<td class="width90"><span class="col-form-span-label"><b>Values</b></span></td>
-					<td>
-						<input type="text" [(ngModel)]="SearchValue" class="form-control width120"/>
-					</td>
-					<td><span class="col-form-span-error">{{ErrorMessage}}</span></td>
-				</tr>
-				
-				<tr class="trbg centerlabel">
-					<td colspan="3">
-						<button type="button" name="searchButton" class="btn btn-l btn-primary" (click)="search();" #searchButton >
-							<span class="col-form-span-label"><app-font-changer [fontIndex]="'0'"></app-font-changer> Search</span>
-						</button>
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div class="col-sm-4">
-		</div>
-	</div>
-	@if (searchList.length > 0) {
-<div class="row">
-		<div class="col-sm-12">
-			<br />
-			<table class="table table-bordered table-striped table-sm-new bgwhite">
-				<thead>
-					<tr class="title-head formheading" style="white-space: nowrap;">
-						<th>M.P.REFERENCE</th>
-						<th>SHIPPER NAME</th>
-						<th>CONSIGNEE NAME</th>
-						<th>TOTAL NO. OF PACKAGES</th>
-						<th>TOTAL NO. OF PIECES</th>
-						<th>ORDER NO./REF DETAILS</th>
-					</tr>
-				</thead>
-				<tbody>
-					@for (obj of searchList; track obj) {
-<tr (click)="rowClick(obj['M.P.REFERENCE'])" style="cursor: pointer;">
-						<td><span class="col-form-span-label">{{obj["exptno_view"]}}</span></td>
-						<td><span class="col-form-span-label">{{obj["SHIPPER NAME"]}}</span></td>
-						<td><span class="col-form-span-label">{{obj["CONSIGNEE NAME"]}}</span></td>
-						<td><span class="col-form-span-label">{{obj["TOTAL NO. OF PACKAGES"]}}</span></td>
-						<td><span class="col-form-span-label">{{obj["TOTAL NO. OF PIECES"]}}</span></td>
-						<td><span class="col-form-span-label">{{obj["ORDER NO./REF DETAILS"]}}</span></td>
-					</tr>
-}
-				</tbody>
-			</table>
-		</div>
-	</div>
-}
-	@if (searchListLength == 1) {
-<div class="row">
-		<div class="col-sm-12 centerlabel">
-			<br /><br />
-			<span class="col-form-span-label">No Record Found!</span>
-		</div>
-	</div>
-}
+﻿<!--
+  Shipment progress - stage search, shared by every *-search route.
+  Import page kit (vessel search recipe). The route decides the stage (headerType,
+  rights, Type1); the list opens with the stage's jobs for this branch, Search
+  narrows by export / order / ref no., the filter narrows the result client-side.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ stageTitle }}</h1>
+      <p>Shipment progress - pick a job to update its {{ stageTitle.toLowerCase() }} details</p>
+    </div>
+    <div class="tools">
+      <button class="btn g" type="button" routerLink="/export/shipment-progress/workspace">Open workspace</button>
+    </div>
+  </div>
+
+  @if (rightsState === 'denied') {
+    <div class="card"><div class="sp-empty">You do not have rights to view this stage.</div></div>
+  } @else {
+    <div class="card">
+      <div class="filters f4">
+        <div class="f">
+          <label>Search by</label>
+          <div class="sp-radios">
+            <label><input type="radio" name="check" (click)="changeType('EXPORT_NO')" [checked]="checkType == 'EXPORT_NO'" />Export no.</label>
+            <label><input type="radio" name="check" (click)="changeType('ORDER_NO')" [checked]="checkType == 'ORDER_NO'" />Order no.</label>
+            <label><input type="radio" name="check" (click)="changeType('REF_NO')" [checked]="checkType == 'REF_NO'" />Ref no.</label>
+          </div>
+        </div>
+        <div class="f">
+          <label for="spSearchValue">{{ checkTypeLabel }}</label>
+          <input type="text" id="spSearchValue" [(ngModel)]="SearchValue" (keyup.enter)="search();" placeholder="Enter a number" />
+          @if (ErrorMessage) {
+            <span class="err">{{ErrorMessage}}</span>
+          }
+        </div>
+        <div class="f">
+          <label for="spFilter">Filter results</label>
+          <input type="text" id="spFilter" [(ngModel)]="Filter" (ngModelChange)="pager.reset()" placeholder="Shipper, consignee, order…" />
+        </div>
+        <div class="f">
+          <label>&nbsp;</label>
+          <button type="button" name="searchButton" class="btn p" (click)="search();" #searchButton><app-font-changer [fontIndex]="'0'"></app-font-changer> Search</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <span>
+          <span class="count">{{ Filtered.length }} {{ Filtered.length === 1 ? 'job' : 'jobs' }}</span>
+          @if (SearchedValue) {
+            <span class="sub-t"> matching “{{ SearchedValue }}”</span>
+          } @else {
+            <span class="sub-t"> listed for this stage</span>
+          }
+        </span>
+        <span class="tb-r">
+          <button class="btn g" type="button" (click)="clearSearch()">Clear</button>
+          <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!Filtered.length">Export</button>
+        </span>
+      </div>
+
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>M.P. reference</th>
+              <th>Shipper</th>
+              <th>Consignee</th>
+              <th class="num">Packages</th>
+              <th class="num">Pieces</th>
+              <th>Order no. / ref details</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (loading || rightsState === 'checking') {
+              <tr><td class="empty" colspan="7">Loading jobs…</td></tr>
+            } @else if (loadError) {
+              <tr><td class="empty" colspan="7">{{ loadError }}</td></tr>
+            } @else {
+              @for (obj of pager.rows; track $index) {
+                <tr class="click" (click)="rowClick(obj['M.P.REFERENCE'])">
+                  <td class="mono"><a class="lnk">{{obj["exptno_view"]}}</a></td>
+                  <td>{{obj["SHIPPER NAME"]}}</td>
+                  <td>{{obj["CONSIGNEE NAME"]}}</td>
+                  <td class="num">{{obj["TOTAL NO. OF PACKAGES"]}}</td>
+                  <td class="num">{{obj["TOTAL NO. OF PIECES"]}}</td>
+                  <td>{{obj["ORDER NO./REF DETAILS"]}}</td>
+                  <td class="act"><button type="button" (click)="$event.stopPropagation(); rowClick(obj['M.P.REFERENCE'])">Update</button></td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="7">{{ searchListLength == 1 ? 'No Record Found!' : 'No jobs match these filters.' }}</td></tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pager">
+        <span>Showing <b>{{ pager.rangeStart }}–{{ pager.rangeEnd }}</b> of <b>{{ pager.total }}</b></span>
+        <div class="pages">
+          <button type="button" [disabled]="pager.page <= 1" (click)="pager.go(pager.page - 1)" aria-label="Previous page">‹</button>
+          @for (p of pager.pageList; track $index) {
+            @if (p === 0) {
+              <span class="gap">…</span>
+            } @else {
+              <button type="button" [class.on]="p === pager.page" (click)="pager.go(p)">{{ p }}</button>
+            }
+          }
+          <button type="button" [disabled]="pager.page >= pager.pageCount" (click)="pager.go(pager.page + 1)" aria-label="Next page">›</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

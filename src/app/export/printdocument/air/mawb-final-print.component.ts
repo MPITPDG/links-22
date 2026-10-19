@@ -110,6 +110,7 @@ export class PrintDocumentMawbfinalprint implements OnInit {
             };
             this._dataService.getData("Export/PrintDocumentAirMawbPrint", _jsonData)
             .subscribe((data: any) => {
+                if (!data || !data.Table || !data.Table.length) { this._loaderService.display(false); return; }
                 if (data.Table[0].STATUS == 100) {
                     this.hawbnoList=data.Table;
                     this.MAWBNO=	data.Table[0].MAWBNO  ;

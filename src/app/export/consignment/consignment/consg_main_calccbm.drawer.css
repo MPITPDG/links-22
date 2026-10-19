@@ -1,0 +1,148 @@
+/* ----------------------------------------------------------------
+   Calculate CBM drawer frame (Links-only, approved mock m7). Loaded by
+   consg_main (styleUrls), whose template owns the bsModal; the calculator
+   content inside .dr-body styles itself (consg_main_calccbm.component.css).
+   Mirrors the consignment edit drawer shell (consig_main_edit_modal.component.css,
+   ported from MPERPNG-20): the bsModal directive is untouched - show() / hide()
+   still drive it - only its dialog is re-anchored to the right edge and slid
+   in, with the kit .dr-head / .dr-body / .dr-foot inside. Monochrome only.
+   Every element here is in consg_main's own template, so plain (emulated)
+   selectors reach them; no ::ng-deep.
+   ---------------------------------------------------------------- */
+
+/* ---------- slide-in drawer frame ---------- */
+.cbm-drawer {
+    padding-right: 0 !important;
+}
+
+.cbm-drawer > .modal-dialog {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    width: 660px;
+    max-width: 100vw;
+    height: 100%;
+    transform: translateX(100%);
+    transition: transform .28s cubic-bezier(.32, .72, 0, 1);
+}
+
+.cbm-drawer.show > .modal-dialog,
+.cbm-drawer.in > .modal-dialog {
+    transform: translateX(0);
+}
+
+.cbm-drawer > .modal-dialog > .modal-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 0;
+    border-left: 1px solid var(--edge, #D2D2D2);
+    border-radius: 0;
+    box-shadow: -12px 0 32px rgba(0, 0, 0, .16);
+    overflow: hidden;
+    padding: 0;
+    background: var(--ground, #FAFAFA);
+}
+
+/* ---------- kit drawer shell (.dr-*) ---------- */
+.dr-head {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    background: var(--band, #F5F5F5);
+    border-bottom: 1px solid var(--edge, #D2D2D2);
+    color: var(--ink, #0A0A0A);
+}
+
+.dr-titlewrap {
+    margin-right: auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.dr-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--faint, #8C8C8C);
+}
+
+.dr-title {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.dr-close {
+    width: 32px;
+    height: 32px;
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--edge, #D2D2D2);
+    border-radius: 4px;
+    background: var(--mp-surface, #fff);
+    color: var(--ink, #0A0A0A);
+    cursor: pointer;
+    padding: 0;
+}
+
+.dr-close:hover {
+    border-color: var(--mp-primary, var(--ink, #0A0A0A));
+}
+
+.dr-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 16px 20px;
+}
+
+/* pinned footer: Abort / Update bottom-right */
+.dr-foot {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 10px 20px;
+    background: var(--mp-surface, #fff);
+    border-top: 1px solid var(--edge, #D2D2D2);
+}
+
+.dr-foot .note {
+    margin-right: auto;
+    font-size: 12px;
+    color: var(--faint, #8C8C8C);
+}
+
+.dr-foot .r {
+    display: flex;
+    gap: 8px;
+}
+
+@media (max-width: 700px) {
+    .dr-foot .note {
+        display: none;
+    }
+
+    .dr-head {
+        padding: 10px 12px;
+    }
+
+    .dr-body {
+        padding: 12px;
+    }
+
+    .dr-foot {
+        padding: 10px 12px;
+    }
+}

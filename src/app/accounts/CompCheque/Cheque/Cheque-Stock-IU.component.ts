@@ -9,9 +9,11 @@ import { LoginService } from 'src/app/shared/service/loginService';
 import { ToastCommonService } from 'src/app/shared/service/toastService';
 
 @Component({
-  selector: 'app-cheque-stock-iu',
-  templateUrl: './cheque-stock-iu.component.html',
-  styles: [],
+    selector: 'app-cheque-stock-iu',
+    templateUrl: './Cheque-Stock-IU.component.html',
+    // Page kit is global (src/styles/kit); kit-cheque scopes cheque-page.css.
+    host: { class: 'kit-cheque' },
+    styles: [],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

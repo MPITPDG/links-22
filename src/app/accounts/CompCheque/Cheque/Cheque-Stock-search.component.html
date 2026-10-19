@@ -1,118 +1,105 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>{{Header| uppercase}}</strong>
-                </div>
-            </div>
-        </div>
+<!--
+  Cheque stock - list by bank.
+  Monochrome page kit (import-page.css + ../cheque-page.css). Opens with the first of our banks
+  (ACC_CHEQUESTOCK_LIST needs a bank); pick another bank and Search. The old free-text box
+  (searchString) now drives the filter below; 10 rows per page.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Cheque stock</h1>
+      <p>Every cheque leaf of a bank with the bank payment it went to, its status and who printed it</p>
     </div>
-    @if (displayType=='SEARCH') {
-<div class="row no-gutters" >
-        <div class="col-sm-12 col-md-3 col-lg-3"> </div>
-        <div class="col-sm-12 col-md-6 col-lg-6">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td ><span class="col-form-span-label"><b>Our Bank</b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td >
-                        <select class="form-control"  [(ngModel)]="OurBank">
-                            <option value="">Please select</option>
-                            @for (d of OurBankList; track d) {
-<option  value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
-}
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2" align="center">
-                        <button class="btn btn-sm btn-success" type="submit" (click)="searchchq()">
-                            <span class="col-form-span-label"><i
-                                    class="fa fa-dot-circle-o"></i>Search</span></button>
-                        <button class="btn btn-sm btn-danger" type="reset"> <span
-                                class="col-form-span-label" (click)="resetcheque();"><i
-                                    class="fa fa-ban"></i> Reset</span></button>
-                    </td>
-                </tr>            
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-3 col-lg-3"> </div>
+    <div class="tools">
+      <button class="btn p" type="button" routerLink="/accounts/CompCheque/Cheque/Add/ ">+ Add cheque range</button>
     </div>
-}
-    @if (displayType=='LIST') {
-<div class="row no-gutters" >
-        <div class="col-12 col-md-1 col-lg-1"> </div>
-        <div class="col-12 col-md-10 col-lg-10">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <thead>
-                    <tr class="title-head formheading">
-                        <th colspan="8">
-                            {{searchHeaderText}}
-                            <a href="javascript:void(0);" (click)="displayType='SEARCH';Searchdata_list=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
-                        </th>
-                    </tr>
-                    <tr>
-                        <td colspan="8">
-                            <div class="input-group input-group-rounded"  style="float: right;width: 200px;font-family: verdana;font-size:11px;padding: 1px;">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" style="padding: 0px;"><i class="fa fa-search"></i></span>
-                                </div>
-                                <input class="form-control" type="search" [(ngModel)]="searchString" autocomplete="off"
-                                    placeholder="Search">
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="title-head formheading">      
-                        <th class="col-form-span-label" align="center">Cheque No</th>
-                        <th class="col-form-span-label" align="center">Bank Code</th>
-                        <th class="col-form-span-label" align="center">Request BP No</th>
-                        <th class="col-form-span-label" align="center">BP Entry No</th>
-                        <th class="col-form-span-label" align="center">Status</th>
-                        <th class="col-form-span-label" align="center">Reason</th>
-                        <th class="col-form-span-label" align="center">Printed BY</th>
-                        <th class="col-form-span-label" align="center">Printed On</th>
-                    </tr>
-                </thead>
-                @if (Searchdata_list.length > 0) {
-<tbody>
-                    @for (data of Searchdata_list | chqstockFilter: searchString|paginate: { itemsPerPage:25, currentPage: PageActual }; track data) {
-<tr>
-                       
-                        <td><span class="col-form-span-label">{{data.ChequeNo}}</span>
-                        </td>
-                        <td><span class="col-form-span-label">{{data.bank_code}}</span>
-                        </td>
+  </div>
 
-                        <td><span class="col-form-span-label">{{data.BP_Num}}</span>
-                        </td>
-                        <td><span class="col-form-span-label">{{data.BP_EntryNo}}</span>
-                        </td>
-                        <td><span class="col-form-span-label">{{data.Status}}</span>
-                        </td>
-                        <td><span class="col-form-span-label">{{data.Reason}}</span>
-                        </td>
-                        <td><span class="col-form-span-label">{{data.PrintedBY}}</span>
-                        </td>
-                        <td><span class="col-form-span-label">{{data.PrintedOn}}</span>
-                        </td>
-                       
-                    </tr>
-}
-                </tbody>
-}
-                <tr>
-                    <td colspan="8">
-                      <div class="row justify-content-center no-gutters"
-                        style="font-family:verdana;font-size: 11px;padding: 1px;">
-                        <pagination-controls (pageChange)="PageActual=$event" ></pagination-controls>
-                      </div>
-                    </td>
-                  </tr>
-            </table>
+  <div class="card">
+    <div class="fields">
+      <div class="fld">
+        <label>Our bank <span class="req">*</span></label>
+        <div class="v-pair">
+          <select [(ngModel)]="OurBank">
+            <option value="">Please select</option>
+            @for (d of OurBankList; track d) {
+              <option value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option>
+            }
+          </select>
+          <button class="btn p" type="submit" (click)="searchchq()">Search</button>
         </div>
-        <div class="col-12 col-md-1 col-lg-1"> </div>
+      </div>
+      <div class="fld">
+        <label>Filter</label>
+        <input type="search" [(ngModel)]="searchString" (ngModelChange)="page = 1" autocomplete="off" placeholder="Cheque, BP no., status, reason, printed by">
+      </div>
+    </div>
 
+    <div class="toolbar">
+      <span>
+        <span class="count">{{ Filtered.length }} {{ Filtered.length === 1 ? 'cheque' : 'cheques' }}</span>
+        <span class="sub-t"> {{ searchHeaderText }}</span>
+      </span>
+      <span class="tb-r">
+        <button class="btn g" type="reset" (click)="resetchequestock(); searchString = ''; Searchdata_list = []; page = 1">Clear</button>
+        <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!Filtered.length">Export</button>
+      </span>
     </div>
-}
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Cheque no.</th>
+            <th>Bank code</th>
+            <th>Request BP no.</th>
+            <th>BP entry no.</th>
+            <th>Status</th>
+            <th>Reason</th>
+            <th>Printed by</th>
+            <th>Printed on</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+            <tr><td class="empty" colspan="8">Loading cheques…</td></tr>
+          } @else if (loadError) {
+            <tr><td class="empty" colspan="8">The cheque list could not be loaded. Try Search again.</td></tr>
+          } @else {
+            @for (data of pageRows; track data) {
+              <tr>
+                <td class="mono">{{data.ChequeNo}}</td>
+                <td>{{data.bank_code}}</td>
+                <td class="mono">{{data.BP_Num}}</td>
+                <td class="mono">{{data.BP_EntryNo}}</td>
+                <td>
+                  @if (data.Status) { <span class="chip">{{data.Status}}</span> }
+                </td>
+                <td>{{data.Reason}}</td>
+                <td>{{data.PrintedBY}}</td>
+                <td>{{data.PrintedOn}}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="8">No cheques for this bank. Choose a bank and Search.</td></tr>
+            }
+          }
+        </tbody>
+      </table>
     </div>
+
+    <div class="pager">
+      <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ Filtered.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="curPage <= 1" (click)="goPage(curPage - 1)" aria-label="Previous page">‹</button>
+        @for (p of pageList; track $index) {
+          @if (p === 0) {
+            <span class="gap">…</span>
+          } @else {
+            <button type="button" [class.on]="p === curPage" (click)="goPage(p)">{{ p }}</button>
+          }
+        }
+        <button type="button" [disabled]="curPage >= pageCount" (click)="goPage(curPage + 1)" aria-label="Next page">›</button>
+      </div>
+    </div>
+  </div>
+</div>

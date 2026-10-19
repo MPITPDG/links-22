@@ -1,0 +1,237 @@
+/*
+  Login - a 1:1 port of erp_new's split sign-in (components/login-page.tsx +
+  app/styles/components.css, "AUTH - SPLIT LAYOUT"). Class names and rules are
+  copied as-is; erp_new's design tokens are resolved to their literal values
+  because this app does not define them.
+
+  The reset block exists because this app still ships Bootstrap globally, which
+  would otherwise add margins to headings/labels and restyle inputs and buttons.
+*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+@keyframes ui-spin { to { transform: rotate(360deg); } }
+
+/* ---- scoped reset against the global Bootstrap sheet -------------------- */
+/* Wrapped in :where() so the reset has zero specificity. As plain
+   ".ui-auth-split h1" it outranked ".ui-auth-heading" and friends and zeroed
+   their margins - the heading sat on the Username label and the footer on
+   the button. */
+:where(.ui-auth-split), :where(.ui-auth-split) * { box-sizing: border-box; }
+:where(.ui-auth-split) :where(h1, h2, h3, p, label, form) { margin: 0; }
+:where(.ui-auth-split) :where(button) { font-family: inherit; cursor: pointer; background: none; border: 0; padding: 0; }
+:where(.ui-auth-split) :where(input) { font-family: inherit; margin: 0; }
+:where(.ui-auth-split) :where(svg) { display: block; }
+
+/* ---- frame --------------------------------------------------------------- */
+.ui-auth-split {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 42% 1fr;
+  overflow: hidden;
+  font-family: Inter, -apple-system, "Segoe UI", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--mp-ink, #111827);
+  -webkit-font-smoothing: antialiased;
+}
+
+.ui-auth-pane {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: var(--mp-band, #F3F4F6);
+  overflow-y: auto;
+}
+.ui-auth-pane-inner { width: 100%; max-width: 400px; }
+
+.ui-auth-mark { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
+.ui-auth-mark-name { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
+
+.ui-brandmark {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--mp-primary, #111827);
+  color: var(--mp-primary-fg, #FFFFFF);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.ui-brandmark--lg { width: 48px; height: 48px; border-radius: 12px; font-size: 20px; }
+/* The company logo is blue on white, so its tile is white rather than the dark ink square. */
+.ui-brandmark--logo { background: var(--mp-surface, #FFFFFF); border: 1px solid var(--mp-line, #E5E7EB); padding: 6px; }
+.ui-brandmark--logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+.ui-auth-heading {
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+  margin-bottom: 24px;
+}
+
+.ui-auth-form { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
+
+.ui-auth-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #DC2626;
+  font-size: 13px;
+}
+
+/* ---- fields -------------------------------------------------------------- */
+.ui-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ui-field-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mp-soft, #6B7280);
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.ui-inputwrap { position: relative; display: block; }
+.ui-inputwrap-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  color: var(--mp-soft, #9CA3AF);
+  pointer-events: none;
+}
+.ui-inputwrap-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  color: var(--mp-soft, #9CA3AF);
+}
+.ui-inputwrap-btn:hover { color: var(--mp-soft, #6B7280); }
+.ui-inputwrap-btn--text { font-size: 12px; font-weight: 500; }
+
+.ui-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--mp-line, #D1D5DB);
+  background: var(--mp-surface, #FFFFFF);
+  color: var(--mp-ink, #111827);
+  font-size: 13px;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+.ui-input:hover { border-color: #9CA3AF; }
+.ui-input:focus { outline: none; border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59, 130, 246, .20); }
+.ui-input:disabled { background: var(--mp-band, #F9FAFB); color: var(--mp-soft, #6B7280); cursor: not-allowed; }
+.ui-input::placeholder { color: var(--mp-soft, #9CA3AF); }
+.ui-input--lg { height: 40px; font-size: 14px; }
+.ui-input--icon { padding-left: 36px; }
+.ui-input--icon-right { padding-right: 52px; }
+
+/* ---- button -------------------------------------------------------------- */
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 1px solid var(--mp-line, #D1D5DB);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background .15s, border-color .15s, color .15s, box-shadow .15s;
+}
+.ui-auth-split .ui-btn--primary { background: #3B82F6; border: 1px solid #3B82F6; color: #FFFFFF; }
+.ui-auth-split .ui-btn--primary:hover { background: var(--mp-primary, #2563EB); border-color: var(--mp-primary, #2563EB); }
+.ui-auth-split .ui-btn--primary:active { background: var(--mp-primary, #1D4ED8); border-color: var(--mp-primary, #1D4ED8); }
+.ui-btn--lg { height: 40px; font-size: 14px; padding: 0 20px; }
+.ui-btn--block { width: 100%; justify-content: center; }
+.ui-auth-split .ui-btn:disabled { opacity: .5; cursor: not-allowed; }
+.ui-auth-split .ui-btn--primary:disabled:hover { background: #3B82F6; border-color: #3B82F6; }
+
+.ui-spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--mp-line, #D1D5DB);
+  border-top-color: #3B82F6;
+  border-radius: 999px;
+  animation: ui-spin 700ms linear infinite;
+  flex-shrink: 0;
+}
+.ui-spinner--sm { width: 14px; height: 14px; }
+
+.ui-auth-foot { font-size: 11px; color: var(--mp-soft, #9CA3AF); text-align: center; margin-top: 24px; }
+
+/* ---- hero ---------------------------------------------------------------- */
+.ui-auth-hero { padding: 20px 20px 20px 0; display: flex; }
+.ui-auth-hero-panel {
+  position: relative;
+  width: 100%;
+  background: var(--mp-primary, #111827);
+  color: var(--mp-primary-fg, #FFFFFF);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 40px;
+}
+.ui-auth-hero-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 80% at 85% 0%, rgba(255, 255, 255, .10), transparent 60%),
+    radial-gradient(90% 60% at 20% 100%, rgba(59, 130, 246, .18), transparent 65%);
+}
+.ui-auth-hero-body { position: relative; z-index: 1; }
+.ui-auth-hero-eyebrow { font-size: 14px; font-weight: 500; color: rgba(255, 255, 255, .7); }
+.ui-auth-hero-title {
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+  margin: 12px 0;
+}
+.ui-auth-hero-text { font-size: 13px; line-height: 1.5; color: rgba(255, 255, 255, .45); max-width: 42ch; }
+.ui-auth-hero-card {
+  margin-top: 32px;
+  max-width: 380px;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 16px;
+  padding: 24px;
+}
+.ui-auth-hero-card-title { font-size: 16px; font-weight: 600; line-height: 1.25; }
+.ui-auth-hero-card-text { font-size: 13px; color: rgba(255, 255, 255, .4); margin-top: 8px; }
+.ui-auth-hero-dots { display: flex; margin-top: 20px; }
+.ui-auth-hero-dot {
+  width: 32px; height: 32px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, .18);
+  background: #3B82F6;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 600;
+}
+.ui-auth-hero-dot + .ui-auth-hero-dot { margin-left: -8px; }
+.ui-auth-hero-dot:nth-child(2) { background: var(--mp-primary, #2563EB); }
+.ui-auth-hero-dot:nth-child(3) { background: var(--mp-primary, #1D4ED8); }
+.ui-auth-hero-dot:last-child { background: rgba(255, 255, 255, .12); }
+
+@media (max-width: 1024px) {
+  .ui-auth-split { grid-template-columns: 1fr; }
+  .ui-auth-hero { display: none; }
+}

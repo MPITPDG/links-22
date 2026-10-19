@@ -10,6 +10,7 @@ import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-purchase-print',
   templateUrl: './purchase-print.component.html',
+  host: { class: 'kit-print' },
   styles: [`
   .dgHeader {
     border-right: black 1px solid;

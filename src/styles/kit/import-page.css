@@ -1,0 +1,718 @@
+/* ----------------------------------------------------------------
+   Links port (Phase 1): GLOBAL page-kit stylesheet, registered in
+   angular.json `styles` after src/tailwind.css.
+   Source: MPERPNG-20 src/app/import/import-page.css
+   Root class .im-page. In MP each screen pulled this file in through styleUrls
+   (349 components, ~18 KB each); here it is loaded once, globally. A screen opts
+   in with nothing more than its root <div class="im-page">.
+   The Google-font @import (IBM Plex Mono) moved to src/index.html.
+   Every rule stays under its root class, so no legacy screen is affected.
+   Do not edit by hand without mirroring MP; regenerate from MP instead.
+   ---------------------------------------------------------------- */
+/* ============================================================
+   Import page kit.
+   The approved monochrome page layout (import-redesign-mock.html) as reusable
+   components: page header, cards, filter bar, toolbar, tables, chips, pager,
+   two-column label-left forms, aside record rows and the sticky save bar.
+   Everything is scoped under .im-page so any Import / WMS / France page can opt in
+   with styleUrls: ['<path>/import-page.css'] and a root <div class="im-page">.
+   The global Bootstrap theme and the ng-select / my-date-picker widgets are
+   restyled inside the root so they look like the mock's boxed inputs.
+   ============================================================ */
+/* ---------- tokens + page root ---------- */
+:root .im-page {
+    --ink: var(--mp-ink, #0A0A0A);
+    --soft: var(--mp-soft, #565656);
+    --faint: var(--mp-soft, #8C8C8C);
+    --line: var(--mp-line, #E4E4E4);
+    --edge: var(--mp-line, #D2D2D2);
+    --band: var(--mp-band, #F5F5F5);
+    --fill: var(--mp-band, #EDEDED);
+    --sheet: var(--mp-surface, #FFFFFF);
+    --ground: var(--mp-bg, #FAFAFA);
+    --num: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-family: var(--ex-font, Inter, system-ui, "Segoe UI", sans-serif);
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--ink);
+    padding: 0 24px 0;
+    min-width: 0;
+}
+
+:root .im-page *,
+:root .im-page *::before,
+:root .im-page *::after {
+    box-sizing: border-box;
+}
+
+/* ---------- page header ---------- */
+:root .im-page .crumb {
+    font-size: 12px;
+    color: var(--faint);
+    padding: 14px 0 4px;
+}
+
+:root .im-page .ph {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0 16px;
+    border-bottom: 1px solid var(--edge);
+    margin-bottom: 18px;
+}
+
+:root .im-page .ph h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    line-height: 1.2;
+}
+
+:root .im-page .ph p {
+    margin: 3px 0 0;
+    color: var(--soft);
+}
+
+:root .im-page .ph .tools {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* ---------- buttons (override Bootstrap .btn) ---------- */
+:root .im-page .btn {
+    font: inherit;
+    font-weight: 600;
+    font-size: 12.5px;
+    line-height: 1;
+    height: 32px;
+    padding: 0 14px;
+    border: 1px solid var(--mp-primary, var(--ink));
+    background: var(--sheet);
+    color: var(--ink);
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+    box-shadow: none;
+    text-decoration: none;
+}
+
+:root .im-page .btn.p {
+    background: var(--mp-primary, var(--ink));
+    color: var(--mp-primary-fg, #fff);
+}
+
+:root .im-page .btn.g {
+    border-color: var(--edge);
+}
+
+:root .im-page .btn:hover {
+    border-color: var(--mp-primary, var(--ink));
+}
+
+:root .im-page .btn.p:hover {
+    background: var(--mp-primary, #2a2a2a);
+}
+
+:root .im-page .btn:focus-visible {
+    outline: 2px solid var(--mp-primary, var(--ink));
+    outline-offset: 2px;
+}
+
+:root .im-page .btn:disabled {
+    opacity: .5;
+    cursor: default;
+}
+
+/* ---------- cards (override Bootstrap .card) ---------- */
+:root .im-page .card {
+    background: var(--sheet);
+    border: 1px solid var(--edge);
+    border-radius: 6px;
+    margin-bottom: 0;
+    box-shadow: none;
+    display: block;
+}
+
+:root .im-page .card.sec,
+:root .im-page .sec {
+    margin-bottom: 16px;
+}
+
+:root .im-page .card-h {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+}
+
+:root .im-page .card-h h2 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+:root .im-page .card-h .meta {
+    color: var(--faint);
+    font-size: 12px;
+}
+
+/* ---------- inputs: boxed, black focus ring, dashed = locked ---------- */
+:root .im-page input:not([type="checkbox"]):not([type="radio"]),
+:root .im-page select,
+:root .im-page .form-control {
+    font: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    background: var(--mp-surface, #fff);
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    height: 32px;
+    padding: 0 10px;
+    width: 100%;
+    box-shadow: none;
+    margin: 0;
+}
+
+:root .im-page input:focus,
+:root .im-page select:focus,
+:root .im-page .form-control:focus {
+    outline: 2px solid var(--mp-primary, var(--ink));
+    outline-offset: -1px;
+    border-color: var(--mp-primary, var(--ink));
+    box-shadow: none;
+}
+
+:root .im-page input.lock,
+:root .im-page input:not([type="checkbox"]):not([type="radio"])[readonly],
+:root .im-page input:not([type="checkbox"]):not([type="radio"]):disabled,
+:root .im-page select:disabled,
+:root .im-page textarea:disabled {
+    border-style: dashed;
+    background: var(--fill);
+    color: var(--soft);
+}
+
+/* my-date-picker: make the whole widget one 32px box */
+:root .im-page .mydp {
+    width: 100% !important;
+    height: auto !important;
+    border: 0 !important;
+    border-radius: 4px;
+    overflow: visible !important;
+}
+
+:root .im-page .mydp .selectiongroup {
+    display: flex;
+    align-items: stretch;
+    height: 32px;
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    background: var(--mp-surface, #fff);
+    overflow: hidden;
+}
+
+:root .im-page .mydp .selectiongroup:focus-within {
+    outline: 2px solid var(--mp-primary, var(--ink));
+    outline-offset: -1px;
+    border-color: var(--mp-primary, var(--ink));
+}
+
+:root .im-page .mydp .selection {
+    border: 0 !important;
+    outline: 0 !important;
+    height: 30px !important;
+    padding: 0 10px !important;
+    font-size: 13px !important;
+    background: transparent !important;
+    cursor: pointer;
+}
+
+:root .im-page .mydp .selbtngroup {
+    height: 30px !important;
+    display: flex;
+}
+
+:root .im-page .mydp .selbtngroup button {
+    height: 30px !important;
+    background: var(--mp-surface, #fff) !important;
+    border: 0 !important;
+    border-left: 1px solid var(--line) !important;
+    color: var(--soft);
+}
+
+:root .im-page .mydp .selector {
+    z-index: 1200;
+    height: auto !important;
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+}
+
+:root .im-page .mydp .selector .selectedday .datevalue,
+:root .im-page .mydp .selector .selectedmonth .monthvalue,
+:root .im-page .mydp .selector .selectedyear .yearvalue {
+    background: var(--mp-primary, var(--ink)) !important;
+    color: var(--mp-primary-fg, #fff) !important;
+}
+
+:root .im-page .mydp .selector .markcurrday,
+:root .im-page .mydp .selector .sunday {
+    color: var(--ink) !important;
+}
+
+/* ng-select: same box as a native select */
+:root .im-page .ng-select .ng-select-container {
+    min-height: 32px !important;
+    height: 32px !important;
+    border: 1px solid var(--edge) !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    color: var(--ink);
+}
+
+:root .im-page .ng-select.ng-select-focused .ng-select-container {
+    outline: 2px solid var(--mp-primary, var(--ink));
+    outline-offset: -1px;
+    border-color: var(--mp-primary, var(--ink)) !important;
+}
+
+:root .im-page .ng-select .ng-select-container input {
+    height: auto !important;
+    border: 0 !important;
+    outline: 0 !important;
+}
+
+:root .im-page .ng-dropdown-panel .ng-option.ng-option-marked {
+    background: var(--band);
+}
+
+:root .im-page .ng-dropdown-panel .ng-option.ng-option-selected {
+    background: var(--fill);
+    color: var(--ink);
+}
+
+/* ---------- filter bar ---------- */
+:root .im-page .filters {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1.3fr 1.3fr 1fr auto;
+    gap: 10px;
+    padding: 14px 16px;
+    align-items: end;
+}
+
+:root .im-page .f label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--soft);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+:root .im-page .f .btn {
+    width: 100%;
+}
+
+/* ---------- toolbar above a table ---------- */
+:root .im-page .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: var(--sheet);
+}
+
+:root .im-page .toolbar .count {
+    font-weight: 600;
+}
+
+:root .im-page .toolbar .tb-r {
+    display: flex;
+    gap: 8px;
+}
+
+/* ---------- tables ---------- */
+:root .im-page .tbl-wrap {
+    overflow-x: auto;
+}
+
+:root .im-page table.tbl {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+    margin: 0;
+    background: transparent;
+}
+
+:root .im-page table.tbl th {
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--soft);
+    font-weight: 600;
+    text-align: left;
+    background: var(--band);
+    padding: 9px 12px;
+    border: 0;
+    border-bottom: 1px solid var(--edge);
+    white-space: nowrap;
+}
+
+:root .im-page table.tbl td {
+    padding: 9px 12px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+}
+
+:root .im-page table.tbl tbody tr:hover td {
+    background: var(--mp-band, #F7F7F7);
+}
+
+:root .im-page table.tbl td.num,
+:root .im-page table.tbl th.num {
+    text-align: right;
+    font-family: var(--num);
+}
+
+:root .im-page table.tbl td.mono {
+    font-family: var(--num);
+    font-size: 12.5px;
+}
+
+:root .im-page table.tbl td.empty {
+    text-align: center;
+    color: var(--faint);
+    padding: 28px 12px;
+}
+
+:root .im-page a.lnk {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+:root .im-page .sub-t {
+    color: var(--faint);
+    font-size: 12px;
+}
+
+/* row action buttons */
+:root .im-page .act {
+    white-space: nowrap;
+    text-align: right;
+}
+
+:root .im-page .act button {
+    font: inherit;
+    font-size: 12px;
+    color: var(--ink);
+    border: 1px solid var(--edge);
+    background: var(--mp-surface, #fff);
+    border-radius: 4px;
+    height: 26px;
+    padding: 0 9px;
+    cursor: pointer;
+    margin-left: 4px;
+}
+
+:root .im-page .act button:hover {
+    border-color: var(--mp-primary, var(--ink));
+}
+
+/* ---------- chips: solid / outline with dot / dashed ---------- */
+:root .im-page .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.45;
+    border: 1px solid var(--edge);
+    border-radius: 999px;
+    padding: 1px 8px;
+    white-space: nowrap;
+    color: var(--ink);
+    background: var(--mp-surface, #fff);
+}
+
+:root .im-page .chip.solid {
+    background: var(--mp-primary, var(--ink));
+    color: var(--mp-primary-fg, #fff);
+    border-color: var(--mp-primary, var(--ink));
+}
+
+:root .im-page .chip.dash {
+    border-style: dashed;
+    color: var(--soft);
+}
+
+:root .im-page .chip .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+/* ---------- pager ---------- */
+:root .im-page .pager {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    font-size: 12.5px;
+    color: var(--soft);
+}
+
+:root .im-page .pager b {
+    color: var(--ink);
+    font-family: var(--num);
+    font-weight: 500;
+}
+
+:root .im-page .pages {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+:root .im-page .pages button {
+    font: inherit;
+    font-size: 12px;
+    color: var(--ink);
+    min-width: 30px;
+    height: 28px;
+    border: 1px solid var(--edge);
+    background: var(--mp-surface, #fff);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+:root .im-page .pages button.on {
+    background: var(--mp-primary, var(--ink));
+    color: var(--mp-primary-fg, #fff);
+    border-color: var(--mp-primary, var(--ink));
+}
+
+:root .im-page .pages button:disabled {
+    color: #bbb;
+    cursor: default;
+}
+
+:root .im-page .pages .gap {
+    min-width: 20px;
+    text-align: center;
+    color: var(--faint);
+}
+
+/* ---------- form: fields left, aside right ---------- */
+:root .im-page .form-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 16px;
+    align-items: start;
+}
+
+:root .im-page .fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+:root .im-page .fld {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--line);
+}
+
+:root .im-page .fields .fld:nth-child(odd) {
+    border-right: 1px solid var(--line);
+}
+
+:root .im-page .fld.full {
+    grid-column: 1 / -1;
+    border-right: 0 !important;
+}
+
+:root .im-page .fld label {
+    font-weight: 600;
+    font-size: 12.5px;
+    margin: 0;
+}
+
+:root .im-page .fld label .req {
+    margin-left: 2px;
+}
+
+:root .im-page .fld .hint {
+    grid-column: 2;
+    color: var(--faint);
+    font-size: 11.5px;
+    margin-top: -6px;
+}
+
+:root .im-page .fields .fld:nth-last-child(-n+2) {
+    border-bottom: 0;
+}
+
+/* ---------- aside: record rows + checklist ---------- */
+:root .im-page .aside .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 16px;
+    margin: 0;
+    flex-wrap: nowrap;
+    border-bottom: 1px solid var(--line);
+    font-size: 12.5px;
+}
+
+:root .im-page .aside .row:last-child {
+    border-bottom: 0;
+}
+
+:root .im-page .aside .row span {
+    color: var(--soft);
+}
+
+:root .im-page .aside .row b {
+    font-family: var(--num);
+    font-weight: 500;
+    text-align: right;
+}
+
+:root .im-page .aside ul {
+    margin: 0;
+    padding: 10px 16px 12px 32px;
+    color: var(--soft);
+    font-size: 12.5px;
+}
+
+:root .im-page .aside li {
+    margin: 3px 0;
+}
+
+/* ---------- sticky Cancel / Save bar ---------- */
+:root .im-page .bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    margin: 16px -24px 0;
+    background: var(--sheet);
+    border-top: 1px solid var(--edge);
+    padding: 10px 24px calc(10px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+:root .im-page .bar .note {
+    color: var(--faint);
+    font-size: 12px;
+}
+
+:root .im-page .bar .r {
+    display: flex;
+    gap: 8px;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 1100px) {
+    :root .im-page .form-layout {
+        grid-template-columns: 1fr;
+    }
+
+    :root .im-page .filters {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    :root .im-page {
+        padding: 0 16px;
+    }
+
+    :root .im-page .filters {
+        grid-template-columns: 1fr;
+    }
+
+    :root .im-page .fields {
+        grid-template-columns: 1fr;
+    }
+
+    :root .im-page .fields .fld {
+        border-right: 0 !important;
+        border-bottom: 1px solid var(--line);
+    }
+
+    :root .im-page .fields .fld:last-child {
+        border-bottom: 0;
+    }
+
+    :root .im-page .fld {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+    :root .im-page .fld .hint {
+        grid-column: 1;
+    }
+
+    :root .im-page .bar {
+        margin: 16px -16px 0;
+        padding-inline: 16px;
+    }
+}
+
+/* ng-select text: the global "custom" theme paints values and placeholders small and navy */
+:root .im-page .ng-select .ng-select-container,
+:root .im-page .ng-select .ng-select-container .ng-value-label,
+:root .im-page .ng-select .ng-select-container .ng-placeholder,
+:root .im-page .ng-select .ng-select-container input {
+    color: var(--mp-ink, #0A0A0A) !important;
+    font-size: 13px !important;
+}
+
+:root .im-page .ng-select .ng-select-container .ng-placeholder {
+    color: var(--mp-soft, #8C8C8C) !important;
+}
+
+/* A full-width row with no label (a note, or a table spanning the form) must not sit
+   in the 150px label column. */
+:root .im-page .fld.full:not(:has(> label)) {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+:root .im-page .fld.full > .tbl-wrap,
+:root .im-page .fld.full > table.tbl {
+    width: 100%;
+}
+
+/* A form with no aside card must use the full width, not leave the 300px
+   aside column standing empty. */
+:root .im-page .form-layout:not(:has(> .aside)) {
+    grid-template-columns: minmax(0, 1fr);
+}

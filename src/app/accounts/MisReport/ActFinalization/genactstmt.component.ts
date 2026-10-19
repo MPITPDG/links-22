@@ -12,10 +12,11 @@ import { catchError } from 'rxjs/operators';
 import { EMPTY } from 'rxjs';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ModalDirective } from 'ngx-bootstrap/modal';
+import { FinPager } from '../../Accreport/fin-kit';
 @Component({
     selector: 'app-genactstatement',
     templateUrl: './genactstmt.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' }, // Links: import-page + accreport-page are global (src/styles/kit)
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -595,5 +596,12 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
         this.ToDate=ev.formatted
       
       }
-    }  
-  
+
+    // ---- redesign: 10/page pager over the ledger rows (display only) ----
+    private _ledgerSrc: any = null;
+    private _ledgerPager = new FinPager<any>(10);
+    get ledgerPage(): FinPager<any> {
+        if (this._ledgerSrc !== this.Searchdata_list) { this._ledgerSrc = this.Searchdata_list; this._ledgerPager.set(this.Searchdata_list); }
+        return this._ledgerPager;
+    }
+}

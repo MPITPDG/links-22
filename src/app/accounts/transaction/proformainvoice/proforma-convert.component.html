@@ -1,4 +1,4 @@
-<div class="animated fadeIn x-page">
+<div class="im-page x-page">
 
     <!-- ================= HEADER ================= -->
     <div class="x-toolbar x-toolbar-sticky">
@@ -11,13 +11,13 @@
         </div>
 
         @if (header && header.CONVERTED_INV_NO) {
-<span class="x-pill x-pill-danger">
-            Converted &rarr; {{header.CONVERTED_INV_NO}}
-        </span>
-}
+            <span class="x-pill x-pill-danger">
+                Converted &rarr; {{header.CONVERTED_INV_NO}}
+            </span>
+        }
         @if (header && header.STATUS == '100') {
-<span class="x-pill x-pill-ok">Ready to convert</span>
-}
+            <span class="x-pill x-pill-ok">Ready to convert</span>
+        }
 
         <button type="button" class="x-btn x-btn-classic" (click)="backToSearch()">
             <i class="fa fa-arrow-left" aria-hidden="true"></i> Back to Search
@@ -29,400 +29,396 @@
 
     <!-- ================= BANNERS ================= -->
     @if (errorText) {
-<div class="pc-alert pc-alert-danger">
-        <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{errorText}}
-    </div>
-}
+        <div class="pc-alert pc-alert-danger">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{errorText}}
+        </div>
+    }
 
     @if (header && header.STATUS == '100' && rateChanged()) {
-<div class="pc-alert pc-alert-warn">
-        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-        <span>
-            <b>A GST rate has changed since this Proforma was raised.</b><br />
-            Tax is recalculated against the Invoice Date below, so the Tax Invoice total will not
-            match the amount quoted to the client. Check the rate table before converting.
-        </span>
-    </div>
-}
+        <div class="pc-alert pc-alert-warn">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            <span>
+                <b>A GST rate has changed since this Proforma was raised.</b><br />
+                Tax is recalculated against the Invoice Date below, so the Tax Invoice total will not
+                match the amount quoted to the client. Check the rate table before converting.
+            </span>
+        </div>
+    }
 
     @if (header) {
-<div>
+        <div>
 
-        <!-- ================= DETAILS + INVOICE FIELDS ================= -->
-        <div class="pc-grid">
+            <!-- ================= DETAILS + INVOICE FIELDS ================= -->
+            <div class="pc-grid">
 
-            <div class="x-card">
-                <div class="x-card-head">
-                    <i class="fa fa-file-text-o" aria-hidden="true"></i>
-                    <h2 class="x-card-title">Proforma</h2>
-                </div>
-                <div class="x-card-body">
-                    <div class="x-kv">
-                        <div class="x-k">Proforma No.</div>
-                        <div class="x-v x-num">{{header.PROF_NO}}</div>
-
-                        <div class="x-k">Proforma Date</div>
-                        <div class="x-v">{{header.PROF_DATE}}</div>
-
-                        <div class="x-k">Client</div>
-                        <div class="x-v">{{header.INV_CLIENT}} &mdash; {{header.CLIENT_NAME}}</div>
-
-                        <div class="x-k">GSTIN</div>
-                        <div class="x-v x-num">{{header.GSTNO || '—'}}</div>
-
-                        <div class="x-k">Place of Supply</div>
-                        <div class="x-v">{{header.POS || '—'}}</div>
-
-                        <div class="x-k">Bill Type</div>
-                        <div class="x-v">{{header.INV_BILLTYPE}}</div>
-
-                        <div class="x-k">Currency</div>
-                        <div class="x-v">{{header.CUR_NAME}} @ {{header.INV_CURRATE}}</div>
-
-                        <div class="x-k">Proforma Total</div>
-                        <div class="x-v x-num"><b>{{header.TOTALAMT}}</b></div>
+                <div class="x-card">
+                    <div class="x-card-head">
+                        <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                        <h2 class="x-card-title">Proforma</h2>
                     </div>
-                </div>
-            </div>
+                    <div class="x-card-body">
+                        <div class="x-kv">
+                            <div class="x-k">Proforma No.</div>
+                            <div class="x-v x-num">{{header.PROF_NO}}</div>
 
-            <div class="x-card">
-                <div class="x-card-head">
-                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                    <h2 class="x-card-title">Tax Invoice</h2>
-                </div>
-                <div class="x-card-body">
-                    <!--  Everything else on the tax invoice - client, jobs, charges, tax,
-                          currency - carries over unchanged from the Proforma, so the only
-                          things entered here are the date it is raised on, the due date
-                          derived from it, and the client's approval reference.
+                            <div class="x-k">Proforma Date</div>
+                            <div class="x-v">{{header.PROF_DATE}}</div>
 
-                          Client PO / Approval Ref. is kept pending confirmation from the
-                          Finance Billing team on whether they capture it.                 -->
-                    <div class="pc-dates">
-                        <div class="pc-date">
-                            <label class="x-lbl">Invoice Date <span class="x-req">*</span></label>
-                            <input type="text" class="form-control" placeholder="dd/mm/yyyy"
-                                   [(ngModel)]="invDate" (blur)="loadPreview()" />
-                        </div>
-                        <div class="pc-date">
-                            <label class="x-lbl">Due Date</label>
-                            <input type="text" class="form-control" placeholder="dd/mm/yyyy"
-                                   [(ngModel)]="payDt" (ngModelChange)="dueDateTouched = true" />
+                            <div class="x-k">Client</div>
+                            <div class="x-v">{{header.INV_CLIENT}} &mdash; {{header.CLIENT_NAME}}</div>
+
+                            <div class="x-k">GSTIN</div>
+                            <div class="x-v x-num">{{header.GSTNO || '—'}}</div>
+
+                            <div class="x-k">Place of Supply</div>
+                            <div class="x-v">{{header.POS || '—'}}</div>
+
+                            <div class="x-k">Bill Type</div>
+                            <div class="x-v">{{header.INV_BILLTYPE}}</div>
+
+                            <div class="x-k">Currency</div>
+                            <div class="x-v">{{header.CUR_NAME}} @ {{header.INV_CURRATE}}</div>
+
+                            <div class="x-k">Proforma Total</div>
+                            <div class="x-v x-num"><b>{{header.TOTALAMT}}</b></div>
                         </div>
                     </div>
-
-                    <div class="pc-ref">
-                        <label class="x-lbl">Client PO / Approval Ref.</label>
-                        <input type="text" class="form-control" maxlength="50"
-                               [(ngModel)]="clientRef" />
-                    </div>
-
-                    <p class="x-sub">
-                        Due Date follows the client's credit period &mdash; sea 30 days, air on
-                        the invoice date where none is set. All other details carry over from the
-                        Proforma. The invoice number is allocated when you confirm.
-                    </p>
                 </div>
+
+                <div class="x-card">
+                    <div class="x-card-head">
+                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                        <h2 class="x-card-title">Tax Invoice</h2>
+                    </div>
+                    <div class="x-card-body">
+                        <!--  Everything else on the tax invoice - client, jobs, charges, tax,
+                              currency - carries over unchanged from the Proforma, so the only
+                              things entered here are the date it is raised on, the due date
+                              derived from it, and the client's approval reference.
+
+                              Client PO / Approval Ref. is kept pending confirmation from the
+                              Finance Billing team on whether they capture it.                 -->
+                        <div class="pc-dates">
+                            <div class="pc-date">
+                                <label class="x-lbl">Invoice Date <span class="x-req">*</span></label>
+                                <input type="text" class="form-control" placeholder="dd/mm/yyyy"
+                                       [(ngModel)]="invDate" (blur)="loadPreview()" />
+                            </div>
+                            <div class="pc-date">
+                                <label class="x-lbl">Due Date</label>
+                                <input type="text" class="form-control" placeholder="dd/mm/yyyy"
+                                       [(ngModel)]="payDt" (ngModelChange)="dueDateTouched = true" />
+                            </div>
+                        </div>
+
+                        <div class="pc-ref">
+                            <label class="x-lbl">Client PO / Approval Ref.</label>
+                            <input type="text" class="form-control" maxlength="50"
+                                   [(ngModel)]="clientRef" />
+                        </div>
+
+                        <p class="x-sub">
+                            Due Date follows the client's credit period &mdash; sea 30 days, air on
+                            the invoice date where none is set. All other details carry over from the
+                            Proforma. The invoice number is allocated when you confirm.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ================= TOTALS STRIP =================
+                 The three numbers that decide the conversion, above the fold, so the detail
+                 tables below can stay folded away.                                            -->
+            @if (charges.length > 0) {
+                <div class="pc-sum">
+                    <div class="pc-sum-i">
+                        <span class="pc-sum-k">Taxable value</span>
+                        <span class="pc-sum-v">{{taxableTotal() | number:'1.2-2'}}</span>
+                    </div>
+                    <div class="pc-sum-i">
+                        <span class="pc-sum-k">Tax &amp; round off</span>
+                        <span class="pc-sum-v">{{totalTax() | number:'1.2-2'}}</span>
+                    </div>
+                    <div class="pc-sum-i pc-sum-grand">
+                        <span class="pc-sum-k">Invoice total</span>
+                        <span class="pc-sum-v">{{grandTotal() | number:'1.2-2'}}</span>
+                    </div>
+                </div>
+            }
+
+            <!-- ================= JOBS ================= -->
+            @if (jobs.length > 0) {
+                <div class="x-card">
+                    <div class="x-card-head">
+                        <i class="fa fa-cubes" aria-hidden="true"></i>
+                        <h2 class="x-card-title">Jobs</h2>
+                        <span class="x-count">{{jobs.length}}</span>
+                    </div>
+                    <div class="x-tablewrap">
+                        <table class="x-table tbl">
+                            <thead>
+                                <tr><th>JOB NO</th><th class="num x-num">PKGS</th><th class="num x-num">GR.WT</th></tr>
+                            </thead>
+                            <tbody>
+                                @for (j of jobs; track j) {
+                                    <tr>
+                                        <td class="num x-num">{{j.INV_JOBNO}}</td>
+                                        <td class="num x-num">{{j.INV_PKGS}}</td>
+                                        <td class="num x-num">{{j.INV_GRWT}}</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            <!-- ================= CHARGES ================= -->
+            <div class="x-card">
+                <div class="x-card-head pc-head-btn" (click)="toggle('charges')">
+                    <i class="fa fa-inr" aria-hidden="true"></i>
+                    <h2 class="x-card-title">Charges</h2>
+                    <span class="x-count">{{charges.length}}</span>
+                    <i class="fa pc-chev" aria-hidden="true"
+                       [class.fa-chevron-up]="open.charges" [class.fa-chevron-down]="!open.charges"></i>
+                </div>
+                @if (open.charges) {
+                    <div class="x-tablewrap">
+                        <table class="x-table tbl">
+                            <thead>
+                                <tr>
+                                    <th>CHARGE</th>
+                                    <th>ACCOUNT</th>
+                                    <th>TAX</th>
+                                    <th class="num x-num">QTY</th>
+                                    <th class="num x-num">RATE</th>
+                                    <th>CUR</th>
+                                    <th class="num x-num">EX. RATE</th>
+                                    <th class="num x-num">AMOUNT</th>
+                                    <th class="num x-num">INR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (c of charges; track c) {
+                                    <tr>
+                                        <td>{{c.CHRG_DESC}} @if (c.INV_DESC) { <span class="x-sub">{{c.INV_DESC}}</span> }</td>
+                                        <td>{{c.ACCTNAME}}</td>
+                                        <td>{{c.INV_TAXABLE}}</td>
+                                        <td class="num x-num">{{c.INV_QTY | number:'1.0-3'}}</td>
+                                        <td class="num x-num">{{c.INV_RATE | number:'1.2-2'}}</td>
+                                        <td>{{c.CUR_NAME}}</td>
+                                        <td class="num x-num">{{c.INV_EXRATE | number:'1.2-4'}}</td>
+                                        <td class="num x-num">{{c.INV_AMOUNT | number:'1.2-2'}}</td>
+                                        <td class="num x-num">{{c.INV_INRAMT | number:'1.2-2'}}</td>
+                                    </tr>
+                                }
+                                @if (charges.length == 0) {
+                                    <tr>
+                                        <td colspan="9" class="x-empty">No charge lines on this Proforma.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                @if (charges.length > 0) {
+                                    <tr class="pc-total">
+                                        <td colspan="7"><b>Taxable value</b></td>
+                                        <td class="num x-num"><b>{{chargeTotal('INV_AMOUNT') | number:'1.2-2'}}</b></td>
+                                        <td class="num x-num"><b>{{chargeTotal('INV_INRAMT') | number:'1.2-2'}}</b></td>
+                                    </tr>
+                                }
+                            </tfoot>
+                        </table>
+                    </div>
+                }
+            </div>
+
+            <!-- ================= GST DETAILS ================= -->
+            @if (taxLines.length > 0) {
+                <div class="x-card">
+                    <div class="x-card-head pc-head-btn" (click)="toggle('gst')">
+                        <i class="fa fa-calculator" aria-hidden="true"></i>
+                        <h2 class="x-card-title">GST details</h2>
+                        <i class="fa pc-chev" aria-hidden="true"
+                           [class.fa-chevron-up]="open.gst" [class.fa-chevron-down]="!open.gst"></i>
+                    </div>
+                    @if (open.gst) {
+                        <div class="x-tablewrap">
+                            <table class="x-table tbl">
+                                <thead>
+                                    <tr>
+                                        <th>CHARGE</th>
+                                        <th>TAX</th>
+                                        <th>ACCOUNT</th>
+                                        <th class="num x-num">RATE %</th>
+                                        <th class="num x-num">AMOUNT</th>
+                                        <th class="num x-num">INR</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (t of taxLines; track t) {
+                                        <tr>
+                                            <td class="x-cell-key">{{t.CHRG_CODE}}</td>
+                                            <td>{{t.TAX_NAME}}</td>
+                                            <td>{{t.ACCTNAME}}</td>
+                                            <td class="num x-num">{{t.RATE}}</td>
+                                            <td class="num x-num">{{t.TAX_AMT}}</td>
+                                            <td class="num x-num">{{t.TAX_INR}}</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr class="pc-total">
+                                        <td colspan="5"><b>Total tax &amp; round off</b></td>
+                                        <td class="num x-num"><b>{{totalTax() | number:'1.2-2'}}</b></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- ================= SAC CODE SUMMARY ================= -->
+            @if (sacLines.length > 0) {
+                <div class="x-card">
+                    <div class="x-card-head pc-head-btn" (click)="toggle('sac')">
+                        <i class="fa fa-list-alt" aria-hidden="true"></i>
+                        <h2 class="x-card-title">SAC code summary</h2>
+                        <span class="x-count">{{sacLines.length}}</span>
+                        <i class="fa pc-chev" aria-hidden="true"
+                           [class.fa-chevron-up]="open.sac" [class.fa-chevron-down]="!open.sac"></i>
+                    </div>
+                    @if (open.sac) {
+                        <div class="x-tablewrap">
+                            <table class="x-table tbl">
+                                <thead>
+                                    <tr>
+                                        <th>SAC CODE</th>
+                                        <th>ACCOUNT</th>
+                                        <th>TAX</th>
+                                        <th class="num x-num">RATE %</th>
+                                        <th class="num x-num">TAXABLE VALUE</th>
+                                        <th class="num x-num">CGST</th>
+                                        <th class="num x-num">SGST</th>
+                                        <th class="num x-num">IGST</th>
+                                        <th class="num x-num">TOTAL TAX</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (s of sacLines; track s) {
+                                        <tr>
+                                            <td class="x-cell-key">
+                                                @if (s.SACCODE) {
+                                                    <span>{{s.SACCODE}}</span>
+                                                }
+                                                @if (!s.SACCODE) {
+                                                    <span class="x-pill x-pill-warn">No SAC</span>
+                                                }
+                                            </td>
+                                            <td>{{s.ACCTNAME}}</td>
+                                            <td>{{s.TAX_CODE}}</td>
+                                            <td class="num x-num">{{s.RATE}}</td>
+                                            <td class="num x-num">{{s.TAXABLE_INR | number:'1.2-2'}}</td>
+                                            <td class="num x-num">{{s.CGST_AMT | number:'1.2-2'}}</td>
+                                            <td class="num x-num">{{s.SGST_AMT | number:'1.2-2'}}</td>
+                                            <td class="num x-num">{{s.IGST_AMT | number:'1.2-2'}}</td>
+                                            <td class="num x-num">{{s.TAX_TOTAL | number:'1.2-2'}}</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr class="pc-total">
+                                        <td colspan="4"><b>Total</b></td>
+                                        <td class="num x-num"><b>{{sacTotal('TAXABLE_INR') | number:'1.2-2'}}</b></td>
+                                        <td class="num x-num"><b>{{sacTotal('CGST_AMT') | number:'1.2-2'}}</b></td>
+                                        <td class="num x-num"><b>{{sacTotal('SGST_AMT') | number:'1.2-2'}}</b></td>
+                                        <td class="num x-num"><b>{{sacTotal('IGST_AMT') | number:'1.2-2'}}</b></td>
+                                        <td class="num x-num"><b>{{sacTotal('TAX_TOTAL') | number:'1.2-2'}}</b></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        @if (missingSac()) {
+                            <div class="x-card-body">
+                                <p class="x-sub">
+                                    One or more charge accounts have no SAC code set in the account master. The
+                                    tax invoice will print without a SAC against those lines.
+                                </p>
+                            </div>
+                        }
+                    }
+                </div>
+            }
+
+            <!-- ================= GST RATE CHECK ================= -->
+            @if (rates.length > 0) {
+                <div class="x-card">
+                    <div class="x-card-head pc-head-btn" (click)="toggle('rates')">
+                        <i class="fa fa-percent" aria-hidden="true"></i>
+                        <h2 class="x-card-title">GST rate check</h2>
+                        @if (rateChanged()) {
+                            <span class="x-pill x-pill-warn">Changed</span>
+                        }
+                        @if (!rateChanged()) {
+                            <span class="x-pill x-pill-ok">Unchanged</span>
+                        }
+                        <i class="fa pc-chev" aria-hidden="true"
+                           [class.fa-chevron-up]="open.rates" [class.fa-chevron-down]="!open.rates"></i>
+                    </div>
+                    @if (open.rates) {
+                        <div class="x-tablewrap">
+                            <table class="x-table tbl">
+                                <thead>
+                                    <tr>
+                                        <th>TAX CODE</th>
+                                        <th class="num x-num">CGST</th>
+                                        <th class="num x-num">SGST</th>
+                                        <th class="num x-num">IGST</th>
+                                        <th>STATUS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (r of rates; track r) {
+                                        <tr [class.pc-row-warn]="r.RATE_CHANGED == 'Y'">
+                                            <td>{{r.TAX_CODE}}</td>
+                                            <td class="num x-num">{{r.CGST_THEN}} &rarr; {{r.CGST_NOW}}</td>
+                                            <td class="num x-num">{{r.SGST_THEN}} &rarr; {{r.SGST_NOW}}</td>
+                                            <td class="num x-num">{{r.IGST_THEN}} &rarr; {{r.IGST_NOW}}</td>
+                                            <td>
+                                                @if (r.RATE_CHANGED == 'Y') {
+                                                    <span class="x-pill x-pill-danger">Changed</span>
+                                                }
+                                                @if (r.RATE_CHANGED != 'Y') {
+                                                    <span class="x-pill x-pill-ok">Unchanged</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="x-card-body">
+                            <p class="x-sub">
+                                Left value is the rate on the Proforma date, right value is the rate on the
+                                Invoice Date. The Tax Invoice is calculated using the right-hand value.
+                            </p>
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- ================= ACTIONS ================= -->
+            <div class="x-actions pc-actions">
+                <button type="button" class="x-btn x-btn-classic" (click)="backToSearch()">Cancel</button>
+                <button type="button" class="x-btn x-btn-danger x-btn-lg"
+                        [disabled]="!canConvert()"
+                        (click)="doConvert()">
+                    <i class="fa fa-exchange" aria-hidden="true"></i>
+                    {{ converting ? 'Converting…' : 'Convert to Tax Invoice' }}
+                </button>
             </div>
 
         </div>
-
-        <!-- ================= TOTALS STRIP =================
-             The three numbers that decide the conversion, above the fold, so the detail
-             tables below can stay folded away.                                            -->
-        @if (charges.length > 0) {
-<div class="pc-sum">
-            <div class="pc-sum-i">
-                <span class="pc-sum-k">Taxable value</span>
-                <span class="pc-sum-v">{{taxableTotal() | number:'1.2-2'}}</span>
-            </div>
-            <div class="pc-sum-i">
-                <span class="pc-sum-k">Tax &amp; round off</span>
-                <span class="pc-sum-v">{{totalTax() | number:'1.2-2'}}</span>
-            </div>
-            <div class="pc-sum-i pc-sum-grand">
-                <span class="pc-sum-k">Invoice total</span>
-                <span class="pc-sum-v">{{grandTotal() | number:'1.2-2'}}</span>
-            </div>
-        </div>
-}
-
-        <!-- ================= JOBS ================= -->
-        @if (jobs.length > 0) {
-<div class="x-card">
-            <div class="x-card-head">
-                <i class="fa fa-cubes" aria-hidden="true"></i>
-                <h2 class="x-card-title">Jobs</h2>
-                <span class="x-count">{{jobs.length}}</span>
-            </div>
-            <div class="x-tablewrap">
-                <table class="x-table">
-                    <thead>
-                        <tr><th>JOB NO</th><th class="x-num">PKGS</th><th class="x-num">GR.WT</th></tr>
-                    </thead>
-                    <tbody>
-                        @for (j of jobs; track j) {
-<tr>
-                            <td class="x-num">{{j.INV_JOBNO}}</td>
-                            <td class="x-num">{{j.INV_PKGS}}</td>
-                            <td class="x-num">{{j.INV_GRWT}}</td>
-                        </tr>
-}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-}
-
-        <!-- ================= CHARGES ================= -->
-        <div class="x-card">
-            <div class="x-card-head pc-head-btn" (click)="toggle('charges')">
-                <i class="fa fa-inr" aria-hidden="true"></i>
-                <h2 class="x-card-title">Charges</h2>
-                <span class="x-count">{{charges.length}}</span>
-                <i class="fa pc-chev" aria-hidden="true"
-                   [class.fa-chevron-up]="open.charges" [class.fa-chevron-down]="!open.charges"></i>
-            </div>
-            @if (open.charges) {
-<div class="x-tablewrap">
-                <table class="x-table">
-                    <thead>
-                        <tr>
-                            <th>CHARGE</th>
-                            <th>ACCOUNT</th>
-                            <th>TAX</th>
-                            <th class="x-num">QTY</th>
-                            <th class="x-num">RATE</th>
-                            <th>CUR</th>
-                            <th class="x-num">EX. RATE</th>
-                            <th class="x-num">AMOUNT</th>
-                            <th class="x-num">INR</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (c of charges; track c) {
-<tr>
-                            <td>{{c.CHRG_DESC}} @if (c.INV_DESC) {
-<span class="x-sub">{{c.INV_DESC}}</span>
-}</td>
-                            <td>{{c.ACCTNAME}}</td>
-                            <td>{{c.INV_TAXABLE}}</td>
-                            <td class="x-num">{{c.INV_QTY | number:'1.0-3'}}</td>
-                            <td class="x-num">{{c.INV_RATE | number:'1.2-2'}}</td>
-                            <td>{{c.CUR_NAME}}</td>
-                            <td class="x-num">{{c.INV_EXRATE | number:'1.2-4'}}</td>
-                            <td class="x-num">{{c.INV_AMOUNT | number:'1.2-2'}}</td>
-                            <td class="x-num">{{c.INV_INRAMT | number:'1.2-2'}}</td>
-                        </tr>
-}
-                        @if (charges.length == 0) {
-<tr>
-                            <td colspan="9" class="x-empty">No charge lines on this Proforma.</td>
-                        </tr>
-}
-                    </tbody>
-                    <tfoot>
-                        @if (charges.length > 0) {
-<tr class="pc-total">
-                            <td colspan="7"><b>Taxable value</b></td>
-                            <td class="x-num"><b>{{chargeTotal('INV_AMOUNT') | number:'1.2-2'}}</b></td>
-                            <td class="x-num"><b>{{chargeTotal('INV_INRAMT') | number:'1.2-2'}}</b></td>
-                        </tr>
-}
-                    </tfoot>
-                </table>
-            </div>
-}
-        </div>
-
-        <!-- ================= GST DETAILS ================= -->
-        @if (taxLines.length > 0) {
-<div class="x-card">
-            <div class="x-card-head pc-head-btn" (click)="toggle('gst')">
-                <i class="fa fa-calculator" aria-hidden="true"></i>
-                <h2 class="x-card-title">GST details</h2>
-                <i class="fa pc-chev" aria-hidden="true"
-                   [class.fa-chevron-up]="open.gst" [class.fa-chevron-down]="!open.gst"></i>
-            </div>
-            @if (open.gst) {
-<div class="x-tablewrap">
-                <table class="x-table">
-                    <thead>
-                        <tr>
-                            <th>CHARGE</th>
-                            <th>TAX</th>
-                            <th>ACCOUNT</th>
-                            <th class="x-num">RATE %</th>
-                            <th class="x-num">AMOUNT</th>
-                            <th class="x-num">INR</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (t of taxLines; track t) {
-<tr>
-                            <td class="x-cell-key">{{t.CHRG_CODE}}</td>
-                            <td>{{t.TAX_NAME}}</td>
-                            <td>{{t.ACCTNAME}}</td>
-                            <td class="x-num">{{t.RATE}}</td>
-                            <td class="x-num">{{t.TAX_AMT}}</td>
-                            <td class="x-num">{{t.TAX_INR}}</td>
-                        </tr>
-}
-                    </tbody>
-                    <tfoot>
-                        <tr class="pc-total">
-                            <td colspan="5"><b>Total tax &amp; round off</b></td>
-                            <td class="x-num"><b>{{totalTax() | number:'1.2-2'}}</b></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-}
-        </div>
-}
-
-        <!-- ================= SAC CODE SUMMARY ================= -->
-        @if (sacLines.length > 0) {
-<div class="x-card">
-            <div class="x-card-head pc-head-btn" (click)="toggle('sac')">
-                <i class="fa fa-list-alt" aria-hidden="true"></i>
-                <h2 class="x-card-title">SAC code summary</h2>
-                <span class="x-count">{{sacLines.length}}</span>
-                <i class="fa pc-chev" aria-hidden="true"
-                   [class.fa-chevron-up]="open.sac" [class.fa-chevron-down]="!open.sac"></i>
-            </div>
-            @if (open.sac) {
-<div class="x-tablewrap">
-                <table class="x-table">
-                    <thead>
-                        <tr>
-                            <th>SAC CODE</th>
-                            <th>ACCOUNT</th>
-                            <th>TAX</th>
-                            <th class="x-num">RATE %</th>
-                            <th class="x-num">TAXABLE VALUE</th>
-                            <th class="x-num">CGST</th>
-                            <th class="x-num">SGST</th>
-                            <th class="x-num">IGST</th>
-                            <th class="x-num">TOTAL TAX</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (s of sacLines; track s) {
-<tr>
-                            <td class="x-cell-key">
-                                @if (s.SACCODE) {
-<span>{{s.SACCODE}}</span>
-}
-                                @if (!s.SACCODE) {
-<span class="x-pill x-pill-warn">No SAC</span>
-}
-                            </td>
-                            <td>{{s.ACCTNAME}}</td>
-                            <td>{{s.TAX_CODE}}</td>
-                            <td class="x-num">{{s.RATE}}</td>
-                            <td class="x-num">{{s.TAXABLE_INR | number:'1.2-2'}}</td>
-                            <td class="x-num">{{s.CGST_AMT | number:'1.2-2'}}</td>
-                            <td class="x-num">{{s.SGST_AMT | number:'1.2-2'}}</td>
-                            <td class="x-num">{{s.IGST_AMT | number:'1.2-2'}}</td>
-                            <td class="x-num">{{s.TAX_TOTAL | number:'1.2-2'}}</td>
-                        </tr>
-}
-                    </tbody>
-                    <tfoot>
-                        <tr class="pc-total">
-                            <td colspan="4"><b>Total</b></td>
-                            <td class="x-num"><b>{{sacTotal('TAXABLE_INR') | number:'1.2-2'}}</b></td>
-                            <td class="x-num"><b>{{sacTotal('CGST_AMT') | number:'1.2-2'}}</b></td>
-                            <td class="x-num"><b>{{sacTotal('SGST_AMT') | number:'1.2-2'}}</b></td>
-                            <td class="x-num"><b>{{sacTotal('IGST_AMT') | number:'1.2-2'}}</b></td>
-                            <td class="x-num"><b>{{sacTotal('TAX_TOTAL') | number:'1.2-2'}}</b></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-}
-            @if (open.sac && missingSac()) {
-<div class="x-card-body">
-                <p class="x-sub">
-                    One or more charge accounts have no SAC code set in the account master. The
-                    tax invoice will print without a SAC against those lines.
-                </p>
-            </div>
-}
-        </div>
-}
-
-        <!-- ================= GST RATE CHECK ================= -->
-        @if (rates.length > 0) {
-<div class="x-card">
-            <div class="x-card-head pc-head-btn" (click)="toggle('rates')">
-                <i class="fa fa-percent" aria-hidden="true"></i>
-                <h2 class="x-card-title">GST rate check</h2>
-                @if (rateChanged()) {
-<span class="x-pill x-pill-warn">Changed</span>
-}
-                @if (!rateChanged()) {
-<span class="x-pill x-pill-ok">Unchanged</span>
-}
-                <i class="fa pc-chev" aria-hidden="true"
-                   [class.fa-chevron-up]="open.rates" [class.fa-chevron-down]="!open.rates"></i>
-            </div>
-            @if (open.rates) {
-<div class="x-tablewrap">
-                <table class="x-table">
-                    <thead>
-                        <tr>
-                            <th>TAX CODE</th>
-                            <th class="x-num">CGST</th>
-                            <th class="x-num">SGST</th>
-                            <th class="x-num">IGST</th>
-                            <th>STATUS</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (r of rates; track r) {
-<tr [class.pc-row-warn]="r.RATE_CHANGED == 'Y'">
-                            <td>{{r.TAX_CODE}}</td>
-                            <td class="x-num">{{r.CGST_THEN}} &rarr; {{r.CGST_NOW}}</td>
-                            <td class="x-num">{{r.SGST_THEN}} &rarr; {{r.SGST_NOW}}</td>
-                            <td class="x-num">{{r.IGST_THEN}} &rarr; {{r.IGST_NOW}}</td>
-                            <td>
-                                @if (r.RATE_CHANGED == 'Y') {
-<span class="x-pill x-pill-danger">Changed</span>
-}
-                                @if (r.RATE_CHANGED != 'Y') {
-<span class="x-pill x-pill-ok">Unchanged</span>
-}
-                            </td>
-                        </tr>
-}
-                    </tbody>
-                </table>
-            </div>
-}
-            @if (open.rates) {
-<div class="x-card-body">
-                <p class="x-sub">
-                    Left value is the rate on the Proforma date, right value is the rate on the
-                    Invoice Date. The Tax Invoice is calculated using the right-hand value.
-                </p>
-            </div>
-}
-        </div>
-}
-
-        <!-- ================= ACTIONS ================= -->
-        <div class="x-actions pc-actions">
-            <button type="button" class="x-btn x-btn-classic" (click)="backToSearch()">Cancel</button>
-            <button type="button" class="x-btn x-btn-danger x-btn-lg"
-                    [disabled]="!canConvert()"
-                    (click)="doConvert()">
-                <i class="fa fa-exchange" aria-hidden="true"></i>
-                {{ converting ? 'Converting…' : 'Convert to Tax Invoice' }}
-            </button>
-        </div>
-
-    </div>
-}
+    }
 </div>

@@ -6,9 +6,10 @@ import { LoaderService } from 'src/app/shared/service/loader.service';
 import { LoginService } from 'src/app/shared/service/loginService';
 import { ToastCommonService } from 'src/app/shared/service/toastService';
 @Component({
-  selector: 'app-reqbp-bill-list',
-  templateUrl: './reqbp-bill-list.component.html',
-  styles: [],
+    selector: 'app-reqbp-bill-list',
+    templateUrl: './reqbp-bill-list.component.html',
+    // import-page / import-entry are global (src/styles/kit); the popup shell sheets are local.
+    styleUrls: ['../export/consign-popup.css', './acc-popup-view.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

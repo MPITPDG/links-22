@@ -10,7 +10,7 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-advancefromClient',
     templateUrl: './advancefromclientPopUp.component.html',
-    styles: [],
+    styleUrls: ['../export/consign-popup.css', './acc-popup-view.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

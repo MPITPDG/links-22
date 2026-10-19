@@ -1,0 +1,737 @@
+/* ----------------------------------------------------------------
+   Links port (Phase 1): GLOBAL page-kit stylesheet, registered in
+   angular.json `styles` after src/tailwind.css.
+   Source: MPERPNG-20 src/app/export/consignment/consignment/consignment-page.css
+   Area add-on. In MP: styleUrls [import-page.css, consignment-page.css].
+   In Links: class "kit-consignment" on the component host or a wrapper around .im-page
+   (it also scopes the .cs-drawer / .vs-sug rules, which sit outside .im-page).
+   Every rule stays under its root class, so no legacy screen is affected.
+   Do not edit by hand without mirroring MP; regenerate from MP instead.
+   ---------------------------------------------------------------- */
+/* ============================================================
+   Export consignment - package additions on top of the Import page kit
+   (src/app/import/import-page.css). Load AFTER the kit.
+   Monochrome only. Shared by the consignment search, workspace, edit hub,
+   edit drawer, consignment view, job creation, order booking list and the
+   air-shipment / CO2 editors.
+   ============================================================ */
+
+/* ---------- a kit page hosted inside another kit page (route drawer) ---------- */
+.kit-consignment .im-page .im-page {
+    padding: 0;
+}
+
+.kit-consignment .im-page .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* ---------- filter grid that fits a variable number of fields ---------- */
+.kit-consignment .im-page .filters {
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+}
+
+.kit-consignment .im-page .filters .f-wide {
+    grid-column: span 2;
+}
+
+.kit-consignment .im-page .filters .f .btn {
+    width: 100%;
+}
+
+.kit-consignment .im-page .es-live {
+    padding: 0 16px 10px;
+    font-size: 12px;
+    color: var(--soft);
+}
+
+.kit-consignment .im-page .es-quick {
+    width: 200px;
+    height: 32px;
+}
+
+.kit-consignment .im-page .es-quick-sel {
+    width: 120px;
+    height: 32px;
+}
+
+.kit-consignment .im-page tr.es-row {
+    cursor: pointer;
+}
+
+/* ---------- sticky header with identity chips + section nav ---------- */
+.kit-consignment .im-page .cs-top {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--ground);
+    margin: 0 -24px 16px;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--edge);
+}
+
+.kit-consignment .im-page .cs-top .ph {
+    border-bottom: 0;
+    margin-bottom: 0;
+    padding: 12px 0 10px;
+}
+
+.kit-consignment .im-page .cs-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.kit-consignment .im-page .chip .k {
+    font-weight: 500;
+    color: var(--faint);
+    margin-right: 2px;
+}
+
+.kit-consignment .im-page .cs-nav {
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    border-top: 1px solid var(--line);
+}
+
+.kit-consignment .im-page .cs-nav button {
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--soft);
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    padding: 9px 12px 7px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.kit-consignment .im-page .cs-nav button:hover,
+.kit-consignment .im-page .cs-nav button.on {
+    color: var(--ink);
+    border-bottom-color: var(--mp-primary, var(--ink));
+}
+
+.kit-consignment .im-page .cs-nav .n {
+    font-family: var(--num);
+    font-weight: 500;
+    color: var(--faint);
+    margin-left: 4px;
+}
+
+.kit-consignment .im-page .cs-anchor,
+.kit-consignment .im-page .cv-anchor {
+    display: block;
+    scroll-margin-top: 150px;
+}
+
+/* ---------- one-page sections (the console-view shape) ----------
+   /export/Consignment/start puts all eleven sections on one page. They live in
+   a .cs-sections wrapper that is NOT inside .cs-drawer, so nothing is hidden;
+   the drawer rules further down still apply to the edit drawer only. */
+.kit-consignment .im-page .cs-sections > .cs-anchor {
+    display: block;
+}
+
+.kit-consignment .im-page .cs-sech {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--faint);
+    padding: 4px 0 6px;
+    border-top: 1px solid var(--line);
+    margin-top: 4px;
+}
+
+/* ---------- sections that cannot be filled until page 1 is submitted ----------
+   They are NOT placeholders: the real fields are on the page, inside a
+   fieldset[disabled], so every control is genuinely disabled (no tab stop, no
+   pointer-events trickery) and the kit's dashed-box-on-grey locked look applies
+   to it. Only the extras the kit does not already cover are added here. */
+.kit-consignment .im-page fieldset.cs-fs {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+}
+
+.kit-consignment .im-page textarea:disabled,
+.kit-consignment .im-page textarea[readonly],
+.kit-consignment .im-page .fld textarea.form-control:disabled {
+    border-style: dashed;
+    background: var(--fill);
+    color: var(--soft);
+}
+
+/* ng-select / my-date-picker are components, not native controls: their inner
+   input is disabled by the fieldset, but the wrapper still needs the look and
+   must not open its dropdown or calendar on a click. */
+.kit-consignment .im-page fieldset.cs-fs[disabled] ng-select .ng-select-container,
+.kit-consignment .im-page fieldset.cs-fs[disabled] .mydp {
+    border-style: dashed !important;
+    background: var(--fill) !important;
+    color: var(--soft) !important;
+}
+
+.kit-consignment .im-page fieldset.cs-fs[disabled] ng-select,
+.kit-consignment .im-page fieldset.cs-fs[disabled] my-date-picker,
+.kit-consignment .im-page fieldset.cs-fs[disabled] .cs-ic {
+    pointer-events: none;
+}
+
+.kit-consignment .im-page fieldset.cs-fs[disabled] .cs-ic {
+    color: var(--faint);
+}
+
+/* the one-line hint that replaces the old "Not ready" placeholder card */
+.kit-consignment .im-page .cs-sech .cs-lockhint {
+    margin-left: 10px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--faint);
+}
+
+/* empty line-item grid: the header row stays, this is the only body row */
+.kit-consignment .im-page table.tbl tbody tr.cs-none td {
+    color: var(--faint);
+    text-align: center;
+    font-style: italic;
+}
+
+/* ---------- section hub list (rows that open the drawer) ---------- */
+.kit-consignment .im-page table.tbl tbody tr.click {
+    cursor: pointer;
+}
+
+.kit-consignment .im-page table.tbl tbody tr.on td {
+    background: var(--band);
+}
+
+.kit-consignment .im-page table.tbl td.step {
+    width: 44px;
+    font-family: var(--num);
+    color: var(--faint);
+}
+
+/* ---------- right-side section drawer (the Shipment Progress pattern) ----------
+   Every section stays in the DOM; the drawer shows one at a time through
+   .cs-open, so no ngModel value is lost when it closes. */
+.kit-consignment .cs-scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 10, 10, .28);
+    z-index: 1040;
+}
+
+.kit-consignment .cs-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(1000px, 94vw);
+    z-index: 1041;
+    display: flex;
+    flex-direction: column;
+    background: var(--ground);
+    border-left: 1px solid var(--edge);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, .10);
+}
+
+.kit-consignment .cs-drawer.shut,
+.kit-consignment .cs-scrim.shut {
+    display: none;
+}
+
+.kit-consignment .cs-drawer-h {
+    flex: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    background: var(--band);
+    border-bottom: 1px solid var(--edge);
+}
+
+.kit-consignment .cs-drawer-h h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.kit-consignment .cs-drawer-h p {
+    margin: 2px 0 0;
+    color: var(--soft);
+    font-size: 12.5px;
+}
+
+.kit-consignment .cs-drawer-h .tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.kit-consignment .cs-drawer-b {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 16px 24px;
+}
+
+/* pinned Cancel / Done, bottom-right inside the drawer */
+.kit-consignment .cs-drawer-f {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 10px 24px;
+    background: var(--mp-surface, #fff);
+    border-top: 1px solid var(--edge);
+}
+
+.kit-consignment .cs-drawer-f .note {
+    margin-right: auto;
+    font-size: 12px;
+    color: var(--faint);
+}
+
+.kit-consignment .cs-drawer-f .r {
+    display: flex;
+    gap: 8px;
+}
+
+.kit-consignment .cs-drawer .cs-sections > .cs-anchor {
+    display: none;
+}
+
+.kit-consignment .cs-drawer .cs-sections > .cs-anchor.cs-open {
+    display: block;
+}
+
+.kit-consignment .cs-drawer .cs-sections > .cs-anchor > .card:last-child {
+    margin-bottom: 0;
+}
+
+/* date pickers must escape the scrolling drawer body */
+.kit-consignment .cs-drawer-b .mydp .selector {
+    z-index: 1200;
+}
+
+@media (max-width: 700px) {
+    .kit-consignment .cs-drawer-f .note {
+        display: none;
+    }
+    .kit-consignment .cs-drawer-h,
+    .kit-consignment .cs-drawer-b,
+    .kit-consignment .cs-drawer-f {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+}
+
+/* ---------- ruled cards ---------- */
+.kit-consignment .im-page .card-h {
+    background: var(--band);
+    border-radius: 6px 6px 0 0;
+}
+
+.kit-consignment .im-page .card-h h2 {
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    font-size: 12px;
+}
+
+.kit-consignment .im-page .card-h .cv-acts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.kit-consignment .im-page .btn.sm {
+    height: 28px;
+    padding: 0 10px;
+    font-size: 12px;
+}
+
+.kit-consignment .im-page .btn i.fa {
+    color: inherit;
+}
+
+/* sub heading band inside a card */
+.kit-consignment .im-page .cs-sub {
+    padding: 7px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--soft);
+    background: var(--band);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+
+.kit-consignment .im-page .cs-subsec {
+    border-top: 1px solid var(--line);
+}
+
+.kit-consignment .im-page .cs-subsec > .cs-sub {
+    border-top: 0;
+}
+
+.kit-consignment .im-page .cs-pad {
+    padding: 12px 16px;
+}
+
+.kit-consignment .im-page .cs-leg {
+    border-top: 1px solid var(--line);
+    margin: 12px -16px 0;
+}
+
+/* ---------- two-column label-left fields, ruled whatever the child order ----------
+   The kit rules field borders by nth-child; these grids mix full-width rows and
+   conditional fields, so every cell carries its own right and bottom rule and the
+   grid clips the outer edge. */
+.kit-consignment .im-page .fields {
+    overflow: hidden;
+}
+
+.kit-consignment .im-page .fields > .fld {
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line) !important;
+    margin: 0 -1px -1px 0;
+}
+
+.kit-consignment .im-page .fld.full {
+    grid-column: 1 / -1;
+}
+
+.kit-consignment .im-page .fld.top {
+    align-items: start;
+}
+
+.kit-consignment .im-page .fld.top > label {
+    padding-top: 7px;
+}
+
+.kit-consignment .im-page .fld textarea.form-control {
+    height: auto;
+    padding: 6px 10px;
+    min-height: 64px;
+}
+
+/* read-only value in a form: dashed box on grey = locked / computed */
+.kit-consignment .im-page .lockv {
+    display: block;
+    min-height: 32px;
+    line-height: 30px;
+    padding: 0 10px;
+    border: 1px dashed var(--edge);
+    background: var(--band);
+    border-radius: 4px;
+    color: var(--soft);
+    overflow-wrap: anywhere;
+}
+
+.kit-consignment .im-page .req {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+/* radio / checkbox groups */
+.kit-consignment .im-page .cs-opts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 20px;
+}
+
+.kit-consignment .im-page .cs-opts.boxed {
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    padding: 5px 10px;
+}
+
+.kit-consignment .im-page .cs-opt {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.kit-consignment .im-page input[type="checkbox"],
+.kit-consignment .im-page input[type="radio"] {
+    accent-color: var(--mp-primary, var(--ink));
+}
+
+.kit-consignment .im-page .cs-dim {
+    opacity: .5;
+}
+
+.kit-consignment .im-page .cs-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.kit-consignment .im-page input.cs-w28 {
+    width: 120px;
+}
+
+.kit-consignment .im-page .cs-unit {
+    font-weight: 600;
+}
+
+/* full-width rows inside a fields grid: action rows and line-item grids */
+.kit-consignment .im-page .cs-full {
+    grid-column: 1 / -1;
+}
+
+.kit-consignment .im-page .cs-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--line);
+    background: var(--sheet);
+}
+
+.kit-consignment .im-page .cs-actions.end {
+    justify-content: flex-end;
+    padding: 6px 16px;
+}
+
+.kit-consignment .im-page .fields > .tbl-wrap {
+    border-bottom: 1px solid var(--line);
+}
+
+.kit-consignment .im-page .cs-ic {
+    cursor: pointer;
+    color: var(--ink);
+    padding: 2px 4px;
+}
+
+.kit-consignment .im-page .cs-ics {
+    white-space: nowrap;
+}
+
+.kit-consignment .im-page .btn.cs-x {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    font-size: 16px;
+}
+
+/* job creation: the latest row keeps its meaning without the global cyan fill */
+.kit-consignment .im-page table.tbl tr.latest-row td {
+    background: var(--band) !important;
+    font-weight: 600;
+}
+
+/* ---------- notes, empty / loading ---------- */
+.kit-consignment .im-page .cs-note {
+    border: 1px dashed var(--edge);
+    background: var(--band);
+    color: var(--soft);
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+.kit-consignment .im-page .card .cs-note {
+    margin: 12px 16px;
+}
+
+.kit-consignment .im-page .cs-nolist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.kit-consignment .im-page .cs-empty {
+    padding: 28px 16px;
+    text-align: center;
+    color: var(--faint);
+}
+
+.kit-consignment .im-page .cs-empty-act {
+    margin-top: 12px;
+}
+
+/* pinned card footer (CO2 editor): primary action bottom-right */
+.kit-consignment .im-page .cs-cardfoot {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 10px 16px;
+    background: var(--sheet);
+    border-top: 1px solid var(--edge);
+    border-radius: 0 0 6px 6px;
+}
+
+.kit-consignment .im-page .cs-cardfoot .note {
+    margin-right: auto;
+    font-size: 12px;
+    color: var(--faint);
+}
+
+/* ---------- read-only key/value grids ---------- */
+.kit-consignment .im-page .es-kv,
+.kit-consignment .im-page .kv4 {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow: hidden;
+}
+
+.kit-consignment .im-page .kv2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: hidden;
+}
+
+.kit-consignment .im-page .es-kv.es-kv2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.kit-consignment .im-page .es-kv > .kv,
+.kit-consignment .im-page .kv4 > .kv,
+.kit-consignment .im-page .kv2 > .kv {
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr);
+    gap: 10px;
+    padding: 8px 16px;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin: 0 -1px -1px 0;
+    min-width: 0;
+}
+
+.kit-consignment .im-page .kv.full {
+    grid-column: 1 / -1;
+}
+
+.kit-consignment .im-page .kv .k {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--soft);
+}
+
+.kit-consignment .im-page .kv .v {
+    overflow-wrap: anywhere;
+}
+
+.kit-consignment .im-page .mono {
+    font-family: var(--num);
+    font-size: 12.5px;
+}
+
+.kit-consignment .im-page .cs-line {
+    display: block;
+}
+
+.kit-consignment .im-page table.tbl.cs-mini td {
+    padding: 4px 8px;
+}
+
+/* ---------- order booking list ---------- */
+.kit-consignment .im-page .ob-chk {
+    width: 44px;
+    text-align: center;
+}
+
+.kit-consignment .im-page tr.ob-on td {
+    background: var(--band);
+}
+
+.kit-consignment .im-page input.ob-pcs {
+    width: 96px;
+    text-align: right;
+    font-family: var(--num);
+}
+
+/* ---------- page bottoms ---------- */
+.kit-consignment .im-page.cv-page,
+.kit-consignment .im-page.ce-page,
+.kit-consignment .im-page.cs-form {
+    padding-bottom: 24px;
+}
+
+@media (max-width: 1100px) {
+    .kit-consignment .im-page .es-kv,
+    .kit-consignment .im-page .kv4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .kit-consignment .im-page .cs-top {
+        position: static;
+    }
+    .kit-consignment .im-page .kv2,
+    .kit-consignment .im-page .kv4,
+    .kit-consignment .im-page .es-kv {
+        grid-template-columns: 1fr;
+    }
+    .kit-consignment .im-page .es-kv > .kv,
+    .kit-consignment .im-page .kv4 > .kv,
+    .kit-consignment .im-page .kv2 > .kv {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+}
+
+@media (max-width: 700px) {
+    .kit-consignment .im-page .filters .f-wide {
+        grid-column: auto;
+    }
+}
+
+/* vessel suggest link next to the Vessel label */
+.kit-consignment .vs-sug { margin-left: 8px; font-size: 11px; font-weight: 500; cursor: pointer; text-decoration: underline; }
+
+
+/* ---------- T-000003: draft band, save error band, Saving spinner ---------- */
+.kit-consignment .im-page .cs-draftband,
+.kit-consignment .im-page .cs-errband {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 12px;
+    padding: 8px 12px;
+    border: 1px solid var(--edge);
+    background: var(--sheet);
+    color: var(--ink);
+    font-size: 13px;
+}
+.kit-consignment .im-page .cs-draftband .r { margin-left: auto; display: flex; gap: 8px; }
+.kit-consignment .im-page .cs-errband { margin: 16px 0 0; border-left: 3px solid var(--ink); font-weight: 600; }
+.kit-consignment .im-page .cs-errband .x {
+    margin-left: auto; background: none; border: 0; font-size: 18px; line-height: 1; cursor: pointer; color: inherit;
+}
+.kit-consignment .im-page .cs-spin {
+    display: inline-block; width: 12px; height: 12px; vertical-align: -2px;
+    border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%;
+    animation: cs-spin .8s linear infinite;
+}
+@keyframes cs-spin { to { transform: rotate(360deg); } }

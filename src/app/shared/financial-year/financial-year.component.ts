@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+﻿import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { LoginService } from '../service/loginService';
 import { DataService } from '../service/dataService';
 import { BehaviorSubject } from 'rxjs';
@@ -58,6 +58,64 @@ export class FinancialYearComponent {
         }
         this._loginService.setFinancialYearModify(financialYear);
         this.newSubject.next(`ACCOUNT YEAR : ${financialYear.STARTDATE} To ${financialYear.ENDDATE}`);
+    }
+
+    // ---- dropdown -----------------------------------------------------------
+    // Open state lives here rather than coming from ngx-bootstrap's
+    // dropdownToggle / *dropdownMenu, which need an enclosing [dropdown]
+    // container. Dropped into the new header there was none, so the menu could
+    // never open - the picker looked absent in the accounts module.
+
+    open = false;
+
+    toggle(event?: Event): void {
+        if (event) { event.preventDefault(); event.stopPropagation(); }
+        this.open = !this.open;
+    }
+
+    close(): void { this.open = false; }
+
+    pick(obj: any): void {
+        this.selectYear(obj);
+        this.open = false;
+    }
+
+    /**
+     * Built here, not with [class.x] in the template: Tailwind arbitrary values
+     * contain brackets and parens - bg-[var(--sidebar-accent)] - which are not
+     * safe inside an Angular class-binding name.
+     */
+    itemCls(obj: any): string {
+        // Monochrome: the row's own tick mark (see the template) shows which
+        // year is selected, so this only needs a neutral hover/active shade.
+        // justify-start with a reserved tick slot, not justify-between: with
+        // space-between and a conditionally rendered tick, unselected rows had
+        // nothing to push right and the panel showed dead space.
+        return 'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm '
+            + 'whitespace-nowrap tabular-nums transition-colors '
+            + 'hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-foreground)] '
+            + (this.isSelected(obj)
+                ? 'bg-[var(--sidebar-accent)] text-[var(--sidebar-foreground)] font-semibold'
+                : 'text-[var(--sidebar-muted)]');
+    }
+
+    isSelected(obj: any): boolean {
+        const fy = this._loginService.getLogin()?.[0]?.FINANCIAL_YEAR;
+        if (!fy) return false;
+        return String(fy.YEARID ?? fy.PK_YEARID) === String(obj.PK_YEARID);
+    }
+
+    /**
+     * Compact label for the header button. The full text is
+     * "ACCOUNT YEAR : 01-Apr-2026 To 31-Mar-2027", which is too long for a
+     * toolbar; this renders "2026-27" and keeps the full range in the menu.
+     */
+    /** Full range on the trigger - operators read the dates, not a shorthand. */
+    get shortLabel(): string {
+        const fy = this._loginService.getLogin()?.[0]?.FINANCIAL_YEAR;
+        const start = fy?.STARTDATE, end = fy?.ENDDATE;
+        if (!start || !end) return 'Select year';
+        return `${start} To ${end}`;
     }
 
     parseDate(s) {

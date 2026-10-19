@@ -1,270 +1,239 @@
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-header formheading">
-                <strong>Export - Master HAWB NO</strong>
+<!--
+  Export - print document - HAWB print update. Page kit recipe 2, ported from MPERPNG-20.
+  The Print button still opens the same legacy ASPX URL (printData() unchanged). MP's extra
+  "Print Hawb" button (popup /popup/hawbprint) is not carried: that popup does not exist in Links.
+-->
+<div class="im-page">
+
+  <div class="ph">
+    <div>
+      <h1>Master HAWB No</h1>
+      <p>Update the HAWB document before printing.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h2>Export - HAWB No</h2></div>
+
+    <div class="overflow-x-auto px-4 py-3">
+      <table class="w-full border-collapse border border-[var(--edge)] text-sm">
+        <tr>
+          <td colspan="4" class="border border-[var(--edge)] p-2 text-right text-sm font-medium">{{HAWBNO}} - {{HAWBDT}}</td>
+        </tr>
+        <tr>
+          <td class="border border-[var(--edge)] p-2 align-top">
+            <label class="mb-1 block">Shipper Name and Address</label>
+            <textarea rows="4" cols="40" OnlyCharacter="true" [(ngModel)]="shipper"></textarea>
+          </td>
+          <td rowspan="2" class="border border-[var(--edge)] p-2 align-top">
+            <span class="text-sm font-semibold text-[var(--ink)]">{{COM_NAME}}<br />&nbsp;&nbsp;{{CMP_CITY}}</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="border border-[var(--edge)] p-2 align-top">
+            <label class="mb-1 block">Consignee Name and Address</label>
+            <textarea rows="4" cols="40" OnlyCharacter="true" [(ngModel)]="consignee"></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td class="border border-[var(--edge)] p-2 align-top">
+            <label class="mb-1 block">Issuing Carriers agent name and City</label>
+            <textarea rows="4" cols="40" OnlyCharacter="true" [(ngModel)]="agentname"></textarea>
+          </td>
+          <td rowspan="2" class="border border-[var(--edge)] p-2 align-top">
+            <label class="mb-1 block">Accounting Information</label>
+            <textarea rows="6" OnlyCharacter="true" [(ngModel)]="actinfo"></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td class="border border-[var(--edge)] p-2 align-top">
+            <label class="mb-1 block">Agent's IATA Code</label>
+            <input type="text" class="max-w-56" [(ngModel)]="IATACode" />
+            <div class="mt-2">
+              <label class="mb-1 block">Account no</label>
+              <input type="text" class="max-w-56" [(ngModel)]="IATAcct" />
             </div>
-        </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="border border-[var(--edge)] p-2 align-top">
+            <label class="mb-1 block">Airport of Departure (Addr. of First Carrier) and Requested Routing</label>
+            <input type="text" class="max-w-56" [(ngModel)]="airportdep" />
+          </td>
+          <td class="border border-[var(--edge)] p-2 align-top">
+            <span class="text-sm text-[var(--soft)]">Reference No</span><br />
+            <span class="text-sm text-[var(--soft)]">Optional Shipping Information</span>
+          </td>
+        </tr>
+      </table>
+
+      <table class="mt-3 w-full border-collapse border border-[var(--edge)] text-sm">
+        <tr class="bg-[var(--band)] text-xs font-medium uppercase tracking-wide text-[var(--soft)]">
+          <td class="border border-[var(--edge)] p-2">To</td>
+          <td class="border border-[var(--edge)] p-2">By First Carrier</td>
+          <td class="border border-[var(--edge)] p-2">to</td>
+          <td class="border border-[var(--edge)] p-2">by</td>
+          <td class="border border-[var(--edge)] p-2">to</td>
+          <td class="border border-[var(--edge)] p-2">by</td>
+          <td class="border border-[var(--edge)] p-2">Currency</td>
+          <td class="border border-[var(--edge)] p-2">CHGS Code</td>
+          <td class="border border-[var(--edge)] p-2">PPD</td>
+          <td class="border border-[var(--edge)] p-2">COLL</td>
+          <td class="border border-[var(--edge)] p-2">PPD</td>
+          <td class="border border-[var(--edge)] p-2">COLL</td>
+          <td class="border border-[var(--edge)] p-2">Declared Value of Carriage</td>
+          <td class="border border-[var(--edge)] p-2">Declared Value of Custom</td>
+        </tr>
+        <tr>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="to1" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="bycarrier1" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="to2" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="by2" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="to3" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="by3" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="currency" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="chgs" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="ppd1" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="coll1" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="ppd2" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="coll2" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="valcarriage" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="valcustom" /></td>
+        </tr>
+        <tr>
+          <td colspan="4" class="border border-[var(--edge)] p-2 align-top">
+            <label class="mb-1 block">Airport Of Destination</label>
+            <input type="text" class="max-w-56" [(ngModel)]="airprtdest" />
+          </td>
+          <td colspan="3" class="border border-[var(--edge)] p-2 align-top">
+            <label class="mb-1 block">Requested Flight/date</label>
+            <input type="text" class="w-24" [(ngModel)]="reqfltdt1" />
+            <input type="text" class="w-24" [(ngModel)]="reqfltdt2" />
+          </td>
+          <td colspan="3" class="border border-[var(--edge)] p-2 align-top">
+            <label class="mb-1 block">Amount of Insurance</label>
+            <input type="text" class="max-w-56" [(ngModel)]="amtinsur" />
+          </td>
+          <td colspan="4" class="border border-[var(--edge)] p-2"></td>
+        </tr>
+        <tr>
+          <td colspan="14" class="border border-[var(--edge)] p-2 align-top">
+            <label class="mb-1 block">Handling Information</label>
+            <textarea rows="4" cols="60" OnlyCharacter="true" [(ngModel)]="handinfo"></textarea>
+          </td>
+        </tr>
+      </table>
+
+      <table class="mt-3 w-full border-collapse border border-[var(--edge)] text-sm">
+        <tr class="bg-[var(--band)] text-xs font-medium uppercase tracking-wide text-[var(--soft)]">
+          <td class="w-14 border border-[var(--edge)] p-2">No.of Pcs RCP</td>
+          <td class="w-14 border border-[var(--edge)] p-2">Grows Weight</td>
+          <td class="w-14 border border-[var(--edge)] p-2">kg lb</td>
+          <td class="w-14 border border-[var(--edge)] p-2">Rate Class</td>
+          <td class="w-14 border border-[var(--edge)] p-2">Commodity Item No.</td>
+          <td class="w-14 border border-[var(--edge)] p-2">Chargable Weight</td>
+          <td class="w-14 border border-[var(--edge)] p-2">Rate Charge</td>
+          <td class="w-14 border border-[var(--edge)] p-2">Total</td>
+          <td class="w-64 border border-[var(--edge)] p-2">Nature Of Quantity of Goods<br />(Incl.Dimensions or Volume)</td>
+        </tr>
+        <tr>
+          <td class="border border-[var(--edge)] p-1"><textarea rows="10" cols="5" OnlyCharacter="true" [(ngModel)]="pcsrcp"></textarea></td>
+          <td class="border border-[var(--edge)] p-1"><textarea rows="10" cols="5" OnlyCharacter="true" [(ngModel)]="grwt"></textarea></td>
+          <td class="border border-[var(--edge)] p-1"><textarea rows="10" cols="5" OnlyCharacter="true" [(ngModel)]="kglb"></textarea></td>
+          <td class="border border-[var(--edge)] p-1"><textarea rows="10" cols="5" OnlyCharacter="true" [(ngModel)]="ratecls"></textarea></td>
+          <td class="border border-[var(--edge)] p-1"><textarea rows="10" cols="5" OnlyCharacter="true" [(ngModel)]="commodity"></textarea></td>
+          <td class="border border-[var(--edge)] p-1"><textarea rows="10" cols="5" OnlyCharacter="true" [(ngModel)]="chblwt"></textarea></td>
+          <td class="border border-[var(--edge)] p-1"><textarea rows="10" cols="5" OnlyCharacter="true" [(ngModel)]="ratechrg"></textarea></td>
+          <td class="border border-[var(--edge)] p-1"><textarea rows="10" cols="5" OnlyCharacter="true" [(ngModel)]="total"></textarea></td>
+          <td class="w-64 border border-[var(--edge)] p-1"><textarea rows="10" cols="15" OnlyCharacter="true" [(ngModel)]="qtyofgoods"></textarea></td>
+        </tr>
+      </table>
+
+      <table class="mt-3 w-full border-collapse border border-[var(--edge)] text-sm">
+        <tr class="bg-[var(--band)] text-xs font-medium uppercase tracking-wide text-[var(--soft)]">
+          <td class="border border-[var(--edge)] p-2"><b>Prepaid</b></td>
+          <td class="border border-[var(--edge)] p-2"><b>Collect</b></td>
+          <td class="border border-[var(--edge)] p-2"><b>Other Charges</b></td>
+        </tr>
+        <tr>
+          <td colspan="2" class="border border-[var(--edge)] p-2 text-center">Weight Charge</td>
+          <td rowspan="6" class="border border-[var(--edge)] p-2 align-top">
+            <textarea rows="3" OnlyCharacter="true" [(ngModel)]="othrchrg"></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="ppwtchrg" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="ccwtchrg" /></td>
+        </tr>
+        <tr>
+          <td colspan="2" class="border border-[var(--edge)] p-2 text-center">Valuation Charge</td>
+        </tr>
+        <tr>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="ppvalchrg" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="ccvalchrg" /></td>
+        </tr>
+        <tr>
+          <td colspan="2" class="border border-[var(--edge)] p-2">Tax</td>
+        </tr>
+        <tr>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="pptax" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="cctax" /></td>
+        </tr>
+        <tr>
+          <td colspan="2" class="border border-[var(--edge)] p-2 text-center">Total Other Change Due Agent</td>
+          <td rowspan="4" class="border border-[var(--edge)] p-2 align-top">
+            <textarea rows="3" OnlyCharacter="true" [(ngModel)]="AGTNAME1"></textarea>
+            <p class="mt-1 text-xs text-[var(--soft)]">Signature of shipper or his Agent</p>
+          </td>
+        </tr>
+        <tr>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="ppothrchrg" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="ccothrchrg" /></td>
+        </tr>
+        <tr>
+          <td colspan="2" class="border border-[var(--edge)] p-2 text-center">Total Other Change Due Carrier</td>
+        </tr>
+        <tr>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="ppothrchrgCar" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="ccothrchrgCar" /></td>
+        </tr>
+        <tr>
+          <td colspan="2" class="border border-[var(--edge)] p-2 text-center">Total</td>
+          <td rowspan="4" class="border border-[var(--edge)] p-2 align-top">
+            <input type="text" [(ngModel)]="bottom" />
+            <p class="mt-1 text-xs text-[var(--soft)]">(date) at (place)</p>
+          </td>
+        </tr>
+        <tr>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="pptotal" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="cctotal" /></td>
+        </tr>
+        <tr>
+          <td class="border border-[var(--edge)] p-2 text-xs text-[var(--soft)]">Currency Coanverision Rates</td>
+          <td class="border border-[var(--edge)] p-2 text-xs text-[var(--soft)]">CC Charges in Dest. Currency</td>
+        </tr>
+        <tr>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="ppcrate" /></td>
+          <td class="border border-[var(--edge)] p-1"><input type="text" [(ngModel)]="ccdestcrate" /></td>
+        </tr>
+        <tr>
+          <td class="border border-[var(--edge)] p-2"></td>
+          <td class="border border-[var(--edge)] p-2"></td>
+          <td class="border border-[var(--edge)] p-2 align-top">
+            <label class="mb-1 block">Total Collect Charges</label>
+            <input type="text" [(ngModel)]="totcollchrg" />
+          </td>
+        </tr>
+      </table>
     </div>
-</div>
-<br />
-<div class="row">
-    <div class="col-sm-2"> </div>
-    <div class="col-sm-8"> 
-        <table class="table table-bordered table-striped table-sm-new bgwhite">
-            <tr>
-                <td colspan="4"><span class="col-form-span-label" style="margin-left: 600px;">{{HAWBNO}} - {{HAWBDT}}</span></td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="col-form-span-label">Shipper Name and Address</span>
-                    <br />
-                    <textarea style="FONT-SIZE: 12px;font-family: Courier New; " rows="4" cols="40" OnlyCharacter="true" [(ngModel)]="shipper"></textarea>
-                    
-                </td>
-                <td rowspan="2">
-                    <span class="col-form-span-label" > <b>{{COM_NAME}}</b> <br/> <b>&nbsp;&nbsp;{{CMP_CITY}}</b></span>
 
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="col-form-span-label">Consignee Name and Address</span>
-                    <br />
-                    <!-- <input [(ngModel)]="consignee" type="text" multiple="multiple" class="form-control width250 " style="height:50px"> -->
-                    <textarea  style="FONT-SIZE: 12px;font-family: Courier New; " rows="4" cols="40"  OnlyCharacter="true" [(ngModel)]="consignee"></textarea>
-                </td>
-
-            </tr>
-            <tr>
-                <td>
-                    <span class="col-form-span-label">Issuing Carriers agent name and City</span>
-                    <br /> <textarea  style="FONT-SIZE: 12px;font-family: Courier New; " rows="4" cols="40" OnlyCharacter="true" [(ngModel)]="agentname"></textarea>
-                    <!-- <input [(ngModel)]="agentname" type="text" multiple="multiple" class="form-control  width250 " style="height:50px"> -->
-                </td>
-                <td rowspan="2"> <span class="col-form-span-label">Accounting Information </span>
-                  <br />       <!--  <input [(ngModel)]="actinfo" type="text" multiple="multiple" class="form-control  width250 " style="height:50px"> -->
-                    <textarea rows="6"   class="form-control" OnlyCharacter="true" [(ngModel)]="actinfo"></textarea>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="col-form-span-label">Agent's IATA Code </span>
-                    <br />
-                    <input [(ngModel)]="IATACode" type="text" multiple="multiple" class="form-control width150 ">
-                    <div>
-                        <span class="col-form-span-label">Account no</span>
-                        <br />
-                        <input [(ngModel)]="IATAcct" type="text" multiple="multiple" class="form-control width150 ">
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span class="col-form-span-label">Airport of Departure (Addr. of First Carrier) and Requested
-                        Routing</span>
-                    <br />
-                     <input [(ngModel)]="airportdep" type="text" multiple="multiple" class="form-control  width150"> 
-                   
-                </td>
-                <div>
-                    <span class="col-form-span-label">  Reference No</span>
-                    <span class="col-form-span-label"> Optional Shipping Information</span>
-                </div>
-            </tr>
-
-        </table>
-        <table class="table table-bordered table-striped table-sm-new bgwhite">
-            <tr>
-                <td> <span class="col-form-span-label">  To</span> </td>
-                <td> <span class="col-form-span-label">   By First Carrier</span></td>
-                <td> <span class="col-form-span-label">  to</span> </td>
-                <td> <span class="col-form-span-label">  by</span> </td>
-                <td> <span class="col-form-span-label">   to</span> </td>
-                <td> <span class="col-form-span-label">   by</span> </td>
-                <td> <span class="col-form-span-label">   Currency </span> </td>
-                <td> <span class="col-form-span-label">  CHGS Code</span> </td>
-                <td> <span class="col-form-span-label">   PPD</span> </td>
-                <td> <span class="col-form-span-label">  COLL</span> </td>
-                <td> <span class="col-form-span-label">  PPD</span> </td>
-                <td> <span class="col-form-span-label">   COLL</span> </td>
-                <td> <span class="col-form-span-label">  Declared Value of Carriage</span> </td>
-                <td> <span class="col-form-span-label">  Declared Value of Custom</span> </td>
-            </tr>
-            <tr>
-                <td> <input [(ngModel)]="to1" type="text" class="form-control"> </td>
-                <td> <input [(ngModel)]="bycarrier1" type="text" class="form-control"> </td>
-                <td> <input [(ngModel)]="to2" type="text" class="form-control"> </td>
-                <td> <input [(ngModel)]="by2" type="text" class="form-control"> </td>
-                <td> <input [(ngModel)]="to3" type="text" class="form-control"> </td>
-                <td> <input [(ngModel)]="by3" type="text" class="form-control"></td>
-                <td> <input [(ngModel)]="currency" type="text" class="form-control"></td>
-                <td> <input [(ngModel)]="chgs" type="text" class="form-control"></td>
-                <td> <input [(ngModel)]="ppd1" type="text" class="form-control"></td>
-                <td> <input [(ngModel)]="coll1" type="text" class="form-control"></td>
-                <td> <input [(ngModel)]="ppd2" type="text" class="form-control"> </td>
-                <td> <input [(ngModel)]="coll2" type="text" class="form-control"> </td>
-                <td> <input [(ngModel)]="valcarriage" type="text" class="form-control"></td>
-                <td> <input [(ngModel)]="valcustom" type="text" class="form-control"></td>
-            </tr>
-            <tr>
-                <td colspan="4">
-                    <span class="col-form-span-label">   Airport Of Destination</span>
-                    <br />
-                    <input [(ngModel)]="airprtdest" type="text" class="form-control width150">
-                </td>
-                <td colspan="3">
-                    <span class="col-form-span-label">  Requested Flight/date </span>
-                    <br />
-                   
-                    <input [(ngModel)]="reqfltdt1" type="text" class="form-control width70"   >  
-                   <input [(ngModel)]="reqfltdt2" type="text"  class="form-control width70"    >
-                </td>
-                <!-- <td>     </td> -->
-                <td colspan="3">
-                    <span class="col-form-span-label">  Amount of Insurance</span>
-                    <br />
-                    <input [(ngModel)]="amtinsur" type="text" class="form-control width150">
-
-                </td>
-                <td colspan="4">
-                    <span class="col-form-span-label">   </span>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="14">
-                    <span class="col-form-span-label">   Handling Inforamtion</span>
-                    <br />
-                    <!-- <input [(ngModel)]="handinfo" multiple="multiple" type="text" class="form-control width220"  style="height:30px"> -->
-                    <textarea  style="FONT-SIZE: 12px;font-family: Courier New; " rows="4" cols="60"  OnlyCharacter="true" [(ngModel)]="handinfo"></textarea>
-
-                </td>
-            </tr>
-        </table>
-        <table class="table table-bordered table-striped table-sm-new bgwhite">
-            <tr>
-                <td style="width: 50px;"> <span class="col-form-span-label">  No.of Pcs RCP</span> </td>
-                <td style="width: 50px;"> <span class="col-form-span-label">   Grows Weight</span></td>
-                <td style="width: 50px;"> <span class="col-form-span-label">   kg lb </span> </td>
-                <td style="width: 50px;"> <span class="col-form-span-label">  Rate Class </span> </td>
-                <td style="width: 50px;"> <span class="col-form-span-label">  Commodity Item No.</span> </td>
-                <td style="width: 50px;"> <span class="col-form-span-label">  Chargable Weight</span> </td>
-                <td style="width: 50px;"> <span class="col-form-span-label">  Rate Charge </span> </td>
-                <td style="width: 50px;"> <span class="col-form-span-label">   Total</span> </td>
-                <td style="width: 250px;"> <span class="col-form-span-label">   Nature Of Quantity of Goods</span> <br />
-                    <span class="col-form-span-label"> (Incl.Dimensions or Volume)</span>
-                </td>
-            </tr>
-            <tr>
-            <tr>
-               <td><textarea style="FONT-SIZE: 12px;font-family: Courier New;" rows="10" cols="5" OnlyCharacter="true" [(ngModel)]="pcsrcp"></textarea>  </td> <!-- <input [(ngModel)]="pcsrcp" type="text" multiple="multiple" class="form-control"> -->
-                <td><textarea style="FONT-SIZE: 12px;font-family: Courier New;" rows="10" cols="5" OnlyCharacter="true" [(ngModel)]="grwt"></textarea>  </td> <!-- <input [(ngModel)]="grwt" type="text" multiple="multiple" class="form-control"> -->
-                <td><textarea   style="FONT-SIZE: 12px;font-family: Courier New;" rows="10" cols="5" OnlyCharacter="true" [(ngModel)]="kglb"></textarea> </td> <!-- <input [(ngModel)]="kglb" type="text" multiple="multiple" class="form-control"> -->
-                <td><textarea  style="FONT-SIZE: 12px;font-family: Courier New;" rows="10" cols="5" OnlyCharacter="true" [(ngModel)]="ratecls"></textarea> </td> <!-- <input [(ngModel)]="ratecls" type="text" multiple="multiple" class="form-control"> -->
-                <td><textarea  style="FONT-SIZE: 12px;font-family: Courier New;" rows="10" cols="5" OnlyCharacter="true" [(ngModel)]="commodity"></textarea> </td> <!-- <input [(ngModel)]="commodity" type="text" multiple="multiple" class="form-control">  -->
-                <td><textarea  style="FONT-SIZE: 12px;font-family: Courier New;" rows="10" cols="5" OnlyCharacter="true" [(ngModel)]="chblwt"></textarea> </td> <!--  <input [(ngModel)]="chblwt" type="text" multiple="multiple" class="form-control"> -->
-                <td> <textarea  style="FONT-SIZE: 12px;font-family: Courier New;" rows="10" cols="5" OnlyCharacter="true" [(ngModel)]="ratechrg"></textarea></td> <!-- <input [(ngModel)]="ratechrg" type="text" multiple="multiple" class="form-control"> -->
-                <td> <textarea  style="FONT-SIZE: 12px;font-family: Courier New;" rows="10" cols="5" OnlyCharacter="true" [(ngModel)]="total"></textarea></td> <!-- <input [(ngModel)]="total" type="text" multiple="multiple" class="form-control"> -->
-                <td><textarea   style="FONT-SIZE: 12px;font-family: Courier New;width: 250px;" rows="10" cols="15" OnlyCharacter="true" [(ngModel)]="qtyofgoods"></textarea></td> <!--  <input [(ngModel)]="qtyofgoods" type="text" multiple="multiple" class="form-control"> -->
-
-            </tr>
-        </table>
-        <table class="table table-bordered table-striped table-sm-new bgwhite">
-            <tr>
-                <td> <span class="col-form-span-label"><b>Prepaid</b>  </span> </td>
-                <td> <span class="col-form-span-label">  <b>Collect</b> </span></td>
-                <td> <span class="col-form-span-label">  <b>Other Charges</b> </span> </td>
-            </tr>
-            <tr>
-                <td colspan="2"><span class="col-form-span-label centerlabel">  Weight Charge</span> </td>
-                <td rowspan="6"><textarea rows="3"   class="form-control" OnlyCharacter="true" [(ngModel)]="othrchrg"></textarea><!-- <input [(ngModel)]="othrchrg" type="text" multiple="multiple" class="form-control width150"> -->
-                </td>
-            </tr>
-            <tr>
-                <td> <input [(ngModel)]="ppwtchrg" type="text" class="form-control width150"> </td>
-                <td> <input [(ngModel)]="ccwtchrg" type="text" class="form-control width150"> </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <span class="col-form-span-label centerlabel">  Valuation Charge</span>
-                </td>
-            </tr>
-            <tr>
-                <td> <input [(ngModel)]="ppvalchrg" type="text" class="form-control width150"> </td>
-                <td> <input [(ngModel)]="ccvalchrg" type="text" class="form-control width150"> </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <span class="col-form-span-label ">  Tax</span>
-                </td>
-            </tr>
-            <tr>
-                <td> <input [(ngModel)]="pptax" type="text" class="form-control width150"> </td>
-                <td> <input [(ngModel)]="cctax" type="text" class="form-control width150"> </td>
-               
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <span class="col-form-span-label centerlabel">  Total Other Change Due Agent</span>
-                </td>
-                <td rowspan="4"><textarea rows="3"   class="form-control" OnlyCharacter="true" [(ngModel)]="AGTNAME1"></textarea> 
-                    <!-- <input [(ngModel)]="othrchrg" type="text" multiple="multiple" class="form-control"> -->
-                    <br />
-                    <span class="col-form-span-label ">  Signature of shipper or his Agent </span>
-                </td>
-            </tr>
-            <tr>
-                <td> <input [(ngModel)]="ppothrchrg" type="text" class="form-control width150"> </td>
-                <td> <input [(ngModel)]="ccothrchrg" type="text" class="form-control width150"> </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <span class="col-form-span-label centerlabel">  Total Other Change Due Carrier</span>
-                </td>
-            </tr>
-            <tr>
-                <td> <input [(ngModel)]="ppothrchrgCar" type="text" class="form-control width150 "> </td>
-                <td> <input [(ngModel)]="ccothrchrgCar" type="text" class="form-control width150"> </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <span class="col-form-span-label centerlabel">  Total </span>
-                </td>
-                <td rowspan="4"> <input [(ngModel)]="bottom" type="text" class="form-control"> 
-                    <br />
-                    <span class="col-form-span-label ">  (date) at (place) </span>
-                </td>
-            </tr>
-            <tr>
-                <td> <input [(ngModel)]="pptotal" type="text" class="form-control width150"> </td>
-                <td> <input [(ngModel)]="cctotal" type="text" class="form-control width150"> </td>
-            </tr>
-            <tr>
-                <td> <span class="col-form-span-label ">  Currency Coanverision Rates</span> </td>
-                <td> <span class="col-form-span-label ">  CC Charges in Dest. Currency </span> </td>
-            </tr>
-            <tr>
-                <td> <input [(ngModel)]="ppcrate" type="text" class="form-control width150"> </td>
-                <td> <input [(ngModel)]="ccdestcrate" type="text" class="form-control width150"> </td>
-            </tr>
-            <tr>
-                    <td> <span class="col-form-span-label ">   </span> </td>
-                    <td> <span class="col-form-span-label ">    </span> </td>
-                    <td> <span class="col-form-span-label ">   Total Collect Charges </span> 
-                    <br/>
-                    <input [(ngModel)]="totcollchrg" type="text" class="form-control">
-                </td>
-            </tr>
-        </table>
-        <div class="col-sm-4 right-text">
-            <br />
-            <button type="button" name="submit" class="btn btn-sm btn-primary" (click)="updateprint();">
-                <span class="col-form-span-label"><i class="fa fa-save"></i> Submit</span>
-            </button>
-            <button type="button" name="Print" class="btn btn-sm btn-primary" (click)="printData();">
-                <span class="col-form-span-label"><i class="fa fa-print"></i> Print</span>
-            </button>
-        </div>
+    <div class="bar" style="margin:0;">
+      <span class="note"></span>
+      <span class="r">
+        <button type="button" class="btn g" name="Print" (click)="printData();">Print</button>
+        <button type="button" class="btn p" name="submit" (click)="updateprint();">Submit</button>
+      </span>
     </div>
-    <div class="col-sm-2"> </div>
+  </div>
+
 </div>

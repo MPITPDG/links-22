@@ -9,8 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 @Component({
     selector: 'app-accounts-vouchers-jv-journalvoucher-search',
     templateUrl: 'journalvoucher_search.component.html',
-    // styleUrls: ['../../../../node_modules/@ng-select/ng-select/themes/default.theme.css'], 
-    encapsulation: ViewEncapsulation.None,
+    styleUrls: ['../vouchers-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -18,10 +17,10 @@ export class JournalVoucherSearchComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {
         dateFormat: 'dd-mmm-yyyy',
         inline: false,
-        height: '16px',
-        width: '120px',
+        height: '30px',
+        width: '100%',
         componentDisabled: false,
-        selectionTxtFontSize: '12px',
+        selectionTxtFontSize: '13px',
         editableDateField: false,
         sunHighlight: true,
         satHighlight: true,
@@ -48,6 +47,13 @@ export class JournalVoucherSearchComponent implements OnInit {
     AccountList: any = [];
     Account: any = null;
     STATUS:string="";
+
+    readonly pageSize = 10;
+    page: number = 1;
+    loading: boolean = false;
+    loadError: boolean = false;
+    /** client-side quick filter over the result list */
+    Quick: string = '';
     constructor(
         private _dataService: DataService,
         private _loginService: LoginService,
@@ -74,9 +80,29 @@ export class JournalVoucherSearchComponent implements OnInit {
              });
 
              if (this.STATUS=="JVREQ"){  this._loginService.verifyRights(192, '')
-             .subscribe((data: any) => { this._loginService.checkVerify('View', data); });}
+             .subscribe((data: any) => { if (this._loginService.checkVerify('View', data)) { this.loadDefault(); } });}
              else  if (this.STATUS=="JV"){  this._loginService.verifyRights(9, '')
-             .subscribe((data: any) => { this._loginService.checkVerify('View', data); });}
+             .subscribe((data: any) => { if (this._loginService.checkVerify('View', data)) { this.loadDefault(); } });}
+    }
+
+    /** default list on open: the same ACC_JV_SEARCH date search, last 30 days, without the
+        one-row auto-open or the "No record found" toast of a user search */
+    loadDefault() {
+        const to = new Date();
+        const from = new Date(); from.setDate(from.getDate() - 30);
+        const mk = (d: Date) => ({
+            date: { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() },
+            formatted: this.fmtPicker(d)
+        });
+        this.Type = 'DATE';
+        this.FromDate = mk(from);
+        this.ToDate = mk(to);
+        this.getData('DATE', '', true);
+    }
+
+    private fmtPicker(d: Date): string {
+        const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        return String(d.getDate()).padStart(2, '0') + '-' + m[d.getMonth()] + '-' + d.getFullYear();
     }
 
     fnValidate_Code(): boolean {
@@ -184,7 +210,7 @@ export class JournalVoucherSearchComponent implements OnInit {
 
        }
 
-    getData(searchtype,Typevalue) {
+    getData(searchtype,Typevalue, isDefault: boolean = false) {
         const _jsonData = {
            
             CODE: searchtype,
@@ -203,11 +229,20 @@ export class JournalVoucherSearchComponent implements OnInit {
         
         };
         this._loaderService.display(true);
+        this.loading = true;
+        this.loadError = false;
         this._dataService.getData("Accounts/ACC_JV_SEARCH", _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
+                this.loading = false;
+                this.page = 1;
+                if (isDefault) {
+                    this.searchList = (data && data.Table) ? data.Table : [];
+                    return;
+                }
                // console.log(data);
                 if (data.Table.length == 0) {
+                    this.searchList = [];
                     this._toasterService.toast("warning", "Alert", "No record found");
                     return false;
                 }
@@ -224,7 +259,50 @@ export class JournalVoucherSearchComponent implements OnInit {
                     this.displayType = 'LIST';
                     this.searchList = data.Table;
                 }
+            }, () => {
+                this._loaderService.display(false);
+                this.loading = false;
+                this.loadError = true;
             });
+    }
+
+    // ---------- list: quick filter, pager, export ----------
+    get Filtered(): Array<any> {
+        const q = (this.Quick || '').trim().toLowerCase();
+        const list = this.searchList || [];
+        if (!q) { return list; }
+        return list.filter((r: any) => [r.JVCODE, r.JV_DATE, r.AMOUNT].some(v => String(v == null ? '' : v).toLowerCase().indexOf(q) >= 0));
+    }
+    get pageCount(): number { return Math.max(1, Math.ceil(this.Filtered.length / this.pageSize)); }
+    get pageRows(): Array<any> { const s = (this.page - 1) * this.pageSize; return this.Filtered.slice(s, s + this.pageSize); }
+    get rangeStart(): number { return this.Filtered.length ? (this.page - 1) * this.pageSize + 1 : 0; }
+    get rangeEnd(): number { return Math.min(this.page * this.pageSize, this.Filtered.length); }
+    get pageList(): number[] {
+        const n = this.pageCount, p = this.page;
+        if (n <= 7) { return Array.from({ length: n }, (_, i) => i + 1); }
+        const out: number[] = [1];
+        const lo = Math.max(2, p - 1), hi = Math.min(n - 1, p + 1);
+        if (lo > 2) { out.push(0); }
+        for (let i = lo; i <= hi; i++) { out.push(i); }
+        if (hi < n - 1) { out.push(0); }
+        out.push(n);
+        return out;
+    }
+    goPage(p: number) { if (p >= 1 && p <= this.pageCount) { this.page = p; } }
+    clearList() { this.ResetAll(); this.Quick = ''; this.searchList = []; this.displayType = 'SEARCH'; this.page = 1; }
+    exportCsv() {
+        const head = ['Voucher no', 'Voucher date', 'Amount'];
+        const rows = this.Filtered.map((r: any) => [r.JVCODE, r.JV_DATE, r.AMOUNT]);
+        const q = (v: any) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+        const csv = [head, ...rows].map(l => l.map(q).join(',')).join('\r\n');
+        const d = new Date();
+        const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+        const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = (this.STATUS == 'JVREQ' ? 'jv-requests-' : 'journal-vouchers-') + stamp + '.csv';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 0);
     }
 
     redirectToEdit(EntryNo) {

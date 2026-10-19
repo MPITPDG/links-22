@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 @Component({
     selector: 'app-purchase-View',
     templateUrl: './purchase-view.component.html',
-    styles: [],
+    styleUrls: ['../export/consign-popup.css', './acc-popup-view.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

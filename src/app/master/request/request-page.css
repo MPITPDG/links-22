@@ -1,0 +1,57 @@
+/* ============================================================
+   Master request forms (client / consignee) - small additions on top of
+   the import page kit (import-page.css). Monochrome collapsible section
+   headers for the CONTACT 1-4 / OTHER / BANK DETAILS blocks, which used to
+   be a colored bar toggled by getcollapse(). Everything else (cards,
+   fields, buttons, tables) comes from the kit.
+   ============================================================ */
+:host ::ng-deep .im-page .coll-h {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    user-select: none;
+    background: var(--band);
+}
+
+:host ::ng-deep .im-page .coll-h:hover {
+    background: var(--fill);
+}
+
+:host ::ng-deep .im-page .coll-h h2 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+:host ::ng-deep .im-page .coll-h .arrow {
+    color: var(--soft);
+    font-size: 11px;
+}
+
+:host ::ng-deep .im-page .card.sec > .fields:only-of-type {
+    margin-top: 0;
+}
+
+:host ::ng-deep .im-page .foot {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--line);
+}
+
+/* ---------- Links port additions ---------- */
+/* Also pulled in by common/Common-Search and the generalaccount screens for .foot
+   (the search / child-row action strip that closes a card).
+   1. the Links my-date-picker shim host is inline-block, so it shrinks inside a .fld
+      cell; make it fill the cell like the other inputs (same fix as
+      import/master/master-page.css and accounts/purchase/purchase-page.css). */
+:host ::ng-deep .im-page my-date-picker {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}

@@ -1,0 +1,916 @@
+/*===============================================================================================
+  EXPORT_REDESIGN_PROCS_LINKSDB20_20261016.sql         (LinksDB20)
+
+  Why  : the redesigned Links export screens (brought over from MP Cargo's MPERPNG-20 front end) call
+         five Links API actions that the Links API did not have. They are now in ExportController
+         (Links_v5_API, branch feature/links-redesign-backend). None of their stored procedures exist
+         on LinksDB20 (checked 2026-10-16). This script creates them, copied from the live Manilal
+         (MP Cargo) definitions and adapted to LinksDB20 where each body says "LINKS:":
+
+           Links API (ExportController)                          procedure
+           GET  api/Export/EXPT_SHIPMENT_PROGRESS_GETBLDATA      dbo.USP_EXPT_SHIPMENT_PROGRESS_GETBLDATA
+           POST api/Export/EXPT_SHIPMENTPROGRESS_BLDETAILS_UPDATE  dbo.USP_EXP_SHIPMENT_PROGRESS_BL_UPDATE
+           GET  api/Export/EXP_RPT_MISSING_DOCS                  dbo.USP_EXP_RPT_MISSING_DOCS
+           POST api/Export/ExportEditCo2Update                   dbo.USP_EXP_MST_EDIT_CO2_UPDATE
+           POST api/Export/UpdateJob                             dbo.USP_EXP_MST_EXPORT_JOB_UPDATE
+
+  LinksDB20 adaptations (details in each procedure's own header):
+    GETBLDATA    @BLNO VARCHAR(50) (EXPT_BLNO is CHAR(50); MP cuts at 20) and @EXPT_VESSEL VARCHAR(50) (MP's 10
+                 cuts the 12-character placeholder vessel MUM2099XXXXX). PKGS / GRWT / CHBLWT / PCS through
+                 dbo.FN_SAFE_FLOAT: LinksDB20 holds 52 EXPT_GRWT and 9 EXPT_CHBLWT values such as '5,750.00'
+                 on which MP's CONVERT(FLOAT) fails for the whole vessel.
+    BL_UPDATE    @BLNO VARCHAR(50); the temp EXPTNO column VARCHAR(25) like EXPT_MASTER.EXPTNO.
+    MISSING_DOCS logic unchanged. TBL_EXPT_BOOKING_ORDER is empty on LinksDB20 and the HappyChic EDI dates
+                 are never filled, so it answers STATUS '103' (the screen's empty state) until bookings exist.
+    EDIT_CO2     a job without a MAWB (every sea job) is updated itself - MP's text updates only through the
+                 MAWB and would change nothing on LinksDB20. LinksDB20 has no CONSOLE_MASTER, so MP's UPDATE
+                 of it is dropped. Audit date / time are filled (NULL in MP). '' clears the value. MP's
+                 commented-out mail block is left out.
+    JOB_UPDATE   NULL @EXWORK / @CUSTOMCLR / @FREIGHTFRD keep the stored flags (MP's screen never sends them).
+                 Table1: VOLWT through FN_SAFE_FLOAT; CMP_DTLS joined on the text of CMPID, because
+                 EXPT_SUBAGT holds supplier codes ('S100788') and MP's INT comparison fails (in MP too).
+                 @EXPT_VESSEL VARCHAR(50): MP's 10 would save MUM2099XXXXX (117 jobs) cut to 10 characters.
+
+  Safety : step 1 checks everything first and stops before creating anything if one check fails: the
+           database is LinksDB20, you may CREATE PROCEDURE, every table, column and function the five
+           procedures use exists, and each of the five names is either free or a procedure created by
+           this script before (its text names this file). A same-named object from anywhere else stops
+           the script, so nothing foreign is ever replaced. Then each procedure is dropped (only ever
+           this script's own) and created, with ANSI_NULLS ON and QUOTED_IDENTIFIER ON as in MP.
+           Nothing else is created or altered and no table row is touched by running this script; the
+           last step only runs the two read-only procedures once. Re-runnable.
+  Rollback: ROLLBACK_EXPORT_REDESIGN_PROCS_LINKSDB20_20261016.sql drops the five procedures
+            (only those whose text names this file). None existed on LinksDB20 before, so there is no
+            older definition to restore.
+  Source copies: Links_v5_API\LINKS_V8NG_API\Database\StoredProcedures\Export\<procedure>.sql
+  Run as : any login that may CREATE PROCEDURE on LinksDB20 (normal login). SQL Server 2008 R2.
+===============================================================================================*/
+USE [LinksDB20]
+GO
+SET NOCOUNT ON;
+SET ANSI_NULLS ON;
+SET QUOTED_IDENTIFIER ON;
+GO
+
+/* ---- 1. prerequisites ------------------------------------------------------------------ */
+DECLARE @problems TABLE (n INT IDENTITY(1,1), problem VARCHAR(600));
+DECLARE @marker   VARCHAR(100);
+SET @marker = 'EXPORT_REDESIGN_PROCS_LINKSDB20_20261016';      -- every procedure below carries this text
+
+-- 1a. we must really be on LinksDB20 (if USE failed above the session is still in another DB)
+IF UPPER(DB_NAME()) <> 'LINKSDB20'
+    INSERT INTO @problems (problem) VALUES ('Connected to ' + DB_NAME() + ', not LinksDB20.');
+
+-- 1b. permission to create the procedures
+IF ISNULL(HAS_PERMS_BY_NAME(DB_NAME(), 'DATABASE', 'CREATE PROCEDURE'), 0) = 0
+    INSERT INTO @problems (problem) VALUES ('No CREATE PROCEDURE permission on ' + DB_NAME() + '.');
+
+-- 1c. every table and column the five procedures read or write
+INSERT INTO @problems (problem)
+SELECT 'Column dbo.' + x.t + '.' + x.c + ' not found.'
+  FROM (VALUES
+        ('EXPT_MASTER', 'EXPTNO'), ('EXPT_MASTER', 'ID'), ('EXPT_MASTER', 'CMPCODE'), ('EXPT_MASTER', 'CITYCODE'),
+        ('EXPT_MASTER', 'USERNAME'), ('EXPT_MASTER', 'EXPT_MODE'), ('EXPT_MASTER', 'EXPT_EXPORTER'), ('EXPT_MASTER', 'EXPT_BILLTO'),
+        ('EXPT_MASTER', 'EXPT_CONSIGNEE'), ('EXPT_MASTER', 'EXPT_BUYER'), ('EXPT_MASTER', 'AGENT'), ('EXPT_MASTER', 'EXPT_SUBAGT'),
+        ('EXPT_MASTER', 'EXPT_VESSEL'), ('EXPT_MASTER', 'VSL_PORT'), ('EXPT_MASTER', 'EXPT_NOOFPKGS'), ('EXPT_MASTER', 'EXPT_TYPEOFPKGS'),
+        ('EXPT_MASTER', 'EXPT_NOOFPCS'), ('EXPT_MASTER', 'EXPT_TYPEOFPCS'), ('EXPT_MASTER', 'EXPT_GRWT'), ('EXPT_MASTER', 'EXPT_NETWT'),
+        ('EXPT_MASTER', 'EXPT_VOLUME'), ('EXPT_MASTER', 'EXPT_CHBLWT'), ('EXPT_MASTER', 'EXPT_INVNO'), ('EXPT_MASTER', 'EXPT_INVDATE'),
+        ('EXPT_MASTER', 'EXPT_DOCRECD'), ('EXPT_MASTER', 'EXPT_INVTYPE'), ('EXPT_MASTER', 'EXPT_FREIGHT'), ('EXPT_MASTER', 'EXPT_SHIPBILLTYPE'),
+        ('EXPT_MASTER', 'EXPT_LDGPORT'), ('EXPT_MASTER', 'EXWORKS'), ('EXPT_MASTER', 'CUSTOM_CLR'), ('EXPT_MASTER', 'FREIGHT_FRD'),
+        ('EXPT_MASTER', 'EXPT_BLNO'), ('EXPT_MASTER', 'EXPT_BLDT'), ('EXPT_MASTER', 'EXPT_BLTYPE'), ('EXPT_MASTER', 'JOBNO'),
+        ('EXPT_MASTER', 'HC_C2_SENTDT'), ('EXPT_MASTER', 'ACTUALFLIGHTDT'), ('EXPT_MASTER', 'ACTUALFLIGHTNO'), ('EXPT_MASTER', 'CO2_EMITION_LVL'),
+        ('EXPT_MASTER', 'HOUSEBILLNO'), ('EXPT_MASTER', 'HOUSEBILLDT'), ('EXPT_MASTER', 'AEROBILLNO'), ('EXPT_MASTER', 'AEROBILLDT'),
+        ('EXPT_MASTER', 'MAWBDEST'), ('EXPT_MASTER', 'MAWBFRT'), ('EXPT_MASTER', 'FLIGHTNO'), ('EXPT_MASTER', 'FLIGHTDT'),
+        ('EXPT_MASTER', 'FLIGHTNO1'), ('EXPT_MASTER', 'FLIGHTNO2'), ('EXPT_MASTER', 'ETAPORT1'), ('EXPT_MASTER', 'ETAPORT2'),
+        ('EXPT_MASTER', 'ETDPORT1'), ('EXPT_MASTER', 'ETDPORT2'), ('EXPT_MASTER', 'TRANSPORT1'), ('EXPT_MASTER', 'TRANSPORT2'),
+        ('EXPT_MASTER', 'EXPTCANCEL'), ('EXPT_MASTER', 'EXPT_FRT'), ('EXPT_MASTER', 'IsDiffAir'), ('EXPT_MASTER', 'EXPT_VSLAGENT'),
+        ('EXPT_MASTER', 'MODEOF_SHIPMENT'), ('EXPT_MASTER', 'CONSOLIDATION'), ('EXPT_MASTER', 'CARTEDDT'), ('EXPT_MASTER', 'OUTCHARGEDT'),
+        ('EXPT_MASTER', 'EXPT_SHIPCUSTOM'), ('EXPT_MASTER', 'AIRLINENAME'), ('EXPT_MASTER', 'PREALERTDT'), ('EXPT_MASTER', 'EXPT_POD'),
+        ('EXP_MASTER', 'EXP_CODE'), ('EXP_MASTER', 'EXP_NAME'), ('CONSIGNEE_MASTER', 'CON_CODE'), ('CONSIGNEE_MASTER', 'CON_NAME'),
+        ('EXPT_CONTAINER1', 'EXPTNO'), ('EXPT_CONTAINER1', 'CONTAINERNO'), ('EXPT_CONTAINER', 'CONTAINERNO'), ('EXPT_CONTAINER', 'BOOK_CARR_NBR'),
+        ('TBL_EXPT_BOOKING_ORDER', 'Concode'), ('TBL_EXPT_BOOKING_ORDER', 'Orderno'), ('TBL_EXPT_BOOKING_ORDER', 'Styleno'), ('TBL_EXPT_BOOKING_ORDER', 'BOOKINGNO'),
+        ('TBL_EXPT_BOOKING_ORDER', 'Orderid'), ('TBL_EXPT_BOOKING_ORDER', 'mode'), ('TBL_EXPT_BOOKING_ORDER', 'citycode'), ('TBL_EXPT_BOOKING_ORDER', 'EXPCODE'),
+        ('TBL_EXPT_BOOKING_ORDER', 'CargoExpectDt'), ('TBL_EXPT_BOOKING_ORDER', 'New_ship_dt'), ('TBL_EXPT_BOOKING_ORDER', 'HC_BKD_PLDT'), ('TBL_EXPT_BOOKING_ORDER', 'ISAuthorised'),
+        ('TBL_EXPT_BOOKING_ORDER', 'Bookingdt'), ('CITY_MASTER', 'CITY_CODE'), ('CITY_MASTER', 'CITY_NAME'), ('CITY_MASTER', 'CITY_COUNTRY'),
+        ('EXPT_ORDERNO', 'EXPTNO'), ('EXPT_ORDERNO', 'ORDERNO'), ('EXPT_ORDERNO', 'STYLENO'), ('EXPT_ORDERNO', 'HC_DOC_DT'),
+        ('SUPPLIER_MASTER', 'SUP_CODE'), ('SUPPLIER_MASTER', 'SUP_NAME'), ('EXPT_AIRBACK', 'EXPTNO'), ('EXPT_AIRBACK', 'CARTEDDT'),
+        ('EXPT_AIRBACK', 'OUTCHARGEDT'), ('EXPT_AIRBACK', 'EXPT_SHIPCUSTOM'), ('EXPT_AIRBACK', 'AIRLINENAME'), ('EXPT_AIRBACK', 'FLIGHTNO'),
+        ('EXPT_AIRBACK', 'FLIGHTDT'), ('EXPT_AIRBACK', 'AEROBILLNO'), ('EXPT_AIRBACK', 'AEROBILLDT'), ('EXPT_AIRBACK', 'HOUSEBILLNO'),
+        ('EXPT_AIRBACK', 'HOUSEBILLDT'), ('EXPT_AIRBACK', 'TRANSPORT1'), ('EXPT_AIRBACK', 'ETDPORT1'), ('EXPT_AIRBACK', 'ETAPORT1'),
+        ('EXPT_AIRBACK', 'TRANSPORT2'), ('EXPT_AIRBACK', 'ETDPORT2'), ('EXPT_AIRBACK', 'ETAPORT2'), ('EXPT_AIRBACK', 'FLIGHTNO1'),
+        ('EXPT_AIRBACK', 'FLIGHTNO2'), ('EXPT_AIRBACK', 'ACTUALFLIGHTNO'), ('EXPT_AIRBACK', 'ACTUALFLIGHTDT'), ('EXPT_AIRBACK', 'MAWBDEST'),
+        ('EXPT_AIRBACK', 'MAWBFRT'), ('EXPT_AIRBACK', 'PREALERTDT'), ('EXPT_AIRBACK', 'MODIFYDT'), ('EXPT_AIRBACK', 'MODIFYTIME'),
+        ('EXPT_AIRBACK', 'USERID'), ('EXPT_AIRBACK', 'CO2_EMITION_LVL'), ('USERTRACK', 'USERNAME'), ('USERTRACK', 'ENTRYDATE'),
+        ('USERTRACK', 'ENTRYTIME'), ('USERTRACK', 'TABLENAME'), ('USERTRACK', 'KEYFIELD'), ('USERTRACK', 'CODENO'),
+        ('USERTRACK', 'CITYCODE'), ('USERTRACK', 'CMPCODE'), ('USERTRACK', 'COMMAND'), ('USERTRACK', 'STATUS'),
+        ('TBL_USERTRACK_EXPTMASTER', 'USERID'), ('TBL_USERTRACK_EXPTMASTER', 'DATETIME'), ('TBL_USERTRACK_EXPTMASTER', 'MODE'), ('TBL_USERTRACK_EXPTMASTER', 'TABLENAME'),
+        ('TBL_USERTRACK_EXPTMASTER', 'COLUMNNAME'), ('TBL_USERTRACK_EXPTMASTER', 'ORIGINALDATA'), ('TBL_USERTRACK_EXPTMASTER', 'MODIFIEDDATA'), ('TBL_USERTRACK_EXPTMASTER', 'RECORDID'),
+        ('TBL_USERTRACK_EXPTMASTER', 'CODE'), ('TBL_USERTRACK_EXPTMASTER', 'LOCALIPADD'), ('TBL_USERTRACK_EXPTMASTER', 'ROUTERIPADD'), ('VSL_MASTER', 'VSL_RTNO'),
+        ('VSL_MASTER', 'VSL_NAME'), ('CMP_DTLS', 'CMPID'), ('CMP_DTLS', 'CMP_USERNAME')
+       ) x (t, c)
+ WHERE COL_LENGTH('dbo.' + x.t, x.c) IS NULL;
+
+-- 1d. functions they call
+IF OBJECT_ID('dbo.fn_Split') IS NULL
+   OR NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('dbo.fn_Split') AND name = 'value')
+    INSERT INTO @problems (problem) VALUES ('Table function dbo.fn_Split (column value) not found - used by USP_EXP_SHIPMENT_PROGRESS_BL_UPDATE.');
+IF OBJECT_ID('dbo.FN_SAFE_FLOAT', 'FN') IS NULL
+    INSERT INTO @problems (problem) VALUES ('Scalar function dbo.FN_SAFE_FLOAT not found - used by GETBLDATA and JOB_UPDATE.');
+IF OBJECT_ID('dbo.FN_EXP_MST_EXPORT_SEARCH_LIST_ORDERNO', 'FN') IS NULL
+    INSERT INTO @problems (problem) VALUES ('Scalar function dbo.FN_EXP_MST_EXPORT_SEARCH_LIST_ORDERNO not found - used by USP_EXP_MST_EXPORT_JOB_UPDATE.');
+
+-- 1e. the five names: free, or a procedure this script created on an earlier run
+INSERT INTO @problems (problem)
+SELECT 'dbo.' + x.p + ' already exists (' + o.type_desc + ') and was not created by this script - it would be replaced. Compare it with this script first.'
+  FROM (VALUES ('USP_EXPT_SHIPMENT_PROGRESS_GETBLDATA'), ('USP_EXP_SHIPMENT_PROGRESS_BL_UPDATE'), ('USP_EXP_RPT_MISSING_DOCS'), ('USP_EXP_MST_EDIT_CO2_UPDATE'), ('USP_EXP_MST_EXPORT_JOB_UPDATE')) x (p)
+  JOIN sys.objects o ON o.object_id = OBJECT_ID('dbo.' + x.p)
+ WHERE o.type <> 'P'
+    OR CHARINDEX(@marker, ISNULL(OBJECT_DEFINITION(o.object_id), '')) = 0;
+
+IF EXISTS (SELECT 1 FROM @problems)
+BEGIN
+    PRINT '*** Prerequisite check failed on ' + DB_NAME() + ' - NOTHING was created or dropped:';
+    SELECT n AS [#], problem FROM @problems ORDER BY n;
+    RAISERROR('Prerequisite check failed - see the list above.', 16, 1);
+    SET NOEXEC ON;     -- skip the rest of the script, including the DROPs and CREATEs below
+END
+ELSE
+    PRINT 'Prerequisites OK on ' + DB_NAME() + '.';
+GO
+
+/* ---- 2. dbo.USP_EXPT_SHIPMENT_PROGRESS_GETBLDATA   (GET api/Export/EXPT_SHIPMENT_PROGRESS_GETBLDATA) --- */
+IF OBJECT_ID('dbo.USP_EXPT_SHIPMENT_PROGRESS_GETBLDATA', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.USP_EXPT_SHIPMENT_PROGRESS_GETBLDATA;      -- step 1 made sure it is this script's own
+GO
+CREATE PROC [dbo].[USP_EXPT_SHIPMENT_PROGRESS_GETBLDATA]
+--DECLARE
+  @CMPCODE VARCHAR(3),
+  @CITYCODE VARCHAR(3),
+  @EXPT_VESSEL VARCHAR(50),  -- LINKS: 50 = EXPT_MASTER.EXPT_VESSEL (MP: 10 cuts the 12-character placeholder vessel MUM2099XXXXX)
+  @VSL_PORT VARCHAR(3),
+  @BLNO VARCHAR(50),        -- LINKS: 50 = EXPT_MASTER.EXPT_BLNO CHAR(50) (MP: VARCHAR(20) silently cuts longer BL numbers)
+  @BLDATE VARCHAR(10)
+
+ AS
+ -- LinksDB20 port 2026-10-16 of MP Cargo's (manilal DB) procedure of the same name.
+ -- Deployed by links-22/_DB_FIX/EXPORT_REDESIGN_PROCS_LINKSDB20_20261016.sql. LinksDB20 changes are marked "LINKS:".
+ -- Called by Links API GET api/Export/EXPT_SHIPMENT_PROGRESS_GETBLDATA (Shipment Progress > Bl Update).
+ -- Table  = jobs of the vessel / port: the ones already on @BLNO + @BLDATE (CHECKED=1) or, when that
+ --          BL is not on the vessel yet, the ones still without a BL (CHECKED=0). STATUS '100' on every row.
+ -- Table1 = MODE 'UPDATE' or 'ADD';  Table2 = CHECKEDCNT;  Table3 = UNCHECKEDCNT;
+ -- Table4 = BL numbers / dates already on the vessel (only when the vessel has jobs).
+ -- LINKS: PKGS / GRWT / CHBLWT / PCS go through dbo.FN_SAFE_FLOAT instead of CONVERT(FLOAT, ISNULL(x,'0')).
+ --        LinksDB20 holds weights such as '5,750.00' and a trailing TAB, on which CONVERT fails for the
+ --        whole vessel. For every plain number (and NULL / '') the result is the same as MP's.
+  --SELECT @CMPCODE='01',@CITYCODE='MUM',@EXPT_VESSEL='202410640',@BLNO='',@BLDATE='26/09/2024',@VSL_PORT='MAA'
+
+ IF EXISTS(SELECT EXPT_BLNO FROM EXPT_MASTER WHERE EXPT_BLNO=@BLNO AND EXPT_BLDT=@BLDATE AND EXPT_VESSEL=@EXPT_VESSEL)
+ BEGIN
+ 	SELECT	STATUS='100',
+			EXPT_MASTER.EXPTNO,
+			SHIPPER=EXP_MASTER.EXP_NAME,
+			CONSIGNEE=CON_NAME,
+			PKGS=dbo.FN_SAFE_FLOAT(EXPT_NOOFPKGS),
+			GRWT=dbo.FN_SAFE_FLOAT(EXPT_MASTER.EXPT_GRWT),
+			CHBLWT=dbo.FN_SAFE_FLOAT(EXPT_MASTER.EXPT_CHBLWT),
+			PCS=dbo.FN_SAFE_FLOAT(EXPT_MASTER.EXPT_NOOFPCS) ,
+			EXPT_MASTER.EXPT_CONSIGNEE,
+			MODEOFSHIP=EXPT_MODE,
+			CHECKED=1,DISABLED=1,EXISTFLAG=1,
+			EXPT_BLNO=ISNULL(EXPT_BLNO,''),
+			EXPT_BLDT=ISNULL(EXPT_BLDT,''),
+			CONTAINER=EXPT_CONTAINER1.CONTAINERNO,
+			BOOK_CARR_NBR=LTRIM(RTRIM(ISNULL(BOOK_CARR_NBR,'')))
+	FROM    EXPT_MASTER LEFT OUTER JOIN
+			EXP_MASTER ON EXPT_MASTER.EXPT_EXPORTER = EXP_MASTER.EXP_CODE LEFT OUTER JOIN CONSIGNEE_MASTER ON
+			EXPT_CONSIGNEE=CONSIGNEE_MASTER.CON_CODE
+			LEFT OUTER JOIN EXPT_CONTAINER1 ON EXPT_CONTAINER1.EXPTNO=EXPT_MASTER.EXPTNO
+			LEFT OUTER JOIN EXPT_CONTAINER ON EXPT_CONTAINER.CONTAINERNO=EXPT_CONTAINER1.CONTAINERNO
+			WHERE	EXPT_MASTER.CITYCODE=@CITYCODE AND
+			ISNULL(EXPT_BLNO,'')=@BLNO AND ISNULL(EXPT_BLDT,'')=@BLDATE
+			AND EXPT_MASTER.CMPCODE=@CMPCODE AND EXPT_MASTER.EXPT_VESSEL=@EXPT_VESSEL AND EXPT_MASTER.VSL_PORT=@VSL_PORT
+
+	SELECT MODE='UPDATE'
+ END
+ ELSE
+
+ BEGIN
+ SELECT	STATUS='100', EXPT_MASTER.EXPTNO,
+				SHIPPER=EXP_MASTER.EXP_NAME,
+				CONSIGNEE=CON_NAME,
+				PKGS=dbo.FN_SAFE_FLOAT(EXPT_NOOFPKGS),
+				GRWT=dbo.FN_SAFE_FLOAT(EXPT_MASTER.EXPT_GRWT),
+				CHBLWT=dbo.FN_SAFE_FLOAT(EXPT_MASTER.EXPT_CHBLWT),
+				PCS=dbo.FN_SAFE_FLOAT(EXPT_MASTER.EXPT_NOOFPCS) ,
+				EXPT_MASTER.EXPT_CONSIGNEE,
+				MODEOFSHIP=EXPT_MODE,
+				CHECKED=0,
+				DISABLED=0,EXISTFLAG=0,
+				EXPT_BLNO=ISNULL(EXPT_BLNO,''),
+				EXPT_BLDT=ISNULL(EXPT_BLDT,''),
+				CONTAINER=EXPT_CONTAINER1.CONTAINERNO,
+				BOOK_CARR_NBR=LTRIM(RTRIM(ISNULL(BOOK_CARR_NBR,'')))
+		FROM    EXPT_MASTER LEFT OUTER JOIN
+				EXP_MASTER ON EXPT_MASTER.EXPT_EXPORTER = EXP_MASTER.EXP_CODE LEFT OUTER JOIN CONSIGNEE_MASTER ON
+				EXPT_CONSIGNEE=CONSIGNEE_MASTER.CON_CODE
+				LEFT OUTER JOIN EXPT_CONTAINER1 ON EXPT_CONTAINER1.EXPTNO=EXPT_MASTER.EXPTNO
+				LEFT OUTER join  EXPT_CONTAINER ON EXPT_CONTAINER.CONTAINERNO=EXPT_CONTAINER1.CONTAINERNO
+		WHERE	EXPT_MASTER.CITYCODE=@CITYCODE AND
+			 EXPT_MASTER.CMPCODE=@CMPCODE AND EXPT_MASTER.EXPT_VESSEL=@EXPT_VESSEL AND EXPT_MASTER.VSL_PORT=@VSL_PORT
+			 AND ISNULL(EXPT_BLNO,'')='' AND ISNULL(EXPT_BLDT,'')=''
+		ORDER BY EXPT_MASTER.ID DESC
+
+SELECT MODE='ADD'
+
+ END
+
+  SELECT CHECKEDCNT=COUNT(EXPTNO)  FROM EXPT_MASTER WHERE EXPT_VESSEL=@EXPT_VESSEL   AND ISNULL(EXPT_BLNO,'') <>''
+  SELECT UNCHECKEDCNT=COUNT(EXPTNO) FROM EXPT_MASTER WHERE EXPT_VESSEL=@EXPT_VESSEL AND ISNULL(EXPT_BLNO,'') =''
+
+  IF EXISTS(SELECT EXPT_BLNO FROM EXPT_MASTER WHERE EXPT_VESSEL=@EXPT_VESSEL) --EXPT_BLNO=@BLNO)
+  BEGIN
+  SELECT DISTINCT EXPT_BLNO=ISNULL(EXPT_BLNO,'') ,EXPT_BLDT=ISNULL(EXPT_BLDT,'') FROM EXPT_MASTER WHERE EXPT_VESSEL=@EXPT_VESSEL
+  AND ISNULL(EXPT_BLNO,'') <> ''
+  END
+GO
+
+/* ---- 3. dbo.USP_EXP_SHIPMENT_PROGRESS_BL_UPDATE   (POST api/Export/EXPT_SHIPMENTPROGRESS_BLDETAILS_UPDATE) --- */
+IF OBJECT_ID('dbo.USP_EXP_SHIPMENT_PROGRESS_BL_UPDATE', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.USP_EXP_SHIPMENT_PROGRESS_BL_UPDATE;      -- step 1 made sure it is this script's own
+GO
+CREATE PROC [dbo].[USP_EXP_SHIPMENT_PROGRESS_BL_UPDATE]
+@BLNO VARCHAR(50),          -- LINKS: 50 = EXPT_MASTER.EXPT_BLNO CHAR(50) (MP: VARCHAR(20) silently cuts longer BL numbers)
+@BLDATE VARCHAR(10),
+@BLTYPE VARCHAR(1),
+@CMPCODE VARCHAR(2),
+@CITYCODE VARCHAR(3),
+@STR VARCHAR(MAX)
+AS
+-- LinksDB20 port 2026-10-16 of MP Cargo's (manilal DB) procedure of the same name.
+-- Deployed by links-22/_DB_FIX/EXPORT_REDESIGN_PROCS_LINKSDB20_20261016.sql. LinksDB20 changes are marked "LINKS:".
+-- Called by Links API POST api/Export/EXPT_SHIPMENTPROGRESS_BLDETAILS_UPDATE (Shipment Progress > Bl Update).
+-- Writes @BLNO / @BLDATE / @BLTYPE on every job listed in @STR ('EXPTNO|EXPTNO|...').
+-- Returns STATUS '100', STATUSTXT. Like MP, no TBL_USERTRACK_EXPTMASTER row is written (MP's is commented out).
+DECLARE @COLUMNNAME VARCHAR(4000),
+		@ORIGINALVALUES VARCHAR(4000),
+		@MODIFIEDDATA VARCHAR(4000)
+CREATE TABLE #JOBTABLE (
+    ID INT IDENTITY(1,1),
+    EXPTNO VARCHAR(25)          -- LINKS: 25 = EXPT_MASTER.EXPTNO (MP: 15)
+)
+
+INSERT INTO #JOBTABLE
+SELECT VALUE FROM DBO.FN_SPLIT(@STR ,'|') WHERE ISNULL(VALUE,'') <>''
+
+ UPDATE A SET A.EXPT_BLNO =@BLNO,
+ A.EXPT_BLDT=@BLDATE,
+ A.EXPT_BLTYPE=@BLTYPE
+ FROM EXPT_MASTER A INNER JOIN
+ #JOBTABLE B ON A.EXPTNO=B.EXPTNO
+
+ SELECT '100' STATUS,STATUSTXT='BLNO -' + @BLNO + ' UPDATED SUCCESSFULLY'
+ 	SET @COLUMNNAME='EXPTNO|EXPT_BLNO|EXPT_BLDATE|EXPT_BLTYPE|EXPT_VESSEL'
+
+DROP TABLE #JOBTABLE
+GO
+
+/* ---- 4. dbo.USP_EXP_RPT_MISSING_DOCS   (GET api/Export/EXP_RPT_MISSING_DOCS) ---------------- */
+IF OBJECT_ID('dbo.USP_EXP_RPT_MISSING_DOCS', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.USP_EXP_RPT_MISSING_DOCS;      -- step 1 made sure it is this script's own
+GO
+CREATE PROCEDURE dbo.USP_EXP_RPT_MISSING_DOCS
+    @CONCODE   VARCHAR(20) = '',
+    @COUNTRY   VARCHAR(50) = '',
+    @MODE      VARCHAR(5)  = '',
+    @CITYCODE  VARCHAR(10) = '',
+    @GRACEDAYS INT         = 2,
+    @FROMDT    DATETIME    = NULL
+AS
+-- LinksDB20 port 2026-10-16 of MP Cargo's (manilal DB) procedure of the same name, logic unchanged.
+-- Deployed by links-22/_DB_FIX/EXPORT_REDESIGN_PROCS_LINKSDB20_20261016.sql.
+-- Called by Links API GET api/Export/EXP_RPT_MISSING_DOCS (missing shipping documents report).
+-- Table  = STATUS '100' + TOTAL, DOCS_NOT_RECEIVED, DOC_NOT_SENT, OVER_7_DAYS, or STATUS '103' (no row).
+-- Table1 = the bookings past CRD + @GRACEDAYS whose documents (job) or DOC EDI file have not followed.
+-- LINKS: every table and column exists on LinksDB20, but the inputs are empty there today:
+--        TBL_EXPT_BOOKING_ORDER has no rows, and the HappyChic EDI dates (TBL_EXPT_BOOKING_ORDER.HC_BKD_PLDT,
+--        EXPT_ORDERNO.HC_DOC_DT) are never filled. So the report answers STATUS '103' (the screen's empty
+--        state), and the HappyChic "DOC FILE NOT SENT" branch stays inert even once bookings exist.
+BEGIN
+    SET NOCOUNT ON;
+    SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+
+    -- local copies: avoid parameter sniffing on a large booking table
+    DECLARE @CON VARCHAR(20), @CTRY VARCHAR(50), @MD VARCHAR(5), @CITY VARCHAR(10),
+            @GRACE INT, @FROM DATETIME, @TODAY DATETIME;
+    SELECT  @CON   = LTRIM(RTRIM(ISNULL(@CONCODE, ''))),
+            @CTRY  = LTRIM(RTRIM(ISNULL(@COUNTRY, ''))),
+            @MD    = UPPER(LTRIM(RTRIM(ISNULL(@MODE, '')))),
+            @CITY  = LTRIM(RTRIM(ISNULL(@CITYCODE, ''))),
+            @GRACE = ISNULL(@GRACEDAYS, 2),
+            @FROM  = ISNULL(@FROMDT, DATEADD(MONTH, -6, GETDATE())),
+            @TODAY = DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0);
+
+    IF OBJECT_ID('tempdb..#R') IS NOT NULL DROP TABLE #R;
+
+    SELECT  BK.Concode                                   AS CLIENT_CODE,
+            LTRIM(RTRIM(ISNULL(CM.con_name, '')))        AS CLIENT,
+            LTRIM(RTRIM(BK.Orderno))                     AS ORDERNO,
+            LTRIM(RTRIM(BK.Styleno))                     AS STYLENO,
+            CASE WHEN ISNULL(BK.BOOKINGNO, '') <> '' THEN BK.BOOKINGNO
+                 ELSE CONVERT(VARCHAR(20), BK.Orderid) END AS BOOKING_REF,
+            LTRIM(RTRIM(ISNULL(CT.city_name, '')))       AS ORIGIN_CITY,
+            LTRIM(RTRIM(ISNULL(CT.city_country, '')))    AS ORIGIN_COUNTRY,
+            UPPER(LTRIM(RTRIM(ISNULL(BK.mode, ''))))     AS MODE,
+            LTRIM(RTRIM(ISNULL(BK.citycode, '')))        AS BRANCH,
+            LTRIM(RTRIM(ISNULL(EX.exp_name, '')))        AS SHIPPER,
+            LTRIM(RTRIM(ISNULL(AG.sup_name, '')))        AS AGENT,
+            BK.CargoExpectDt                             AS ANNOUNCED_CRD,
+            BK.New_ship_dt                               AS REVISED_CRD,
+            DATEDIFF(DAY, ISNULL(BK.New_ship_dt, BK.CargoExpectDt), @TODAY) AS DAYS_SINCE_CRD,
+            BK.HC_BKD_PLDT                               AS LAST_C1_SENT,
+            ISNULL(JOB.EXPTNO, '')                       AS JOBNO,
+            CASE WHEN JOB.EXPTNO IS NULL THEN 'DOCS NOT RECEIVED'
+                 ELSE 'DOC FILE NOT SENT' END            AS DOC_STATUS
+    INTO    #R
+    FROM    TBL_EXPT_BOOKING_ORDER BK
+            LEFT JOIN consignee_master CM ON CM.con_code = BK.Concode
+            LEFT JOIN city_master CT      ON CT.city_code = BK.citycode
+            LEFT JOIN exp_master EX       ON EX.exp_code = BK.EXPCODE
+            OUTER APPLY (
+                SELECT TOP 1 EO.EXPTNO, EO.HC_DOC_DT
+                FROM   EXPT_ORDERNO EO
+                WHERE  LTRIM(RTRIM(EO.ORDERNO)) = LTRIM(RTRIM(BK.Orderno))
+                  AND  LTRIM(RTRIM(EO.STYLENO)) = LTRIM(RTRIM(BK.Styleno))
+                ORDER BY CASE WHEN EO.HC_DOC_DT IS NULL THEN 1 ELSE 0 END
+            ) JOB
+            LEFT JOIN expt_master EM      ON EM.EXPTNO = JOB.EXPTNO
+            LEFT JOIN supplier_master AG  ON AG.sup_code = EM.agent
+    WHERE   ISNULL(BK.ISAuthorised, '') <> ''
+      AND   BK.Bookingdt >= @FROM
+      AND   ISNULL(BK.New_ship_dt, BK.CargoExpectDt) IS NOT NULL
+      AND   DATEADD(DAY, @GRACE, ISNULL(BK.New_ship_dt, BK.CargoExpectDt)) <= @TODAY
+      AND   ISNULL(EM.EXPTCANCEL, '') <> 'Y'
+      AND   (   JOB.EXPTNO IS NULL                                        -- documents not in
+             OR (BK.HC_BKD_PLDT IS NOT NULL AND JOB.HC_DOC_DT IS NULL))   -- C1 sent, DOC not
+      AND   (@CON  = '' OR BK.Concode = @CON)
+      AND   (@MD   = '' OR UPPER(LTRIM(RTRIM(BK.mode))) = @MD)
+      AND   (@CITY = '' OR LTRIM(RTRIM(BK.citycode)) = @CITY)
+      AND   (@CTRY = '' OR LTRIM(RTRIM(CT.city_country)) = @CTRY);
+
+    IF EXISTS (SELECT 1 FROM #R)
+    BEGIN
+        SELECT  '100' AS STATUS,
+                COUNT(*) AS TOTAL,
+                SUM(CASE WHEN DOC_STATUS = 'DOCS NOT RECEIVED' THEN 1 ELSE 0 END) AS DOCS_NOT_RECEIVED,
+                SUM(CASE WHEN DOC_STATUS = 'DOC FILE NOT SENT' THEN 1 ELSE 0 END) AS DOC_NOT_SENT,
+                SUM(CASE WHEN DAYS_SINCE_CRD > 7 THEN 1 ELSE 0 END)                AS OVER_7_DAYS
+        FROM    #R;
+
+        SELECT  CLIENT_CODE, CLIENT, ORDERNO, STYLENO, BOOKING_REF,
+                ORIGIN_CITY, ORIGIN_COUNTRY, MODE, BRANCH, SHIPPER, AGENT,
+                CONVERT(VARCHAR(10), ANNOUNCED_CRD, 103) AS ANNOUNCED_CRD,
+                ISNULL(CONVERT(VARCHAR(10), REVISED_CRD, 103), '') AS REVISED_CRD,
+                DAYS_SINCE_CRD,
+                ISNULL(CONVERT(VARCHAR(10), LAST_C1_SENT, 103), '') AS LAST_C1_SENT,
+                JOBNO, DOC_STATUS
+        FROM    #R
+        ORDER BY DAYS_SINCE_CRD DESC, CLIENT, ORDERNO, STYLENO;
+    END
+    ELSE
+    BEGIN
+        SELECT '103' AS STATUS, 'NO RECORD FOUND' AS statustext;
+    END
+END
+GO
+
+/* ---- 5. dbo.USP_EXP_MST_EDIT_CO2_UPDATE   (POST api/Export/ExportEditCo2Update) ------------- */
+IF OBJECT_ID('dbo.USP_EXP_MST_EDIT_CO2_UPDATE', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.USP_EXP_MST_EDIT_CO2_UPDATE;      -- step 1 made sure it is this script's own
+GO
+CREATE PROCEDURE [dbo].[USP_EXP_MST_EDIT_CO2_UPDATE]
+--DECLARE
+@EXPTNO VARCHAR(15),
+@CO2EMISSIONLEVEL VARCHAR(10),
+@CMPCODE VARCHAR(3),
+@CITYCODE VARCHAR(3),
+@MAKERID VARCHAR(10)
+AS
+/*
+  LinksDB20 port 2026-10-16 of MP Cargo's (manilal DB) procedure of the same name.
+  Deployed by links-22/_DB_FIX/EXPORT_REDESIGN_PROCS_LINKSDB20_20261016.sql. LinksDB20 changes are marked "LINKS:".
+  Called by Links API POST api/Export/ExportEditCo2Update (consignment > edit CO2 emission level).
+  Saves the job's old air details to EXPT_AIRBACK, sets EXPT_MASTER.CO2_EMITION_LVL, logs to USERTRACK.
+  Returns STATUS '100' (one extra 'MAIL' row first for an air consolidation, as in MP).
+
+  LINKS changes:
+   1. MP updates CO2 only through the MAWB (every job on EXPT_MASTER.AEROBILLNO) and does nothing for a
+      job without one. LinksDB20 is sea: on 2026-10-16 it held 32,711 sea jobs, none with an AEROBILLNO,
+      and 16 air jobs (12 with one). For a sea job MP's text would answer '100' and change nothing, so
+      without a MAWB this copy updates the job itself (EXPTNO = @EXPTNO). The MAWB path is kept.
+   2. MP also updates CONSOLE_MASTER for a consolidation. LinksDB20 has no CONSOLE_MASTER table (and
+      EXPT_MASTER.CONSOLIDATION is empty on every job), so that UPDATE is dropped; the 'MAIL' row stays.
+   3. MP never sets @ENTRYDATE / @ENTRYTIME, so its EXPT_AIRBACK.MODIFYDT and USERTRACK.ENTRYDATE /
+      ENTRYTIME are NULL. Here they are filled: GETDATE(), and dd/mm/yyyy + hh:mi:ss text the way
+      other LinksDB20 USERTRACK rows are written.
+   4. An empty @CO2EMISSIONLEVEL clears the value (NULL). MP would fail converting '' to DECIMAL.
+   5. MP's commented-out alert-mail block (addresses and mail-server settings) is left out.
+*/
+BEGIN
+	SET NOCOUNT ON;
+	DECLARE @FLIGHTNO VARCHAR(MAX),
+			@FLIGHTDT VARCHAR(MAX),
+			@AEROBILLNO VARCHAR(MAX),
+			@_ACTUALFLIGHTNO VARCHAR(MAX),
+			@_ACTUALFLIGHTDT VARCHAR(MAX),
+			@CONSOLIDATION VARCHAR(3),
+			@ALERTMSG VARCHAR(8000),
+			@ENTRYDATE VARCHAR(10),
+			@ENTRYTIME VARCHAR(15),
+			@etaold varchar(10)
+	SELECT
+			@FLIGHTNO=ISNULL(FLIGHTNO,''),
+			@FLIGHTDT = FLIGHTDT,
+			@AEROBILLNO=AEROBILLNO,
+			@_ACTUALFLIGHTNO=ISNULL(ACTUALFLIGHTNO,''),
+			@_ACTUALFLIGHTDT = ACTUALFLIGHTDT,
+			@CONSOLIDATION=CONSOLIDATION,
+			@ETAOLD=CASE WHEN ISNULL(TRANSPORT2,'')<>'' THEN ISNULL(ETAPORT2,'') ELSE ISNULL(ETAPORT1,'') END
+	FROM	EXPT_MASTER
+	WHERE	EXPTNO =@EXPTNO
+
+	-- LINKS (3): audit date / time (MP leaves both NULL)
+	SELECT	@ENTRYDATE = CONVERT(VARCHAR(10), GETDATE(), 103),
+			@ENTRYTIME = CONVERT(VARCHAR(8), GETDATE(), 108)
+
+	-- LINKS (4): '' = clear the value
+	SET @CO2EMISSIONLEVEL = NULLIF(LTRIM(RTRIM(@CO2EMISSIONLEVEL)), '')
+
+	INSERT INTO EXPT_AIRBACK (EXPTNO,CARTEDDT,OUTCHARGEDT,EXPT_SHIPCUSTOM,AIRLINENAME,FLIGHTNO,FLIGHTDT,AEROBILLNO,AEROBILLDT,HOUSEBILLNO,HOUSEBILLDT,TRANSPORT1,ETDPORT1,ETAPORT1,TRANSPORT2,ETDPORT2,ETAPORT2,FLIGHTNO1,FLIGHTNO2,ACTUALFLIGHTNO, ACTUALFLIGHTDT,MAWBDEST,MAWBFRT,PREALERTDT,MODIFYDT,MODIFYTIME,USERID,CO2_EMITION_LVL)
+	SELECT EXPTNO,CARTEDDT,OUTCHARGEDT,EXPT_SHIPCUSTOM,AIRLINENAME,FLIGHTNO,FLIGHTDT,AEROBILLNO,AEROBILLDT,HOUSEBILLNO,HOUSEBILLDT,TRANSPORT1,ETDPORT1,ETAPORT1,TRANSPORT2,ETDPORT2,ETAPORT2,FLIGHTNO1,FLIGHTNO2,ACTUALFLIGHTNO, ACTUALFLIGHTDT,MAWBDEST,MAWBFRT,PREALERTDT,GETDATE() /* LINKS (3): MP @ENTRYDATE = NULL */,@ENTRYTIME,@MAKERID,CO2_EMITION_LVL FROM EXPT_MASTER
+	WHERE EXPTNO=@EXPTNO
+
+	IF ISNULL(@AEROBILLNO,'')<>''
+	BEGIN
+		UPDATE	EXPT_MASTER
+		SET		CO2_EMITION_LVL=@CO2EMISSIONLEVEL
+		WHERE	AEROBILLNO=@AEROBILLNO
+
+		IF RTRIM(LTRIM(@CONSOLIDATION))='Y'
+		BEGIN
+			-- LINKS (2): MP's  UPDATE CONSOLE_MASTER SET CO2_EMITION_LVL = ... WHERE MAWBNO = @AEROBILLNO  dropped
+			SELECT '100' [STATUS] , 'MAIL' STATUSTEXT,
+					AEROBILLNO ,FLIGHTNO, ACTUALFLIGHTDT,AEROBILLNO,
+					CONSIGNEE =(SELECT CON_NAME FROM CONSIGNEE_MASTER WHERE CON_CODE=EXPT_CONSIGNEE),
+					EXPT_POD =(SELECT CITY_NAME FROM CITY_MASTER WHERE CITY_CODE=EXPT_POD)
+			FROM    EXPT_MASTER
+			WHERE   EXPTNO=@EXPTNO
+
+		END
+	END
+	ELSE
+	BEGIN
+		-- LINKS (1): no MAWB (every sea job) - update the job itself; MP changes nothing here
+		UPDATE	EXPT_MASTER
+		SET		CO2_EMITION_LVL=@CO2EMISSIONLEVEL
+		WHERE	EXPTNO=@EXPTNO
+	END
+
+	INSERT INTO USERTRACK (USERNAME,ENTRYDATE,ENTRYTIME,TABLENAME,KEYFIELD,CODENO,CITYCODE,CMPCODE,COMMAND,STATUS)
+	VALUES(@MAKERID,@ENTRYDATE,@ENTRYTIME,'EXPT_AIRBACK','EXPTNO',@EXPTNO,@CITYCODE,@CMPCODE,'E','CO2 UPDATE')
+END
+SELECT '100'[STATUS] ,'' STATUSTEXT
+GO
+
+/* ---- 6. dbo.USP_EXP_MST_EXPORT_JOB_UPDATE   (POST api/Export/UpdateJob) --------------------- */
+IF OBJECT_ID('dbo.USP_EXP_MST_EXPORT_JOB_UPDATE', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.USP_EXP_MST_EXPORT_JOB_UPDATE;      -- step 1 made sure it is this script's own
+GO
+CREATE PROCEDURE [dbo].[USP_EXP_MST_EXPORT_JOB_UPDATE]
+--DECLARE
+@PKID VARCHAR(20),
+@EXPTNO VARCHAR(25),
+@EXPT_MODE VARCHAR(5),
+@EXPT_EXPORTER VARCHAR(10),
+@EXPT_BILLTO VARCHAR(10),
+@EXPT_CONSIGNEE VARCHAR(10),
+@EXPT_BUYER VARCHAR(10),
+@EXPT_AGENT VARCHAR(10),
+@EXPT_SUBAGENT VARCHAR(10),
+--@SERVICE_TYPE VARCHAR(10),
+@EXPT_VESSEL VARCHAR(50),		-- LINKS (4): 50 = EXPT_MASTER.EXPT_VESSEL
+@NOOFPKGS VARCHAR(10),
+@TYPEOFPKGS VARCHAR(10),
+@NOOFPCS VARCHAR(10),
+@TYPEOFPCS VARCHAR(10),
+@GROSSWT VARCHAR(10),
+@NETWT VARCHAR(10),
+@VOLUME VARCHAR(10),
+@CHBLWT VARCHAR(10),
+@INVNO VARCHAR(20),
+@INVDT VARCHAR(10),
+@DOCRECDT VARCHAR(10),
+@INCOTERM VARCHAR(10),
+@FREIGHT VARCHAR(10),
+@SHIPBILLTYPE VARCHAR(10),
+@POL VARCHAR(10),
+--@EXPT_SRCAGT VARCHAR(10),
+@USERID VARCHAR(50),
+@MAKERIP VARCHAR(20),
+@CMPCODE VARCHAR(2),
+@CITYCODE VARCHAR(3),
+@EXWORK VARCHAR(15),
+@CUSTOMCLR VARCHAR(15),
+@FREIGHTFRD VARCHAR(15)
+AS
+/*
+  LinksDB20 port 2026-10-16 of MP Cargo's (manilal DB) procedure of the same name.
+  Deployed by links-22/_DB_FIX/EXPORT_REDESIGN_PROCS_LINKSDB20_20261016.sql. LinksDB20 changes are marked "LINKS:".
+  Called by Links API POST api/Export/UpdateJob (job creation screen in edit mode). Same 32 parameters,
+  same order as MP. Updates the job (EXPTNO + ID), writes a TBL_USERTRACK_EXPTMASTER 'EDIT' row, returns
+  Table = STATUS '100' + EXPTNO, Table1 = the user's jobs in the branch (USERNAME = @USERID = login cmpid).
+
+  LINKS changes:
+   1. @EXWORK / @CUSTOMCLR / @FREIGHTFRD NULL = keep the job's stored EXWORKS / CUSTOM_CLR / FREIGHT_FRD.
+      MP's API never sends them (its controller passes 30 values for these 32 parameters and fails with
+      "Parameter count does not match"); the Links API sends NULL unless the caller gives the service
+      flags, and a NULL must not wipe them. With ANSI_NULLS ON the audit comparison skips a NULL as well.
+   2. VOLWT in Table1 goes through dbo.FN_SAFE_FLOAT: a non-numeric EXPT_VOLUME on any of the user's jobs
+      would otherwise fail the list AFTER the update has been saved. Same value for every plain number.
+   3. Table1 joins CMP_DTLS on CONVERT(VARCHAR(20), CMP_DTLS.CMPID) = EM.EXPT_SUBAGT. MP compares the INT
+      CMPID with EXPT_SUBAGT, which holds supplier codes such as 'S100788' (9,794 LinksDB20 jobs), so the
+      list fails with a conversion error for every user with such a job - in MP as well. Numeric values
+      still match; a supplier code gives SUBAGENT NULL instead of an error.
+   4. @EXPT_VESSEL and @_EXPT_VESSEL VARCHAR(50) = EXPT_MASTER.EXPT_VESSEL. MP's VARCHAR(10) cuts the
+      12-character placeholder vessel MUM2099XXXXX (117 LinksDB20 jobs) and would save it cut.
+*/
+
+	DECLARE @COLUMNNAME NVARCHAR(4000),
+			@ORIGINALDATA NVARCHAR(4000),
+			@MODIFIEDDATA NVARCHAR(4000)
+
+	SET @COLUMNNAME = ''
+	SET @ORIGINALDATA = ''
+	SET @MODIFIEDDATA = ''
+
+	DECLARE	@_EXPT_MODE VARCHAR(5),
+			@_EXPT_EXPORTER VARCHAR(10),
+			@_EXPT_BILLTO VARCHAR(10),
+			@_EXPT_CONSIGNEE VARCHAR(10),
+			@_EXPT_BUYER VARCHAR(10),
+			@_EXPT_AGENT VARCHAR(10),
+			@_EXPT_SUBAGENT VARCHAR(10),
+			@_EXPT_SERVICETYPE VARCHAR(10),
+			@_EXPT_VESSEL VARCHAR(50),	-- LINKS (4)
+			@_NOOFPKGS VARCHAR(10),
+			@_TYPEOFPKGS VARCHAR(10),
+			@_NOOFPCS VARCHAR(10),
+			@_TYPEOFPCS VARCHAR(10),
+			@_GROSSWT VARCHAR(10),
+			@_NETWT VARCHAR(10),
+			@_VOLUME VARCHAR(10),
+			@_CHBLWT VARCHAR(10),
+			@_INVNO VARCHAR(20),
+			@_INVDT VARCHAR(10),
+			@_DOCRECDT VARCHAR(10),
+			@_INCOTERM VARCHAR(10),
+			@_FREIGHT VARCHAR(10),
+			@_SHIPBILLTYPE VARCHAR(10),
+			@_POL VARCHAR(10),
+			@_EXWORK VARCHAR(15),
+			@_CUSTOMCLR VARCHAR(15),
+			@_FREIGHTFRD VARCHAR(15)
+			--@_CLEARANCE VARCHAR(1)
+
+
+	SELECT	@_EXPT_EXPORTER=RTRIM(ISNULL(EXPT_EXPORTER,'')),
+			@_EXPT_BILLTO=RTRIM(ISNULL(EXPT_BILLTO,'')),
+			@_EXPT_CONSIGNEE=RTRIM(ISNULL(EXPT_CONSIGNEE,'')),
+			@_EXPT_BUYER=RTRIM(ISNULL(EXPT_BUYER,'')),
+			@_EXPT_AGENT=RTRIM(ISNULL(AGENT,'')),
+			@_EXPT_SUBAGENT=RTRIM(ISNULL(EXPT_SUBAGT,'')),
+			--@_EXPT_SERVICETYPE=RTRIM(ISNULL(EXWORKS,'')),
+			@_EXPT_VESSEL =RTRIM(ISNULL(EXPT_VESSEL,'')),
+			@_NOOFPKGS=RTRIM(ISNULL(EXPT_NOOFPKGS,'')),
+			@_TYPEOFPKGS=RTRIM(ISNULL(EXPT_TYPEOFPKGS,'')),
+			@_NOOFPCS=RTRIM(ISNULL(EXPT_NOOFPCS,'')),
+			@_TYPEOFPCS=RTRIM(ISNULL(EXPT_TYPEOFPCS,'')),
+			@_GROSSWT=RTRIM(ISNULL(EXPT_GRWT,'')),
+			@_NETWT=RTRIM(ISNULL(EXPT_NETWT,'')),
+			@_VOLUME=RTRIM(ISNULL(EXPT_VOLUME,'')),
+			@_CHBLWT=RTRIM(ISNULL(EXPT_CHBLWT,'')),
+			@_INVNO=RTRIM(ISNULL(EXPT_INVNO,'')),
+			@_INVDT=RTRIM(ISNULL(EXPT_INVDATE,'')),
+			@_DOCRECDT=RTRIM(ISNULL(EXPT_DOCRECD,'')),
+			@_INCOTERM=RTRIM(ISNULL(EXPT_INVTYPE,'')),
+			@_FREIGHT=RTRIM(ISNULL(EXPT_FREIGHT,'')),
+			@_SHIPBILLTYPE=RTRIM(ISNULL(EXPT_SHIPBILLTYPE,'')),
+			@_POL=RTRIM(ISNULL(EXPT_LDGPORT,'')),
+			@_EXWORK=RTRIM(ISNULL(EXWORKS,'')),
+			@_CUSTOMCLR=RTRIM(ISNULL(CUSTOM_CLR,'')),
+			@_FREIGHTFRD=RTRIM(ISNULL(FREIGHT_FRD,''))
+
+
+	FROM EXPT_MASTER
+	WHERE	EXPTNO = @EXPTNO
+			AND ID = @PKID
+
+	SET @COLUMNNAME = 'ID|EXPTNO|'
+	SET @ORIGINALDATA = @PKID + '|' + @EXPTNO+'|'
+	SET @MODIFIEDDATA = @PKID + '|' + @EXPTNO+'|'
+
+--	IF @_CLEARANCE <> @CLEARANCE
+--	BEGIN
+--		SET @COLUMNNAME = @COLUMNNAME + 'CLEARANCE|'
+--		SET @ORIGINALDATA = @ORIGINALDATA + @_CLEARANCE + '|'
+--		SET @MODIFIEDDATA = @MODIFIEDDATA + @CLEARANCE + '|'
+--	END
+	IF @_EXPT_EXPORTER <> @EXPT_EXPORTER
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'EXPT_EXPORTER|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_EXPT_EXPORTER + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @EXPT_EXPORTER + '|'
+	END
+	IF @_EXPT_BILLTO <> @EXPT_BILLTO
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'EXPT_BILLTO|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_EXPT_BILLTO + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @EXPT_BILLTO + '|'
+	END
+		IF @_EXPT_CONSIGNEE <> @EXPT_CONSIGNEE
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'EXPT_CONSIGNEE|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_EXPT_CONSIGNEE + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @EXPT_CONSIGNEE + '|'
+	END
+	IF @_EXPT_AGENT <> @EXPT_AGENT
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'AGENT|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_EXPT_AGENT + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @EXPT_AGENT + '|'
+	END
+
+		IF @_EXPT_SUBAGENT <> @EXPT_SUBAGENT
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'EXPT_SUBAGT|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_EXPT_SUBAGENT + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @EXPT_SUBAGENT + '|'
+	END
+
+
+	IF @_EXPT_BUYER <> @EXPT_BUYER
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'EXPT_BUYER|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_EXPT_BUYER + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @EXPT_BUYER + '|'
+	END
+
+	IF @_EXPT_VESSEL <> @EXPT_VESSEL
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'EXPT_VESSEL|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_EXPT_VESSEL + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @EXPT_VESSEL + '|'
+	END
+
+		IF @_NOOFPKGS <> @NOOFPKGS
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'NOOFPKGS|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_NOOFPKGS + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @NOOFPKGS + '|'
+	END
+			IF @_TYPEOFPKGS <> @TYPEOFPKGS
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'TYPEOFPKGS|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_TYPEOFPKGS + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @TYPEOFPKGS + '|'
+	END
+
+		IF @_NOOFPCS <> @NOOFPCS
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'NOOFPCS|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_NOOFPCS + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @NOOFPCS + '|'
+	END
+
+			IF @_TYPEOFPCS <> @TYPEOFPCS
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'TYPEOFPCS|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_TYPEOFPCS + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @TYPEOFPCS + '|'
+	END
+
+	IF @_GROSSWT <> @GROSSWT
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'GROSSWT|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_GROSSWT + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @GROSSWT + '|'
+	END
+	IF @_NETWT <> @NETWT
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'NETWT|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_NETWT + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @NETWT + '|'
+	END
+	IF @_VOLUME <> @VOLUME
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'VOLUME|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_VOLUME + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @VOLUME + '|'
+	END
+		IF @_CHBLWT <> @CHBLWT
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'CHBLWT|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_CHBLWT + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @CHBLWT + '|'
+	END
+		IF @_INVNO <> @INVNO
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'INVNO|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_INVNO + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @INVNO + '|'
+	END
+
+		IF @_INVDT <> @INVDT
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'INVDT|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_INVDT + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @INVDT + '|'
+	END
+
+		IF @_DOCRECDT <> @DOCRECDT
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'EXPT_DOCRECD|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_DOCRECDT + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @DOCRECDT + '|'
+	END
+
+	IF @_INCOTERM <> @INCOTERM
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'EXPT_INVTYPE|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_INCOTERM + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @INCOTERM + '|'
+	END
+
+		IF @_FREIGHT <> @FREIGHT
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'EXPT_FREIGHT|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_FREIGHT + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @FREIGHT + '|'
+	END
+
+			IF @_SHIPBILLTYPE <> @SHIPBILLTYPE
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'EXPT_SHIPBILLTYPE|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_SHIPBILLTYPE + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @SHIPBILLTYPE + '|'
+	END
+
+
+			IF @_POL <> @POL
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'EXPT_LDGPORT|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_POL + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @POL + '|'
+	END
+
+
+			IF @_EXWORK <> @EXWORK
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'EXWORK|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_EXWORK + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @EXWORK + '|'
+	END
+	IF @_CUSTOMCLR <> @CUSTOMCLR
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'CUSTOMCLR|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_CUSTOMCLR + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @CUSTOMCLR + '|'
+	END
+		IF @_FREIGHTFRD <> @FREIGHTFRD
+	BEGIN
+		SET @COLUMNNAME = @COLUMNNAME + 'FREIGHTFRD|'
+		SET @ORIGINALDATA = @ORIGINALDATA + @_FREIGHTFRD + '|'
+		SET @MODIFIEDDATA = @MODIFIEDDATA + @FREIGHTFRD + '|'
+	END
+	UPDATE EXPT_MASTER
+	SET	EXPT_EXPORTER = @EXPT_EXPORTER,
+		EXPT_BILLTO = @EXPT_BILLTO,
+		EXPT_CONSIGNEE = @EXPT_CONSIGNEE,
+		EXPT_BUYER = @EXPT_BUYER,
+		AGENT=@EXPT_AGENT,
+		EXPT_SUBAGT=@EXPT_SUBAGENT,
+		EXPT_VESSEL=@EXPT_VESSEL,
+		EXPT_NOOFPKGS=@NOOFPKGS,
+		EXPT_TYPEOFPKGS=@TYPEOFPKGS,
+		EXPT_NOOFPCS=@NOOFPCS,
+		EXPT_TYPEOFPCS=@TYPEOFPCS,
+		EXPT_GRWT=@GROSSWT,
+		EXPT_NETWT=@NETWT,
+		EXPT_VOLUME=@VOLUME,
+		EXPT_CHBLWT=@CHBLWT,
+		EXPT_INVNO=@INVNO,
+		EXPT_INVDATE=@INVDT,
+		EXPT_DOCRECD=@DOCRECDT,
+		EXPT_INVTYPE=@INCOTERM,
+		EXPT_FREIGHT=@FREIGHT,
+		EXPT_SHIPBILLTYPE=@SHIPBILLTYPE,
+		EXPT_LDGPORT=@POL,
+		EXWORKS=ISNULL(@EXWORK, EXWORKS),			-- LINKS (1): NULL = keep
+		CUSTOM_CLR=ISNULL(@CUSTOMCLR, CUSTOM_CLR),	-- LINKS (1)
+		FREIGHT_FRD=ISNULL(@FREIGHTFRD, FREIGHT_FRD)	-- LINKS (1)
+	WHERE	EXPTNO = @EXPTNO
+			AND ID = @PKID
+
+	INSERT INTO TBL_USERTRACK_EXPTMASTER(USERID,[DATETIME],MODE,TABLENAME,COLUMNNAME,ORIGINALDATA,MODIFIEDDATA,RECORDID,CODE,LOCALIPADD,ROUTERIPADD)
+	VALUES(@USERID,GETDATE(),'EDIT','EXPT_MASTER',@COLUMNNAME,@ORIGINALDATA,@MODIFIEDDATA,@PKID,@EXPTNO,@MAKERIP,@MAKERIP)
+
+	SELECT	'100' STATUS,
+			@EXPTNO EXPTNO
+
+
+  	SELECT	ISNULL(JOBNO, 'NO') JOBEXIST,
+					ISNULL(CONVERT(VARCHAR,HC_C2_SENTDT),'NO') 'EDISENT',
+					NULL 'CONTAINEREXIST',
+					ISNULL(ACTUALFLIGHTDT,'') as ACTUALFLIGHTDT,
+					UPPER(EXPT_MODE) 'EXPT_MODE',
+					CO2_EMITION_LVL,
+					EXPTNO,
+					RTRIM(ISNULL(EXP_M.EXP_NAME,'')) SHIPPER,
+					RTRIM(ISNULL(CON_M.CON_NAME,'')) CONSIGNEE,
+					RTRIM(ISNULL(EM.expt_noofpkgs,'')) EXPT_NOOFPKGS,
+					(CASE WHEN EXPT_MODE = 'SEA' THEN (SELECT TOP 1 RTRIM(ISNULL(VSL_NAME,'')) FROM VSL_MASTER WHERE VSL_RTNO = EM.EXPT_VESSEL)
+						 ELSE ''
+					END) VSL_NAME
+					,[DBO].[FN_EXP_MST_EXPORT_SEARCH_LIST_ORDERNO](EM.EXPTNO,'-') ORDER_NO
+					,EM.HOUSEBILLNO, EM.AEROBILLNO,
+					EXPT_GRWT,EXPT_VOLUME,(CASE WHEN EXPT_VOLUME IS NULL THEN NULL ELSE dbo.FN_SAFE_FLOAT(EXPT_VOLUME) END/0.006)VOLWT /* LINKS (2) */,EXPT_CHBLWT,HOUSEBILLDT,
+					mawbdest=(SELECT CITY_NAME FROM city_master WHERE CITY_CODE=mawbdest),
+					RTRIM(flightno)+' - '+ RTRIM(flightdt)  ,RTRIM(actualflightno)+ ' - '+RTRIM(actualflightdt),0,0,0,etaport1,etaport2
+					,CASE WHEN EXPT_MODE='sea' THEN ISNULL(expt_vessel,'') ELSE ISNULL(EXPTCANCEL,'') END,
+					EM.EXPT_INVNO,EM.EXPT_FRT
+						,isnull(em.IsDiffAir,'0'),
+					EXPT_MODE,EXPT_NOOFPCS,
+					EXPT_EXPORTER,EXPT_BILLTO,EXPT_CONSIGNEE,EXPT_DOCRECD,EXPT_LDGPORT,EXPT_INVNO,EXPT_INVDATE,
+					EXPT_INVTYPE,EXPT_SHIPBILLTYPE,
+					EXPT_VESSEL,EXPT_NOOFPKGS,EXPT_TYPEOFPKGS,EXPT_TYPEOFPCS,EXPT_GRWT,EXPT_NETWT,EXPT_VOLUME,
+					EXPT_VSLAGENT,EXPT_FRT,MODEOF_SHIPMENT,
+					BILLTO=BILLTO.EXP_NAME,
+					BUYERNM=BUYER.CON_NAME,
+					AGENTNM=AGENT.SUP_NAME,
+					SUBAGENT=CMP_DTLS.CMP_USERNAME,
+					SERVICETYPE=EXWORKS + ' ' + CUSTOM_CLR + ' ' +  FREIGHT_FRD ,
+					 VSLNAME=VSL_NAME,
+					EXPT_INVTYPE,
+					EXPT_FRT,
+					EXPT_SHIPBILLTYPE,
+					POLCITY=CITY_NAME,
+					VSL_PORT,SERVICETYPEVAL=CASE WHEN EXWORKS='EX' THEN 'E' END ,
+					MODEOFSHIPMENTVAL=CASE WHEN MODEOF_SHIPMENT='F' THEN '1'  WHEN  MODEOF_SHIPMENT='D' THEN 2 ELSE 3  END,
+					EM.AGENT,EM.EXPT_BUYER,
+					EM.ID,
+					EM.CUSTOM_CLR,EM.FREIGHT_FRD,EM.EXWORKS
+			FROM	EXPT_MASTER EM
+					LEFT OUTER JOIN EXP_MASTER EXP_M ON EXP_M.EXP_CODE = EM.EXPT_EXPORTER
+					LEFT OUTER JOIN CONSIGNEE_MASTER CON_M ON CON_M.CON_CODE = EM.EXPT_CONSIGNEE
+					LEFT OUTER JOIN EXP_MASTER BILLTO ON BILLTO.EXP_CODE=EM.EXPT_BILLTO
+					LEFT OUTER JOIN CONSIGNEE_MASTER BUYER ON BUYER.CON_CODE=EM.EXPT_BUYER
+					LEFT OUTER JOIN SUPPLIER_MASTER AGENT ON AGENT.SUP_CODE=EM.AGENT
+					LEFT OUTER JOIN CMP_DTLS ON CONVERT(VARCHAR(20), CMP_DTLS.CMPID)=EM.EXPT_SUBAGT /* LINKS (3) */
+					LEFT OUTER JOIN VSL_MASTER ON VSL_MASTER.VSL_RTNO=EM.EXPT_VESSEL
+					INNER JOIN CITY_MASTER ON CITY_MASTER.CITY_CODE=EM.EXPT_LDGPORT
+			WHERE   CMPCODE=@CMPCODE AND EM.CITYCODE=@CITYCODE AND EM.USERNAME=@USERID
+			ORDER BY EM.ID DESC
+GO
+
+SET NOEXEC OFF;
+GO
+
+/* ---- 7. verify (read-only) --------------------------------------------------------------- */
+SELECT p.name AS [procedure], CONVERT(VARCHAR(19), p.modify_date, 120) AS created,
+       CASE WHEN CHARINDEX('EXPORT_REDESIGN_PROCS_LINKSDB20_20261016', OBJECT_DEFINITION(p.object_id)) > 0
+            THEN 'this script' ELSE '*** NOT this script' END AS [source]
+  FROM sys.procedures p
+ WHERE p.name IN ('USP_EXPT_SHIPMENT_PROGRESS_GETBLDATA', 'USP_EXP_SHIPMENT_PROGRESS_BL_UPDATE', 'USP_EXP_RPT_MISSING_DOCS', 'USP_EXP_MST_EDIT_CO2_UPDATE', 'USP_EXP_MST_EXPORT_JOB_UPDATE')
+ ORDER BY p.name;
+
+IF (SELECT COUNT(*) FROM sys.procedures
+     WHERE name IN ('USP_EXPT_SHIPMENT_PROGRESS_GETBLDATA', 'USP_EXP_SHIPMENT_PROGRESS_BL_UPDATE', 'USP_EXP_RPT_MISSING_DOCS', 'USP_EXP_MST_EDIT_CO2_UPDATE', 'USP_EXP_MST_EXPORT_JOB_UPDATE')
+       AND CHARINDEX('EXPORT_REDESIGN_PROCS_LINKSDB20_20261016', OBJECT_DEFINITION(object_id)) > 0) = 5
+BEGIN
+    PRINT 'All five export procedures are in place on ' + DB_NAME() + '.';
+
+    -- the two read-only ones, once each (the other three write, so they are not run here)
+    PRINT 'USP_EXP_RPT_MISSING_DOCS with defaults - expected today: STATUS 103 (no booking orders on LinksDB20).';
+    EXEC dbo.USP_EXP_RPT_MISSING_DOCS;
+
+    DECLARE @vsl VARCHAR(50), @port VARCHAR(3), @cmp VARCHAR(3), @city VARCHAR(3);
+    SELECT TOP 1 @vsl = EXPT_VESSEL, @port = VSL_PORT, @cmp = CMPCODE, @city = CITYCODE
+      FROM dbo.EXPT_MASTER
+     WHERE ISNULL(EXPT_VESSEL, '') <> '' AND ISNULL(VSL_PORT, '') <> '' AND ISNULL(EXPT_BLNO, '') <> ''
+     ORDER BY ID DESC;
+    PRINT 'USP_EXPT_SHIPMENT_PROGRESS_GETBLDATA for the newest job with a BL: vessel ' + ISNULL(@vsl, '?') + ' / ' + ISNULL(@port, '?') + ' (expected: STATUS 100 rows, MODE ADD or UPDATE, counts).';
+    IF @vsl IS NOT NULL
+        EXEC dbo.USP_EXPT_SHIPMENT_PROGRESS_GETBLDATA @cmp, @city, @vsl, @port, '', '';
+END
+ELSE
+    PRINT '*** One or more of the five procedures is missing or not this script''s own on ' + DB_NAME() + ' - see the messages above.';
+GO

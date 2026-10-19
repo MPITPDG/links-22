@@ -14,7 +14,7 @@ import { EMPTY, Subscription } from 'rxjs';
 @Component({
     selector: 'app-trialbalance-groupwise',
     templateUrl: './trialbal-groupwise.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

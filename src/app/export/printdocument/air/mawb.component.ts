@@ -9,6 +9,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-print-air-mawb-list',
     templateUrl: 'mawb.list.component.html',
+    styleUrls: ['./mawb-generate.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -73,6 +74,7 @@ export class PrintDocumentMawbListComponent implements OnChanges {
 @Component({
     selector: 'app-print-air-mawb-update',
     templateUrl: 'mawb.update.component.html',
+    styleUrls: ['./mawb-generate.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -132,9 +134,10 @@ export class PrintDocumentMawbUpdateComponents implements OnChanges {
         this._dataService.getData("Export/PrintDocumentAirMawbUpdatePageload", _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                this.currencyList = data.Table;
-                this.destinationList = data.Table1;
-                this.mawbnoList = data.Table2;
+                this.currencyList = (data && data.Table) ? data.Table : [];
+                this.destinationList = (data && data.Table1) ? data.Table1 : [];
+                this.mawbnoList = (data && data.Table2) ? data.Table2 : [];
+                if (!this.mawbnoList.length) { return; }
                 if (this.mawbnoList.length > 0) {
                     for (let i=0; i < this.mawbnoList.length; i++) {
                         this.totalGrwt += this.mawbnoList[i].GRWT;
@@ -193,6 +196,7 @@ export class PrintDocumentMawbUpdateComponents implements OnChanges {
 
 @Component({
     templateUrl: 'mawb.component.html',
+    styleUrls: ['./mawb-generate.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -228,6 +232,10 @@ export class PrintDocumentMawbComponent implements OnInit {
     Airmawbno:any;
     searchLength: any = 0;
     AllMawbNoList: any = [];
+    /** Display only (page crumb / heading): the same /number test ngOnInit uses for viewType. */
+    get isGenerateRoute(): boolean {
+        return this._router.url.search(/number/gi) != -1;
+    }
     constructor(
         private _router: Router,
         private _activatedRoute: ActivatedRoute,
@@ -255,8 +263,8 @@ export class PrintDocumentMawbComponent implements OnInit {
             }
             this._dataService.getData("Export/EXP_MAWB_STOCK_PAGELOAD",_jsonData)
             .subscribe((data: any) => {
-                this.AirLineList=data.Table1;
-                this.AllMawbNoList=data.Table3
+                this.AirLineList=(data && data.Table1) ? data.Table1 : [];
+                this.AllMawbNoList=(data && data.Table3) ? data.Table3 : []
             });
 
             let pageType = /number/gi;
@@ -352,7 +360,7 @@ export class PrintDocumentMawbComponent implements OnInit {
         this._dataService.getData("Export/PrintDocumentAirMawbList", _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                if (data.Table.length > 0) {
+                if (data && data.Table && data.Table.length > 0) {
                     if (data.Table[0].STATUS == 100) {
                         this.viewType = 'List';
                         this.searchList = data.Table;
@@ -400,6 +408,7 @@ export class PrintDocumentMawbComponent implements OnInit {
 @Component({
     selector: 'app-mawb-search',
     templateUrl: 'mawb.search.component.html',
+    styleUrls: ['./mawb-generate.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -458,7 +467,7 @@ export class PrintDocumentMawbSearchComponent implements OnChanges {
             }
             this._dataService.getData("Export/EXP_MAWB_STOCK_PAGELOAD",_jsonData)
             .subscribe((data: any) => {
-                this.AirLineList=data.Table1;
+                this.AirLineList=(data && data.Table1) ? data.Table1 : [];
             });
     }
     ngOnChanges() { }
@@ -534,7 +543,7 @@ export class PrintDocumentMawbSearchComponent implements OnChanges {
         this._dataService.getData("Export/PrintDocumentAirMawbList", _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                if (data.Table.length > 0) {
+                if (data && data.Table && data.Table.length > 0) {
                     if (data.Table[0].STATUS == 100) {
                         this.viewType = 'List';
                         this.searchList = data.Table;

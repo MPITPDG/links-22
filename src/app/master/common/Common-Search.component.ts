@@ -12,6 +12,7 @@ import {ITEMS,REQITEMS} from './Cls-common.item';
 @Component({
     selector: 'app-commonsearch',
     templateUrl: 'Common-Search.component.html',
+    styleUrls: ['../request/request-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -81,7 +82,7 @@ export class Commonsearch     {
         this.loaderService.display(true);
         this._dataService.getData("Master/Master_Search_common",jsonmaster)
         .subscribe((data: any) => {
-             this.Reqlist=data.Table;
+             this.Reqlist=(data && data.Table) || [];
              this.loaderService.display(false);
         });
         this.config = {

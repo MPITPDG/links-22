@@ -1,111 +1,68 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{PageName|uppercase}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Accounts -> MIS -> Job profit -> Client wise.
+  Download-only: calculate() queues the report and routes to /accounts/report/ReportDownload/:pkid.
+  Every radio, [disabled] rule and handler is unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ PageName | titlecase }}</h1>
+      <p>Job profit for one client or all clients, by date or job range &middot; generated as an Excel file</p>
     </div>
-    <div class="row no-gutters">
-        <div class="col-sm-12 col-md-2 col-lg-2">
-        </div>
-        <div class="col-sm-12 col-md-8 col-lg-8 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr >
-                    <td colspan="3" style="text-align: left;"><input type="radio"  name="searchclient" value='CLIENT'  
-                        [(ngModel)]="searchclient">&nbsp;<span class="col-form-span-label"><b>Any One Client</b> </span></td>
-                    <td colspan="3">
-                        <ng-select   [items]="ClientList" bindLabel="EXP_NAME_CITY" [disabled]="searchclient == 'ALLCLIENT' "
-                               bindValue="EXP_CODE"  [(ngModel)]="Client"  
-                               class="custom" placeholder="--Please Select--"> 
-                                </ng-select>
-            
-                    </td>
-                </tr>
-                <tr >
-                    <td colspan="2" style="text-align: left;"><input type="radio"  name="searchclient" value='ALLCLIENT'  
-                        [(ngModel)]="searchclient">&nbsp;<span class="col-form-span-label"><b>All Client</b> </span></td>
-                    <td colspan="4">
-                        <ng-select [items]="AllClientList"  [(ngModel)]="allclient" class="custom" 
-                        placeholder="--Please Select Client--" [disabled]="searchclient == 'CLIENT'" style="width: 400px;">
-                 </ng-select>
-                    </td>
-                </tr>
-                <tr >
-                    <td colspan="2" style="text-align: left;" ><input type="radio"  name="searchtype" value='DATEWISE'
-                        [(ngModel)]="searchtype">&nbsp;<span class="col-form-span-label"><b>{{dtlable}}</b> </span></td>
-                    <td colspan="4 " style="text-align: left;">
-                        <div style="display: inline-flex;gap: 5px;">
-                            <span class="col-form-span-label">From </span>
-                             <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)" [disabled]="searchtype == 'JOBWISE'"  [options]="myDatePickerOptions"
-                          [selDate]="FromDate"    ></my-date-picker>
-                            <!-- <my-date-picker name="FromDate" [options]="myDatePickerOptions" 
-                                [(ngModel)]="FromDate" [disabled]="searchtype == 'JOBWISE'"></my-date-picker> &nbsp; -->
-                            <span class="col-form-span-label">To </span>
-                            <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)" [disabled]="searchtype == 'JOBWISE'" [options]="myDatePickerOptionsInv"
-                             [selDate]="ToDate"   ></my-date-picker>
-                            <!-- <my-date-picker name="ToDate" [options]="myDatePickerOptions"
-                                [(ngModel)]="ToDate" [disabled]="searchtype == 'JOBWISE'"></my-date-picker> -->
-                        </div>
-                       <br>
-                        <div style="display: inline-flex;" class="col-form-span-label">
-                            <input type="radio"  name="modetype_radio" value='SEA_exp' (change)="updateDtlable(modetype)"
-                                [(ngModel)]="modetype" [disabled]="searchtype == 'JOBWISE'" >&nbsp;<b>Sea Export </b>
-                                &nbsp;<input type="radio"name="modetype_radio" value='AIR_exp' (change)="updateDtlable(modetype)"
-                                [(ngModel)]="modetype" [disabled]="searchtype == 'JOBWISE'">&nbsp;<b>Air  Export</b>
-                                &nbsp;<input type="radio"name="modetype_radio" value='SEA_imp' (change)="updateDtlable(modetype)"
-                                [(ngModel)]="modetype" [disabled]="searchtype == 'JOBWISE'">&nbsp;<b>Sea Import </b>
-                                &nbsp;<input type="radio"name="modetype_radio" value='AIR_imp' (change)="updateDtlable(modetype)"
-                                [(ngModel)]="modetype" [disabled]="searchtype == 'JOBWISE'">&nbsp;<b>Air Import </b>
-                                &nbsp;<input type="radio"name="modetype_radio" value='DateAll' (change)="updateDtlable(modetype)"
-                                [(ngModel)]="modetype" [disabled]="searchtype == 'JOBWISE'">&nbsp;<b>All (For Any One Cllient) </b>
-                        </div>
-                       
-                    </td>
-                </tr>
-               
-                <tr >
-                    <td colspan="2" style="text-align: left;"><input type="radio"  name="searchtype" value='JOBWISE'
-                        [(ngModel)]="searchtype">&nbsp;<span class="col-form-span-label"><b>Job No</b> </span></td>
-                    <td colspan="4" style="text-align: left;">
-                        <div style="display: inline-flex;">
-                            <span class="col-form-span-label">From &nbsp;</span>
+  </div>
 
-                            <input [(ngModel)]="fromjobno" type="text" class="form-control width130"   [disabled]="searchtype == 'DATEWISE' "
-                                maxlength="40">
-                                &nbsp;
-                            <span class="col-form-span-label">To  &nbsp;</span>
-
-                            <input [(ngModel)]="tojobno" type="text" class="form-control width130"   [disabled]="searchtype == 'DATEWISE' " maxlength="40">
-                        </div>
-                    </td>
-
-                </tr>
-              
-                <tr  >
-                    <td colspan="6" class="centerlabel">
-                   
-                            <button class="btn btn-sm btn-primary" type="submit" (click)="calculate()">
-                                <span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Calculate</span>
-                               </button> &nbsp;
-                               <!-- <button class="btn btn-sm btn-primary" type="submit" (click)="download()">
-                                <span class="col-form-span-label"><i class="fa fa-download"></i> download</span>
-       
-                               </button> -->
-                  
-                <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
-                        (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
-                    </td>
-                    </tr>
-            </table>
+  <div class="card sec">
+    <div class="card-h"><h2>Search by</h2><span class="meta"><b>*</b> required</span></div>
+    <div class="fields">
+      <div class="fld full">
+        <label><input type="radio" name="searchclient" value="CLIENT" [(ngModel)]="searchclient"> Any one client</label>
+        <ng-select [items]="ClientList" bindLabel="EXP_NAME_CITY" [disabled]="searchclient == 'ALLCLIENT' " bindValue="EXP_CODE" [(ngModel)]="Client" class="custom" placeholder="--Please Select--"></ng-select>
+      </div>
+      <div class="fld full">
+        <label><input type="radio" name="searchclient" value="ALLCLIENT" [(ngModel)]="searchclient"> All client</label>
+        <ng-select [items]="AllClientList" [(ngModel)]="allclient" class="custom" placeholder="--Please Select Client--" [disabled]="searchclient == 'CLIENT'"></ng-select>
+      </div>
+      <div class="fld full">
+        <label><input type="radio" name="searchtype" value="DATEWISE" [(ngModel)]="searchtype"> {{dtlable}}</label>
+        <div>
+          <div class="fk-seg">
+            @for (p of periods; track p.key) {
+              <button type="button" [disabled]="searchtype == 'JOBWISE'" [class.on]="period === p.key" (click)="setPeriod(p.key)">{{ p.label }}</button>
+            }
+          </div>
+          <div class="fk-inline">
+            <span>From</span>
+            <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event); period = ''" [disabled]="searchtype == 'JOBWISE'" [options]="myDatePickerOptions" [selDate]="FromDate"></my-date-picker>
+            <span>To</span>
+            <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event); period = ''" [disabled]="searchtype == 'JOBWISE'" [options]="myDatePickerOptionsInv" [selDate]="ToDate"></my-date-picker>
+          </div>
+          <div class="fk-opts">
+            <label><input type="radio" name="modetype_radio" value="SEA_exp" (change)="updateDtlable(modetype)" [(ngModel)]="modetype" [disabled]="searchtype == 'JOBWISE'"> Sea export</label>
+            <label><input type="radio" name="modetype_radio" value="AIR_exp" (change)="updateDtlable(modetype)" [(ngModel)]="modetype" [disabled]="searchtype == 'JOBWISE'"> Air export</label>
+            <label><input type="radio" name="modetype_radio" value="SEA_imp" (change)="updateDtlable(modetype)" [(ngModel)]="modetype" [disabled]="searchtype == 'JOBWISE'"> Sea import</label>
+            <label><input type="radio" name="modetype_radio" value="AIR_imp" (change)="updateDtlable(modetype)" [(ngModel)]="modetype" [disabled]="searchtype == 'JOBWISE'"> Air import</label>
+            <label><input type="radio" name="modetype_radio" value="DateAll" (change)="updateDtlable(modetype)" [(ngModel)]="modetype" [disabled]="searchtype == 'JOBWISE'"> All (for any one client)</label>
+          </div>
         </div>
-        <div class="col-sm-12 col-md-2 col-lg-2">
+      </div>
+      <div class="fld full">
+        <label><input type="radio" name="searchtype" value="JOBWISE" [(ngModel)]="searchtype"> Job no.</label>
+        <div class="fk-inline">
+          <span>From</span>
+          <input [(ngModel)]="fromjobno" type="text" [disabled]="searchtype == 'DATEWISE' " maxlength="40">
+          <span>To</span>
+          <input [(ngModel)]="tojobno" type="text" [disabled]="searchtype == 'DATEWISE' " maxlength="40">
         </div>
+      </div>
     </div>
+    <div class="fk-note">Calculate queues the report on the server and opens the Report download page.</div>
+  </div>
+
+  <div class="bar">
+    <span class="note">Opens the Report download page when the file is queued.</span>
+    <div class="r">
+      <button class="btn g" type="reset" (click)="Reset(); period = ''">Reset</button>
+      <button class="btn p" type="submit" (click)="calculate()">Calculate</button>
+    </div>
+  </div>
 </div>

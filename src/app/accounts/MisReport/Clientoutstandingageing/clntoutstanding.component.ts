@@ -9,10 +9,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 import { DatePipe } from '@angular/common';
 import { FilterPipe } from 'ngx-filter-pipe';
+import { FinPager, finNum, finAmt } from '../../Accreport/fin-kit';
 @Component({
     selector: 'app-clntoutstanding',
     templateUrl: './clntoutstanding.component.html',
-    styles: [],
+    host: { class: 'kit-accreport' }, // Links: import-page + accreport-page are global (src/styles/kit)
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -65,10 +66,11 @@ import { FilterPipe } from 'ngx-filter-pipe';
               var jsoncmp = {
               cmpcode:this._loginService.getLogin()[0].CMPCODE  }
                 this._dataService.getData("Accounts/ACC_RPT_CLIENTOUTSTANDING_AGEING", jsoncmp)
-                .subscribe((data: any) => {
-                this.cloutList=data.Table1
+                                .subscribe((data: any) => {
+                this.cloutList=data.Table1 || []
                 this.loaderService.display(false)
-            })
+                this.loading = false; this.buildView();
+            }, () => { this.loaderService.display(false); this.loading = false; this.failed = true; })
           }
             GetCompanyName()
             {
@@ -113,4 +115,34 @@ import { FilterPipe } from 'ngx-filter-pipe';
              //   return x.ACCTNAME.toLowerCase().includes(searchValue.toLowerCase());
                // this.cloutList=this.filteredData;
             }    
-        }       
+        
+    // ---- redesign: KPIs, age-bucket chart, client filter + 10/page pager (display only) ----
+    loading = true;
+    failed = false;
+    pager = new FinPager<any>(10);
+    fmt = finAmt;
+    kpiReceivable = 0;
+    kpiOver180 = 0;
+    kpiUnadj = 0;
+    kpiAdvance = 0;
+    buckets: { label: string; value: number; pct: number }[] = [];
+    readonly bucketCols = [
+        ['DAYS_000_030', '< 30 days'], ['DAYS_031_060', '31-60 days'], ['DAYS_061_090', '61-90 days'], ['DAYS_091_120', '91-120 days'],
+        ['DAYS_121_180', '121-180 days'], ['DAYS_181_365', '181-365 days'], ['DAYS_366_730', '> 1 year']];
+    /* same match as clntoutageingfilterpipe: ACCTNAME contains the search text */
+    applyFilter() {
+        const q = (this.searchString || '').toLowerCase();
+        this.pager.set(q ? this.cloutList.filter(it => (it.ACCTNAME || '').toLowerCase().includes(q)) : this.cloutList);
+    }
+    buildView() {
+        const rows = this.cloutList || [];
+        this.applyFilter();
+        this.kpiReceivable = rows.reduce((a, r) => a + finNum(r.RECEIVABLE_AS_ON), 0);
+        this.kpiOver180 = rows.reduce((a, r) => a + finNum(r.DAYS_181_365) + finNum(r.DAYS_366_730), 0);
+        this.kpiUnadj = rows.reduce((a, r) => a + finNum(r.UNADJUSTED_RECEIPTS), 0);
+        this.kpiAdvance = rows.reduce((a, r) => a + finNum(r.ADVANCE), 0);
+        const vals = this.bucketCols.map(([c, l]) => ({ label: l, value: rows.reduce((a, r) => a + finNum(r[c]), 0) }));
+        const tot = vals.reduce((a, v) => a + Math.max(0, v.value), 0) || 1;
+        this.buckets = vals.map(v => ({ ...v, pct: Math.max(0, Math.min(100, v.value / tot * 100)) }));
+    }
+}       

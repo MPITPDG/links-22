@@ -1,80 +1,53 @@
-<div class="animated fadeIn" >  
-    <div class="row no-gutters"  >
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{Header}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Accounts -> MIS -> Invoicing delay.
+  Download-only: ExportData() -> ACC_MIS_INVOICE_DELAY, workbook built client-side. The date labels
+  follow the chosen mode through the existing lblchange().
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Header || 'Invoicing delay' }}</h1>
+      <p>Days between the shipment date and the invoice, per job &middot; downloads an Excel workbook</p>
     </div>
-    <div class="row no-gutters" >
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td class="col-form-span-heading" colspan="6"> <b>{{PageType}}</b> </td>
-           </tr>
-           <tr class="trbg">
-      
-            <td colspan="2">
-      <div class="leftlabel">
-                    <span class="col-form-span-label">
-                        <input type="radio" name="radioDisplay" value="SEAEXPORT" (change)="lblchange($event)" [(ngModel)]="rdbtype" />&nbsp;Sea Export </span>&nbsp;&nbsp;&nbsp;&nbsp;
-           </div>
-            </td>
-            <td colspan="2">
-                <div class="leftlabel">
-                           <span class="col-form-span-label">
-                        <input type="radio" name="radioDisplay" value="SEAIMPORT" (change)="lblchange($event)" [(ngModel)]="rdbtype" />&nbsp;Sea Import</span>
-       </div>
-            </td>
-          
-        </tr>
-          <tr>
-            <td colspan="2" >
-                <div class="leftlabel">
-                    <span class="col-form-span-label">
-                     <input type="radio" name="radioDisplay" value="AIREXPORT" (change)="lblchange($event)" [(ngModel)]="rdbtype" />&nbsp;Air Export </span>&nbsp;&nbsp;&nbsp;&nbsp;
-                  </div>
-                      </td>
-                      <td colspan="2" >
-                        <div class="leftlabel">
-                    <span class="col-form-span-label">
-                   <input type="radio" name="radioDisplay" value="AIRIMPORT" (change)="lblchange($event)" [(ngModel)]="rdbtype"  />&nbsp;Air Import</span>
-                         </div>
-                  </td>         
-          </tr> 
-                <tr>
-                    <td><span class="col-form-span-label"><b>{{frmdtlbl}}</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                <td>
-                    <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)"  [options]="myDatePickerOptionsRpt"
-                        class="form-control"  [selDate]="FromDate"    ></my-date-picker>
-                </td>
-                    <td><span class="col-form-span-label"><b>{{todtlbl}} </b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td><my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)"  [options]="myDatePickerOptionsRpt"
-                            class="form-control"  [selDate]="ToDate"   ></my-date-picker>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="6" class="centerlabel">
-                        <button class="btn btn-sm btn-primary" type="submit" (click)="ExportData()" > <span
-                                class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
-                                Export To Excel </span></button>&nbsp;
-                                <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-    </div>
-</div>
+  </div>
 
+  <div class="card sec">
+    <div class="card-h"><h2>{{ PageType || 'Mode and period' }}</h2><span class="meta"><b>*</b> required</span></div>
+    <div class="fields">
+      <div class="fld full">
+        <label>Mode <span class="req">*</span></label>
+        <div class="fk-opts">
+          <label><input type="radio" name="radioDisplay" value="SEAEXPORT" (change)="lblchange($event)" [(ngModel)]="rdbtype" /> Sea export</label>
+          <label><input type="radio" name="radioDisplay" value="SEAIMPORT" (change)="lblchange($event)" [(ngModel)]="rdbtype" /> Sea import</label>
+          <label><input type="radio" name="radioDisplay" value="AIREXPORT" (change)="lblchange($event)" [(ngModel)]="rdbtype" /> Air export</label>
+          <label><input type="radio" name="radioDisplay" value="AIRIMPORT" (change)="lblchange($event)" [(ngModel)]="rdbtype" /> Air import</label>
+        </div>
+      </div>
+      <div class="fld full">
+        <label>Quick period</label>
+        <div class="fk-seg">
+          @for (p of periods; track p.key) {
+            <button type="button" [class.on]="period === p.key" (click)="setPeriod(p.key)">{{ p.label }}</button>
+          }
+        </div>
+      </div>
+      <div class="fld">
+        <label>{{frmdtlbl}} <span class="req">*</span></label>
+        <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event); period = ''" [options]="myDatePickerOptionsRpt" [selDate]="FromDate"></my-date-picker>
+      </div>
+      <div class="fld">
+        <label>{{todtlbl}} <span class="req">*</span></label>
+        <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event); period = ''" [options]="myDatePickerOptionsRpt" [selDate]="ToDate"></my-date-picker>
+      </div>
+    </div>
+    <div class="fk-note">The report downloads as an Excel file; nothing is listed on this screen.</div>
+  </div>
+
+  <div class="bar">
+    <span class="note">The output is an Excel file; nothing is listed on this screen.</span>
+    <div class="r">
+      <button class="btn g" type="reset" (click)="Reset(); period = ''">Reset</button>
+      <button class="btn p" type="submit" (click)="ExportData()">Export to Excel</button>
+    </div>
+  </div>
+</div>

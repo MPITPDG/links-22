@@ -1,55 +1,111 @@
-<div class="animated fadeIn" >  
-    <div class="row no-gutters">
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-        <div class="col-sm-12 col-md-10 col-lg-10 ">
+<!--
+  Accounts -> Reports -> Not over (cash book entries whose cheques are not yet over).
+  Recipe 1 list + KPIs + chart. Data: Accounts/Acc_Rpt_NotOver_List on open.
+  Entry no. opens the legacy print popup via OpenPrint() (window.open ./#/popup/...), unchanged.
+  Export keeps the existing Excel export (ExportexcelService).
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Not over report</h1>
+      <p>Cash book entries whose cheques are not yet cleared &middot; select an entry no. to print it</p>
+    </div>
+  </div>
 
-           
-            <div class="row  xyscroll"  style="height: 550px;">
-                <table class="table table-bordered table-sm-new table-striped  " >
-                    <thead>
-                        <tr class="title-head formheading table-primary">
-                        
-                            <th class="col-form-span-label" align="center">Entry No</th>
-                            <th class="col-form-span-label" align="center">	Entry Date</th>
-                            <th class="col-form-span-label" align="center">Cheque No</th>      
-                            <th class="col-form-span-label" align="center">Cheque Date</th>     
-                            <th class="col-form-span-label" align="center">Bank</th>     
-                            <th class="col-form-span-label" align="center">Account Name</th>      
-                            <th class="col-form-span-label" align="center">Amount </th>                        
-                        </tr>
-                    </thead>
-                    @if (NotOverList.length > 0) {
-<tbody>
-                        @for (data of NotOverList; track data) {
-<tr>
-                            <td ><span  class="col-form-span-label anchor-link" (click)="OpenPrint(data.entryno,data.status)" >{{data.entryno}}</span> </td> 
-                            <td  ><span class="col-form-span-label">{{data.entrydt}}</span>  </td>                             
-                            <td  ><span class="col-form-span-label">{{data.chequeno}}</span>  </td>
-                            <td  ><span class="col-form-span-label">{{data.chequedt}}</span>  </td>
-                            <td  ><span class="col-form-span-label">{{data.bank}}</span>  </td>
-                            <td  ><span class="col-form-span-label">{{data.acctname}}</span>  </td>
-                            <td  ><span class="col-form-span-label">{{data.actualamount}}</span>  </td>
-                        </tr>
-}
-                    </tbody>
-}
-                    <!-- <tr> <td colspan="7" class="centerlabel">
-                       &nbsp;
-                    </td>
-            </tr> -->
-                </table>
-            </div>
-            <div align="right">
-                <button class="btn btn-sm btn-primary" type="submit" (click)="ExportNotOver()" > <span
-                    class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
-                    Export To Excel </span></button>
-            </div>
-             
+  @if (failed) {
+    <div class="card fk-alert">The not-over list could not be loaded. Reload the page to try again.</div>
+  }
+
+  <div class="fk-kpis">
+    @if (loading) {
+      @for (k of [1,2,3]; track k) { <div class="card fk-kpi"><div class="fk-skel w40"></div><div class="fk-skel h24 w60"></div></div> }
+    } @else {
+      <div class="card fk-kpi"><div class="k">Entries</div><div class="v">{{ NotOverList.length }}</div></div>
+      <div class="card fk-kpi"><div class="k">Total amount</div><div class="v">{{ total || fmt(kpiAmount, 2) }}</div><div class="s">{{ TotLable }}</div></div>
+      <div class="card fk-kpi"><div class="k">Banks</div><div class="v">{{ kpiBanks }}</div></div>
+    }
+  </div>
+
+  <div class="card sec">
+    <div class="card-h"><h2>Amount by bank</h2><span class="meta">top 12</span></div>
+    <div class="fk-chart">
+      @if (loading) {
+        <div class="fk-skel chart"></div>
+      } @else {
+        @if (chart) {
+          <svg [attr.viewBox]="'0 0 ' + chart.w + ' ' + chart.h" role="img" aria-label="Amount by bank">
+            @for (g of chart.grid; track $index) {
+              <line class="gl" [attr.x1]="chart.l" [attr.x2]="chart.w - 12" [attr.y1]="g.y" [attr.y2]="g.y"></line>
+              <text class="ax" [attr.x]="chart.l - 6" [attr.y]="g.y + 3" text-anchor="end">{{ g.label }}</text>
+            }
+            @for (b of chart.bars; track $index) {
+              <rect class="fb" [class.neg]="b.neg" [attr.x]="b.x" [attr.y]="b.y" [attr.width]="b.w" [attr.height]="b.h"><title>{{ b.label }}: {{ fmt(b.value, 2) }}</title></rect>
+              <text class="ax" [attr.x]="b.lx" [attr.y]="b.ly" text-anchor="middle">{{ b.label }}</text>
+            }
+          </svg>
+        } @else {
+          <div class="empty">Nothing to chart.</div>
+        }
+      }
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="toolbar">
+      <span><span class="count">{{ NotOverList.length }} {{ NotOverList.length === 1 ? 'entry' : 'entries' }}</span></span>
+      <span class="tb-r">
+        <button class="btn g" type="submit" (click)="ExportNotOver()" [disabled]="!NotOverList.length">Export</button>
+      </span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Entry no.</th>
+            <th>Entry date</th>
+            <th>Cheque no.</th>
+            <th>Cheque date</th>
+            <th>Bank</th>
+            <th>Account name</th>
+            <th class="num">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+            <tr><td class="empty" colspan="7">Loading entries&hellip;</td></tr>
+          } @else {
+            @for (data of pager.paged; track $index) {
+              <tr>
+                <td><a href="javascript:void(0);" class="lnk" (click)="OpenPrint(data.entryno,data.status)">{{data.entryno}}</a></td>
+                <td>{{data.entrydt}}</td>
+                <td>{{data.chequeno}}</td>
+                <td>{{data.chequedt}}</td>
+                <td>{{data.bank}}</td>
+                <td>{{data.acctname}}</td>
+                <td class="num">{{data.actualamount}}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="7">No not-over entries.</td></tr>
+            }
+            @if (NotOverList.length) {
+              <tr class="tot"><td colspan="6">{{ TotLable || 'Total amount' }}</td><td class="num">{{ total }}</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (pager.rows.length > pager.size) {
+      <div class="pager">
+        <span>Showing <b>{{ pager.from }}&ndash;{{ pager.to }}</b> of <b>{{ pager.rows.length }}</b></span>
+        <div class="pages">
+          <button type="button" [disabled]="pager.page === 1" (click)="pager.go(pager.page - 1)" aria-label="Previous page">&lsaquo;</button>
+          @for (p of pager.numbers; track $index) {
+            @if (p === '...') { <span class="gap">&hellip;</span> }
+            @else { <button type="button" [class.on]="p === pager.page" (click)="pager.go(p)">{{ p }}</button> }
+          }
+          <button type="button" [disabled]="pager.page === pager.total" (click)="pager.go(pager.page + 1)" aria-label="Next page">&rsaquo;</button>
         </div>
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-        
-                      
-    </div>  
+      </div>
+    }
+  </div>
 </div>

@@ -1,0 +1,132 @@
+<!--
+  Export > Booking > Approval. Page kit recipe 1 (src/styles/kit/import-page.css),
+  ported from MPERPNG-20 booking-authorisation. Sortable list with row and master
+  checkboxes; Abort / Verify & Authorise pinned bottom right; confirmation dialog
+  lists the selected orders before anything is saved.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Header | titlecase }}</h1>
+      <p>Review and authorise pending order bookings.</p>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Unauthorised booking list</h2>
+      <span class="chip dash">{{ unauthorisedCount }} pending</span>
+    </div>
+
+    <div class="toolbar">
+      <span class="count">{{ selectedCount }} selected of {{ totalCount }}</span>
+      <span class="tb-r">
+        <button class="btn g" type="button" (click)="selectAll()" [disabled]="!unauthorisedCount">Select all</button>
+        <button class="btn g" type="button" (click)="deselectAll()" [disabled]="!selectedCount">Deselect all</button>
+      </span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl nowrap">
+        <thead>
+          <tr>
+            <th class="col-check">
+              <input type="checkbox"
+                [checked]="masterChecked"
+                [indeterminate]="masterIndeterminate"
+                [disabled]="!unauthorisedCount"
+                (change)="toggleMaster($event)"
+                title="Select all" />
+            </th>
+            <th class="sortable" (click)="sortBy('ORDERNO')">Order no. <span class="sort-icon" [ngClass]="getSortClass('ORDERNO')"></span></th>
+            <th class="sortable" (click)="sortBy('STYLENO')">Style no. <span class="sort-icon" [ngClass]="getSortClass('STYLENO')"></span></th>
+            <th>City</th>
+            <th>Mode</th>
+            <th>Consignee</th>
+            <th class="sortable" (click)="sortBy('BOOKINGON')">Booking dt <span class="sort-icon" [ngClass]="getSortClass('BOOKINGON')"></span></th>
+            <th>Docs expect</th>
+            <th>Approval expect</th>
+            <th>Cargo expect</th>
+            <th>ETD origin</th>
+            <th>Trans ETA</th>
+            <th>Trans ETD</th>
+            <th>ETA dest</th>
+            <th>Prepared by</th>
+            <th class="sortable" (click)="sortBy('CREATEDON')">Prepared on <span class="sort-icon" [ngClass]="getSortClass('CREATEDON')"></span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (isLoading) {
+            <tr><td colspan="16" class="empty">Loading bookings…</td></tr>
+          } @else if (loadFailed) {
+            <!-- Kept apart from the empty state: a dead endpoint must not read as "nothing to authorise". -->
+            <tr>
+              <td colspan="16" class="empty">
+                <b>Could not load bookings.</b>
+                <span class="sub-t"> {{ loadErrorDetail }}</span>
+                <div class="ba-retry"><button class="btn g" type="button" (click)="retryLoad()">Retry</button></div>
+              </td>
+            </tr>
+          } @else {
+            @for (row of displayRows; track row) {
+              <tr [class.selected]="row.checked" [class.authorised-row]="row.authorised">
+                <td class="col-check">
+                  <input type="checkbox"
+                    [checked]="row.checked"
+                    [disabled]="row.authorised"
+                    (change)="toggleRow(row)" />
+                </td>
+                <td class="mono"><b>{{ row.ORDERNO }}</b></td>
+                <td class="mono">{{ row.STYLENO }}</td>
+                <td>{{ row.CITY }}</td>
+                <td><span class="chip">{{ row.MODE }}</span></td>
+                <td>{{ row.CONSGN }}</td>
+                <td>{{ row.BOOKINGON }}</td>
+                <td>{{ row.DOCSEXPECT }}</td>
+                <td>{{ row.APPROVALEXPECT }}</td>
+                <td>{{ row.CARGOEXPECT }}</td>
+                <td>{{ row.ETD_ORIGIN }}</td>
+                <td>{{ row.TRANS_ETA || '—' }}</td>
+                <td>{{ row.TRANS_ETD || '—' }}</td>
+                <td>{{ row.ETA_DEST }}</td>
+                <td>{{ row.CREATEDBY }}</td>
+                <td>{{ row.CREATEDON }}</td>
+              </tr>
+            } @empty {
+              <tr><td colspan="16" class="empty">No unauthorised bookings found.</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">
+      Total orders <b>{{ totalCount }}</b> &middot; authorised <b>{{ authorisedCount }}</b> &middot; unauthorised <b>{{ unauthorisedCount }}</b>
+    </span>
+    <div class="r">
+      <button class="btn g" type="button" (click)="abort()">Abort</button>
+      <button class="btn p" type="button" (click)="openConfirmModal()" [disabled]="selectedCount === 0">Verify &amp; Authorise</button>
+    </div>
+  </div>
+
+  <!-- Confirmation dialog: inside .im-page so the kit tokens and .btn styles apply -->
+  @if (showModal) {
+    <div class="ba-backdrop" (click)="closeModal()">
+      <div class="ba-dialog" role="dialog" aria-modal="true" aria-labelledby="ba-dialog-title" (click)="$event.stopPropagation()">
+        <h3 id="ba-dialog-title">Confirm authorisation</h3>
+        <p>You are about to authorise the following <b>{{ selectedRows.length }}</b> order(s). This cannot be undone.</p>
+        <ul class="ba-list">
+          @for (row of selectedRows; track row) {
+            <li><b>{{ row.ORDERNO }}</b> — style {{ row.STYLENO }} — {{ row.CONSGN }}</li>
+          }
+        </ul>
+        <div class="ba-actions">
+          <button type="button" class="btn g" (click)="closeModal()">Cancel</button>
+          <button type="button" class="btn p" (click)="authorise()" [disabled]="isSaving">{{ isSaving ? 'Saving…' : 'Confirm authorise' }}</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

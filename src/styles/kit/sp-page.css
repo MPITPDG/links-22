@@ -1,0 +1,515 @@
+/* ----------------------------------------------------------------
+   Links port (Phase 1): GLOBAL page-kit stylesheet, registered in
+   angular.json `styles` after src/tailwind.css.
+   Source: MPERPNG-20 src/app/export/shipment_progress/sp-page.css
+   Area add-on. In MP: styleUrls [import-page.css, sp-page.css].
+   In Links: class "kit-sp" on the component host or a wrapper around .im-page
+   (MP's `:host { display:block }` is now `.kit-sp { display:block }`).
+   Every rule stays under its root class, so no legacy screen is affected.
+   Do not edit by hand without mirroring MP; regenerate from MP instead.
+   ---------------------------------------------------------------- */
+/* ============================================================
+   Export - Shipment Progress.
+   Package additions on top of the Import page kit (src/app/import/import-page.css):
+   the one-screen workspace with its milestone table and right-side stage drawer,
+   boxed radios / textareas, read-only key/value grids, inline hour/minute pairs
+   and in-card notes. Monochrome only.
+   ============================================================ */
+
+.kit-sp {
+    display: block;
+}
+
+/* ---------- radios, checkboxes, textareas ---------- */
+.kit-sp .im-page input[type="checkbox"],
+.kit-sp .im-page input[type="radio"] {
+    accent-color: var(--mp-primary, #0A0A0A);
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.kit-sp .im-page .sp-radios {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 18px;
+    min-height: 32px;
+}
+
+.kit-sp .im-page .sp-radios label,
+.kit-sp .im-page label.sp-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 500;
+    font-size: 13px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.kit-sp .im-page textarea {
+    font: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    background: var(--mp-surface, #fff);
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    padding: 7px 10px;
+    width: 100%;
+    min-height: 58px;
+    resize: vertical;
+    box-shadow: none;
+    margin: 0;
+}
+
+.kit-sp .im-page textarea:focus {
+    outline: 2px solid var(--mp-primary, var(--ink));
+    outline-offset: -1px;
+    border-color: var(--mp-primary, var(--ink));
+}
+
+.kit-sp .im-page textarea:disabled {
+    border-style: dashed;
+    background: var(--fill);
+    color: var(--soft);
+}
+
+/* ---------- fields: top-aligned rows, inline control pairs ---------- */
+.kit-sp .im-page .fld.top {
+    align-items: start;
+}
+
+.kit-sp .im-page .fld.top > label {
+    padding-top: 7px;
+}
+
+.kit-sp .im-page .sp-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.kit-sp .im-page .sp-inline > .ng-select,
+.kit-sp .im-page .sp-inline > select {
+    flex: 0 0 84px;
+    width: 84px;
+}
+
+.kit-sp .im-page .sp-inline > my-date-picker {
+    flex: 1 1 150px;
+    min-width: 150px;
+}
+
+.kit-sp .im-page .sp-inline .u {
+    color: var(--faint);
+    font-size: 12px;
+}
+
+.kit-sp .im-page .sp-val {
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+/* ---------- read-only key/value grid ---------- */
+.kit-sp .im-page .sp-kv {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.kit-sp .im-page .sp-kv > div {
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr);
+    gap: 10px;
+    align-items: baseline;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--line);
+    font-size: 12.5px;
+    min-width: 0;
+}
+
+.kit-sp .im-page .sp-kv > div > span {
+    color: var(--soft);
+}
+
+.kit-sp .im-page .sp-kv > div > b {
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.kit-sp .im-page .sp-kv > div.w {
+    grid-column: 1 / -1;
+}
+
+/* band that splits one card into sub-sections */
+.kit-sp .im-page .sp-band {
+    padding: 7px 16px;
+    background: var(--band);
+    border-bottom: 1px solid var(--line);
+    border-top: 1px solid var(--line);
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--soft);
+    font-weight: 600;
+}
+
+.kit-sp .im-page .card > .sp-band:first-child {
+    border-top: 0;
+}
+
+/* ---------- notes, empty states, card footers ---------- */
+.kit-sp .im-page .sp-note {
+    border: 1px dashed var(--edge);
+    background: var(--band);
+    color: var(--ink);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12.5px;
+    margin: 0 0 16px;
+}
+
+.kit-sp .im-page .card .sp-note {
+    margin: 12px 16px;
+}
+
+.kit-sp .im-page .sp-empty {
+    padding: 28px 16px;
+    text-align: center;
+    color: var(--faint);
+}
+
+.kit-sp .im-page .sp-foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--line);
+}
+
+.kit-sp .im-page .sp-foot .r {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.kit-sp .im-page .sp-stack > .card + .card,
+.kit-sp .im-page .sp-stack > .card + app-shipment-progress-common-view,
+.kit-sp .im-page .sp-stack > app-shipment-progress-common-view + .card {
+    margin-top: 16px;
+}
+
+/* filter bars with fewer inputs than the kit's six-column default */
+.kit-sp .im-page .filters.f2 {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+}
+
+.kit-sp .im-page .filters.f3 {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+}
+
+.kit-sp .im-page .filters.f4 {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr) auto;
+}
+
+.kit-sp .im-page .f .err {
+    display: block;
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* ---------- tables ---------- */
+.kit-sp .im-page table.tbl tbody tr.click {
+    cursor: pointer;
+}
+
+.kit-sp .im-page table.tbl tbody tr.on td {
+    background: var(--band);
+}
+
+.kit-sp .im-page table.tbl td.chk,
+.kit-sp .im-page table.tbl th.chk {
+    width: 36px;
+    text-align: center;
+}
+
+.kit-sp .im-page table.tbl td input:not([type="checkbox"]):not([type="radio"]) {
+    height: 28px;
+    min-width: 90px;
+}
+
+.kit-sp .im-page table.tbl td .mydp {
+    min-width: 140px;
+}
+
+.kit-sp .im-page table.tbl td.miss {
+    outline: 1px dashed var(--mp-primary, var(--ink));
+    outline-offset: -3px;
+}
+
+.kit-sp .im-page .tbl-wrap.tall {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* ---------- workspace ---------- */
+.kit-sp .im-page.sp-ws {
+    padding-bottom: 24px;
+}
+
+.kit-sp .sp-ws .sp-seg {
+    display: inline-flex;
+    gap: 2px;
+    padding: 2px;
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    background: var(--mp-surface, #fff);
+}
+
+.kit-sp .sp-ws .sp-seg button {
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    height: 26px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--soft);
+    cursor: pointer;
+}
+
+.kit-sp .sp-ws .sp-seg button.on {
+    background: var(--mp-primary, var(--ink));
+    color: var(--mp-primary-fg, #fff);
+}
+
+.kit-sp .sp-ws .sp-grid {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+}
+
+.kit-sp .sp-ws .sp-side > .card + .card {
+    margin-top: 16px;
+}
+
+.kit-sp .sp-ws .sp-job {
+    display: grid;
+    gap: 12px;
+    padding: 14px 16px;
+}
+
+.kit-sp .sp-ws .sp-job .acts {
+    display: flex;
+    gap: 8px;
+}
+
+.kit-sp .sp-ws .sp-hits {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.kit-sp .sp-ws .sp-hits button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font: inherit;
+    font-size: 12.5px;
+    padding: 9px 16px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: var(--mp-surface, #fff);
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.kit-sp .sp-ws .sp-hits button:last-child {
+    border-bottom: 0;
+}
+
+.kit-sp .sp-ws .sp-hits button:hover,
+.kit-sp .sp-ws .sp-hits button.on {
+    background: var(--band);
+}
+
+.kit-sp .sp-ws .sp-hits button b {
+    display: block;
+    font-family: var(--num);
+    font-weight: 500;
+}
+
+.kit-sp .sp-ws .sp-hits button span {
+    display: block;
+    color: var(--soft);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* KPI tiles above the milestone table */
+.kit-sp .sp-ws .sp-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-bottom: 1px solid var(--line);
+}
+
+.kit-sp .sp-ws .sp-kpis > div {
+    padding: 12px 16px;
+    border-right: 1px solid var(--line);
+}
+
+.kit-sp .sp-ws .sp-kpis > div:last-child {
+    border-right: 0;
+}
+
+.kit-sp .sp-ws .sp-kpis b {
+    display: block;
+    font-family: var(--num);
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.kit-sp .sp-ws .sp-kpis span {
+    color: var(--soft);
+    font-size: 12px;
+}
+
+.kit-sp .sp-ws .sp-meter {
+    height: 6px;
+    background: var(--fill);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.kit-sp .sp-ws .sp-meter i {
+    display: block;
+    height: 100%;
+    background: var(--mp-primary, var(--ink));
+}
+
+.kit-sp .sp-ws table.tbl td.step {
+    width: 44px;
+    font-family: var(--num);
+    color: var(--faint);
+}
+
+.kit-sp .sp-ws table.tbl tr.locked td {
+    color: var(--faint);
+}
+
+/* right-side stage drawer; the outlet inside it is always in the DOM */
+.kit-sp .sp-ws .sp-scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 10, 10, .28);
+    z-index: 1040;
+}
+
+.kit-sp .sp-ws .sp-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(900px, 94vw);
+    z-index: 1041;
+    display: flex;
+    flex-direction: column;
+    background: var(--ground);
+    border-left: 1px solid var(--edge);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, .10);
+}
+
+.kit-sp .sp-ws .sp-drawer.shut,
+.kit-sp .sp-ws .sp-scrim.shut {
+    display: none;
+}
+
+.kit-sp .sp-ws .sp-drawer-h {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    background: var(--sheet);
+    border-bottom: 1px solid var(--edge);
+}
+
+.kit-sp .sp-ws .sp-drawer-h h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.kit-sp .sp-ws .sp-drawer-h p {
+    margin: 2px 0 0;
+    color: var(--soft);
+    font-size: 12.5px;
+}
+
+.kit-sp .sp-ws .sp-drawer-h .tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.kit-sp .sp-ws .sp-drawer-b {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+/* the hosted stage keeps its own sticky Cancel / Update bar; the drawer head replaces its page header */
+.kit-sp .sp-ws .sp-drawer-b .im-page {
+    padding-top: 16px;
+}
+
+.kit-sp .sp-ws .sp-drawer-b .im-page > .ph {
+    display: none;
+}
+
+.kit-sp .sp-ws .sp-drawer-b .im-page .bar {
+    margin-bottom: 0;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 1100px) {
+    .kit-sp .im-page .sp-kv {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .kit-sp .sp-ws .sp-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .kit-sp .im-page .filters.f2,
+    .kit-sp .im-page .filters.f3,
+    .kit-sp .im-page .filters.f4 {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .kit-sp .im-page .sp-kv,
+    .kit-sp .sp-ws .sp-kpis {
+        grid-template-columns: 1fr;
+    }
+
+    .kit-sp .im-page .filters.f2,
+    .kit-sp .im-page .filters.f3,
+    .kit-sp .im-page .filters.f4 {
+        grid-template-columns: 1fr;
+    }
+}

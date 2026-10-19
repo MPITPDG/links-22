@@ -1,331 +1,194 @@
-<div class="animated fadeIn x-page">
-
-    <!-- ================= HEADER ================= -->
-    <div class="x-toolbar">
-        <div class="x-mark">
-            <i class="fa fa-search" aria-hidden="true"></i>
-        </div>
-        <div class="x-titlewrap">
-            <span class="x-eyebrow">Accounts</span>
-            <h1 class="x-title">Proforma Invoice Search</h1>
-        </div>
+<!--
+  Proforma invoice search. Page kit recipe 1 (src/styles/kit/import-page.css +
+  ../invoice/invoice-page.css), ported from MPERPNG-20. Every ngModel, radio value,
+  validation and (click) handler is unchanged; only the chrome moved to the kit's filter
+  card, toolbar, table.tbl and pager. Print actions (ProformaPrint / PrintInvoice /
+  ListOnclick) and Convert to Invoice behave exactly as before. Links-only, kept: the quick
+  filter over the loaded rows (term), Back to search (backToSearch) and Enter-to-search.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Proforma Invoice Search</h1>
+      <p>Find a proforma by number, client, job, amount or date - print it or convert it to a tax invoice.</p>
     </div>
+    @if (Searchdata_list.length >= 1) {
+      <div class="tools">
+        <button class="btn g" type="button" (click)="backToSearch(); PageActual = 1"><i class="fa fa-arrow-circle-left"></i> Back to search</button>
+      </div>
+    }
+  </div>
 
-    <!-- ================= SEARCH ================= -->
-    @if (Searchdata_list.length == 0) {
-<div class="x-card ps-searchcard">
-
-        <!-- mode: segmented control -->
-        <div class="x-seg ps-seg">
-            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == 'INVOICENO'">
-                <input type="radio" name="exampleRadios" value="INVOICENO" [(ngModel)]="exampleRadios1" /> Proforma No.
-            </label>
-            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == 'CLIENT'">
-                <input type="radio" name="exampleRadios" value="CLIENT" [(ngModel)]="exampleRadios1" /> Client Wise
-            </label>
-            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == 'JOBNO'">
-                <input type="radio" name="exampleRadios" value="JOBNO" [(ngModel)]="exampleRadios1" /> Job No.
-            </label>
-            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == 'AMOUNT'">
-                <input type="radio" name="exampleRadios" value="AMOUNT" [(ngModel)]="exampleRadios1" /> Amount
-            </label>
-            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == 'DATE'">
-                <input type="radio" name="exampleRadios" value="DATE" [(ngModel)]="exampleRadios1" /> Date Wise
-            </label>
-            <label class="x-seg-btn ps-seg-btn" [class.active]="exampleRadios1 == '6'">
-                <input type="radio" name="exampleRadios" value="6" [(ngModel)]="exampleRadios1" /> Print All of a Day
-            </label>
+  @if (Searchdata_list.length==0) {
+    <div class="card sec">
+      <div class="card-h"><h2>Search by</h2></div>
+      <div class="fields">
+        <div class="fld full">
+          <label class="gis-radio"><input type="radio" name="exampleRadios" value='INVOICENO' [(ngModel)]="exampleRadios1"> Proforma Inv No</label>
+          <div class="gis-inline">
+            <input type="text" class="form-control gis-w" [maxlength]="15" [(ngModel)]="invoiceno" [disabled]="exampleRadios1 != 'INVOICENO'"
+              placeholder="15-digit proforma no." (keyup.enter)="searchlist()">
+            <button class="btn p" type="submit" (click)="ProformaPrint(invoiceno)"><i class="fa fa-print"></i> Print</button>
+          </div>
         </div>
 
-        <!-- ============ PROFORMA NO. ============ -->
-        @if (exampleRadios1 == 'INVOICENO') {
-<div class="ps-criteria">
-            <div class="ps-row">
-                <div class="ps-field">
-                    <label class="x-lbl">Proforma Invoice No.</label>
-                    <div class="ps-searchgroup">
-                        <i class="fa fa-search ps-searchicon" aria-hidden="true"></i>
-                        <input type="text" class="form-control" [maxlength]="15" [(ngModel)]="invoiceno"
-                               placeholder="15-digit Proforma Invoice No." (keyup.enter)="searchlist()" />
-                        <button type="button" class="ps-searchbtn" (click)="searchlist()">Search</button>
-                    </div>
-                </div>
-                <div class="ps-field ps-field-action">
-                    <button type="button" class="x-btn x-btn-primary" (click)="ProformaPrint(invoiceno)">
-                        <i class="fa fa-print" aria-hidden="true"></i> Print
-                    </button>
-                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
-                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
-                    </button>
-                </div>
-            </div>
+        <div class="fld full">
+          <label class="gis-radio"><input type="radio" name="exampleRadios" value='CLIENT' [(ngModel)]="exampleRadios1"> Client Name</label>
+          <ng-select [items]="clientable"
+            bindLabel="EXP_NAME_CITY"
+            bindValue="EXP_CODE"
+            [(ngModel)]="client" class="custom"
+            placeholder="--Please Select Client --"
+            [searchable]="true" [clearable]="true"
+            [disabled]="exampleRadios1 != 'CLIENT'">
+          </ng-select>
         </div>
-}
-
-        <!-- ============ CLIENT WISE ============ -->
-        @if (exampleRadios1 == 'CLIENT') {
-<div class="ps-criteria">
-            <div class="ps-row">
-                <div class="ps-field ps-field-wide">
-                    <label class="x-lbl">Client</label>
-                    <ng-select [items]="clientable" bindLabel="EXP_NAME_CITY" bindValue="EXP_CODE"
-                               [(ngModel)]="client" class="form-control"
-                               placeholder="Type to search client…" [searchable]="true" [clearable]="true">
-                    </ng-select>
-                </div>
-            </div>
-            <div class="ps-row">
-                <div class="ps-field ps-field-narrow">
-                    <label class="x-lbl">Start Date <span class="x-req">*</span></label>
-                    <my-date-picker name="ClientStartDate" [options]="myDatePickerOptions"
-                                    [(ngModel)]="client_startdate"></my-date-picker>
-                </div>
-                <div class="ps-field ps-field-narrow">
-                    <label class="x-lbl">End Date <span class="x-req">*</span></label>
-                    <my-date-picker name="ClientEndDate" [options]="myDatePickerOptions"
-                                    [(ngModel)]="client_enddate"></my-date-picker>
-                </div>
-                <div class="ps-field ps-field-action">
-                    <button type="button" class="ps-searchbtn ps-searchbtn-solo" (click)="searchlist()">
-                        <i class="fa fa-search" aria-hidden="true"></i> Search
-                    </button>
-                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
-                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
-                    </button>
-                </div>
-            </div>
+        <div class="fld">
+          <label>Start Date <span class="req">*</span></label>
+          <my-date-picker name="ClientStartDate" [options]="myDatePickerOptions" [(ngModel)]="client_startdate" [disabled]="exampleRadios1 != 'CLIENT'">
+          </my-date-picker>
         </div>
-}
-
-        <!-- ============ JOB NO. ============ -->
-        @if (exampleRadios1 == 'JOBNO') {
-<div class="ps-criteria">
-            <div class="ps-row">
-                <div class="ps-field">
-                    <label class="x-lbl">Job No.</label>
-                    <div class="ps-searchgroup">
-                        <i class="fa fa-search ps-searchicon" aria-hidden="true"></i>
-                        <input type="text" class="form-control" [maxlength]="15" [OnlyNumber]="true"
-                               [(ngModel)]="jobno" placeholder="Job No." (keyup.enter)="searchlist()" />
-                        <button type="button" class="ps-searchbtn" (click)="searchlist()">Search</button>
-                    </div>
-                </div>
-                <div class="ps-field ps-field-action">
-                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
-                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
-                    </button>
-                </div>
-            </div>
+        <div class="fld">
+          <label>End Date <span class="req">*</span></label>
+          <my-date-picker name="ClientEndDate" [options]="myDatePickerOptions" [(ngModel)]="client_enddate" [disabled]="exampleRadios1 != 'CLIENT'">
+          </my-date-picker>
         </div>
-}
 
-        <!-- ============ AMOUNT ============ -->
-        @if (exampleRadios1 == 'AMOUNT') {
-<div class="ps-criteria">
-            <div class="ps-row">
-                <div class="ps-field">
-                    <label class="x-lbl">Amount</label>
-                    <div class="ps-searchgroup">
-                        <i class="fa fa-search ps-searchicon" aria-hidden="true"></i>
-                        <input type="text" class="form-control" [(ngModel)]="amount"
-                               placeholder="Exact invoice total" (keyup.enter)="searchlist()" />
-                        <button type="button" class="ps-searchbtn" (click)="searchlist()">Search</button>
-                    </div>
-                </div>
-                <div class="ps-field ps-field-action">
-                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
-                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
-                    </button>
-                </div>
-            </div>
+        <div class="fld">
+          <label class="gis-radio"><input type="radio" name="exampleRadios" value='JOBNO' [(ngModel)]="exampleRadios1"> Job No</label>
+          <input type="text" class="form-control gis-w" [(ngModel)]="jobno" [maxlength]="15" [OnlyNumber]="true" [disabled]="exampleRadios1 != 'JOBNO'"
+            (keyup.enter)="searchlist()">
         </div>
-}
-
-        <!-- ============ DATE WISE ============ -->
-        @if (exampleRadios1 == 'DATE') {
-<div class="ps-criteria">
-            <div class="ps-row">
-                <div class="ps-field ps-field-narrow">
-                    <label class="x-lbl">Start Date <span class="x-req">*</span></label>
-                    <my-date-picker name="DateStartDate" [options]="myDatePickerOptions"
-                                    [(ngModel)]="datewise_startdate"></my-date-picker>
-                </div>
-                <div class="ps-field ps-field-narrow">
-                    <label class="x-lbl">End Date <span class="x-req">*</span></label>
-                    <my-date-picker name="DateEndDate" [options]="myDatePickerOptions"
-                                    [(ngModel)]="datewise_enddate"></my-date-picker>
-                </div>
-                <div class="ps-field ps-field-action">
-                    <button type="button" class="ps-searchbtn ps-searchbtn-solo" (click)="searchlist()">
-                        <i class="fa fa-search" aria-hidden="true"></i> Search
-                    </button>
-                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
-                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
-                    </button>
-                </div>
-            </div>
+        <div class="fld">
+          <label class="gis-radio"><input type="radio" name="exampleRadios" value='AMOUNT' [(ngModel)]="exampleRadios1"> Amount</label>
+          <input type="text" class="form-control gis-w" [(ngModel)]="amount" [disabled]="exampleRadios1 != 'AMOUNT'"
+            placeholder="Exact invoice total" (keyup.enter)="searchlist()">
         </div>
-}
 
-        <!-- ============ PRINT ALL OF A DAY ============ -->
-        @if (exampleRadios1 == '6') {
-<div class="ps-criteria">
-            <div class="ps-row">
-                <div class="ps-field ps-field-narrow">
-                    <label class="x-lbl">Date <span class="x-req">*</span></label>
-                    <my-date-picker name="PrintAllDate" [options]="myDatePickerOptions"
-                                    [(ngModel)]="printall_date"></my-date-picker>
-                </div>
-                <div class="ps-field ps-field-action">
-                    <button type="button" class="ps-searchbtn ps-searchbtn-solo" (click)="searchlist()">
-                        <i class="fa fa-search" aria-hidden="true"></i> Search
-                    </button>
-                    <button type="button" class="x-btn x-btn-classic" (click)="reset()">
-                        <i class="fa fa-ban" aria-hidden="true"></i> Reset
-                    </button>
-                </div>
-            </div>
-            <p class="x-sub">
-                Lists every Proforma Invoice raised on that date so they can be selected and printed together.
-            </p>
+        <div class="fld full">
+          <label class="gis-radio"><input type="radio" name="exampleRadios" id="exampleRadios2" value="DATE" [(ngModel)]="exampleRadios1"> Date Wise</label>
         </div>
-}
+        <div class="fld">
+          <label>Start Date <span class="req">*</span></label>
+          <my-date-picker name="DateStartDate" [options]="myDatePickerOptions" [(ngModel)]="datewise_startdate" [disabled]="exampleRadios1 != 'DATE'">
+          </my-date-picker>
+        </div>
+        <div class="fld">
+          <label>End Date <span class="req">*</span></label>
+          <my-date-picker name="DateEndDate" [options]="myDatePickerOptions" [(ngModel)]="datewise_enddate" [disabled]="exampleRadios1 != 'DATE'">
+          </my-date-picker>
+        </div>
 
+        <div class="fld full">
+          <label class="gis-radio"><input type="radio" name="exampleRadios" value="6" [(ngModel)]="exampleRadios1"> Print All Invoice of That Day</label>
+          <my-date-picker name="PrintAllDate" [options]="myDatePickerOptions" [(ngModel)]="printall_date" [disabled]="exampleRadios1 != '6'">
+          </my-date-picker>
+        </div>
+      </div>
+      <div class="gis-actions">
+        <button class="btn g" type="reset" (click)="reset();"><i class="fa fa-ban"></i> Reset</button>
+        <button class="btn p" type="submit" (click)="searchlist(); PageActual = 1"><i class="fa fa-search"></i> Search</button>
+      </div>
     </div>
-}
+  }
 
-    <!-- ================= RESULTS ================= -->
-    @if (Searchdata_list.length > 0) {
-<div class="x-card">
-        <div class="x-card-head">
-            <i class="fa fa-table" aria-hidden="true"></i>
-            <h2 class="x-card-title">Proforma Invoices</h2>
-            <span class="x-count">{{ (Searchdata_list | filter: term).length }} of {{ Searchdata_list.length }}</span>
-
-            <div class="ps-search">
-                <i class="fa fa-search" aria-hidden="true"></i>
-                <input type="text" class="form-control"
-                       placeholder="Filter these results…" [(ngModel)]="term" />
-                @if (term) {
-<i class="fa fa-times ps-clear" (click)="term=''" title="Clear filter"></i>
-}
-            </div>
-
-            <button type="button" class="x-btn x-btn-classic" (click)="backToSearch()">
-                <i class="fa fa-arrow-circle-left" aria-hidden="true"></i> Back to Search
-            </button>
-            @if (exampleRadios1 == '6') {
-<button type="button" class="x-btn x-btn-primary" (click)="PrintInvoice()">
-                <i class="fa fa-print" aria-hidden="true"></i> Print Selected
-            </button>
-}
-        </div>
-
-        <div class="x-tablewrap ps-resultwrap">
-            <table class="x-table">
-                <thead>
-                    <tr>
-                        @if (exampleRadios1 == '6') {
-<th class="ps-checkcol">
-                            <input type="checkbox" [(ngModel)]="checkbox" (change)="checkAll($event)" />
-                        </th>
-}
-                        <th (click)="setOrder('INV_NO')">PROFORMA NO.</th>
-                        <th (click)="setOrder('INV_DATE')" [class.active]="order === 'INV_DATE'">INV DATE</th>
-                        <th (click)="setOrder('EXP_NAME')" [class.active]="order === 'EXP_NAME'">CLIENT</th>
-                        <th (click)="setOrder('INV_BILLTYPE')" [class.active]="order === 'INV_BILLTYPE'">BILL TYPE</th>
-                        @if (exampleRadios1 != '6') {
-<th (click)="setOrder('INVOICED_ON')"
-                            [class.active]="order === 'INVOICED_ON'">RAISED ON</th>
-}
-                        @if (exampleRadios1 != '6') {
-<th>CONVERTED TO</th>
-}
-                        @if (exampleRadios1 != '6') {
-<th>ACTION</th>
-}
-                        @if (exampleRadios1 == '6') {
-<th class="x-num" (click)="setOrder('TOTALAMT')"
-                            [class.active]="order === 'TOTALAMT'">TOTAL AMT</th>
-}
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (data of Searchdata_list | filter: term | orderBy: order:reverse:'case-insensitive'; track data) {
-<tr>
-                        @if (exampleRadios1 == '6') {
-<td class="ps-checkcol">
-                            <input type="checkbox" [(ngModel)]="data.Checked"
-                                   (ngModelChange)="getCheckboxValues($event, data.INV_NO)" />
-                        </td>
-}
-                        <td class="x-cell-key">
-                            <span class="ps-link" (click)="ListOnclick(data.INV_NO)">{{data.INV_NO}}</span>
-                        </td>
-                        <td>{{data.INV_DATE}}</td>
-                        <td>{{data.EXP_NAME}}</td>
-                        <td>{{data.INV_BILLTYPE}}</td>
-                        @if (exampleRadios1 != '6') {
-<td>{{data.INVOICED_ON}}</td>
-}
-                        @if (exampleRadios1 != '6') {
-<td>
-                            <!--  The converted number opens the real Tax Invoice in a drawer, so the
-                                  billing team can check what was produced without leaving the list. -->
-                            @if (data.CONVERTED_INV_NO) {
-<a class="x-pill x-pill-ok ps-convlink"
-                               (click)="ViewInvoice(data.CONVERTED_INV_NO)"
-                               title="View this Tax Invoice">{{data.CONVERTED_INV_NO}}</a>
-}
-                            @if (!data.CONVERTED_INV_NO) {
-<span class="x-sub">—</span>
-}
-                        </td>
-}
-                        @if (exampleRadios1 != '6') {
-<td class="ps-actioncol">
-                            @if (!data.CONVERTED_INV_NO || data.CONVERTED_INV_NO.trim() == '') {
-<button type="button" class="x-btn x-btn-primary"
-                                   
-                                    (click)="ConvertToInvoice(data.INV_NO)">
-                                <i class="fa fa-exchange" aria-hidden="true"></i> Convert to Invoice
-                            </button>
-}
-                            @if (data.CONVERTED_INV_NO && data.CONVERTED_INV_NO.trim() != '') {
-<button type="button" class="x-btn x-btn-classic"
-                                   
-                                    (click)="ViewInvoice(data.CONVERTED_INV_NO)">
-                                <i class="fa fa-eye" aria-hidden="true"></i> View Invoice
-                            </button>
-}
-                        </td>
-}
-                        @if (exampleRadios1 == '6') {
-<td class="x-num">{{data.TOTALAMT}}</td>
-}
-                    </tr>
-}
-                    @if ((Searchdata_list | filter: term).length == 0) {
-<tr>
-                        <td colspan="8" class="x-empty">No rows match “{{term}}”.</td>
-                    </tr>
-}
-                </tbody>
-            </table>
-        </div>
+  <!--  The list shows from one row up (a single match used to leave the page blank). -->
+  @if (Searchdata_list.length >= 1) {
+    <div class="toolbar">
+      <span class="count">{{ filteredRows.length }} of {{Searchdata_list.length}} proforma(s)@if (exampleRadios1=='6') { <span> &middot; select-all applies to every row, on all pages</span> }</span>
+      <div class="tb-r">
+        <input type="text" class="gis-filter" [(ngModel)]="term" (ngModelChange)="PageActual = 1" placeholder="Filter these results…">
+        <button class="btn g" type="button" (click)="exportCsv()"><i class="fa fa-download"></i> Export</button>
+        @if (exampleRadios1=='6') {
+          <button class="btn p" type="submit" (click)="PrintInvoice()"><i class="fa fa-print"></i> Print</button>
+        }
+      </div>
     </div>
-}
-
+    <div class="card sec">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              @if (exampleRadios1=='6') {
+                <th><input type="checkbox" [(ngModel)]='checkbox' (change)="checkAll($event)" /></th>
+              }
+              <th class="gis-sort" [class.active]="order === 'INV_NO'" (click)="setOrder('INV_NO')">Proforma no <span [hidden]="reverse">▼</span><span [hidden]="!reverse">▲</span></th>
+              <th class="gis-sort" [class.active]="order === 'INV_DATE'" (click)="setOrder('INV_DATE')">Inv Date <span [hidden]="reverse">▼</span><span [hidden]="!reverse">▲</span></th>
+              <th class="gis-sort" [class.active]="order === 'EXP_NAME'" (click)="setOrder('EXP_NAME')">Client <span [hidden]="reverse">▼</span><span [hidden]="!reverse">▲</span></th>
+              <th class="gis-sort" [class.active]="order === 'INV_BILLTYPE'" (click)="setOrder('INV_BILLTYPE')">Bill type <span [hidden]="reverse">▼</span><span [hidden]="!reverse">▲</span></th>
+              @if (exampleRadios1!='6') {
+                <th class="gis-sort" [class.active]="order === 'INVOICED_ON'" (click)="setOrder('INVOICED_ON')">Raised on <span [hidden]="reverse">▼</span><span [hidden]="!reverse">▲</span></th>
+                <th>Converted inv no</th>
+                <th>Status</th>
+                <th>Action</th>
+              }
+              @if (exampleRadios1=='6') {
+                <th class="num gis-sort" [class.active]="order === 'TOTALAMT'" (click)="setOrder('TOTALAMT')">Total amt <span [hidden]="reverse">▼</span><span [hidden]="!reverse">▲</span></th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (data of pageRows; track data) {
+              <tr>
+                @if (exampleRadios1=='6') {
+                  <td><input type="checkbox" [(ngModel)]="data.Checked" (ngModelChange)="getCheckboxValues($event,data.INV_NO)"></td>
+                }
+                <td class="mono"><a class="lnk" (click)="ListOnclick(data.INV_NO)">{{data.INV_NO}}</a></td>
+                <td>{{data.INV_DATE}}</td>
+                <td>{{data.EXP_NAME}}</td>
+                <td>{{data.INV_BILLTYPE}}</td>
+                @if (exampleRadios1!='6') {
+                  <td>{{data.INVOICED_ON}}</td>
+                  <!-- The converted number opens the real Tax Invoice in a drawer, so the
+                       billing team can check what was produced without leaving the list. -->
+                  <td class="mono">@if (data.CONVERTED_INV_NO) { <a class="lnk" (click)="ViewInvoice(data.CONVERTED_INV_NO)" title="View this Tax Invoice">{{data.CONVERTED_INV_NO}}</a> } @else { <span class="gis-dim">—</span> }</td>
+                  <td>
+                    @if (!data.CONVERTED_INV_NO || data.CONVERTED_INV_NO.trim()=='') { <span class="chip dash">Not converted</span> }
+                    @else { <span class="chip solid">Converted</span> }
+                  </td>
+                  <td>
+                    @if (!data.CONVERTED_INV_NO || data.CONVERTED_INV_NO.trim()=='') {
+                      <button class="btn g" type="button" (click)="ConvertToInvoice(data.INV_NO)">Convert to Invoice</button>
+                    } @else {
+                      <button class="btn g" type="button" (click)="ViewInvoice(data.CONVERTED_INV_NO)">View Invoice</button>
+                    }
+                  </td>
+                }
+                @if (exampleRadios1=='6') {
+                  <td class="num">{{data.TOTALAMT}}</td>
+                }
+              </tr>
+            }
+            @if (!pageRows.length) {
+              <tr><td colspan="9" class="empty">No rows match “{{term}}”.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ filteredRows.length }}</b></span>
+        <div class="pages">
+          <button type="button" [disabled]="pg <= 1" (click)="goPage(pg - 1)" aria-label="Previous page">‹</button>
+          @for (p of pageList; track $index) {
+            @if (p === 0) {
+              <span class="gap">…</span>
+            } @else {
+              <button type="button" [class.on]="p === pg" (click)="goPage(p)">{{ p }}</button>
+            }
+          }
+          <button type="button" [disabled]="pg >= pageCount" (click)="goPage(pg + 1)" aria-label="Next page">›</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>
 
-<!--  Tax Invoice drawer, the same component and behaviour as the Invoice Search screen:
-      it slides over the list, and the list stays where it was.                        -->
+<!-- Tax Invoice drawer, the same component and behaviour as the Invoice Search screen:
+     it slides over the list, and the list stays where it was. -->
 @if (DrawerInvNo) {
-<div class="iv-backdrop" (click)="CloseDrawer()"></div>
-}
-@if (DrawerInvNo) {
-<div class="iv-drawer">
+  <div class="iv-backdrop" (click)="CloseDrawer()"></div>
+  <div class="iv-drawer">
     <app-invoice-view-page [invNoInput]="DrawerInvNo" [embedded]="true"
                            (closed)="CloseDrawer()"></app-invoice-view-page>
-</div>
+  </div>
 }

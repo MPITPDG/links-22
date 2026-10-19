@@ -1,442 +1,180 @@
-<div class="animated fadeIn">
-	<div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>{{Header| uppercase}}</strong>
-                </div>
-            </div>
-        </div>
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{Header| uppercase}}</h1>
+      <p>General account master</p>
     </div>
-    <div class="row">
-		<div class="col-sm-2">
-		</div>
-		<div class="col-sm-8">
+  </div>
 
-            <table class="table table-bordered table-sm-new bgwhite" style="border: 1px solid #fff;">
+  <div class="card sec">
+    <div class="card-h"><h2>Account Details</h2></div>
+    <div class="fields">
+      <div class="fld">
+        <label>Under Group <span class="req">*</span></label>
+        <select class="form-control" [(ngModel)]="undergroup" (change)="getgroupcode($event.target.value)">
+          <option value="">Please select</option>
+          @for (d of undergrouplist; track d) {
+            <option value={{d.Code}}>{{d.Name}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld">
+        <label>Account Name <span class="req">*</span></label>
+        <input [(ngModel)]="AccountName" type="text" class="form-control" maxlength="40">
+      </div>
+      <div class="fld">
+        <label>SACC Code</label>
+        <input [(ngModel)]="SacCode" type="text" class="form-control" maxlength="40">
+      </div>
+      <div class="fld full">
+        <label>Affecting Area</label>
+        <div class="inl" style="display:flex; flex-wrap:wrap; gap:14px;">
+          <label style="font-weight:normal;"><input type="checkbox" [(ngModel)]="IsInvoiceAccount"> Inv Account</label>
+          <label style="font-weight:normal;"><input type="checkbox" [(ngModel)]="IsBank"> Bank</label>
+          <label style="font-weight:normal;"><input type="checkbox" [(ngModel)]="IsJobreport"> Job Report</label>
+          <label style="font-weight:normal;"><input type="checkbox" [(ngModel)]="IsEmployee"> Is Employee</label>
+          <label style="font-weight:normal;"><input type="checkbox" [(ngModel)]="IsInvregreport"> Inv Reg Report</label>
+          <label style="font-weight:normal;"><input type="checkbox" [(ngModel)]="IsExpenselock"> ExpenseLock</label>
+          <label style="font-weight:normal;"><input type="checkbox" [(ngModel)]="IsPurchaseshow"> PurchaseShow</label>
+        </div>
+      </div>
+      <div class="fld full">
+        <label>City</label>
+        <div class="inl" style="display:flex; flex-wrap:wrap; gap:14px;">
+          <label style="font-weight:normal;"><input type="checkbox" disabled [(ngModel)]="IsMUM"> MUM</label>
+        </div>
+      </div>
+      <div class="fld full">
+        <label>Active Company <span class="req">*</span></label>
+        <ng-select [items]="Companylist" class="form-control"
+          bindLabel="CMPNAME"
+          bindValue="CMPCODE"
+          appendTo="body"
+          multiple="true" [closeOnSelect]="false"
+          [selectableGroup]="true"
+          [(ngModel)]="Companycode"
+          (change)="onchnage(Companycode)">
+          <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
+            <input type="checkbox" [(ngModel)]="item$.selected">
+            {{ item.CMPNAME}}
+          </ng-template>
+        </ng-select>
+      </div>
+    </div>
+  </div>
+
+  @if (grp=='M000020' || grp=='M000024' || IS_TDSApp==true) {
+    <div class="card sec">
+      <div class="card-h">
+        @if (grp=='M000020' || grp=='M000024') {
+          <h2><label style="display:flex; align-items:center; gap:8px; margin:0;"><input type="checkbox" [(ngModel)]="IS_TDSApp" (change)="checkValue(IS_TDSApp?'TDS':'')"> TDS DETAILS</label></h2>
+        } @else {
+          <h2>TDS DETAILS</h2>
+        }
+      </div>
+      @if (IS_TDSApp==true) {
+        <div class="fields">
+          <div class="fld">
+            <label>Section <span class="req">*</span></label>
+            <select class="form-control" [(ngModel)]="sections">
+              <option value="">Please select</option>
+              @for (d of Sectionlist; track d) {
+                <option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+              }
+            </select>
+          </div>
+          <div class="fld">
+            <label>From Date</label>
+            <my-date-picker name="frmdt" [options]="myDatePickerOptions" [(ngModel)]="frmdt" required></my-date-picker>
+          </div>
+          <div class="fld">
+            <label>To Date</label>
+            <my-date-picker name="todt" [options]="myDatePickerOptions" [(ngModel)]="todt" required></my-date-picker>
+          </div>
+          <div class="fld">
+            <label>TDS Type</label>
+            <select class="form-control" [(ngModel)]="tdstype" (change)="EnableLDSRate($event.target.value)">
+              <option value="">Please Select</option>
+              <option value="BRC">Base Rate</option>
+              <option value="LDC">Low Deduction Certificate</option>
+              <option value="EDC">Exemption</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>Base % Rate</label>
+            <input [(ngModel)]="secRate" type="text" class="form-control" OnlyNumber="true">
+          </div>
+          <div class="fld">
+            <label>LDC % Rate</label>
+            <input [(ngModel)]="ldcRate" type="text" [disabled]='disableldcrate' class="form-control" OnlyNumber="true">
+          </div>
+          <div class="fld">
+            <label>Amount Limit</label>
+            <input [(ngModel)]="tdsLimit" type="text" OnlyNumber="true" class="form-control" [disabled]='disablelimitamt'>
+          </div>
+          <div class="fld">
+            <label>Company</label>
+            <select class="form-control" [(ngModel)]="Company" [disabled]='disablecompany'>
+              <option value="">Please select</option>
+              @for (d of TDSCompanyList; track d) {
+                <option value={{d.CMP_CODE}}>{{d.CMP_NAME}}</option>
+              }
+            </select>
+          </div>
+          <div class="fld">
+            <label>Certificate No.</label>
+            <input [(ngModel)]="LdccertNo" type="text" OnlyNumber="true" class="form-control" [disabled]='disablecertno'>
+          </div>
+        </div>
+        <div class="foot">
+          <button class="btn p" type="submit" (click)="AddTDScildrcrd()">{{txtchildTDS}}</button>
+          <button class="btn g" type="reset" (click)="ResetTDScildrcrd();">Reset</button>
+        </div>
+        @if (TdsList?.length > 0) {
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead>
                 <tr>
-                    <td><span class="col-form-span-label"><b>Under Group</b> </span><span class="col-form-span-error">*</span></td>
-                    <td colspan="3">
-                        <!--select class="form-control width150"  [(ngModel)]="city"-->
-                            <select class="form-control width150"  [(ngModel)]="undergroup"  (change)="getgroupcode($event.target.value)" style="border-radius: 7px;">
-                            <option value="">Please select</option>
-                            @for (d of undergrouplist; track d) {
-<option value={{d.Code}}>{{d.Name}}</option>
-}
-                        </select>
-                    </td>
-                    </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>Account Name</b> </span><span class="col-form-span-error">*</span></td>
-                    <td colspan="3"><input [(ngModel)]="AccountName" type="text" class="form-control width300" maxlength="40" style="border-radius: 7px;"> </td>
-                    </tr>
-                        <!-- <tr>
-                            <td><span class="col-form-span-label"><b>Under Group</b> </span><span class="col-form-span-error">*</span></td>
-                            <td colspan="3">
-                                <!--select class="form-control width150"  [(ngModel)]="city"-->
-                                    <!-- <select class="form-control width150"  [(ngModel)]="undergroup" style="border-radius: 7px;">
-                                    <option value="">Please select</option>
-                                    <option *ngFor="let d of undergrouplist" value={{d.Code}}>{{d.Name}}</option>
-                                </select>
-                            </td>
-                            </tr> -->
-                        <tr>
-                         <td><span class="col-form-span-label"><b>SACC Code</b> </span></td>
-                            <td colspan="3">  <input [(ngModel)]="SacCode" type="text"    class="form-control width200" maxlength="40" style="border-radius: 7px;"> </td>
-                            </tr>
-                        <tr>
+                  <th></th>
+                  <th>SECTIONS</th>
+                  <th>RATE</th>
+                  <th>FROM DT</th>
+                  <th>TO DT</th>
+                  <th>LIMIT</th>
+                  <th>TDS TYPE</th>
+                  <th>LDC RATE</th>
+                  <th>LDC CERTNO</th>
+                  <th>COMPANY</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (obj of TdsList; track obj) {
+                  <tr>
+                    <td class="act"><i class="fa fa-pencil" (click)="EDIT_Tds(obj.PKID)"></i></td>
+                    <td>{{obj.SECTIONS_NME}}</td>
+                    <td>{{obj.PER_RATE}}</td>
+                    <td>{{obj.FRMDT}}</td>
+                    <td>{{obj.TODT}}</td>
+                    <td>{{obj.TDS_LIMIT_AMT}}</td>
+                    <td>{{obj.TDS_TYPE }}</td>
+                    <td>{{obj.LDCRATE }}</td>
+                    <td>{{obj.LDCCERTNO }}</td>
+                    <td>{{obj.CMP_NAME }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    </div>
+  }
 
-                            <td  style="width:20%">
-                                <span class="col-form-span-label" ><b>Affecting Area</b>  </span>
-
-                             </td>
-                             <td colspan="3">
-
-
-                             <table class="table-clear">
-                                <tr>
-                                    <td>
-                                        <input type="checkbox"  [(ngModel)]="IsInvoiceAccount"   />
-                                        <span class="col-form-span-label" ><b>Inv Account</b>  </span>
-
-                                    </td>
-                                     <td width="10px"></td>
-                                    <td>
-                                        <input type="checkbox"  [(ngModel)]="IsBank"   />
-                                        <span class="col-form-span-label" ><b>Bank</b>  </span>
-
-                                    </td>
-                                    <td width="10px"></td>
-                                    <td>
-                                        <input type="checkbox"  [(ngModel)]="IsJobreport"   />
-                                        <span class="col-form-span-label" ><b>Job Report</b>  </span>
-
-                                    </td>
-                                    <td width="10px"></td>
-                                    <td>
-                                        <input type="checkbox"  [(ngModel)]="IsEmployee"   />
-                                        <span class="col-form-span-label" ><b>Is Employee</b>  </span>
-
-                                    </td>
-                                </tr>
-                             </table>
-                             <table class="table-clear">
-                                <tr>
-                                    <td>
-                                        <input type="checkbox"    [(ngModel)]="IsInvregreport" />
-                                        <span class="col-form-span-label" ><b>Inv Reg Report</b>  </span>
-
-                                     </td>
-                                     <td width="10px"></td>
-                                     <td>
-                                        <input type="checkbox"    [(ngModel)]="IsExpenselock" />
-                                        <span class="col-form-span-label" ><b>ExpenseLock</b>  </span>
-
-                                     </td>
-                                     <td width="10px"></td>
-                                     <td>
-                                        <input type="checkbox"    [(ngModel)]="IsPurchaseshow" />
-                                        <span class="col-form-span-label" ><b>PurchaseShow</b>  </span>
-
-                                     </td>
-                                </tr>
-
-                             </table>
-                             <!--td colspan="2">
-                                 <table class="table-clear">
-                                     <tr>
-                                        <span class="col-form-span-label" ><b>Inv Account</b>  </span>
-                                        <input type="checkbox"  [(ngModel)]="IsInvoiceAccount"   />
-
-                                        <span class="col-form-span-label" ><b>Bank</b>  </span>
-                                        <input type="checkbox"    [(ngModel)]="IsBank" />
-                                        <span class="col-form-span-label" ><b>Jobreport</b>  </span>
-                                        <input type="checkbox"    [(ngModel)]="IsJobreport" />
-                                        <span class="col-form-span-label" ><b>Is Employee</b>  </span>
-                                        <input type="checkbox"    [(ngModel)]="IsEmployee" />
-                                     </tr>
-                                     </table>
-
-                                     <table>
-                                        <tr>
-                                            <span class="col-form-span-label" ><b>Invoice Reg Report</b>  </span>
-                                            <input type="checkbox"    [(ngModel)]="IsInvregreport" />
-                                            <span class="col-form-span-label" ><b>Is ExpenseLock</b>  </span>
-                                             <input type="checkbox"    [(ngModel)]="IsExpenselock" />
-                                             <span class="col-form-span-label" ><b>Is PurchaseShow</b>  </span>
-                                             <input type="checkbox"    [(ngModel)]="IsPurchaseshow" />
-                                         </tr>
-                                     </table-->
-
-
-                                         <!--td>
-                                            <span class="col-form-span-label" ><b>Inv Account</b>  </span>
-                                            <input type="checkbox"  [(ngModel)]="IsInvoiceAccount"   />
-                                         </td>
-                                         <td>
-                                            <span class="col-form-span-label" ><b>Bank</b>  </span>
-                                            <input type="checkbox"    [(ngModel)]="IsBank" />
-                                         </td>
-                                         <td>
-                                         <span class="col-form-span-label" ><b>Jobreport</b>  </span>
-                                        <input type="checkbox"    [(ngModel)]="IsJobreport" />
-                                         </td>
-                                         <td>
-                                            <span class="col-form-span-label" ><b>Is Employee</b>  </span>
-                                            <input type="checkbox"    [(ngModel)]="IsEmployee" />
-                                         </td>
-                                     </tr>
-                                     <tr>
-                                         <td>
-                                            <span class="col-form-span-label" ><b>Invoice Reg Report</b>  </span>
-                                            <input type="checkbox"    [(ngModel)]="IsInvregreport" />
-                                         </td>
-                                         <td>
-                                            <span class="col-form-span-label" ><b>Is ExpenseLock</b>  </span>
-                                            <input type="checkbox"    [(ngModel)]="IsExpenselock" />
-                                         </td>
-                                         <td>
-                                            <span class="col-form-span-label" ><b>Is PurchaseShow</b>  </span>
-                                            <input type="checkbox"    [(ngModel)]="IsPurchaseshow" />
-                                         </td>
-                                     </tr-->
-
-                             </td>
-                             <!--td  colspan="3" >
-
-                                <span class="col-form-span-label" ><b>Inv Account</b>  </span>
-                                  <input type="checkbox"  [(ngModel)]="IsInvoiceAccount"   />
-                                  <span class="col-form-span-label" ><b>Bank</b>  </span>
-                                  <input type="checkbox"    [(ngModel)]="IsBank" />
-
-                                  <span class="col-form-span-label" ><b>Jobreport</b>  </span>
-                                  <input type="checkbox"    [(ngModel)]="IsJobreport" />
-                                  <span class="col-form-span-label" ><b>Is Employee</b>  </span>
-                                  <input type="checkbox"    [(ngModel)]="IsEmployee" />
-                                  <span class="col-form-span-label" ><b>Invoice Reg Report</b>  </span>
-                                  <input type="checkbox"    [(ngModel)]="IsInvregreport" />
-                                  <span class="col-form-span-label" ><b>Is ExpenseLock</b>  </span>
-                                  <input type="checkbox"    [(ngModel)]="IsExpenselock" />
-                                  <span class="col-form-span-label" ><b>Is PurchaseShow</b>  </span>
-                                  <input type="checkbox"    [(ngModel)]="IsPurchaseshow" />
-                             </td-->
-
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="col-form-span-label" ><b>City</b>  </span>
-                                </td>
-                                <td colspan="3">
-                                    <table class="table-clear" >
-                                        <tr>
-
-
-                                            <td>
-                                                <input type="checkbox"   disabled [(ngModel)]="IsMUM" />
-                                                <span class="col-form-span-label" ><b>MUM</b>  </span>
-
-                                            </td>
-                                            <td width="10px"></td>
-                                            <!-- <td>
-                                                <input type="checkbox"    [(ngModel)]="IsDEL" />
-                                                <span class="col-form-span-label" ><b>DEL</b>  </span>
-
-                                            </td>
-                                            <td width="10px"></td>
-                                            <td>
-                                                <input type="checkbox"    [(ngModel)]="IsMAA" />
-                                                <span class="col-form-span-label" ><b>MAA</b>  </span>
-
-                                            </td>
-                                            <td width="10px"></td>
-
-                                            <td>
-                                                <input type="checkbox"    [(ngModel)]="IsAMD" />
-                                                <span class="col-form-span-label" ><b>AMD</b>  </span>
-
-                                            </td> -->
-
-                                        </tr>
-                                        <tr>
-                                            <!-- <td>
-                                                <input type="checkbox"    [(ngModel)]="IsBLR" />
-                                                <span class="col-form-span-label" ><b>BLR</b>  </span>
-
-                                            </td> -->
-                                            <!-- <td width="10px"></td>
-                                            <td>
-                                                <input type="checkbox"    [(ngModel)]="IsTRN" />
-                                                <span class="col-form-span-label" ><b>TRN</b>  </span>
-
-                                            </td>
-                                            <td width="10px"></td>
-                                            <td>
-                                                <input type="checkbox"    [(ngModel)]="IsTRU" />
-                                                <span class="col-form-span-label" ><b>TRU</b>  </span>
-
-                                            </td>
-                                            <td width="10px"></td>
-                                            <td>
-                                                <input type="checkbox"    [(ngModel)]="IsCOC" />
-                                                <span class="col-form-span-label" ><b>COC</b>  </span>
-
-                                            </td> -->
-                                        </tr>
-                                    </table>
-                                </td>
-                                <!--td  style="width:30%" >
-                                    <span class="col-form-span-label" ><b>MUM</b>  </span>
-                                    <input type="checkbox"    [(ngModel)]="IsMUM" />
-                                     <span class="col-form-span-label" ><b>DEL</b>  </span>
-                                      <input type="checkbox"    [(ngModel)]="IsDEL" />
-                                      <span class="col-form-span-label" ><b>MAA</b>  </span>
-                                      <input type="checkbox"    [(ngModel)]="IsMAA" />
-
-                                 </td-->
-
-                            </tr>
-
-                            <tr>
-                                <td>
-                                    <span class="col-form-span-label" ></span>
-                                </td>
-                                <!--td>
-                                    <span class="col-form-span-label" ><b>BLR</b>  </span>
-                                    <input type="checkbox"    [(ngModel)]="IsBLR" />
-                                    <span class="col-form-span-label" ><b>AMD</b>  </span>
-                                    <input type="checkbox"    [(ngModel)]="IsAMD" />
-                                    <span class="col-form-span-label" ><b>DAC</b>  </span>
-                                    <input type="checkbox"    [(ngModel)]="IsDAC" />
-                                </td--->
-                            </tr>
-                        <tr>
-                            <td colspan="4">
-                                <table class="table table-bordered table-sm-new bgwhite" >
-                                    <tr>
-
-                                            <td style="width:20%"><span class="col-form-span-label"><b>Active Company</b> </span><span class="col-form-span-error">*</span> </td>
-                                            <td>
-                                                <ng-select [items]="Companylist"  class="form-control width350"
-                                                bindLabel="CMPNAME"
-                                                bindValue="CMPCODE"
-                                                appendTo="body"
-                                                multiple="true"  [closeOnSelect]="false"
-                                                [selectableGroup]="true"
-                                                [(ngModel)]="Companycode"
-                                                (change)="onchnage(Companycode)">
-                                                <ng-template ng-option-tmp let-item="item" let-item$="item$" let-index="index">
-                                                    <input  type="checkbox" [(ngModel)]="item$.selected"  />
-                                                    {{ item.CMPNAME}}
-                                                 </ng-template>
-                                                </ng-select>
-                                            </td>
-                                    </tr>
-                                </table>
-                            </td>
-
-                        </tr>
-                        @if (grp=='M000020' || grp=='M000024') {
-<tr >
-                            <td class="col-form-span-heading   " colspan="4">
-                                <!-- <input type="checkbox"   [(ngModel)]="IS_TDSApp" (change)="checkValue(IS_TDSApp?'TDS':'')"  /> -->
-                                <input type="checkbox"   [(ngModel)]="IS_TDSApp" (change)="checkValue(IS_TDSApp?'TDS':'')"  />
-                                    <span class="col-form-span-label"><b>TDS DETAILS</b> </span>
-                                    
-                            </td>
-                        </tr>
-}
-
-                            @if (IS_TDSApp==true) {
-<tr  >
-                                <td><span class="col-form-span-label"><b>Section</b> </span><span class="col-form-span-error">*</span></td>
-                                <td colspan="3"><select class="form-control width150"  [(ngModel)]="sections" style="border-radius: 7px;">
-                                    <option value="">Please select</option>
-                                    @for (d of Sectionlist; track d) {
-<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
-}
-                                </select>  </td>
-                            </tr>
-}
-                            @if (IS_TDSApp==true) {
-<tr >
-                               <td><span class="col-form-span-label"><b>From Date</b> </span></td>
-                                <td style="width: 30%;">
-                                    <my-date-picker name="frmdt" [options]="myDatePickerOptions" [(ngModel)]="frmdt" required></my-date-picker>
-                                </td>
-                                <td><span class="col-form-span-label"><b>To Date</b> </span></td>
-                                <td>
-                                    <my-date-picker name="todt" [options]="myDatePickerOptions" [(ngModel)]="todt" required></my-date-picker>
-                                </td>
-                            </tr>
-}
-                            @if (IS_TDSApp==true) {
-<tr >
-                                <td><span class="col-form-span-label"><b>TDS Type</b> </span></td>
-                                <td>    <select class="form-control width150"  [(ngModel)]="tdstype"  (change)="EnableLDSRate($event.target.value)" style="border-radius: 7px;">
-                                    <option value="">Please Select</option>
-                                    <option value="BRC">Base Rate</option>
-                                    <option value="LDC">Low Deduction Certificate</option>
-                                    <option value="EDC">Exemption</option>
-
-                                </select></td>
-                                <td><span class="col-form-span-label"><b>Base % Rate</b> </span></td>
-                                <td>  <input [(ngModel)]="secRate" type="text" class="form-control width50" OnlyNumber="true" style="border-radius: 7px;"> </td>
-
-                            </tr>
-}
-                            @if (IS_TDSApp==true) {
-<tr  >
-                                <td><span class="col-form-span-label"><b>LDC % Rate</b> </span></td>
-                                <td>  <input [(ngModel)]="ldcRate" type="text" [disabled]='disableldcrate' class="form-control width50" OnlyNumber="true" style="border-radius: 7px;"> </td>
-                                <td><span class="col-form-span-label"><b>Amount Limit</b> </span></td>
-                                <td><input [(ngModel)]="tdsLimit" type="text" OnlyNumber="true" class="form-control width100" [disabled]='disablelimitamt' style="border-radius: 7px;"> </td>
-
-                            </tr>
-}
-                            @if (IS_TDSApp==true) {
-<tr >
-                            <td><span class="col-form-span-label"><b>Company</b> </span></td>
-                            <td>
-                                <select class="form-control width250"  [(ngModel)]="Company" [disabled]='disablecompany' style="border-radius: 7px;">
-                                    <option value="">Please select</option>
-                                    @for (d of TDSCompanyList; track d) {
-<option value={{d.CMP_CODE}}>{{d.CMP_NAME}}</option>
-}
-                                </select>
-                               </td>
-                                <td><span class="col-form-span-label"><b>Certificate No.</b> </span></td>
-                                <td>  <input [(ngModel)]="LdccertNo" type="text" OnlyNumber="true"   class="form-control width100"  [disabled]='disablecertno' style="border-radius: 7px;"> </td>
-
-                            </tr>
-}
-
-                            @if (IS_TDSApp==true) {
-<tr >
-                                <td colspan="4"  class="centerlabel">
-                                    <button class="btn btn-sm btn-success" type="submit" (click)="AddTDScildrcrd()"> <span class="col-form-span-label"><i class="fa fa-plus" ></i> {{txtchildTDS}}</span></button>
-                                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="ResetTDScildrcrd();"><i class="fa fa-ban"></i> Reset</span></button>
-                                </td>
-                            </tr>
-}
-                            @if (IS_TDSApp==true) {
-<tr>
-                                <td colspan="4">
-                                    <!-- <div class="row xyscroll" style="overflow-y: auto; width:715px" *ngIf="TdsList.length > 0"> -->
-                                        <div class="row xyscroll" style="overflow-y: auto; width:715px">
-
-                                            <table class="table table-responsive-sm table-bordered">
-                                                <thead>
-                                                    <tr class="col-form-span-heading">
-                                                        <th class="width50 centerlabel"><span class="col-form-span-label"></span></th>
-                                                        <th class="width100 centerlabel"><span class="col-form-span-label">SECTIONS</span></th>
-                                                        <th class="width100 centerlabel"><span class="col-form-span-label">RATE</span></th>
-                                                        <th class="width100 centerlabel"><span class="col-form-span-label">FROM DT</span></th>
-                                                        <th class="width100 centerlabel"><span class="col-form-span-label">TO DT</span></th>
-                                                        <th class="width100 centerlabel"><span class="col-form-span-label">LIMIT</span></th>
-                                                        <th class="width100 centerlabel"><span class="col-form-span-label">TDS TYPE</span></th>
-                                                        <th class="width100 centerlabel"><span class="col-form-span-label">LDC RATE</span></th>
-                                                        <th class="width100 centerlabel"><span class="col-form-span-label">LDC CERTNO</span></th>
-                                                        <th class="width100 centerlabel"><span class="col-form-span-label">COMPANY</span></th>
-                                                    </tr>
-                                                </thead>
-                                                @if (TdsList.length>0) {
-<tbody  >
-                                                    @for (obj of TdsList; track obj) {
-<tr>
-                                                        <td class="width50 centerlabel">
-                                                            <i class="fa fa-pencil" (click)="EDIT_Tds(obj.PKID)" ></i>
-                                                            <!-- &nbsp;
-                                                            <i class="fa fa-trash" (click)="deletechildrecd(obj.PKID)"></i> -->
-                                                        </td>
-                                                        <td><span class="width100 col-form-span-label" >   {{obj.SECTIONS_NME}} </span></td>
-                                                        <td><span class="width100 col-form-span-label">{{obj.PER_RATE}}</span></td>
-                                                        <td><span class="width100 col-form-span-label">{{obj.FRMDT}}</span></td>
-                                                        <td><span class="width100 col-form-span-label">{{obj.TODT}}</span></td>
-                                                        <td><span class="width100 col-form-span-label">{{obj.TDS_LIMIT_AMT}}</span></td>
-                                                        <td><span class="width100 col-form-span-label">{{obj.TDS_TYPE }}</span></td>
-                                                        <td><span class="width100 col-form-span-label">{{obj.LDCRATE }}</span></td>
-                                                        <td><span class="width100 col-form-span-label">{{obj.LDCCERTNO }}</span></td>
-                                                        <td><span class="width100 col-form-span-label">{{obj.CMP_NAME }}</span></td>
-                                                    </tr>
-}
-                                                </tbody>
-}
-                                            </table>
-                                    </div>
-                                </td>
-                            </tr>
-}
-                        <tr>
-                            <td colspan="4"  class="centerlabel">
-                                <button class="btn btn-sm btn-success" type="submit" (click)="AddMain()"> <span class="col-form-span-label"><i class="fa fa-dot-circle-o" ></i> {{text}}</span></button>
-                                <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label" (click)="RestMain();"><i class="fa fa-ban"></i> Reset</span></button>
-                            </td>
-                        </tr>
-					</table>
-
-			</div>
-		</div>
-		<div class="col-sm-2">
-		</div>
-
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose {{text}}.</span>
+    <div class="r">
+      <button class="btn g" type="reset" (click)="RestMain();">Reset</button>
+      <button class="btn p" type="submit" (click)="AddMain()">{{text}}</button>
+    </div>
+  </div>
 </div>

@@ -1,100 +1,49 @@
-<div class="row">
-	<div class="col-sm-12">
-		<div class="card">
-			<div class="card-header formheading">
-			   <strong>Export - Master MAWB NO</strong>
-			</div>
-		</div>
-	</div>
-</div>
-<div class="row">
-	<div class="col-sm-2">
-	</div>
-	<div class="col-sm-8">
-		<table class="table table-sm-new bgwhite">
-			<tr class="title-head formheading">
-				<td colspan="6">
-					<span class="col-form-span-label"><strong>MAWB DETAILS </strong></span>
-				</td>
-			</tr>
-		</table>
-		<table class="table table-sm-new bgwhite">
-			<tr class="title-head trbg">
-				<td class="right-text">
-					<span class="col-form-span-label">AirLine</span><span class="col-form-span-error">*</span>
-				</td>
-				<td >
-					<select class="form-control width250"   [(ngModel)]="AirLine" >
-						<option value="0">Please select</option>
-						@for (d of AirLineList; track d) {
-<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
-}
-
-					</select>
-				</td>
-				<td class="width300">
-					@if (error == 1) {
-<span class="col-form-span-error">Please select AirLine*</span>
-}
-				</td>
-			</tr>
-			<!-- <tr class="title-head trbg">
-				<td class="right-text">
-					<span class="col-form-span-label">MAWB No.</span><span class="col-form-span-error">*</span>
-				</td>
-				<td class="width130">
-					<select class="form-control width120"   [(ngModel)]="mawbno">
-                        <option value="0">Please select</option>
-                        <option value="17645678932">17645678932</option>
-                        <option value="17636789525">17636789525</option>
-                        </select>
-				</td>
-				<td class="width300">
-                    <span class="col-form-span-error" *ngIf="error == 2">Please select Mawb Number*</span>
-                    <span class="col-form-span-error" *ngIf="error == 3">Invalid Mawb Number*</span>
-				</td>
-			</tr> -->
-			<tr class="title-head trbg">
-				<td class="right-text">
-					<span class="col-form-span-label">MAWB No.</span><span class="col-form-span-error">*</span>
-				</td>
-				<td class="width130">
-					<input type="text" [(ngModel)]="mawbno" class="form-control width120"  [OnlyNumber]="true" [maxlength]="11" />
-				</td>
-				<td class="width300">
-					@if (error == 2) {
-<span class="col-form-span-error">Please enter Mawb Number*</span>
-}
-					@if (error == 3) {
-<span class="col-form-span-error">Invalid Mawb Number*</span>
-}
-				</td>
-			</tr>
-			<tr class="title-head trbg">
-				<td class="right-text">
-					<span class="col-form-span-label">MAWB Date.</span><span class="col-form-span-error">*</span>
-				</td>
-				<td class="width130">
-					<my-date-picker name="mawbdate" [options]="myDatePickerOptions" [(ngModel)]="mawbdate"></my-date-picker>
-				</td>
-				<td class="width300">
-					@if (error == 4) {
-<span class="col-form-span-error">Mawb date can not blank*</span>
-}
-				</td>
-			</tr>
-			<tr class="title-head trbg">
-				<td colspan="3" class="centerlabel">
-					<button type="button" name="searchButton" class="btn btn-sm btn-info" (click)="searchData();">
-						<span class="col-form-span-label"><i class="fa fa-search"></i>Search</span>
-					</button>
-					<button type="button" name="printButton" class="btn btn-sm btn-warning" (click)="printData();">
-						<span class="col-form-span-label"><i class="fa fa-print"></i> Print</span>
-					</button>
-				</td>
-			</tr>
-		</table>
-	</div>
-	<div class="col-sm-2">
-	</div>
+<!--
+  Export - print document - MAWB search / print, step 1 (app-mawb-search, hosted by
+  mawb.component.html). Page kit card built to the approved mock links-export-mocks.html #m3;
+  the page heading lives in the host. Carries its own .im-page root (see the host).
+  Bindings, validations and messages are the old screen's: Search calls searchData(),
+  Print calls printData().
+-->
+<div class="im-page">
+  <div class="card sec">
+    <div class="card-h">
+      <h2>1 · MAWB</h2>
+      <div class="acts">
+        <button type="button" name="printButton" class="btn g sm" (click)="printData();">Print</button>
+        <button type="button" name="searchButton" class="btn sm" (click)="searchData();">Search</button>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="fld">
+        <label for="mawb-s-airline">Airline <span class="req">*</span></label>
+        <select id="mawb-s-airline" [(ngModel)]="AirLine">
+          <option value="0">Please select</option>
+          @for (d of AirLineList; track d) {
+            <option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}</option>
+          }
+        </select>
+        @if (error == 1) {
+          <span class="hint err">Please select AirLine*</span>
+        }
+      </div>
+      <div class="fld cut">
+        <label for="mawb-s-no">MAWB no. <span class="req">*</span></label>
+        <input id="mawb-s-no" type="text" class="mono" [(ngModel)]="mawbno" [OnlyNumber]="true" [maxlength]="11" />
+        @if (error == 2) {
+          <span class="hint err">Please enter Mawb Number*</span>
+        }
+        @if (error == 3) {
+          <span class="hint err">Invalid Mawb Number*</span>
+        }
+      </div>
+      <div class="fld full">
+        <label>MAWB date <span class="req">*</span></label>
+        <my-date-picker class="dp-s" name="mawbdate" [options]="myDatePickerOptions" [(ngModel)]="mawbdate"></my-date-picker>
+        @if (error == 4) {
+          <span class="hint err">Mawb date can not blank*</span>
+        }
+      </div>
+    </div>
+  </div>
 </div>

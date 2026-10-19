@@ -12,6 +12,7 @@
     @Component({
         selector: 'app-mastersupplier',
         templateUrl: 'supplier.component.html',
+        styleUrls: ['./request-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })  

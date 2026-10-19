@@ -1,0 +1,308 @@
+/* ----------------------------------------------------------------
+   Links port: copied verbatim from MPERPNG-20 src/app/accounts/purchase/purchase-page.css
+   (component-local, :host ::ng-deep). In MP: styleUrls [import-page.css, purchase-page.css];
+   in Links the .im-page kit is global (src/styles/kit/import-page.css), so components list
+   only this file. Shared by accounts/purchase/* and accounts/Request/staff/*.
+   Links-only additions sit at the end, under "Links port additions".
+   ---------------------------------------------------------------- */
+/* ============================================================
+   India Accounts - purchase area additions on top of import/import-page.css.
+   Used by purchase-general, mawb-purchase, multicontainer-purchase and
+   purchase-search. Monochrome only.
+   ============================================================ */
+
+/* Bootstrap nav-tabs kept (jQuery .tab('show') drives #data-step1 / #data-step2),
+   painted as the kit's segmented tab bar. */
+:host ::ng-deep .im-page .pu-tabs {
+    display: inline-flex;
+    border: 1px solid var(--edge);
+    border-radius: 6px;
+    background: var(--mp-surface, #fff);
+    padding: 2px;
+    gap: 2px;
+    margin: 0 0 16px;
+    list-style: none;
+}
+
+:host ::ng-deep .im-page .pu-tabs .nav-item {
+    margin: 0;
+}
+
+:host ::ng-deep .im-page .pu-tabs .nav-link {
+    display: inline-flex;
+    align-items: center;
+    height: 30px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--soft);
+    background: transparent;
+    text-decoration: none;
+}
+
+:host ::ng-deep .im-page .pu-tabs .nav-link:hover {
+    color: var(--ink);
+    background: var(--line);
+}
+
+:host ::ng-deep .im-page .pu-tabs .nav-link.active {
+    background: var(--mp-primary, var(--ink));
+    color: var(--mp-primary-fg, #fff);
+}
+
+:host ::ng-deep .im-page .pu-tabs .nav-link.disabled {
+    color: var(--faint);
+    background: transparent;
+    pointer-events: none;
+}
+
+:host ::ng-deep .im-page .tab-content > .tab-pane {
+    display: none;
+}
+
+:host ::ng-deep .im-page .tab-content > .tab-pane.active {
+    display: block;
+}
+
+/* TDS flag in a card header: label + checkbox */
+:host ::ng-deep .im-page .pu-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+:host ::ng-deep .im-page .pu-flag input[type="checkbox"],
+:host ::ng-deep .im-page table.tbl input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--mp-primary, var(--ink));
+    margin: 0;
+}
+
+/* line-item entry actions under the fields */
+:host ::ng-deep .im-page .pu-add {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--line);
+}
+
+/* totals strip under the line-item table: right aligned, monospace */
+:host ::ng-deep .im-page .pu-totals {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px 24px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--edge);
+    background: var(--band);
+    border-radius: 0 0 6px 6px;
+}
+
+:host ::ng-deep .im-page .pu-totals .t {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+:host ::ng-deep .im-page .pu-totals .t span {
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--soft);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+:host ::ng-deep .im-page .pu-totals .t.grand span {
+    color: var(--ink);
+}
+
+:host ::ng-deep .im-page .pu-totals input {
+    width: 150px !important;
+}
+
+:host ::ng-deep .im-page input.num {
+    text-align: right;
+    font-family: var(--num);
+}
+
+:host ::ng-deep .im-page table.tbl td.num input {
+    text-align: right;
+    font-family: var(--num);
+    min-width: 90px;
+}
+
+:host ::ng-deep .im-page table.tbl td.wrap {
+    white-space: pre-wrap;
+    min-width: 180px;
+}
+
+/* modals: kit chrome over Bootstrap .modal */
+:host ::ng-deep .im-page .modal.pu-modal {
+    background: rgba(10, 10, 10, .35);
+    overflow-y: auto;
+}
+
+:host ::ng-deep .im-page .modal-dialog.pu-wide {
+    max-width: min(1100px, calc(100vw - 32px));
+    width: auto;
+}
+
+:host ::ng-deep .im-page .modal-content {
+    border: 1px solid var(--edge);
+    border-radius: 6px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .18);
+    background: var(--sheet);
+}
+
+:host ::ng-deep .im-page .modal-content > .card-h h2 {
+    font-size: 14px;
+}
+
+:host ::ng-deep .im-page .pu-radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    padding: 12px 16px 8px;
+}
+
+:host ::ng-deep .im-page .pu-radio input {
+    accent-color: var(--mp-primary, var(--ink));
+    margin: 0;
+}
+
+:host ::ng-deep .im-page .pu-sum {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px 24px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--line);
+}
+
+:host ::ng-deep .im-page .pu-sum .k {
+    color: var(--soft);
+}
+
+:host ::ng-deep .im-page .pu-sum b {
+    font-family: var(--num);
+}
+
+:host ::ng-deep .im-page .modal .bar {
+    margin: 0;
+    border-radius: 0 0 6px 6px;
+    justify-content: flex-end;
+}
+
+/* search page: action buttons in a cell */
+:host ::ng-deep .im-page .act button + button {
+    margin-left: 6px;
+}
+
+/* input + button (or radio pair) side by side inside one field */
+:host ::ng-deep .im-page .pu-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+:host ::ng-deep .im-page .pu-inline > input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+:host ::ng-deep .im-page .fld label input[type="radio"],
+:host ::ng-deep .im-page .pu-flag input[type="radio"] {
+    accent-color: var(--mp-primary, var(--ink));
+    margin: 0 6px 0 0;
+    vertical-align: -2px;
+}
+
+:host ::ng-deep .im-page .pu-end {
+    justify-content: flex-end;
+}
+
+:host ::ng-deep .im-page .toolbar input.pu-quick {
+    width: 220px;
+}
+
+/* segmented list switch (authorisation lists) */
+:host ::ng-deep .im-page .pu-seg {
+    display: inline-flex;
+    border: 1px solid var(--edge);
+    border-radius: 6px;
+    background: var(--mp-surface, #fff);
+    padding: 2px;
+    gap: 2px;
+    margin: 0 0 16px;
+    max-width: 100%;
+    flex-wrap: wrap;
+}
+
+:host ::ng-deep .im-page .pu-seg button {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--soft);
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    height: 30px;
+    padding: 0 18px;
+    cursor: pointer;
+}
+
+:host ::ng-deep .im-page .pu-seg button:hover {
+    color: var(--ink);
+    background: var(--line);
+}
+
+:host ::ng-deep .im-page .pu-seg button.on {
+    background: var(--mp-primary, var(--ink));
+    color: var(--mp-primary-fg, #fff);
+}
+
+/* monospace figures outside table cells (aside rows, totals shown as text) */
+:host ::ng-deep .im-page .mono {
+    font-family: var(--num);
+}
+
+/* ---------- Links port additions ---------- */
+/* 1. the Links my-date-picker shim host is inline-block, so it shrinks inside a .fld cell;
+      make it fill the cell like the other inputs (same fix as import/master/master-page.css). */
+:host ::ng-deep .im-page my-date-picker {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
+/* 2. narration textarea (#autoresizing): the kit boxes only input / select / .form-control.
+      Same box as MP's sibling finance forms (Vouchers/vouchers-page.css). */
+:host ::ng-deep .im-page textarea {
+    font: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    background: var(--mp-surface, #fff);
+    width: 100%;
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    padding: 6px 10px;
+    min-height: 60px;
+    margin: 0;
+    box-shadow: none;
+    display: block;
+}
+
+:host ::ng-deep .im-page textarea:focus {
+    outline: 2px solid var(--mp-primary, var(--ink));
+    outline-offset: -1px;
+    border-color: var(--mp-primary, var(--ink));
+}

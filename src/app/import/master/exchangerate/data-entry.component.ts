@@ -8,6 +8,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
 @Component({
     selector: 'app-consignment-import-master-exchange-rate-data-entry',
     templateUrl: 'data-entry.component.html',
+    styleUrls: ['../master-page.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -15,10 +16,10 @@ export class EntryExchangeRateMasterComponent implements OnInit {
     public myDatePickerOptions: IMyDpOptions = {
         dateFormat: 'dd-mmm-yyyy',
         inline: false,
-        height: '16px',
-        width: '120px',
+        height: '30px',
+        width: '100%',
         componentDisabled: false,
-        selectionTxtFontSize: '12px',
+        selectionTxtFontSize: '13px',
         editableDateField: false,
         sunHighlight: true,
         satHighlight: true,
@@ -39,6 +40,10 @@ export class EntryExchangeRateMasterComponent implements OnInit {
     CurrencyList: Array<any> = [];
     BranchList: Array<any> = [];
 
+    /** read-only context shown in the Record aside */
+    BranchName: string = "";
+    CreatedBy: string = "";
+
     constructor(
         private _dataService: DataService,
         private _loginService: LoginService,
@@ -48,6 +53,11 @@ export class EntryExchangeRateMasterComponent implements OnInit {
         private _loaderService: LoaderService) { }
 
     ngOnInit() {
+        const login = this._loginService.getLogin();
+        if (login && login[0]) {
+            this.BranchName = login[0].CITYNAME || "";
+            this.CreatedBy = login[0].CMP_USERNAME || "";
+        }
         this._activatedRoute.params.subscribe(params => {
             if (params["param"]) {
                 this.Id = params["param"];
@@ -76,8 +86,8 @@ export class EntryExchangeRateMasterComponent implements OnInit {
         this._dataService.getData("Import/CurrencyAndCity", {})
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                this.CurrencyList = data.Table;
-                this.BranchList = data.Table1;
+                this.CurrencyList = (data && Array.isArray(data.Table)) ? data.Table : [];
+                this.BranchList = (data && Array.isArray(data.Table1)) ? data.Table1 : [];
                 if (this.Id == '0') {
                     this.BranchList.forEach((key) => {
                         key["checked"] = true;
@@ -91,6 +101,7 @@ export class EntryExchangeRateMasterComponent implements OnInit {
         this._dataService.getData("Import/CurrencyDetails", { id: id })
             .subscribe((data: any) => {
                 this._loaderService.display(false);
+                if (!data || !Array.isArray(data.Table) || data.Table.length == 0) { return; }
                 this.Id = data.Table[0]["pk_ExchangeRateId"];
                 this.CurrencyType = data.Table[0]["Curr_Type"];
                 this.Cities = data.Table[0]["Branch_Name"];

@@ -1,112 +1,126 @@
-<div class="animated fadeIn" >
-    <div class="row no-gutters"  >
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{Header}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  E-Invoice - upload the IRN response file from the GST portal (invoice or credit note).
+  Monochrome page kit (import-page.css + einvoice-page.css). The radio [(ngModel)]="rdbtype",
+  #inputFile (reset by the .ts after each upload), onFileChange(), onupload() and Reset() are
+  unchanged. The rows the API returns (IRN / ack no. per document) are listed below with
+  a display-only filter and 10-per-page pager.
+-->
+<div class="im-page ei-page">
+  <div class="ph">
+    <div>
+      <h1>E-Invoice · upload IRN response</h1>
+      <p>Upload the JSON response from the IRP to store IRN and acknowledgement numbers.</p>
     </div>
-    <div class="row no-gutters" >
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-                <tr>
-                    <td class="col-form-span-heading" colspan="6"> <b>UPLOAD DETAILS</b> </td>
-                </tr>
-                <tr>
-                    <td class="width130">
-                        <span  class="col-form-span-label"><b>Trans Type</b> </span><span
-                        class="col-form-span-error">*</span>
-                    </td>
-                    <td colspan="3" >
-                        <div >
-                            <span class="col-form-span-label">
-                             <input type="radio" name="radioDisplay" value="INV" (change)="lblchange($event)" [(ngModel)]="rdbtype" />&nbsp;Invoice</span>&nbsp;&nbsp;&nbsp;&nbsp;
+  </div>
 
-                             <span class="col-form-span-label">
-                                <input type="radio" name="radioDisplay" value="CN" (change)="lblchange($event)" [(ngModel)]="rdbtype"  />&nbsp;Credit Note</span>
-                          </div>
-
-                                <!-- <div >
-                            <span class="col-form-span-label">
-                           <input type="radio" name="radioDisplay" value="CN" (change)="lblchange($event)" [(ngModel)]="rdbtype"  />&nbsp;Credit Note</span>
-                                 </div> -->
-                          </td>
-                 </tr>
-                 <tr>
-                    <td>
-                        <span class="col-form-span-label"><b>Select File</b> </span>
-                        <span class="col-form-span-error">*</span>
-                    </td>
-                <td colspan="3">
-                    <input  type="file" #inputFile  accept=".csv,.xls,.xlsx,.doc,.docx,.ppt,.pptx,.txt,.pdf,.png" (change)="onFileChange($event)" class="form-control width180">
-                     <!-- <input #fileUpload type="file" class="col-form-span-label" (change)="fileChangeEvent($event)" placeholder="Upload file..." multiple accept=".pdf" /> -->
-                     <!-- <input type="text" #Caption ngModel name="Caption" id="Caption"> -->
-                </td>
-
-                </tr>
-                <tr>
-                    <td>
-                      
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-success" type="submit" (click)="onupload()"><span
-                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Upload</span></button>
-                            &nbsp;&nbsp;
-                        <button class="btn btn-sm btn-danger" type="submit" (click)="Reset()"> <span
-                            class="col-form-span-label"><i class="fa fa-ban"></i>Reset</span></button>
-                    </td>
-                </tr>
-
-            </table>
-        </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
+  @if (grid.notice) {
+    <div class="ei-notice" [class.err]="grid.notice.kind === 'err'" role="status">
+      <div>
+        <h3>{{ grid.notice.title }}</h3>
+        <p>{{ grid.notice.text }}</p>
+      </div>
+      <button type="button" class="ei-x" (click)="grid.notice = null">Dismiss</button>
     </div>
-    <div class="col-sm-12 col-md-12 col-lg-12 ">
-        <table class="table table-bordered table-sm-new bgwhite">
-            <thead>
-                <tr class="col-form-span-heading">
-                   
-                    <th   align="center"><span  class="col-form-span-label"> INV NO</span></th>
-                    <th   align="center"><span  class="col-form-span-label"> INV DATE</span> </th>
-                    <th   align="center"><span  class="col-form-span-label">  SUPPLY TYPE</span></th>
-                    <th   align="center"> <span  class="col-form-span-label"> CLIENT</span> </th>
-                    <th   align="center"> <span  class="col-form-span-label"> IRN NO</span> </th>
-                    <th   align="center"> <span  class="col-form-span-label">ACK NO</span> </th>
-                    <th   align="center"> <span  class="col-form-span-label">ACK DT</span> </th>
-                    <th   align="center"> <span  class="col-form-span-label">JSON CREATED BY</span> </th>
-                    <th   align="center"> <span  class="col-form-span-label">RESPONSE UPDATED BY</span> </th>
-                </tr>
-            </thead>
-            @if (data_table.length > 0) {
-<tbody>
-                @for (data of data_table; track data) {
-<tr>
-                  
-                    <td><span  class="col-form-span-label">{{data.INVNO}}</span>  </td>
-                    <td><span class="col-form-span-label">{{data.INVDATE}}</span>   </td>
-                    <td><span  class="col-form-span-label">{{data.SUPTYPE}}</span>  </td>
-                    <td><span  class="col-form-span-label">{{data.CLIENTNAME}}</span>  </td>
-                    <td><span  class="col-form-span-label">{{data.IRNNO}}</span>  </td>
-                    <td><span  class="col-form-span-label">{{data.ACKNO}}</span>  </td>
-                    <td><span  class="col-form-span-label">{{data.ACKDATE}}</span>  </td>
-                    <td><span  class="col-form-span-label">{{ data['JSON CREATED BY']}}</span>  </td>
-                    <td><span  class="col-form-span-label">{{ data['RESPONSE UPDATED BY']}}</span>  </td>
-                </tr>
-}
-            </tbody>
-}
+  }
 
-        </table>
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Upload details</h2>
+      <span class="meta"><b>*</b> required</span>
     </div>
+    <div class="fields">
+      <div class="fld">
+        <label>Trans type <span class="req">*</span></label>
+        <div class="ei-radio">
+          <label><input type="radio" name="radioDisplay" value="INV" (change)="lblchange($event)" [(ngModel)]="rdbtype" /> Invoice</label>
+          <label><input type="radio" name="radioDisplay" value="CN" (change)="lblchange($event)" [(ngModel)]="rdbtype" /> Credit note</label>
+        </div>
+      </div>
+      <div class="fld">
+        <label>Select file <span class="req">*</span></label>
+        <input type="file" #inputFile accept=".csv,.xls,.xlsx,.doc,.docx,.ppt,.pptx,.txt,.pdf,.png" (change)="onFileChange($event)" class="form-control">
+      </div>
+    </div>
+  </div>
+
+  <div class="card sec">
+    <div class="card-h">
+      <h2>Response</h2>
+      <span class="meta">{{ data_table?.length || 0 }} document(s) updated by the last upload</span>
+    </div>
+    <div class="ei-filters">
+      <div class="f">
+        <label for="eiFind">Find</label>
+        <input id="eiFind" type="text" [(ngModel)]="grid.text" (ngModelChange)="grid.onFilter()" placeholder="Document no., client, IRN or ack no." />
+      </div>
+      <div class="f ei-meta">
+        <span>Type <b>{{ rdbtype == 'CN' ? 'Credit note' : 'Invoice' }}</b></span>
+        <span>File <b>{{ selectedFile?.name || '—' }}</b></span>
+      </div>
+      <div class="f"></div>
+    </div>
+    <div class="toolbar">
+      <span class="count">{{ grid.filtered.length }} {{ grid.filtered.length === 1 ? 'document' : 'documents' }}</span>
+      <span class="tb-r">
+        <button class="btn g" type="button" (click)="grid.clear()">Clear</button>
+        <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!grid.filtered.length">Export</button>
+      </span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Inv no</th>
+            <th>Inv date</th>
+            <th>Supply type</th>
+            <th>Client</th>
+            <th>IRN no</th>
+            <th>Ack no</th>
+            <th>Ack dt</th>
+            <th>JSON created by</th>
+            <th>Response updated by</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (data of grid.pageRows; track data) {
+            <tr>
+              <td class="mono">{{data.INVNO}}</td>
+              <td>{{data.INVDATE}}</td>
+              <td><span class="chip">{{data.SUPTYPE}}</span></td>
+              <td>{{data.CLIENTNAME}}</td>
+              <td class="ei-irn">{{data.IRNNO}}</td>
+              <td class="mono">{{data.ACKNO}}</td>
+              <td>{{data.ACKDATE}}</td>
+              <td>{{ data['JSON CREATED BY']}}</td>
+              <td>{{ data['RESPONSE UPDATED BY']}}</td>
+            </tr>
+          } @empty {
+            <tr><td class="empty" colspan="9">{{ grid.loading ? 'Uploading…' : (grid.text ? 'No documents match this filter.' : 'Nothing uploaded yet. Choose the response file and press Upload.') }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <span>Showing <b>{{ grid.rangeStart }}–{{ grid.rangeEnd }}</b> of <b>{{ grid.filtered.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="grid.page <= 1" (click)="grid.goPage(grid.page - 1)" aria-label="Previous page">‹</button>
+        @for (p of grid.pageList; track $index) {
+          @if (p === 0) {
+            <span class="gap">…</span>
+          } @else {
+            <button type="button" [class.on]="p === grid.page" (click)="grid.goPage(p)">{{ p }}</button>
+          }
+        }
+        <button type="button" [disabled]="grid.page >= grid.pageCount" (click)="grid.goPage(grid.page + 1)" aria-label="Next page">›</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">{{ rdbtype == 'CN' ? 'Credit note' : 'Invoice' }} response · {{ selectedFile?.name || 'no file chosen' }}</span>
+    <div class="r">
+      <button class="btn g" type="button" (click)="Reset()">Reset</button>
+      <button class="btn p" type="button" [disabled]="grid.loading" (click)="onupload()">Upload</button>
+    </div>
+  </div>
 </div>
-
-

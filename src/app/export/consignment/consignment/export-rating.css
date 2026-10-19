@@ -1,0 +1,522 @@
+/* ----------------------------------------------------------------
+   Links port: screen-level stylesheet (styleUrls) on the three rating sheets
+   (MAWBEditComponent, HAWBEditComponent, JobEditComponent), as in MP.
+   Source: MPERPNG-20 src/app/export/consignment/consignment/export-rating.css,
+   copied unchanged, plus SECTION D at the end for markup only Links has
+   (the Airline-charges editors on the MAWB / HAWB sheets).
+   Links keeps the legacy nested-table MAWB sheet (MP rewrote it to one row per
+   charge; the AL-charges editor and the combined tariff+net handlers do not map
+   onto that rewrite), so the .rt-* rules below match nothing here and the
+   legacy .width60/70/80/100, td.centerlabel and tr.col-form-span-heading rules
+   carry all three sheets.
+   ---------------------------------------------------------------- */
+/* Rating drawers (MAWB / HAWB / Job freight rating).
+
+   The MAWB sheet is one row per charge: description, then the tariff group
+   (payable on / rate / amount / PP-CC) and the same four again for net net.
+   Cells carry .rt-payon / .rt-rate / .rt-amt / .rt-frt so a column means the
+   same thing on every row, which is what lets the amounts line up.
+
+   THE LOOK: a ruled monochrome rating sheet. Black, white and grey only -
+   hierarchy comes from weight, rules and fills, never hue. Every field keeps a
+   visible box, because in an ERP people need to see what they can type into
+   before they click it; a dashed box on a grey fill means calculated or
+   locked. The grid is ruled in both directions and the whole sheet is boxed.
+
+   THREE GROUPS OF RULES, AND THE SPLIT MATTERS:
+
+   Section A is UNGATED - it applies in both the compact and the original
+   layout. Being able to read the amount you are editing is a bug fix, not a
+   style preference, so it must not depend on which layout is selected.
+
+   Section B is gated on :host(:not(.rating-classic)) and is purely density -
+   row height, padding, control size. That is a taste question, so it is what
+   the Compact/Original toggle actually switches.
+
+   Section C is the original layout only.
+
+   The HAWB and Job sheets still use the old nested-table markup, so every rule
+   here is written to hold for both shapes: the .rt-* classes style the
+   flattened sheet, and the legacy .width60/70/80/100 classes keep doing their
+   job on the sheets that still have them.
+
+   WHY !important: the parent drawer styles this sheet through ::ng-deep
+   (.x-legacy table td { padding: 9px 14px }, .x-legacy input.form-control
+   { min-height: 30px; color: var(--ex-ink-soft) }). Those selectors have the
+   same shape as these, so without it the winner is decided by stylesheet
+   insertion order.
+
+   WHY ch UNITS: numeric fields are sized in `ch` (the width of the "0" glyph),
+   not px, so the floor holds at any font size or browser zoom. Amounts are
+   always written back with .toFixed(2). */
+
+:host {
+    --rt-ink: var(--mp-ink, #0A0A0A);
+    --rt-ink-soft: var(--mp-soft, #565656);
+    --rt-faint: var(--mp-soft, #9A9A9A);
+    --rt-line: #DEDEDE;
+    --rt-line-soft: var(--mp-line, #F1F1F1);
+    --rt-fill: var(--mp-band, #ECECEC);
+    --rt-sheet: var(--mp-surface, #FFFFFF);
+    --rt-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+    display: block;
+    color: var(--rt-ink);
+}
+
+
+/* ================================================================== *
+ * SECTION A - THE SHEET. Always on.
+ * ================================================================== */
+
+/* ---- the view switch above the sheet ---- */
+:host .rt-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 0 8px;
+}
+
+:host .rt-switch {
+    padding: 4px 10px;
+    border: 1px solid var(--rt-line);
+    border-radius: 6px;
+    background: var(--rt-sheet);
+    font: inherit;
+    font-size: 12px;
+    color: var(--rt-ink-soft);
+    cursor: pointer;
+}
+
+:host .rt-switch.is-on {
+    border-color: var(--mp-primary, var(--rt-ink));
+    background: var(--rt-fill);
+    color: var(--rt-ink);
+    font-weight: 600;
+}
+
+:host .rt-switch:focus-visible {
+    outline: 2px solid var(--mp-primary, var(--rt-ink));
+    outline-offset: 2px;
+}
+
+/* Folding the Net Net block away takes its header cell with it. */
+:host .rt-wrap.rt-nonn .nn {
+    display: none;
+}
+
+/* ---- the grid ---- */
+:host table.table-bordered {
+    width: 100%;
+    border: 1px solid var(--mp-primary, var(--rt-ink)) !important;
+    border-collapse: collapse;
+}
+
+/* Ruled both ways: a rating sheet is read across a charge and down a column,
+   so both directions need a line. */
+:host table.table-bordered > tbody > tr > td {
+    border: 0 !important;
+    border-right: 1px solid var(--rt-line) !important;
+    border-bottom: 1px solid var(--rt-line) !important;
+    vertical-align: middle;
+}
+
+:host table.table-bordered > tbody > tr > td:last-child {
+    border-right: 0 !important;
+}
+
+:host tr.rt-row:hover > td {
+    background: var(--rt-line-soft);
+}
+
+/* Column headers and section banners are a solid black band: the sheet's own
+   structure, not decoration. The MAWB sheet marks a banner on the row, the
+   HAWB and Job sheets on the cell, and those two head their columns with
+   .centerlabel - all three are the same thing to a reader. */
+:host tr.col-form-span-heading > td,
+:host tr.col-form-span-heading,
+:host td.col-form-span-heading,
+:host td.centerlabel {
+    background: var(--mp-primary, var(--rt-ink)) !important;
+    border-color: var(--mp-primary, var(--rt-ink)) !important;
+}
+
+:host tr.col-form-span-heading .col-form-span-label,
+:host tr.col-form-span-heading strong,
+:host tr.col-form-span-heading span,
+:host td.col-form-span-heading .col-form-span-label,
+:host td.col-form-span-heading strong,
+:host td.col-form-span-heading span,
+:host td.centerlabel .col-form-span-label,
+:host td.centerlabel strong,
+:host td.centerlabel u,
+:host td.centerlabel span {
+    color: var(--rt-sheet) !important;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+/* The two rate groups are separated by a real edge - it is the only thing
+   between two blocks of identical-looking numbers. */
+:host .rt-payon.nn {
+    border-left: 2px solid var(--mp-primary, var(--rt-ink)) !important;
+}
+
+/* Charge name. The only text column, so it sets the row's reading line. */
+:host .rt-desc {
+    width: 1%;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+:host .rt-desc .col-form-span-label {
+    font-weight: 500;
+}
+
+/* Column widths. The amount column absorbs the slack; everything else shrinks
+   to its content. Do NOT give the amount cell `width: 100%`: on a table cell
+   that means "as wide as the entire table", and the browser adds the sibling
+   cells on top of it, so the sheet scrolls sideways. */
+:host .rt-payon,
+:host .rt-frt {
+    width: 1%;
+    white-space: nowrap;
+}
+
+:host .rt-rate {
+    width: 1%;
+    min-width: 9ch;
+}
+
+:host .rt-amt {
+    width: auto;
+    min-width: 14ch;
+}
+
+/* ---- fields keep their boxes ---- */
+:host .form-control,
+:host select.form-control {
+    width: 100%;
+    border: 1px solid var(--rt-faint) !important;
+    border-radius: 3px !important;
+    background-color: var(--rt-sheet) !important;
+    box-shadow: none !important;
+    color: var(--rt-ink) !important;
+    font-family: var(--rt-num) !important;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+    text-align: right !important;
+    transition: border-color .12s;
+}
+
+:host select.form-control {
+    font-family: inherit !important;
+    font-size: 12.5px;
+    text-align: left !important;
+}
+
+:host .form-control:hover:not(:disabled):not([readonly]) {
+    border-color: var(--rt-ink-soft) !important;
+}
+
+:host .form-control:focus,
+:host select.form-control:focus {
+    border-color: var(--mp-primary, var(--rt-ink)) !important;
+    box-shadow: 0 0 0 2px var(--rt-fill) !important;
+    outline: none !important;
+}
+
+/* Amounts are the numbers people actually read - give them a size of their own. */
+:host .rt-amt > .form-control,
+:host td.width100 > .form-control {
+    min-width: 14ch !important;
+    font-size: 13px !important;
+    font-weight: 600;
+}
+
+/* Payable-on and PP/CC hold two characters - keep them out of the amount's way. */
+:host .rt-payon > select.form-control,
+:host .rt-frt > select.form-control,
+:host select.form-control.width70,
+:host select.form-control.width80 {
+    width: auto !important;
+    min-width: 6.5ch !important;
+}
+
+/* Calculated or locked. A dashed box on a grey fill says "not yours to type"
+   while keeping the value readable - browsers grey disabled text out via
+   -webkit-text-fill-color, which `color` alone will not override, and several
+   rating fields are legitimately disabled (e.g. [disabled]="UserWgt > 151")
+   but still have to be read. */
+:host .form-control:disabled,
+:host .form-control[readonly],
+:host select.form-control:disabled,
+:host .form-control[disabled] {
+    border-style: dashed !important;
+    border-color: var(--rt-faint) !important;
+    background: var(--rt-line-soft) !important;
+    color: var(--rt-ink-soft) !important;
+    -webkit-text-fill-color: var(--rt-ink-soft) !important;
+    opacity: 1 !important;
+}
+
+/* A charge nobody has priced keeps its boxes but stops shouting. rtFilled()
+   on the component decides; "0" counts as empty. */
+:host tr.rt-empty .rt-desc,
+:host tr.rt-empty .form-control,
+:host tr.rt-empty select.form-control {
+    color: var(--rt-faint) !important;
+    -webkit-text-fill-color: var(--rt-faint) !important;
+}
+
+:host tr.rt-empty .form-control {
+    border-color: var(--rt-line) !important;
+}
+
+/* ---- everything else reads black ---- */
+:host,
+:host td,
+:host th,
+:host span,
+:host strong,
+:host label,
+:host option,
+:host .col-form-span-label,
+:host .col-form-span-value,
+:host .col-form-span-labelnormal {
+    color: var(--rt-ink);
+}
+
+:host ::ng-deep .ng-select .ng-select-container,
+:host ::ng-deep .ng-select .ng-value,
+:host ::ng-deep .ng-select .ng-value-label,
+:host ::ng-deep .ng-dropdown-panel .ng-option {
+    color: var(--rt-ink) !important;
+}
+
+:host ::ng-deep .ng-select .ng-select-container {
+    border: 1px solid var(--rt-faint) !important;
+    border-radius: 3px !important;
+    background: var(--rt-sheet) !important;
+}
+
+:host ::ng-deep .ng-select.ng-select-disabled .ng-select-container,
+:host ::ng-deep .ng-select.ng-select-disabled .ng-value-label {
+    color: var(--rt-ink-soft) !important;
+    -webkit-text-fill-color: var(--rt-ink-soft) !important;
+    border-style: dashed !important;
+    background: var(--rt-line-soft) !important;
+    opacity: 1 !important;
+}
+
+/* The required-field marker. Monochrome, so it earns attention with weight. */
+:host .col-form-span-error {
+    color: var(--rt-ink) !important;
+    font-weight: 700;
+}
+
+/* The legacy row tints are a flat maroon/grey wash - the grid carries the
+   structure now, so drop the cast on every sheet. */
+:host .bglightmaroon,
+:host .bglightgray {
+    background-color: transparent !important;
+}
+
+/* Legacy nested-table sheets (HAWB, Job): same column widths by their own
+   class names. */
+:host td.width60,
+:host td.width70,
+:host td.width80 {
+    width: 1% !important;
+    white-space: nowrap;
+}
+
+:host td.width100 {
+    width: auto !important;
+    min-width: 14ch !important;
+}
+
+:host td.width60 {
+    min-width: 9ch !important;
+}
+
+:host table.table-sm-new {
+    width: 100%;
+    table-layout: auto;
+}
+
+/* Only the INNER per-charge tables lose their cell borders. The outer sheet
+   carries .table-sm-new too, so an unscoped rule here silently erases the row
+   rules and the sheet comes out as one undivided block. */
+:host table.table-sm-new:not(.table-bordered) {
+    border: 0 !important;
+}
+
+:host table.table-sm-new:not(.table-bordered) > tbody > tr > td,
+:host table.table-sm-new:not(.table-bordered) > tbody > tr > th,
+:host table.table-sm-new:not(.table-bordered) > tr > td {
+    border: 0 !important;
+}
+
+
+/* The Compact/Original control itself lives in the drawer header, beside the
+   close button - see .cx-layoutbar in consig_main_edit_modal.component.css. */
+
+
+/* ================================================================== *
+ * SECTION B - DENSITY. Compact layout only.
+ * ================================================================== */
+
+:host(:not(.rating-classic)) .form-control {
+    height: 25px !important;
+    min-height: 25px !important;
+    padding: 0 6px !important;
+    line-height: 23px !important;
+    font-size: 12px !important;
+}
+
+/* ...but never shrink the amount text itself, which Section A just sized. */
+:host(:not(.rating-classic)) .rt-amt > .form-control,
+:host(:not(.rating-classic)) td.width100 > .form-control {
+    font-size: 13px !important;
+}
+
+:host(:not(.rating-classic)) select.form-control {
+    padding: 0 3px !important;
+    background-position: right 3px center;
+}
+
+:host(:not(.rating-classic)) table td,
+:host(:not(.rating-classic)) table th {
+    padding: 3px 6px !important;
+    vertical-align: middle !important;
+    line-height: 1.25 !important;
+}
+
+:host(:not(.rating-classic)) table.table-sm-new:not(.table-bordered) td,
+:host(:not(.rating-classic)) table.table-sm-new:not(.table-bordered) th {
+    padding: 0 2px !important;
+}
+
+:host(:not(.rating-classic)) table.table-sm-new {
+    margin-bottom: 0 !important;
+}
+
+:host(:not(.rating-classic)) .col-form-span-label {
+    font-size: 11.5px;
+    line-height: 1.2;
+}
+
+:host(:not(.rating-classic)) input[type="radio"],
+:host(:not(.rating-classic)) input[type="checkbox"] {
+    margin: 0 3px 0 0;
+    vertical-align: middle;
+}
+
+/* ng-select is used heavily on the HAWB and Job sheets and ships a 36px
+   container by default - bring it in line with the compacted inputs. */
+:host(:not(.rating-classic)) ::ng-deep .ng-select .ng-select-container,
+:host(:not(.rating-classic)) ::ng-deep .ng-select.ng-select-single .ng-select-container {
+    min-height: 25px !important;
+    height: 25px !important;
+    font-size: 12px !important;
+}
+
+:host(:not(.rating-classic)) ::ng-deep .ng-select .ng-select-container .ng-value-container {
+    padding-left: 5px;
+}
+
+:host(:not(.rating-classic)) ::ng-deep .ng-select .ng-select-container .ng-value-container .ng-input > input {
+    font-size: 12px;
+}
+
+:host(:not(.rating-classic)) ::ng-deep .ng-select .ng-arrow-wrapper,
+:host(:not(.rating-classic)) ::ng-deep .ng-select .ng-clear-wrapper {
+    height: 23px;
+}
+
+
+/* ================================================================== *
+ * SECTION C - ORIGINAL layout only.
+ *
+ * Requested by the rating users: shrink the DESCRIPTION column text so the
+ * long labels stop wrapping onto a second line. Wrapping is what actually
+ * drives the scrolling here - "(5) MISCELLANEOUS CHARGES", "(8) BUSINESS
+ * PROMOTION" and "(13) DUE CARRIER [2+3+4+5+6+7+8+9]" each cost a full extra
+ * line at 11px in a 220px column, so those rows are ~50% taller than their
+ * single-line neighbours.
+ * ================================================================== */
+
+:host(.rating-classic) table.table-bordered > tbody > tr > td:first-child,
+:host(.rating-classic) table.table-bordered > tbody > tr > td:first-child .col-form-span-label,
+:host(.rating-classic) table.table-bordered > tbody > tr > td:first-child strong {
+    font-size: 10px !important;
+    line-height: 1.15 !important;
+}
+
+:host(.rating-classic) table.table-bordered > tbody > tr > td:first-child {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+}
+
+
+/* ================================================================== *
+ * SECTION D - LINKS ONLY. Airline charges (MAWB "(13)", HAWB "(18)").
+ *
+ * The AL-charges editor is a nested table inside the sheet. Two of its
+ * cells carry .centerlabel only to centre them - the tariff-rate input
+ * and the edit / delete icons of the saved-charges grid - so Section A
+ * would paint them as black heading cells (the icons vanish, black on
+ * black). Every real column heading sits in the sheet's own outer table,
+ * so a .centerlabel cell inside a nested table is never a heading.
+ * Its banner row and the grid's column headings use the old .formheading
+ * class; they get the same black band as every other banner on the sheet.
+ * ================================================================== */
+:host table table td.centerlabel {
+    background: transparent !important;
+    border-color: var(--rt-line) !important;
+}
+
+:host tr.formheading > td,
+:host tr.formheading > th {
+    background: var(--mp-primary, var(--rt-ink)) !important;
+    border-color: var(--mp-primary, var(--rt-ink)) !important;
+    color: var(--rt-sheet) !important;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+
+:host tr.formheading .col-form-span-label,
+:host tr.formheading strong,
+:host tr.formheading span {
+    color: var(--rt-sheet) !important;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+
+:host table table i.fa {
+    color: var(--rt-ink);
+    cursor: pointer;
+}
+
+/* Add / Reset under the AL editor: same black edge as the legacy .btn rule in
+   export-legacy-content.css (import-entry.css makes the same call for uiBtn). */
+:host button[uibtn][variant="outline"] {
+    border-color: var(--mp-primary, var(--rt-ink));
+}
+
+
+@media (max-width: 900px) {
+    :host .rt-amt,
+    :host td.width100 {
+        min-width: 12ch !important;
+    }
+}

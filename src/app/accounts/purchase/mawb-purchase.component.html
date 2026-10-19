@@ -1,640 +1,447 @@
-<div class="animated fadeIn">
-    <div class="row no-gutters">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>MAWB</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  India Accounts - MAWB purchase (recipe 2, two steps).
+  Kit: global .im-page kit (src/styles/kit) + purchase-page.css. The Bootstrap nav-tabs markup is kept on purpose:
+  the component drives it with jQuery ($("#data-step1"/"#data-step2") add/removeClass("disabled"),
+  $('.nav a[href="#step1"/"#step2"]').tab('show')), so the ids, hrefs, .nav, .tab-content and
+  .tab-pane#step1/#step2 must stay. Every [(ngModel)], handler and amount/total binding is unchanged.
+  Links port: Links-only bits kept - the step 2 narration textarea (#autoresizing, TextareaValueChange),
+  job no. maxlength 40, line narration maxlength 800, and the 10-argument getCheckedTDSData() call.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>MAWB purchase</h1>
+      <p>Step 1 splits the MAWB cost by account; step 2 books the supplier purchase</p>
     </div>
-    <div class="row no-gutters">
-        <div class="col-sm-12 col-md-2 col-lg-2"> </div>
-        <div class="col-sm-12 col-md-8 col-lg-8">
-            <div class="tab" role="tabpanel">
-                <div >
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="data-step1" data-toggle="tab" href="#step1">MAWB </a>
-                        </li>
-                        <li class="nav-item" >
-                            <a class="nav-link disabled" id="data-step2"  data-toggle="tab" href="#step2"> PURCHASE </a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="step1">
-                        <div class="row">
-                            <div class="col-12">
-                        <table class="table table-bordered table-sm-new bgwhite">
+    <div class="tools">
+      @if (PurchaseNo_step2) {
+        <span class="chip solid">{{ PurchaseNo_step2 }}</span>
+      }
+      @if (mawbno) {
+        <span class="chip"><span class="dot"></span>MAWB {{ mawbno }}</span>
+      }
+    </div>
+  </div>
 
-                            <tr  >
-                                <td class="col-form-span-heading"  colspan="4">
-                                    <b> General Details</b>
-                                </td>
-                            </tr>
-                            <tr>
-                              
-                            </tr>
-                            <tr>
-            
-                                <td><span class="col-form-span-label"><b>Mawb No</b> </span><span
-                                        class="col-form-span-error">*</span></td>
-                                <td> <input [(ngModel)]="mawbno" type="text" class="form-control width150" (change)="fn_Validate_MawbNo(mawbno)" [maxlength]="30" 
-                                        > </td>
-                                <td><span class="col-form-span-label"><b>Purchase Date</b> </span><span
-                                            class="col-form-span-error">*</span></td>
-                                <td>
-                                        <my-date-picker name="purchasedate_step1" [options]="myDatePickerOptionsInv"
-                                            class="form-control width170" (dateChanged)="PurchaseDate_Step1Changed($event)"
-                                            [selDate]="purchasedate_step1"></my-date-picker>
-                                        </td>
-                            </tr>
-                            <tr  >
-                                <td class="col-form-span-heading"   colspan="4">
-                                    <b> Supplier Details</b>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="col-form-span-label"><b>Supplier Name</b> </span><span
-                                        class="col-form-span-error">*</span></td>
-                                <td colspan="3">
-                                    <!-- <select class="form-control width350"  [(ngModel)]="staff">
-                                        <option value="">Please select</option>
-                                        <option *ngFor="let d of Stafflist" value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
-                                    </select> -->
-                                    <ng-select [items]="supplierlist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
-                                        [(ngModel)]="step1suppliername" (ngModelChange)="GetStep1SupplierName($event)" class="custom "
-                                        placeholder="--Select--">
-                                    </ng-select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="col-form-span-label"><b>Bill To Address</b> </span><span
-                                        class="col-form-span-error">*</span></td>
-                                <td colspan="3">
-                                    <select class="form-control" [(ngModel)]="billaddress_step1">
-                                        <option value="">Please select</option>
-                                        @for (d of billaddressfilter_step1; track d) {
-<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}
-                                        </option>
-}
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="col-form-span-heading" colspan="4">
-                                             
-                                    <div style="display: flex;float: center;" >&nbsp;&nbsp;&nbsp;
-                                        <span class="col-form-span-label" style="color: crimson;"><b>{{chktdslbl_step1}}</b> </span>
-                                        <span class="col-form-span-label"> <input type="checkbox"   
-                                              [(ngModel)]="chkIsTDS_step1"  [disabled]='disablecheckbox'
-                                                /> </span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr >
-                                <td class="col-form-span-heading" colspan="4">
-                                    <b>Accounts Details</b>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="col-form-span-label"><b>Account Name</b> </span><span
-                                    class="col-form-span-error">*</span></td>
-                                <td colspan="3">
-                                    <ng-select [items]="AccountNameList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
-                                        (ngModelChange)="GetActName($event)" [(ngModel)]="AccountName_step1" class="custom "
-                                        placeholder="--Select--">
-                                    </ng-select>
-                                   
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="col-form-span-label"><b> Amount</b> </span><span
-                                        class="col-form-span-error">*</span>
-                                </td>
-                                <td> <input [(ngModel)]="AcctAmount_step1" OnlyNumber="true" type="text" [disabled]="disableamt" class="form-control width150"
-                                        maxlength="40"> </td>
-                                        <td><span class="col-form-span-label"><b> Deduction</b> </span><span
-                                            class="col-form-span-error">*</span>
-                                    </td>
-                                    <td> <input [(ngModel)]="Deduction_step1" OnlyNumber="true" type="text"  [disabled]="disablededuction" class="form-control width150"
-                                            maxlength="40"> </td>
-                            </tr>
-                           
-                            <tr>
-                                <td><span class="col-form-span-label"><b> TDS Applicable</b> </span><span
-                                        class="col-form-span-error">*</span>
-                                </td>
-                                <td style=" display: flex; ">
-                                    <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
-                                        <select class="form-control width150"  [(ngModel)]="TDSApplicable_step1"   >
-                                        <option value="">--Please select--</option>
-                                        <option value="Y">Y</option>
-                                        <option value="N">N</option>
-                                       </select>
-                
-                            </td>
-                                <td><span class="col-form-span-label"><b>GST Applicable</b> </span><span
-                                    class="col-form-span-error">*</span></td>
-                                <td style=" display: flex; ">
-                                    <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
-                                        <select class="form-control width150"  [(ngModel)]="GSTApplicable_step1"   >
-                                            <option  value="" >-- Please Select --</option>
-                                            <option value="1">Y</option>
-                                            <option value="0" >N</option>
-                                            <option value="2" >RCM</option>
-                                       </select>
-                                </td>
-            
-                            </tr>
-                         <tr>
-                                <td colspan="4" class="centerlabel">
-                                    <button class="btn btn-sm btn-success" type="submit" (click)="Addchildrcrdstep1()"> <span
-                                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>
-                                            {{txtchild}}</span></button>
-                                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
-                                            (click)="Resetchildrcrdstep1();"><i class="fa fa-ban"></i> Reset</span></button>
-                                </td>
-                            </tr>
-            
-                            <tr>
-            
-                                <td><span class="col-form-span-heading"><b> Net Total</b> </span></td>
-                                <td> <input [(ngModel)]="NetTotal_step1" disabled="disabled" type="text" class="form-control width150"
-                                        maxlength="40"> </td>
-                                <td colspan="2"></td>
-                            </tr>
-                                <tr>
-                                <td><span class="col-form-span-label"><b> Amount</b> </span></td>
-                                <td> <input [(ngModel)]="NetAmount_step1" OnlyNumber="true" disabled="disabled" type="text"
-                                        class="form-control width150" maxlength="40"> </td>
-                                <td colspan="2"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="4">
-                                    <div class="row xyscroll">
-                                        <div class="col-12">
-                                        <table class="table table-responsive-sm table-bordered">
-                                            <thead>
-                                                <tr class="bakgrdliteBlue">
-                                                    <th class="col-form-span-label"></th>
-                                                    <th class="col-form-span-label font-weight-bold headerwhite">Account Name</th>
-                                                    <th class="col-form-span-label font-weight-bold headerwhite">Amount</th>
-                                                    <th class="col-form-span-label font-weight-bold headerwhite">Deduction</th>
-                                                    <th class="col-form-span-label font-weight-bold headerwhite">Tds</th>
-                                                    <th class="col-form-span-label font-weight-bold headerwhite">Gst</th>
-                                                   
-                                                </tr>
-                                            </thead>
-                                            <tbody >
-                                                @for (obj of Accountlist_step1; track obj) {
-<tr>
-                                                    <td class="centerlabel">
-                                                        <i class="fa fa-pencil" (click)="Editchildrecdstep1(obj.ID)"></i>
-                                                        &nbsp;
-                                                       <i class="fa fa-trash" (click)="deletechildrecdstep1(obj.ID)"></i> 
-                                                    </td>
-                                                    <td><span class="col-form-span-label">{{obj.ACCOUNT_NAME}} </span></td>
-                                                    <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>                                    
-                                                    <td><span class="col-form-span-label">{{obj.DEDUCTION}}</span></td>
-                                                    <td><span class="col-form-span-label">{{obj.PUR_TDS}}</span></td>
-                                                    <td><span class="col-form-span-label">{{obj.GST}}</span></td>
-                                                </tr>
-}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="4" class="centerlabel">
-                                    <button class="btn btn-sm btn-success" type="submit"   [disabled]="buttonStatus" (click)="Add_Mainstep1()"> <span
-                                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> {{text}}</span></button>
-                                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
-                                            (click)="RestMain_step1();"><i class="fa fa-ban"></i> Reset</span></button>
-                                </td>
-                            </tr>
-                      
-                        </table>
-                        </div>
-                        </div>
-                    </div>
-                    <div role="tabpanel " class="tab-pane" id="step2">
-                        <div class="row">
-                            <div class="col-12">
-                        <table class="table table-bordered table-sm-new bgwhite">
+  <div class="tab" role="tabpanel">
+    <ul class="nav nav-tabs pu-tabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="data-step1" data-toggle="tab" href="#step1">1 · MAWB</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" id="data-step2" data-toggle="tab" href="#step2">2 · Purchase</a>
+      </li>
+    </ul>
 
-                            <tr  >
-                                <td class="col-form-span-heading" colspan="4">
-                                    <b> General Details</b>
-                                </td>
-                            </tr>
-                            <tr>
-            
-                                <td><span class="col-form-span-label"><b>Purchase No</b> </span><span
-                                        class="col-form-span-error">*</span></td>
-                                <td> <input [(ngModel)]="PurchaseNo_step2" type="text" class="form-control width150" [maxlength]="30" 
-                                        [disabled]="true"> </td>
-                                <td><span class="col-form-span-label"><b>Purchase Date</b> </span><span
-                                        class="col-form-span-error">*</span></td>
-                                <td style="text-align:left ;">              
-                                    <my-date-picker name="purchasedate_step2" [options]="myDatePickerOptionsInv" [disabled]='disablepurchasedate_step2'
-                                        class="width170" (dateChanged)="PurchaseDate_Step2Changed($event)" [selDate]="purchasedate_step2" ></my-date-picker>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="col-form-span-label"><b>Narration</b> </span></td>
-                                <!-- <td colspan="3"> <input [(ngModel)]="Narration_step2" type="text" class="form-control"
-                                        [maxlength]="4000"> </td> -->
-                                        <td colspan="3">
-                                            <textarea class="form-control" id="autoresizing" (change)="TextareaValueChange($event)"
-                                             placeholder="text" cols="50" rows="3" [innerHTML]="Narration_step2"></textarea>
-                                               </td>
-                            </tr>
-                            <tr  >
-                                <td class="col-form-span-heading" colspan="4">
-                                    <b>Supplier Details</b>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="col-form-span-label"><b>Supplier Name</b> </span><span
-                                        class="col-form-span-error">*</span></td>
-                                <td colspan="3">                      
-                                    <ng-select [items]="supplierlist" disabled bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
-                                        [(ngModel)]="suppliername" (ngModelChange)="GetSupplierName($event)" class="custom"
-                                        placeholder="--Select--">
-                                    </ng-select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="col-form-span-label"><b>Bill To Address</b> </span><span
-                                        class="col-form-span-error">*</span></td>
-                                <td colspan="3">
-                                    <select class="form-control" disabled [(ngModel)]="billaddress">
-                                        <option value="">Please select</option>
-                                        @for (d of billaddressfilter; track d) {
-<option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}
-                                        </option>
-}
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-            
-                                <td><span class="col-form-span-label"><b>Inv No</b> </span><span
-                                        class="col-form-span-error">*</span></td>
-                                <td> <input [(ngModel)]="InvNo" type="text"  class="form-control width150"
-                                        maxlength="40"> </td>
-                                <td><span class="col-form-span-label"><b>Inv Date</b> </span><span
-                                        class="col-form-span-error">*</span></td>
-                                <td style="text-align: left;">
-                                    <my-date-picker name="InvDate" [options]="myDatePickerOptions" class=" width170"
-                                        [(ngModel)]="InvDate"></my-date-picker>
-                                </td>
-                            </tr>
-                            <tr>
-            
-                                <td><span class="col-form-span-label"><b>Bill Received On</b> </span><span
-                                        class="col-form-span-error">*</span></td>
-                                <td style="text-align: left;">
-                                    <my-date-picker name="BillReceive" [options]="myDatePickerOptions" class="width170"
-                                        [(ngModel)]="BillReceive"></my-date-picker>
-                                </td>
-                                <td><span class="col-form-span-label"><b>Due Date</b> </span><span
-                                        class="col-form-span-error">*</span></td>
-                                <td style="text-align: left;">
-                                    <my-date-picker name="DueDate" [options]="myDatePickerOptions" class="width170"
-                                        [(ngModel)]="DueDate"></my-date-picker>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="col-form-span-heading" colspan="4">
-                                             
-                                    <div style="display: flex;float: left;" >
-                                        <span class="col-form-span-label" style="color: crimson;"><b>{{chktdslbl_step2}}</b> </span>
-                                        <span class="col-form-span-label"> <input type="checkbox"   
-                                              [(ngModel)]="chkIsTDS_step2"  [disabled]='disablecheckbox'
-                                                /> </span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <!-- <tr  class="trheader">
-                                <td class="col-form-span-label" colspan="2">
-                                    <b> Passing Details</b>
-                                </td>
-                                <td class="col-form-span-heading" colspan="2">
-            
-                                    <div style="display: flex;">
-                                        <span class="col-form-span-label"><b>Passed&nbsp;&nbsp;</b> </span>
-                                        <span class="col-form-span-label"> <input type="checkbox" [(ngModel)]="IsPassed"
-                                                (change)="changeEvent($event)" /> </span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="col-form-span-label"><b>Passed By</b> </span></td>
-                                <td>
-                                    <select class="form-control width150" [(ngModel)]="passedby" [disabled]='togglepassedby'>
-                                        <option value="">Please select</option>
-                                        <option *ngFor="let d of PassedBylist" value={{d.CMPID}}>{{d.CMP_USERNAME}}</option>
-                                    </select>
-                                </td>
-                                <td><span class="col-form-span-label"><b>Passed Amount</b> </span><span
-                                        class="col-form-span-error">*</span></td>
-                                <td> <input [(ngModel)]="PassedAmount" OnlyNumber="true" type="text" [disabled]='togglepamount'
-                                        class="form-control width150" maxlength="40"> </td>
-                            </tr>
-                            <tr>
-                                <td><span class="col-form-span-label"><b>Invoice Amount</b> </span><span
-                                        class="col-form-span-error">*</span></td>
-                                <td> <input [(ngModel)]="InvoiceAmount" OnlyNumber="true" type="text" [disabled]='toggleinvamount'
-                                        class="form-control width150" maxlength="40"> </td>
-                                <td><span class="col-form-span-label"><b>Voucher No</b> </span><span
-                                        class="col-form-span-error">*</span></td>
-                                <td> <input [(ngModel)]="VoucherNo" OnlyNumber="true" type="text" [disabled]='togglevno'
-                                        class="form-control width150" maxlength="40"> </td>
-            
-                            </tr> -->
-                            <tr >
-                                <td class="col-form-span-heading" colspan="4">
-                                    <b>Accounts Details</b>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="col-form-span-label"><b>Account Name</b> </span></td>
-                                <td colspan="3">                   
-                                    <ng-select [items]="AccountNameStep2List" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
-                                        (ngModelChange)="GetActName_Step2($event)" [(ngModel)]="AccountName_step2" class="custom"
-                                        placeholder="--Select--">
-                                    </ng-select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="col-form-span-label"><b>Item</b> </span></td>
-                                <td colspan="3">
-                                    <ng-select [items]="Itemslist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Item_step2"
-                                        class="custom" placeholder="--Select--">
-                                    </ng-select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><span class="col-form-span-label"><b> TDS Applicable</b> </span><span
-                                        class="col-form-span-error">*</span>
-                                </td>
-                                <td style=" display: flex; ">
-                                    <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
-                                        <select class="form-control width150"  [(ngModel)]="TDSApplicable_step2"   >
-                                        <option value="">--Please select--</option>
-                                        <option value="Y">Y</option>
-                                        <option value="N">N</option>
-                                       </select>
-                
-                            </td>
-                                <td><span class="col-form-span-label"><b>GST Applicable</b> </span></td>
-                                <td style=" display: flex; ">
-                                    <!-- <select class="form-control width150"  [(ngModel)]="EntryType" (change)="listbillpopup()" (change)="EntryTypeChg($event.target.value)" > -->
-                                        <select class="form-control width150"  [(ngModel)]="GSTApplicable_step2"   >
-                                            <option  value="" >-- Please Select --</option>
-                                            <option value="1">Y</option>
-                                            <option value="0" >N</option>
-                                            <option value="2" >RCM</option>
-                                       </select>
-                                </td>
-            
-                            </tr>
-                            <tr>
-                                <td><span class="col-form-span-label"><b> Amount</b> </span><span
-                                        class="col-form-span-error">*</span>
-                                </td>
-                                <td> <input [(ngModel)]="Amount_step2" OnlyNumber="true" type="text" class="form-control width150"
-                                        maxlength="40"> </td>
-                                <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
-                                <td> <input [(ngModel)]="Deduction_step2" type="text" OnlyNumber="true" class="form-control width150"
-                                        maxlength="40"> </td>
-            
-                            </tr>
-                            <tr>
-                                <td><span class="col-form-span-label"><b> Job No</b> </span><span
-                                        class="col-form-span-error">*</span>
-                                </td>
-                                <td> <input [(ngModel)]="JobNo_step2" type="text" OnlyNumber="true" class="form-control width150"
-                                        maxlength="40"> </td>
-                                <td><span class="col-form-span-label"><b>Pass Amount</b> </span></td>
-                                <td> <input [(ngModel)]="actpassedamount_step2" type="text"  disabled="true"
-                                        class="form-control width150" maxlength="40">
-                                </td>
-            
-                            </tr>
-                            <tr>
-                                <td><span class="col-form-span-label"><b>Narration</b> </span></td>
-                                <td colspan="3">
-                                    <input [(ngModel)]="ActNarration_step2" type="text" [maxlength]="800" class="form-control">
-                                </td>
-                            </tr>
-            
-                            <tr>
-                                <td colspan="4" class="centerlabel">
-                                    <button class="btn btn-sm btn-success" type="submit" (click)="Addchildrcrdstep2()" [disabled]='disablechildaddbtn'> <span
-                                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>
-                                            {{txtchild}}</span></button>
-                                    <button class="btn btn-sm btn-danger" type="reset" [disabled]='disablechildresetbtn'> <span class="col-form-span-label"
-                                            (click)="Resetchildrcrdstep2();"><i class="fa fa-ban"></i> Reset</span></button>
-                                    <button class="btn btn-sm btn-success" type="submit"  [disabled]='disabletdsbtn'> <span class="col-form-span-label"
-                                            (click)=" !disabletdsbtn && OpenTdsModal();"><i class="fa fa-dot-circle-o"></i> Cal TDS</span></button>
-                                     <button class="btn btn-sm btn-danger" type="reset"  [disabled]='disableresetbtn'> <span class="col-form-span-label"
-                                            (click)="!disableresetbtn && ResetTDS()"><i class="fa fa-ban"></i> Reset TDS</span></button>        
-                                </td>
-                            </tr>
-                          
-                            <tr>
-            
-                                <td><span class="col-form-span-heading"><b> Net Total</b> </span></td>
-                                <td> <input [(ngModel)]="NetAmt_step2" disabled="disabled" type="text" class="form-control width150"
-                                        maxlength="40"> </td>
-                                <td colspan="2"></td>
-                            </tr>
-            
-                            <tr>
-                                <td><span class="col-form-span-label"><b> Amount</b> </span></td>
-                                <td> <input [(ngModel)]="NetAmount_step2" OnlyNumber="true" disabled="disabled" type="text"
-                                        class="form-control width150" maxlength="40"> </td>
-                                <td><span class="col-form-span-label"><b>Deduction</b> </span></td>
-                                <td> <input [(ngModel)]="Netdeduction_step2" OnlyNumber="true" disabled="disabled" type="text"
-                                        class="form-control width150" maxlength="40"> </td>
-                            </tr>
-                             <tr>
-                                <td colspan="6">
-                                    <div class="row xyscroll" style="overflow-y: auto; width:670px">
-                                        <div class="col-12">
-                                        @if (Accountlist_step2.length>0) {
-<table class="table table-responsive-sm table-bordered" style="width:100%">
-                                            <thead>
-                                                <tr class="bakgrdliteBlue">
-                                                    <th class="col-form-span-label"></th>
-                                                    <th class="col-form-span-label font-weight-bold headerwhite">Account Name</th>
-                                                    <th class="col-form-span-label font-weight-bold headerwhite">Amount</th>
-                                                    <th class="col-form-span-label font-weight-bold headerwhite">Deduction</th>
-                                                    <th class="col-form-span-label font-weight-bold headerwhite">TDS</th>
-                                                    <th class="col-form-span-label font-weight-bold headerwhite">GST</th>
-                                                    <th class="col-form-span-label font-weight-bold headerwhite">Item</th>
-                                                    <th class="col-form-span-label font-weight-bold headerwhite">Job No</th>
-                                                    <th class="col-form-span-label font-weight-bold headerwhite">Narration</th>
-                                                </tr>
-                                            </thead>
-                                            @if (Accountlist_step2.length>0) {
-<tbody>
-                                                @for (obj of Accountlist_step2; track obj) {
-<tr>
-                                                    <td class="centerlabel">
-                                                        <i class="fa fa-pencil" (click)="Editchildrecdstep2(obj.ID)"></i>
-                                                        &nbsp;
-                                                        <i class="fa fa-trash" (click)="deletechildrecdstep2(obj.ID,obj.IS_NOT_EDIT_ABLE)"></i>
-                                                    </td>
-                                                    <td><span class="col-form-span-label" [innerHtml]="obj.ACCOUNT_NAME"> </span>
-                                                    </td>
-                                                    <td><span class="col-form-span-label">{{obj.AMOUNT}}</span></td>
-                                                    <td><span class="col-form-span-label">{{obj.DEDUCTION}}</span></td>
-                                                    <td><span class="col-form-span-label">{{obj.PUR_TDS}}</span></td>
-                                                    <td><span class="col-form-span-label">{{obj.GST}}</span></td>
-                                                    <td><span class="col-form-span-label">{{obj.ITEM}}</span></td>
-                                                    <td><span class="col-form-span-label">{{obj.JOBNO}}</span></td>
-                                                    <td>@if (obj.CLIENT=='G100741') {
-<span class="col-form-span-label" [innerHtml]="obj.NARRATION"></span>
-}
-                                                        @if (obj.CLIENT!='G100741') {
-<span class="col-form-span-label">{{obj.NARRATION}}</span>
-}</td> 
-                                                </tr>
-}
-                                            </tbody>
-}
-                                        </table>
-}
-                                    </div>
-                                    </div>
-                                </td>
-                            </tr> 
-                            <tr>
-                                <td colspan="4" class="centerlabel">
-                                    <button class="btn btn-sm btn-success" type="submit" (click)="supplier_validation()"> <span
-                                            class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> {{text}}</span></button>
-                                    <button class="btn btn-sm btn-danger" type="reset"> <span class="col-form-span-label"
-                                            (click)="Reset();"><i class="fa fa-ban"></i> Reset</span></button>
-                                </td>
-                            </tr>
-                      
-            
-                        </table>
-                        </div>
-                        </div>
-                    </div>
-                    </div>
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="step1">
+        <div class="card sec">
+          <div class="card-h">
+            <h2>General</h2>
+            <span class="meta"><b>*</b> required</span>
+          </div>
+          <div class="fields">
+            <div class="fld">
+              <label>MAWB no. <span class="req">*</span></label>
+              <input [(ngModel)]="mawbno" type="text" (change)="fn_Validate_MawbNo(mawbno)" [maxlength]="30">
             </div>
+            <div class="fld">
+              <label>Purchase date <span class="req">*</span></label>
+              <my-date-picker name="purchasedate_step1" [options]="myDatePickerOptionsInv"
+                (dateChanged)="PurchaseDate_Step1Changed($event)"
+                [selDate]="purchasedate_step1"></my-date-picker>
+            </div>
+          </div>
         </div>
-        <div class="col-sm-12 col-md-2 col-lg-8"> </div>
 
-    </div>
-    </div>
-    <div class="modal" [style.display]="showModal_TDS ? 'block' : 'none' "  >
-        <div class="modal-dialog modal-lg" role="document" style="width: 700px;">
-            <div class="modal-content">
-                <div class="card-header formheading">
-                    <!-- <h5 class="modal-title">TDS Details</h5> -->
-                    <strong>TDS Details</strong>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col" style="height:400px;overflow-y: auto; ">
-                            <table class="table table-bordered table-sm-new bgwhite">
-                              
-                                <tr>
-                                    <td>
-                                        <thead style="text-align: center;">
-                                            <tr>
-                                                <th class="col-form-span-label"></th>
-                                                <th class="col-form-span-label">Acct Name.</th>
-                                                <th class="col-form-span-label">Section</th>
-                                                <th class="col-form-span-label">LDC Limit</th>
-                                                <th class="col-form-span-label">Utilized Amt</th>
-                                                <th class="col-form-span-label">LDC Rate %</th>
-                                                <th class="col-form-span-label">Base Rate %"</th>
-                                                <th class="col-form-span-label">PI Amt</th>
-                                                <th class="col-form-span-label">TDS Amount</th>
-                                                <th class="col-form-span-label">Remarks</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                               @for (obj of TDSList ; track obj) {
-<tr>
-                                                <td class="col-form-span-label">
-                                                    <input type="checkbox" [(ngModel)]="obj.Checked" [id]="i" [value]="i" [disabled]="obj.Disabled"
-                                                         (ngModelChange)="getCheckedTDSData($event,obj.TDSACCTID,obj.RATE,obj.TDSAMOUNT,obj.AMOUNT,obj.ITEMCODE,obj.NARRATION,obj.RATETYPE,obj.ACCTID,obj.OFFLAG)">
-                                                    &nbsp; 
-                                                </td>
-                                                <td class="col-form-span-label">{{obj.ACCTNAME}}</td>
-                                                <td class="col-form-span-label">{{obj.SECTIONNAME}}</td>
-                                                <td class="col-form-span-label">{{obj.TDS_LIMIT_AMT}}</td>
-                                                <td class="col-form-span-label">{{obj.UTIAMT}}</td>
-                                                <td class="col-form-span-label">{{obj.LDCRATE}}</td>
-                                                <td class="col-form-span-label">{{obj.RATE}}</td>
-                                                <td class="col-form-span-label">{{obj.AMOUNT}}</td>
-                                                <td class="col-form-span-label">{{obj.TDSAMOUNT}}</td>
-                                                <td class="col-form-span-label">{{obj.NARRATION}}</td>
-                                            </tr>
-}
-                                          
-                             
-                            </tbody>
-                        </td>
-                    </tr>
-                            </table>
-                             <table class="table table-bordered table-sm-new bgwhite">
-                                <td colspan="9" align="center" style="width:100%">
-                                    <tr >
-                                        <td colspan="5"><span class="col-form-span-label">Total PI Amount :  </span>
-                                            <span class="col-form-span-label"><b>{{totpiamt}}</b> </span>
-                                        </td>
-                                        <td align="right" colspan="4"><span class="col-form-span-label">Selected PI Amount  :  </span>
-                                            <span class="col-form-span-label"><b>{{seltaxableamt}}</b> </span>
-                                        </td>
-                                        <td>
-                                            <thead style="text-align: center;">
-                                                <tr>
-                                                  <th class="col-form-span-label">Section</th>
-                                                  <th class="col-form-span-label">Total Tds Amount</th>
-                                                 </tr>
-                                            </thead> 
-                                            <tbody>
-                                                @for (obj of TotalTDSList ; track obj) {
-<tr>
-                                                 <td class="col-form-span-label"><b>{{obj.SECTIONNAME}}</b></td>
-                                                 <td class="col-form-span-label"><b>{{obj.TOTTDSAMOUNT}}</b></td>
-                                             </tr>
-}
-                                             </tbody> 
-                                        </td>
-                                    </tr>
-                                   
-                                </td>
-                             </table>   
-                        </div>
-                    </div>
-                    <div class="card-header formheading" style="height:25px" >
-                        <button class="btn btn-sm btn-danger" style="float: right;" type="reset"> <span class="col-form-span-label"
-                            (click)="closeTdsModal()"><i class="fa fa-ban"></i>
-                            Close</span></button>
-                        <button class="btn btn-sm btn-success" style="float: right;" type="submit" (click)="AddtdsDetails()"> <span
-                                class="col-form-span-label"><i class="fa fa-dot-circle-o"></i>Add</span></button>
-                       
-                    </div>
-                 
-                </div>
+        <div class="card sec">
+          <div class="card-h">
+            <h2>Supplier</h2>
+          </div>
+          <div class="fields">
+            <div class="fld full">
+              <label>Supplier <span class="req">*</span></label>
+              <ng-select [items]="supplierlist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                [(ngModel)]="step1suppliername" (ngModelChange)="GetStep1SupplierName($event)" class="custom"
+                placeholder="--Select--">
+              </ng-select>
             </div>
+            <div class="fld full">
+              <label>Bill to address <span class="req">*</span></label>
+              <select [(ngModel)]="billaddress_step1">
+                <option value="">Please select</option>
+                @for (d of billaddressfilter_step1; track d) {
+                  <option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
         </div>
+
+        <div class="card sec">
+          <div class="card-h">
+            <h2>Account lines</h2>
+            <label class="pu-flag">
+              <span>{{chktdslbl_step1}}</span>
+              <input type="checkbox" [(ngModel)]="chkIsTDS_step1" [disabled]='disablecheckbox' />
+            </label>
+          </div>
+          <div class="fields">
+            <div class="fld full">
+              <label>Account <span class="req">*</span></label>
+              <ng-select [items]="AccountNameList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
+                (ngModelChange)="GetActName($event)" [(ngModel)]="AccountName_step1" class="custom"
+                placeholder="--Select--">
+              </ng-select>
+            </div>
+            <div class="fld">
+              <label>Amount <span class="req">*</span></label>
+              <input [(ngModel)]="AcctAmount_step1" OnlyNumber="true" type="text" [disabled]="disableamt" class="num" maxlength="40">
+            </div>
+            <div class="fld">
+              <label>Deduction <span class="req">*</span></label>
+              <input [(ngModel)]="Deduction_step1" OnlyNumber="true" type="text" [disabled]="disablededuction" class="num" maxlength="40">
+            </div>
+            <div class="fld">
+              <label>TDS applicable <span class="req">*</span></label>
+              <select [(ngModel)]="TDSApplicable_step1">
+                <option value="">--Please select--</option>
+                <option value="Y">Y</option>
+                <option value="N">N</option>
+              </select>
+            </div>
+            <div class="fld">
+              <label>GST applicable <span class="req">*</span></label>
+              <select [(ngModel)]="GSTApplicable_step1">
+                <option value="">-- Please Select --</option>
+                <option value="1">Y</option>
+                <option value="0">N</option>
+                <option value="2">RCM</option>
+              </select>
+            </div>
+          </div>
+          <div class="pu-add">
+            <button class="btn p" type="button" (click)="Addchildrcrdstep1()">{{txtchild}}</button>
+            <button class="btn g" type="button" (click)="Resetchildrcrdstep1();">Reset line</button>
+          </div>
+
+          <div class="toolbar">
+            <span class="count">{{ Accountlist_step1.length }} {{ Accountlist_step1.length === 1 ? 'line' : 'lines' }}</span>
+          </div>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Account</th>
+                  <th class="num">Amount</th>
+                  <th class="num">Deduction</th>
+                  <th class="num">TDS</th>
+                  <th class="num">GST</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (obj of Accountlist_step1; track obj) {
+                  <tr>
+                    <td>{{obj.ACCOUNT_NAME}}</td>
+                    <td class="num">{{obj.AMOUNT}}</td>
+                    <td class="num">{{obj.DEDUCTION}}</td>
+                    <td class="num">{{obj.PUR_TDS}}</td>
+                    <td class="num">{{obj.GST}}</td>
+                    <td class="act">
+                      <button type="button" (click)="Editchildrecdstep1(obj.ID)">Edit</button>
+                      <button type="button" (click)="deletechildrecdstep1(obj.ID)">Remove</button>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr><td class="empty" colspan="6">No account lines yet.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div class="pu-totals">
+            <div class="t"><span>Amount</span><input [(ngModel)]="NetAmount_step1" OnlyNumber="true" disabled="disabled" type="text" class="num" maxlength="40"></div>
+            <div class="t grand"><span>Net total</span><input [(ngModel)]="NetTotal_step1" disabled="disabled" type="text" class="num" maxlength="40"></div>
+          </div>
+        </div>
+
+        <div class="bar">
+          <span class="note">Step 1 of 2. Saving opens the purchase step.</span>
+          <div class="r">
+            <button class="btn g" type="button" (click)="RestMain_step1();">Reset</button>
+            <button class="btn p" type="button" [disabled]="buttonStatus" (click)="Add_Mainstep1()">{{text}}</button>
+          </div>
+        </div>
+      </div>
+
+      <div role="tabpanel " class="tab-pane" id="step2">
+        <div class="card sec">
+          <div class="card-h">
+            <h2>General</h2>
+            <span class="meta"><b>*</b> required</span>
+          </div>
+          <div class="fields">
+            <div class="fld">
+              <label>Purchase no. <span class="req">*</span></label>
+              <input [(ngModel)]="PurchaseNo_step2" type="text" [maxlength]="30" [disabled]="true">
+            </div>
+            <div class="fld">
+              <label>Purchase date <span class="req">*</span></label>
+              <my-date-picker name="purchasedate_step2" [options]="myDatePickerOptionsInv" [disabled]='disablepurchasedate_step2'
+                (dateChanged)="PurchaseDate_Step2Changed($event)" [selDate]="purchasedate_step2"></my-date-picker>
+            </div>
+            <div class="fld full">
+              <label>Narration</label>
+              <textarea id="autoresizing" (change)="TextareaValueChange($event)"
+                placeholder="text" cols="50" rows="3" [innerHTML]="Narration_step2"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="card sec">
+          <div class="card-h">
+            <h2>Supplier and invoice</h2>
+          </div>
+          <div class="fields">
+            <div class="fld full">
+              <label>Supplier <span class="req">*</span></label>
+              <ng-select [items]="supplierlist" disabled bindLabel="TEXTFIELD" bindValue="VALUEFIELD"
+                [(ngModel)]="suppliername" (ngModelChange)="GetSupplierName($event)" class="custom"
+                placeholder="--Select--">
+              </ng-select>
+            </div>
+            <div class="fld full">
+              <label>Bill to address <span class="req">*</span></label>
+              <select disabled [(ngModel)]="billaddress">
+                <option value="">Please select</option>
+                @for (d of billaddressfilter; track d) {
+                  <option value={{d.DATAVALUEFIELD}}>{{d.DATATEXTFIELD}}
+                  </option>
+                }
+              </select>
+            </div>
+            <div class="fld">
+              <label>Invoice no. <span class="req">*</span></label>
+              <input [(ngModel)]="InvNo" type="text" maxlength="40">
+            </div>
+            <div class="fld">
+              <label>Invoice date <span class="req">*</span></label>
+              <my-date-picker name="InvDate" [options]="myDatePickerOptions" [(ngModel)]="InvDate"></my-date-picker>
+            </div>
+            <div class="fld">
+              <label>Bill received on <span class="req">*</span></label>
+              <my-date-picker name="BillReceive" [options]="myDatePickerOptions" [(ngModel)]="BillReceive"></my-date-picker>
+            </div>
+            <div class="fld">
+              <label>Due date <span class="req">*</span></label>
+              <my-date-picker name="DueDate" [options]="myDatePickerOptions" [(ngModel)]="DueDate"></my-date-picker>
+            </div>
+          </div>
+        </div>
+
+        <div class="card sec">
+          <div class="card-h">
+            <h2>Account lines</h2>
+            <label class="pu-flag">
+              <span>{{chktdslbl_step2}}</span>
+              <input type="checkbox" [(ngModel)]="chkIsTDS_step2" [disabled]='disablecheckbox' />
+            </label>
+          </div>
+          <div class="fields">
+            <div class="fld full">
+              <label>Account</label>
+              <ng-select [items]="AccountNameStep2List" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
+                (ngModelChange)="GetActName_Step2($event)" [(ngModel)]="AccountName_step2" class="custom"
+                placeholder="--Select--">
+              </ng-select>
+            </div>
+            <div class="fld full">
+              <label>Item</label>
+              <ng-select [items]="Itemslist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="Item_step2"
+                class="custom" placeholder="--Select--">
+              </ng-select>
+            </div>
+            <div class="fld">
+              <label>TDS applicable <span class="req">*</span></label>
+              <select [(ngModel)]="TDSApplicable_step2">
+                <option value="">--Please select--</option>
+                <option value="Y">Y</option>
+                <option value="N">N</option>
+              </select>
+            </div>
+            <div class="fld">
+              <label>GST applicable</label>
+              <select [(ngModel)]="GSTApplicable_step2">
+                <option value="">-- Please Select --</option>
+                <option value="1">Y</option>
+                <option value="0">N</option>
+                <option value="2">RCM</option>
+              </select>
+            </div>
+            <div class="fld">
+              <label>Amount <span class="req">*</span></label>
+              <input [(ngModel)]="Amount_step2" OnlyNumber="true" type="text" class="num" maxlength="40">
+            </div>
+            <div class="fld">
+              <label>Deduction</label>
+              <input [(ngModel)]="Deduction_step2" type="text" OnlyNumber="true" class="num" maxlength="40">
+            </div>
+            <div class="fld">
+              <label>Job no. <span class="req">*</span></label>
+              <input [(ngModel)]="JobNo_step2" type="text" OnlyNumber="true" maxlength="40">
+            </div>
+            <div class="fld">
+              <label>Pass amount</label>
+              <input [(ngModel)]="actpassedamount_step2" type="text" disabled="true" class="num" maxlength="40">
+            </div>
+            <div class="fld full">
+              <label>Line narration</label>
+              <input [(ngModel)]="ActNarration_step2" type="text" [maxlength]="800">
+            </div>
+          </div>
+          <div class="pu-add">
+            <button class="btn p" type="button" (click)="Addchildrcrdstep2()" [disabled]='disablechildaddbtn'>{{txtchild}}</button>
+            <button class="btn g" type="button" [disabled]='disablechildresetbtn' (click)="Resetchildrcrdstep2();">Reset line</button>
+            <button class="btn" type="button" [disabled]='disabletdsbtn' (click)="!disabletdsbtn && OpenTdsModal();">Calculate TDS</button>
+            <button class="btn g" type="button" [disabled]='disableresetbtn' (click)="!disableresetbtn && ResetTDS()">Reset TDS</button>
+          </div>
+
+          <div class="toolbar">
+            <span class="count">{{ Accountlist_step2.length }} {{ Accountlist_step2.length === 1 ? 'line' : 'lines' }}</span>
+          </div>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Account</th>
+                  <th class="num">Amount</th>
+                  <th class="num">Deduction</th>
+                  <th class="num">TDS</th>
+                  <th class="num">GST</th>
+                  <th>Item</th>
+                  <th>Job no.</th>
+                  <th>Narration</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (obj of Accountlist_step2; track obj) {
+                  <tr>
+                    <td><span [innerHtml]="obj.ACCOUNT_NAME"></span></td>
+                    <td class="num">{{obj.AMOUNT}}</td>
+                    <td class="num">{{obj.DEDUCTION}}</td>
+                    <td class="num">{{obj.PUR_TDS}}</td>
+                    <td class="num">{{obj.GST}}</td>
+                    <td>{{obj.ITEM}}</td>
+                    <td class="mono">{{obj.JOBNO}}</td>
+                    <td>@if (obj.CLIENT=='G100741') {
+                      <span [innerHtml]="obj.NARRATION"></span>
+                    }
+                    @if (obj.CLIENT!='G100741') {
+                      <span>{{obj.NARRATION}}</span>
+                    }</td>
+                    <td class="act">
+                      <button type="button" (click)="Editchildrecdstep2(obj.ID)">Edit</button>
+                      <button type="button" (click)="deletechildrecdstep2(obj.ID,obj.IS_NOT_EDIT_ABLE)">Remove</button>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr><td class="empty" colspan="9">No account lines yet.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div class="pu-totals">
+            <div class="t"><span>Amount</span><input [(ngModel)]="NetAmount_step2" OnlyNumber="true" disabled="disabled" type="text" class="num" maxlength="40"></div>
+            <div class="t"><span>Deduction</span><input [(ngModel)]="Netdeduction_step2" OnlyNumber="true" disabled="disabled" type="text" class="num" maxlength="40"></div>
+            <div class="t grand"><span>Net total</span><input [(ngModel)]="NetAmt_step2" disabled="disabled" type="text" class="num" maxlength="40"></div>
+          </div>
+        </div>
+
+        <div class="bar">
+          <span class="note">Step 2 of 2. Nothing is saved until you choose {{text}}.</span>
+          <div class="r">
+            <button class="btn g" type="button" (click)="Reset();">Reset</button>
+            <button class="btn p" type="button" (click)="supplier_validation()">{{text}}</button>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <div class="modal pu-modal" [style.display]="showModal_TDS ? 'block' : 'none' ">
+    <div class="modal-dialog modal-lg pu-wide" role="document">
+      <div class="modal-content">
+        <div class="card-h"><h2>TDS details</h2></div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Account</th>
+                <th>Section</th>
+                <th class="num">LDC limit</th>
+                <th class="num">Utilized amt</th>
+                <th class="num">LDC rate %</th>
+                <th class="num">Base rate %</th>
+                <th class="num">PI amt</th>
+                <th class="num">TDS amount</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (obj of TDSList ; track obj) {
+                <tr>
+                  <td>
+                    <input type="checkbox" [(ngModel)]="obj.Checked" [id]="i" [value]="i" [disabled]="obj.Disabled"
+                      (ngModelChange)="getCheckedTDSData($event,obj.TDSACCTID,obj.RATE,obj.TDSAMOUNT,obj.AMOUNT,obj.ITEMCODE,obj.NARRATION,obj.RATETYPE,obj.ACCTID,obj.OFFLAG)">
+                  </td>
+                  <td>{{obj.ACCTNAME}}</td>
+                  <td>{{obj.SECTIONNAME}}</td>
+                  <td class="num">{{obj.TDS_LIMIT_AMT}}</td>
+                  <td class="num">{{obj.UTIAMT}}</td>
+                  <td class="num">{{obj.LDCRATE}}</td>
+                  <td class="num">{{obj.RATE}}</td>
+                  <td class="num">{{obj.AMOUNT}}</td>
+                  <td class="num">{{obj.TDSAMOUNT}}</td>
+                  <td>{{obj.NARRATION}}</td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="10">No TDS rows.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="pu-sum">
+          <span><span class="k">Total PI amount </span><b>{{totpiamt}}</b></span>
+          <span><span class="k">Selected PI amount </span><b>{{seltaxableamt}}</b></span>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Section</th>
+                <th class="num">Total TDS amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (obj of TotalTDSList ; track obj) {
+                <tr>
+                  <td><b>{{obj.SECTIONNAME}}</b></td>
+                  <td class="num"><b>{{obj.TOTTDSAMOUNT}}</b></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="bar">
+          <div class="r">
+            <button class="btn g" type="button" (click)="closeTdsModal()">Close</button>
+            <button class="btn p" type="button" (click)="AddtdsDetails()">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

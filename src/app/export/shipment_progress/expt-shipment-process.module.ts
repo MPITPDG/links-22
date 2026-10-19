@@ -37,7 +37,9 @@ import { CartingSea,
          ListCartingSea,
          manageCartingSea } from './carting-sea.sp.component';
 import { TransfervslCartingSea } from './carting-transfer-vessel.sp.component';
-import {ButtonService,FontChangerComponent} from './../../shared/common-font-changer.directive' 
+import {ButtonService,FontChangerComponent} from './../../shared/common-font-changer.directive'
+import { BlUpdateComponent } from './bl-details-update.component';
+import { SpWorkspaceComponent } from './sp-workspace.component';
 @NgModule({
     imports: [ExportshipmentprocessRoutingModule,
         FormsModule,
@@ -55,7 +57,7 @@ import {ButtonService,FontChangerComponent} from './../../shared/common-font-cha
         ContainerLoadingShipmentProgressComponent, PrepaidfrtApprovShipmentProgressComponent,  dimensionShipmentProgressComponent ,
          SearchCartingSea,CartingSea,TransfervslCartingSea,ListCartingSea,manageCartingSea ,PendingShipReportShipmentProgressComponent ,
          UpdateContainerLoadingShipmentProgressComponent,ReportContainerLoadingShipmentProgressComponent,
-         CommonViewShipmentProgressComponent,ViewContainerLoadingShipmentProgressComponent,FontChangerComponent],
+         CommonViewShipmentProgressComponent,ViewContainerLoadingShipmentProgressComponent,FontChangerComponent,BlUpdateComponent,SpWorkspaceComponent],
     providers: [ButtonService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

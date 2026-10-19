@@ -1,69 +1,47 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>{{Header| uppercase}}</strong>
-                </div>
-            </div>
-        </div>
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{Header| uppercase}}</h1>
+      <p>City master</p>
     </div>
-    <div class="row">
-        <div class="col-sm-3">  </div>
-        <div class="col-sm-6">
-            <table class="table table-bordered table-sm-new bgwhite">       
-                <tr>
-                    <td class="col-form-span-heading" colspan="2">
-                        CITY DETAILS
-                    </td>
-                </tr>
-                <tr>   
-                    <td><span class="col-form-span-label"><b>City Code(3 digit IATA code)</b> </span></td>         
-                    <td>  <input [(ngModel)]="txtcity_code" type="text"    class="form-control width180"   >   </td> 
-                   
-                </tr>
-                
-                <tr >
-                    <td><span class="col-form-span-label"><b>City Name</b> </span></td>         
-                    <td>  <input [(ngModel)]="txtcity_name" type="text"    class="form-control width180"   >   </td>      
-                </tr>
-                 <tr>
-                    <td><span class="col-form-span-label"><b>Country</b> </span></td>         
-                    <td> 
-                        <select class="form-control width180"  [(ngModel)]="drpcity_country">
-                            <option value="">Please select</option>
-                            @for (d of Countrylist; track d) {
-<option value={{d.country_name}}>{{d.country_name}}</option>
-}
-                        </select>
-                    </td> 
-                    
-                </tr>
-                <tr>
-                    <!-- <td><span class="col-form-span-label"><b></b> </span></td>          -->
-                    <td colspan="2" class="" > 
-                        @for (data of Transpoints; track data) {
-<div class="col-form-span-label ">
-                                <input type="checkbox" class="centerlabel" (change)="onChange(data.Transpoint, $event.target.checked)"   > {{data.Transpoint}}<br>
-                        </div>
-}
-                        <!-- <input  type="checkbox"  [(ngModel)]="chkcity"   >  -->
-                    </td> 
-                </tr>
-                <tr class="trheader">
-                    <td colspan="2"><span class="col-form-span-label"><b> DOCUMENTATION</b> </span></td>  
-                </tr>
-                <tr>
-                    <td colspan="2" class="centerlabel"> 
-                    <button type="button" class="btn btn-sm btn-primary" (click)="finalSubmit()"><span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Submit</span></button>
-                    <button type="reset" class="btn btn-sm btn-danger"><span class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
-                    </td>
-                </tr>
-            </table>    
+  </div>
+
+  <div class="card sec">
+    <div class="card-h"><h2>City Details</h2></div>
+    <div class="fields">
+      <div class="fld">
+        <label>City Code (3 digit IATA code) <span class="req">*</span></label>
+        <input [(ngModel)]="txtcity_code" type="text" class="form-control">
+      </div>
+      <div class="fld">
+        <label>City Name <span class="req">*</span></label>
+        <input [(ngModel)]="txtcity_name" type="text" class="form-control">
+      </div>
+      <div class="fld">
+        <label>Country <span class="req">*</span></label>
+        <select class="form-control" [(ngModel)]="drpcity_country">
+          <option value="">Please select</option>
+          @for (d of Countrylist; track d) {
+            <option value={{d.country_name}}>{{d.country_name}}</option>
+          }
+        </select>
+      </div>
+      <div class="fld full">
+        <label>Documentation</label>
+        <div class="inl" style="display:flex; flex-wrap:wrap; gap:14px;">
+          @for (data of Transpoints; track data) {
+            <label style="font-weight:normal;"><input type="checkbox" (change)="onChange(data.Transpoint, $event.target.checked)"> {{data.Transpoint}}</label>
+          }
         </div>
-        <!-- <div class="card-footer">
-                <button type="button" class="btn btn-sm btn-primary" (click)="finalSubmit()"><span class="col-form-span-label"><i class="fa fa-dot-circle-o"></i> Submit</span></button>
-                <button type="reset" class="btn btn-sm btn-danger"><span class="col-form-span-label"><i class="fa fa-ban"></i> Reset</span></button>
-        </div> -->
-        <div class="col-sm-3">  </div>
+      </div>
     </div>
+  </div>
+
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose Submit.</span>
+    <div class="r">
+      <button class="btn g" type="reset">Reset</button>
+      <button class="btn p" type="button" (click)="finalSubmit()">Submit</button>
+    </div>
+  </div>
+</div>

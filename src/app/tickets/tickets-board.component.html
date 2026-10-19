@@ -1,0 +1,316 @@
+<div class="tk-page" [class.tk-with-drawer]="mode() !== ''">
+  <div class="tk-main">
+    <div class="hd">
+      <button type="button" class="btn pri" (click)="openRaise()" [disabled]="unavailable()"
+              [title]="unavailable() ? 'The ticket server is not reachable yet' : ''">+ Raise ticket</button>
+      @if (isDev()) {
+        <h1>Tickets</h1><span class="pill dark">Developer</span>
+        <div class="fld actor"><label>Acting as</label>
+          <select [ngModel]="actor()" (ngModelChange)="setActor($event)" [class.need]="!actor()">
+            <option value="">Choose…</option>
+            @for (a of actors(); track a.code) { <option [value]="a.code">{{ a.name }}</option> }
+          </select>
+        </div>
+      } @else {
+        <h1>My tickets</h1>
+      }
+      <span class="spacer"></span>
+      <span class="muted">Logged in as <b>{{ me.userName }}@if (!isDev() && me.cityCode) { · {{ me.cityCode }}}</b></span>
+      @if (isDev()) {
+        <p>All tickets from every user. Move any card between columns; the user who raised it is notified.</p>
+      } @else {
+        <p>Every ticket you raised, by status. Developers move them; you get a bell notification on each move.</p>
+      }
+    </div>
+
+    @if (unavailable()) {
+      <div class="offline" role="status">
+        <span><b>Tickets are not available yet.</b> The ticket server did not answer, so nothing can be listed or raised right now.</span>
+        <span class="spacer"></span>
+        <button type="button" class="btn sm" (click)="load()">Retry</button>
+      </div>
+    }
+
+    @if (isDev() && stats(); as s) {
+      <div class="dash">
+        <div class="dash-hd" role="button" tabindex="0" (click)="toggleDash()" (keydown.enter)="toggleDash()">
+          <span>Dashboard</span><span class="spacer"></span><span class="tg">{{ dashOpen() ? 'Hide' : 'Show' }} {{ dashOpen() ? '▲' : '▼' }}</span>
+        </div>
+        @if (dashOpen()) {
+          <div class="td-tiles">
+            <div class="td-tile"><div class="k">Open</div><div class="v">{{ s.totals.OPEN }}</div>
+              <div class="s">{{ s.totals.OLDEST_OPEN_DAYS !== null ? 'oldest ' + s.totals.OLDEST_OPEN_DAYS + ' d' : 'none open' }}</div></div>
+            <div class="td-tile"><div class="k">In progress</div><div class="v">{{ s.totals.INPROGRESS }}</div><div class="s">{{ s.totals.RAISED }} waiting in Raised</div></div>
+            <div class="td-tile"><div class="k">Resolved this week</div><div class="v">{{ s.totals.RESOLVED_7D }}</div><div class="s">{{ s.totals.RAISED_7D }} raised this week</div></div>
+            <div class="td-tile"><div class="k">Resolved 30 days</div><div class="v">{{ s.totals.RESOLVED_30D }}</div>
+              <div class="s">{{ s.totals.AVG_RESOLVE_HOURS_30D !== null ? 'avg ' + s.totals.AVG_RESOLVE_HOURS_30D + ' h to resolve' : 'no average yet' }}</div></div>
+            <div class="td-tile"><div class="k">Raised 30 days</div><div class="v">{{ s.totals.RAISED_30D }}</div><div class="s">{{ s.totals.RESOLVED_ALL }} resolved all time</div></div>
+            <div class="td-tile"><div class="k">Discarded</div><div class="v">{{ s.totals.DISCARDED_ALL }}</div><div class="s">all time</div></div>
+          </div>
+          <div class="dash-row">
+            <div class="dcard">
+              <div class="band">By person</div>
+              <table class="dt">
+                <thead><tr><th>Name</th><th class="n">Open</th><th class="n">In progress</th><th class="n">Resolved 30d</th><th class="n">Resolved all</th><th class="n">Avg h</th></tr></thead>
+                <tbody>
+                  @for (p of s.people; track p.code) {
+                    <tr><td><span class="av">{{ p.code }}</span> {{ p.display_name }}</td><td class="n">{{ p.open }}</td><td class="n">{{ p.inprogress }}</td>
+                      <td class="n">{{ p.resolved_30d }}</td><td class="n">{{ p.resolved_all }}</td><td class="n">{{ hrs(p.avg_resolve_hours_30d) }}</td></tr>
+                  } @empty { <tr><td colspan="6" class="muted">No data</td></tr> }
+                </tbody>
+              </table>
+            </div>
+            <div class="dcard">
+              <div class="band">Last 8 weeks</div>
+              <div class="bars">
+                @for (w of s.weeks; track w.week_start) {
+                  <div class="wk" [title]="'Week of ' + wk(w.week_start) + ': ' + w.raised + ' raised, ' + w.resolved + ' resolved'">
+                    <div class="pair">
+                      <span class="b raised" [style.height.%]="pct(w.raised)"></span>
+                      <span class="b resolved" [style.height.%]="pct(w.resolved)"></span>
+                    </div>
+                    <div class="lb">{{ wk(w.week_start) }}</div>
+                  </div>
+                }
+              </div>
+              <div class="legend"><span><i class="sw raised"></i>Raised</span><span><i class="sw resolved"></i>Resolved</span></div>
+            </div>
+            @if (s.branches.length) {
+              <div class="dcard narrow">
+                <div class="band">By branch</div>
+                <table class="dt">
+                  <thead><tr><th>Branch</th><th class="n">Open</th><th class="n">Resolved 30d</th></tr></thead>
+                  <tbody>
+                    @for (b of s.branches; track b.raised_city) {
+                      <tr><td>{{ b.raised_city }}</td><td class="n">{{ b.open }}</td><td class="n">{{ b.resolved_30d }}</td></tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    @if (isDev()) {
+      <div class="fbar">
+        <div class="fld"><label>Assigned to</label>
+          <select [ngModel]="assignedTo()" (ngModelChange)="assignedTo.set($event); load()">
+            <option value="">Everyone</option>
+            @for (a of assignees(); track a.code) { <option [value]="a.code">{{ a.display_name }}</option> }
+          </select>
+        </div>
+        <div class="fld"><label>Branch</label>
+          <select [ngModel]="branch()" (ngModelChange)="branch.set($event); load()">
+            <option value="">All</option>
+            @for (b of branches(); track b) { <option [value]="b">{{ b }}</option> }
+          </select>
+        </div>
+        <div class="fld"><label>Show</label>
+          <select [ngModel]="show()" (ngModelChange)="show.set($event); load()">
+            <option value="open">Open (raised + in progress)</option>
+            <option value="all">All incl. completed</option>
+            <option value="discarded">Discarded only</option>
+          </select>
+        </div>
+        <div class="fld grow"><label>Search</label>
+          <input [ngModel]="q()" (ngModelChange)="q.set($event)" (keydown.enter)="load()" placeholder="Ticket no (L-000001), subject, user or job no">
+        </div>
+        <button type="button" class="btn pri" (click)="load()">Search</button>
+      </div>
+    }
+
+    <div class="board" [class.dim]="loading()">
+      @for (c of columns(); track c.v) {
+        <div class="col" [class.over]="dragOver() === c.v"
+             (dragover)="onColDragOver($event, c.v)" (dragleave)="onColDragLeave($event, c.v)" (drop)="onColDrop($event, c.v)">
+          <h3>{{ c.t }}<span class="n">{{ c.n }}</span></h3>
+          <div class="items">
+            @for (t of c.rows; track t.ticket_id) {
+              <div class="tk" [class.dragging]="dragId === t.ticket_id"
+                   [attr.draggable]="isDev() ? 'true' : null"
+                   (dragstart)="onDragStart($event, t)" (dragend)="onDragEnd()"
+                   (click)="openDetail(t.ticket_id)">
+                <div class="no">{{ t.ticket_no }} · {{ age(t) }} ago</div>
+                <div class="subj">{{ t.subject }}</div>
+                <div class="meta">
+                  @if (isDev()) { <span>by <b>{{ t.raised_by_name }}@if (t.raised_city) { · {{ t.raised_city }}}</b></span> }
+                  <span><span class="av">{{ t.assigned_code || initial(t.assigned_name) }}</span> {{ t.assigned_name }}</span>
+                  @if (t.file_count) { <span class="att">&#128206; {{ t.file_count }}</span> }
+                  @if (t.comment_count) { <span class="att">&#128172; {{ t.comment_count }}</span> }
+                </div>
+                @if (t.last_remark) { <div class="remark sm">{{ t.last_remark }}</div> }
+                @if (isDev()) {
+                  @if (pending()?.id === t.ticket_id) {
+                    <div class="mvbox" (click)="$event.stopPropagation()">
+                      <div class="muted">Move to <b>{{ label(pending()!.to) }}</b></div>
+                      <textarea rows="2" [ngModel]="pendingRemark()" (ngModelChange)="pendingRemark.set($event)" placeholder="Remark (optional, sent to the user)"></textarea>
+                      <div class="mv">
+                        <button type="button" class="btn pri sm" [disabled]="busy()" (click)="confirmMove()">Move</button>
+                        <button type="button" class="btn sm" (click)="cancelMove()">Cancel</button>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="mv" (click)="$event.stopPropagation()">
+                      <select #mvSel (change)="askMove(t, mvSel.value, mvSel)">
+                        <option value="">Move to…</option>
+                        @for (s of statuses; track s.v) { @if (s.v !== t.status) { <option [value]="s.v">{{ s.t }}</option> } }
+                      </select>
+                    </div>
+                  }
+                }
+              </div>
+            } @empty {
+              <div class="empty">{{ loading() ? 'Loading…' : 'Nothing here' }}</div>
+            }
+            @if (c.more > 0) { <div class="empty">+{{ c.more }} more (narrow the filter)</div> }
+          </div>
+        </div>
+      }
+    </div>
+    @if (isDev()) {
+      <p class="note">Drag a card to another column, or use the <b>Move to</b> select on the card. Completed and Discarded hide after 30 days unless "All" is chosen.</p>
+    } @else {
+      <p class="note">Click a card to see its history or add a comment. Completed and Discarded tickets hide after 30 days.</p>
+    }
+  </div>
+
+  @if (mode() === 'raise') {
+    <div class="drawer" (paste)="onPaste($event)">
+      <div class="dh">Raise ticket <button type="button" class="x" (click)="closeDrawer()" aria-label="Close">&#10005;</button></div>
+      <div class="band">Ticket</div>
+      <div class="frm">
+        <div class="row"><label>Assign to</label>
+          <div><select [ngModel]="fAssign()" (ngModelChange)="fAssign.set($event)">
+            <option value="">Choose…</option>
+            @for (a of assignees(); track a.code) { <option [value]="a.code">{{ a.display_name }}</option> }
+          </select></div>
+        </div>
+        <div class="row"><label>Subject</label><input maxlength="200" [ngModel]="fSubject()" (ngModelChange)="fSubject.set($event)" placeholder="One line: what is wrong"></div>
+        <div class="row"><label>Page</label>
+          <div><input maxlength="500" [ngModel]="fPage()" (ngModelChange)="fPage.set($event)" placeholder="/export/...">
+            <div class="hint">Pre-filled with the page you came from. Edit if the problem is elsewhere.</div></div>
+        </div>
+        <div class="row"><label>Description</label><textarea rows="7" [ngModel]="fDesc()" (ngModelChange)="fDesc.set($event)" placeholder="What you did, what you expected, what happened. Job numbers help."></textarea></div>
+      </div>
+      <div class="band">Screenshots</div>
+      <div class="frm">
+        <div class="drop" [class.hot]="dropHot()" (dragover)="onDropOver($event)" (dragleave)="dropHot.set(false)" (drop)="onDropFiles($event)">
+          Paste a screenshot (Ctrl+V), drop images here, or <a class="lnk" (click)="fileIn.click()">browse</a> · PNG/JPG/PDF up to 5 MB each, 25 MB per ticket
+          <input #fileIn type="file" multiple hidden accept=".png,.jpg,.jpeg,.gif,.webp,.pdf" (change)="onBrowse(fileIn)">
+        </div>
+        @if (shots().length) {
+          <div class="hint">{{ shots().length }} {{ shots().length === 1 ? 'file' : 'files' }}, {{ mb(shotBytes()) }} of 25 MB</div>
+          <div class="thumbs">
+            @for (s of shots(); track s.url; let i = $index) {
+              <div class="th" [title]="s.file.name">
+                @if (s.isImage) { <img [src]="s.url" alt=""> } @else { <span class="pdf">PDF</span> }
+                <span class="nm">{{ s.file.name }}</span>
+                <button type="button" class="x" (click)="removeShot(i)" aria-label="Remove">&#10005;</button>
+              </div>
+            }
+          </div>
+        }
+        @if (fErr()) { <div class="err">{{ fErr() }}</div> }
+      </div>
+      <div class="foot">
+        <button type="button" class="btn pri" [disabled]="busy()" (click)="raise()">{{ busy() ? 'Raising…' : 'Raise' }}</button>
+        <button type="button" class="btn" (click)="closeDrawer()">Discard</button>
+        <span class="spacer"></span>
+        <span class="muted by">Raised by {{ me.userName }}@if (me.cityCode) { · {{ me.cityCode }}}</span>
+      </div>
+    </div>
+  }
+
+  @if (mode() === 'detail') {
+    <div class="drawer">
+      @if (detail()?.ticket; as t) {
+        <div class="dh"><span class="mono">{{ t.ticket_no }}</span> {{ t.subject }} <button type="button" class="x" (click)="closeDrawer()" aria-label="Close">&#10005;</button></div>
+        <div class="kv">
+          <b>Status</b><span><span class="pill" [class.dark]="t.status === 'INPROGRESS' || t.status === 'RAISED'">{{ label(t.status) }}</span></span>
+          <b>Raised by</b><span>{{ t.raised_by_name }}@if (t.raised_city) { · {{ t.raised_city }}} · {{ dt(t.raised_at) }}</span>
+          <b>Assigned to</b>
+          <span>
+            <span class="av">{{ t.assigned_code || initial(t.assigned_name) }}</span> {{ t.assigned_name }}
+            @if (isDev()) {
+              @if (!reassignOpen()) {
+                <button type="button" class="btn sm ghost ml" (click)="reassignOpen.set(true)">Reassign</button>
+              } @else {
+                <span class="ra">
+                  <select [ngModel]="reassignTo()" (ngModelChange)="reassignTo.set($event)">
+                    @for (a of assignees(); track a.code) { <option [value]="a.code">{{ a.display_name }}</option> }
+                  </select>
+                  <button type="button" class="btn sm pri" [disabled]="busy()" (click)="doReassign()">Save</button>
+                  <button type="button" class="btn sm" (click)="reassignOpen.set(false)">Cancel</button>
+                </span>
+              }
+            }
+          </span>
+          @if (t.page_url) {
+            <b>Page</b><span><a class="mono lnk" (click)="openPage(t.page_url)" [title]="t.page_title || t.page_url">{{ t.page_url }}</a></span>
+          }
+        </div>
+        <div class="band">Description</div>
+        <div class="desc">{{ t.description }}</div>
+        @if (detail()!.files.length) {
+          <div class="band">Screenshots ({{ detail()!.files.length }})</div>
+          <div class="frm"><div class="thumbs">
+            @for (f of detail()!.files; track f.file_id) {
+              <a class="th" [href]="fileUrl(f.file_id)" target="_blank" rel="noopener" [title]="f.file_name">
+                @if (isImg(f.content_type, f.file_name)) { <img [src]="fileUrl(f.file_id)" alt=""> } @else { <span class="pdf">PDF</span> }
+                <span class="nm">{{ f.file_name }}</span>
+              </a>
+            }
+          </div></div>
+        }
+        <div class="band">History</div>
+        <ul class="tl">
+          @for (e of detail()!.events; track e.event_id) {
+            <li><span class="w">{{ dt(e.at, false) }}</span>
+              <span>
+                @if (e.event_type === 'STATUS') {
+                  Moved <b>{{ label(e.from_status) }} &rarr; {{ label(e.to_status) }}</b> by {{ e.by_name }}
+                } @else if (e.event_type === 'RAISED') {
+                  Raised by {{ e.by_name }}@if (detail()!.events.length === 1 || $first) {, assigned to {{ t.assigned_name }}}
+                } @else { {{ evText(e) }} }
+                @if (e.remark) { <div class="remark">{{ e.remark }}</div> }
+              </span>
+            </li>
+          } @empty { <li><span class="w"></span><span class="muted">No history yet</span></li> }
+        </ul>
+        <div class="band">Comment</div>
+        <div class="frm">
+          <div class="row"><label>Comment</label>
+            <textarea rows="2" [ngModel]="commentText()" (ngModelChange)="commentText.set($event)"
+                      [placeholder]="isOwner() ? 'Goes to the assigned developer' : 'Goes to the user who raised it'"></textarea></div>
+          <div class="row"><span></span><div><button type="button" class="btn sm" [disabled]="busy() || !commentText().trim()" (click)="addComment()">Add comment</button></div></div>
+        </div>
+        @if (isDev()) {
+          <div class="band">Developer · move</div>
+          <div class="frm">
+            <div class="row"><label>Move to</label>
+              <select [ngModel]="mvTo()" (ngModelChange)="mvTo.set($event)">
+                @for (s of statuses; track s.v) { <option [value]="s.v">{{ s.t }}</option> }
+              </select></div>
+            <div class="row"><label>Remark</label><textarea rows="2" [ngModel]="mvRemark()" (ngModelChange)="mvRemark.set($event)" placeholder="Optional, sent to the user"></textarea></div>
+          </div>
+          <div class="foot">
+            <button type="button" class="btn pri" [disabled]="busy()" (click)="updateMove()">Update</button>
+            <button type="button" class="btn" (click)="closeDrawer()">Close</button>
+          </div>
+        } @else {
+          <div class="foot">
+            @if (isOwner() && t.status === 'RAISED') {
+              <button type="button" class="btn" [disabled]="busy()" (click)="discardOwn()">Discard ticket</button>
+            }
+            <span class="spacer"></span>
+            <button type="button" class="btn" (click)="closeDrawer()">Close</button>
+          </div>
+        }
+      } @else {
+        <div class="dh">{{ detailLoading() ? 'Loading…' : 'Ticket' }} <button type="button" class="x" (click)="closeDrawer()" aria-label="Close">&#10005;</button></div>
+      }
+    </div>
+  }
+</div>

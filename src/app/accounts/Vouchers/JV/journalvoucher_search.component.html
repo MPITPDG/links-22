@@ -1,188 +1,159 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>Search</strong>
-                </div>
+<!--
+  Journal voucher / JV request - search.
+  Monochrome page kit. Opens with the last 30 days (ACC_JV_SEARCH, DATE); a user search keeps
+  its legacy behaviour (one hit opens the voucher, none toasts). Search-by drives the same Type
+  model the old radio buttons did; Print opens the same #/popup/Account-JV-Print window.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ STATUS == 'JVREQ' ? 'Journal voucher requests' : 'Journal vouchers' }}</h1>
+      <p>Find a voucher by number, job, invoice, client, amount or date; open it to edit or print</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="fields">
+      <div class="fld">
+        <label for="jvType">Search by</label>
+        <select id="jvType" name="check" [(ngModel)]="Type">
+          <option value="CODE">Voucher no.</option>
+          <option value="JOBNO">Job no.</option>
+          <option value="INVOICENO">Invoice no.</option>
+          <option value="CLIENT">Client</option>
+          <option value="AMOUNT">Amount</option>
+          <option value="DATE">Date range</option>
+          <option value="PRINTAV">Print vouchers of a day</option>
+          <option value="DISPLAY">Display</option>
+        </select>
+      </div>
+      @switch (Type) {
+        @case ('CODE') {
+          <div class="fld">
+            <label>Voucher no.</label>
+            <div class="v-pair">
+              <input type="text" [(ngModel)]="VoucherNo" [maxlength]="15" [OnlyNumber]="true" [disabled]="Type!='CODE'" (keyup.enter)="search()" />
+              <button type="button" name="printButton" class="btn g" (click)="Print();" [disabled]="Type!='CODE'">Print</button>
             </div>
+          </div>
+        }
+        @case ('JOBNO') {
+          <div class="fld">
+            <label>Job no.</label>
+            <input type="text" [(ngModel)]="JobNo" [maxlength]="15" [OnlyNumber]="true" [disabled]="Type!='JOBNO'" (keyup.enter)="search()" />
+          </div>
+        }
+        @case ('INVOICENO') {
+          <div class="fld">
+            <label>Invoice no.</label>
+            <input type="text" [(ngModel)]="InvoiceNo" [OnlyNumber]="true" [maxlength]="15" [disabled]="Type!='INVOICENO'" (keyup.enter)="search()" />
+          </div>
+        }
+        @case ('CLIENT') {
+          <div class="fld">
+            <label>Client</label>
+            <ng-select [items]="AccountList" bindLabel="ACCTNAME"
+              bindValue="ACCTCODENAME" [(ngModel)]="Account"
+              class="custom" placeholder="--Please Select--">
+            </ng-select>
+          </div>
+        }
+        @case ('AMOUNT') {
+          <div class="fld">
+            <label>Amount</label>
+            <input type="text" [(ngModel)]="Amount" [OnlyNumber]="true" [maxlength]="15" [disabled]="Type!='AMOUNT'" (keyup.enter)="search()" />
+          </div>
+        }
+        @case ('DATE') {
+          <div class="fld">
+            <label>From</label>
+            <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate" [disabled]="Type!='DATE'"></my-date-picker>
+          </div>
+          <div class="fld">
+            <label>To</label>
+            <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate" [disabled]="Type!='DATE'"></my-date-picker>
+          </div>
+        }
+        @case ('PRINTAV') {
+          <div class="fld">
+            <label>Date</label>
+            <my-date-picker name="Day" [options]="myDatePickerOptions" [(ngModel)]="VoucherDay" [disabled]="Type!='PRINTAV'"></my-date-picker>
+          </div>
+        }
+        @case ('DISPLAY') {
+          <div class="fld">
+            <label>Display</label>
+            <div class="v-radios">
+              <label><input type="radio" name="radioDisplay" value="0" [(ngModel)]="Display" [disabled]="Type!='DISPLAY'" /> List</label>
+              <label><input type="radio" name="radioDisplay" value="1" [(ngModel)]="Display" [disabled]="Type!='DISPLAY'" /> Details</label>
+            </div>
+          </div>
+        }
+      }
+      <div class="fld full">
+        <label>Filter results</label>
+        <div class="v-pair">
+          <input type="text" [(ngModel)]="Quick" (ngModelChange)="page = 1" placeholder="Voucher no., date or amount in the list below" />
+          <button type="button" name="submitButton" class="btn p" (click)="search();">Search</button>
         </div>
+      </div>
     </div>
-    @if (displayType=='SEARCH') {
-<div class="row">
-        <div class="col-sm-3">
-        </div>
-        <div class="col-sm-6">
-            <table class="table table-sm-new bgwhite">
-                <tr class="trbg">
-                    <td class="width150">
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="CODE" [(ngModel)]="Type" />&nbsp;Voucher No</span>
-                    </td>
-                    <td class="width150">
-                        <input type="text" [(ngModel)]="VoucherNo" class="form-control width150" [maxlength]="15" [OnlyNumber]="true" [disabled]="Type!='CODE'"
-                        />
-                    </td>
-                    <td>
-                        <button type="button" name="printButton" class="btn btn-sm btn-primary" (click)="Print();" [disabled]="Type!='CODE'">
-                            <span class="col-form-span-label">
-                                <i class="fa fa-print"></i> Print</span>
-                        </button>
-                    </td>
-                </tr>
-                <tr class="trbg">
-                    <td  class="width150">
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="JOBNO" [(ngModel)]="Type" />&nbsp;Job No</span>
-                    </td>
-                    <td colspan="3" >
-                        <input type="text" [(ngModel)]="JobNo"   class="form-control" [maxlength]="15" class="form-control width150" [OnlyNumber]="true" [disabled]="Type!='JOBNO'"
-                        />
-                    </td>
-                   
-                </tr>
-                <tr class="trbg">
-                    <td class="width150">
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="INVOICENO" [(ngModel)]="Type" />&nbsp;Invoice No</span>
-                    </td>
-                    <td colspan="3"  >
-                        <input type="text" [(ngModel)]="InvoiceNo" [OnlyNumber]="true" class="form-control" [maxlength]="15" class="form-control width150" [disabled]="Type!='INVOICENO'"
-                        />
-                    </td>
-                   
-                </tr>
-                <tr class="trbg">
-                    <td class="width150">
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="CLIENT" [(ngModel)]="Type" />&nbsp;Client</span>
-                    </td>
-                    <td colspan="2">
-                       
-                                 <!-- <select class="form-control width200"  [(ngModel)]="Account" [disabled]="Type!='CLIENT'">
-                                    <option value="">Please select</option>
-                                    <option *ngFor="let d of AccountList" value={{d.ACCTCODENAME}}>{{d.ACCTNAME}}</option> 
-                                </select> -->
-                                <ng-select   [items]="AccountList" bindLabel="ACCTNAME" 
-                                bindValue="ACCTCODENAME"  [(ngModel)]="Account"  (ngModelChange)="GetAccountName($event)"
-                                class="custom" placeholder="--Please Select--">
-                                 </ng-select>
-                       
-                    </td>
-                </tr>
-              
-                <tr class="trbg">
-                    <td class="width150">
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="AMOUNT" [(ngModel)]="Type" />&nbsp;Amount</span>
-                    </td>
-                    <td colspan="3"  >
-                        <input type="text" [(ngModel)]="Amount" [OnlyNumber]="true"  [maxlength]="15" class="form-control width150" [disabled]="Type!='AMOUNT'"
-                        />
-                    </td>
-                   
-                </tr>
-                <tr class="trbg">
-                    <td  class="width150">
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="DATE" [(ngModel)]="Type" />&nbsp; Date Wise</span>
-                    </td>
-                    <td colspan="3">
-                        <span class="col-form-span-label">From</span>
-                        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate" [disabled]="Type!='DATE'"></my-date-picker>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <span class="col-form-span-label">To</span>
-                        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate" [disabled]="Type!='DATE'"></my-date-picker>
-                    </td>
-                
-                </tr>
-                
-                <tr class="trbg">
-                    <td  class="width150">
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="PRINTAV" [(ngModel)]="Type" />&nbsp; Print Vouchers of a day</span>
-                    </td>
-                    <td colspan="3">
-                      
-                            <span class="col-form-span-label">Date</span>
-                            <my-date-picker name="Day" [options]="myDatePickerOptions" [(ngModel)]="VoucherDay" [disabled]="Type!='PRINTAV'"></my-date-picker>
-                       
-                    </td>
-                </tr>
-                <tr class="trbg">
-                    <td  class="width150">
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="DISPLAY" [(ngModel)]="Type" />&nbsp;Display</span>
-                    </td>
-                    <td colspan="3">
-                      
-                        <div class="leftlabel">
-                            <span class="col-form-span-label">
-                                <input type="radio" name="radioDisplay" value="0" [(ngModel)]="Display"  [disabled]="Type!='DISPLAY'"/>&nbsp;List</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <span class="col-form-span-label">
-                                <input type="radio" name="radioDisplay" value="1" [(ngModel)]="Display"  [disabled]="Type!='DISPLAY'"/>&nbsp;Details</span>
-                        </div>
-                    </td>
-                </tr>
-             
-                <tr class="trbg centerlabel">
-                    <td colspan="3">
-                        <button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="search();">
-                            <span class="col-form-span-label">
-                                <i class="fa fa-search"></i> Search</span>
-                                      
-                        </button>
-                        <button class="btn btn-sm btn-danger" type="reset">
-                            <span class="col-form-span-label" (click)="ResetAll();"><i class="fa fa-ban"></i> Reset</span></button> 
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-3">
-        </div>
+
+    <div class="toolbar">
+      <span>
+        <span class="count">{{ Filtered.length }} {{ Filtered.length === 1 ? 'voucher' : 'vouchers' }}</span>
+        <span class="sub-t"> {{ searchHeaderText }}</span>
+      </span>
+      <span class="tb-r">
+        <button class="btn g" type="reset" (click)="clearList();">Clear</button>
+        <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!Filtered.length">Export</button>
+      </span>
     </div>
-}
-   
-    @if (displayType=='LIST') {
-<div class="row">
-        <div class="col-sm-12 xyscroll" style="height:300px;" >
-            <table class="table table-sm-new table-bordered bgwhite">
-                <thead>
-                    <tr class="title-head formheading">
-                        <th colspan="8">
-                            {{searchHeaderText}}
-                            <a href="javascript:void(0);" (click)="displayType='SEARCH';searchList=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
-                        </th>
-                    </tr>
-                    <tr class="title-head formheading">
-                        <th>Voucher No</th>
-                        <th>Voucher Date</th>
-                        <th>Amount</th>
-                     
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (obj of searchList; track obj) {
-<tr>
-                        <td>
-                            <span class="col-form-span-label anchor-link" (click)="redirectToEdit(obj.JVCODE,obj.STATUS)" style="cursor:pointer;">{{obj.JVCODE}}</span>
-                            <!-- <span class="col-form-span-label">
-                                 <a href="javascript:void(0);" (click)="redirectToEdit(obj.pur_code)">{{obj.PUR_CODE}}</a> 
-                            </span> -->
-                        </td>
-                        <td>
-                            <span class="col-form-span-label">{{obj.JV_DATE}}</span>
-                        </td>
-                        <td>
-                            <span class="col-form-span-label">{{obj.AMOUNT}}</span>
-                        </td>
-                      
-                    </tr>
-}
-                </tbody>
-            </table>
-        </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Voucher no.</th>
+            <th>Voucher date</th>
+            <th class="num">Amount</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+            <tr><td class="empty" colspan="4">Loading vouchers…</td></tr>
+          } @else if (loadError) {
+            <tr><td class="empty" colspan="4">The voucher list could not be loaded. Try Search again.</td></tr>
+          } @else {
+            @for (obj of pageRows; track $index) {
+              <tr>
+                <td><a class="lnk" (click)="redirectToEdit(obj.JVCODE,obj.STATUS)">{{obj.JVCODE}}</a></td>
+                <td>{{obj.JV_DATE}}</td>
+                <td class="num">{{obj.AMOUNT}}</td>
+                <td class="act"><button type="button" (click)="redirectToEdit(obj.JVCODE,obj.STATUS)">Open / print</button></td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="4">No vouchers match. Choose a search above.</td></tr>
+            }
+          }
+        </tbody>
+      </table>
     </div>
-}
-   
+
+    <div class="pager">
+      <span>Showing <b>{{ rangeStart }}–{{ rangeEnd }}</b> of <b>{{ Filtered.length }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="page <= 1" (click)="goPage(page - 1)" aria-label="Previous page">‹</button>
+        @for (p of pageList; track $index) {
+          @if (p === 0) {
+            <span class="gap">…</span>
+          } @else {
+            <button type="button" [class.on]="p === page" (click)="goPage(p)">{{ p }}</button>
+          }
+        }
+        <button type="button" [disabled]="page >= pageCount" (click)="goPage(page + 1)" aria-label="Next page">›</button>
+      </div>
+    </div>
+  </div>
 </div>

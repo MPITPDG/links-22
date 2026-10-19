@@ -1,0 +1,128 @@
+﻿<!--
+  Shipment progress - BL update (bulk). Import page kit list recipe.
+  Enter the BL no., date and vessel, Search lists the vessel's jobs, tick the jobs
+  (ticking one ticks every job with the same booking carrier no.) and Update.
+  The proc needs all three filters, so the list starts with a prompt.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>BL update</h1>
+      <p>Apply one BL no. and date to several jobs on the same vessel and booking</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="filters f4">
+      <div class="f">
+        <label>B/L type</label>
+        <div class="sp-radios">
+          <label><input type="radio" name="BLType" [checked]="BlType == 'M'" (change)="BlType='M'"/>Master B/L</label>
+          <label><input type="radio" name="BLType" [checked]="BlType == 'S'" (change)="BlType='S'"/>Seaway B/L</label>
+        </div>
+      </div>
+      <div class="f">
+        <label for="spBlNo">BL no. <span class="req">*</span></label>
+        <input type="text" id="spBlNo" [(ngModel)]="blno" />
+      </div>
+      <div class="f">
+        <label>BL date <span class="req">*</span></label>
+        <my-date-picker name="bldate" [options]="myDatePickerOptions" (dateChanged)="BLDateDateChanged($event)" [selDate]="bldate"></my-date-picker>
+      </div>
+      <div class="f">
+        <label for="spBlVessel">Vsl / voyage / port <span class="req">*</span></label>
+        <select id="spBlVessel" [(ngModel)]="vslcmpName">
+          <option value="0">Please select</option>
+          @for (d of vessel; track d) {
+            <option value={{d.VALUEFILED}}>{{d.VSLNAME}}</option>
+          }
+        </select>
+      </div>
+      <div class="f">
+        <label>&nbsp;</label>
+        <button type="button" name="searchButton" class="btn p" (click)="searchData();">Search</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <span>
+        <span class="count">Total No. Of Jobs: {{datalist.length}}</span>
+        @if (datalist.length > 0) {
+          <span class="sub-t"> · {{ selectedCount }} ticked across all pages</span>
+        }
+      </span>
+      <span class="tb-r">
+        <button type="button" name="ResetButton" class="btn g" (click)="ResetData();">Reset</button>
+        <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!datalist.length">Export</button>
+      </span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th class="chk">Select</th>
+            <th>Expt no.</th>
+            <th>BL no.</th>
+            <th>BL dt</th>
+            <th>BL</th>
+            <th>Container</th>
+            <th>Booking carr. no.</th>
+            <th>Shipper</th>
+            <th>Consignee</th>
+            <th class="num">Pkgs</th>
+            <th class="num">Gr. wt</th>
+            <th class="num">Chrg. wt</th>
+            <th class="num">Pcs</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (obj of pager.rows; track obj; let j = $index) {
+            <tr [class.on]="obj.CHECKED == true || obj.CHECKED == '1'">
+              <td class="chk">
+                <input type="checkbox" [checked]="obj.CHECKED == '1'" [disabled]="obj.DISABLED == '1'" [(ngModel)]="obj.CHECKED" [id]="pager.offset + j" [value]="pager.offset + j" (change)="onCheckboxChange(obj)"/>
+              </td>
+              <td class="mono">{{obj.EXPTNO}}</td>
+              <td class="mono"><b>{{obj.EXPT_BLNO}}</b></td>
+              <td>{{obj.EXPT_BLDT}}</td>
+              <td>
+                @if (obj.EXPT_BLNO) { <span class="chip solid">On record</span> } @else { <span class="chip dash">No BL</span> }
+              </td>
+              <td class="mono">{{obj.CONTAINER}}</td>
+              <td class="mono">{{obj.BOOK_CARR_NBR}}</td>
+              <td>{{obj.SHIPPER}}</td>
+              <td>{{obj.CONSIGNEE}}</td>
+              <td class="num">{{obj.PKGS}}</td>
+              <td class="num">{{obj.GRWT}}</td>
+              <td class="num">{{obj.CHBLWT}}</td>
+              <td class="num">{{obj.PCS}}</td>
+            </tr>
+          } @empty {
+            <tr><td class="empty" colspan="13">Enter the BL no., BL date and vessel, then choose Search.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <span>Showing <b>{{ pager.rangeStart }}–{{ pager.rangeEnd }}</b> of <b>{{ pager.total }}</b></span>
+      <div class="pages">
+        <button type="button" [disabled]="pager.page <= 1" (click)="pager.go(pager.page - 1)" aria-label="Previous page">‹</button>
+        @for (p of pager.pageList; track $index) {
+          @if (p === 0) { <span class="gap">…</span> } @else { <button type="button" [class.on]="p === pager.page" (click)="pager.go(p)">{{ p }}</button> }
+        }
+        <button type="button" [disabled]="pager.page >= pager.pageCount" (click)="pager.go(pager.page + 1)" aria-label="Next page">›</button>
+      </div>
+    </div>
+  </div>
+
+  @if (datalist.length > 0) {
+    <div class="bar">
+      <span class="note">Ticking a job ticks every job with the same booking carrier no.</span>
+      <div class="r">
+        <button type="button" class="btn g" (click)="ResetData();">Cancel</button>
+        <button type="button" [disabled]="disableupdatebtn" name="updateButton" class="btn p" (click)="UpdateBLData();">Update</button>
+      </div>
+    </div>
+  }
+</div>

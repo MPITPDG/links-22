@@ -9,7 +9,7 @@ import { Tds26asExportService } from './tds26as-export.service';
 @Component({
     selector: 'app-tds26as-reconcil',
     templateUrl: './tds26as-reconcil.component.html',
-    styleUrls: ['./tds26as-reconcil.component.css'],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

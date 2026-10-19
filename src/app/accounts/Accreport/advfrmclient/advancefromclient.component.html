@@ -1,138 +1,129 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>OUTSTANDING RECEIVABLE - ADVANCE FROM CLIENTS
-                    </strong>
-                </div>
-            </div>
-        </div>
+<!--
+  Accounts -> Reports -> Outstanding receivable -> Advance from clients.
+  Recipe 1: filter card (job no. / account / all) + results with KPIs and a chart.
+  Data: Accounts/Acc_Rpt_Receivable_AdvFromClients. Job no. opens the job-profit popup and the
+  trans code opens the legacy voucher print popup (window.open ./#/popup/...), both unchanged.
+  Rows with an empty TYPE are the server's subtotal rows and stay bold.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>Advance from clients</h1>
+      <p>Outstanding receivable &middot; advances received against a job, an account, or all clients</p>
     </div>
-    @if (displayType=='SEARCH') {
-<div class="row no-gutters">
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
-                  <tr class="trbg">
-                    <td  >
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="JOBNO" [(ngModel)]="Type" />&nbsp;Job No</span>
-                    </td>
-                    <td colspan="3" >
-                        <input type="text" [(ngModel)]="JobNo"   class="form-control" [maxlength]="15" class="form-control width150" [OnlyNumber]="true" [disabled]="Type!='JOBNO'"
-                        />
-                    </td>
-                   
-                </tr>
-                <tr class="trbg" >
-                    <td >
-                        <span class="col-form-span-label">
-                            <input type="radio" name="check" value="CLIENT" [(ngModel)]="Type" />&nbsp;Account</span>
-                    </td>
-                    <td colspan="4">
-                       
-                                 <select class="form-control width300"  [(ngModel)]="Exporter" [disabled]="Type!='CLIENT'">
-                                    <option value="">Please select</option>
-                                    @for (d of ExporterList; track d) {
-<option value={{d.EXP_CODE}}>{{d.EXP_NAME_CITY}}</option>
-} 
-                                </select>
-                   </td>
-                </tr>
-                <tr class="trbg">
-                    <td colspan="4">
-                        <span class="col-form-span-label">
-                            <input type="radio"  name="check" value="All" [(ngModel)]="Type" />&nbsp;All</span>
-                    </td>
-                </tr>
-                <tr class="trbg centerlabel">
-                    <td colspan="3">
-                        <button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="GetClientAdvanceData();">
-                            <span class="col-form-span-label">  <i class="fa fa-search"></i> Search</span>  </button>
-                        <button class="btn btn-sm btn-danger" type="reset">
-                            <span class="col-form-span-label" (click)="ResetAll();"><i class="fa fa-ban"></i> Reset</span></button> 
-                    </td>
-                </tr>
-            </table>
-          
-    </div>
-    <div class="col-sm-12 col-md-3 col-lg-3">
-    </div>
-    </div>
-}
-    <div class="row no-gutters">
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-        <div class="col-sm-12 col-md-10 col-lg-10">
-    <!-- <div  class="row xyscroll"  *ngIf="displayType=='LIST'"> -->
-        @if (displayType=='LIST') {
-<div class="row  xyscroll">
-      
-            <table class="table table-bordered table-sm-new table-striped   " >
+  </div>
 
-                <thead>
-                    <tr class="title-head formheading">
-                        <th colspan="7" >
-                      <a href="javascript:void(0);" (click)="displayType='SEARCH';ClAdvList=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
-                        </th>
-                    </tr>
-                <tr class="title-head formheading ">
-                        <th>Client Name</th>
-                        <th>Job No</th>
-                        <th>Type</th>
-                        <th>Trans Code</th>
-                        <th>Trans Date </th>
-                        <th>Dr Amt</th>
-                        <th>Cr Amt</th>
-                    </tr>   
-               </thead>
-                <tbody>
-                    @for (obj of ClAdvList; track obj) {
-<tr>
-                        <td><span class="col-form-span-label " style="cursor:pointer;">{{obj.CLIENTNAME}}</span></td>
-                       <td><span class="col-form-span-label anchor-link" (click)="OpenJobPrint(obj.JOBNO)" >{{obj.JOBNO.replace("'", "")}}</span></td>
-                       <td> <span class="col-form-span-label">{{obj.TYPE}}</span></td>
-                       <td> @if (obj.TYPE!='') {
-<span class="col-form-span-label anchor-link" (click)="OpenPrint(obj.TRANSCODE,obj.TYPE)">{{obj.TRANSCODE.replace("'", "")}}</span>
-}
-                        @if (obj.TYPE=='') {
-<span class="col-form-span-label " ><b>{{obj.TRANSCODE.replace("'", "")}}</b></span>
-} </td>
-                        <!-- <td> <span class="col-form-span-label">{{obj.TRANSDATE}}</span></td> -->
-                        <td>
-                            @if (obj.TYPE!='') {
-<span class="col-form-span-label ">{{obj.TRANSDATE}}</span>
-}
-                            @if (obj.TYPE=='') {
-<span class="col-form-span-label " ><b>{{obj.TRANSDATE}}</b></span>
-}
-                        </td>
-                        <td><span class="col-form-span-label">{{obj.DRAMT|number:'2.2-4'}}</span></td>
-                        <!-- <td><span class="col-form-span-label">{{obj.CRAMT|number:'2.2-4'}}</span></td> -->
-                        <td>
-                            @if (obj.TYPE!='') {
-<span class="col-form-span-label ">{{obj.CRAMT|number:'2.2-4'}}</span>
-}
-                            @if (obj.TYPE=='') {
-<span class="col-form-span-label " ><b>{{obj.CRAMT|number:'2.2-4'}}</b></span>
-}
-                        </td>
-                </tr>
-}
-                </tbody>
-                <tr> <td colspan="7" class="centerlabel">
-                    <button class="btn btn-sm btn-primary" type="submit" (click)="ExportAdvfrmClnt()" > <span
-                    class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
-                    Export To Excel </span></button>&nbsp;
+  <div class="card sec">
+    <div class="filters fk-f">
+      <div class="f w2">
+        <label><input type="radio" name="check" value="JOBNO" [(ngModel)]="Type" /> Job no.</label>
+        <input type="text" [(ngModel)]="JobNo" [maxlength]="15" [OnlyNumber]="true" [disabled]="Type!='JOBNO'" placeholder="15-digit job no." />
+      </div>
+      <div class="f w2">
+        <label><input type="radio" name="check" value="CLIENT" [(ngModel)]="Type" /> Account</label>
+        <ng-select [items]="ExporterList" bindLabel="EXP_NAME_CITY" bindValue="EXP_CODE" [(ngModel)]="Exporter" [disabled]="Type!='CLIENT'" class="custom" placeholder="--Please Select--"></ng-select>
+      </div>
+      <div class="f">
+        <label>&nbsp;</label>
+        <div class="fk-opts"><label><input type="radio" name="check" value="All" [(ngModel)]="Type" /> All clients</label></div>
+      </div>
+      <div class="f act">
+        <button class="btn g" type="reset" (click)="ResetAll();">Reset</button>
+        <button class="btn p" type="button" name="submitButton" (click)="GetClientAdvanceData();">Search</button>
+      </div>
+    </div>
+  </div>
+
+  @if (failed) {
+    <div class="card fk-alert">The advances could not be loaded. Try the search again.</div>
+  }
+
+  @if (displayType=='LIST') {
+    <div class="fk-kpis">
+      <div class="card fk-kpi"><div class="k">Clients</div><div class="v">{{ kpiClients }}</div></div>
+      <div class="card fk-kpi"><div class="k">Dr amount</div><div class="v">{{ fmt(kpiDr, 2) }}</div></div>
+      <div class="card fk-kpi"><div class="k">Cr amount</div><div class="v">{{ fmt(kpiCr, 2) }}</div></div>
+      <div class="card fk-kpi"><div class="k">Net advance (Cr &minus; Dr)</div><div class="v">{{ fmt(kpiCr - kpiDr, 2) }}</div></div>
+    </div>
+
+    <div class="card sec">
+      <div class="card-h"><h2>Net advance by client</h2><span class="meta">top 12 &middot; grey = net debit</span></div>
+      <div class="fk-chart">
+        @if (chart) {
+          <svg [attr.viewBox]="'0 0 ' + chart.w + ' ' + chart.h" role="img" aria-label="Net advance by client">
+            @for (g of chart.grid; track $index) {
+              <line class="gl" [attr.x1]="chart.l" [attr.x2]="chart.w - 12" [attr.y1]="g.y" [attr.y2]="g.y"></line>
+              <text class="ax" [attr.x]="chart.l - 6" [attr.y]="g.y + 3" text-anchor="end">{{ g.label }}</text>
+            }
+            @for (b of chart.bars; track $index) {
+              <rect class="fb" [class.neg]="b.neg" [attr.x]="b.x" [attr.y]="b.y" [attr.width]="b.w" [attr.height]="b.h"><title>{{ b.label }}: {{ fmt(b.value, 2) }}</title></rect>
+              <text class="ax" [attr.x]="b.lx" [attr.y]="b.ly" text-anchor="middle">{{ b.label }}</text>
+            }
+          </svg>
+        } @else {
+          <div class="empty">Nothing to chart.</div>
+        }
+      </div>
+    </div>
+
+    <div class="card sec">
+      <div class="toolbar">
+        <span><span class="count">{{ ClAdvList.length }} {{ ClAdvList.length === 1 ? 'row' : 'rows' }}</span></span>
+        <span class="tb-r">
+          <button class="btn g" type="button" (click)="displayType='SEARCH';ClAdvList=[]">Clear results</button>
+          <button class="btn g" type="submit" (click)="ExportAdvfrmClnt()">Export</button>
+        </span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Client name</th>
+              <th>Job no.</th>
+              <th>Type</th>
+              <th>Trans code</th>
+              <th>Trans date</th>
+              <th class="num">Dr amt</th>
+              <th class="num">Cr amt</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (obj of pager.paged; track $index) {
+              <tr [class.tot]="obj.TYPE==''">
+                <td>{{obj.CLIENTNAME}}</td>
+                <td><a href="javascript:void(0);" class="lnk" (click)="OpenJobPrint(obj.JOBNO)">{{obj.JOBNO.replace("'", "")}}</a></td>
+                <td>{{obj.TYPE}}</td>
+                <td>
+                  @if (obj.TYPE!='') {
+                    <a href="javascript:void(0);" class="lnk" (click)="OpenPrint(obj.TRANSCODE,obj.TYPE)">{{obj.TRANSCODE.replace("'", "")}}</a>
+                  }
+                  @if (obj.TYPE=='') {
+                    <b>{{obj.TRANSCODE.replace("'", "")}}</b>
+                  }
                 </td>
-        </tr>
-            </table>
+                <td>{{obj.TRANSDATE}}</td>
+                <td class="num">{{obj.DRAMT|number:'2.2-4'}}</td>
+                <td class="num">{{obj.CRAMT|number:'2.2-4'}}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="7">No advances found for this search.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    @if (pager.rows.length > pager.size) {
+      <div class="pager">
+        <span>Showing <b>{{ pager.from }}&ndash;{{ pager.to }}</b> of <b>{{ pager.rows.length }}</b></span>
+        <div class="pages">
+          <button type="button" [disabled]="pager.page === 1" (click)="pager.go(pager.page - 1)" aria-label="Previous page">&lsaquo;</button>
+          @for (p of pager.numbers; track $index) {
+            @if (p === '...') { <span class="gap">&hellip;</span> }
+            @else { <button type="button" [class.on]="p === pager.page" (click)="pager.go(p)">{{ p }}</button> }
+          }
+          <button type="button" [disabled]="pager.page === pager.total" (click)="pager.go(pager.page + 1)" aria-label="Next page">&rsaquo;</button>
         </div>
-}
-
+      </div>
+    }
     </div>
-    <div class="col-sm-12 col-md-1 col-lg-1">
-    </div>        
+  }
 </div>

@@ -47,9 +47,9 @@ export class companySearch implements OnInit   {
             });
        this._dataService.getAll("Admin/Company_MST_Search")
           .subscribe((data: any) => {
-          this.Reqlist = data.Table;      
-         this.loaderService.display(false);             
-        });
+          this.Reqlist = data?.Table || [];   // fail soft: no Table -> empty state
+         this.loaderService.display(false);
+        }, () => { this.Reqlist = []; this.loaderService.display(false); });
     }
 
    

@@ -6,29 +6,8 @@ import { LoginService } from '../shared/service/loginService';
 import { ToastCommonService } from '../shared/service/toastService';
 @Component({
     templateUrl: 'login.component.html',
-    styles: [`
-    nav {
-        background-color: #26a6d4;
-        height: 60px;
-      }
-      main {
-        height: 100px;
-        margin: calc(30vh - 50px - 20px) calc(50vw - 150px);
-        text-align: center;
-        width: 300px;
-      }
-      footer {
-        background-color: #26a6d4;
-        bottom: 0;
-        height: 20px;
-        position: absolute;
-        width: 100%;
-        font-weight: bold;
-        font-size: 8pt;
-        color: #ffffff;
-        font-family: Verdana, Arial;
-      }
-    `],
+    // Inline nav/main/footer styles replaced by MP's split sign-in sheet.
+    styleUrls: ['login.component.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
@@ -37,6 +16,11 @@ export class LoginComponent implements OnInit {
     public password: string = '';
     companyName: string = "";
     disabledbutton: boolean = false;
+
+    /** Inline banner above the form. The toasts still fire; this keeps the reason next to the fields. */
+    errorText: string = '';
+    showPassword: boolean = false;
+    readonly year = new Date().getFullYear();
     constructor(
         private _router: Router,
         private _dataService: DataService,
@@ -53,10 +37,12 @@ export class LoginComponent implements OnInit {
         this.companyName = 'LINKS GROUP';
     }
     btnLogin() {
+        this.errorText = '';
         if (this.username == '' && this.password == '') {
+            this.errorText = 'Username and password are required.';
             this._toasterService.toast('error', 'Alert', 'Username and Password Required.');
-        } else if (this.username == '') { this._toasterService.toast('error', 'Alert', 'Username Required.'); }
-        else if (this.password == '') { this._toasterService.toast('error', 'Alert', 'Password Required.'); }
+        } else if (this.username == '') { this.errorText = 'Username is required.'; this._toasterService.toast('error', 'Alert', 'Username Required.'); }
+        else if (this.password == '') { this.errorText = 'Password is required.'; this._toasterService.toast('error', 'Alert', 'Password Required.'); }
         else {
             this.disabledbutton = true;
             this._auth
@@ -86,8 +72,15 @@ export class LoginComponent implements OnInit {
                             this._router.navigate(['/Profile/ChangePassword']);
                         }else{ this._router.navigate(['/branch']);}
                     } else {
+                        this.errorText = data.Table[0].STATUSMSG || 'Invalid username or password.';
                         this._toasterService.toast('error', 'Login Failed', data.Table[0].STATUSMSG);
                     }
+                }, () => {
+                    // Without this the button stayed on "Verifying..." forever when
+                    // the API was unreachable or returned an HTTP error.
+                    this.disabledbutton = false;
+                    this.errorText = 'Could not reach the server. Please try again.';
+                    this._toasterService.toast('error', 'Login Failed', 'Could not reach the server.');
                 });
         }
     }

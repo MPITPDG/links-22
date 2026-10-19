@@ -1,110 +1,103 @@
-<div class="animated fadeIn">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <strong>{{Header}}</strong>
-                </div>
+<!--
+  Import exchange rate master - add / edit. Page kit recipe 2 (src/styles/kit/import-page.css),
+  ported from MPERPNG-20. Every [(ngModel)] (including each branch's item.checked),
+  the my-date-picker controls and submit() / cancel() are unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Id == '0' ? 'New exchange rate' : 'Edit exchange rate' }}</h1>
+      <p>{{ Id == '0' ? 'Add a currency exchange rate for one or more branches' : 'Update the exchange rate validity and value' }}</p>
+    </div>
+    <div class="tools">
+      <button class="btn g" type="button" routerLink="/import/master/exchange-rate/search">Back to exchange rates</button>
+    </div>
+  </div>
+
+  <div class="form-layout">
+    <div>
+      <div class="card sec">
+        <div class="card-h">
+          <h2>Currency exchange rate</h2>
+          <span class="meta"><b>*</b> required</span>
+        </div>
+        <div class="fields">
+          <div class="fld">
+            <label for="selCurrencyType">Currency type <span class="req">*</span></label>
+            <select id="selCurrencyType" name="selCurrencyType" [(ngModel)]="CurrencyType">
+              <option value="0">-- Select --</option>
+              @for (item of CurrencyList; track item) {
+                <option value="{{item.DATAVALUEFIELD}}">{{item.DATATEXTFIELD}}</option>
+              }
+            </select>
+          </div>
+          <div class="fld">
+            <label for="txtExchangeRate">Exchange rate <span class="req">*</span></label>
+            <input type="text" id="txtExchangeRate" name="txtExchangeRate" [(ngModel)]="ExchangeRate" [maxlength]="50" [OnlyNumber]="true" />
+          </div>
+          <div class="fld">
+            <label>From date <span class="req">*</span></label>
+            <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate"></my-date-picker>
+          </div>
+          <div class="fld">
+            <label>To date <span class="req">*</span></label>
+            <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate"></my-date-picker>
+          </div>
+        </div>
+      </div>
+
+      <div class="card sec">
+        <div class="card-h">
+          <h2>Branches</h2>
+          <span class="meta">{{ Id == '0' ? 'the rate applies to every ticked branch' : 'fixed once saved' }}</span>
+        </div>
+        <div class="fields">
+          <div class="fld full top">
+            <label>Branch name</label>
+            <div class="chk-list">
+              @for (item of BranchList; track item) {
+                <label class="chk">
+                  <input type="checkbox" [(ngModel)]="item.checked" [disabled]="Id!=0" />
+                  <span>{{item.DATATEXTFIELD}}</span>
+                </label>
+              } @empty {
+                <span class="chk-empty">No branches loaded.</span>
+              }
             </div>
+          </div>
         </div>
+      </div>
     </div>
-    <div class="row">
-        <div class="col-sm-3">
-        </div>
-        <div class="col-sm-6">
-            <table class="table table-sm-new bgwhite">
-                <tr class="trbg">
-                    <td colspan="2">
-                        <span class="col-form-span-label"><b>ADD CURRENCY EXCHANGE RATE</b></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="width150">
-                        <span class="col-form-span-label">Currency Type
-                            <span class="col-form-span-error">*</span>
-                        </span>
-                    </td>
-                    <td>
-                        <select class="form-control" [(ngModel)]="CurrencyType">
-                            <option value="0">-- Select --</option>
-                            @for (item of CurrencyList; track item) {
 
-                                <option value="{{item.DATAVALUEFIELD}}">{{item.DATATEXTFIELD}}</option>
-                            
-}
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="col-form-span-label">Branch Name</span>
-                    </td>
-                    <td>
-                        <div class="yscroll" style="height: 150px;width:100%">
-                            <table class="table table-bordered table-sm-new">
-                                <tbody>
-                                    @for (item of BranchList; track item) {
+    <aside class="aside">
+      <div class="card sec">
+        <div class="card-h">
+          <h2>Record</h2>
+          @if (Id == '0') {
+            <span class="chip dash">Draft</span>
+          } @else {
+            <span class="chip solid">Saved</span>
+          }
+        </div>
+        <div class="row"><span>Branch</span><b>{{ BranchName || '—' }}</b></div>
+        <div class="row"><span>User</span><b>{{ CreatedBy || '—' }}</b></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Before you save</h2></div>
+        <ul>
+          <li>Currency type, from date, to date and exchange rate are required.</li>
+          <li>To date must be after the from date.</li>
+          <li>Exchange rate must be a non-zero number.</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
 
-                                        <tr>
-                                            <td class="width50 centerlabel">
-                                                <input type="checkbox" [(ngModel)]="item.checked" [disabled]="Id!=0" class="col-form-span-label" />
-                                            </td>
-                                            <td>
-                                                <span class="col-form-span-label">
-                                                    {{item.DATATEXTFIELD}}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    
-}
-                                </tbody>
-                            </table>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="col-form-span-label">From Date
-                            <span class="col-form-span-error">*</span>
-                        </span>
-                    </td>
-                    <td>
-                        <my-date-picker name="FromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate"></my-date-picker>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="col-form-span-label">To Date</span>
-                    </td>
-                    <td>
-                        <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate"></my-date-picker>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="col-form-span-label">Exchange Rate</span>
-                    </td>
-                    <td>
-                        <input type="text" [(ngModel)]="ExchangeRate" class="form-control" [maxlength]="50"
-                            [OnlyNumber]="true" />
-                    </td>
-                </tr>
-                <tr class="trbg centerlabel">
-                    <td colspan="3">
-                        <button type="button" name="submitButton" class="btn btn-sm btn-primary" (click)="submit();">
-                            <span class="col-form-span-label">
-                                <i class="{{(Id=='0')? 'fa fa-save' : 'fa fa-refresh'}}"></i> {{ (Id=='0')? 'Save' :
-                                'Update'}}</span>
-                        </button>&nbsp;
-                        <button type="button" name="cancelButton" class="btn btn-sm btn-danger" (click)="cancel();">
-                            <span class="col-form-span-label">
-                                <i class="fa fa-times-circle"></i> Cancel</span>
-                        </button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-sm-3">
-        </div>
+  <div class="bar">
+    <span class="note">Nothing is saved until you choose {{ Id == '0' ? 'Save' : 'Update' }}.</span>
+    <div class="r">
+      <button class="btn g" type="button" name="cancelButton" (click)="cancel();">Cancel</button>
+      <button class="btn p" type="button" name="submitButton" (click)="submit();">{{ Id == '0' ? 'Save' : 'Update' }}</button>
     </div>
+  </div>
 </div>

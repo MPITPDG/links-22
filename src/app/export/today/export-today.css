@@ -1,0 +1,77 @@
+/* Export > Today - severity tiles on top of the import page kit. Monochrome. */
+:host ::ng-deep .im-page .td-tiles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+:host ::ng-deep .im-page .td-tile {
+    text-align: left;
+    padding: 12px 14px;
+    cursor: pointer;
+    font: inherit;
+    width: 100%;
+}
+
+:host ::ng-deep .im-page .td-tile.on {
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+:host ::ng-deep .im-page .td-tile .k {
+    font-size: 11px;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--soft);
+    font-weight: 600;
+}
+
+:host ::ng-deep .im-page .td-tile .v {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+    margin-top: 4px;
+    line-height: 1.1;
+    color: var(--ink);
+}
+
+:host ::ng-deep .im-page .td-tile .s {
+    color: var(--soft);
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+:host ::ng-deep .im-page .td-bar {
+    height: 6px;
+    margin-top: 8px;
+    background: var(--mp-band, #EDEDED);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+:host ::ng-deep .im-page .td-fill { display: block; height: 100%; }
+:host ::ng-deep .im-page .td-CRIT { background: var(--mp-primary, #0A0A0A); }
+:host ::ng-deep .im-page .td-WARN { background: var(--mp-accent, #6B6B6B); }
+:host ::ng-deep .im-page .td-INFO { background: var(--mp-strong, #B5B5B5); }
+
+:host ::ng-deep .im-page td.td-act { white-space: nowrap; }
+:host ::ng-deep .im-page td.td-act .btn + .btn { margin-left: 6px; }
+
+@media (max-width: 700px) {
+    :host ::ng-deep .im-page .td-tiles { grid-template-columns: 1fr; }
+}
+
+/* palette accents (Classic tokens resolve to greys / ink) */
+:host ::ng-deep .im-page .td-tile { border-top: 3px solid var(--mp-primary, #0A0A0A); }
+:host ::ng-deep .im-page .td-tiles > .td-tile:first-child,
+:host ::ng-deep .im-page .td-tile.on { background: var(--mp-primary-soft, #EFEFEF); }
+:host ::ng-deep .im-page .td-tile.on { border-color: var(--mp-primary, #0A0A0A); box-shadow: inset 0 0 0 1px var(--mp-primary, #0A0A0A); }
+:host ::ng-deep .im-page .td-CRIT { background: var(--mp-late, #0A0A0A); }
+:host ::ng-deep .im-page .td-WARN { background: var(--mp-chart-2, #6B6B6B); }
+:host ::ng-deep .im-page .td-INFO { background: var(--mp-chart-4, #B5B5B5); }
+:host ::ng-deep .im-page .chip.solid { background: var(--mp-late, #0A0A0A); border-color: var(--mp-late, #0A0A0A); color: #FFFFFF; }
+:host ::ng-deep .im-page .chip:not(.solid):not(.dash) { border-color: var(--mp-accent, #6B6B6B); background: var(--mp-accent-soft, #FFFFFF); }
+:host ::ng-deep .im-page table tbody tr:hover > td { background: var(--mp-primary-soft, #EFEFEF); }
+:host ::ng-deep .im-page a.lnk { color: var(--mp-primary, #0A0A0A); }

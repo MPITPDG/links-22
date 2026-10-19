@@ -1,39 +1,111 @@
-<nav class="app-header navbar">
-  <div style="display: inline-flex;">
-      <!-- <a style="background-image: url(Untitled-1.png);" class="navbar-brand" href="javascript:void(0);"></a> -->
-  <a class="navbar-brand" href="javascript:void(0);">
-    <!--<img src="" style="width: 155px;height: 55px;">-->
-  </a>
-  <span style='font-size: 24px; font-weight: bold; font-family: "Euclid Fraktur", "Old English Text MT", fantasy, serif; color: #ffffff; text-shadow: 1px 1px 2px #0300bd, 0 0 25px #0300bd, 0 0 5px #0300bd;'>
-    {{companyName | titlecase}}&nbsp;
-  </span>
-  </div>
+<!--
+  Split sign-in page, ported from MPERPNG-20 (itself a 1:1 port of erp_new's
+  LoginPage). Markup and class names match MP element for element; styles are
+  in login.component.css. Links name and logo.
 
-</nav>
-<main style="border-radius: 20px;">
-  <div class="card p-4" [ngStyle]="{'border-radius': '20px'}">
-    <div class="card-body">
-      <div class="row">
-        <div class="col-sm-12 centerlabel">
-          <h1>Login</h1>
-          <p class="text-muted">Sign In to your account</p>
+  Sign-in behaviour is Links' own and unchanged: username / password
+  bindings, btnLogin(), the disabledbutton guard and the toasts.
+-->
+<main class="ui-auth-split">
+
+  <!-- Left: form -->
+  <section class="ui-auth-pane">
+    <div class="ui-auth-pane-inner">
+
+      <div class="ui-auth-mark">
+        <div class="ui-brandmark ui-brandmark--lg ui-brandmark--logo"><img src="assets/img/Untitled-1.png" alt="Links" /></div>
+        <span class="ui-auth-mark-name">{{ companyName | titlecase }}</span>
+      </div>
+      <h1 class="ui-auth-heading">Sign in</h1>
+
+      <form autocomplete="on" class="ui-auth-form" (ngSubmit)="btnLogin()">
+
+        @if (errorText) {
+          <div class="ui-auth-error">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" /><path d="M12 8v4" /><path d="M12 16h.01" />
+            </svg>
+            {{ errorText }}
+          </div>
+        }
+
+        <div class="ui-field">
+          <label class="ui-field-label" for="login-username">Username</label>
+          <div class="ui-inputwrap">
+            <span class="ui-inputwrap-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+              </svg>
+            </span>
+            <input id="login-username" name="username"
+                   class="ui-input ui-input--lg ui-input--icon" type="text"
+                   autocomplete="username" placeholder="Enter your username" autofocus
+                   [disabled]="disabledbutton"
+                   [(ngModel)]="username" (ngModelChange)="errorText = ''" />
+          </div>
+        </div>
+
+        <div class="ui-field">
+          <label class="ui-field-label" for="login-password">Password</label>
+          <div class="ui-inputwrap">
+            <span class="ui-inputwrap-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="4" fill="currentColor" />
+              </svg>
+            </span>
+            <input id="login-password" name="password"
+                   class="ui-input ui-input--lg ui-input--icon ui-input--icon-right"
+                   [type]="showPassword ? 'text' : 'password'"
+                   autocomplete="current-password" placeholder="••••••••"
+                   [disabled]="disabledbutton"
+                   [(ngModel)]="password" (ngModelChange)="errorText = ''" />
+            <button type="button" tabindex="-1"
+                    class="ui-inputwrap-btn ui-inputwrap-btn--text"
+                    [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+                    (click)="showPassword = !showPassword">
+              {{ showPassword ? 'Hide' : 'Show' }}
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="ui-btn ui-btn--primary ui-btn--lg ui-btn--block" [disabled]="disabledbutton">
+          @if (disabledbutton) {
+            <span class="ui-spinner ui-spinner--sm"></span> Verifying&hellip;
+          } @else {
+            Sign in
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+            </svg>
+          }
+        </button>
+      </form>
+
+      <p class="ui-auth-foot">Links ERP &middot; &copy; {{ year }}</p>
+    </div>
+  </section>
+
+  <!-- Right: dark hero -->
+  <section class="ui-auth-hero">
+    <div class="ui-auth-hero-panel">
+      <div class="ui-auth-hero-glow"></div>
+      <div class="ui-auth-hero-body">
+        <p class="ui-auth-hero-eyebrow">{{ companyName | titlecase }}</p>
+        <h2 class="ui-auth-hero-title">Welcome to {{ companyName | titlecase }}</h2>
+        <p class="ui-auth-hero-text">
+          One platform for import, export, finance, logistics, and documentation.
+        </p>
+        <p class="ui-auth-hero-text">Operations teams across every branch &mdash; unified.</p>
+        <div class="ui-auth-hero-card">
+          <h3 class="ui-auth-hero-card-title">Select your branch and start working</h3>
+          <p class="ui-auth-hero-card-text">Role-based access across all companies and cities.</p>
+          <div class="ui-auth-hero-dots">
+            <span class="ui-auth-hero-dot" title="Export">E</span>
+            <span class="ui-auth-hero-dot" title="Import">I</span>
+            <span class="ui-auth-hero-dot" title="Accounts">A</span>
+            <span class="ui-auth-hero-dot" title="Master, E-Doc, Admin">+3</span>
+          </div>
         </div>
       </div>
-      <div class="input-group mb-3">
-        <span class="input-group-addon"><i class="icon-user"></i></span>
-        <input type="text" class="form-control" placeholder="Username" [(ngModel)]="username">
-      </div>
-      <div class="input-group mb-4">
-        <span class="input-group-addon"><i class="icon-lock"></i></span>
-        <input type="password" class="form-control" placeholder="Password" [(ngModel)]="password">
-      </div>
-      <div class="input-group mb-4">
-        <button type="button" [ngStyle]="{'width': '100%'}" (click)="btnLogin()" [disabled]="disabledbutton" class="btn btn-sm btn-primary">Login&nbsp;<i
-            class="fa fa-sign-in"></i></button>
-      </div>
     </div>
-  </div>
+  </section>
 </main>
-<footer>
-  Angular version6.0.3@2018 Manilal Patel Group. All Rights Reserved.
-</footer>

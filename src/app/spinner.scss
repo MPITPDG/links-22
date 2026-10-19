@@ -125,3 +125,31 @@
     transform: rotate(360deg);
   }
 }
+
+/* Non-blocking fallback indicator (pages without a layout content area).
+   Never captures the pointer. The old .loading overlay above is no longer
+   rendered. */
+.app-topbar-loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 2000;
+  pointer-events: none;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.06);
+}
+.app-topbar-loading::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 35%;
+  background: var(--mp-strong, #374151);
+  animation: app-topbar-slide 1.1s ease-in-out infinite;
+}
+@keyframes app-topbar-slide {
+  0% { left: -35%; }
+  100% { left: 100%; }
+}

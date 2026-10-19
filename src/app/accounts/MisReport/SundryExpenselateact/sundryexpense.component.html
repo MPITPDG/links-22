@@ -1,138 +1,144 @@
-<div class="animated fadeIn" >  
-    <div class="row no-gutters"  >
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header formheading">
-                    <div class="row no-gutters">
-                        <div class="col-sm-12">
-                            <strong>{{Header}}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--
+  Accounts -> MIS -> Sundry expenses / sundry expenses late accounting.
+  Shared by SundryExpenses and SundryExpensesjob (same template). Report recipe: filter card,
+  KPIs, amount-by-account chart, 10/page table with the server's GRAND TOTAL row pinned last.
+  Data: ACC_MIS_SUNDRY_EXPENSES (GenerateData). Voucher numbers open the legacy print popup via
+  Openprint(); Export keeps the existing Excel export (ExportData).
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{ Header | titlecase }}</h1>
+      <p>Cash expense (CE, CP) vouchers booked late against jobs &middot; {{ PageType | titlecase }}</p>
     </div>
-    @if (displayType=='SEARCH') {
-<div class="row no-gutters">
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
-        <div class="col-sm-12 col-md-6 col-lg-6 ">
-            <table class="table table-bordered table-sm-new bgwhite">
+  </div>
 
-                <tr>
-                    <td class="col-form-span-heading" colspan="6"> <b>{{PageType}}</b> </td>
-           </tr>
-                 <tr>
-                    <td colspan="4"><span class="col-form-span-label"><b>Expenses Voucher Date (CE ,CP)</b> </span><span class="col-form-span-error">*</span></td>
-                 </tr>   
-                 <tr>
-                    <td><span class="col-form-span-label"><b>From</b> </span><span class="col-form-span-error">*</span></td>
-                    <td>
-                    <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event)"  [options]="myDatePickerOptions"
-                        class="form-control"  [selDate]="FromDate"  ></my-date-picker>
-                </td>
-                    <td><span class="col-form-span-label"><b>To </b> </span><span
-                            class="col-form-span-error">*</span></td>
-                    <td><my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event)"  [options]="myDatePickerOptions"
-                            class="form-control"  [selDate]="ToDate"   ></my-date-picker>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="col-form-span-label"><b>No. Of Days Delay</b> </span><span
-                        class="col-form-span-error">*</span></td>
-                
-                    <td >  <input [(ngModel)]="DelayDays" type="text"  [OnlyNumber]="true"  class="form-control width150" maxlength="3" > </td>
-              
-                    <td><span class="col-form-span-label"><b>(Range 30 To 240) </b> </span></td>
-                 
-                </tr>
-                <tr>
-                    <td >
-                        <span  class="col-form-span-label"><b>Department </b> </span><span
-                        class="col-form-span-error">*</span>
-                    </td>
-                            <td colspan="3" >
-                                <select class="form-control width150"  [(ngModel)]="Department" (change)="GetDepartmentName($event)" >
-                                    <option value="0">All</option>
-                                    @for (d of Departmentlist; track d) {
-<option  value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
-}
-                
-                                </select>
-                            </td>
-                </tr>
-                <tr> <td colspan="6" class="centerlabel">
-                    <button class="btn btn-sm btn-primary" type="submit" (click)="GenerateData()" > <span
-                    class="col-form-span-label"><i class="fa fa-gg"></i>
-                    Generate </span></button>&nbsp;
-                </td>
-        </tr>
-            </table>
+  <div class="card sec">
+    <div class="filters fk-f">
+      <div class="f w2">
+        <label>Expense voucher date (CE, CP)</label>
+        <div class="fk-seg">
+          @for (p of periods; track p.key) {
+            <button type="button" [class.on]="period === p.key" (click)="setPeriod(p.key)">{{ p.label }}</button>
+          }
         </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-        </div>
+      </div>
+      <div class="f">
+        <label>From <span class="req">*</span></label>
+        <my-date-picker name="FromDate" (dateChanged)="FromDateChanged($event); period = ''" [options]="myDatePickerOptions" [selDate]="FromDate"></my-date-picker>
+      </div>
+      <div class="f">
+        <label>To <span class="req">*</span></label>
+        <my-date-picker name="ToDate" (dateChanged)="ToDateChanged($event); period = ''" [options]="myDatePickerOptions" [selDate]="ToDate"></my-date-picker>
+      </div>
+      <div class="f">
+        <label>Days delay <span class="req">*</span> <span class="fk-sub">30&ndash;240</span></label>
+        <input [(ngModel)]="DelayDays" type="text" [OnlyNumber]="true" maxlength="3">
+      </div>
+      <div class="f">
+        <label>Department <span class="req">*</span></label>
+        <select [(ngModel)]="Department" (change)="GetDepartmentName($event)">
+          <option value="0">All</option>
+          @for (d of Departmentlist; track d) {
+            <option value={{d.VALUEFIELD}}>{{d.TEXTFIELD}}</option>
+          }
+        </select>
+      </div>
+      <div class="f act">
+        @if (displayType=='SEARCH') {
+          <button class="btn p" type="submit" (click)="GenerateData()">Generate</button>
+        } @else {
+          <button class="btn g" type="button" (click)="displayType='SEARCH';SundryexpenseList=[]">New search</button>
+        }
+      </div>
     </div>
-}
-    @if (displayType=='LIST') {
-<div class="row no-gutters"  >
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-        <div class="col-sm-12 col-md-10 col-lg-10 ">
-           <div class="row  xyscroll"  style="height: 500px;">
-                <table class="table table-bordered table-sm-new table-striped table-hover" >
-                
+  </div>
 
-                    <thead>
-                        <tr align="right" class="title-head formheading">
-                            <td colspan="7" >
-                          <a href="javascript:void(0);" (click)="displayType='SEARCH';SundryexpenseList=[]" style="float: right;text-decoration: underline;color: red;">back to search</a>
-                            </td>
-                        </tr>
-                        <tr class="title-head formheading table-primary">
-                            <th class="col-form-span-label" align="center">JOB NO</th>
-                            <th class="col-form-span-label" align="center">	CLIENT</th>
-                            <th class="col-form-span-label" align="center"></th>   
-                            <th class="col-form-span-label" align="center">VOUCHER NO.</th>   
-                            <th class="col-form-span-label" align="center">VOUCHER DATE</th>   
-                            <th class="col-form-span-label" align="center">ACCOUNT</th>   
-                            <th class="col-form-span-label" align="center">AMOUNT</th>   
-                        </tr>
-                    </thead>
-                    @if (SundryexpenseList.length > 0) {
-<tbody>
-                        @for (data of SundryexpenseList; track data) {
-<tr>
-                            <td style="width: 130px;"><span [ngClass]="{'col-form-span-label': data.JOBNO1  === 'GRAND TOTAL', 'col-form-span-label anchor-link': data.JOBNO1 != 'GRAND TOTAL'}"
-                                
-                                                class="col-form-span-label"><b>{{data.JOBNO1}}</b></span></td>  
-                          <!-- <td style="width: 30px;"><span   *ngIf="data.JOBNO1!='GRAND TOTAL'"class="col-form-span-label anchor-link" (click)="PrintJob(data.JOBNO1)" >{{data.JOBNO1}}</span> </td>  -->
-                            <td style="width: 130px;" ><span class="col-form-span-label">{{data.CLIENTNAME}}</span>  </td>                             
-                            <td  style="width: 90px;" ><span class="col-form-span-label">{{data.TRASNTYPE}}</span>  </td>
-                            <td  style="width:130px; " class="col-form-span-label">
-                                <p    style="white-space: pre-wrap;width: 130px; "  class="col-form-span-label anchor-link " (click)="Openprint(data.TRANSCODE,data.TRASNTYPE)" > {{data.TRANSCODE}}</p>
-                            </td> 
-                           <td  style="width:100px; " class="col-form-span-label">
-                            <p  style="white-space: pre-wrap;width: 100px; " >{{data.ENTRYDT}}</p>
-                           </td>
-                            <td  style="width: 200px;" ><span class="col-form-span-label">{{data.ACCTNAME}}</span>  </td>
-                            <td   style="width: 100px;"><span class="col-form-span-label">{{data.AMOUNT}}</span>  </td>
-                        </tr>
-}
-                        <tr> <td colspan="7" class="centerlabel">
-                            <button class="btn btn-sm btn-primary" type="submit" (click)="ExportData()" > <span
-                            class="col-form-span-label"><i class="fa fa-file-excel-o"></i>
-                            Export To Excel </span></button>&nbsp;
-                        </td>
-                </tr>
-                    </tbody>
-}
-                </table>
-            </div>
-         </div>
-        <div class="col-sm-12 col-md-1 col-lg-1">
-        </div>
-                    
+  @if (failed) {
+    <div class="card fk-alert">The expenses could not be loaded. Try again.</div>
+  }
+
+  @if (displayType=='LIST') {
+    <div class="fk-kpis">
+      <div class="card fk-kpi"><div class="k">Vouchers</div><div class="v">{{ pager.rows.length }}</div></div>
+      <div class="card fk-kpi"><div class="k">Jobs</div><div class="v">{{ kpiJobs }}</div></div>
+      <div class="card fk-kpi"><div class="k">Amount</div><div class="v">{{ grandTotal ? grandTotal.AMOUNT : fmt(kpiAmount, 2) }}</div></div>
     </div>
-} 
+
+    <div class="card sec">
+      <div class="card-h"><h2>Amount by account</h2><span class="meta">top 12</span></div>
+      <div class="fk-chart">
+        @if (chart) {
+          <svg [attr.viewBox]="'0 0 ' + chart.w + ' ' + chart.h" role="img" aria-label="Amount by account">
+            @for (g of chart.grid; track $index) {
+              <line class="gl" [attr.x1]="chart.l" [attr.x2]="chart.w - 12" [attr.y1]="g.y" [attr.y2]="g.y"></line>
+              <text class="ax" [attr.x]="chart.l - 6" [attr.y]="g.y + 3" text-anchor="end">{{ g.label }}</text>
+            }
+            @for (b of chart.bars; track $index) {
+              <rect class="fb" [class.neg]="b.neg" [attr.x]="b.x" [attr.y]="b.y" [attr.width]="b.w" [attr.height]="b.h"><title>{{ b.label }}: {{ fmt(b.value, 2) }}</title></rect>
+              <text class="ax" [attr.x]="b.lx" [attr.y]="b.ly" text-anchor="middle">{{ b.label }}</text>
+            }
+          </svg>
+        } @else {
+          <div class="empty">Nothing to chart.</div>
+        }
+      </div>
+    </div>
+
+    <div class="card sec">
+      <div class="toolbar">
+        <span><span class="count">{{ pager.rows.length }} vouchers</span></span>
+        <span class="tb-r"><button class="btn g" type="submit" (click)="ExportData()" [disabled]="!SundryexpenseList.length">Export</button></span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Job no.</th>
+              <th>Client</th>
+              <th></th>
+              <th>Voucher no.</th>
+              <th>Voucher date</th>
+              <th>Account</th>
+              <th class="num">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (data of pager.paged; track $index) {
+              <tr>
+                <td><b>{{data.JOBNO1}}</b></td>
+                <td>{{data.CLIENTNAME}}</td>
+                <td>{{data.TRASNTYPE}}</td>
+                <td><a href="javascript:void(0);" class="lnk" (click)="Openprint(data.TRANSCODE,data.TRASNTYPE)">{{data.TRANSCODE}}</a></td>
+                <td>{{data.ENTRYDT}}</td>
+                <td>{{data.ACCTNAME}}</td>
+                <td class="num">{{data.AMOUNT}}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="7">No late expense vouchers for this selection.</td></tr>
+            }
+            @if (grandTotal) {
+              <tr class="tot">
+                <td colspan="6">{{grandTotal.JOBNO1}}</td>
+                <td class="num">{{grandTotal.AMOUNT}}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (pager.rows.length > pager.size) {
+        <div class="pager">
+          <span>Showing <b>{{ pager.from }}&ndash;{{ pager.to }}</b> of <b>{{ pager.rows.length }}</b></span>
+          <div class="pages">
+            <button type="button" [disabled]="pager.page === 1" (click)="pager.go(pager.page - 1)" aria-label="Previous page">&lsaquo;</button>
+            @for (p of pager.numbers; track $index) {
+              @if (p === '...') { <span class="gap">&hellip;</span> }
+              @else { <button type="button" [class.on]="p === pager.page" (click)="pager.go(p)">{{ p }}</button> }
+            }
+            <button type="button" [disabled]="pager.page === pager.total" (click)="pager.go(pager.page + 1)" aria-label="Next page">&rsaquo;</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
 </div>
-

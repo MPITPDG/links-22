@@ -10,7 +10,8 @@ import { environment } from  '../../../../environments/environment';
 @Component({
     selector: 'app-RePrint-ExistingCheque-search',
     templateUrl: './RePrintexistCheque.component.html',
-    styles: [],
+    // Page kit is global (src/styles/kit); kit-cheque scopes cheque-page.css.
+    host: { class: 'kit-cheque' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

@@ -8,6 +8,7 @@ import { ToastCommonService } from '../../shared/service/toastService';
     selector: 'app-actstatement-advance-print',
     templateUrl: './actstatement-advance-Print.component.html',
     styles: [],
+    host: { class: 'kit-print' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })

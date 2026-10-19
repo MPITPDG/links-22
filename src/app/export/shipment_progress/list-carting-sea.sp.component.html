@@ -1,61 +1,90 @@
-﻿<div class="row">	
-	<div class="col-sm-1">
-	</div>
-	<div class="col-sm-10">	 
-		<table class="table table-bordered table-sm-new">	
-		<thead class="">
-			@for (d of SearchHead; track d) {
-<tr  class="col-form-span-heading">
-				<th colspan="12" class="col-form-span-label"> 
-					<span class="col-form-span-label" >{{d.vsl}}</span>
-				</th>
-			</tr>
-} 
-		</thead>
-		<thead>
-		 <tr class="col-form-span-heading">		 	 
-				<th class="col-form-span-label" >Select</th>
-				<th class="col-form-span-label">M.P Ref. No</th>
-				<th class="col-form-span-label">Shipper</th>
-				<th class="col-form-span-label">Consignee</th>
-				<th class="col-form-span-label">Tot. Pkgs</th>
-				<th class="col-form-span-label">Tot. Pieces</th>
-				<th class="col-form-span-label">Tot. Pkgs Recvd</th>
-				<th class="col-form-span-label">Order No.</th>
-				<th class="col-form-span-label">Carton</th>
-				<th class="col-form-span-label">Pkgs</th>
-				<th class="col-form-span-label">Remark</th>
-				<th class="col-form-span-label"></th>
-				
-		 </tr>
-		 </thead>
-			<tbody class="bgwhite">
-				@for (d of CartingList; track d) {
-<tr  [ngStyle]="{'background-color':d.SELEJOB!=true ? '' : 'white' }" >	
-					<td><input type="checkbox" [(ngModel)]="d.SELEJOB" > </td>
-					<td class="col-form-span-label">{{d.EXPTNO}}</td>
-					<td class="col-form-span-label">{{d.SHIPPER}}</td>													 
-					<td class="col-form-span-label">{{d.CONSIGNEE}}</td>													
-					<td class="col-form-span-label">{{d.EXP_NOPKGS}}</td>
-					<td class="col-form-span-label">{{d.EXP_NOPCS}}</td>
-					<td class="col-form-span-label">{{d.RCVDPKGS}}</td>
-					<td class="col-form-span-label">{{d.ORDERNO}}</td>					
-					<td> 
-						<my-date-picker name="dtbld" [options]="myDatePickerOptions" [(ngModel)]="d.CARTEDON" [disabled]="d.SELEJOB!=true" ></my-date-picker>
-					</td>
-					<td><input type="Textbox"  class="form-control width150" [(ngModel)]="d.NOOFPKG" [disabled]="d.SELEJOB!=true" (keyup)="vslidaionPkgs(d.RCVDPKGS,d.NOOFPKG)" > </td>
-					<td><input type="Textbox" class="form-control width150" [(ngModel)]="d.REMARK" [disabled]="d.SELEJOB!=true"  > </td>
-					<td><button class="btn btn-sm btn-danger" type="submit"   name="btndelete" [disabled]="d.CARTID==0"   (click)="OnDelete(d.containerno,d.CARTID)"><span class="col-form-span-label "> <i class="fa fa-trash"></i>  </span> </button>				 </td>
-				</tr>
-}
-				
-			</tbody>
-		</table>
-		<div style="float:right">
-		<button class="btn btn-sm btn-success" type="submit"   name="btnAdd" [disabled]="buttondis"  (click)="OnCartSave()"><span class="col-form-span-label "> <i class="fa fa-search"></i> Submit</span> </button>				 
-		</div> 
-	</div>
-		<div class="col-sm-1">
-		</div>
-	</div>
-	
+﻿<!--
+  Shipment progress - carting (sea) job list. Import page kit list recipe.
+  Tick a job to enable its carting date, packages and remark; Update saves every
+  ticked job on every page together. Bindings, (keyup) check and delete unchanged.
+-->
+<div class="card">
+  <div class="card-h">
+    <h2>Carting list</h2>
+    <span class="meta">
+      @for (d of SearchHead; track d) { {{d.vsl}} }
+    </span>
+  </div>
+
+  <div class="toolbar">
+    <span>
+      <span class="count">{{ CartingList.length }} {{ CartingList.length === 1 ? 'job' : 'jobs' }}</span>
+      <span class="sub-t"> · {{ selectedCount }} ticked · {{ cartedCount }} already carted</span>
+    </span>
+    <span class="tb-r">
+      <button class="btn g" type="button" (click)="exportCsv()" [disabled]="!CartingList.length">Export</button>
+    </span>
+  </div>
+
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th class="chk">Select</th>
+          <th>M.P ref. no</th>
+          <th>Shipper</th>
+          <th>Consignee</th>
+          <th class="num">Tot. pkgs</th>
+          <th class="num">Tot. pieces</th>
+          <th class="num">Pkgs recvd</th>
+          <th>Order no.</th>
+          <th>Status</th>
+          <th>Carted on</th>
+          <th>Pkgs</th>
+          <th>Remark</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (d of pager.rows; track d) {
+          <tr [class.on]="d.SELEJOB==true">
+            <td class="chk"><input type="checkbox" [(ngModel)]="d.SELEJOB" /></td>
+            <td class="mono">{{d.EXPTNO}}</td>
+            <td>{{d.SHIPPER}}</td>
+            <td>{{d.CONSIGNEE}}</td>
+            <td class="num">{{d.EXP_NOPKGS}}</td>
+            <td class="num">{{d.EXP_NOPCS}}</td>
+            <td class="num">{{d.RCVDPKGS}}</td>
+            <td>{{d.ORDERNO}}</td>
+            <td>
+              @if (d.CARTID != 0) { <span class="chip solid">Carted</span> } @else { <span class="chip dash">Not carted</span> }
+            </td>
+            <td>
+              <my-date-picker name="dtbld" [options]="myDatePickerOptions" [(ngModel)]="d.CARTEDON" [disabled]="d.SELEJOB!=true"></my-date-picker>
+            </td>
+            <td><input type="Textbox" [(ngModel)]="d.NOOFPKG" [disabled]="d.SELEJOB!=true" (keyup)="vslidaionPkgs(d.RCVDPKGS,d.NOOFPKG)" /></td>
+            <td><input type="Textbox" [(ngModel)]="d.REMARK" [disabled]="d.SELEJOB!=true" /></td>
+            <td class="act">
+              <button type="submit" name="btndelete" [disabled]="d.CARTID==0" (click)="OnDelete(d.containerno,d.CARTID)">Delete</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td class="empty" colspan="13">No jobs on this vessel.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pager">
+    <span>Showing <b>{{ pager.rangeStart }}–{{ pager.rangeEnd }}</b> of <b>{{ pager.total }}</b></span>
+    <div class="pages">
+      <button type="button" [disabled]="pager.page <= 1" (click)="pager.go(pager.page - 1)" aria-label="Previous page">‹</button>
+      @for (p of pager.pageList; track $index) {
+        @if (p === 0) { <span class="gap">…</span> } @else { <button type="button" [class.on]="p === pager.page" (click)="pager.go(p)">{{ p }}</button> }
+      }
+      <button type="button" [disabled]="pager.page >= pager.pageCount" (click)="pager.go(pager.page + 1)" aria-label="Next page">›</button>
+    </div>
+  </div>
+</div>
+
+<div class="bar">
+  <span class="note">Ticked jobs on every page are saved together.</span>
+  <div class="r">
+    <button class="btn p" type="submit" name="btnAdd" [disabled]="buttondis" (click)="OnCartSave()">Update</button>
+  </div>
+</div>
