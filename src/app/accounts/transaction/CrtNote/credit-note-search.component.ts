@@ -190,18 +190,16 @@ export class CreditNoteSearchComponent implements OnInit {
     let theTop = (screen.height / 2) - (483 / 2);
     let theLeft = (screen.width / 2) - (780 / 2);
     let toolbar = 'resizable=no,scrollbars=no,width=800,height=450,status=no,left=' + theLeft + ',top=' + theTop;
-   // old .NET print page (still reachable from the "Print from .NET page" button on the new print popup)
-   // let URL = "http://180.179.207.163/Linkserp-ac/UI/Accounts/frm_Acc_Tran_CreditNote_Print.aspx?" +
-   // "huhpnk=" + this._loginService.getLogin()[0].GUID
-   // + "&citycode=" + this._loginService.getLogin()[0].CITYCODE1
-   // + "&Userid=" + this._loginService.getLogin()[0].CMPID
-   // + "&cmp_code=" + this._loginService.getLogin()[0].CMPCODE
-   // + "&CreditNoteNo=" +creditno
-   // + "&DisplayMode=" + "0"
-   // + "&CurLogInIP=" + environment.edocumentIp
-   // window.open(URL, "_blank");
-   toolbar = 'resizable=yes,scrollbars=yes,width=900,height=700,status=no,left=' + ((screen.width / 2) - 450) + ',top=' + ((screen.height / 2) - 350);
-   window.open('./#/popup/Account-CreditNote-print/' + creditno + '/' , "CreditNote Print", toolbar);
+   // window.open('./#/popup/Account-CreditNote-print/' + creditno + '/' , "CreditNote Print", toolbar);
+   let URL = "http://180.179.207.163/Linkserp-ac/UI/Accounts/frm_Acc_Tran_CreditNote_Print.aspx?" +
+   "huhpnk=" + this._loginService.getLogin()[0].GUID
+   + "&citycode=" + this._loginService.getLogin()[0].CITYCODE1
+   + "&Userid=" + this._loginService.getLogin()[0].CMPID
+   + "&cmp_code=" + this._loginService.getLogin()[0].CMPCODE
+   + "&CreditNoteNo=" +creditno
+   + "&DisplayMode=" + "0"
+   + "&CurLogInIP=" + environment.edocumentIp
+   window.open(URL, "_blank");
   }
 
     ListOnclick(CREDITNO) {
@@ -213,21 +211,18 @@ export class CreditNoteSearchComponent implements OnInit {
       let toolbar = 'resizable=no,scrollbars=no,width=800,height=450,status=no,left=' + theLeft + ',top=' + theTop;
      // window.open('./#/popup/Account-CreditNote-print/' + creditno + '/' , "CreditNote Print", toolbar);
      if (confirm('Click Ok to Print or Click Cancel to Edit ?')) {
-     // old .NET print page (still reachable from the "Print from .NET page" button on the new print popup)
-     // let URL = "http://180.179.207.163/Linkserp-ac/UI/Accounts/frm_Acc_Tran_CreditNote_Print.aspx?" +
-     // "huhpnk=" + this._loginService.getLogin()[0].GUID
-     // + "&citycode=" + this._loginService.getLogin()[0].CITYCODE1
-     // + "&Userid=" + this._loginService.getLogin()[0].CMPID
-     // + "&cmp_code=" + this._loginService.getLogin()[0].CMPCODE
-     // + "&CreditNoteNo=" +CREDITNO
-     // + "&DisplayMode=" + "0"
-     // + "&CurLogInIP=" + environment.edocumentIp
-     // + "&cmp_username=" + this._loginService.getLogin()[0].CMP_USERNAME
-     // + "&FinStartDate=" + this._loginService.getLogin()[0].FINANCIAL_YEAR.STARTDATE
-     // + "&FinEndDate=" + this._loginService.getLogin()[0].FINANCIAL_YEAR.ENDDATE
-     // window.open(URL, "_blank");
-     toolbar = 'resizable=yes,scrollbars=yes,width=900,height=700,status=no,left=' + ((screen.width / 2) - 450) + ',top=' + ((screen.height / 2) - 350);
-     window.open('./#/popup/Account-CreditNote-print/' + CREDITNO + '/', "CreditNote Print", toolbar);
+     let URL = "http://180.179.207.163/Linkserp-ac/UI/Accounts/frm_Acc_Tran_CreditNote_Print.aspx?" +
+     "huhpnk=" + this._loginService.getLogin()[0].GUID
+     + "&citycode=" + this._loginService.getLogin()[0].CITYCODE1
+     + "&Userid=" + this._loginService.getLogin()[0].CMPID
+     + "&cmp_code=" + this._loginService.getLogin()[0].CMPCODE
+     + "&CreditNoteNo=" +CREDITNO
+     + "&DisplayMode=" + "0"
+     + "&CurLogInIP=" + environment.edocumentIp
+     + "&cmp_username=" + this._loginService.getLogin()[0].CMP_USERNAME
+     + "&FinStartDate=" + this._loginService.getLogin()[0].FINANCIAL_YEAR.STARTDATE
+     + "&FinEndDate=" + this._loginService.getLogin()[0].FINANCIAL_YEAR.ENDDATE
+     window.open(URL, "_blank");
      return false;
     }
         else
