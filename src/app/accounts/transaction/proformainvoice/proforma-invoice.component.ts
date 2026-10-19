@@ -526,7 +526,8 @@ export class ProformaInvoiceComponent implements OnInit    {
         this.selected_data = ID
         this.jobno_disable = true
         this.invno = ID.INV_NO
-        this.invdate = this.datePipe.transform(this.InvoiceDate, 'dd/mm/yyyy')
+        // disabled: 'mm' in DatePipe is minutes, so this wrote dd/<minutes>/yyyy into the invoice date (broken drafts in acc_invoice); same as the Manilal app
+        // this.invdate = this.datePipe.transform(this.InvoiceDate, 'dd/mm/yyyy')
         this.jobno = ID.INV_JOBNO
         this.packages = ID.INV_PKGS
         this.propweight = ID.INV_GRWT
@@ -541,7 +542,8 @@ export class ProformaInvoiceComponent implements OnInit    {
         this.propweight = ""
         this.jobno = ""
         this.invno = ""
-        this.invdate = this.datePipe.transform(this.InvoiceDate, 'dd/mm/yyyy')
+        // disabled: 'mm' in DatePipe is minutes, so this wrote dd/<minutes>/yyyy into the invoice date (broken drafts in acc_invoice); same as the Manilal app
+        // this.invdate = this.datePipe.transform(this.InvoiceDate, 'dd/mm/yyyy')
 
     }
     updatejob() {

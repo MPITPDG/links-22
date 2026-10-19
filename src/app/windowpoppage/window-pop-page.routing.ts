@@ -12,6 +12,7 @@ import { InvoiceViewComponent } from './Account/invoice-view.component';
 import { InvoiceViewPageComponent } from '../accounts/transaction/invoice/invoice-view-page.component';
 import { CreditnoteViewComponent } from './Account/creditnote-view.component';
 import { CreditnotePrintComponent } from './Account/creditnote-print.component';
+import { CreditnotePrintNetComponent } from './Account/creditnote-print-net.component';
 import { PurchasePrintComponent } from './Account/purchase-print.component';
 import { CashBookBRPrintComponent } from './Account/CashBook-BR-print.component';
 import { ReqbpViewComponent } from './Account/reqbp-view.component';
@@ -58,6 +59,7 @@ const routes: Routes = [
       { path: 'Account-Invoice-View-New/:invno', component: InvoiceViewPageComponent, data: { title: 'Invoice View (new)', popup: true } },
       { path: 'Account-CreditNote-View/:CrtNo', component: CreditnoteViewComponent, data: { title: 'CreditNote View' } },
       { path: 'Account-CreditNote-print/:CrtNo', component: CreditnotePrintComponent, data: { title: 'CreditNote Print' } },
+      { path: 'Account-CreditNote-print-net/:CrtNo', component: CreditnotePrintNetComponent, data: { title: 'CreditNote Print (.NET style)' } },
       { path: 'Account-Purchase-print/:SuppNo/:Status', component: PurchasePrintComponent, data: { title: 'Purchase Print' } },
       { path: 'Account-CashBook-BankReceipt-print/:Type/:BrNo', component: CashBookBRPrintComponent, data: { title: 'CashBook-Bank Receipt' } },
       { path: 'Account-Request-Bank-Payment-print/:EntryNo', component: ReqbpViewComponent, data: { title: 'View Request Bank Payment' } },
