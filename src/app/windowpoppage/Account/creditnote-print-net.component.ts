@@ -39,6 +39,8 @@ const CN_CSS = `
   selector: 'app-creditnote-print-net',
   templateUrl: './creditnote-print-net.component.html',
   styles: [CN_CSS],
+  // On-screen chrome only (Print bar, currency picker) from the global kit; the printed #demo is untouched.
+  host: { class: 'kit-print' },
   changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false
 })
