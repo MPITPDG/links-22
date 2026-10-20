@@ -251,7 +251,18 @@ export class InvoiceRegisterComponent implements OnInit {
       })
 
     } else if (this.PageType == "CreditNote") {
-      this.api("Accounts/fn_Acc_Rpt_CN_Register_AcctDetail_XL", jsonmaster).subscribe((data: any) => {
+      // This API action binds FromDate/ToDate/CmpCode/CityCode/Fin_StartDate/Fin_EndDate, not the
+      // _FromDt/cmp_code/FINSTARTDATE names the other registers use, so the shared jsonmaster
+      // never matched it (the request was rejected before the proc ran). Same values, its own names.
+      const cnParams = {
+        FromDate: jsonmaster._FromDt,
+        ToDate: jsonmaster._ToDt,
+        CmpCode: jsonmaster.cmp_code,
+        CityCode: jsonmaster.citycode,
+        Fin_StartDate: jsonmaster.FINSTARTDATE,
+        Fin_EndDate: jsonmaster.FINENDDATE
+      }
+      this.api("Accounts/fn_Acc_Rpt_CN_Register_AcctDetail_XL", cnParams).subscribe((data: any) => {
         if (data && data.Table && data.Table.length > 0){
           this.registerdata = data.Table
 
