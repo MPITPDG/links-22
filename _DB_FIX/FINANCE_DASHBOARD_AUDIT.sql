@@ -18,6 +18,10 @@
 
   Target: SQL Server 2008 R2. Re-runnable (drop/recreate).
 
+  2026-10-21: checks 3 and 4 read indexed temp sets (#BANK, #EXP, #INVNO, #CNNO) built once,
+  445 s -> about 2 s per call on LinksDB20, same rows. Where this script already ran, apply
+  FINANCE_DASHBOARD_AUDIT_PERF_LINKSDB20_20261021.sql instead.
+
   RESULT SETS
     Table   summary - one row per check
     Table1  drill   - one flat shape for every check, TOP 500 per check by value
@@ -114,6 +118,29 @@ BEGIN
     CREATE CLUSTERED INDEX IX_PINV ON #PINV (INV_NO)
 
     ---------------------------------------------------------------------------------
+    -- lookup sets for checks 3 and 4, built once. acc_bank, acc_bankdtls, acc_invoice and
+    -- acc_creditnote have no indexes and exp_code is compared trimmed, so the per-receipt
+    -- lookups scanned those tables once per row: check 4 took 421 s and 127 million reads
+    -- for 8,059 receipts on LinksDB20 (2026-10-21), check 3 took 24 s. Same comparisons
+    -- as before, same rows (#BANK is only pre-filtered with the checks' own predicates).
+    ---------------------------------------------------------------------------------
+    SELECT entryno, entrydt, status, citycode INTO #BANK FROM acc_bank
+     WHERE status IN ('BR','CR')
+       AND LEN(ISNULL(entrydt,'')) = 10
+       AND SUBSTRING(entrydt,7,4)+SUBSTRING(entrydt,4,2)+SUBSTRING(entrydt,1,2)
+           BETWEEN @FROM_YMD AND @TO_YMD
+    CREATE CLUSTERED INDEX IX_BANK ON #BANK (entryno)
+
+    SELECT LTRIM(RTRIM(exp_code)) AS EXP_CODE, exp_name INTO #EXP FROM exp_master
+    CREATE CLUSTERED INDEX IX_EXP ON #EXP (EXP_CODE)
+
+    SELECT DISTINCT inv_no INTO #INVNO FROM acc_invoice WHERE inv_no IS NOT NULL
+    CREATE CLUSTERED INDEX IX_INVNO ON #INVNO (inv_no)
+
+    SELECT DISTINCT LTRIM(RTRIM(crt_no)) AS CRT_NO INTO #CNNO FROM acc_creditnote WHERE crt_no IS NOT NULL
+    CREATE CLUSTERED INDEX IX_CNNO ON #CNNO (CRT_NO)
+
+    ---------------------------------------------------------------------------------
     -- CHECK 1 : CREDIT_PERIOD_MISSING (HIGH) - the headline finding.
     --   ~50% of invoiced clients have no credit period on the client master; every
     --   overdue / ageing / recovery-gap figure for them runs on the default 30.
@@ -171,9 +198,9 @@ BEGIN
                 THEN ' (on-account / advance - unapplied by design)'
                 ELSE ' - not applied to any bill; match it or the client ages incorrectly' END
       FROM acc_bankdtls d
-     INNER JOIN acc_bank b ON b.entryno = d.entryno
+     INNER JOIN #BANK b ON b.entryno = d.entryno
      INNER JOIN #CITY c ON c.CITYCODE = LTRIM(RTRIM(b.citycode))
-      LEFT JOIN exp_master e ON LTRIM(RTRIM(e.exp_code)) = LTRIM(RTRIM(d.client))
+      LEFT JOIN #EXP e ON e.EXP_CODE = LTRIM(RTRIM(d.client))
      WHERE b.status IN ('BR','CR')
        AND ISNULL(d.entrytype,'') <> 'AB'
        AND LTRIM(RTRIM(ISNULL(d.client,''))) LIKE 'E%'
@@ -207,9 +234,9 @@ BEGIN
            0,
            'billno ' + LTRIM(RTRIM(ISNULL(d.billno,''))) + ' matches no invoice and no credit note'
       FROM acc_bankdtls d
-     INNER JOIN acc_bank b ON b.entryno = d.entryno
+     INNER JOIN #BANK b ON b.entryno = d.entryno
      INNER JOIN #CITY c ON c.CITYCODE = LTRIM(RTRIM(b.citycode))
-      LEFT JOIN exp_master e ON LTRIM(RTRIM(e.exp_code)) = LTRIM(RTRIM(d.client))
+      LEFT JOIN #EXP e ON e.EXP_CODE = LTRIM(RTRIM(d.client))
      WHERE b.status IN ('BR','CR')
        AND d.entrytype = 'AB'
        AND ISNULL(d.billno,'') <> ''
@@ -217,10 +244,10 @@ BEGIN
        AND LEN(ISNULL(b.entrydt,'')) = 10
        AND SUBSTRING(b.entrydt,7,4)+SUBSTRING(b.entrydt,4,2)+SUBSTRING(b.entrydt,1,2)
            BETWEEN @FROM_YMD AND @TO_YMD
-       AND NOT EXISTS (SELECT 1 FROM acc_invoice iv
+       AND NOT EXISTS (SELECT 1 FROM #INVNO iv
                         WHERE iv.inv_no = LTRIM(RTRIM(d.billno)))
-       AND NOT EXISTS (SELECT 1 FROM acc_creditnote cn
-                        WHERE LTRIM(RTRIM(cn.crt_no)) = LTRIM(RTRIM(d.billno)))
+       AND NOT EXISTS (SELECT 1 FROM #CNNO cn
+                        WHERE cn.CRT_NO = LTRIM(RTRIM(d.billno)))
      ORDER BY CONVERT(FLOAT, ISNULL(NULLIF(LTRIM(RTRIM(d.amount)),''),'0')) DESC
 
     INSERT INTO #SUMMARY
@@ -313,6 +340,10 @@ BEGIN
     DROP TABLE #PINV
     DROP TABLE #PJOB
     DROP TABLE #KNOWN
+    DROP TABLE #BANK
+    DROP TABLE #EXP
+    DROP TABLE #INVNO
+    DROP TABLE #CNNO
 END
 GO
 
