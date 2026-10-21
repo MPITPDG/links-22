@@ -1,297 +1,276 @@
-<div class="fd-page" [ngClass]="{ 'fd-dark': DarkMode }">
-
-    <!-- ============================== HEADER ============================== -->
-    <div class="fd-header">
-        <div class="fd-title-wrap">
-            <div class="fd-crumb">Finance <i class="fa fa-angle-right"></i> MIS Report <i class="fa fa-angle-right"></i> Admin Report</div>
-            <div class="fd-title-row">
-                <h1 class="fd-title">Management Day-End</h1>
-                @if (Kpi) {
-<span class="fd-badge">{{ Kpi.ONDATE }}</span>
-}
-            </div>
-            <div class="fd-sub">What happened today and what needs attention tomorrow</div>
-        </div>
-        <div class="fd-header-actions">
-            <button type="button" class="fd-icon-btn" (click)="DarkMode = !DarkMode"
-                    [title]="DarkMode ? 'Light mode' : 'Dark mode'">
-                <i class="fa" [ngClass]="DarkMode ? 'fa-moon-o' : 'fa-sun-o'"></i>
-            </button>
-        </div>
+<!--
+  Accounts -> MIS Report -> Admin Report -> Management Day-End (Links: /accounts/MisReport/AdminReport/DayEnd/dashboard).
+  Added by the October 2026 Angular 8 port (nalini-mp/links-22#2) and moved onto the page kit like the Finance
+  dashboard it summarises: global kit (.im-page, host kit-accreport) plus the Finance dashboard's scoped
+  finance-dashboard-page.css, so the two pages stay visually identical. Every binding, handler, rights check and
+  empty / loading state is the same as before; the page's own light / dark toggle is gone because the app theme
+  covers dark mode (as on the Finance dashboard).
+-->
+<div class="im-page fd-kit fd-page">
+  <div class="ph">
+    <div>
+      <h1>Management Day-End</h1>
+      <p>What happened today and what needs attention tomorrow @if (Kpi) {&middot; {{ Kpi.ONDATE }}}</p>
     </div>
-
-    <!-- ============================ FILTER BAR ============================ -->
-    <div class="fd-filterbar">
-        <div class="fd-filter-row">
-            <div class="fd-field fd-field--date" title="Date">
-                <input type="date" class="form-control" [(ngModel)]="OnDate" (change)="load()" aria-label="Date" />
-            </div>
-            <div class="fd-field fd-field--company" title="Company">
-                <select class="form-control" [(ngModel)]="Company" [disabled]="!Rights.allBranch" (change)="load()">
-                    @for (c of CompanyList; track c) {
-<option [value]="c.VALUEFIELD">{{ c.TEXTFIELD }}</option>
-}
-                </select>
-            </div>
-            <div class="fd-field fd-field--branch" title="Branch">
-                <select class="form-control" [(ngModel)]="Branch" [disabled]="!Rights.allBranch" (change)="load()">
-                    @for (b of BranchList; track b) {
-<option [value]="b.code">{{ b.name }}</option>
-}
-                </select>
-            </div>
-            <div class="fd-filter-actions">
-                <button type="button" class="fd-btn fd-btn--primary" (click)="load()">
-                    <i class="fa fa-filter"></i> Apply
-                </button>
-                @if (Rights.export) {
-<button type="button" class="fd-btn fd-btn--outline" (click)="exportExcel()" [disabled]="!Kpi">
-                    <i class="fa fa-download"></i> Export
-                </button>
-}
-            </div>
-        </div>
-        @if (Fin && FinCacheInfo) {
-<div class="fd-asof">
-            <i class="fa fa-database"></i> Receivable and margin figures: data as of {{ FinCacheInfo.CACHED_AT }}
-        </div>
-}
+    <div class="tools">
+      @if (Fin && FinCacheInfo) {
+        <span class="chip" title="Receivable and margin figures come from the Finance dashboard and share its cache">Receivables and margin: data as of {{ FinCacheInfo.CACHED_AT }}</span>
+      }
+      @if (Rights.export) {
+        <button type="button" class="btn g" (click)="exportExcel()" [disabled]="!Kpi">Export</button>
+      }
     </div>
+  </div>
 
-    @if (loading && !Kpi) {
-<div class="fd-note">Loading today's figures&hellip;</div>
-}
-
-    <!-- ============================== RESULTS ============================== -->
-    @if (Kpi) {
-<div class="fd-body">
-
-        <!-- ---- headline cards ---- -->
-        <div class="fd-grid">
-
-            <div class="fd-card fd-kpi">
-                <div class="fd-kpi-top">
-                    <div class="fd-kpi-label">Billed today</div>
-                    <span class="fd-kpi-icon fd-ico--green"><i class="fa fa-file-text-o"></i></span>
-                </div>
-                <div class="fd-kpi-value">{{ inr(Kpi.BILLED_TODAY) }}</div>
-                <div class="fd-kpi-tip">Invoices raised today across the selected company and branch.</div>
-                <div class="fd-kpi-sub">
-                    <div class="fd-kpi-row"><span>Invoices</span><b>{{ Kpi.BILLED_COUNT }}</b></div>
-                    <div class="fd-kpi-row"><span>Yesterday</span><b>{{ inr(Kpi.BILLED_YESTERDAY) }}</b></div>
-                    <div class="fd-kpi-row"><span>Change</span><b [ngClass]="deltaTone(Kpi.BILLED_TODAY, Kpi.BILLED_YESTERDAY)">{{ delta(Kpi.BILLED_TODAY, Kpi.BILLED_YESTERDAY) }}</b></div>
-                </div>
-            </div>
-
-            <div class="fd-card fd-kpi">
-                <div class="fd-kpi-top">
-                    <div class="fd-kpi-label">Jobs opened / invoiced</div>
-                    <span class="fd-kpi-icon fd-ico--blue"><i class="fa fa-ship"></i></span>
-                </div>
-                <div class="fd-kpi-value">{{ Kpi.JOBS_OPENED }} / {{ Kpi.JOBS_INVOICED_TODAY }}<span class="fd-kpi-unit">today</span></div>
-                <div class="fd-kpi-tip">Jobs opened today, and jobs that went onto an invoice today.</div>
-                <div class="fd-kpi-sub">
-                    <div class="fd-kpi-row"><span>Export</span><b>{{ Kpi.JOBS_EXPORT }}</b></div>
-                    <div class="fd-kpi-row"><span>Import / Misc</span><b>{{ Kpi.JOBS_IMPORT }} / {{ Kpi.JOBS_MISC }}</b></div>
-                    <div class="fd-kpi-row"><span>Opened yesterday</span><b>{{ Kpi.JOBS_OPENED_YESTERDAY }}</b></div>
-                </div>
-            </div>
-
-            <div class="fd-card fd-kpi">
-                <div class="fd-kpi-top">
-                    <div class="fd-kpi-label">Done, not invoiced</div>
-                    <span class="fd-kpi-icon fd-ico--amber"><i class="fa fa-hourglass-half"></i></span>
-                </div>
-                <div class="fd-kpi-value">{{ Kpi.UNBILLED_JOBS }}<span class="fd-kpi-unit">jobs</span></div>
-                <div class="fd-kpi-tip">Opened 7 to 90 days ago and on no invoice yet &mdash; work done but not billed.</div>
-                <div class="fd-kpi-sub">
-                    <div class="fd-kpi-row"><span>Oldest</span><b class="fd-up">{{ Kpi.UNBILLED_OLDEST_DAYS }} days</b></div>
-                    @if (Fin) {
-<div class="fd-kpi-row"><span>Cost booked, not billed</span><b>{{ inr(Fin.UNBILLED_VALUE) }}</b></div>
-}
-                    <div class="fd-kpi-row"><span>Delayed shipments</span><b [ngClass]="Kpi.DELAYED_COUNT > 0 ? 'fd-up' : ''">{{ Kpi.DELAYED_COUNT }}</b></div>
-                </div>
-            </div>
-
-            <div class="fd-card fd-kpi">
-                <div class="fd-kpi-top">
-                    <div class="fd-kpi-label">Overdue receivable</div>
-                    <span class="fd-kpi-icon fd-ico--red"><i class="fa fa-exclamation-triangle"></i></span>
-                </div>
-                @if (Fin) {
-<div class="fd-kpi-value">{{ inr(Fin.OVERDUE_AMT) }}</div>
-}
-                @if (!Fin) {
-<div class="fd-kpi-value fd-kpi-muted">{{ FinLoading ? 'Loading' : 'n/a' }}</div>
-}
-                <div class="fd-kpi-tip">Money customers owe us past the due date, as on the selected date (Finance Dashboard basis).</div>
-                @if (Fin) {
-<div class="fd-kpi-sub">
-                    <div class="fd-kpi-row"><span>Outstanding</span><b>{{ inr(Fin.TOTAL_OUTSTANDING) }}</b></div>
-                    <div class="fd-kpi-row"><span>Overdue share</span><b class="fd-up">{{ pct(Fin.OVERDUE_AMT, Fin.TOTAL_OUTSTANDING) }}</b></div>
-                </div>
-}
-            </div>
-        </div>
-
-        <!-- ---- delayed + margin ---- -->
-        <div class="fd-grid fd-grid--wide">
-
-            <div class="fd-card">
-                <div class="fd-card-head">
-                    <span class="fd-card-title">Delayed Shipments
-                        <i class="fd-info" title="Export sea jobs whose vessel ETD passed 3 to 30 days ago with no BL or HBL no. entered">i</i></span>
-                    @if (Kpi.DELAYED_COUNT > 0) {
-<span class="fd-pill fd-pill--red">{{ Kpi.DELAYED_COUNT }} jobs</span>
-}
-                </div>
-                <div class="fd-table-scroll">
-                    <table class="fd-table">
-                        <thead><tr><th>Job</th><th>Client</th><th>Vessel</th><th>ETD</th><th class="num">Late</th></tr></thead>
-                        <tbody>
-                            @for (d of (ShowAllDelayed ? Delayed : Delayed.slice(0,6)); track d) {
-<tr>
-                                <td>{{ d.JOBNO }}</td>
-                                <td>{{ d.CLIENT }}</td>
-                                <td>{{ d.VESSEL }}</td>
-                                <td>{{ d.ETD }}</td>
-                                <td class="num"><span class="fd-pill" [ngClass]="d.DELAY_DAYS >= 10 ? 'fd-pill--red' : 'fd-pill--amber'">{{ d.DELAY_DAYS }} d</span></td>
-                            </tr>
-}
-                            @if (Delayed.length === 0) {
-<tr><td colspan="5" class="fd-empty">No delayed shipments.</td></tr>
-}
-                        </tbody>
-                    </table>
-                </div>
-                @if (Delayed.length > 6) {
-<button type="button" class="fd-more" (click)="ShowAllDelayed = !ShowAllDelayed">
-                    {{ ShowAllDelayed ? 'Show fewer' : 'Show all ' + Delayed.length }}
-                </button>
-}
-            </div>
-
-            <div class="fd-card">
-                <div class="fd-card-head">
-                    <span class="fd-card-title">Margin Watch
-                        <i class="fd-info" title="Lowest-profit billed jobs, last 30 days. Ledger income less booked job cost, same basis as the Finance Dashboard.">i</i></span>
-                    @if (Rights.margin) {
-<button type="button" class="fd-btn fd-btn--outline fd-btn--icon" (click)="refreshFinance()" title="Recalculate (bypass cache)">
-                        <i class="fa fa-refresh"></i>
-                    </button>
-}
-                </div>
-                @if (!Rights.margin) {
-<div class="fd-empty"><i class="fa fa-lock"></i> You do not have the margin right for this page.</div>
-}
-                @if (Rights.margin) {
-
-                    @if (FinLoading) {
-<div class="fd-empty">Calculating from the Finance Dashboard&hellip;</div>
-}
-                    @if (FinError && !FinLoading) {
-<div class="fd-empty">Finance figures could not be loaded.</div>
-}
-                    @if (!FinLoading && !FinError) {
-<div class="fd-table-scroll">
-                        <table class="fd-table">
-                            <thead><tr><th>Job</th><th>Client</th><th class="num">Income</th><th class="num">Profit</th></tr></thead>
-                            <tbody>
-                                @for (m of FinMargin.slice(0,6); track m) {
-<tr>
-                                    <td>{{ m.JOBNO }}</td>
-                                    <td>{{ m.CLIENTNAME }}</td>
-                                    <td class="num">{{ inr(m.INCOME) }}</td>
-                                    <td class="num" [ngClass]="m.PROFIT < 0 ? 'fd-neg' : 'fd-pos'">{{ inr(m.PROFIT) }}</td>
-                                </tr>
-}
-                                @if (FinMargin.length === 0) {
-<tr><td colspan="4" class="fd-empty">No billed jobs in the last 30 days.</td></tr>
-}
-                            </tbody>
-                        </table>
-                    </div>
-}
-                
-}
-            </div>
-        </div>
-
-        <!-- ---- tomorrow + unbilled ---- -->
-        <div class="fd-grid fd-grid--wide">
-
-            <div class="fd-card">
-                <div class="fd-card-head">
-                    <span class="fd-card-title">Needs Attention Tomorrow
-                        <i class="fd-info" title="Supplier bill amounts are gross: the ERP keeps no balance on purchase bills.">i</i></span>
-                </div>
-                <div class="fd-mini">
-                    <div class="fd-mini-item"><span>Vessel ETDs</span><b>{{ Kpi.ETD_TOMORROW }}</b></div>
-                    <div class="fd-mini-item"><span>Supplier bills due</span><b>{{ Kpi.BILLS_DUE_TOMORROW }}</b><em>{{ inr(Kpi.BILLS_DUE_TOMORROW_AMT) }}</em></div>
-                    <div class="fd-mini-item"><span>Proformas to convert</span><b>{{ Kpi.PROFORMA_OPEN }}</b></div>
-                </div>
-                <div class="fd-table-scroll">
-                    <table class="fd-table">
-                        <thead><tr><th>Item</th><th>Reference</th><th>Party</th><th>Detail</th></tr></thead>
-                        <tbody>
-                            @for (t of (ShowAllTomorrow ? Tomorrow : Tomorrow.slice(0,6)); track t) {
-<tr>
-                                <td>{{ t.KIND }}</td>
-                                <td>{{ t.REF }}</td>
-                                <td>{{ t.PARTY }}</td>
-                                <td>{{ t.DETAIL }}</td>
-                            </tr>
-}
-                            @if (Tomorrow.length === 0) {
-<tr><td colspan="4" class="fd-empty">Nothing scheduled for tomorrow.</td></tr>
-}
-                        </tbody>
-                    </table>
-                </div>
-                @if (Tomorrow.length > 6) {
-<button type="button" class="fd-more" (click)="ShowAllTomorrow = !ShowAllTomorrow">
-                    {{ ShowAllTomorrow ? 'Show fewer' : 'Show all ' + Tomorrow.length }}
-                </button>
-}
-            </div>
-
-            <div class="fd-card">
-                <div class="fd-card-head">
-                    <span class="fd-card-title">Jobs Not Invoiced
-                        <i class="fd-info" title="Jobs opened 7 to 90 days ago that appear on no invoice. Oldest first.">i</i></span>
-                    <span class="fd-pill fd-pill--amber">{{ Kpi.UNBILLED_JOBS }} jobs</span>
-                </div>
-                <div class="fd-table-scroll">
-                    <table class="fd-table">
-                        <thead><tr><th>Job</th><th>Type</th><th>Client</th><th class="num">Age</th></tr></thead>
-                        <tbody>
-                            @for (u of (ShowAllUnbilled ? Unbilled : Unbilled.slice(0,6)); track u) {
-<tr>
-                                <td>{{ u.JOBNO }}</td>
-                                <td>{{ u.JOB_TYPE }}</td>
-                                <td>{{ u.CLIENT }}</td>
-                                <td class="num">{{ u.AGE_DAYS }} d</td>
-                            </tr>
-}
-                            @if (Unbilled.length === 0) {
-<tr><td colspan="4" class="fd-empty">Every job older than a week is invoiced.</td></tr>
-}
-                        </tbody>
-                    </table>
-                </div>
-                @if (Unbilled.length > 6) {
-<button type="button" class="fd-more" (click)="ShowAllUnbilled = !ShowAllUnbilled">
-                    {{ ShowAllUnbilled ? 'Show fewer' : 'Show all ' + Unbilled.length }}
-                </button>
-}
-            </div>
-        </div>
-
+  <!-- ============================ FILTERS ============================ -->
+  <div class="card sec">
+    <div class="filters fk-f">
+      <div class="f">
+        <label>Date</label>
+        <input type="date" [(ngModel)]="OnDate" (change)="load()" aria-label="Date" />
+      </div>
+      <div class="f dd-company">
+        <label>Company</label>
+        <select [(ngModel)]="Company" [disabled]="!Rights.allBranch" (change)="load()">
+          @for (c of CompanyList; track c) {
+            <option [value]="c.VALUEFIELD">{{ c.TEXTFIELD }}</option>
+          }
+        </select>
+      </div>
+      <div class="f">
+        <label>Branch</label>
+        <select [(ngModel)]="Branch" [disabled]="!Rights.allBranch" (change)="load()">
+          @for (b of BranchList; track b) {
+            <option [value]="b.code">{{ b.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="f act">
+        <button type="button" class="btn pri" (click)="load()">Apply</button>
+      </div>
     </div>
-}
+  </div>
 
-    @if (!Kpi && !loading) {
-<div class="fd-note">No data to show. Pick a date, company and branch, then press Apply.</div>
-}
+  @if (loading && !Kpi) {
+    <div class="card sec"><div class="empty">Loading today's figures&hellip;</div></div>
+  }
 
+  <!-- ============================ RESULTS ============================ -->
+  @if (Kpi) {
+
+    <!-- ---- today ---- -->
+    <section class="fd-sec">
+      <div class="fd-sech"><h2>Today</h2><span>Billing, jobs, work not yet billed and overdue receivables for the selected company and branch.</span></div>
+      <div class="fk-kpis">
+        <div class="fd-tile">
+          <div class="k">Billed today</div>
+          <div class="v">{{ inr(Kpi.BILLED_TODAY) }}</div>
+          <div class="s">Invoices raised today across the selected company and branch.</div>
+          <div class="fd-kpi-rows">
+            <div class="fd-kpi-row"><span>Invoices</span><b>{{ Kpi.BILLED_COUNT }}</b></div>
+            <div class="fd-kpi-row"><span>Yesterday</span><b>{{ inr(Kpi.BILLED_YESTERDAY) }}</b></div>
+            <div class="fd-kpi-row"><span>Change</span><b [ngClass]="deltaTone(Kpi.BILLED_TODAY, Kpi.BILLED_YESTERDAY)">{{ delta(Kpi.BILLED_TODAY, Kpi.BILLED_YESTERDAY) }}</b></div>
+          </div>
+        </div>
+
+        <div class="fd-tile">
+          <div class="k">Jobs opened / invoiced</div>
+          <div class="v">{{ Kpi.JOBS_OPENED }} / {{ Kpi.JOBS_INVOICED_TODAY }}<span class="u">today</span></div>
+          <div class="s">Jobs opened today, and jobs that went onto an invoice today.</div>
+          <div class="fd-kpi-rows">
+            <div class="fd-kpi-row"><span>Export</span><b>{{ Kpi.JOBS_EXPORT }}</b></div>
+            <div class="fd-kpi-row"><span>Import / Misc</span><b>{{ Kpi.JOBS_IMPORT }} / {{ Kpi.JOBS_MISC }}</b></div>
+            <div class="fd-kpi-row"><span>Opened yesterday</span><b>{{ Kpi.JOBS_OPENED_YESTERDAY }}</b></div>
+          </div>
+        </div>
+
+        <div class="fd-tile">
+          <div class="k">Done, not invoiced</div>
+          <div class="v">{{ Kpi.UNBILLED_JOBS }}<span class="u">jobs</span></div>
+          <div class="s">Opened 7 to 90 days ago and on no invoice yet &mdash; work done but not billed.</div>
+          <div class="fd-kpi-rows">
+            <div class="fd-kpi-row"><span>Oldest</span><b class="fd-up">{{ Kpi.UNBILLED_OLDEST_DAYS }} days</b></div>
+            @if (Fin) {
+              <div class="fd-kpi-row"><span>Cost booked, not billed</span><b>{{ inr(Fin.UNBILLED_VALUE) }}</b></div>
+            }
+            <div class="fd-kpi-row"><span>Delayed shipments</span><b [ngClass]="Kpi.DELAYED_COUNT > 0 ? 'fd-up' : ''">{{ Kpi.DELAYED_COUNT }}</b></div>
+          </div>
+        </div>
+
+        <div class="fd-tile">
+          <div class="k">Overdue receivable</div>
+          @if (Fin) {
+            <div class="v">{{ inr(Fin.OVERDUE_AMT) }}</div>
+          }
+          @if (!Fin) {
+            <div class="v sm fd-kpi-muted">{{ FinLoading ? 'Loading' : 'n/a' }}</div>
+          }
+          <div class="s">Money customers owe us past the due date, as on the selected date (Finance dashboard basis).</div>
+          @if (Fin) {
+            <div class="fd-kpi-rows">
+              <div class="fd-kpi-row"><span>Outstanding</span><b>{{ inr(Fin.TOTAL_OUTSTANDING) }}</b></div>
+              <div class="fd-kpi-row"><span>Overdue share</span><b class="fd-up">{{ pct(Fin.OVERDUE_AMT, Fin.TOTAL_OUTSTANDING) }}</b></div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ---- delayed + margin ---- -->
+    <section class="fd-sec">
+      <div class="fd-sech"><h2>Watch</h2><span>Shipments running late and the lowest-profit jobs billed in the last 30 days.</span></div>
+      <div class="fd-grid dd-grid">
+        <div class="card sec">
+          <div class="card-h">
+            <h2>Delayed shipments</h2>
+            <span class="meta">Export sea jobs whose vessel ETD passed 3 to 30 days ago with no BL or HBL no. entered</span>
+            @if (Kpi.DELAYED_COUNT > 0) {
+              <span class="chip solid">{{ Kpi.DELAYED_COUNT }} jobs</span>
+            }
+          </div>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>Job</th><th>Client</th><th>Vessel</th><th>ETD</th><th class="num">Late</th></tr></thead>
+              <tbody>
+                @for (d of (ShowAllDelayed ? Delayed : Delayed.slice(0,6)); track d) {
+                  <tr>
+                    <td>{{ d.JOBNO }}</td>
+                    <td>{{ d.CLIENT }}</td>
+                    <td>{{ d.VESSEL }}</td>
+                    <td>{{ d.ETD }}</td>
+                    <td class="num"><span class="chip" [class.solid]="d.DELAY_DAYS >= 10" [class.dash]="d.DELAY_DAYS < 10">{{ d.DELAY_DAYS }} d</span></td>
+                  </tr>
+                }
+                @if (Delayed.length === 0) {
+                  <tr><td colspan="5" class="empty">No delayed shipments.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          @if (Delayed.length > 6) {
+            <div class="dd-more">
+              <button type="button" class="btn g" (click)="ShowAllDelayed = !ShowAllDelayed">{{ ShowAllDelayed ? 'Show fewer' : 'Show all ' + Delayed.length }}</button>
+            </div>
+          }
+        </div>
+
+        <div class="card sec">
+          <div class="card-h">
+            <h2>Margin watch</h2>
+            <span class="meta">Lowest-profit billed jobs, last 30 days. Ledger income less booked job cost, same basis as the Finance dashboard.</span>
+            @if (Rights.margin) {
+              <button type="button" class="btn g" (click)="refreshFinance()" title="Recalculate (bypass cache)">Recalculate</button>
+            }
+          </div>
+          @if (!Rights.margin) {
+            <div class="empty">You do not have the margin right for this page.</div>
+          }
+          @if (Rights.margin) {
+            @if (FinLoading) {
+              <div class="empty">Calculating from the Finance dashboard&hellip;</div>
+            }
+            @if (FinError && !FinLoading) {
+              <div class="empty">Finance figures could not be loaded.</div>
+            }
+            @if (!FinLoading && !FinError) {
+              <div class="tbl-wrap">
+                <table class="tbl">
+                  <thead><tr><th>Job</th><th>Client</th><th class="num">Income</th><th class="num">Profit</th></tr></thead>
+                  <tbody>
+                    @for (m of FinMargin.slice(0,6); track m) {
+                      <tr>
+                        <td>{{ m.JOBNO }}</td>
+                        <td>{{ m.CLIENTNAME }}</td>
+                        <td class="num">{{ inr(m.INCOME) }}</td>
+                        <td class="num" [ngClass]="m.PROFIT < 0 ? 'fd-neg' : 'fd-pos'">{{ inr(m.PROFIT) }}</td>
+                      </tr>
+                    }
+                    @if (FinMargin.length === 0) {
+                      <tr><td colspan="4" class="empty">No billed jobs in the last 30 days.</td></tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ---- tomorrow + unbilled ---- -->
+    <section class="fd-sec">
+      <div class="fd-sech"><h2>Tomorrow and backlog</h2><span>What falls due tomorrow, and jobs still waiting for an invoice.</span></div>
+      <div class="fd-grid dd-grid">
+        <div class="card sec">
+          <div class="card-h">
+            <h2>Needs attention tomorrow</h2>
+            <span class="meta">Supplier bill amounts are gross: the ERP keeps no balance on purchase bills.</span>
+          </div>
+          <div class="fd-tiles fd-pad">
+            <div class="fd-tile flat"><div class="k">Vessel ETDs</div><div class="v sm">{{ Kpi.ETD_TOMORROW }}</div></div>
+            <div class="fd-tile flat"><div class="k">Supplier bills due</div><div class="v sm">{{ Kpi.BILLS_DUE_TOMORROW }}</div><div class="s">{{ inr(Kpi.BILLS_DUE_TOMORROW_AMT) }}</div></div>
+            <div class="fd-tile flat"><div class="k">Proformas to convert</div><div class="v sm">{{ Kpi.PROFORMA_OPEN }}</div></div>
+          </div>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>Item</th><th>Reference</th><th>Party</th><th>Detail</th></tr></thead>
+              <tbody>
+                @for (t of (ShowAllTomorrow ? Tomorrow : Tomorrow.slice(0,6)); track t) {
+                  <tr>
+                    <td>{{ t.KIND }}</td>
+                    <td>{{ t.REF }}</td>
+                    <td>{{ t.PARTY }}</td>
+                    <td>{{ t.DETAIL }}</td>
+                  </tr>
+                }
+                @if (Tomorrow.length === 0) {
+                  <tr><td colspan="4" class="empty">Nothing scheduled for tomorrow.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          @if (Tomorrow.length > 6) {
+            <div class="dd-more">
+              <button type="button" class="btn g" (click)="ShowAllTomorrow = !ShowAllTomorrow">{{ ShowAllTomorrow ? 'Show fewer' : 'Show all ' + Tomorrow.length }}</button>
+            </div>
+          }
+        </div>
+
+        <div class="card sec">
+          <div class="card-h">
+            <h2>Jobs not invoiced</h2>
+            <span class="meta">Jobs opened 7 to 90 days ago that appear on no invoice. Oldest first.</span>
+            <span class="chip dash">{{ Kpi.UNBILLED_JOBS }} jobs</span>
+          </div>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>Job</th><th>Type</th><th>Client</th><th class="num">Age</th></tr></thead>
+              <tbody>
+                @for (u of (ShowAllUnbilled ? Unbilled : Unbilled.slice(0,6)); track u) {
+                  <tr>
+                    <td>{{ u.JOBNO }}</td>
+                    <td>{{ u.JOB_TYPE }}</td>
+                    <td>{{ u.CLIENT }}</td>
+                    <td class="num">{{ u.AGE_DAYS }} d</td>
+                  </tr>
+                }
+                @if (Unbilled.length === 0) {
+                  <tr><td colspan="4" class="empty">Every job older than a week is invoiced.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          @if (Unbilled.length > 6) {
+            <div class="dd-more">
+              <button type="button" class="btn g" (click)="ShowAllUnbilled = !ShowAllUnbilled">{{ ShowAllUnbilled ? 'Show fewer' : 'Show all ' + Unbilled.length }}</button>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  @if (!Kpi && !loading) {
+    <div class="card sec"><div class="empty">No data to show. Pick a date, company and branch, then press Apply.</div></div>
+  }
 </div>

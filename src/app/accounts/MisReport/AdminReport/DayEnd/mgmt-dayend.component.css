@@ -1,60 +1,26 @@
-/* Management Day-End uses the Finance Dashboard's own stylesheet (tokens, cards, KPI tiles,
-   tables, pills, dark mode) so the two pages stay visually identical. Only additions below. */
-@import '../../FinanceDashboard/finance-dashboard.component.css';
+/* Management Day-End: layout, tiles, tables and chips come from the global page kit (host kit-accreport) and the
+   Finance dashboard's scoped stylesheet (finance-dashboard-page.css, first in styleUrls), so the two pages stay
+   identical. Only what that sheet does not cover is here. Greyscale like the dashboard: a figure that needs
+   attention (fd-up from deltaTone / the template) is set heavier, never coloured. */
+:host ::ng-deep .fd-page .fd-up { color: var(--mp-late, #0A0A0A); font-weight: 700; }
+:host ::ng-deep .fd-page .fd-down,
+:host ::ng-deep .fd-page .fd-pos { color: var(--ink); }
+:host ::ng-deep .fd-page .fd-kpi-muted { color: var(--soft); }
 
-.fd-field--company { width: 290px; }
-
-.fd-kpi-muted { color: var(--fd-muted-fg); font-size: 24px; }
-
-.fd-more {
-    display: block;
-    margin: 10px 0 0 auto;
-    border: 0;
-    background: none;
-    padding: 0;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--fd-muted-fg);
-    text-decoration: underline;
-    cursor: pointer;
+/* the date filter is a native date input; match the sheet's text inputs */
+:host ::ng-deep .fd-page .filters.fk-f input[type="date"] {
+    height: 30px; border: 1px solid var(--box); border-radius: 4px; background: var(--sheet); color: var(--ink);
+    padding: 0 8px; font: inherit; font-size: 12.5px; box-shadow: none;
 }
+:host ::ng-deep .fd-page .filters.fk-f input[type="date"]:focus { outline: none; border-color: var(--ink); }
+:host ::ng-deep .fd-page .dd-company select { min-width: 260px; }
 
-.fd-mini {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 14px;
-}
+/* card header: description under the title, chip / button on the right */
+:host ::ng-deep .fd-page .card-h { flex-wrap: wrap; }
+:host ::ng-deep .fd-page .card-h .meta { flex: 1 1 260px; }
 
-.fd-mini-item {
-    background: var(--fd-muted);
-    border-radius: var(--fd-radius);
-    padding: 10px 14px;
-}
+/* "Show all" under a 6-row table */
+:host ::ng-deep .fd-page .dd-more { display: flex; justify-content: flex-end; padding: 8px 12px 10px; border-top: 1px solid var(--line); }
 
-.fd-mini-item span {
-    display: block;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-    color: var(--fd-muted-fg);
-}
-
-.fd-mini-item b { display: block; margin-top: 2px; font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
-.fd-mini-item em { display: block; font-style: normal; font-size: 11px; color: var(--fd-muted-fg); }
-
-@media (max-width: 900px) {
-    .fd-grid, .fd-grid--2 { grid-template-columns: minmax(0, 1fr); }
-    .fd-mini { grid-template-columns: minmax(0, 1fr); }
-}
-
-.fd-grid--wide { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
-
-.fd-crumb { font-size: 12px; color: var(--fd-muted-fg); margin-bottom: 2px; }
-.fd-crumb .fa { margin: 0 4px; }
-.fd-sub { font-size: 12.5px; color: var(--fd-muted-fg); margin-top: 2px; }
-
-@media (max-width: 900px) {
-    .fd-grid--wide { grid-template-columns: minmax(0, 1fr); }
-}
+/* two cards per row only when each can hold its table (kit tables have min-width 760px); otherwise stacked */
+:host ::ng-deep .fd-page .fd-grid.dd-grid { grid-template-columns: repeat(auto-fit, minmax(min(780px, 100%), 1fr)); }

@@ -15,7 +15,9 @@ import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 @Component({
     selector: 'app-mgmt-dayend',
     templateUrl: './mgmt-dayend.component.html',
-    styleUrls: ['./mgmt-dayend.component.css'],
+    // page kit like the Finance dashboard: global kit + that page's scoped sheet, then Day-End's few additions
+    styleUrls: ['../../FinanceDashboard/finance-dashboard-page.css', './mgmt-dayend.component.css'],
+    host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
