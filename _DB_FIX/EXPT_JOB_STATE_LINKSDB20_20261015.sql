@@ -438,7 +438,8 @@ GO
    3 DOCS_IN / 2 DOCS_PENDING / 1 OPENED.
 
  Measured as the equivalent SELECT on LinksDB20 2026-10-15: 2,662 jobs in scope, under a minute
- cold through a remote read-only session.
+ cold through a remote read-only session. As a procedure it took 162 s (2026-10-21) until the jobs
+ in scope went into #JS; about 1.5 s since (EXPT_JOB_STATE_REFRESH_PERF_LINKSDB20_20261021.sql).
 */
 IF OBJECT_ID('dbo.USP_EXPT_JOB_STATE_REFRESH', 'P') IS NOT NULL
     DROP PROCEDURE dbo.USP_EXPT_JOB_STATE_REFRESH;
@@ -462,6 +463,7 @@ BEGIN
             @FROM2Y  = DATEADD(DAY, -730, @TODAY);
 
     IF OBJECT_ID('tempdb..#J') IS NOT NULL DROP TABLE #J;
+    IF OBJECT_ID('tempdb..#JS') IS NOT NULL DROP TABLE #JS;
     IF OBJECT_ID('tempdb..#S') IS NOT NULL DROP TABLE #S;
 
     -- one pass over expt_master
@@ -497,8 +499,17 @@ BEGIN
           -- "DOCS CANCELLED" placeholder voyage (rtno like MUM2099XXXXX): the job is dead, keep it out
           AND   ISNULL(E.expt_vessel,'') NOT LIKE '%XXXXX%';
 
+    -- LINKS: an export number can be in expt_master twice (321102610000001 on 2026-10-21: two different
+    -- jobs). TBL_EXPT_JOB_STATE keeps one row per exptno, so the first-opened job is kept; without this
+    -- the INSERT below fails the whole run on its primary key.
+    WITH D AS (SELECT ROW_NUMBER() OVER (PARTITION BY exptno ORDER BY opened_dt, vsl_rtno) AS rn FROM #J)
+    DELETE FROM D WHERE rn > 1;
+
     CREATE CLUSTERED INDEX CX_J ON #J (exptno);
 
+    -- LINKS: the jobs in scope are worked out once, into #JS. As a CTE, JS (with the INV aggregate
+    -- inside it) was evaluated again at each of its 18 references below: 162 s per run on LinksDB20
+    -- (2026-10-21), about 1.5 s this way, same rows.
     WITH
     INV AS (
         SELECT  IJ.inv_jobno AS exptno, MIN(ISNULL(AI.MakerDT, AI.AuthorisationDate)) AS invoiced_dt
@@ -510,7 +521,13 @@ BEGIN
         SELECT J.*, INV.invoiced_dt, CASE WHEN INV.exptno IS NULL THEN 0 ELSE 1 END AS invoiced_flag
         FROM   #J J LEFT JOIN INV ON INV.exptno = J.exptno
         WHERE  J.opened_dt >= @FROM180 OR INV.exptno IS NULL
-    ),
+    )
+    SELECT * INTO #JS FROM JS;
+
+    CREATE CLUSTERED INDEX CX_JS ON #JS (exptno);
+
+    WITH
+    JS AS (SELECT * FROM #JS),
     DC AS (
         SELECT  C.exptno, COUNT(DISTINCT C.doccode) AS called_cnt,
                 COUNT(DISTINCT CASE WHEN R.exptno IS NULL THEN C.doccode END) AS pending_cnt,
