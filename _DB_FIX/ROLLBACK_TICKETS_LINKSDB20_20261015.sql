@@ -1,6 +1,6 @@
 /*  Rollback for TICKETS_LINKSDB20_20261015.sql (LinksDB20 only).
     None of these objects existed on LinksDB20 before, so rollback is a drop.
-    After it, every api/Tickets/* call returns an error row (STATUS 101) and the Links tickets
+    After it, every api/Tickets/... call returns an error row (STATUS 101) and the Links tickets
     board shows nothing; nothing else in Links uses these objects.
 
     The 13 procedures and 5 functions are always dropped (they hold no data).

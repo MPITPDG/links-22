@@ -15,7 +15,7 @@
         kept and the script says how many acknowledgements there are; set
         @DropEvenIfAcknowledged = 1 below to discard them as well.
 
-    After it: api/Export/JobState/* and Export/GetRecentConsignments return an error row
+    After it: api/Export/JobState/... and Export/GetRecentConsignments return an error row
     (STATUS 101); the Angular alert service fails soft (empty bell). Nothing else is affected.
     Re-runnable.  SQL Server 2008 R2.                                                         */
 USE [LinksDB20]

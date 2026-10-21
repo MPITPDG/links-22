@@ -477,8 +477,11 @@ SELECT o.name AS PROCEDURE_NAME,
   JOIN sys.sql_modules m ON m.object_id = o.object_id
  WHERE o.object_id = OBJECT_ID('dbo.USP35_IMP_IMPORT_RPT_Search') AND o.type = 'P';
 
+-- PRINT takes no subquery, so read modify_date into a variable first.
+DECLARE @md VARCHAR(23);
+SELECT @md = CONVERT(VARCHAR(23), modify_date, 121) FROM sys.objects WHERE object_id = OBJECT_ID('dbo.USP35_IMP_IMPORT_RPT_Search');
 PRINT DB_NAME() + ': USP35_IMP_IMPORT_RPT_Search modify_date = '
-    + ISNULL((SELECT CONVERT(VARCHAR(23), modify_date, 121) FROM sys.objects WHERE object_id = OBJECT_ID('dbo.USP35_IMP_IMPORT_RPT_Search')), '(procedure missing)')
+    + ISNULL(@md, '(procedure missing)')
     + '  (before this script: 2023-08-20 18:43:37.460).';
 
 IF @d IS NOT NULL AND CHARINDEX(@s, @d) = 0 AND CHARINDEX(@e, @d) = 0

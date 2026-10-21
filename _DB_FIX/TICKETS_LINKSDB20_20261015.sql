@@ -4,7 +4,7 @@
   Why  : the Links ERP gets the same "Tickets" feature MP Cargo has (support / issue tickets that
          any ERP user raises, with screenshots or PDFs, and the developers work on a board
          RAISED -> INPROGRESS -> COMPLETED, or DISCARDED). The Links API TicketController
-         (api/Tickets/*) runs the procedures below. This is a SEPARATE queue: it lives in
+         (api/Tickets/...) runs the procedures below. This is a SEPARATE queue: it lives in
          LinksDB20 only and shares nothing with the MP Cargo queue in the manilal database.
          Copied from ManilalV5_WebApi\Database\StoredProcedures\Tickets\ALL_IN_ONE.sql
          (commits b973b48 .. c7959b8), checked on 2026-10-15 against the LIVE definitions in the
