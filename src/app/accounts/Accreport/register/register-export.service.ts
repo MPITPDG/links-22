@@ -46,7 +46,7 @@ export class RegisterExportService {
         this.save(downloadname, ws => {
             const r = this.titles(ws, meta.header, meta.company)
             this.grid(ws, r, cols, rows)
-        })
+        }, meta.sheet)                                    // sheet carries the report name, e.g. Invoice Register
     }
 
     /* frm_Acc_Rpt_Purchase_Register_XL: Pur No | Pur Date | Supplier Name | Suppl. Invno | Suppl. Invdt | Job No | Amount, then the total row */
@@ -65,7 +65,7 @@ export class RegisterExportService {
                0.00 row amounts; only the total carries thousands separators */
             const end = this.grid(ws, 1, cols, rows)
             this.totalRow(ws, end, cols.length, this.val(total, 'header'), this.num(this.val(total, 'total')), '#,##0.00')
-        }, downloadname)                                  // sheet is named like the file, e.g. PDG_Accounts_Purchase_Register
+        }, meta.sheet)                                    // e.g. Purchase Register
     }
 
     /* frm_Acc_Rpt_Brokerage_Register_XL: Brokerage No | Brok Date | Job No | Vsl Name | VslVoy No | Amount, then the total row */
@@ -82,7 +82,7 @@ export class RegisterExportService {
             const r = this.titles(ws, meta.header, meta.company)
             const end = this.grid(ws, r, cols, rows)
             this.totalRow(ws, end, cols.length, this.val(total, 'header'), this.num(this.val(total, 'total')), '0.00')
-        }, downloadname)                                  // sheet is named like the file, e.g. PDG_Accounts_Brokerage_Register
+        }, meta.sheet)                                    // e.g. Brokerage Register
     }
 
     /* frm_Acc_Rpt_storage_Register_XL: Entry No | Entry Date | Client Name | Good Desc | Amount, then the total row */
@@ -98,7 +98,7 @@ export class RegisterExportService {
             const r = this.titles(ws, meta.header, meta.company)
             const end = this.grid(ws, r, cols, rows)
             this.totalRow(ws, end, cols.length, this.val(total, 'header'), this.num(this.val(total, 'total')), '0.00')
-        }, downloadname)                                  // sheet is named like the file, e.g. PDG_Accounts_Storage_Register
+        }, meta.sheet)                                    // e.g. Storage Register
     }
 
     /* frm_Acc_Rpt_Invoice_Register_ActDetail_XL and frm_Acc_Rpt_CN_Register_AcctDetail_XL: the .NET DataGrid auto-generates
@@ -117,7 +117,7 @@ export class RegisterExportService {
         this.save(downloadname, ws => {
             const r = this.titles(ws, meta.header, meta.company)
             this.grid(ws, r, cols, rows)
-        })
+        }, meta.sheet)                                    // e.g. Credit Note Register, Invoice Register Details
     }
 
     /* frm_Acc_Rpt_CashBook_Register_XL: plain bordered table of the stored procedure's own column names, preceded by
@@ -163,7 +163,7 @@ export class RegisterExportService {
                 r++
             }
             this.widths(ws, names, rows, 12, 55)
-        })
+        }, meta.sheet)                                    // e.g. Cash Book Register
     }
 
     /* ------------------------------------------------------------------ building blocks ------------------------------------------------------------------ */
@@ -174,9 +174,10 @@ export class RegisterExportService {
         return n === '' ? 'Sheet1' : n
     }
 
+    /* the sheet is named after the report; without one it takes the file name, never a bare "Sheet1" */
     private save(downloadname: string, build: (ws: Worksheet) => void, sheet?: string) {
         const workbook = new Workbook()
-        const ws = workbook.addWorksheet(sheet ? this.sheetName(sheet) : 'Sheet1')
+        const ws = workbook.addWorksheet(this.sheetName(sheet || downloadname))
         build(ws)
         workbook.xlsx.writeBuffer().then((data) => {
             const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })

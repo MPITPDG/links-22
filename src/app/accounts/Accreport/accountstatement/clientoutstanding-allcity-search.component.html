@@ -49,11 +49,11 @@
 
   @if (displayType=='LIST') {
     <div class="fk-kpis">
-      <div class="card fk-kpi"><div class="k">Opening</div><div class="v">{{ OpDrBal ? (OpDrBal|number:'2.2-4') + ' Dr' : '' }}{{ OpCrBal|number:'2.2-4' }}</div></div>
-      <div class="card fk-kpi"><div class="k">Current total Dr</div><div class="v">{{ (currTotalDr|number:'2.2-4') || '—' }}</div></div>
-      <div class="card fk-kpi"><div class="k">Current total Cr</div><div class="v">{{ (currTotalcr|number:'2.2-4') || '—' }}</div></div>
+      <div class="card fk-kpi"><div class="k">Opening</div><div class="v">{{ OpDrBal }}{{ OpCrBal }}</div></div>
+      <div class="card fk-kpi"><div class="k">Current total Dr</div><div class="v">{{ currTotalDr || '—' }}</div></div>
+      <div class="card fk-kpi"><div class="k">Current total Cr</div><div class="v">{{ currTotalcr || '—' }}</div></div>
       <div class="card fk-kpi"><div class="k">Closing</div><div class="v">{{ CLDrBal }}{{ CLCrBal }}</div></div>
-      <div class="card fk-kpi"><div class="k">Advance</div><div class="v">{{ AdvCrAmt|number:'2.2-4' }} {{ AdvDrAmt }}</div>
+      <div class="card fk-kpi"><div class="k">Advance</div><div class="v">{{ AdvCrAmt }} {{ AdvDrAmt }}</div>
         <div class="s"><a href="javascript:void(0);" class="lnk" (click)="AdvanceViewData()">View advance details</a></div></div>
     </div>
 
@@ -106,15 +106,15 @@
           <tbody>
             <tr class="tot">
               <td colspan="4">Opening</td>
-              <td class="num">@if (OpDrBal) {{{OpDrBal|number:'2.2-4'}} Dr}</td>
-              <td class="num">{{OpCrBal|number:'2.2-4'}}</td>
+              <td class="num">{{OpDrBal}}</td>
+              <td class="num">{{OpCrBal}}</td>
             </tr>
             @for (data of pager.paged; track $index) {
               <tr>
                 <td>{{data.TRANSTYPE}}</td>
                 <td><a href="javascript:void(0);" class="lnk" (click)="Openprint(data.TRANSCODE,data.TRANSTYPE)">{{data.TRANSCODE}}</a></td>
                 <td>{{data.TRANSDATE}}</td>
-                <td class="fk-wrap">{{data.NARR}}{{data.EXP_SNAME}}{{data.SUP_SNAME}} {{data.ACCTNAME}}</td>
+                <td class="fk-wrap">{{data.NARR?.trim()}}{{data.EXP_SNAME}}{{data.SUP_SNAME}} {{data.ACCTNAME}}</td>
                 <td class="num">{{data.DRAMT|number:'2.2-4'}}</td>
                 <td class="num">{{data.CRAMT|number:'2.2-4'}}</td>
               </tr>
@@ -123,8 +123,8 @@
             }
             <tr class="tot">
               <td colspan="4">Current total</td>
-              <td class="num">{{currTotalDr|number:'2.2-4'}}</td>
-              <td class="num">{{currTotalcr|number:'2.2-4'}}</td>
+              <td class="num">{{currTotalDr}}</td>
+              <td class="num">{{currTotalcr}}</td>
             </tr>
             <tr class="tot">
               <td colspan="4">Closing</td>
@@ -133,8 +133,8 @@
             </tr>
             <tr class="tot">
               <td colspan="4"><a href="javascript:void(0);" class="lnk" (click)="AdvanceViewData()">Advance</a></td>
-              <td class="num">{{AdvCrAmt|number:'2.2-4'}}</td>
               <td class="num">{{AdvDrAmt}}</td>
+              <td class="num">{{AdvCrAmt}}</td>
             </tr>
           </tbody>
         </table>

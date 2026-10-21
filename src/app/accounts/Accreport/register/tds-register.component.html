@@ -96,6 +96,7 @@
                 <th class="num">Sr. no.</th>
                 <th>Voucher no.</th>
                 <th>Voucher date</th>
+                <th>Party name</th>
                 <th>Account name</th>
                 <th class="num">TDS on</th>
                 <th class="num">TDS %</th>
@@ -108,17 +109,18 @@
               @for (l of pagedLines(); track $index) {
                 @if (l.KIND=='party') {
                   <tr class="grp">
-                    <td colspan="9">{{l.PARTYNAME}} @if (l.PARTYPAN) {<span class="chip">PAN {{l.PARTYPAN}}</span>}</td>
+                    <td colspan="10">{{l.PARTYNAME}} @if (l.PARTYPAN) {<span class="chip">PAN {{l.PARTYPAN}}</span>}</td>
                   </tr>
                 }
                 @if (l.KIND=='head') {
-                  <tr><td colspan="9" class="fk-sub"><b>{{l.HEADNAME}}</b></td></tr>
+                  <tr><td colspan="10" class="fk-sub"><b>{{l.HEADNAME}}</b></td></tr>
                 }
                 @if (l.KIND=='row') {
                   <tr>
                     <td class="num">{{l.SRNO}}</td>
                     <td class="mono" [title]="l.BILLNO ? 'Bill / Ref: ' + l.BILLNO : ''">{{l.VNO}}-{{l.VTYPE}}</td>
                     <td>{{l.VDATE}}</td>
+                    <td>{{l.PARTYNAME}} @if (l.PARTYPAN) {<span class="chip">PAN {{l.PARTYPAN}}</span>}</td>
                     <td [title]="l.NARRATION">{{l.HEADNAME}}</td>
                     <td class="num">{{l.TDSON | number:'1.2-2'}}</td>
                     <td class="num">{{l.TDSPCT | number:'1.2-2'}}</td>
@@ -129,7 +131,7 @@
                 }
                 @if (l.KIND=='subtotal') {
                   <tr class="fk-subtot">
-                    <td colspan="4"></td>
+                    <td colspan="5"></td>
                     <td class="num">{{l.TDSON | number:'1.2-2'}}</td>
                     <td></td>
                     <td class="num">{{l.DRAMT | number:'1.2-2'}}</td>
@@ -138,10 +140,10 @@
                   </tr>
                 }
               } @empty {
-                <tr><td class="empty" colspan="9">No TDS vouchers for this selection.</td></tr>
+                <tr><td class="empty" colspan="10">No TDS vouchers for this selection.</td></tr>
               }
               <tr class="tot">
-                <td colspan="4">Total</td>
+                <td colspan="5">Total</td>
                 <td class="num">{{totTdsOn | number:'1.2-2'}}</td>
                 <td></td>
                 <td class="num">{{totDr | number:'1.2-2'}}</td>

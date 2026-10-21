@@ -31,7 +31,7 @@
       </div>
       <div class="fld">
         <label>Purchase date <span class="req">*</span></label>
-        <my-date-picker name="PurchaseDate" [options]="myDatePickerOptions" [selDate]="PurchaseDate"></my-date-picker>
+        <my-date-picker name="PurchaseDate" [options]="myDatePickerOptions" [selDate]="PurchaseDate" [disabled]="IsEdit" (dateChanged)="PurchaseDateChanged($event)"></my-date-picker>
       </div>
       <div class="fld full">
         <label>Narration</label>
@@ -40,7 +40,7 @@
       <div class="fld full">
         <label>Staff <span class="req">*</span></label>
         <ng-select [items]="Stafflist" bindLabel="TEXTFIELD" bindValue="VALUEFIELD" [(ngModel)]="staff"
-          class="custom" placeholder="--Select--">
+          [disabled]="IsEdit" class="custom" placeholder="--Select--">
         </ng-select>
       </div>
     </div>
@@ -51,7 +51,7 @@
       <h2>Passing</h2>
       <label class="pu-flag">
         <span>Passed</span>
-        <input type="checkbox" [(ngModel)]="IsPassed" (change)="changeEvent($event)" />
+        <input type="checkbox" [(ngModel)]="IsPassed" [disabled]="PassLocked" (change)="changeEvent($event)" />
       </label>
     </div>
     <div class="fields">
@@ -106,11 +106,11 @@
       </div>
       <div class="fld">
         <label>Job no. <span class="req">*</span></label>
-        <input [(ngModel)]="JobNo" type="text" [OnlyNumber]="true" maxlength="40">
+        <input [(ngModel)]="JobNo" type="text" [OnlyNumber]="true" maxlength="15">
       </div>
       <div class="fld">
         <label>Pass amount</label>
-        <input [(ngModel)]="actpassedamount" [OnlyNumber]="true" type="text" class="num" maxlength="40">
+        <input [value]="passAmtPreview" type="text" disabled="disabled" title="Pass amount is set by the authoriser" class="num">
       </div>
       <div class="fld full">
         <label>Line narration</label>
@@ -151,7 +151,7 @@
               <td>{{obj.NARRATION}}</td>
               <td class="act">
                 <button type="button" (click)="Editchildrecd(obj.ID)">Edit</button>
-                <button type="button" (click)="deletechildrecd(obj.ID,obj.ACC_PURCHASEDTLS_ID)">Remove</button>
+                <button type="button" (click)="deletechildrecd(obj.ID,obj.ACC_PURCHASEDTLS_ID,obj.IS_NOT_EDIT_ABLE)">Remove</button>
               </td>
             </tr>
           } @empty {
@@ -170,10 +170,17 @@
   <!-- Links: the save bar appears once the request has at least one account line (as before) -->
   @if (Accountlist.length>0) {
     <div class="bar">
-      <span class="note">Nothing is saved until you choose {{text}}.</span>
+      @if (PurchaseDone == '1') {
+        <span class="note" style="color:#b42318">Purchase is already generated for this Staff Purchase Request - it can no longer be updated.</span>
+      } @else {
+        <span class="note">Nothing is saved until you choose {{text}}.</span>
+      }
       <div class="r">
         <button class="btn g" type="button" (click)="Reset();">Reset</button>
-        <button class="btn p" type="button" (click)="Add_Main()">{{text}}</button>
+        <button class="btn p" type="button" [disabled]="PurchaseDone == '1'" (click)="Add_Main()">{{text}}</button>
+        @if (IsEdit) {
+          <button class="btn" type="button" (click)="Print(PurchaseNo)">Print</button>
+        }
       </div>
     </div>
   }

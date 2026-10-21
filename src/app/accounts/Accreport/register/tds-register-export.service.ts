@@ -6,7 +6,7 @@ import { TdsRegisterLine } from './tds-register.component';
 // Excel export for the TDS Payable / Receivable registers.
 // Layout follows the finance team's "TDS Register" template:
 //   company / period header, then per party -> per TDS head:
-//   Sr. No. | Voucher No. | Voucher Date | Account Name | TDS On | TDS % | Debit | Credit | Balance
+//   Sr. No. | Voucher No. | Voucher Date | Party Name | Account Name | TDS On | TDS % | Debit | Credit | Balance
 //   with a subtotal per group, and a party-wise "TDS Summary" block at the end.
 @Injectable({
     providedIn: 'root'
@@ -21,7 +21,7 @@ export class TdsRegisterExportService {
     } as const;
 
     private readonly NUM = '#,##0.00';
-    private readonly COLS = 9;
+    private readonly COLS = 10;
 
     export(meta: any, lines: TdsRegisterLine[], summary: any[], downloadname: string) {
 
@@ -32,6 +32,7 @@ export class TdsRegisterExportService {
             { width: 8 },   // Sr
             { width: 22 },  // Voucher No
             { width: 13 },  // Voucher Date
+            { width: 52 },  // Party Name [PAN]
             { width: 58 },  // Account Name
             { width: 16 },  // TDS On
             { width: 9 },   // TDS %
@@ -68,7 +69,7 @@ export class TdsRegisterExportService {
                 ws.getCell(r, 1).font = { name: 'Arial', size: 10, bold: true, underline: 'single' };
                 r++;
                 const h = ws.getRow(r);
-                h.values = ['Sr. No.', 'Voucher No.', 'Voucher Date', 'Account Name', 'TDS On', 'TDS %', 'Debit', 'Credit', 'Balance'];
+                h.values = ['Sr. No.', 'Voucher No.', 'Voucher Date', 'Party Name', 'Account Name', 'TDS On', 'TDS %', 'Debit', 'Credit', 'Balance'];
                 h.eachCell((cell) => {
                     cell.font = { name: 'Arial', size: 9, bold: true };
                     cell.border = this.thinBorder;
@@ -83,6 +84,7 @@ export class TdsRegisterExportService {
                     l.SRNO,
                     l.VNO + '-' + l.VTYPE,
                     this.toDate(l.VDATE),
+                    (l.PARTYNAME || '') + (l.PARTYPAN ? '   [PAN: ' + l.PARTYPAN + ']' : ''),
                     l.HEADNAME || '',
                     l.TDSON || 0,
                     l.TDSPCT || 0,
@@ -92,21 +94,21 @@ export class TdsRegisterExportService {
                 ];
                 row.font = { name: 'Arial', size: 9 };
                 row.getCell(3).numFmt = 'dd-mmm-yyyy';
-                row.getCell(5).numFmt = this.NUM;
-                row.getCell(6).numFmt = '0.00';
-                row.getCell(7).numFmt = this.NUM;
+                row.getCell(6).numFmt = this.NUM;
+                row.getCell(7).numFmt = '0.00';
                 row.getCell(8).numFmt = this.NUM;
-                row.getCell(9).alignment = { horizontal: 'right' };
+                row.getCell(9).numFmt = this.NUM;
+                row.getCell(10).alignment = { horizontal: 'right' };
                 r++;
             }
             else if (l.KIND === 'subtotal') {
                 const row = ws.getRow(r);
-                row.values = ['', '', '', '', l.TDSON || 0, '', l.DRAMT || 0, l.CRAMT || 0, l.BALTEXT];
+                row.values = ['', '', '', '', '', l.TDSON || 0, '', l.DRAMT || 0, l.CRAMT || 0, l.BALTEXT];
                 row.font = { name: 'Arial', size: 9, bold: true };
-                for (const c of [5, 7, 8]) { row.getCell(c).numFmt = this.NUM; }
-                row.getCell(9).alignment = { horizontal: 'right' };
+                for (const c of [6, 8, 9]) { row.getCell(c).numFmt = this.NUM; }
+                row.getCell(10).alignment = { horizontal: 'right' };
                 row.eachCell({ includeEmpty: true }, (cell, col) => {
-                    if (col >= 5) { cell.border = { top: { style: 'thin' }, bottom: { style: 'double' } }; }
+                    if (col >= 6) { cell.border = { top: { style: 'thin' }, bottom: { style: 'double' } }; }
                 });
                 r++;
             }
@@ -119,33 +121,33 @@ export class TdsRegisterExportService {
         ws.getCell(r, 1).font = { name: 'Arial', size: 11, bold: true };
         r++;
         const sh = ws.getRow(r);
-        sh.values = ['Account', '', '', '', 'TDS ON', '', '', '', 'TDS Amount'];
-        ws.mergeCells(r, 1, r, 4);
+        sh.values = ['Account', '', '', '', '', 'TDS ON', '', '', '', 'TDS Amount'];
+        ws.mergeCells(r, 1, r, 5);
         sh.eachCell({ includeEmpty: true }, (cell) => {
             cell.font = { name: 'Arial', size: 9, bold: true };
             cell.border = this.thinBorder;
             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'F1F5F9' } };
         });
-        sh.getCell(5).alignment = { horizontal: 'center' };
-        sh.getCell(9).alignment = { horizontal: 'center' };
+        sh.getCell(6).alignment = { horizontal: 'center' };
+        sh.getCell(10).alignment = { horizontal: 'center' };
         r++;
         let sOn = 0;
         for (const s of summary) {
             const row = ws.getRow(r);
-            row.values = [s.PARTYNAME, '', '', '', Number(s.TDSON) || 0, '', '', '', s.AMTTEXT];
-            ws.mergeCells(r, 1, r, 4);
+            row.values = [s.PARTYNAME, '', '', '', '', Number(s.TDSON) || 0, '', '', '', s.AMTTEXT];
+            ws.mergeCells(r, 1, r, 5);
             row.font = { name: 'Arial', size: 9 };
-            row.getCell(5).numFmt = this.NUM;
-            row.getCell(9).alignment = { horizontal: 'right' };
+            row.getCell(6).numFmt = this.NUM;
+            row.getCell(10).alignment = { horizontal: 'right' };
             sOn += Number(s.TDSON) || 0;
             r++;
         }
         const tot = ws.getRow(r);
-        tot.values = ['***  Total  ***', '', '', '', sOn, '', meta.totDr, meta.totCr, meta.totBalText];
-        ws.mergeCells(r, 1, r, 4);
+        tot.values = ['***  Total  ***', '', '', '', '', sOn, '', meta.totDr, meta.totCr, meta.totBalText];
+        ws.mergeCells(r, 1, r, 5);
         tot.font = { name: 'Arial', size: 9, bold: true };
-        for (const c of [5, 7, 8]) { tot.getCell(c).numFmt = this.NUM; }
-        tot.getCell(9).alignment = { horizontal: 'right' };
+        for (const c of [6, 8, 9]) { tot.getCell(c).numFmt = this.NUM; }
+        tot.getCell(10).alignment = { horizontal: 'right' };
         tot.eachCell({ includeEmpty: true }, (cell) => {
             cell.border = { top: { style: 'thin' }, bottom: { style: 'double' } };
         });

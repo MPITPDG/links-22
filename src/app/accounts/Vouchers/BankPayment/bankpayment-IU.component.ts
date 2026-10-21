@@ -52,6 +52,8 @@ export class BankPaymentComponent implements OnInit {
     TotalDeduction: string="0";
     NetTotal: string="0";
     OldNetTotal:string="0";
+    // values as loaded: a Computerised Cheque entry may only change its account details
+    origBP: any = null;
     NewnetAmt:string="0";
     ID:string="0";
     ISNOTEDITABLE:string="0";
@@ -562,7 +564,10 @@ export class BankPaymentComponent implements OnInit {
                     this._toasterService.toast('warning', 'warning', 'Please enter Account Details !');
                     return false;
                 }
-                if (this.ChqType != "PO"  ) {
+                // Duplicate cheque check only for CHEQUE / NOT OVER entries with a cheque no.
+                // NEFT, RTGS and PAY ORDER have no cheque no.: checking a blank no. matched every earlier blank entry of the bank (40+ sec)
+                const isCheque = (this.ChqType == "CHQ" || this.ChqType == "Y");
+                if (isCheque) {
                     if (this.ChequeNo == "") {
                         var answer = window.confirm("ChequeNo is Blank - Please Check \n Click Yes to Accept and No To Retry");
                         if (answer==false) {
@@ -570,9 +575,17 @@ export class BankPaymentComponent implements OnInit {
                         }else {this.confirmsave="Y";}
                     }
                 }
-                if(this.EntryNo!=" ")
-                { this.validateEdit(); }
-                this.chequevalidate();
+                // validateEdit alerts and returns false for Pay Order / Computerised Cheque entries that cannot be updated;
+                // its result used to be ignored, so the entry was saved anyway after the alert.
+                if (this.EntryNo != " " && this.validateEdit() === false) {
+                    return false;
+                }
+                if (isCheque && this.ChequeNo != "") {
+                    this.chequevalidate();
+                } else {
+                    this.Conf = "Y";
+                    this.SaveUpdate();
+                }
             //      }
             //  else{
             //      this._toasterService.toast("warning","warning" ,"You can not Update this Bank Payment because this is generated through Computerisd Cheque Print !" );
@@ -681,6 +694,7 @@ export class BankPaymentComponent implements OnInit {
             this.OldNetTotal=data.Table[0].ACTUALAMOUNT;
             this.CompChequeFlag=data.Table[0].COMPCHEQUE;
             this.BankRefNo=data.Table[0].BANKREFNO;
+            this.origBP = { ourbank: this.OurBank, chqtype: this.ChqType, chqno: this.ChequeNo, entrydt: this.EntryDate };
             this.tdsledgercnt=data.Table3[0].TDSAPPLICABLE;
             if(this.tdsledgercnt >="1"){
                 this.disableresetbtn=false;
@@ -951,8 +965,25 @@ export class BankPaymentComponent implements OnInit {
             return false;
         }
         else if(this.CompChequeFlag == '1' && this.NOTOVERFLAG != "Y" && this.ChqType!="PO")   {
-            alert("You can not Update this Bank Payment \n Because this is generated through Computerised Cheque Print !!");
-            return false;
+            // Computerised Cheque (incl. NEFT/RTGS from the request flow): account details may be corrected,
+            // but the paid amount, bank, cheque type/no. and entry date must stay as issued
+            let msg = "";
+            const orgAmt = parseFloat(this.OldNetTotal) || 0;
+            const netAmt = parseFloat(this.NetTotal) || 0;
+            if (Math.abs(netAmt - orgAmt) > 0.005) {
+                msg += "- Net Total must remain " + orgAmt.toFixed(2) + " (now " + netAmt.toFixed(2) + ")\n";
+            }
+            if (this.origBP) {
+                if (this.OurBank != this.origBP.ourbank) { msg += "- Our Bank cannot be changed\n"; }
+                if (this.ChqType != this.origBP.chqtype) { msg += "- Cheque Type cannot be changed\n"; }
+                if ((this.ChequeNo || "") != (this.origBP.chqno || "")) { msg += "- Cheque No. cannot be changed\n"; }
+                if ((this.EntryDate || "") != (this.origBP.entrydt || "")) { msg += "- Entry Date cannot be changed\n"; }
+            }
+            if (msg != "") {
+                alert("This Bank Payment is generated through Computerised Cheque Print.\nOnly account details can be changed:\n\n" + msg);
+                return false;
+            }
+            return true;
         }
         else if(this.CompChequeFlag == '1' && this.NOTOVERFLAG == "Y" && this.ChqType!="PO")        {
         return true;

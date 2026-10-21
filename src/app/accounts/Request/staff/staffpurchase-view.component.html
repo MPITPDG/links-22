@@ -68,7 +68,7 @@
           </div>
           <div class="fld">
             <label>Pass amount</label>
-            <input [(ngModel)]="actpassedamount" type="text" class="num" maxlength="40">
+            <input [(ngModel)]="actpassedamount" [OnlyNumber]="true" [disabled]="!ID || ID == '0'" type="text" class="num" maxlength="15">
           </div>
         }
         <div class="fld full">
@@ -78,7 +78,8 @@
       </div>
       @if ( flag == 'EDIT') {
         <div class="pu-add">
-          <button class="btn p" type="button" (click)="Addchildrcrd()">{{txtchild}}</button>
+          <button class="btn p" type="button" [disabled]="!ID || ID == '0'" (click)="Addchildrcrd()">{{txtchild}}</button>
+          <button class="btn g" type="button" (click)="Resetchildrcrd();">Reset</button>
         </div>
       }
     }
@@ -116,7 +117,7 @@
               <td>{{data.NARRATION}}</td>
               @if ( flag == 'EDIT') {
                 <td class="act">
-                  <button type="button" (click)="Editchildrecd(data.ID)">Edit</button>
+                  <button type="button" title="Set Pass Amount" (click)="Editchildrecd(data.ID)">Edit</button>
                 </td>
               }
             </tr>
@@ -140,12 +141,15 @@
     </div>
   </div>
 
+  @if (ISPURGENERATE == '1') {
+    <div class="bar"><span class="note" style="color:#b42318">Purchase is already generated for this Staff Purchase Request.</span></div>
+  }
   @if ( flag == 'EDIT') {
     <div class="bar">
       <span class="note">Verifying saves the pass amounts shown above.</span>
       <div class="r">
         <button class="btn g" type="button" (click)="abortModal()">Abort</button>
-        <button class="btn p" type="button" (click)="SaveVerify()">{{text}}</button>
+        <button class="btn p" type="button" [disabled]="ISPURGENERATE == '1'" (click)="SaveVerify()">{{text}}</button>
       </div>
     </div>
   }

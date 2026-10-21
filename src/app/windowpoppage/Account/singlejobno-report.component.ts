@@ -39,11 +39,22 @@ export class SinglejobnoReportComponent implements OnInit {
   LinesByGroup: { [acct: string]: any[] } = {};
   GroupOpen: { [acct: string]: boolean } = {};
 
-  /* KPI strip, derived once from Table4 */
+  /* KPI strip. Income / Expense / Profit are TRADING only: customs duty is paid for the
+     client and billed straight back, so it is shown on its own line below instead of
+     inside the profit. The head-wise table and the voucher lines are unchanged - duty
+     still appears there exactly as the report has always shown it. */
   Income = 0;
   Expense = 0;
   Profit = 0;
   MarginPct: number = null;
+
+  /* duty heads come from TBL_MST_DUTY_HEAD, the same master the dashboards use, so the
+     two screens can never disagree about what counts as duty */
+  DutyCodes: { [code: string]: boolean } = {};
+  DutyLoaded = false;
+  DutyPaid = 0;
+  DutyRecovered = 0;
+  DutyPending = 0;
 
   /* status + plain-language insights (derived, nothing recomputed from the proc) */
   Status: 'PROVISIONAL' | 'NOT-BILLED' | 'LOSS' | 'HEALTHY' | 'EMPTY' = 'EMPTY';
@@ -60,11 +71,58 @@ export class SinglejobnoReportComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.getDutyHeads();
     this._route.params.subscribe(params => {
       this.JobNo = params['jobno'];
       this.getData();
     });
   }
+
+  /* The list is tiny and rarely changes. If it cannot be read the screen still works:
+     DutyLoaded stays false, nothing is treated as duty, and the totals read as they
+     always did - a failure here must never blank out a job's profit. */
+  private getDutyHeads() {
+    this._dataService.getData('Accounts/ACC_RPT_DUTY_HEADS', {}).subscribe((d: any) => {
+      const rows = (d && d.Table) ? d.Table : [];
+      for (const r of rows) {
+        const c = (r.ACCTCODE || '').toString().trim().toUpperCase();
+        if (c) { this.DutyCodes[c] = true; }
+      }
+      this.DutyLoaded = true;
+      if (this.Loaded && !this.NoData) { this.computeTotals(); this.buildInsights(); }
+    }, () => { this.DutyLoaded = false; });
+  }
+
+  isDutyHead(g: any): boolean {
+    const c = (g && g.ACCTCODE || '').toString().trim().toUpperCase();
+    if (this.DutyCodes[c]) { return true; }
+    /* fallback only while the master has not been read */
+    if (!this.DutyLoaded) {
+      const n = (g && g.ACCTNAME || '').toString().toUpperCase();
+      return n.indexOf('CUSTOM DUTY') >= 0;
+    }
+    return false;
+  }
+
+  /* Trading totals from the head rows, duty kept aside. Table4's grand totals still
+     include duty, which is why they are no longer read here. */
+  private computeTotals() {
+    const heads = this.table2 || [];
+    let inc = 0, exp = 0, dPaid = 0, dRec = 0;
+    for (const g of heads) {
+      const paid = this.num(g.PAIDAMT), rec = this.num(g.RECOVERYAMT);
+      if (this.isDutyHead(g)) { dPaid += paid; dRec += rec; } else { inc += rec; exp += paid; }
+    }
+    this.Income = inc;
+    this.Expense = exp;
+    this.Profit = this.Income - this.Expense;
+    this.MarginPct = this.Income !== 0 ? (this.Profit / this.Income) * 100 : null;
+    this.DutyPaid = dPaid;
+    this.DutyRecovered = dRec;
+    this.DutyPending = dPaid - dRec;
+  }
+
+  get HasDuty(): boolean { return this.DutyPaid > 0.01 || this.DutyRecovered > 0.01; }
 
   getData() {
     const jsoncmp = { JOBNO: this.JobNo };
@@ -98,12 +156,11 @@ export class SinglejobnoReportComponent implements OnInit {
       this.GroupOpen = {};
       for (const g of this.table2) { this.GroupOpen[(g.ACCTCODE || '').toString().trim()] = true; }
 
-      this.Income = this.num(this.table4.GRAND_RECOVERYAMT);
-      this.Expense = this.num(this.table4.GRAND_PAIDAMT);
       /* GRAND_DIFFAMT comes back unsigned - a loss is only marked in GRAND_REMARKS ('Less
-         Charged') - so a loss read as a profit. Income less expense is the profit, signed. */
-      this.Profit = this.Income - this.Expense;
-      this.MarginPct = this.Income !== 0 ? (this.Profit / this.Income) * 100 : null;
+         Charged') - so a loss read as a profit. Income less expense is the profit, signed.
+         The grand totals also carry duty, so the trading figures are summed from the head
+         rows instead and duty is reported separately. */
+      this.computeTotals();
       this.buildInsights();
     }, () => {
       this.Loaded = true;
@@ -115,9 +172,10 @@ export class SinglejobnoReportComponent implements OnInit {
   private buildInsights() {
     const ins: any[] = [];
     const heads = this.table2 || [];
-    const costOnly  = heads.filter(g => this.num(g.PAIDAMT) > 0.01 && this.num(g.RECOVERYAMT) <= 0.01);
-    const billOnly  = heads.filter(g => this.num(g.RECOVERYAMT) > 0.01 && this.num(g.PAIDAMT) <= 0.01);
-    const lossHeads = heads.filter(g => this.isLoss(g.REMARKS) || this.groupDiff(g) < -0.01);
+    const trading   = heads.filter(g => !this.isDutyHead(g));
+    const costOnly  = trading.filter(g => this.num(g.PAIDAMT) > 0.01 && this.num(g.RECOVERYAMT) <= 0.01);
+    const billOnly  = trading.filter(g => this.num(g.RECOVERYAMT) > 0.01 && this.num(g.PAIDAMT) <= 0.01);
+    const lossHeads = trading.filter(g => this.isLoss(g.REMARKS) || this.groupDiff(g) < -0.01);
 
     if (this.Income <= 0.01 && this.Expense <= 0.01) {
       this.Status = 'EMPTY';

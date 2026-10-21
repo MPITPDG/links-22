@@ -145,6 +145,26 @@
 <div class="jp-kpi-sub">{{ expenseShare() | number:'1.0-0' }}% of income</div>
 }
             </div>
+            @if (HasDuty) {
+<div class="jp-kpi jp-kpi--duty">
+                <div class="jp-kpi-top">
+                    <div class="jp-kpi-label">Duty <span class="jp-hint">paid for the client</span></div>
+                    <span class="jp-kpi-ico jp-ico--amber"><i class="fa fa-university"></i></span>
+                </div>
+                <div class="jp-kpi-value">{{ DutyPaid | number:'1.2-2' }}</div>
+                <div class="jp-kpi-sub">
+                    recovered {{ DutyRecovered | number:'1.2-2' }}
+                    @if (DutyPending > 0.01) {
+<span class="jp-pill jp-pill--loss jp-pill--sm"
+                          title="Customs duty paid on the client's behalf and not yet billed back. It is OUT of the profit above because it is the client's money passing through - but it is our cash until it is recovered.">
+                        {{ DutyPending | number:'1.0-0' }} still to recover</span>
+}
+                    @if (DutyPending <= 0.01 && DutyPending >= -0.01) {
+<span class="jp-pill jp-pill--sm">fully recovered</span>
+}
+                </div>
+            </div>
+}
             <div class="jp-kpi" [ngClass]="Profit >= 0 ? 'jp-kpi--pos' : 'jp-kpi--neg'">
                 <div class="jp-kpi-top">
                     <div class="jp-kpi-label">Profit <span class="jp-hint">income &minus; expense</span></div>
@@ -260,10 +280,25 @@
                     </tbody>
                     <tfoot>
                         <tr class="jp-total">
+                            <td colspan="3">{{ HasDuty ? 'Total (excluding duty)' : 'Grand total' }}</td>
+                            <td class="num">{{ Expense | number:'1.2-2' }}</td>
+                            <td class="num">{{ Income | number:'1.2-2' }}</td>
+                        </tr>
+                        @if (HasDuty) {
+<tr class="jp-total jp-total--duty"
+                            title="Customs duty is paid for the client and billed straight back, so it is not profit or loss. It is listed among the heads above and totalled here on its own.">
+                            <td colspan="3">Customs duty (recoverable)</td>
+                            <td class="num">{{ DutyPaid | number:'1.2-2' }}</td>
+                            <td class="num">{{ DutyRecovered | number:'1.2-2' }}</td>
+                        </tr>
+}
+                        @if (HasDuty) {
+<tr class="jp-total">
                             <td colspan="3">Grand total</td>
                             <td class="num">{{ table4.GRAND_PAIDAMT | number:'1.2-2' }}</td>
                             <td class="num">{{ table4.GRAND_RECOVERYAMT | number:'1.2-2' }}</td>
                         </tr>
+}
                         <tr class="jp-result" [ngClass]="Profit >= 0 ? 'jp-result--pos' : 'jp-result--neg'">
                             <td colspan="3">{{ Profit < 0 ? 'Loss' : 'Gain' }}</td>
                             <td colspan="2" class="num" [ngClass]="Profit < 0 ? 'jp-neg' : 'jp-pos'">{{ Profit | number:'1.2-2' }}</td>

@@ -135,15 +135,31 @@ import { ActivatedRoute,Router } from '@angular/router';
     FormId:"194",
    }
 
+  this.loaderService.display(true)
   this._dataService.getData("Accounts/ACC_GENERATE_FINAL_CODE_CPJVPI", adddata)
     .subscribe((data: any) => {
-      if (data.Table2[0].GETSTATUS.split("#")[0] == "100"){
+      this.loaderService.display(false)
+      const t2 = (data && data.Table2 && data.Table2[0]) ? data.Table2[0] : null;
+      const t0 = (data && data.Table && data.Table[0]) ? data.Table[0] : null;
+      const st = String((t2 && (t2.GETSTATUS || t2.STATUS)) || (t0 && t0.STATUS) || "");
+      if (t2 && t2.GETSTATUS && st.split("#")[0] == "100"){
         this.getdataforgenerate();
-        this.PAGETYPE=data.Table2[0].GETSTATUS.split("#")[1];
-        this._toasterService.toast('success', 'success', data.Table2[0].GETSTATUS.split("#")[2]);
-        this.Print(data.Table2[0].ENTRYNO,this.PAGETYPE);
+        this.PAGETYPE=st.split("#")[1];
+        this._toasterService.toast('success', 'success', st.split("#")[2]);
+        this.Print(t2.ENTRYNO,this.PAGETYPE);
       }
-    })
+      // V4 (fnxml_DataLoaded_Generate_IU): 101 session, 102 error, 103 message from the proc
+      else if (st.split("#")[0] == "101") {
+        this._toasterService.toast('warning', 'warning', 'Session Time Out! Please Re-Login.');
+      }
+      else if (st.split("#")[0] == "102" || st == "") {
+        this._toasterService.toast('warning', 'warning', 'Error! Please contact System Administrator.');
+      }
+      else {
+        this._toasterService.toast('warning', 'warning', st.split("#")[1] || st);
+        this.getdataforgenerate();
+      }
+    }, () => { this.loaderService.display(false) })
       }
       Print(no,pgtype) {
         let theTop = (screen.height / 2) - (483 / 2);

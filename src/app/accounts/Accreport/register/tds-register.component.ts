@@ -258,6 +258,7 @@ export class TdsRegisterComponent implements OnInit {
             const bal = this.signed(gDr, gCr);
             out.push({
                 KIND: 'row', SRNO: sr, VNO: r.VNO, VTYPE: r.VTYPE, VDATE: r.VDATE,
+                PARTYNAME: r.PARTYNAME, PARTYCODE: r.PARTYCODE, PARTYPAN: r.PARTYPAN,
                 HEADNAME: (sr === 1) ? r.HEADNAME : '',
                 TDSON: on, TDSPCT: Number(r.TDSPCT) || 0, DRAMT: dr, CRAMT: cr,
                 BALANCE: bal, BALTEXT: this.balText(bal),

@@ -7,6 +7,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
 import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/shared/service/dataService';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
+import { ExpwopExportService } from './expwop-export.service';
 import { RegisterExportService } from './register-export.service';
 import { catchError } from 'rxjs/operators';
 import { EMPTY } from 'rxjs';
@@ -56,7 +57,7 @@ export class InvoiceRegisterComponent implements OnInit {
     private _toasterService: ToastCommonService,
     private loaderService: LoaderService,
     private _router: Router,
-    private http: HttpClient, private exportser: ExportexcelService,
+    private http: HttpClient, private exportser: ExportexcelService, private expwopExport: ExpwopExportService,
     private regExport: RegisterExportService,
     private _activatedRoute: ActivatedRoute,
     private _loginService: LoginService,
@@ -171,7 +172,8 @@ export class InvoiceRegisterComponent implements OnInit {
           const exportInvoice = (jobs: any) => {
             this.regExport.exportInvoice({
               header: 'Invoice Search Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
-              company: this.cmpFullName
+              company: this.cmpFullName,
+              sheet: 'Invoice Register'
             }, this.registerdata, jobs, "Invoice Register");
             this.loaderService.display(false);
           }
@@ -206,7 +208,8 @@ export class InvoiceRegisterComponent implements OnInit {
 
           this.regExport.exportCashBook({
             header: 'Cash Book Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
-            company: this.cmpFullName
+            company: this.cmpFullName,
+            sheet: 'Cash Book Register'
           }, cashbal, bankbal, this.registerdata, ((this._loginService.getLogin()[0].CMP_USERNAME || "") + "").trim() + "_Accounts_CashBook_Register");
           this.loaderService.display(false);
       }
@@ -223,7 +226,8 @@ export class InvoiceRegisterComponent implements OnInit {
 
           this.regExport.exportPurchase({
             header: 'Purchase Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
-            company: this.cmpFullName
+            company: this.cmpFullName,
+            sheet: 'Purchase Register'
           }, this.registerdata, data.Table1 && data.Table1[0], ((this._loginService.getLogin()[0].CMP_USERNAME || "") + "").trim() + "_Accounts_Purchase_Register");
           this.loaderService.display(false);
       }
@@ -240,7 +244,8 @@ export class InvoiceRegisterComponent implements OnInit {
 
           this.regExport.exportBrokerage({
             header: 'Brokerage Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
-            company: this.cmpFullName
+            company: this.cmpFullName,
+            sheet: 'Brokerage Register'
           }, this.registerdata, data.Table1 && data.Table1[0], ((this._loginService.getLogin()[0].CMP_USERNAME || "") + "").trim() + "_Accounts_Brokerage_Register");
           this.loaderService.display(false);
       }
@@ -268,7 +273,8 @@ export class InvoiceRegisterComponent implements OnInit {
 
           this.regExport.exportAutoGrid({
             header: 'Credit Note Register Accounts Detail From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
-            company: this.cmpFullName
+            company: this.cmpFullName,
+            sheet: 'Credit Note Register'
           }, this.registerdata, ((this._loginService.getLogin()[0].CMP_USERNAME || "") + "").trim() + "_Accounts_CreditNote_Register");
           this.loaderService.display(false);
       }
@@ -285,7 +291,8 @@ export class InvoiceRegisterComponent implements OnInit {
 
           this.regExport.exportStorage({
             header: 'Storage Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
-            company: this.cmpFullName
+            company: this.cmpFullName,
+            sheet: 'Storage Register'
           }, this.registerdata, data.Table1 && data.Table1[0], ((this._loginService.getLogin()[0].CMP_USERNAME || "") + "").trim() + "_Accounts_Storage_Register");
           this.loaderService.display(false);
       }
@@ -299,18 +306,14 @@ export class InvoiceRegisterComponent implements OnInit {
       this.api("Accounts/fn_Acc_Rpt_EXPWOP_Register_XL", jsonmaster).subscribe((data: any) => {
         if (data && data.Table && data.Table.length > 0){
           this.registerdata = data.Table
-          this.registerdata.forEach((row: any) => {
-            this.dataForExcel1.push(Object.values(row))
-          })
-
-          let reportData = {
-            title: this.cmpnyname,
-            subtitle: this.PageType + ' Search Register From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
-            data: this.dataForExcel1,
-            headers: Object.keys(this.registerdata[0]),
-            pagetype: this.PageType,
-          }
-          this.exportser.exportExceltry(reportData, "Report-EXPWOP Register");
+          // dedicated workbook: INV sheet, CN sheet (Table1 = foreign-currency credit notes), Summary sheet
+          this.expwopExport.export({
+            company: this.cmpnyname,
+            fromDate: this.FromDate.formatted,
+            toDate: this.ToDate.formatted,
+            branch: this._loginService.getLogin()[0].CITYCODE
+          }, data.Table, data.Table1 || [], "Report-EXPWOP Register");
+          this.loaderService.display(false);
       }
       else{
         this._toasterService.toast("warning","warning", this.noDataMessage(data))
@@ -370,7 +373,8 @@ export class InvoiceRegisterComponent implements OnInit {
 
         this.regExport.exportAutoGrid({
           header: 'Invoice Register Account Detail From ' + this.FromDate.formatted + ' To ' + this.ToDate.formatted,
-          company: this.cmpFullName
+          company: this.cmpFullName,
+          sheet: 'Invoice Register Details'
         }, this.registerdata_details, "Report-Invoice Register Details");
         this.loaderService.display(false);
     }
