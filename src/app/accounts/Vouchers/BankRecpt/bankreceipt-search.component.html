@@ -54,7 +54,7 @@
         @case ('CLIENT') {
           <div class="fld">
             <label>Account</label>
-            <ng-select [items]="AccountList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
+            <ng-select [items]="AccountList" [virtualScroll]="true" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
               [(ngModel)]="Account" class="custom" placeholder="--Select--" [disabled]="Type!='CLIENT'">
             </ng-select>
           </div>
@@ -71,7 +71,7 @@
           <div class="fld">
             <label>Our bank</label>
             <ng-select [items]="OurBankList" bindLabel="ACCTNAME" bindValue="ACCTCODENAME"
-              [(ngModel)]="OurBank" (change)="GetActName($event?.ACCTCODENAME)" class="custom" placeholder="--Select--" [disabled]="Type!='OURBANK'">
+              [(ngModel)]="OurBank" (change)="GetActName($safeNavigationMigration($event?.ACCTCODENAME))" class="custom" placeholder="--Select--" [disabled]="Type!='OURBANK'">
             </ng-select>
           </div>
           <div class="fld">

@@ -16,6 +16,11 @@ const routes: Routes = [
             loadChildren: () => import('./ClientRegister/clientregister.module').then(m => m.ClientRegisterModule),
             canActivate: [FinancialYearAuthGuard],
         },
+        {
+            path: 'DayEnd',
+            loadChildren: () => import('./DayEnd/mgmt-dayend.module').then(m => m.MgmtDayEndModule),
+            canActivate: [FinancialYearAuthGuard],
+        },
         { path: 'DrCrDiffAudit', component: FyDrCrDiffAuditComponent, data: { title: 'FY Debit/Credit Difference Audit' } },
 
 

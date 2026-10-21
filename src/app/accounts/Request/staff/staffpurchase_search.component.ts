@@ -33,7 +33,7 @@ export class StaffPurchaseSearchComponent implements OnInit {
     searchList: any = [];
 
     displayType: string = 'SEARCH';
-    searchHeaderText: string = 'List of Purchase';
+    searchHeaderText: string = 'List of Staff Purchase Requests';
     Display:string="0";
     Type: string = 'CODE';
     PurchaseNo: any = '';
@@ -167,7 +167,9 @@ export class StaffPurchaseSearchComponent implements OnInit {
         else if (this.Type == 'STAFF') { if (this.fnValidate_Supplier()) { SearchType = "Supplier"; this.getData(SearchType); } }
         else if (this.Type == 'JOBNO') { if (this.fnValidate_JobNo()) { SearchType = "JobNo"; this.getData(SearchType); } }
         else if (this.Type == 'AMOUNT') { if (this.fnValidate_Amount()) { SearchType = "Amount"; this.getData(SearchType); } }
-      
+        // V4 menu "List": the logged-in user's own staff purchase requests
+        else if (this.Type == 'USERID') { this.getData("USERID"); }
+
     }
 
     getData(searchtype) {
@@ -199,10 +201,10 @@ export class StaffPurchaseSearchComponent implements OnInit {
                 if (data.Table.length == 0) {
                     this._toasterService.toast("warning", "Alert", "No record found");
                 }
-                 else if (data.Table.length == 1) {
+                 else if (data.Table.length == 1 && searchtype != "USERID") {
                      this._router.navigate(["/accounts/Request/staff/StaffPurchaseReq/", data.Table[0].PUR_CODE]);
                 }
-                else if (data.Table.length > 1) {
+                else {
                     this.displayType = 'LIST';
                     this.searchList = data.Table;
                     this.isDefaultList = false;

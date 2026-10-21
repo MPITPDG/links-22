@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/shared/service/dataService';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 import { networkInterfaces } from 'os';
-import { TrialBalanceExportService } from './trialbal-export.service';
+import { ExportexcelTrialBalanceGroupWise } from 'src/app/shared/service/exportexcel_trialbalance_grp';
 import { catchError } from 'rxjs/operators';
 import { EMPTY, Subscription } from 'rxjs';
 @Component({
@@ -62,7 +62,7 @@ import { EMPTY, Subscription } from 'rxjs';
         private _activatedRoute: ActivatedRoute,
         private _loginService: LoginService,
         private _loaderService: LoaderService,
-        private tbExport: TrialBalanceExportService,
+        private tbExcel: ExportexcelTrialBalanceGroupWise,
       ) { }
           ngOnInit() {
              this.setAsOnDate()
@@ -148,6 +148,7 @@ import { EMPTY, Subscription } from 'rxjs';
         CityCode1:this._loginService.getLogin()[0].CITYCODE1,
         FinEndDate1:this.FinalAsonDate ,
         }
+    const asOn = this.FinalAsonDate;
     this._dataService.getData("Accounts/Acc_Rpt_TrialBalance_GrpWiseDtls_All_ToExcel_TrialBalanceGroupDetail", jsonview)
         .pipe(catchError((err: any) => {
           /* the server could not answer (HTTP 500, endpoint missing, network): stop the loader and say so */
@@ -162,20 +163,22 @@ import { EMPTY, Subscription } from 'rxjs';
           this._toasterService.toast('warning', 'warning', (data && data.Table) ? 'No Record Found !' : 'The report could not be generated on the server (stored procedure error). Please contact support.');
           return;
         }
+        // each download is built from its own reply only, never from rows kept from an earlier download
         this.trbldata = data.Table;
-        this.ExportToExcelData();
+        this.ExportToExcelData(this.trbldata, asOn);
             });
     }
-    ExportToExcelData(){
+    ExportToExcelData(rows: any[], asOn: string){
         var date = new Date(this._loginService.getLogin()[0].FINANCIAL_YEAR.STARTDATE);
         var todate = new Date(this._loginService.getLogin()[0].FINANCIAL_YEAR.ENDDATE);
         var startYear = date.getFullYear().toString().substr(-2);
         var endYear = todate.getFullYear().toString().substr(-2);
-        /* file name exactly as the .NET page: Accounts_TrialBalanceAll_GRP_WiseDtls-<ClientCode>-<from yy>-<to yy>; the client code is empty there, hence the double dash */
-        this.tbExport.exportGroupWiseDetail({
-          asOn: this.FinalAsonDate,
-          company: this.cmpnyname
-        }, this.trbldata, 'Accounts_TrialBalanceAll_GRP_WiseDtls--' + startYear + '-' + endYear);
-    }   
+        /* file name as the .NET page: Accounts_TrialBalanceAll_GRP_WiseDtls-<ClientCode>-<from yy>-<to yy>; the client code is empty there, hence the double dash */
+        this.tbExcel.download({
+          titleLines: [this.cmpnyname, 'Trial Balance As On ' + asOn],
+          rows: rows,
+          fileName: 'Accounts_TrialBalanceAll_GRP_WiseDtls--' + startYear + '-' + endYear
+        });
+    }
 
 }

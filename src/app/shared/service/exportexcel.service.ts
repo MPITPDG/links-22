@@ -1308,6 +1308,29 @@ if (excelData.pagetype == "Purchase" || excelData.pagetype == "Storage" || excel
     });
      this._loaderService.display(false);
     //download file call
+    // Optional second sheet ({name, subtitle, headers, data}) - used by the EXPWOP register for credit notes
+    if (excelData.sheet2 && excelData.sheet2.headers && excelData.sheet2.data) {
+      const ws2 = workbook.addWorksheet(excelData.sheet2.name || 'Sheet2');
+      ws2.getCell('A1').value = title;
+      ws2.getCell('A1').font = { name: 'Arial', size: 10, bold: true };
+      ws2.getCell('A2').value = excelData.sheet2.subtitle || subtitle;
+      ws2.getCell('A2').font = { name: 'Arial', size: 10 };
+      ws2.addRow([]);
+      const h2 = ws2.addRow(excelData.sheet2.headers);
+      h2.eachCell((cell) => {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '000000' }, bgColor: { argb: '' } };
+        cell.font = { name: 'Arial', bold: true, color: { argb: 'FFFFFF' }, size: 10 };
+        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+      });
+      excelData.sheet2.data.forEach((d: any) => {
+        const r2 = ws2.addRow(d);
+        r2.font = { name: 'Arial', size: 10 };
+        r2.eachCell({ includeEmpty: true }, (cell) => {
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+        });
+      });
+      ws2.columns.forEach((col) => { col.width = 18; });
+    }
     workbook.xlsx.writeBuffer().then((data) => {
       let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       fs.saveAs(blob, downloadname + '.xlsx');

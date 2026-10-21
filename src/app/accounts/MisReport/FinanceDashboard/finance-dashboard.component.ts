@@ -94,6 +94,24 @@ export class FinanceDashboardComponent implements OnInit {
     UnbilledLines: any[] = [];     // Table9: voucher-level expense lines behind unbilled jobs
     Funnel: any[] = [];            // Table10: Jobs -> Invoiced -> Collected
     Coverage: any = null;          // Table11: billing coverage / invoicing lag
+    FyYears: any[] = [];           // Table15: outstanding by the financial year of the bill
+    /*  The client breakdown is deliberately NOT part of this page's load - it was 639
+        rows on Links and 1,692 on Manilal fetched on every open, and it held the other
+        menus up. It comes from the drill procedure, only when somebody asks for it.  */
+    FyClients: any[] = [];
+    FyDetail = false;
+    FyBusy = false;
+    FyError = '';
+    FyOpen: number = null;         // the year whose modal is open
+    FyLabel = '';
+    FyRow: any = null;
+    /*  Table16: the voucher lines behind the amber "unmatched" pill. The procedure only
+        returns them when ONE client is selected - across all clients it was 2,898 rows
+        on top of a payload that already carries 8,700, on a page that loads every time.
+        So the pill re-runs the dashboard for that client first, then opens.  */
+    UnmLinesAll: any[] = [];
+    UnmJob: any = null;            // the job row whose lines are open
+    UnmPending: string = null;     // job we should open once the client load finishes
     CacheInfo: any = null;         // CACHEINFO appended by the API cache
 
     /* expanded-row state for the Margin (per client) and Unbilled (per job) drills */
@@ -348,6 +366,14 @@ export class FinanceDashboardComponent implements OnInit {
                 this.Margin = data.Table7 ? data.Table7 : [];
                 this.MarginShipper = data.Table12 ? data.Table12 : [];
                 this.JobSplit = data.Table13 ? data.Table13 : [];
+                this.FyYears = data.Table15 ? data.Table15 : [];
+                this.UnmLinesAll = data.Table16 ? data.Table16 : [];
+                if (this.UnmPending) {
+                    const jb = this.UnmPending;
+                    this.UnmPending = null;
+                    const row = this.JobSplit.find(s => (s.JOBNO || '').toString().trim() === jb);
+                    if (row && this.UnmLinesFor(row).length) { this.UnmJob = row; }
+                }
                 this.JobPL = data.Table8 ? data.Table8 : [];
                 this.UnbilledLines = data.Table9 ? data.Table9 : [];
                 this.Funnel = data.Table10 ? data.Table10 : [];
@@ -1049,6 +1075,16 @@ export class FinanceDashboardComponent implements OnInit {
         return (+k.GROSS_PENDING || 0) - (+k.TOTAL_OUTSTANDING || 0);
     }
 
+    /*  Part of the credit above that is credit notes nobody linked to an invoice. The
+        note is real money owed to the client, but with no link the bill behind it stays
+        open for ever - Links Mumbai carried 93.66 lakh of these, 52.81 lakh of it on one
+        client whose Account Statement showed the account square. Shown on its own line so
+        Accounts can see what to go back and attach.  */
+    CnUnlinked(): number {
+        const k: any = this.Kpi || {};
+        return +k.CN_UNLINKED || 0;
+    }
+
     CreditStranded(): number {
         const k: any = this.Kpi || {};
         if (k.CREDIT_STRANDED !== undefined && k.CREDIT_STRANDED !== null) { return +k.CREDIT_STRANDED; }
@@ -1167,6 +1203,65 @@ export class FinanceDashboardComponent implements OnInit {
         }, 'FinanceDashboard_' + d.file + '_');
     }
 
+    /*  Outstanding split by the financial year the bill was raised in. Unapplied client
+        credit is set against the oldest year first - client by client - so the years add
+        back to the Outstanding and Overdue on the cards above.  */
+    OpenFy(y: any) {
+        this.FyOpen = this.num(y.FY_START);
+        this.FyLabel = y.FY;
+        this.FyRow = y;
+        this.LoadFyDetail();
+    }
+
+    CloseFy() { this.FyOpen = null; }
+
+    UnmLinesFor(j: any): any[] {
+        if (!j || !this.UnmLinesAll.length) { return []; }
+        const job = (j.JOBNO || '').toString().trim();
+        const cl = (j.CLIENTCODE || '').toString().trim();
+        return this.UnmLinesAll.filter(r => (r.JOBNO || '').toString().trim() === job
+                                         && (r.CLIENTCODE || '').toString().trim() === cl);
+    }
+
+    UnmTotal(j: any): number {
+        return this.UnmLinesFor(j).reduce((s, r) => s + this.num(r.SHARE), 0);
+    }
+
+    /*  With a client already selected the lines are in hand, so open at once. Otherwise
+        re-run scoped to that client - the only way to get the lines without putting them
+        on every page load - and open when the data lands.  */
+    OpenUnm(j: any, ev: any) {
+        if (ev) { ev.stopPropagation(); }
+        if (this.UnmLinesFor(j).length) { this.UnmJob = j; return; }
+        this.UnmPending = (j.JOBNO || '').toString().trim();
+        this.LoadClient((j.CLIENTCODE || '').toString().trim());
+    }
+
+    CloseUnm() { this.UnmJob = null; }
+
+    LoadFyDetail() {
+        if (this.FyDetail || this.FyBusy) { return; }
+        this.FyBusy = true;
+        this.FyError = '';
+        this._dataService.getData('Accounts/ACC_RPT_ACCOUNTS_HOME_DRILL', {
+            CMPCODE: this._loginService.getLogin()[0].CMPCODE,
+            CITYCODE: this.Branch,
+            KIND: 'OVERDUE',
+            ASOF: ''
+        }).subscribe((data: any) => {
+            this.FyBusy = false;
+            const ok = data && data.Table && data.Table.length > 0 && data.Table[0].STATUS == '100';
+            if (!ok) { this.FyError = 'The client detail could not be loaded.'; return; }
+            this.FyClients = data.Table6 || [];
+            this.FyDetail = true;
+        }, () => { this.FyBusy = false; this.FyError = 'The client detail could not be loaded.'; });
+    }
+
+    FyClientsFor(y: any): any[] {
+        const n = this.num(y);
+        return this.FyClients.filter(c => this.num(c.FY_START) === n);
+    }
+
     /* full-rupee figure for the arithmetic lines (the cards show the short form) */
     fmtRs(v): string { return 'Rs. ' + this.fmtINR(v); }
 
@@ -1210,6 +1305,9 @@ export class FinanceDashboardComponent implements OnInit {
                 extra: [
                     { label: 'Credit left over (clients holding more credit than open bills)'
                         + (this.BiggestLeftOver() ? ' - largest: ' + this.BiggestLeftOver() : ''), value: this.fmtRs(this.CreditStranded()) },
+                    { op: ' ', label: 'of the credit above, credit notes never linked to an invoice ('
+                        + this.num((this.Kpi || {}).CN_UNLINKED_NOTES) + ' notes, '
+                        + this.num((this.Kpi || {}).CN_UNLINKED_CLIENTS) + ' clients)', value: this.fmtRs(this.CnUnlinked()) },
                     { label: 'of which Overdue (past the due date)', value: this.fmtRs(k.OVERDUE_AMT) },
                     { label: 'Overdue share of Outstanding', value: this.pctOf(k.OVERDUE_AMT, k.TOTAL_OUTSTANDING).toFixed(0) + ' %' }
                 ],

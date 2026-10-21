@@ -362,6 +362,7 @@
                             { menuid: "13.8.1",   menuname: "Client Register", routerlink: "/accounts/MisReport/AdminReport/ClientRegister/Client", ischild: 'n', parentid: 0, isactive: 1, data: [] },    
                             { menuid: "13.8.2",   menuname: "Supplier Register", routerlink: "/accounts/MisReport/AdminReport/ClientRegister/Supp", ischild: 'n', parentid: 0, isactive: 1, data: [] },
                             { menuid: "13.8.3",   menuname: "FY Dr/Cr Difference Audit", routerlink: "/accounts/MisReport/AdminReport/DrCrDiffAudit", ischild: 'n', parentid: 0, isactive: 1, data: [] },
+                            { menuid: "13.8.4",   menuname: "Management Day-End", routerlink: "/accounts/MisReport/AdminReport/DayEnd/dashboard", ischild: 'n', parentid: 0, isactive: 1, data: [] },
 
                         ] },
                             { menuid: "13.9",   menuname: "Job Profit", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [

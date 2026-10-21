@@ -1,618 +1,72 @@
+<!-- TAX INVOICE print - same layout as Links_V4 UI/Accounts/frm_Acc_Tran_Invoice_Print.aspx.
+     One self-contained .invoice-page per physical page: header (pgHead) + this page's charge rows +
+     (last page only) the trailer (pgTrailer) + the footer (pgFoot) on every page. -->
+@if (loading) {
+<div id="divLoading">Loading ...</div>
+}
+
 @if (printmodal) {
 <div class="printmain">
   <div id="demo">
-    <table bordercolor="black" height="764" cellspacing="0" cellpadding="2" width="100%" border="0">
-      <tbody>
-        <tr>
-          <td valign="top">
-          </td>
-          <td valign="top">
-            <table id="Table2" style="border-right: black 1px solid; border-top: black 1px solid;
-                left: 0px; border-left: black 1px solid; border-bottom: black 1px solid;margin:0 auto" cellspacing="0"
-              cellpadding="0" width="700" border="0">
+    <div class="sheet">
+      @for (pg of pages; track pg; let last = $last) {
+<div class="invoice-page" [class.pg-break]="!last">
+
+        <ng-container *ngTemplateOutlet="pgHead"></ng-container>
+
+        <div class="invoice-content">
+          <div class="charges-wrap">
+            <table class="charges">
+              <thead>
+                <tr>
+                  <th class="ctr c-sr">Sr.</th>
+                  <th>Particulars of Charges</th>
+                  <th class="ctr c-sac">SAC</th>
+                  <th class="num c-amt">{{hdr.taxHead}}</th>
+                  <th class="num c-amt">{{hdr.ntaxHead}}</th>
+                </tr>
+                @if (!pg.first) {
+<tr class="cont-note"><td></td><td colspan="4">...continued from previous page</td></tr>
+}
+              </thead>
               <tbody>
-                <tr>
-                  <td>
-                <tr width="700">
-                  <td>
-                    <!-- <span
-                      style='font-size:28px; font-weight: bold; font-family: "Euclid Fraktur", "Old English Text MT", fantasy, serif; color: black;'>
-                      Manilal Patel Clearing Forwarding Private Limited</span> -->
-                      <!-- <span
-                style='font-size:24pt; font-weight: bold; font-family: "Euclid Fraktur","Old English Text MT", fantasy, serif; color: black;'>
-                 {{table0[0].CMP_NAME| titlecase }}</span> -->
-                 <span> 
-                  <!-- <img src="../../../assets/img/HEADER_CLGBOM.jpg"></span> -->
-                      <!-- <img src="assets/img/HEADER_CLGBOM.jpg" width="700">  </span>    -->
-                     <img src={{CMP_IMAGE}} width="700">  </span>       
-
-                  </td>
-                </tr>
-          </td>
-        </tr>
-        <!-- <tr>
-          <td style="border-bottom: black 1px solid">
-            <table id="Table3" cellspacing="0" cellpadding="0" width="100%" border="0">
-              <tbody>
-                <tr>
-                  <td width="45%">
-                    <span class="Rpt_CodeDate" style="font-weight:bold;">
-                      <b> &nbsp;{{table0[0].CMP_ADD1}}<br> &nbsp;{{table0[0].CMP_ADD2}}<br>
-                          &nbsp;{{table0[0].CMP_ADD3}}</b></span>
-                  </td>
-                  <td  width="33%">
-                    <span class="Rpt_CodeDate" style="font-weight:bold;">
-                     <b>TelNo.+91(22)27240275/3095<br>FaxNo.+91(22)27240280,<br>Email:accounts.bom@manilal.com<br>Website:www.manilal.com</b> 
-      
-                      <b>TelNo.&nbsp;{{table0[0].CMP_TELNO}}<br>FaxNo.&nbsp;{{table0[0].CMP_FAXNO}}<br>
-                          Email:&nbsp;{{table0[0].CMP_EMAIL}}<br>Website:&nbsp;</b>
-                    </span>
-                  </td>
-                  <td align="right">
-                    <span class="Rpt_CodeDate" style="font-weight:bold;">
-                      <img src="../../../assets/Untitled-1.png"></span>&nbsp;
-                     <img src=" ../img/Untitled-1.png"></span>&nbsp; 
-                     
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr> -->
-        <tr>
-          <td style="border-bottom: black 1px solid">
-
-          </td>
-        </tr>
-        <tr>
-          <td style="border-bottom: black 1px solid">
-            <table id="Table3" cellspacing="0" cellpadding="0" width="100%" border="0">
-              <tbody>
-                <tr>
-                  <td width="33%">
-                    &nbsp;&nbsp;<span class="Rpt_CodeDate" style="font-weight:bold;">No.
-                      {{INV_NO1}}</span>
-                  </td>
-                  <td align="center" width="33%">
-                    <span style="font-family:Arial;font-size:16pt;font-weight:bold;">INVOICE</span>
-                  </td>
-                  <td align="right">
-                    <span class="Rpt_CodeDate" style="font-weight:bold;">DATE :
-                      {{INV_DATE1}}</span>&nbsp;
-                  </td>
-                
-
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <td style="border-bottom: black 1px solid">
-            <table id="Table4" cellspacing="0" cellpadding="1" width="100%" border="0">
-              <tbody>
-                <tr>
-                  <td valign="top" width="1%">
-                  </td>
-                  <td style="border-right: black 1px solid" valign="top" width="49%">
-                    <table id="tbl_exp_mst" class="Rpt_Label_content" cellspacing="0" cellpadding="2" width="100%"
-                      border="0">
-                    </table>
-
-                    <span class="Rpt_Label" style="display:inline-block;width:100%;">{{EXP_NAME1}}
-                    </span><span class="Rpt_Label_content" style="display:inline-block;width:100%;">
-                      {{EXP_INVADD11}}<br>{{EXP_INVADD2}}<br>{{EXP_INVADD3}}
-                      <br>{{EXP_INVCITY}} - {{EXP_INVPINCODE}}, <span class="col-form-span-label"
-                        [innerHTML]="CITY_COUNTRY1"></span>
-                    </span>
-
-
-                  </td>
-                  <td>
-                    <table id="Table6" cellspacing="0" cellpadding="2" width="100%" border="0">
-                      <tbody>
-                        <tr>
-                          <td align="right" width="40%">
-                            <span class="Rpt_Label"> OUR REF :</span>
-                          </td>
-                          <td width="60%">
-                            <span class="Rpt_Label_content"
-                              style="display:inline-block;width:100%;">{{INV_JOBNO1}}</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td align="right" width="40%">
-                            <span class="Rpt_Label"> VESSEL / AIRLINE :</span>
-                          </td>
-                          <td width="60%">
-                            <span class="Rpt_Label_content"
-                              style="display:inline-block;width:100%;">{{INV_CARRIER1}}</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td align="right" width="40%" colspan="1" rowspan="1">
-                            <span class="Rpt_Label"> H.B/L/H.A.W.B :</span>
-                          </td>
-                          <td width="60%">
-                            <span class="Rpt_Label_content"
-                              style="display:inline-block;width:100%;">{{INV_HAWBNO1}}</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td align="right" width="40%">
-                            <span class="Rpt_Label"> DATE :</span>
-                          </td>
-                          <td width="60%">
-                            <span class="Rpt_Label_content"
-                              style="display:inline-block;width:100%;">{{INV_HAWBDT1}}</span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <td style="border-bottom: black 1px solid">
-            <table id="Table7" cellspacing="1" cellpadding="1" width="100%" border="0">
-              <tbody>
-                <tr>
-                  <td align="right" width="22%">
-                    <span class="Rpt_Label">DOCUMENT THROUGH:</span>
-                  </td>
-                  <td width="30%">
-                    <span class="Rpt_Label_content" style="display:inline-block;width:100%;">{{DOCTHROUGH1}}</span>
-                  </td>
-                  <td align="right" width="20%">
-
-                  </td>
-                  <td width="30%">
-
-                  </td>
-                </tr>
-                <tr>
-                  <td align="right" width="22%">
-                    <span class="Rpt_Label">CONTENTS :</span>
-                  </td>
-                  <td width="30%">
-                    <span class="Rpt_Label_content" style="display:inline-block;width:100%;"></span>
-                  </td>
-                  <td align="right" width="20%">
-
-                  </td>
-                  <td width="30%">
-
-                  </td>
-                </tr>
-                <tr>
-                  <td align="right" width="22%">
-                    <span class="Rpt_Label">YOUR REFERENCE :</span>
-                  </td>
-                  <td width="30%">
-                    <span class="Rpt_Label_content" style="display:inline-block;width:100%;">{{INV_CLIENTREF1}}</span>
-                  </td>
-                  <td align="right" width="20%">
-
-                  </td>
-                  <td width="30%">
-
-                  </td>
-                </tr>
-                <tr>
-                  <td align="right" width="22%">
-
-                  </td>
-                  <td width="30%">
-
-                  </td>
-                  <td align="right" width="20%">
-
-                  </td>
-                  <td width="30%">
-
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <table id="Table5" cellspacing="0" cellpadding="0" width="100%" border="0">
-              <tbody>
-                <tr>
-                  <td valign="top" width="200">
-                    <table id="tblEnclosure" cellspacing="0" cellpadding="0" width="200" border="0">
-                      <tbody>
-                        <tr>
-                          <td style="border-bottom: 1px solid" align="center" width="150" height="40">
-                            <span class="Rpt_Label_content"
-                              style="display:inline-block;color:Black;font-size:7pt;font-weight:bold;width:100%;">Enclosure</span>
-                          </td>
-                          <td style="border-left: 1px solid; border-bottom: 1px solid" align="center" width="50"
-                            height="40">
-                            <span class="Rpt_Label_content"
-                              style="display:inline-block;color:Black;font-size:7pt;font-weight:bold;width:100%;">Nos</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td id="tdEnclosure" style="border-bottom: 1px solid" align="center" colspan="2">
-                            <table cellspacing="0" cellpadding="0" width="200px" he="" border="0"
-                              class="Rpt_Label_content">
-                              <tbody>
-                                @for (data of enclosuretable; track data) {
+                @for (r of pg.rows; track r) {
 <tr>
-                                  <td width="1%"></td>
-                                  <td>{{data.inv_desc}}</td>
-                                  <td width="50px" style="BORDER-LEFT: 1px solid">{{data.inv_number}}</td>
-                                </tr>
-}
-                              </tbody>
-                            </table>
-                          </td>
-                        </tr>
-                        <tr>
-                        </tr>
-                      </tbody>
-                    </table>
-
-                  </td>
-                  <td id="tdheight" style="border-left: 1px solid" valign="top" width="500" height="300">
-                    <table id="tbl_Charges" style="font-size: 7pt; font-family: Verdana, Arial" height="100%"
-                      cellspacing="0" cellpadding="0" width="500" border="0">
-                      <tbody>
-                        <tr>
-                          <td style="width: 360px; border-bottom: 1px solid; height: 40px" align="center" height="40">
-                            <span class="Rpt_Label_content"
-                              style="display:inline-block;color:Black;font-size:7pt;font-weight:bold;width:100%;">Charges
-                              Particulars</span>
-                          </td>
-                          <td style="border-left: 1px solid; width: 70px; border-bottom: 1px solid; height: 40px"
-                            align="center" height="40">
-                            <span class="Rpt_Label_content"
-                              style="display:inline-block;color:Black;font-size:7pt;font-weight:bold;width:100%;">Taxable
-                              INDIAN RUPEES</span>
-                          </td>
-                          <td style="border-left: 1px solid; width: 70px; border-bottom: 1px solid" align="center"
-                            height="40">
-                            <span class="Rpt_Label_content"
-                              style="display:inline-block;color:Black;font-size:7pt;font-weight:bold;width:100%;">Non
-                              Taxable INDIAN RUPEES</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td id="tdCharges" align="center" colspan="3">
-                            <table cellspacing="0" cellpadding="0" width="100%" border="0" class="Rpt_Label_content">
-                              <tbody>
-                                @for (data2 of chargestable; track data2) {
-<tr>
-                                  <td width="1px"></td>
-                                  <td width="360px" valign="top">{{data2.CHRG_DESC}} </td>
-                                  @if ((inrtype=='1')) {
-<td width="70px" style="BORDER-LEFT: 1px solid" align="right" valign="bottom" >
-                                    {{data2.INV_AMOUNT_Y|number:'2.2-4'}}&nbsp;</td>
-}
-                                    @if ((inrtype=='0')) {
-<td width="70px" style="BORDER-LEFT: 1px solid" align="right" valign="bottom" >
-                                      {{data2.INV_INRAMT_Y |number:'2.2-4'}}&nbsp;</td>
-}
-                                      @if ((inrtype=='1')) {
-<td width="70px" style="BORDER-LEFT: 1px solid" align="right" valign="bottom" >
-                                        {{data2.INV_INRAMT_N |number:'2.2-4'}}&nbsp;</td>
-}
-                                        @if ((inrtype=='0')) {
-<td width="70px" style="BORDER-LEFT: 1px solid" align="right" valign="bottom" >
-                                          {{data2.INV_INRAMT_N |number:'2.2-4'}}&nbsp;</td>
-}
-                                </tr>
-}
-                              </tbody>
-                            </table>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style="width: 360px" align="center" height="100%">
-                            &nbsp;
-                          </td>
-                          <td style="border-left: black 1px solid; width: 70px" align="center" height="100%">
-                            &nbsp;
-                          </td>
-                          <td style="border-left: black 1px solid" align="center" width="70" height="100%">
-                            &nbsp;
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-
-                  </td>
+                  <td class="ctr">{{r.sr}}</td>
+                  <td [innerHTML]="r.desc"></td>
+                  <td class="ctr">{{r.sac}}</td>
+                  <td class="num">{{r.y}}</td>
+                  <td class="num">{{r.n}}</td>
                 </tr>
+}
+                @if (!pg.last) {
+<tr class="cont-note"><td></td><td colspan="4">Continued in next page...</td></tr>
+}
               </tbody>
             </table>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <table id="Table9" cellspacing="0" cellpadding="0" width="700" border="0">
-              <tbody>
-                <tr>
-                  <td style="border-top: 1px solid;height:32px" valign="top" width="560" colspan="2">
-                    <!-- <table id="tbl_jobno" class="labelnormal" style="color: black" cellspacing="0"
-                            cellpadding="1" width="90%" border="0">
-                            <tbody>
-                              <tr>
-                                <td></td>
-                              </tr>
-                            </tbody>
-                          </table> -->
-
-                    <span class="Rpt_Label_content"
-                    [innerHTML]="NARRATION1"></span>
-
-                    <span
-                      style="display:inline-block;color:Black;font-family:Arial;font-size:14px;font-weight:bold;width:90%;padding:0px;margin:0px"><br>
-                      PAY BY DATE: {{PAYBLEBYDT1}}</span>
-                  </td>
-                  <td style="border-left: black 1px solid; height: 32px" align="right" width="70" height="32">
-                    &nbsp;
-                  </td>
-                  <td style="border-left: black 1px solid; height: 32px" align="right" width="69" height="32">
-                    &nbsp;
-                  </td>
-                </tr>
-                <tr>
-                  <td style="border-top: black 1px solid; border-bottom: black 3px solid" width="560" colspan="2"
-                    height="25">
-                    &nbsp;
-                  </td>
-                  <td style="border-top: black 1px solid; border-left: black 1px solid; border-bottom: black 3px solid"
-                    align="right" width="70" height="25">
-                    @if ((inrtype=='1')) {
-<span class="Rpt_Label_content" style="display:inline-block;width:100%;"  >{{datattable5[0].TOT_INV_AMOUNT_Y|number:'2.2-4'}}</span>
-}
-                    @if ((inrtype=='0')) {
-<span class="Rpt_Label_content" style="display:inline-block;width:100%;"  >{{datattable5[0].TOT_INV_INRAMT_Y|number:'2.2-4'}}</span>
-}
-
-                  </td>
-                  <td style="border-top: black 1px solid; border-left: black 1px solid; border-bottom: black 3px solid"
-                    align="right" width="69" height="25">
-                    @if ((inrtype=='1')) {
-<span class="Rpt_Label_content" style="display:inline-block;width:100%;"  >{{datattable5[0].TOT_INV_AMOUNT_N|number:'2.2-4'}}</span>
-}
-                    @if ((inrtype=='0')) {
-<span class="Rpt_Label_content" style="display:inline-block;width:100%;"  >{{datattable5[0].TOT_INV_INRAMT_N|number:'2.2-4'}}</span>
-}
-
-                  </td>
-                </tr>
-                @for (data of gsttable; track data) {
-<tr>
-                  <td id="tdTaxableAmt" style="border-bottom: black 1px solid" nowrap="nowrap" colspan="2">
-                    <table cellspacing="0" cellpadding="0" width="100%" border="0" class="Rpt_Label_content">
-                      <tbody>
-                        <tr>
-                          <td width="1px"></td>
-                          <td valign="top">{{data.DESC1}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </td>
-
-                  <td id="tdTotalTaxableAmt" style="border-left: black 1px solid; border-bottom: black 1px solid"
-                    align="right" width="70">
-                    <table cellspacing="0" cellpadding="0" width="100%" border="0" class="Rpt_Label_content">
-                      <tbody>
-                        <tr>
-                          <td width="1px"></td>
-                         
-                          @if ((inrtype=='1')) {
-<td width="359px"  align="right" valign="top"  >
-                            {{data.INV_AMOUNT|number:'2.2-4'}}</td>
-}
-                            @if ((inrtype=='0')) {
-<td width="359px"  align="right" valign="top"  >
-                              {{data.INV_INRAMT|number:'2.2-4'}}</td>
-} 
-                        </tr>
-                      </tbody>
-                    </table>
-                  </td>
-
-                  <td id="tdRight" style="border-left: black 1px solid; border-bottom: black 1px solid" align="right"
-                    width="69">
-                    <table cellspacing="0" cellpadding="0" width="100%" border="0" class="Rpt_Label_content">
-                      <tbody>
-                        <tr>
-                          <td width="1px"></td>
-                      
-                        
-                          @if ((inrtype=='1')) {
-<td width="359px"  align="right" valign="top"  >
-                            {{data.TAXABLEAMT|number:'2.2-4'}}</td>
-}
-                            @if ((inrtype=='0')) {
-<td width="359px"  align="right" valign="top"  >
-                              {{data.TAXABLEAMTINR|number:'2.2-4'}}</td>
-} 
-                        </tr>
-                      </tbody>
-                    </table>
-                  </td>
-
-                </tr>
-}
-                <tr  style="border-top: black 3px solid">
-                  <td style="border-bottom: black 1px solid" align="left" width="630" colspan="3">
-                    <span class="Rpt_Label_content">Amount Rounded off</span>
-                  </td>
-                  <td style="border-left: black 1px solid; border-bottom: black 1px solid" align="right" width="69">
-                    <span class="Rpt_Label_content"  >{{dattable9[0].ROUNDVALUE}}</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="border-bottom: black 1px solid" width="630" colspan="3">
-                    <span class="Rpt_Label_content">TOTAL RUPEES : {{sum_words}} </span>
-                  </td>
-                  <td style="border-left: black 1px solid; border-bottom: black 1px solid" align="right" width="69">
-                    <span class="Rpt_Label_content"  style="display:inline-block;width:100%;" >{{this.sum |number:'2.2-4'}}</span>
-                    </td>
-                </tr>
-                <tr>
-                  <td style="border-bottom: black 1px solid" align="left" width="630" colspan="3">
-                    <span class="Rpt_Label_content">Less: Advance</span>
-                  </td>
-                  <td style="border-left: black 1px solid; border-bottom: black 1px solid" align="right" width="69">
-                    <span class="Rpt_Label_content">{{INV_ADVANCE1|number:'2.2-4'}}</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="border-bottom: black 1px solid" align="left" width="630" colspan="3">
-                    <span class="Rpt_Label_content">Balance due to us</span>
-                  </td>
-                  <td style="border-left: black 1px solid; border-bottom: black 1px solid" align="right" width="69">
-                    <span class="Rpt_Label_content">{{this.balance|number:'2.2-4'}}</span></td>
-                </tr>
-                <tr>
-                  <td style="border-bottom: black 1px solid" width="630" colspan="3">
-                    <span class="Rpt_Label_content"></span>
-                  </td>
-                  <td style="border-left: black 1px solid; border-bottom: black 1px solid" align="right" width="69">
-                    <span class="Rpt_Label_content"></span>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="border-bottom: black 1px solid" width="630" colspan="3">
-                    <span class="Rpt_Label_content"></span>
-                  </td>
-                  <td style="border-left: black 1px solid; border-bottom: black 1px solid" align="right" width="69">
-                    <span class="Rpt_Label_content"></span>
-                  </td>
-                </tr>
-              </tbody>
+            <!-- carries the charges column lines down through the leftover page height to SUB TOTAL (print only) -->
+            <table class="charges fill-table">
+              <colgroup>
+                <col style="width:8mm" /><col /><col style="width:17mm" /><col style="width:26mm" /><col style="width:26mm" />
+              </colgroup>
+              <tbody><tr><td></td><td></td><td></td><td></td><td></td></tr></tbody>
             </table>
-          </td>
-        </tr>
-        <tr>
-          <td style="height: 165px" align="right">
-            <table id="Table11" cellspacing="1" cellpadding="0" width="100%" border="0">
-              <tbody>
-                <tr>
-                  <td valign="top">
-                    <table id="tbl_Despatch" class="Rpt_Label_content" style="font-size: 7pt" cellspacing="0"
-                      cellpadding="1" width="90%" border="0">
-                      @for (data of dispatchtable; track data) {
-<tr>
-                        <td style="border-bottom: black 1px solid" width="45%">
-                          <span class="Rpt_Label_content">{{data.inv_desc}}</span>
-                        </td>
-                        <td style="border-bottom: black 1px solid" width="45%">
-                          <span class="Rpt_Label_content">{{data.inv_number}} </span>
-                        </td>
-                      </tr>
+          </div>
+
+          @if (pg.last) {
+
+            <ng-container *ngTemplateOutlet="pgTrailer"></ng-container>
+          
 }
+        </div>
 
-                    </table>
-                  </td>
-                  <td valign="top" align="center" width="35%">
-                    <table id="Table1" cellspacing="1" cellpadding="1" width="100%" border="0">
-                      <tbody>
-                        <tr>
-                          <td>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
+        <ng-container *ngTemplateOutlet="pgFoot"></ng-container>
 
-                          </td>
-                        </tr>
-                        <tr>
-                          <td height="25">
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </td>
-                </tr>
-                <tr>
-                  <td valign="top">
-                    <table id="tbl_Despatch" class="Rpt_Label_content" style="font-size: 7pt" cellspacing="0"
-                      cellpadding="1" width="90%" border="0">
-                    </table>
-
-                    <span id="lblStaxNotify" class="Rpt_Label_content"
-                      style="display:inline-block;width:100%;border: 1px solid #808080;"></span>
-                  </td>
-                  <td valign="top" align="center" width="35%">
-                    <table id="Table1" cellspacing="1" cellpadding="1" width="100%" border="0">
-                      <tbody>
-                        <tr>
-                          <td>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <span id="lblFor" class="Rpt_Label_content" style="display:inline-block;width:100%;">For
-                              {{CMP_FULLNAME1}}
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td height="25">
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <table id="Table13" cellspacing="1" cellpadding="0" width="100%" border="0">
-              <tbody>
-                <tr>
-                  <td width="33%" colspan="2">
-                    <span class="Rpt_Label_content" style="display:inline-block;width:456px;">GSTIN -
-                      {{GSTIN1}}</span><span class="Rpt_Label_content" style="display:inline-block;width:90%;">Our ESIC
-                      Regd No. {{ESIC_REGD1}}</span>
-                  </td>
-                  <td valign="top" align="center" width="40%">
-
-                  </td>
-                </tr>
-                <tr>
-                  <td width="33%" colspan="2">
-                    <span class="Rpt_Label_content" style="display:inline-block;width:90%;">Income Tax No.
-                      {{INCOMETAXNO1}}</span><span class="Rpt_Label_content" style="display:inline-block;width:90%;">CIN
-                      No.
-                      {{CINNO_REG1}}</span>
-                  </td>
-
-                  <td valign="top" align="center" width="40%">
-                    <span class="Rpt_Label_content">Authorised
-                      Signatory</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <span class="Rpt_Label_content"
-              style="display:inline-block;width:100%;border-top: black 1px solid">{{CMPADDRESS1}}</span>
-          </td>
-        </tr>
-
-      </tbody>
-    </table>
-    </td>
-    </tr>
-    </tbody>
-    </table>
+      </div>
+}
+    </div>
   </div>
-  <div class="modal-footer pp-bar">
+  <div class="modal-footer pp-bar no-print">
     <div class="row">
       <button type="button" class="pp-btn p" (click)="PrintElem()"><i class="fa fa-print"></i> Print</button>
     </div>
@@ -620,7 +74,340 @@
 </div>
 }
 
-<div class="modal" [style.display]="showModal ? 'block' : 'none'">
+<!-- pgHead: letterhead, title bar, Billed To + invoice meta, shipment strip -->
+<ng-template #pgHead>
+  <div class="pg-head">
+    <div class="co-band">
+      <table class="txt-header">
+        <tr>
+          <td class="th-logo"><img src="assets/img/Links_logo1.png" alt="" /></td>
+          <td class="th-id">
+            <span class="th-name">{{cmp.bold}}</span>&ngsp;<span class="th-suffix">{{cmp.suffix}}</span>
+            <div class="th-addr">@for (a of cmp.add; track a) {
+<span>{{a}}</span>
+}</div>
+            <div class="th-contact">@if (cmp.tel) {
+<span>{{cmp.tel}}</span>
+}@if (cmp.email) {
+<span>{{cmp.email}}</span>
+}</div>
+            <div class="th-gst"><span>{{cmp.gst}}</span></div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="title-bar">
+      <span class="side">&nbsp;</span>
+      <span class="doc-title">{{cmp.title}}</span>
+      <span class="side" style="text-align:right;font-style:italic">Original for Recipient</span>
+    </div>
+
+    <div class="split">
+      <div class="party">
+        <span class="cap">Billed To</span>
+        <span class="party-name">{{inv.party}}</span>
+        <span class="party-addr" [innerHTML]="inv.addr"></span>
+        @if (inv.partyGst) {
+<span class="party-tax">GSTIN : <b>{{inv.partyGst}}</b></span>
+}
+        @if (inv.pos) {
+<span class="party-tax">Place of Supply : {{inv.pos}}</span>
+}
+      </div>
+      <div class="meta">
+        <table>
+          <tr>
+            <td class="k">INVOICE NO. &amp; DATE</td>
+            <td class="b">{{inv.no}} / {{inv.date}}</td>
+          </tr>
+          <tr>
+            <td class="k">OUR REF (JOB)</td>
+            <td>{{inv.job}}</td>
+          </tr>
+          <tr>
+            <td class="k">YOUR REF</td>
+            <td>{{inv.ref}}</td>
+          </tr>
+          @if (inv.payBy) {
+<tr>
+            <td class="k">PAY BY DATE</td>
+            <td class="b">{{inv.payBy}}</td>
+          </tr>
+}
+          <tr>
+            <td class="k">CURRENCY</td>
+            <td>{{inv.currency}}</td>
+          </tr>
+          <tr>
+            <td class="k">@if (inv.showDocThrough) {
+<span>DOCUMENT THROUGH</span>
+}</td>
+            <td>@if (inv.showDocThrough) {
+<span>{{inv.docThrough}}</span>
+}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="ship">
+      <table>
+        <tr>
+          <td><span class="cap">H.B/L / H.A.W.B No.</span>{{inv.hbl}}</td>
+          <td><span class="cap">H.B/L / H.A.W.B Date</span>{{inv.hblDt}}</td>
+          <td><span class="cap">Vessel / Airline</span>{{inv.carrier}}</td>
+          <td><span class="cap">{{hdr.sbLabel}}</span>{{hdr.sbNo}}</td>
+        </tr>
+        <tr>
+          <td><span class="cap">Port of Loading</span>{{hdr.pol}}</td>
+          <td><span class="cap">Port of Discharge</span>{{hdr.pod}}</td>
+          <td><span class="cap">Pkgs / Gr. Wt.</span>{{inv.pkgs}}</td>
+          <td><span class="cap">Contents</span><div class="shipv">{{inv.contents}}</div></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</ng-template>
+
+<!-- pgTrailer (last page only): SUB TOTAL + amount in words, narration / totals box, SAC-wise tax summary -->
+<ng-template #pgTrailer>
+  <div class="trailer-wrap">
+    <table class="charges subtotal-table">
+      <colgroup>
+        <col style="width:8mm" /><col /><col style="width:17mm" /><col style="width:26mm" /><col style="width:26mm" />
+      </colgroup>
+      <tr class="subtotal-row">
+        <td colspan="3">
+          <div class="subrow">
+            <div class="wordbox"><span class="words-val">{{tot.words}}</span></div>
+            <span class="sublbl">SUB TOTAL</span>
+          </div>
+        </td>
+        <td class="num">{{tot.y}}</td>
+        <td class="num">{{tot.n}}</td>
+      </tr>
+    </table>
+
+    <div class="totals-zone">
+      <div class="words">
+        <div class="enc">@if (enclosure) {
+<span class="k">ENCLOSURES :</span> {{enclosure}}
+}</div>
+        <table class="desp">
+          @for (d of despatch; track d) {
+<tr><td [innerHTML]="d.desc"></td><td [innerHTML]="d.no"></td></tr>
+}
+        </table>
+        @if (otherJobs) {
+<div class="jobsline">
+          <span class="k">OTHER JOB NOS :</span>&ngsp;<table class="jobs"><tr><td>{{otherJobs}}</td></tr></table>
+        </div>
+}
+        <div class="narr">
+          <span class="k">NARRATION :</span>
+          <span class="narr-val" [innerHTML]="inv.narration"></span>
+        </div>
+      </div>
+      <div class="totals">
+        <table>
+          <tbody>
+            <tr>
+              <td>Total (Taxable + Non-Tax)</td>
+              <td class="num">{{tot.yn}}</td>
+            </tr>
+          </tbody>
+          <tbody>
+            @for (t of taxRows; track t) {
+<tr><td>{{t.label}}</td><td class="num">{{t.amt}}</td></tr>
+}
+          </tbody>
+          <tbody>
+            @if (tot.showRound) {
+<tr>
+              <td>Round Off</td>
+              <td class="num">{{tot.round}}</td>
+            </tr>
+}
+            <tr class="grand">
+              <td>GRAND TOTAL {{hdr.grandCur}}</td>
+              <td class="num">{{tot.grand}}</td>
+            </tr>
+            @if (tot.adv) {
+<tr>
+              <td>Less: Advance</td>
+              <td class="num">{{tot.adv.advance}}</td>
+            </tr>
+}
+            @if (tot.adv) {
+<tr>
+              <td>{{tot.adv.label}}</td>
+              <td class="num">{{tot.adv.bal}}</td>
+            </tr>
+}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    @if (taxSum) {
+<div class="taxsum">
+      <span class="cap">Tax Summary (SAC-wise)</span>
+      <table>
+        <tr>
+          <th>SAC</th><th class="num">Taxable Value</th>
+          <th class="num">CGST %</th><th class="num">CGST Amt</th>
+          <th class="num">SGST %</th><th class="num">SGST Amt</th>
+          <th class="num">IGST %</th><th class="num">IGST Amt</th>
+          <th class="num">Total Tax</th>
+        </tr>
+        @for (r of taxSum.rows; track r) {
+<tr>
+          <td>{{r.sac}}</td><td class="num">{{r.base}}</td>
+          <td class="num">{{r.cgR}}</td><td class="num">{{r.cg}}</td>
+          <td class="num">{{r.sgR}}</td><td class="num">{{r.sg}}</td>
+          <td class="num">{{r.igR}}</td><td class="num">{{r.ig}}</td>
+          <td class="num">{{r.tot}}</td>
+        </tr>
+}
+        @if (taxSum.foot) {
+<tr class="tsfoot">
+          <td>TOTAL</td><td class="num">{{taxSum.foot.base}}</td>
+          <td class="num">&mdash;</td><td class="num">{{taxSum.foot.cg}}</td>
+          <td class="num">&mdash;</td><td class="num">{{taxSum.foot.sg}}</td>
+          <td class="num">&mdash;</td><td class="num">{{taxSum.foot.ig}}</td>
+          <td class="num">{{taxSum.foot.tot}}</td>
+        </tr>
+}
+      </table>
+    </div>
+}
+  </div>
+</ng-template>
+
+<!-- pgFoot (every page): e-invoice QR + bank details, IRN line, declarations + signatory -->
+<ng-template #pgFoot>
+  <div class="pg-foot">
+    <div class="bank-zone">
+      @if (hasEinv) {
+<div class="einv">
+        <span class="cap">e-Invoice</span>
+        <img class="qr" alt="" [attr.src]="qrSrc || null" />
+      </div>
+}
+      <div class="bank">
+        <span class="cap">Bank Details for Remittance</span>
+        @if (!bank.dual) {
+<table class="bank-grid">
+          <tbody>
+            <tr>
+              <td class="k">Beneficiary :</td>
+              <td><span style="font-weight:bold;">{{bank.beneficiary}}</span></td>
+              <td class="k">A/C No. :</td>
+              <td><span [innerHTML]="bank.act"></span></td>
+            </tr>
+            <tr>
+              <td class="k">Bank :</td>
+              <td>{{bank.name}}</td>
+              <td class="k">IFSC :</td>
+              <td>{{bank.ifsc}}</td>
+            </tr>
+            <tr>
+              <td class="k">Branch :</td>
+              <td colspan="3">{{bank.branch}}</td>
+            </tr>
+            <tr>
+              <td class="k">SWIFT :</td>
+              <td>{{bank.swift}}</td>
+              <td class="k">MICR :</td>
+              <td>{{bank.micr}}</td>
+            </tr>
+            <tr>
+              <td class="k">PAN No. :</td>
+              <td>{{bank.pan}}</td>
+              <td class="k">CIN No. :</td>
+              <td>{{bank.cin}}</td>
+            </tr>
+            <tr>
+              <td class="k">RTGS/NEFT :</td>
+              <td>{{bank.rtgs}}</td>
+              <td class="k">@if (bank.uomLabel) {
+<span>UAM No. :</span>
+}</td>
+              <td>{{bank.uom}}</td>
+            </tr>
+          </tbody>
+        </table>
+}
+        @if (bank.dual) {
+
+          <table class="bank-dual">
+            <tbody>
+              <tr>
+                <td><ng-container *ngTemplateOutlet="bankCellTpl; context: { $implicit: bank.dual.cells[0] }"></ng-container></td>
+                <td class="bd2"><ng-container *ngTemplateOutlet="bankCellTpl; context: { $implicit: bank.dual.cells[1] }"></ng-container></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="bank-dual-reg"><b>PAN No. :</b> {{bank.dual.pan}}&nbsp;&nbsp;&nbsp;<b>CIN No. :</b> {{bank.dual.cin}}@if (bank.dual.uom) {
+&nbsp;&nbsp;&nbsp;<b>UAM No. :</b> {{bank.dual.uom}}
+}</div>
+        
+}
+        <div class="bank-reg">@if (cmp.reg) {
+<span>{{cmp.reg}}</span>
+}</div>
+      </div>
+    </div>
+
+    @if (hasEinv) {
+<div class="irn-zone"><span>{{irnText}}</span> &nbsp;&nbsp;@if (ackText) {
+<span>{{ackText}}</span>
+}</div>
+}
+
+    <div class="signoff">
+      <div class="decl">
+        @if (inv.notify) {
+<span class="notify" [innerHTML]="inv.notify"></span>
+}
+        <span>1. Whether tax is payable on reverse charge basis : <b>No</b></span>
+        <span style="white-space:nowrap;font-size:7pt;">2. All payments to be made by A/c Payee Cheque / NEFT / RTGS in favour of the beneficiary named above.</span>
+        <span>3. Interest @ 18% p.a. will be charged on invoices remaining unpaid beyond the Pay-By date.</span>
+        <span>4. Subject to Mumbai jurisdiction. &nbsp;E. &amp; O. E.</span>
+        <span>{{serviceTaxReg}}</span>
+        <span>{{cmp.esic}}</span>
+      </div>
+      <div class="sig">
+        <span class="sig-for">{{cmp.forName}}</span>
+        <img src="assets/img/Signature-Image.JPG" alt="" />
+        <span class="sig-cap">AUTHORISED SIGNATORY</span>
+      </div>
+    </div>
+
+    <div class="foot-note"><span>{{cmp.address}}</span><span> &nbsp;|&nbsp; This is a computer-generated invoice.</span></div>
+  </div>
+</ng-template>
+
+<!-- BuildBankCell: one bank of the side-by-side two-bank layout -->
+<ng-template #bankCellTpl let-c>
+  <table class="bank-grid">
+    <tbody>
+      <tr><td class="k">Beneficiary :</td><td><b>{{c.beneficiary}}</b></td></tr>
+      <tr><td class="k">A/C No. :</td><td><b>{{c.act}}</b></td></tr>
+      <tr><td class="k">Bank :</td><td>{{c.name}}</td></tr>
+      <tr><td class="k">Branch :</td><td>{{c.branch}}</td></tr>
+      <tr><td class="k">SWIFT :</td><td>{{c.swift}}</td></tr>
+      <tr><td class="k">IFSC / RTGS :</td><td>{{c.ifsc}}</td></tr>
+      @if (c.micr) {
+<tr><td class="k">MICR :</td><td>{{c.micr}}</td></tr>
+}
+    </tbody>
+  </table>
+</ng-template>
+
+<!-- currency chooser (Panel1 of the .NET page) - only for an invoice raised in a foreign currency -->
+<div class="modal no-print" [style.display]="showModal ? 'block' : 'none'">
   <table style="width: 250px; height: 88px; text-align: center" cellspacing="1" cellpadding="1" width="250"
     align="center" border="1">
     <tr>
@@ -631,8 +418,7 @@
     <tr>
       <td>
         <input type="radio" class="col-form-span-label" name="exampleRadios" value='0' [(ngModel)]="exampleRadios1">&nbsp; INR Invoice
-        <input type="radio" class="col-form-span-label"  name="exampleRadios" value='1' [(ngModel)]="exampleRadios1">&nbsp; NON INR
-        Invoice
+        <input type="radio" class="col-form-span-label" name="exampleRadios" value='1' [(ngModel)]="exampleRadios1">&nbsp; NON INR Invoice
 
         <button class="pp-btn p mt-1" type="submit" (click)="currencyType(exampleRadios1)"> <span
             class="col-form-span-label">OK</span></button>

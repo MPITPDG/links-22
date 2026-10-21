@@ -9,9 +9,7 @@ import { DataService } from 'src/app/shared/service/dataService';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { catchError } from 'rxjs/operators';
-import { EMPTY } from 'rxjs';
-import { AccountStatementExportService } from './account-statement-export.service';
+import { ExportexcelAccStatementV4, AccStatementExcel } from 'src/app/shared/service/exportexcel_accstatement_v4';
 import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, finAmt, finByMonth } from '../fin-kit';
 @Component({
     selector: 'app-General-AccountStmt-Local',
@@ -62,7 +60,12 @@ import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, 
       AdvanceTable = [];
       exceldata_list= [];
       Compname:string;
-      CompFull:string;
+      CompCity:string="";
+      stmtTotals:any=null;
+      stmtAdvTotals:any=null;
+      searchNo:number=0;   // only the latest search may fill the screen / Excel
+      balRow: any;
+      advTotRow: any;
       rptopbal:string;
       rptclbal:string;
       rptcrtotdr:any;
@@ -92,10 +95,8 @@ import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, 
         private _loginService: LoginService,
         private modalService: BsModalService,
         private _loaderService: LoaderService,
-        private stmtExport: AccountStatementExportService,
+        private stmtExcel: ExportexcelAccStatementV4,
       ) { }
-      balRow: any;
-      advTotRow: any;
       ngOnInit() {
         this.FromDate= new Date();
         this.FromDate=this._dataService.datechnge1(this._loginService.getLogin()[0].FINANCIAL_YEAR.STARTDATE)
@@ -138,8 +139,18 @@ import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, 
     
     }
     Showdata()  {
-     
+
+        // start every search clean, otherwise the previous account's rows end up in the Excel
+        const searchNo = ++this.searchNo;
+        this.dataList=[];
         this.dataForExcel=[];
+        this.exceldata_list=[];
+        this.advdataForExcel=[];
+        this.advheaderlist=[];
+        this.AdvanceTable=[];
+        this.AdvTotal='';
+        this.stmtTotals=null;
+        this.stmtAdvTotals=null;
         this._loaderService.display(true);
         if (this.Client ==""  || this.Client ==undefined){
           this._toasterService.toast('warning', 'warning', "Please select Account !");
@@ -168,9 +179,20 @@ import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, 
           this._loaderService.display(true);
           this._dataService.getData("Accounts/Acc_Rpt_ClientOutstandingList_GetAll", jsonData)
           .subscribe((data: any) => {
+            if (searchNo != this.searchNo) { return; }   // an older search answered late
             if (data?.Table?.length>0)
             {
           this.displayType="LIST";
+          this.OpCrBal='';
+          this.OpDrBal='';
+          this.CLCrBal='';
+          this.CLDrBal='';
+          this.currTotalDr='';
+          this.currTotalcr='';
+          this.AdvCrAmt='';
+          this.AdvDrAmt='';
+          this.stmtTotals = data.Table1[0];
+          this.stmtAdvTotals = data.Table2[0];
           this.dataList = data.Table;
           this.balRow = data.Table1 && data.Table1[0];
           this.advTotRow = data.Table2 && data.Table2[0];
@@ -190,53 +212,7 @@ import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, 
           this.dataForExcel.push(Object.values(row))
           });
             if (!data.Table1?.[0] || !data.Table2?.[0]) { this.searchHeaderText="Account Statement From " + this.FromDate + " To " + this.ToDate; this._loaderService.display(false); return; } // fail soft: no summary rows
-            if(data.Table1[0].OPBAL >0) {
-              this.OpDrBal=data.Table1[0].OPBAL  + " Dr";
-              this.rptopbal=data.Table1[0].OPBAL  + " Dr"; }
-              else   {
-              this.OpCrBal=(data.Table1[0].OPBAL=="0.00")?"0.0" :Math.abs(data.Table1[0].OPBAL) + " Cr";
-              this.rptopbal=(data.Table1[0].OPBAL=="0.00")?"0.0" :Math.abs(data.Table1[0].OPBAL) + " Cr";
-            }
-            if(data.Table1[0].CLBAL >0){
-              this.CLDrBal=data.Table1[0].CLBAL + " Dr"; ;
-              this.rptclbal=data.Table1[0].CLBAL  + " Dr";
-             }
-            else{
-              this.CLCrBal=(data.Table1[0].CLBAL=="0.00")?"" :Math.abs(data.Table1[0].CLBAL) + " Cr";
-              this.rptclbal=(data.Table1[0].CLBAL=="0.00")?"" :Math.abs(data.Table1[0].CLBAL) + " Cr";
-            }
-            if(data.Table1[0].TLDR >0){
-              this.currTotalDr=data.Table1[0].TLDR ;
-              this.rptcrtotdr=data.Table1[0].TLDR ;
-            }
-            else  {
-              this.currTotalDr=(data.Table1[0].TLDR=="0.00")?"" :Math.abs(data.Table1[0].TLDR) ;
-              this.rptcrtotdr=(data.Table1[0].TLDR=="0.00")?"" :Math.abs(data.Table1[0].TLDR)+ "Dr";
-            }
-            if(data.Table1[0].TLCR >0){
-              this.currTotalcr=data.Table1[0].TLCR  ;
-              this.rptcrtotcr=data.Table1[0].TLCR  ;
-            }
-            else  {
-              this.currTotalcr=(data.Table1[0].TLCR=="0.00")?"" :Math.abs(data.Table1[0].TLCR) 
-              this.rptcrtotcr=(data.Table1[0].TLCR=="0.00")?"" :Math.abs(data.Table1[0].TLCR) 
-            }
-            if(data.Table2[0].ADVTOTALDR >0) {
-              this.AdvDrAmt=data.Table2[0].ADVTOTALDR ;
-              this.rptadvtotdr=data.Table2[0].ADVTOTALDR ;
-            }
-            else {
-              this.AdvDrAmt=(data.Table2[0].ADVTOTALDR=="0.00")?"" :Math.abs(data.Table2[0].ADVTOTALDR) ;
-              this.rptadvtotdr=(data.Table2[0].ADVTOTALDR=="0.00")?"" :Math.abs(data.Table2[0].ADVTOTALDR) ;
-            }
-            if(data.Table2[0].ADVTOTALCR >0) {
-              this.AdvCrAmt=data.Table2[0].ADVTOTALCR  ;
-              this.rptadvtotcr=data.Table2[0].ADVTOTALCR ;
-            }
-            else {
-              this.AdvCrAmt=(data.Table2[0].ADVTOTALCR=="0.00")?"" :Math.abs(data.Table2[0].ADVTOTALCR) ;
-              this.rptadvtotcr=(data.Table2[0].ADVTOTALCR=="0.00")?"" :Math.abs(data.Table2[0].ADVTOTALCR) ;
-            } 
+            this.setSummaryFigures(data.Table1[0], data.Table2[0]);
             this.searchHeaderText="Account Statement From " + this.FromDate + " To " + this.ToDate
                                
           this.Getadvancedata();
@@ -249,6 +225,27 @@ import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, 
            }
         }, () => { this._loaderService.display(false); this.failed = true; })     
       } 
+      // summary box, same format on every statement screen: "648,745.00 Dr", "30,589.00 Cr"
+      setSummaryFigures(totals: any, advTotals: any) {
+        const op = parseFloat(totals.OPBAL) || 0;
+        const cl = parseFloat(totals.CLBAL) || 0;
+        this.OpDrBal = op >= 0 ? this.figure(op, 'Dr', true) : '';
+        this.OpCrBal = op < 0 ? this.figure(op, 'Cr', true) : '';
+        this.CLDrBal = cl >= 0 ? this.figure(cl, 'Dr', true) : '';
+        this.CLCrBal = cl < 0 ? this.figure(cl, 'Cr', true) : '';
+        this.currTotalDr = this.figure(totals.TLDR, 'Dr', false);
+        this.currTotalcr = this.figure(totals.TLCR, 'Cr', false);
+        this.AdvDrAmt = this.figure(advTotals.ADVTOTALDR, 'Dr', false);
+        this.AdvCrAmt = this.figure(advTotals.ADVTOTALCR, 'Cr', false);
+      }
+
+      /** zero shows "0.00" when keepZero, otherwise blank */
+      figure(value: any, side: string, keepZero: boolean): string {
+        const n = Math.abs(parseFloat(value) || 0);
+        if (!n) { return keepZero ? '0.00' : ''; }
+        return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + side;
+      }
+
       GetClientName(clientcode)
       {
         let updateItem = this.ClientList.find(item => item.ACCTCODENAME === clientcode);
@@ -318,6 +315,7 @@ import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, 
       } 
       Getadvancedata()
       {
+        const searchNo = this.searchNo;
         this.advdataForExcel=[];
         var jsonadv = {
           ClCode:this.Client,
@@ -340,7 +338,10 @@ import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, 
         if(this.Status=="All")  {
           this._dataService.getData("Accounts/Acc_Rpt_TrialBalance_With_Advance_Print_GetAll", jsonadvall)
           .subscribe((data: any) => {
+          if (searchNo != this.searchNo) { return; }   // a newer search has started
           this.AdvanceTable=data.Table;
+          this.advheaderlist=[];
+          this.advdataForExcel=[];
           for (var i = 0; i < this.AdvanceTable.length; i++) {
             let obj = {
               Type: this.AdvanceTable[i].transtype,
@@ -362,7 +363,10 @@ import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, 
           else {
           this._dataService.getData("Accounts/Acc_Rpt_TrialBalance_With_Advance_Print_Get", jsonadv)
           .subscribe((data: any) => {
+            if (searchNo != this.searchNo) { return; }   // a newer search has started
             this.AdvanceTable=data.Table;
+            this.advheaderlist=[];
+            this.advdataForExcel=[];
             for (var i = 0; i < this.AdvanceTable.length; i++) {
               let obj = {
                 Type: this.AdvanceTable[i].transtype,
@@ -393,7 +397,7 @@ import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, 
         this._dataService.getData("Accounts/fn_Acc_Rpt_Common_CompanyDetails", jsoncmp)
           .subscribe((data: any) => {
           this.Compname=data.Table[0].cmp_name
-          this.CompFull = data.Table[0].cmp_name + (data.Table[0].city_name ? ' - ' + data.Table[0].city_name : '')
+          this.CompCity=data.Table[0].city_name || ""
           this._loaderService.display(false)
           })
       }
@@ -407,49 +411,40 @@ import { FIN_PERIODS, FinPeriod, finRange, FinPager, FinChart, finBars, finNum, 
       close()
        {  this.showModal_Advance = false  }
        expt_exlwithadv() {
-
-        if(confirm('Click OK For With Advance Excel,\n CANCEL For Without Advance Excel'))
-        {
-          if (!this.dataList || this.dataList.length == 0) {
-            this._toasterService.toast('info', 'info', 'No Data Found !');
-            return false;
-          }
-          /* as the .NET page: the statement rows plus the client's advance rows, in one Excel */
-          this._loaderService.display(true)
-          const l = this._loginService.getLogin()[0]
-          const all = this.Status == "All"
-          const jsonadv = all
-            ? { ClCode: this.Client, cmp_code: l.CMPCODE, citycode1: l.CITYCODE1, STARTDATE: this.FromDate, ENDDATE: this.ToDate }
-            : { ClCode: this.Client, FINSTARTDATE: l.FINANCIAL_YEAR.STARTDATE, FINENDDATE: l.FINANCIAL_YEAR.ENDDATE, cmp_code: l.CMPCODE, citycode1: l.CITYCODE1, STARTDATE: this.FromDate, ENDDATE: this.ToDate }
-          this._dataService.getData(all ? "Accounts/Acc_Rpt_TrialBalance_With_Advance_Print_GetAll" : "Accounts/Acc_Rpt_TrialBalance_With_Advance_Print_Get", jsonadv)
-            .pipe(catchError((err: any) => {
-              this._loaderService.display(false);
-              this._toasterService.toast('error', 'error', 'The server could not return the advance details (service unavailable or server error). Please contact support.');
-              return EMPTY;
-            }))
-            .subscribe((data: any) => {
-              this._loaderService.display(false)
-              const advRows = (data && data.Table) ? data.Table : []
-              /* file name as the .NET page: Account_Statement_With_Adv-<client code>-<from yy>-<to yy> */
-              const yy = (s: any) => ((s || '') + '').slice(-2)
-              const fy = l.FINANCIAL_YEAR
-              const filename = 'Account_Statement_With_Adv-' + this.Client + '-' + yy(new Date(fy.STARTDATE).getFullYear()) + '-' + yy(new Date(fy.ENDDATE).getFullYear())
-              this.stmtExport.exportWithAdvance({
-                company: this.CompFull || this.Compname,
-                title: 'Account Statement', companyLast: true, font: { name: 'Calibri', size: 11 },
-                from: this.FromDate,
-                to: this.ToDate,
-                clientName: this.ClientName
-              }, this.dataList, this.balRow, this.advTotRow, advRows, filename)
-              this._toasterService.toast('success', 'success', 'Excel downloaded (.NET format): ' + filename + '.xlsx');
-            })
-          }
-            else
-            {
-              return false;
-              
-            }
-          }
+        // Excel in the Manilal V4 layout: OK = with the advance grid, Cancel = without (as V4 did)
+        const withAdvance = confirm('Click OK For With Advance Excel,\n CANCEL For Without Advance Excel');
+        const login = this._loginService.getLogin()[0];
+        const stmt: AccStatementExcel = {
+          titleLines: [
+            this.Compname + (this.CompCity ? " - " + this.CompCity : ""),
+            "Account Statement From " + this.FromDate + " To " + this.ToDate,
+            this.ClientName
+          ],
+          totals: this.stmtTotals,
+          advTotals: this.stmtAdvTotals,
+          rows: this.dataList,
+          fileName: (withAdvance ? "Account_Statement_With_Adv-" : "Account_Statement-") + this.Client
+            + this.stmtExcel.finYearSuffix(login.FINANCIAL_YEAR.STARTDATE, login.FINANCIAL_YEAR.ENDDATE)
+        };
+        if (!withAdvance) {
+          this.stmtExcel.download(stmt);
+          return;
+        }
+        // advances are read at download time (as V4 did), so the file always matches the client on screen
+        const url = (this.Status == "All") ? "Accounts/Acc_Rpt_TrialBalance_With_Advance_Print_GetAll" : "Accounts/Acc_Rpt_TrialBalance_With_Advance_Print_Get";
+        const json: any = { ClCode: this.Client, cmp_code: login.CMPCODE, citycode1: login.CITYCODE1, STARTDATE: this.FromDate, ENDDATE: this.ToDate };
+        if (this.Status != "All") {
+          json.FINSTARTDATE = login.FINANCIAL_YEAR.STARTDATE;
+          json.FINENDDATE = login.FINANCIAL_YEAR.ENDDATE;
+        }
+        this._loaderService.display(true);
+        this._dataService.getData(url, json)
+          .subscribe((data: any) => {
+            stmt.advRows = data.Table || [];
+            this.stmtExcel.download(stmt);
+            this._loaderService.display(false);
+          }, () => this._loaderService.display(false));
+      }
           ShowRemark() {  
             this.showModal_Remark = true;
             this.Remark== "";

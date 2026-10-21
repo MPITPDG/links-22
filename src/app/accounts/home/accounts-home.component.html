@@ -63,35 +63,35 @@ empty, and the home page is the blank one it has always been.                   
       <div class="td-tiles">
         <button type="button" class="td-tile strong" (click)="openDrill('OVERDUE', $event)" title="Clients and bills behind this figure">
           <span class="k">Overdue receivable</span>
-          <span class="v" [title]="money(kpi?.OVERDUE_AMT)">&#8377; {{short(kpi?.OVERDUE_AMT)}}</span>
-          <span class="s">{{kpi?.OVERDUE_PCT || 0}}% of &#8377; {{short(kpi?.TOTAL_OUTSTANDING)}} outstanding is past the credit period</span>
+          <span class="v" [title]="money($safeNavigationMigration(kpi?.OVERDUE_AMT))">&#8377; {{short($safeNavigationMigration(kpi?.OVERDUE_AMT))}}</span>
+          <span class="s">{{kpi?.OVERDUE_PCT || 0}}% of &#8377; {{short($safeNavigationMigration(kpi?.TOTAL_OUTSTANDING))}} outstanding is past the credit period</span>
         </button>
         <button type="button" class="td-tile" (click)="go('ah-week')" title="See when supplier bills fall due">
           <span class="k">Overdue payable</span>
-          <span class="v" [title]="money(cash?.PAY_OVERDUE)">&#8377; {{short(cash?.PAY_OVERDUE)}}</span>
-          <span class="s">supplier bills past their due date, of &#8377; {{short(cash?.PAYABLE)}} we owe</span>
+          <span class="v" [title]="money($safeNavigationMigration(cash?.PAY_OVERDUE))">&#8377; {{short($safeNavigationMigration(cash?.PAY_OVERDUE))}}</span>
+          <span class="s">supplier bills past their due date, of &#8377; {{short($safeNavigationMigration(cash?.PAYABLE))}} we owe</span>
         </button>
         <button type="button" class="td-tile" (click)="go('ah-act')" title="Earned but not yet collected">
           <span class="k">Unbilled after 15 days</span>
-          <span class="v">{{count(cash?.UNBILLED15_JOBS)}} <small>jobs</small></span>
-          <span class="s">&#8377; {{short(cash?.UNBILLED15_COST)}} cost booked, no invoice raised yet</span>
+          <span class="v">{{count($safeNavigationMigration(cash?.UNBILLED15_JOBS))}} <small>jobs</small></span>
+          <span class="s">&#8377; {{short($safeNavigationMigration(cash?.UNBILLED15_COST))}} cost booked, no invoice raised yet</span>
         </button>
         <button type="button" class="td-tile" (click)="go('ah-week')" title="Cash forecast for the coming days">
           <span class="k">Due in 7 days</span>
-          <span class="v">&#8377; {{short(cash?.RECV_DUE_7)}}</span>
-          <span class="s">to collect &middot; &#8377; {{short(cash?.PAY_DUE_7)}} to pay suppliers</span>
+          <span class="v">&#8377; {{short($safeNavigationMigration(cash?.RECV_DUE_7))}}</span>
+          <span class="s">to collect &middot; &#8377; {{short($safeNavigationMigration(cash?.PAY_DUE_7))}} to pay suppliers</span>
         </button>
         <button type="button" class="td-tile" (click)="openDrill('MARGIN', $event)" title="Jobs behind this figure">
           <span class="k">GOP this month</span>
-          <span class="v" [title]="money(kpi?.GOP_MTD)">&#8377; {{short(kpi?.GOP_MTD)}}</span>
-          <span class="s">revenue &minus; cost &middot; last month &#8377; {{short(kpi?.GOP_PM)}}</span>
+          <span class="v" [title]="money($safeNavigationMigration(kpi?.GOP_COSTED_MTD))">&#8377; {{short($safeNavigationMigration(kpi?.GOP_COSTED_MTD))}}</span>
+          <span class="s">revenue &minus; cost &middot; last month &#8377; {{short($safeNavigationMigration(kpi?.GOP_COSTED_PM))}}</span>
         </button>
         <button type="button" class="td-tile" (click)="openDrill('MARGIN', $event)" title="Jobs behind this figure">
           <span class="k">Margin</span>
-          <span class="v">{{ kpi ? kpi.MARGIN_PCT_MTD : '-' }}@if (kpi) {
+          <span class="v">{{ kpi ? kpi.MARGIN_PCT_COSTED_MTD : '-' }}@if (kpi) {
             <small>%</small>
           }</span>
-          <span class="s">GOP &divide; revenue &middot; last month {{ kpi ? kpi.MARGIN_PCT_PM : '-' }}%</span>
+          <span class="s">GOP &divide; revenue &middot; last month {{ kpi ? kpi.MARGIN_PCT_COSTED_PM : '-' }}%</span>
         </button>
       </div>
     }
@@ -177,7 +177,7 @@ empty, and the home page is the blank one it has always been.                   
               <span class="ah-pipe-k">Invoices waiting for authorisation</span>
               <span class="ah-ico" [class.open]="info == 'pauth'" (click)="$event.preventDefault(); $event.stopPropagation(); toggleInfo('pauth')" title="What is this?" role="button"><i class="fa fa-gavel" aria-hidden="true"></i></span>
             </span>
-            <span class="ah-pipe-v">{{count(cash?.AUTH_PENDING_COUNT)}} <span class="ah-pipe-amt"><span class="u">&#8377;</span>{{short(cash?.AUTH_PENDING_VALUE)}}</span></span>
+            <span class="ah-pipe-v">{{count($safeNavigationMigration(cash?.AUTH_PENDING_COUNT))}} <span class="ah-pipe-amt"><span class="u">&#8377;</span>{{short($safeNavigationMigration(cash?.AUTH_PENDING_VALUE))}}</span></span>
             <span class="ah-pipe-s">as listed on the Authorisation screen@if (cash && cash.AUTH_PENDING_COUNT > 0) {
               <span> &middot; oldest {{cash.AUTH_PENDING_OLDEST_DAYS}} days</span>
             }</span>
@@ -187,8 +187,8 @@ empty, and the home page is the blank one it has always been.                   
               <span class="ah-pipe-k">Proformas not yet converted</span>
               <span class="ah-ico" [class.open]="info == 'ppro'" (click)="$event.preventDefault(); $event.stopPropagation(); toggleInfo('ppro')" title="What is this?" role="button"><i class="fa fa-file-o" aria-hidden="true"></i></span>
             </span>
-            <span class="ah-pipe-v">{{count(cash?.PROFORMA_OPEN_COUNT)}} <span class="ah-pipe-amt"><span class="u">&#8377;</span>{{short(cash?.PROFORMA_OPEN_VALUE)}}</span></span>
-            <span class="ah-pipe-s">{{count(cash?.PROFORMA_MTD_COUNT)}} raised this month, {{count(cash?.PROFORMA_MTD_CONVERTED)}} converted@if (cash && cash.PROFORMA_OPEN_COUNT > 0) {
+            <span class="ah-pipe-v">{{count($safeNavigationMigration(cash?.PROFORMA_OPEN_COUNT))}} <span class="ah-pipe-amt"><span class="u">&#8377;</span>{{short($safeNavigationMigration(cash?.PROFORMA_OPEN_VALUE))}}</span></span>
+            <span class="ah-pipe-s">{{count($safeNavigationMigration(cash?.PROFORMA_MTD_COUNT))}} raised this month, {{count($safeNavigationMigration(cash?.PROFORMA_MTD_CONVERTED))}} converted@if (cash && cash.PROFORMA_OPEN_COUNT > 0) {
               <span> &middot; oldest {{cash.PROFORMA_OPEN_OLDEST_DAYS}} days</span>
             }</span>
           </a>
@@ -197,7 +197,7 @@ empty, and the home page is the blank one it has always been.                   
               <span class="ah-pipe-k">Shipments unbilled after 15 days</span>
               <span class="ah-ico" [class.open]="info == 'punb'" (click)="$event.preventDefault(); $event.stopPropagation(); toggleInfo('punb')" title="What is this?" role="button"><i class="fa fa-ship" aria-hidden="true"></i></span>
             </span>
-            <span class="ah-pipe-v">{{count(cash?.UNBILLED15_JOBS)}} <span class="ah-pipe-amt"><span class="u">&#8377;</span>{{short(cash?.UNBILLED15_COST)}} cost booked</span></span>
+            <span class="ah-pipe-v">{{count($safeNavigationMigration(cash?.UNBILLED15_JOBS))}} <span class="ah-pipe-amt"><span class="u">&#8377;</span>{{short($safeNavigationMigration(cash?.UNBILLED15_COST))}} cost booked</span></span>
             <span class="ah-pipe-s">opened since the 1st of last month@if (cash && cash.UNBILLED15_JOBS > 0) {
               <span> &middot; oldest {{cash.UNBILLED15_OLDEST_DAYS}} days</span>
             }</span>
@@ -207,8 +207,8 @@ empty, and the home page is the blank one it has always been.                   
               <span class="ah-pipe-k">Money received, not applied to a bill</span>
               <span class="ah-ico" [class.open]="info == 'puna'" (click)="$event.preventDefault(); $event.stopPropagation(); toggleInfo('puna')" title="What is this?" role="button"><i class="fa fa-random" aria-hidden="true"></i></span>
             </span>
-            <span class="ah-pipe-v"><span class="u">&#8377;</span>{{short(cash?.UNAPPLIED_RECEIPTS)}}</span>
-            <span class="ah-pipe-s">{{count(cash?.UNAPPLIED_CLIENTS)}} clients &middot; supplier advances &#8377; {{short(cash?.SUPPLIER_ADVANCES)}}</span>
+            <span class="ah-pipe-v"><span class="u">&#8377;</span>{{short($safeNavigationMigration(cash?.UNAPPLIED_RECEIPTS))}}</span>
+            <span class="ah-pipe-s">{{count($safeNavigationMigration(cash?.UNAPPLIED_CLIENTS))}} clients &middot; supplier advances &#8377; {{short($safeNavigationMigration(cash?.SUPPLIER_ADVANCES))}}</span>
           </div>
         </div>
       </div>
@@ -228,21 +228,21 @@ empty, and the home page is the blank one it has always been.                   
           </div>
           <div class="ah-cash">
             <div class="ah-cash-top">
-              <div class="ah-cash-stat" [title]="money(cash?.RECEIVABLE)">
+              <div class="ah-cash-stat" [title]="money($safeNavigationMigration(cash?.RECEIVABLE))">
                 <span class="ah-cash-k"><span class="ah-ico ah-ico-s" [class.open]="info == 'cin'" (click)="toggleInfo('cin')" title="What is this?" role="button"><i class="fa fa-sign-in" aria-hidden="true"></i></span>Clients owe us</span>
-                <span class="ah-cash-v"><span class="u">&#8377;</span>{{amt(cash?.RECEIVABLE).n}}<span class="u">{{amt(cash?.RECEIVABLE).u}}</span></span>
-                <span class="ah-cash-s">&#8377; {{short(cash?.RECV_OVERDUE)}} overdue &middot; &#8377; {{short(cash?.RECV_DUE_7)}} due in 7 days</span>
+                <span class="ah-cash-v"><span class="u">&#8377;</span>{{amt($safeNavigationMigration(cash?.RECEIVABLE)).n}}<span class="u">{{amt($safeNavigationMigration(cash?.RECEIVABLE)).u}}</span></span>
+                <span class="ah-cash-s">&#8377; {{short($safeNavigationMigration(cash?.RECV_OVERDUE))}} overdue &middot; &#8377; {{short($safeNavigationMigration(cash?.RECV_DUE_7))}} due in 7 days</span>
               </div>
               <div class="ah-cash-op">&minus;</div>
-              <div class="ah-cash-stat" [title]="money(cash?.PAYABLE)">
+              <div class="ah-cash-stat" [title]="money($safeNavigationMigration(cash?.PAYABLE))">
                 <span class="ah-cash-k"><span class="ah-ico ah-ico-s" [class.open]="info == 'cout'" (click)="toggleInfo('cout')" title="What is this?" role="button"><i class="fa fa-sign-out" aria-hidden="true"></i></span>We owe suppliers</span>
-                <span class="ah-cash-v"><span class="u">&#8377;</span>{{amt(cash?.PAYABLE).n}}<span class="u">{{amt(cash?.PAYABLE).u}}</span></span>
-                <span class="ah-cash-s">&#8377; {{short(cash?.PAY_OVERDUE)}} overdue &middot; &#8377; {{short(cash?.PAY_DUE_7)}} due in 7 days</span>
+                <span class="ah-cash-v"><span class="u">&#8377;</span>{{amt($safeNavigationMigration(cash?.PAYABLE)).n}}<span class="u">{{amt($safeNavigationMigration(cash?.PAYABLE)).u}}</span></span>
+                <span class="ah-cash-s">&#8377; {{short($safeNavigationMigration(cash?.PAY_OVERDUE))}} overdue &middot; &#8377; {{short($safeNavigationMigration(cash?.PAY_DUE_7))}} due in 7 days</span>
               </div>
               <div class="ah-cash-op">=</div>
-              <div class="ah-cash-stat ah-cash-net" [class.ah-cash-neg]="cash && cash.NET_POSITION < 0" [title]="money(cash?.NET_POSITION)">
+              <div class="ah-cash-stat ah-cash-net" [class.ah-cash-neg]="cash && cash.NET_POSITION < 0" [title]="money($safeNavigationMigration(cash?.NET_POSITION))">
                 <span class="ah-cash-k"><span class="ah-ico ah-ico-s" [class.open]="info == 'cnet'" (click)="toggleInfo('cnet')" title="What is this?" role="button"><i class="fa fa-calculator" aria-hidden="true"></i></span>Net position</span>
-                <span class="ah-cash-v"><span class="u">&#8377;</span>{{amt(cash?.NET_POSITION).n}}<span class="u">{{amt(cash?.NET_POSITION).u}}</span></span>
+                <span class="ah-cash-v"><span class="u">&#8377;</span>{{amt($safeNavigationMigration(cash?.NET_POSITION)).n}}<span class="u">{{amt($safeNavigationMigration(cash?.NET_POSITION)).u}}</span></span>
                 <span class="ah-cash-s">{{ cash && cash.NET_POSITION < 0 ? 'we owe more than we are owed' : 'we are owed more than we owe' }}</span>
               </div>
             </div>
@@ -298,13 +298,13 @@ empty, and the home page is the blank one it has always been.                   
             <div class="ah-days-pair">
               <div class="ah-days-stat">
                 <span class="ah-days-k"><span class="ah-ico ah-ico-s" [class.open]="info == 'ddso'" (click)="toggleInfo('ddso')" title="What is this?" role="button"><i class="fa fa-hourglass-half" aria-hidden="true"></i></span>Clients pay us in</span>
-                <span class="ah-days-v">{{days(cash?.DSO_DAYS)}}<span class="u">days</span></span>
-                <span class="ah-days-s">{{count(cash?.DSO_BILLS)}} settled invoices &middot; agreed {{days(cash?.AVG_CREDIT_PERIOD)}} days</span>
+                <span class="ah-days-v">{{days($safeNavigationMigration(cash?.DSO_DAYS))}}<span class="u">days</span></span>
+                <span class="ah-days-s">{{count($safeNavigationMigration(cash?.DSO_BILLS))}} settled invoices &middot; agreed {{days($safeNavigationMigration(cash?.AVG_CREDIT_PERIOD))}} days</span>
               </div>
               <div class="ah-days-stat">
                 <span class="ah-days-k"><span class="ah-ico ah-ico-s" [class.open]="info == 'ddpo'" (click)="toggleInfo('ddpo')" title="What is this?" role="button"><i class="fa fa-credit-card" aria-hidden="true"></i></span>We pay suppliers in</span>
-                <span class="ah-days-v">{{days(cash?.DPO_DAYS)}}<span class="u">days</span></span>
-                <span class="ah-days-s">{{count(cash?.DPO_BILLS)}} settled bills</span>
+                <span class="ah-days-v">{{days($safeNavigationMigration(cash?.DPO_DAYS))}}<span class="u">days</span></span>
+                <span class="ah-days-s">{{count($safeNavigationMigration(cash?.DPO_BILLS))}} settled bills</span>
               </div>
             </div>
             @if (cash && cash.DSO_DAYS != null && cash.DPO_DAYS != null) {
@@ -351,16 +351,16 @@ empty, and the home page is the blank one it has always been.                   
             <span class="k">Invoiced <span class="ah-hint">this month</span></span>
             <button type="button" class="ah-ico" [class.open]="info == 'inv'" (click)="toggleInfo('inv')" title="What is this?"><i class="fa fa-file-text-o" aria-hidden="true"></i></button>
           </div>
-          <div class="v" [title]="money(kpi?.INV_VALUE_MTD)"><span class="u">&#8377;</span>{{amt(kpi?.INV_VALUE_MTD).n}}<span class="u">{{amt(kpi?.INV_VALUE_MTD).u}}</span></div>
+          <div class="v" [title]="money($safeNavigationMigration(kpi?.INV_VALUE_MTD))"><span class="u">&#8377;</span>{{amt($safeNavigationMigration(kpi?.INV_VALUE_MTD)).n}}<span class="u">{{amt($safeNavigationMigration(kpi?.INV_VALUE_MTD)).u}}</span></div>
           @if (kpi) {
             <div class="ah-cmp">
-              <div class="ah-cmp-row"><span class="ah-cmp-k">This month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct('INV_VALUE_MTD','INV_VALUE_PM')"></span></span><span class="ah-cmp-v">&#8377; {{short(kpi?.INV_VALUE_MTD)}}</span></div>
-              <div class="ah-cmp-row"><span class="ah-cmp-k">Last month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct('INV_VALUE_PM','INV_VALUE_MTD')"></span></span><span class="ah-cmp-v">&#8377; {{short(kpi?.INV_VALUE_PM)}}</span></div>
+              <div class="ah-cmp-row"><span class="ah-cmp-k">This month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct('INV_VALUE_MTD','INV_VALUE_PM')"></span></span><span class="ah-cmp-v">&#8377; {{short($safeNavigationMigration(kpi?.INV_VALUE_MTD))}}</span></div>
+              <div class="ah-cmp-row"><span class="ah-cmp-k">Last month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct('INV_VALUE_PM','INV_VALUE_MTD')"></span></span><span class="ah-cmp-v">&#8377; {{short($safeNavigationMigration(kpi?.INV_VALUE_PM))}}</span></div>
             </div>
           }
           <div class="ah-kpi-foot">
             <span class="ah-delta" [ngClass]="deltaClass('INV_VALUE_MTD','INV_VALUE_PM', true)">{{deltaText('INV_VALUE_MTD','INV_VALUE_PM')}}</span>
-            <span class="s">{{count(kpi?.INV_COUNT_MTD)}} invoices &middot; {{count(kpi?.INV_COUNT_PM)}} last month</span>
+            <span class="s">{{count($safeNavigationMigration(kpi?.INV_COUNT_MTD))}} invoices &middot; {{count($safeNavigationMigration(kpi?.INV_COUNT_PM))}} last month</span>
           </div>
         </div>
         <div class="im-card im-kpi">
@@ -368,11 +368,11 @@ empty, and the home page is the blank one it has always been.                   
             <span class="k">Collected <span class="ah-hint">applied to bills</span></span>
             <button type="button" class="ah-ico" [class.open]="info == 'col'" (click)="toggleInfo('col')" title="What is this?"><i class="fa fa-arrow-circle-down" aria-hidden="true"></i></button>
           </div>
-          <div class="v" [title]="money(kpi?.COLLECTED_MTD)"><span class="u">&#8377;</span>{{amt(kpi?.COLLECTED_MTD).n}}<span class="u">{{amt(kpi?.COLLECTED_MTD).u}}</span></div>
+          <div class="v" [title]="money($safeNavigationMigration(kpi?.COLLECTED_MTD))"><span class="u">&#8377;</span>{{amt($safeNavigationMigration(kpi?.COLLECTED_MTD)).n}}<span class="u">{{amt($safeNavigationMigration(kpi?.COLLECTED_MTD)).u}}</span></div>
           @if (kpi) {
             <div class="ah-cmp">
-              <div class="ah-cmp-row"><span class="ah-cmp-k">This month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct('COLLECTED_MTD','COLLECTED_PM')"></span></span><span class="ah-cmp-v">&#8377; {{short(kpi?.COLLECTED_MTD)}}</span></div>
-              <div class="ah-cmp-row"><span class="ah-cmp-k">Last month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct('COLLECTED_PM','COLLECTED_MTD')"></span></span><span class="ah-cmp-v">&#8377; {{short(kpi?.COLLECTED_PM)}}</span></div>
+              <div class="ah-cmp-row"><span class="ah-cmp-k">This month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct('COLLECTED_MTD','COLLECTED_PM')"></span></span><span class="ah-cmp-v">&#8377; {{short($safeNavigationMigration(kpi?.COLLECTED_MTD))}}</span></div>
+              <div class="ah-cmp-row"><span class="ah-cmp-k">Last month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct('COLLECTED_PM','COLLECTED_MTD')"></span></span><span class="ah-cmp-v">&#8377; {{short($safeNavigationMigration(kpi?.COLLECTED_PM))}}</span></div>
             </div>
           }
           <div class="ah-kpi-foot">
@@ -385,7 +385,7 @@ empty, and the home page is the blank one it has always been.                   
             <span class="k">Outstanding <span class="ah-hint">as of today</span></span>
             <button type="button" class="ah-ico" [class.open]="info == 'out'" (click)="toggleInfo('out')" title="What is this?"><i class="fa fa-balance-scale" aria-hidden="true"></i></button>
           </div>
-          <div class="v" [title]="money(kpi?.TOTAL_OUTSTANDING)"><span class="u">&#8377;</span>{{amt(kpi?.TOTAL_OUTSTANDING).n}}<span class="u">{{amt(kpi?.TOTAL_OUTSTANDING).u}}</span></div>
+          <div class="v" [title]="money($safeNavigationMigration(kpi?.TOTAL_OUTSTANDING))"><span class="u">&#8377;</span>{{amt($safeNavigationMigration(kpi?.TOTAL_OUTSTANDING)).n}}<span class="u">{{amt($safeNavigationMigration(kpi?.TOTAL_OUTSTANDING)).u}}</span></div>
           <div class="ah-kpi-foot">
             <span class="s">{{kpi?.OVERDUE_PCT || 0}}% of it is overdue &middot; net of unapplied credit</span>
           </div>
@@ -396,9 +396,9 @@ empty, and the home page is the blank one it has always been.                   
             <span class="k">Overdue <span class="ah-hint">past credit period</span></span>
             <button type="button" class="ah-ico" [class.open]="info == 'ovd'" (click)="toggleInfo('ovd')" title="What is this?"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></button>
           </div>
-          <div class="v" [title]="money(kpi?.OVERDUE_AMT)"><span class="u">&#8377;</span>{{amt(kpi?.OVERDUE_AMT).n}}<span class="u">{{amt(kpi?.OVERDUE_AMT).u}}</span></div>
+          <div class="v" [title]="money($safeNavigationMigration(kpi?.OVERDUE_AMT))"><span class="u">&#8377;</span>{{amt($safeNavigationMigration(kpi?.OVERDUE_AMT)).n}}<span class="u">{{amt($safeNavigationMigration(kpi?.OVERDUE_AMT)).u}}</span></div>
           <div class="ah-kpi-foot">
-            <span class="s">{{count(kpi?.UNBILLED_JOBS)}} jobs this month still unbilled &middot; &#8377; {{short(kpi?.UNBILLED_VALUE)}} cost booked</span>
+            <span class="s">{{count($safeNavigationMigration(kpi?.UNBILLED_JOBS))}} jobs this month still unbilled &middot; &#8377; {{short($safeNavigationMigration(kpi?.UNBILLED_VALUE))}} cost booked</span>
           </div>
           <div class="ah-drill-link">See the bills behind this &rsaquo;</div>
         </div>
@@ -408,16 +408,54 @@ empty, and the home page is the blank one it has always been.                   
             <span class="k">GOP <span class="ah-hint">revenue &minus; cost</span></span>
             <button type="button" class="ah-ico" [class.open]="info == 'gop'" (click)="toggleInfo('gop')" title="What is this?"><i class="fa fa-line-chart" aria-hidden="true"></i></button>
           </div>
-          <div class="v" [title]="money(kpi?.GOP_MTD)"><span class="u">&#8377;</span>{{amt(kpi?.GOP_MTD).n}}<span class="u">{{amt(kpi?.GOP_MTD).u}}</span></div>
+          <div class="v" [title]="money($safeNavigationMigration(kpi?.GOP_COSTED_MTD))"><span class="u">&#8377;</span>{{amt($safeNavigationMigration(kpi?.GOP_COSTED_MTD)).n}}<span class="u">{{amt($safeNavigationMigration(kpi?.GOP_COSTED_MTD)).u}}</span></div>
+          <div class="ah-kpi-on">on jobs where the cost is booked &mdash; margin {{ kpi ? kpi.MARGIN_PCT_COSTED_MTD : '-' }}%</div>
           @if (kpi) {
             <div class="ah-cmp">
-              <div class="ah-cmp-row"><span class="ah-cmp-k">This month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct('GOP_MTD','GOP_PM')"></span></span><span class="ah-cmp-v">&#8377; {{short(kpi?.GOP_MTD)}}</span></div>
-              <div class="ah-cmp-row"><span class="ah-cmp-k">Last month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct('GOP_PM','GOP_MTD')"></span></span><span class="ah-cmp-v">&#8377; {{short(kpi?.GOP_PM)}}</span></div>
+              <div class="ah-cmp-row"><span class="ah-cmp-k">This month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct('GOP_COSTED_MTD','GOP_COSTED_PM')"></span></span><span class="ah-cmp-v">&#8377; {{short($safeNavigationMigration(kpi?.GOP_COSTED_MTD))}}</span></div>
+              <div class="ah-cmp-row"><span class="ah-cmp-k">Last month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct('GOP_COSTED_PM','GOP_COSTED_MTD')"></span></span><span class="ah-cmp-v">&#8377; {{short($safeNavigationMigration(kpi?.GOP_COSTED_PM))}}</span></div>
             </div>
           }
+          @if (hasAwait()) {
+            <!-- money billed on jobs that carry no supplier cost at all: stated here, not counted as profit -->
+            <div class="ah-await" (click)="toggleAwait($event)" role="button"
+              title="Click to list the jobs. These are billed but no purchase has been entered, so the profit above does not include them.">
+              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+              <div>
+                <b>&#8377; {{short(awaitRevenue())}}</b> billed on {{count(awaitCount())}} job@if (awaitCount() != 1) {s}
+                with <b>no supplier cost booked yet</b>
+                @if (awaitWho()) {
+                  <div class="ah-await-who">{{ awaitWho() }}</div>
+                }
+                <div class="ah-await-link">{{ showAwait ? 'Hide these jobs' : 'Show these jobs' }} &rsaquo;</div>
+              </div>
+            </div>
+            @if (showAwait) {
+              <div class="ah-await-list" (click)="$event.stopPropagation()">
+                <table class="ah-dt">
+                  <thead><tr><th>Job</th><th>Opened</th><th class="ah-dt-wrap">Billed to</th><th class="num">Billed</th></tr></thead>
+                  <tbody>
+                    @for (j of awaitJobs; track $index) {
+                      <tr>
+                        <td>{{ j.JOBNO }}</td>
+                        <td>{{ j.JOB_DATE }} @if (toNum(j.AGE_DAYS) > 45) {<span class="ah-dt-code">{{count(j.AGE_DAYS)}} d old</span>}</td>
+                        <td class="ah-dt-wrap">{{ j.BILLED_TO || '-' }}</td>
+                        <td class="num">{{ rs(j.REVENUE) }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+                <div class="ah-drill-note">
+                  Nothing has been purchased against these jobs, so every rupee billed reads as profit.
+                  They are kept out of the GOP and margin above until the supplier invoice is entered.
+                  Billed in all, including these: &#8377; {{short($safeNavigationMigration(kpi?.REVENUE_MTD))}}.
+                </div>
+              </div>
+            }
+          }
           <div class="ah-kpi-foot">
-            <span class="ah-delta" [ngClass]="deltaClass('GOP_MTD','GOP_PM', true)">{{deltaText('GOP_MTD','GOP_PM')}}</span>
-            <span class="s">revenue &#8377; {{short(kpi?.REVENUE_MTD)}} &middot; cost &#8377; {{short(kpi?.COST_MTD)}}</span>
+            <span class="ah-delta" [ngClass]="deltaClass('GOP_COSTED_MTD','GOP_COSTED_PM', true)">{{deltaText('GOP_COSTED_MTD','GOP_COSTED_PM')}}</span>
+            <span class="s">revenue &#8377; {{short($safeNavigationMigration(kpi?.REVENUE_COSTED_MTD))}} &middot; cost &#8377; {{short($safeNavigationMigration(kpi?.COST_COSTED_MTD))}}</span>
           </div>
           <div class="ah-drill-link">See the jobs behind this &rsaquo;</div>
         </div>
@@ -427,23 +465,82 @@ empty, and the home page is the blank one it has always been.                   
             <span class="k">Margin <span class="ah-hint">GOP &divide; revenue</span></span>
             <button type="button" class="ah-ico" [class.open]="info == 'mgn'" (click)="toggleInfo('mgn')" title="What is this?"><i class="fa fa-percent" aria-hidden="true"></i></button>
           </div>
-          <div class="v">{{ kpi ? kpi.MARGIN_PCT_MTD : '-' }}@if (kpi) {
+          <div class="v">{{ kpi ? kpi.MARGIN_PCT_COSTED_MTD : '-' }}@if (kpi) {
             <span class="u">%</span>
           }</div>
+          <div class="ah-kpi-on">on jobs where the cost is booked</div>
           @if (kpi) {
             <div class="ah-cmp">
-              <div class="ah-cmp-row"><span class="ah-cmp-k">This month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct('MARGIN_PCT_MTD','MARGIN_PCT_PM')"></span></span><span class="ah-cmp-v">{{ kpi ? kpi.MARGIN_PCT_MTD : '-' }}%</span></div>
-              <div class="ah-cmp-row"><span class="ah-cmp-k">Last month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct('MARGIN_PCT_PM','MARGIN_PCT_MTD')"></span></span><span class="ah-cmp-v">{{ kpi ? kpi.MARGIN_PCT_PM : '-' }}%</span></div>
+              <div class="ah-cmp-row"><span class="ah-cmp-k">This month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-now" [style.width.%]="cmpPct('MARGIN_PCT_COSTED_MTD','MARGIN_PCT_COSTED_PM')"></span></span><span class="ah-cmp-v">{{ kpi ? kpi.MARGIN_PCT_COSTED_MTD : '-' }}%</span></div>
+              <div class="ah-cmp-row"><span class="ah-cmp-k">Last month</span><span class="ah-cmp-track"><span class="ah-cmp-fill ah-cmp-prev" [style.width.%]="cmpPct('MARGIN_PCT_COSTED_PM','MARGIN_PCT_COSTED_MTD')"></span></span><span class="ah-cmp-v">{{ kpi ? kpi.MARGIN_PCT_COSTED_PM : '-' }}%</span></div>
             </div>
           }
           <div class="ah-kpi-foot">
-            <span class="ah-delta" [ngClass]="deltaClass('MARGIN_PCT_MTD','MARGIN_PCT_PM', true)">{{deltaText('MARGIN_PCT_MTD','MARGIN_PCT_PM')}}</span>
-            <span class="s">{{count(kpi?.JOBS_MTD)}} jobs opened &middot; {{count(kpi?.JOBS_PM)}} last month</span>
+            <span class="ah-delta" [ngClass]="deltaClass('MARGIN_PCT_COSTED_MTD','MARGIN_PCT_COSTED_PM', true)">{{deltaText('MARGIN_PCT_COSTED_MTD','MARGIN_PCT_COSTED_PM')}}</span>
+            <span class="s">{{count($safeNavigationMigration(kpi?.JOBS_MTD))}} jobs opened &middot; {{count($safeNavigationMigration(kpi?.JOBS_PM))}} last month</span>
           </div>
           <div class="ah-drill-link">See the jobs behind this &rsaquo;</div>
         </div>
       </div>
     }
+    <!-- ================= OUTSTANDING BY FINANCIAL YEAR ================= -->
+    @if (scope == 'accounts' && fyYears.length) {
+      <div class="im-card ah-sec">
+        <div class="im-card-h">
+          <div class="ah-h">
+            <span class="ah-ico ah-ico-static"><i class="fa fa-calendar-o" aria-hidden="true"></i></span>
+            <h2>Outstanding by financial year</h2>
+          </div>
+          <span class="meta">which year's billing the money owed to us is still sitting in &middot; click a year to see its clients</span>
+        </div>
+        <div class="ah-drill-scroll">
+          <table class="ah-dt">
+            <thead>
+              <tr>
+                <th>Financial year</th>
+                <th class="num">Clients</th>
+                <th class="num">Bills</th>
+                <th class="num" title="Pending on open bills raised in that year">Bills pending</th>
+                <th class="num" title="Client credit set against that year. Credit is applied to the oldest year first, client by client.">Credit applied</th>
+                <th class="num">Outstanding</th>
+                <th class="num" title="Of what is still outstanding in that year, the part that has not yet passed its credit period - it cannot be chased today">Not yet due</th>
+                <th class="num" title="The part of that year's outstanding that is past its due date">Overdue</th>
+                <th title="The oldest bill still open in that year">Oldest bill</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (y of fyYears; track $index) {
+                <tr class="ah-dt-click" (click)="openFy(y)" [title]="'Click to see the clients in ' + y.FY">
+                  <td>
+                    <i class="fa fa-search-plus" aria-hidden="true"></i>
+                    {{ y.FY }}
+                    @if (toNum(y.OPENING_PART) > 0.5) {
+                      <span class="ah-dt-code" title="Balance brought forward from before the ERP went live">includes opening b/f {{ rs(y.OPENING_PART) }}</span>
+                    }
+                  </td>
+                  <td class="num">{{ count(y.CLIENTS) }}</td>
+                  <td class="num">{{ count(y.BILLS) }}</td>
+                  <td class="num">{{ rs(y.GROSS_PENDING) }}</td>
+                  <td class="num">{{ toNum(y.CREDIT_APPLIED) > 0 ? rs(y.CREDIT_APPLIED) : '-' }}</td>
+                  <td class="num"><b>{{ rs(y.OUTSTANDING) }}</b></td>
+                  <td class="num">{{ toNum(y.NOT_YET_DUE) > 0.5 ? rs(y.NOT_YET_DUE) : '-' }}</td>
+                  <td class="num">{{ rs(y.OVERDUE) }}</td>
+                  <td>{{ y.OLDEST_BILL || '-' }}
+                    @if (toNum(y.OLDEST_DAYS) > 0) { <span class="ah-dt-code">{{ count(y.OLDEST_DAYS) }} d</span> }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="ah-drill-note">
+          A bill sits in the year it was raised, April to March. Money a client has paid but Accounts has
+          not matched to a bill is set against that client's <b>oldest</b> year first, so the years add back
+          to the Outstanding and Overdue figures on the cards above. Credit is never moved between clients.
+        </div>
+      </div>
+    }
+
     <!-- ================= RECEIVABLE AGEING ================= -->
     @if (scope == 'accounts') {
       <div class="im-card ah-sec">
@@ -477,9 +574,9 @@ empty, and the home page is the blank one it has always been.                   
         <div class="im-card-h">
           <div class="ah-h">
             <button type="button" class="ah-ico" [class.open]="info == 'jobs'" (click)="toggleInfo('jobs')" title="What is this?"><i class="fa fa-cubes" aria-hidden="true"></i></button>
-            <h2>Jobs opened this month <span class="ah-count">{{count(kpi?.JOBS_MTD)}}</span></h2>
+            <h2>Jobs opened this month <span class="ah-count">{{count($safeNavigationMigration(kpi?.JOBS_MTD))}}</span></h2>
           </div>
-          <span class="meta">vs {{count(kpi?.JOBS_PM)}} same period last month</span>
+          <span class="meta">vs {{count($safeNavigationMigration(kpi?.JOBS_PM))}} same period last month</span>
         </div>
         <p class="ah-card-note ah-note-pad"><b>Billed</b> jobs have at least one tax invoice; <b>Unbilled</b> have none yet. GOP is billed value minus purchase cost on those jobs.</p>
         <div class="im-tbl-wrap">
@@ -666,6 +763,152 @@ empty, and the home page is the blank one it has always been.                   
     <!-- ================= CARD DRILL-DOWN: the rows behind Overdue / GOP / Margin =================
     Movable by its title bar (same drag handler as the explanation popup). Fetched only on
     click from Accounts/ACC_RPT_ACCOUNTS_HOME_DRILL; every total adds up to the card.      -->
+    <!-- ================= THE VOUCHERS BEHIND THE "UNMATCHED" CHIP ================= -->
+    @if (unmClient) {
+      <div class="ah-modal-back ah-unm-back" (mousedown)="$event.target === $event.currentTarget && closeUnm()">
+        <div class="im-card ah-help ah-drill" role="dialog" aria-modal="true">
+          <div class="im-card-h">
+            <div class="ah-drill-headtext">
+              <div class="ah-h">
+                <span class="ah-ico ah-ico-static"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
+                <h2>Cost with no matching charge &mdash; &#8377; {{ short(unmTotal(unmClient)) }}</h2>
+              </div>
+              <span class="meta">{{ unmLines(unmClient).length }} line@if (unmLines(unmClient).length != 1) {s} &middot; the share column adds up to the chip</span>
+            </div>
+            <div class="ah-drill-actions">
+              <button type="button" class="im-btn im-btn-g ah-close" (click)="closeUnm()" title="Close" aria-label="Close"><i class="fa fa-times" aria-hidden="true"></i></button>
+            </div>
+          </div>
+          <div class="ah-drill-body">
+            <div class="ah-drill-scroll">
+              <table class="ah-dt">
+                <thead>
+                  <tr>
+                    <th>Job</th>
+                    <th title="The voucher type as the Account Statement shows it">Type</th>
+                    <th>Voucher</th>
+                    <th>Date</th>
+                    <th class="ah-dt-wrap">Charge head with no matching billing</th>
+                    <th class="ah-dt-wrap">Supplier</th>
+                    <th class="num">Line amount</th>
+                    <th class="num" title="This client's share of that line">Share</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (r of unmLines(unmClient); track $index) {
+                    <tr>
+                      <td>{{ r.JOBNO }} <span class="ah-dt-code">{{ r.JOB_DATE }}</span></td>
+                      <td><span class="im-chip">{{ r.VCH_TYPE }}</span></td>
+                      <td>{{ r.REFNO }}</td>
+                      <td>{{ r.REF_DATE }}</td>
+                      <td class="ah-dt-wrap">{{ r.ACCTNAME }}</td>
+                      <td class="ah-dt-wrap">{{ r.SUPPLIER || '-' }}</td>
+                      <td class="num">{{ rs(r.LINE_AMOUNT) }}</td>
+                      <td class="num"><b>{{ rs(r.SHARE) }}</b> <span class="ah-dt-code">{{ r.SHARE_PCT }}%</span></td>
+                    </tr>
+                  } @empty {
+                    <tr><td colspan="8" class="ah-dt-none">No lines found.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <div class="ah-drill-note">
+              These costs sit on the job under a head that was never billed as a charge of its own on that
+              job, so there is no invoice to attach them to. They are shared across the clients on the job by
+              each one's share of the job's income. Two ways to fix one: bill the charge, or &mdash; when the
+              income is billed under a differently named head &mdash; add the pair to the job cost pairing
+              master so the two are recognised as the same thing.
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ================= ONE FINANCIAL YEAR, ON DEMAND: only that year's clients ================= -->
+    @if (fyOpen !== null) {
+      <div class="ah-modal-back" (mousedown)="$event.target === $event.currentTarget && closeFy()">
+        <div class="im-card ah-help ah-drill" role="dialog" aria-modal="true">
+          <div class="im-card-h">
+            <div class="ah-drill-headtext">
+              <div class="ah-h">
+                <span class="ah-ico ah-ico-static"><i class="fa fa-calendar-o" aria-hidden="true"></i></span>
+                <h2>Outstanding in {{ fyLabel }} &mdash; the clients behind &#8377; {{ short($safeNavigationMigration(fyRow?.OUTSTANDING)) }}</h2>
+              </div>
+              @if (fyRow) {
+                <span class="meta">
+                  {{ count(fyRow.BILLS) }} bills &middot; {{ count(fyRow.CLIENTS) }} clients
+                  &middot; overdue &#8377; {{ short(fyRow.OVERDUE) }}
+                  &middot; {{ allBranches ? 'All branches' : 'this branch' }}
+                </span>
+              }
+            </div>
+            <div class="ah-drill-actions">
+              @if (fyDetail && fyClientsFor(fyOpen).length) {
+                <button type="button" class="im-btn im-btn-g" (click)="exportFy()" title="Download these rows">
+                  <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel
+                </button>
+              }
+              <button type="button" class="im-btn im-btn-g ah-close" (click)="closeFy()" title="Close" aria-label="Close"><i class="fa fa-times" aria-hidden="true"></i></button>
+            </div>
+          </div>
+          <div class="ah-drill-body">
+            @if (fyBusy) {
+              <div class="ah-note-card ah-drill-note-card" role="status" aria-live="polite">
+                <b>Loading the client detail&hellip;</b>
+                <span class="im-sub-t">The first time can take a few seconds; after that every year opens at once.</span>
+              </div>
+            }
+            @if (fyError && !fyBusy) {
+              <div class="ah-note-card ah-drill-note-card ah-alert">
+                <b><i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{ fyError }}</b>
+              </div>
+            }
+            @if (fyDetail && !fyBusy) {
+              <div class="ah-drill-scroll">
+                <table class="ah-dt">
+                  <thead>
+                    <tr>
+                      <th class="ah-dt-wrap">Client</th>
+                      <th class="num">Bills</th>
+                      <th class="num">Bills pending</th>
+                      <th class="num">Credit applied</th>
+                      <th class="num">Outstanding</th>
+                      <th class="num" title="Of what is still outstanding in that year, the part that has not yet passed its credit period - it cannot be chased today">Not yet due</th>
+                      <th class="num">Overdue</th>
+                      <th title="The oldest bill still open in that year">Oldest bill</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (c of fyClientsFor(fyOpen); track $index) {
+                      <tr>
+                        <td class="ah-dt-wrap">{{ c.CLIENTNAME }} <span class="ah-dt-code">{{ c.CLIENTCODE }}</span></td>
+                        <td class="num">{{ count(c.BILLS) }}</td>
+                        <td class="num">{{ rs(c.GROSS_PENDING) }}</td>
+                        <td class="num">{{ toNum(c.CREDIT_APPLIED) > 0 ? rs(c.CREDIT_APPLIED) : '-' }}</td>
+                        <td class="num"><b>{{ rs(c.OUTSTANDING) }}</b></td>
+                        <td class="num">{{ toNum(c.NOT_YET_DUE) > 0.5 ? rs(c.NOT_YET_DUE) : '-' }}</td>
+                        <td class="num">{{ rs(c.OVERDUE) }}</td>
+                        <td>{{ c.OLDEST_BILL || '-' }}
+                          @if (toNum(c.OLDEST_DAYS) > 0) { <span class="ah-dt-code">{{ count(c.OLDEST_DAYS) }} d</span> }
+                        </td>
+                      </tr>
+                    } @empty {
+                      <tr><td colspan="8" class="ah-dt-none">No client rows for this year.</td></tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+              <div class="ah-drill-note">
+                A bill sits in the year it was raised, April to March. Money a client has paid but Accounts has not
+                matched to a bill is set against that client's <b>oldest</b> year first, so these rows add back to
+                the year total above. Credit is never moved between clients.
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
     @if (drillKind) {
       <div class="ah-modal-back" (mousedown)="$event.target === $event.currentTarget && closeDrill()">
         <div class="im-card ah-help ah-drill" role="dialog" aria-modal="true"
@@ -675,13 +918,13 @@ empty, and the home page is the blank one it has always been.                   
               @if (drillKind === 'OVERDUE') {
                 <div class="ah-h">
                   <span class="ah-ico ah-ico-static"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
-                  <h2>Overdue past credit period &mdash; the bills behind &#8377; {{short(kpi?.OVERDUE_AMT)}}</h2>
+                  <h2>Overdue past credit period &mdash; the bills behind &#8377; {{short($safeNavigationMigration(kpi?.OVERDUE_AMT))}}</h2>
                 </div>
               }
               @if (drillKind === 'MARGIN') {
                 <div class="ah-h">
                   <span class="ah-ico ah-ico-static"><i class="fa fa-line-chart" aria-hidden="true"></i></span>
-                  <h2>GOP this month &mdash; the jobs behind &#8377; {{short(kpi?.GOP_MTD)}} ({{ kpi ? kpi.MARGIN_PCT_MTD : '-' }}%)</h2>
+                  <h2>GOP this month &mdash; the jobs behind &#8377; {{short($safeNavigationMigration(kpi?.GOP_MTD))}} ({{ kpi ? kpi.MARGIN_PCT_MTD : '-' }}%)</h2>
                 </div>
               }
               @if (drill[drillKind]; as d) {
@@ -734,6 +977,19 @@ empty, and the home page is the blank one it has always been.                   
                   </div>
                 </div>
               }
+              @if (+d.sum.CN_UNLINKED > 0.5) {
+                <!-- a credit note raised against the client but never attached to an invoice: the bill behind it stays fully open until Accounts links it -->
+                <div class="ah-warn" role="alert">
+                  <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                  <div>
+                    <b>&#8377; {{short(d.sum.CN_UNLINKED)}} of credit notes ({{count(d.sum.CN_UNLINKED_NOTES)}} notes,
+                    {{count(d.sum.CN_UNLINKED_CLIENTS)}} clients) are not linked to any bill.</b>
+                    They are counted as the client's credit above, but until Accounts opens each note and names the
+                    invoice it belongs to, the bill behind it will keep showing here. The
+                    <b>of which credit notes</b> column shows the amount per client.
+                  </div>
+                </div>
+              }
               <div class="ah-sum">
                 <div class="ah-sum-cell"><span>Overdue bills</span><b>&#8377; {{rs(d.sum.OVERDUE_GROSS)}}</b></div>
                 <div class="ah-sum-op">&minus;</div>
@@ -766,6 +1022,7 @@ empty, and the home page is the blank one it has always been.                   
                       <th class="num">Bills</th>
                       <th class="num" title="Pending on bills past their due date">Overdue bills</th>
                       <th class="num" title="Receipts on account (OA), general (GR) or against opening (AO) that name no bill">Paid on account</th>
+                      <th class="num" title="Part of the credit beside it that is credit notes never linked to an invoice">of which credit notes</th>
                       <th class="num" title="Overdue bills less money on account - this is what the card adds up">Overdue (net)</th>
                       <th class="num">Oldest</th>
                       <th>Last receipt</th>
@@ -781,13 +1038,16 @@ empty, and the home page is the blank one it has always been.                   
                         <td class="num">{{ count(c.BILLS) }}</td>
                         <td class="num">{{ rs(c.OVERDUE_GROSS) }}</td>
                         <td class="num">{{ +c.CREDIT_ON_ACCOUNT > 0 ? rs(c.CREDIT_ON_ACCOUNT) : '-' }}</td>
+                        <td class="num" [class.ah-dt-amber]="+c.CN_UNLINKED > 0.5"
+                          [title]="+c.CN_UNLINKED > 0.5 ? (count(c.CN_UNLINKED_NOTES) + ' credit notes with no invoice named') : ''">
+                          {{ +c.CN_UNLINKED > 0 ? rs(c.CN_UNLINKED) : '-' }}</td>
                         <td class="num"><b>{{ rs(c.OVERDUE_NET) }}</b></td>
                         <td class="num">{{ count(c.OLDEST_DAYS) }} d</td>
                         <td>{{ c.LAST_RECEIPT || '-' }}</td>
                       </tr>
                       @if (drillOpenClient === c.CLIENTCODE) {
                         <tr class="ah-dt-sub">
-                          <td colspan="7">
+                          <td colspan="8">
                             <table class="ah-dt ah-dt-inner">
                               <thead>
                                 <tr>
@@ -864,7 +1124,7 @@ empty, and the home page is the blank one it has always been.                   
                     }
                   }
                   @if (!drillClients().length) {
-                    <tr><td colspan="7" class="ah-dt-none">No client matches.</td></tr>
+                    <tr><td colspan="8" class="ah-dt-none">No client matches.</td></tr>
                   }
                 </tbody>
               </table>
@@ -883,7 +1143,10 @@ empty, and the home page is the blank one it has always been.                   
             }
             <div class="ah-drill-note">
               <b>Paid on account</b> is money received with receipt types OA (on account), GR (general) or AO (against opening),
-              which name no bill. It is set off client by client &mdash; one client's money never reduces another client's dues.
+              which name no bill, plus credit notes that were raised for the client but never linked to an invoice.
+              It is set off client by client &mdash; one client's money never reduces another client's dues.
+              A credit note is applied to a bill only up to what that bill still owes: a receipt books the full invoice
+              and carries the note on a separate line, so counting the note again would credit the same bill twice.
               Income on a job counts every invoice on that job, whoever it was billed to, as the Job Profit statement does.
             </div>
           }
@@ -1047,7 +1310,7 @@ empty, and the home page is the blank one it has always been.                   
                         <td class="num">
                           {{ rs(c.COST) }}
                           @if (+c.UNMATCHED_COST > 0.5) {
-                            <span class="im-chip dash ah-dt-flag" title="Cost with no matching charge on the job, shared by income">{{ rs(c.UNMATCHED_COST) }} unmatched</span>
+                            <span class="im-chip dash ah-dt-flag" style="cursor:pointer" (click)="openUnm(c.CLIENTCODE, $event)" title="Cost with no matching charge on the job, shared by income - click to see the vouchers behind it">{{ rs(c.UNMATCHED_COST) }} unmatched <i class="fa fa-search-plus" aria-hidden="true"></i></span>
                           }
                         </td>
                         <td class="num" [class.ah-neg]="+c.GOP < 0"><b>{{ rs(c.GOP) }}</b></td>

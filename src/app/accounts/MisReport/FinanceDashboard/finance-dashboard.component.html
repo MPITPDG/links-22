@@ -368,6 +368,9 @@
             <div class="fd-kpi-foot">Compare <b>Bills pending</b> with a ledger closing &mdash; and remember the ledger shows this financial year only.</div>
             <div class="fd-kpi-row" title="Receipts on account that did knock off open bills of the same client"><span>Credit applied</span><b>{{ fmtShort(CreditApplied()) }}</b></div>
             <div class="fd-kpi-row" title="Money held from clients who have no open bill left to set it against - it cannot reduce anybody else's dues"><span>Credit left over</span><b>{{ fmtShort(CreditStranded()) }}</b></div>
+            @if (CnUnlinked() > 0.5) {
+              <div class="fd-kpi-row" title="Credit notes raised for a client but never linked to an invoice, so nothing knocks the bill off. They count as the client's credit here; Accounts still has to open each one and attach it to its bill."><span>of which credit notes not linked to a bill</span><b>{{ fmtShort(CnUnlinked()) }}</b></div>
+            }
             <div class="fd-kpi-row"><span>Overdue</span><b>{{ fmtShort(Kpi.OVERDUE_AMT) }}</b></div>
           </div>
         </div>
@@ -660,6 +663,49 @@
         }
       </div>
 
+      @if (FyYears.length) {
+        <div class="card sec">
+          <div class="card-h"><h2>Outstanding by financial year</h2><span class="meta">click a year to see its clients</span></div>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Financial year</th>
+                  <th class="num">Clients</th><th class="num">Bills</th>
+                  <th class="num">Bills pending</th><th class="num">Credit applied</th>
+                  <th class="num">Outstanding</th>
+                  <th class="num" title="Of what is still outstanding in that year, the part that has not yet passed its credit period - it cannot be chased today">Not yet due</th>
+                  <th class="num">Overdue</th>
+                  <th title="The oldest bill still open in that year">Oldest bill</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (y of FyYears; track $index) {
+                  <tr class="fk-click" (click)="OpenFy(y)" [title]="'Click to see the clients in ' + y.FY">
+                    <td>
+                      {{ y.FY }}
+                      @if (num(y.OPENING_PART) > 0.5) {
+                        <span class="chip" title="Balance brought forward from before the ERP went live">incl. opening b/f {{ y.OPENING_PART | number:'1.0-0' }}</span>
+                      }
+                    </td>
+                    <td class="num">{{ y.CLIENTS }}</td>
+                    <td class="num">{{ y.BILLS }}</td>
+                    <td class="num">{{ y.GROSS_PENDING | number:'1.0-0' }}</td>
+                    <td class="num">{{ num(y.CREDIT_APPLIED) > 0 ? (y.CREDIT_APPLIED | number:'1.0-0') : '-' }}</td>
+                    <td class="num"><b>{{ y.OUTSTANDING | number:'1.0-0' }}</b></td>
+                    <td class="num">{{ num(y.NOT_YET_DUE) > 0.5 ? (y.NOT_YET_DUE | number:'1.0-0') : '-' }}</td>
+                    <td class="num">{{ y.OVERDUE | number:'1.0-0' }}</td>
+                    <td>{{ y.OLDEST_BILL || '-' }}
+                      @if (num(y.OLDEST_DAYS) > 0) { <span class="chip">{{ y.OLDEST_DAYS }} d</span> }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
       <div class="card sec">
         <div class="card-h"><h2>Receivable ageing by client</h2><span class="meta">{{ Ageing.length }} clients</span></div>
         <div class="tbl-wrap">
@@ -800,7 +846,7 @@
                                   <span class="chip solid" title="This job was billed to {{ j.SPLIT }} parties. This row is this client's share: its own invoices, and the cost of the charges it was billed for. Whole job: income {{ j.JOB_INCOME | number:'1.0-0' }}, expense {{ j.JOB_EXPENSE | number:'1.0-0' }}.">Split {{ j.SPLIT }} ways</span>
                                 }
                                 @if (num(j.UNMATCHED) > 0.5) {
-                                  <span class="chip dash" title="{{ j.UNMATCHED | number:'1.0-0' }} of this cost had no matching charge billed on the job, so it is shared by each client's share of the job's income.">Unmatched {{ j.UNMATCHED | number:'1.0-0' }}</span>
+                                  <span class="chip dash" style="cursor:pointer" (click)="OpenUnm(j, $event)" title="{{ j.UNMATCHED | number:'1.0-0' }} of this cost had no matching charge billed on the job, so it is shared by each client's share of the job's income.">Unmatched {{ j.UNMATCHED | number:'1.0-0' }}</span>
                                 }
                               </td>
                               <td>{{ j.MODE_ }}</td>
@@ -1712,6 +1758,101 @@
         <div class="fk-modal-bar">
           <button type="button" class="btn g" (click)="CloseDrill()">Close</button>
           <button type="button" class="btn p" (click)="LoadClient(DrillClient.CLIENTCODE)">Reload dashboard for this client</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ========================= OUTSTANDING IN ONE FINANCIAL YEAR ========================= -->
+  @if (FyOpen !== null) {
+    <div class="fk-modal-back" (click)="CloseFy()">
+      <div class="card fk-modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+        <div class="card-h"><h2>Outstanding in {{ FyLabel }}</h2><span class="meta">the clients behind {{ $safeNavigationMigration(FyRow?.OUTSTANDING) | number:'1.0-0' }} @if (FyRow) {&middot; {{ FyRow.BILLS }} bills &middot; {{ FyRow.CLIENTS }} clients &middot; overdue {{ FyRow.OVERDUE | number:'1.0-0' }}}</span></div>
+        @if (FyBusy) {
+          <div class="fk-note">Loading the client detail... the first time can take a few seconds.</div>
+        }
+        @if (FyError && !FyBusy) {
+          <div class="fk-note">{{ FyError }}</div>
+        }
+        @if (FyDetail && !FyBusy) {
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Client</th><th class="num">Bills</th>
+                  <th class="num">Bills pending</th><th class="num">Credit applied</th>
+                  <th class="num">Outstanding</th>
+                  <th class="num" title="Of what is still outstanding in that year, the part that has not yet passed its credit period - it cannot be chased today">Not yet due</th>
+                  <th class="num">Overdue</th>
+                  <th title="The oldest bill still open in that year">Oldest bill</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (c of FyClientsFor(FyOpen); track $index) {
+                  <tr>
+                    <td>{{ c.CLIENTNAME }}</td>
+                    <td class="num">{{ c.BILLS }}</td>
+                    <td class="num">{{ c.GROSS_PENDING | number:'1.0-0' }}</td>
+                    <td class="num">{{ num(c.CREDIT_APPLIED) > 0 ? (c.CREDIT_APPLIED | number:'1.0-0') : '-' }}</td>
+                    <td class="num"><b>{{ c.OUTSTANDING | number:'1.0-0' }}</b></td>
+                    <td class="num">{{ num(c.NOT_YET_DUE) > 0.5 ? (c.NOT_YET_DUE | number:'1.0-0') : '-' }}</td>
+                    <td class="num">{{ c.OVERDUE | number:'1.0-0' }}</td>
+                    <td>{{ c.OLDEST_BILL || '-' }}
+                      @if (num(c.OLDEST_DAYS) > 0) { <span class="chip">{{ c.OLDEST_DAYS }} d</span> }
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr><td class="empty" colspan="8">No client rows for this year.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div class="fk-note">A bill sits in the year it was raised, April to March. Client credit that was never matched to a bill is set against that client's oldest year first, so these rows add back to the year total above.</div>
+        }
+        <div class="fk-modal-bar">
+          <button type="button" class="btn g" (click)="CloseFy()">Close</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ========================= VOUCHERS BEHIND THE "UNMATCHED" CHIP ========================= -->
+  @if (UnmJob) {
+    <div class="fk-modal-back" (click)="CloseUnm()">
+      <div class="card fk-modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+        <div class="card-h"><h2>Cost with no matching charge &mdash; {{ UnmTotal(UnmJob) | number:'1.0-0' }}</h2><span class="meta">Job {{ UnmJob.JOBNO }} &middot; {{ UnmJob.CLIENTNAME }} &middot; the share column adds up to the chip</span></div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th title="The voucher type as the Account Statement shows it">Type</th>
+                <th>Voucher</th><th>Date</th>
+                <th>Charge head with no matching billing</th>
+                <th>Supplier</th>
+                <th class="num">Line amount</th>
+                <th class="num">Share</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of UnmLinesFor(UnmJob); track $index) {
+                <tr>
+                  <td><span class="chip">{{ r.VCH_TYPE }}</span></td>
+                  <td>{{ r.REFNO }}</td>
+                  <td>{{ r.REF_DATE }}</td>
+                  <td>{{ r.ACCTNAME }}</td>
+                  <td>{{ r.SUPPLIER || '-' }}</td>
+                  <td class="num">{{ r.LINE_AMOUNT | number:'1.0-0' }}</td>
+                  <td class="num"><b>{{ r.SHARE | number:'1.0-0' }}</b> <span class="chip">{{ r.SHARE_PCT }}%</span></td>
+                </tr>
+              } @empty {
+                <tr><td class="empty" colspan="7">No lines found.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="fk-note">This cost sits on the job under a head that was never billed as a charge of its own on that job, so there is no invoice to attach it to. It is shared across the clients on the job by each one's share of the job's income. Either bill the charge, or &mdash; when the income is billed under a differently named head &mdash; add the pair to the job cost pairing master.</div>
+        <div class="fk-modal-bar">
+          <button type="button" class="btn g" (click)="CloseUnm()">Close</button>
         </div>
       </div>
     </div>

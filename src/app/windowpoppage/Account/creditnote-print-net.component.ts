@@ -3,9 +3,8 @@ import { DataService } from '../../shared/service/dataService';
 import { LoaderService } from '../../shared/service/loader.service';
 import { ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../shared/service/loginService';
+import QRCode from 'qrcode';
 
-declare var require: any;
-const QRCode = require('qrcode');
 
 /*  CREDIT NOTE print - exact Angular copy of Links frm_Acc_Tran_CreditNote_Print.aspx (+ .aspx.vb).
     Flow, same as the .NET page:

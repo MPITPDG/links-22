@@ -61,6 +61,21 @@ export class AccountsHomeComponent implements OnInit, OnDestroy {
     cash: any = null;          // Table5: payable, due windows, DSO/DPO, pipeline
     forecast: any[] = [];      // Table6: money in vs out by window
     watch: any[] = [];         // Table7: clients to ask about
+    fyYears: any[] = [];       // Table8: outstanding by financial year of the bill
+    awaitJobs: any[] = [];     // Table9: billed this month, no supplier cost booked yet
+    /*  The client breakdown of each year is NOT part of the page load - it was 639 rows
+        on Links and 1,692 on Manilal fetched every time anybody opened the dashboard,
+        and it held the other menus up. It comes from the drill procedure instead, only
+        when somebody asks for it.  */
+    fyClients: any[] = [];     // drill Table6, loaded on demand
+    fyDetail = false;          // has the breakdown been fetched
+    fyBusy = false;
+    fyError = '';
+    fyOpen: number = null;     // the year whose modal is open
+    fyLabel = '';              // that year's label, for the modal heading
+    fyRow: any = null;         // that year's summary row, for the modal heading
+    unmClient: string = null;  // client whose unmatched-cost lines are open
+    showAwait = false;         // the awaiting-cost list under the GOP card
     cacheInfo: any = null;
 
     loaded: boolean = false;
@@ -191,6 +206,8 @@ export class AccountsHomeComponent implements OnInit, OnDestroy {
                 this.cash       = (data && data.Table5 && data.Table5.length > 0) ? data.Table5[0] : null;
                 this.forecast   = (data && data.Table6) ? data.Table6 : [];
                 this.watch      = (data && data.Table7) ? data.Table7 : [];
+                this.fyYears    = (data && data.Table8) ? data.Table8 : [];
+                this.awaitJobs  = (data && data.Table9) ? data.Table9 : [];
                 this.cacheInfo  = (data && data.CACHEINFO && data.CACHEINFO.length > 0) ? data.CACHEINFO[0] : null;
 
                 if (!ok) {
@@ -293,7 +310,8 @@ export class AccountsHomeComponent implements OnInit, OnDestroy {
                 }
                 const d: any = {
                     sum: data.Table[0],
-                    t1: data.Table1 || [], t2: data.Table2 || [], t3: data.Table3 || [], t4: data.Table4 || []
+                    t1: data.Table1 || [], t2: data.Table2 || [], t3: data.Table3 || [],
+                    t4: data.Table4 || [], t5: data.Table5 || []
                 };
                 if (kind === 'OVERDUE') {
                     d.byClient = {};
@@ -456,10 +474,108 @@ export class AccountsHomeComponent implements OnInit, OnDestroy {
     /*  ---- presentation helpers ------------------------------------------------------- */
 
     /*  Every tile reads through these so a missing result set shows "-", never NaN. */
+    /*  num() above reads a KPI FIELD BY NAME. toNum() converts a VALUE. They are easy to
+        confuse: passing a value to num() looks up this.kpi[<the value>], which is always
+        undefined, so it quietly returns null. That is what stopped the year modal from
+        opening and made every 'Credit applied' cell show a dash.  */
+    toNum(v: any): number {
+        if (v === null || v === undefined || v === '') { return 0; }
+        const n = Number(String(v).replace(/[^0-9.\-]/g, ''));
+        return isNaN(n) ? 0 : n;
+    }
+
     num(field: string): number {
         if (!this.kpi || this.kpi[field] === undefined || this.kpi[field] === null) { return null; }
         const n = Number(String(this.kpi[field]).replace(/[^0-9.\-]/g, ''));
         return isNaN(n) ? null : n;
+    }
+
+    /*  The GOP and Margin cards report the trading figures - the jobs that carry a
+        supplier cost. Revenue billed on a job with no purchase entered at all is pure
+        profit on paper and swamped the headline: Links October 2026 showed 80.8% because
+        11.04 Cr of MISC billing had 74,816 of cost against it. That money is not hidden,
+        it is named on its own line as cost still to come.  */
+    awaitRevenue(): number { return this.num('REVENUE_AWAITCOST_MTD') || 0; }
+    awaitCount(): number { return this.num('JOBS_AWAITCOST_MTD') || 0; }
+    hasAwait(): boolean { return this.awaitRevenue() > 0.5; }
+
+    /* the two or three parties behind most of it, for the one-line summary on the card */
+    awaitWho(): string {
+        const by: any = {};
+        this.awaitJobs.forEach(j => {
+            const k = (j.BILLED_TO || '').toString().trim() || 'not billed';
+            by[k] = (by[k] || 0) + this.toNum(j.REVENUE);
+        });
+        return Object.keys(by).sort((a, b) => by[b] - by[a]).slice(0, 3).join(', ');
+    }
+
+    toggleAwait(ev: any) { if (ev) { ev.stopPropagation(); } this.showAwait = !this.showAwait; }
+
+    /*  One year at a time. Clicking a year opens a modal with only that year's clients;
+        the breakdown itself is fetched once, from the drill procedure, the first time
+        anybody asks. Nothing of it is fetched on page load.  */
+    openFy(y: any) {
+        this.fyOpen = this.toNum(y.FY_START);
+        this.fyLabel = y.FY;
+        this.fyRow = y;
+        if (this.fyDetail || this.fyBusy) { return; }
+        this.fyBusy = true;
+        this.fyError = '';
+        this._dataService.getData('Accounts/ACC_RPT_ACCOUNTS_HOME_DRILL', {
+            CMPCODE: this.login.CMPCODE,
+            CITYCODE: this.allBranches ? 'ALL' : this.login.CITYCODE1,
+            KIND: 'OVERDUE',
+            ASOF: ''
+        }).subscribe((data: any) => {
+            this.fyBusy = false;
+            const ok = data && data.Table && data.Table.length > 0 && data.Table[0].STATUS == '100';
+            if (!ok) { this.fyError = 'The client detail could not be loaded.'; return; }
+            this.fyClients = data.Table6 || [];
+            this.fyDetail = true;
+        }, () => { this.fyBusy = false; this.fyError = 'The client detail could not be loaded.'; });
+    }
+
+    closeFy() { this.fyOpen = null; }
+
+    fyClientsFor(y: any): any[] {
+        const n = this.toNum(y);
+        return this.fyClients.filter(c => this.toNum(c.FY_START) === n);
+    }
+
+    exportFy() {
+        const rows = this.fyClientsFor(this.fyOpen);
+        if (!rows.length) { this._toasterService.toast('warning', 'warning', 'Nothing to export !'); return; }
+        this.exportser.exportExceltry({
+            data: rows.map((c: any) => [c.CLIENTCODE, c.CLIENTNAME, +c.BILLS, +c.GROSS_PENDING,
+                                        +c.CREDIT_APPLIED, +c.OUTSTANDING, +c.NOT_YET_DUE,
+                                        +c.OVERDUE, c.OLDEST_BILL || '', +c.OLDEST_DAYS]),
+            headers: ['Client code', 'Client', 'Bills', 'Bills pending', 'Credit applied',
+                      'Outstanding', 'Not yet due', 'Overdue', 'Oldest bill', 'Oldest (days)'],
+            pagetype: 'FinanceDashboard',
+            title: (this.login && (this.login.CMPNAME || this.login.CMP_NAME)) || 'Accounts',
+            subtitle: 'Outstanding by financial year - ' + this.fyLabel
+                + ' - ' + (this.allBranches ? 'All branches' : 'this branch')
+        }, 'Home_OutstandingByYear_');
+    }
+
+    /*  The voucher lines behind the amber "unmatched" badge: cost that found no charge
+        of its own billed on the job, so it was shared across the job's clients by their
+        share of income. The shares add back to the badge exactly.  */
+    unmLines(client: string): any[] {
+        const d: any = this.drill['MARGIN'];
+        if (!d || !d.t5) { return []; }
+        return d.t5.filter(r => (r.CLIENTCODE || '').toString().trim() === client);
+    }
+
+    openUnm(client: string, ev: any) {
+        if (ev) { ev.stopPropagation(); }
+        this.unmClient = (this.unmClient === client) ? null : client;
+    }
+
+    closeUnm() { this.unmClient = null; }
+
+    unmTotal(client: string): number {
+        return this.unmLines(client).reduce((s, r) => s + this.toNum(r.SHARE), 0);
     }
 
     money(v: any): string {

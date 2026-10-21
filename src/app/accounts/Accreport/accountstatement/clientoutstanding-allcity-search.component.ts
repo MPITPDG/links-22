@@ -7,9 +7,7 @@ import { LoaderService } from '../../../shared/service/loader.service';
 import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/shared/service/dataService';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
-import { AccountStatementExportService } from './account-statement-export.service';
-import { catchError } from 'rxjs/operators';
-import { EMPTY } from 'rxjs';
+import { ExportexcelAccStatementV4, AccStatementExcel } from 'src/app/shared/service/exportexcel_accstatement_v4';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { environment } from 'src/environments/environment';
@@ -66,10 +64,11 @@ export class ClientOutstandingAllCityComponent implements OnInit {
   dataForExcel = [];
   RemarkList: any = [];
   advdataForExcel = [];
-  balRow: any = null;       // Table1 of the last search: OPBAL, TLDR, TLCR, CLBAL
-  advTotRow: any = null;    // Table2 of the last search: ADVTOTALDR, ADVTOTALCR
   AdvanceTable = [];
   Compname: string;
+  stmtTotals: any = null;
+  stmtAdvTotals: any = null;
+  searchNo: number = 0;   // only the latest search may fill the screen / Excel
   rptopbal: string;
   rptclbal: string;
   rptcrtotdr: any;
@@ -113,7 +112,7 @@ export class ClientOutstandingAllCityComponent implements OnInit {
     private _loginService: LoginService,
     private modalService: BsModalService,
     private _loaderService: LoaderService,
-    private stmtExport: AccountStatementExportService,
+    private stmtExcel: ExportexcelAccStatementV4,
   ) { }
   ngOnInit() {
     this.FromDate = new Date();
@@ -151,6 +150,17 @@ export class ClientOutstandingAllCityComponent implements OnInit {
 
   }
   ShowOutstanding() {
+    // start every search clean, otherwise the previous client's rows end up in the Excel
+    const searchNo = ++this.searchNo;
+    this.Searchdata_list = [];
+    this.dataForExcel = [];
+    this.exceldata_list = [];
+    this.advdataForExcel = [];
+    this.advheaderlist = [];
+    this.AdvanceTable = [];
+    this.AdvTotal = '';
+    this.stmtTotals = null;
+    this.stmtAdvTotals = null;
     if (this.Client == "" || this.Client == undefined) {
       this._toasterService.toast('error', 'Error', "Please select client from list !");
       return false;
@@ -166,8 +176,19 @@ export class ClientOutstandingAllCityComponent implements OnInit {
     }
     this._dataService.getData("Accounts/Acc_Rpt_ClientOutstandingALL_AllCITY_LIST", jsonmaster)
       .subscribe((data: any) => {
+        if (searchNo != this.searchNo) { return; }   // an older search answered late
         if (data?.Table?.length > 0) {
           this.displayType = 'LIST';
+          this.OpCrBal = '';
+          this.OpDrBal = '';
+          this.CLCrBal = '';
+          this.CLDrBal = '';
+          this.currTotalDr = '';
+          this.currTotalcr = '';
+          this.AdvCrAmt = '';
+          this.AdvDrAmt = '';
+          this.stmtTotals = data.Table1[0];
+          this.stmtAdvTotals = data.Table2[0];
           this.Searchdata_list = data.Table;
           this.failed = false; this.buildView();
           this.exceldata_list = data.Table4;
@@ -176,63 +197,15 @@ export class ClientOutstandingAllCityComponent implements OnInit {
           //   });
           this.searchHeaderText = "Account Statement From " + this.FromDate + " To " + this.ToDate;
           if (!data.Table1?.[0] || !data.Table2?.[0]) { this.loaderService.display(false); return; } // fail soft: no summary rows
-          if (data.Table1[0].OPBAL > 0) {
-            this.OpDrBal = parseFloat(data.Table1[0].OPBAL).toFixed(2) ;//+ " Dr";
-            this.rptopbal = parseFloat(data.Table1[0].OPBAL).toFixed(2) + " Dr";
-          }
-          else {
-            this.OpCrBal = (data.Table1[0].OPBAL == "0.00") ? "0.0" : parseFloat(data.Table1[0].OPBAL).toFixed(2);// + " Cr";
-            this.rptopbal = (data.Table1[0].OPBAL == "0.00") ? "0.0" : (data.Table1[0].OPBAL) + " Cr";
-          }
-          if (data.Table1[0].CLBAL > 0) {
-            this.CLDrBal = parseFloat(data.Table1[0].CLBAL).toFixed(2) + " Dr";
-            this.rptclbal = parseFloat(data.Table1[0].CLBAL).toFixed(2) + " Dr";
-          }
-          else {
-            this.CLCrBal = (data.Table1[0].CLBAL == "0.00") ? "" : (data.Table1[0].CLBAL) + " Cr";
-            this.rptclbal = (data.Table1[0].CLBAL == "0.00") ? "" : (data.Table1[0].CLBAL) + " Cr";
-          }
-          if (data.Table1[0].TLDR > 0) {
-            this.currTotalDr = parseFloat(data.Table1[0].TLDR).toFixed(2);
-            this.rptcrtotdr = data.Table1[0].TLDR + " Dr";
-          }
-          else {
-            this.currTotalDr = (data.Table1[0].TLDR == "0.00") ? "" : parseFloat(data.Table1[0].TLDR).toFixed(2);
-            this.rptcrtotdr = (data.Table1[0].TLDR == "0.00") ? "" : (data.Table1[0].TLDR) + "Dr";
-          }
-          if (data.Table1[0].TLCR > 0) {
-            this.currTotalcr = parseFloat(data.Table1[0].TLCR).toFixed(2);
-            this.rptcrtotcr = parseFloat(data.Table1[0].TLCR).toFixed(2) + " Cr";
-          }
-          else {
-            this.currTotalcr = (data.Table1[0].TLCR == "0.00") ? "" : (data.Table1[0].TLCR)
-            this.rptcrtotcr = (data.Table1[0].TLCR == "0.00") ? "" : (data.Table1[0].TLCR)
-          }
-          if (data.Table2[0].ADVTOTALDR > 0) {
-            this.AdvDrAmt = parseFloat(data.Table2[0].ADVTOTALDR).toFixed(2);
-            this.rptadvtotdr = parseFloat(data.Table2[0].ADVTOTALDR).toFixed(2);
-          }
-          else {
-            this.AdvDrAmt = (data.Table2[0].ADVTOTALDR == "0.00") ? "" : parseFloat(data.Table2[0].ADVTOTALDR).toFixed(2);
-            this.rptadvtotdr = data.Table2[0].ADVTOTALDR;
-          }
-          if (data.Table2[0].ADVTOTALCR > 0) {
-            this.AdvCrAmt = parseFloat(data.Table2[0].ADVTOTALCR).toFixed(2);
-            this.rptadvtotcr = parseFloat(data.Table2[0].ADVTOTALCR).toFixed(2);
-          }
-          else {
-            this.AdvCrAmt = (data.Table2[0].ADVTOTALCR == "0.00") ? "" : (data.Table2[0].ADVTOTALCR);
-            this.rptadvtotcr = data.Table2[0].ADVTOTALCR;
-          }
+          this.setSummaryFigures(data.Table1[0], data.Table2[0]);
 
-          this.balRow = data.Table1[0];
-          this.advTotRow = data.Table2[0];
           this.getCompanyName();
           // this.getadvancedata();
           this.loaderService.display(false)
         }
         else {
           this._toasterService.toast('info', 'info', 'No Data Found !');
+          this.loaderService.display(false)
           return false;
         }
       }, () => { this.loaderService.display(false); this.failed = true; })
@@ -241,6 +214,27 @@ export class ClientOutstandingAllCityComponent implements OnInit {
 
 
 
+  // summary box, same format on every statement screen: "648,745.00 Dr", "30,589.00 Cr"
+  setSummaryFigures(totals: any, advTotals: any) {
+    const op = parseFloat(totals.OPBAL) || 0;
+    const cl = parseFloat(totals.CLBAL) || 0;
+    this.OpDrBal = op >= 0 ? this.figure(op, 'Dr', true) : '';
+    this.OpCrBal = op < 0 ? this.figure(op, 'Cr', true) : '';
+    this.CLDrBal = cl >= 0 ? this.figure(cl, 'Dr', true) : '';
+    this.CLCrBal = cl < 0 ? this.figure(cl, 'Cr', true) : '';
+    this.currTotalDr = this.figure(totals.TLDR, 'Dr', false);
+    this.currTotalcr = this.figure(totals.TLCR, 'Cr', false);
+    this.AdvDrAmt = this.figure(advTotals.ADVTOTALDR, 'Dr', false);
+    this.AdvCrAmt = this.figure(advTotals.ADVTOTALCR, 'Cr', false);
+  }
+
+  /** zero shows "0.00" when keepZero, otherwise blank */
+  figure(value: any, side: string, keepZero: boolean): string {
+    const n = Math.abs(parseFloat(value) || 0);
+    if (!n) { return keepZero ? '0.00' : ''; }
+    return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + side;
+  }
+
   GetClientName(clientcode) {
     let updateItem = this.ClientList.find(item => item.acctcodename === clientcode);
     this.ClientName = updateItem?.acctname; // guarded: clearing the select passed undefined
@@ -248,45 +242,39 @@ export class ClientOutstandingAllCityComponent implements OnInit {
   }
 
   expt_exlwithadv() {
-
-    if (confirm('Click OK For With Advance Excel,\n CANCEL For Without Advance Excel')) {
-      if (!this.Searchdata_list || this.Searchdata_list.length == 0) {
-        this._toasterService.toast('info', 'info', 'No Data Found !');
-        return false;
-      }
-      /* as the .NET page: the statement rows plus the client's advance rows, in one Excel */
-      this.loaderService.display(true)
-      const l = this._loginService.getLogin()[0]
-      const all = this.Status == "All"
-      const jsonadv = all
-        ? { ClCode: this.Client, cmp_code: l.CMPCODE, citycode1: l.CITYCODE1, STARTDATE: this.FromDate, ENDDATE: this.ToDate }
-        : { ClCode: this.Client, FINSTARTDATE: l.FINANCIAL_YEAR.STARTDATE, FINENDDATE: l.FINANCIAL_YEAR.ENDDATE, cmp_code: l.CMPCODE, citycode1: l.CITYCODE1, STARTDATE: this.FromDate, ENDDATE: this.ToDate }
-      this._dataService.getData(all ? "Accounts/Acc_Rpt_TrialBalance_With_Advance_Print_GetAll" : "Accounts/Acc_Rpt_TrialBalance_With_Advance_Print_Get", jsonadv)
-        .pipe(catchError((err: any) => {
-          this.loaderService.display(false);
-          this._toasterService.toast('error', 'error', 'The server could not return the advance details (service unavailable or server error). Please contact support.');
-          return EMPTY;
-        }))
-        .subscribe((data: any) => {
-          this.loaderService.display(false)
-          const advRows = (data && data.Table) ? data.Table : []
-          /* file name exactly as the .NET page: Account_StatementAll_With_AllBranch_With_Adv-<client code>-<from yy>-<to yy>; the .NET page opens without a client code, so that part is empty (double dash) */
-          const yy = (s: any) => ((s || '') + '').slice(-2)
-          const fy = l.FINANCIAL_YEAR
-          const filename = 'Account_StatementAll_With_AllBranch_With_Adv--' + yy(new Date(fy.STARTDATE).getFullYear()) + '-' + yy(new Date(fy.ENDDATE).getFullYear())
-          this.stmtExport.exportWithAdvance({
-            company: this.Compname,
-            from: this.FromDate,
-            to: this.ToDate,
-            clientName: this.ClientName
-          }, this.Searchdata_list, this.balRow, this.advTotRow, advRows, filename)
-          this._toasterService.toast('success', 'success', 'Excel downloaded (.NET format): ' + filename + '.xlsx');
-        })
+    // Excel in the Manilal V4 layout, built from the same rows as the screen: OK = with the advance grid, Cancel = without
+    const withAdvance = confirm('Click OK For With Advance Excel,\n CANCEL For Without Advance Excel');
+    const login = this._loginService.getLogin()[0];
+    const stmt: AccStatementExcel = {
+      titleLines: [
+        this.Compname,
+        "Account Statement All with All Branch From " + this.FromDate + " To " + this.ToDate,
+        this.ClientName
+      ],
+      totals: this.stmtTotals,
+      advTotals: this.stmtAdvTotals,
+      rows: this.Searchdata_list,
+      fileName: (withAdvance ? "Account_StatementAll_With_AllBranch_With_Adv-" : "Account_StatementAll_With_AllBranch-") + this.Client
+        + this.stmtExcel.finYearSuffix(login.FINANCIAL_YEAR.STARTDATE, login.FINANCIAL_YEAR.ENDDATE)
+    };
+    if (!withAdvance) {
+      this.stmtExcel.download(stmt);
+      return;
     }
-    else {
-      return false;
-
+    // advances are read at download time (as V4 did), so they are included even if the Advance popup was never opened
+    const url = (this.Status == "All") ? "Accounts/Acc_Rpt_TrialBalance_With_Advance_Print_GetAll" : "Accounts/Acc_Rpt_TrialBalance_With_Advance_Print_Get";
+    const json: any = { ClCode: this.Client, cmp_code: login.CMPCODE, citycode1: login.CITYCODE1, STARTDATE: this.FromDate, ENDDATE: this.ToDate };
+    if (this.Status != "All") {
+      json.FINSTARTDATE = login.FINANCIAL_YEAR.STARTDATE;
+      json.FINENDDATE = login.FINANCIAL_YEAR.ENDDATE;
     }
+    this.loaderService.display(true);
+    this._dataService.getData(url, json)
+      .subscribe((data: any) => {
+        stmt.advRows = data.Table || [];
+        this.stmtExcel.download(stmt);
+        this.loaderService.display(false);
+      }, () => this.loaderService.display(false));
   }
 
   getCompanyName() {
@@ -411,6 +399,8 @@ export class ClientOutstandingAllCityComponent implements OnInit {
       this._dataService.getData("Accounts/Acc_Rpt_TrialBalance_With_Advance_Print_GetAll", jsonadvall)
         .subscribe((data: any) => {
           this.AdvanceTable = data.Table;
+          this.advheaderlist = [];
+          this.advdataForExcel = [];
           for (var i = 0; i < this.AdvanceTable.length; i++) {
             let obj = {
               Type: this.AdvanceTable[i].transtype,
@@ -433,6 +423,8 @@ export class ClientOutstandingAllCityComponent implements OnInit {
       this._dataService.getData("Accounts/Acc_Rpt_TrialBalance_With_Advance_Print_Get", jsonadv)
         .subscribe((data: any) => {
           this.AdvanceTable = data.Table;
+          this.advheaderlist = [];
+          this.advdataForExcel = [];
           for (var i = 0; i < this.AdvanceTable.length; i++) {
             let obj = {
               Type: this.AdvanceTable[i].transtype,
