@@ -327,6 +327,15 @@ BEGIN
         IN_PERIOD    BIT
     )
 
+    /* supplier / ledger names keyed on the TRIMMED code, built once. Joined inline as
+       LTRIM(RTRIM(code)) = X.SUPPLIER no index could serve the comparison, so both masters
+       were scanned once per purchase bill: 7.5 s and 3.5 million reads of an 11.3 s run on
+       LinksDB20 (2026-10-21). Same comparison, same rows (no DISTINCT - duplicates kept). */
+    SELECT LTRIM(RTRIM(SUP_CODE)) AS SUP_CODE, SUP_NAME, SUP_SNAME INTO #SUPM FROM SUPPLIER_MASTER
+    CREATE CLUSTERED INDEX IX_SUPM ON #SUPM (SUP_CODE)
+    SELECT LTRIM(RTRIM(ACCTCODE)) AS ACCTCODE, ACCTNAME INTO #GACC FROM GENACCT_MASTER
+    CREATE CLUSTERED INDEX IX_GACC ON #GACC (ACCTCODE)
+
     /* PASS 1 - strings only. Not one CONVERT to DATETIME in this statement, so there is
        nothing for the optimizer to reorder ahead of the validation. */
     INSERT INTO #PINV (PUR_CODE, PUR_INVNO, PUR_YMD, DUE_YMD, HAS_TERMS, SUPPLIER, SUPNAME,
@@ -388,8 +397,8 @@ BEGIN
                AND (@SUPPLIERCODE = '' OR LTRIM(RTRIM(p.pur_supplier)) = @SUPPLIERCODE)
            ) X
       LEFT JOIN #CITY c ON c.CITYCODE = X.CITYCODE
-      LEFT JOIN SUPPLIER_MASTER sm ON LTRIM(RTRIM(sm.SUP_CODE)) = X.SUPPLIER
-      LEFT JOIN GENACCT_MASTER  g  ON LTRIM(RTRIM(g.ACCTCODE))  = X.SUPPLIER
+      LEFT JOIN #SUPM sm ON sm.SUP_CODE = X.SUPPLIER
+      LEFT JOIN #GACC g  ON g.ACCTCODE  = X.SUPPLIER
      WHERE (@ALLCITY = 1 OR c.CITYCODE IS NOT NULL)
 
     /* bills whose date cannot be read at all: they were never loaded above, because a
@@ -512,7 +521,7 @@ BEGIN
            'This supplier code has no row in SUPPLIER_MASTER, so the report can only show the code.'
       FROM #PINV v
      WHERE v.IN_PERIOD = 1
-       AND NOT EXISTS (SELECT 1 FROM SUPPLIER_MASTER sm WHERE LTRIM(RTRIM(sm.SUP_CODE)) = v.SUPPLIER)
+       AND NOT EXISTS (SELECT 1 FROM #SUPM sm WHERE sm.SUP_CODE = v.SUPPLIER)
 
     /* UNIQUE is safe here and only here: the duplicate-code collapse ran above. If it
        ever throws, duplicates survived the dedupe and the payable is double counted -
@@ -1186,6 +1195,8 @@ BEGIN
     DROP TABLE #DPO
     DROP TABLE #SUPP
     DROP TABLE #RECV
+    DROP TABLE #SUPM
+    DROP TABLE #GACC
 END
 GO
 
