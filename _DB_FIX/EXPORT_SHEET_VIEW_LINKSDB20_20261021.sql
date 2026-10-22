@@ -4500,8 +4500,9 @@ BEGIN
     -- Deployed by links-22/_DB_FIX/EXPORT_SHEET_VIEW_LINKSDB20_20261021.sql (Export > Sheet view). Do not edit here: change that script.
     -- KPI(MONTH_ID). The workbook's KPI Summary: "parts and frames must not be loaded on the same vessel", over the rows of
     -- the Sri Lanka parts and frames tab (TAB_CODE SLPF, as the workbook reads only that tab; other tabs carry SPARE PARTS rows).
-    -- PARTS = rows whose VEH contains PART, FRAMES = rows whose VEH contains FRAME. Vessel = the Links vessel name when the row is
-    -- linked and Links has one, else the sheet's VSL NAME (line breaks folded). KPI_STATUS 'VIOLATION' (both > 0), 'OK', 'NONE'.
+    -- PARTS = rows whose VEH contains PART, FRAMES = rows whose VEH contains FRAME. Vessel = the sheet's VSL NAME (line breaks folded),
+    -- as the workbook groups; a linked row with no sheet vessel falls back to the Links vessel name (Links names carry no voyage,
+    -- so preferring them split one vessel in two and could hide a violation). KPI_STATUS 'VIOLATION' (both > 0), 'OK', 'NONE'.
     -- Table: VESSEL, PARTS, FRAMES, KPI_STATUS (vessels with a name, by name);
     -- Table1 (one row): VESSELS, PARTS, FRAMES, VIOLATIONS, VIOLATION_VESSELS, ROWS, LATEST_STUFFING_DT (dd-mm-yyyy, the latest real
     -- STUFFING DATE), TODAY_ROWS, TODAY_WOS, TODAY_CONTAINERS, TODAY_PARTS_WOS, TODAY_FRAMES_WOS, TODAY_PARTS_ONLY_VESSELS,
@@ -4553,7 +4554,7 @@ BEGIN
            FROM   dbo.EXPT_MASTER E JOIN (SELECT DISTINCT EXPTNO FROM #KP WHERE EXPTNO IS NOT NULL) K ON K.EXPTNO = E.EXPTNO) X
            LEFT JOIN (SELECT V.VSL_RTNO, MAX(LTRIM(RTRIM(V.VSL_NAME))) AS VSL_NAME FROM dbo.VSL_MASTER V GROUP BY V.VSL_RTNO) VM ON VM.VSL_RTNO = X.VESSEL
     WHERE  X.RN = 1;
-    UPDATE K SET VESSEL = CASE WHEN ISNULL(J.VSL_NAME, N'') <> N'' THEN J.VSL_NAME ELSE K.VESSEL END,
+    UPDATE K SET VESSEL = CASE WHEN ISNULL(K.VESSEL, N'') = N'' AND ISNULL(J.VSL_NAME, N'') <> N'' THEN J.VSL_NAME ELSE K.VESSEL END,
                  BL = CASE WHEN ISNULL(J.BLNO, N'') <> N'' OR K.BL_SHEET = 1 THEN 1 ELSE 0 END,
                  SB = CASE WHEN ISNULL(J.SBNO, N'') <> N'' OR K.SB_SHEET = 1 THEN 1 ELSE 0 END
     FROM   #KP K LEFT JOIN #KP_J J ON J.EXPTNO = K.EXPTNO;

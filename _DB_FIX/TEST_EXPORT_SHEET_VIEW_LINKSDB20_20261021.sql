@@ -48,7 +48,7 @@ DECLARE @STEP NVARCHAR(200), @HS VARCHAR(3), @HT NVARCHAR(1000), @H1 INT, @H2 IN
         @JOB VARCHAR(25), @JCMP VARCHAR(6), @JCITY VARCHAR(3), @JINV NVARCHAR(4000), @JPOD NVARCHAR(4000), @JCON NVARCHAR(4000), @JCONCODE VARCHAR(50),
         @P_EXISTS BIT, @P_SUM INT, @P_TLOG INT, @P_TS VARCHAR(40), @P_SC VARCHAR(10), @P_DO_ETD DATETIME, @P_LC_DATE DATETIME,
         @P_DO_RECEIVE_DT DATETIME, @P_ROWS BIGINT, @A_ROWS BIGINT, @A_SUM INT, @A_EXISTS BIT, @A_TLOG INT, @NM NVARCHAR(MAX), @DT NVARCHAR(MAX), @RAISED BIT, @ERRMSG NVARCHAR(MAX),
-        @SAID VARCHAR(50), @P_SALOG INT, @A_SALOG INT, @G2 INT, @T1 DATETIME;
+        @SAID VARCHAR(50), @P_SALOG INT, @A_SALOG INT, @G2 INT, @T1 DATETIME, @KV NVARCHAR(200);
 DECLARE @RES TABLE (N INT IDENTITY(1,1) PRIMARY KEY, OK BIT NOT NULL, CHECK_NAME NVARCHAR(400) NOT NULL, DETAIL NVARCHAR(MAX) NULL);
 DECLARE @IDENT TABLE (T SYSNAME NOT NULL PRIMARY KEY, BEFORE_ID NUMERIC(38, 0) NULL);
 SELECT @HN = 0, @T0 = DATEADD(MINUTE, -1, GETDATE());
@@ -809,8 +809,64 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN @H1 = 1 AND @H2 = 2 AND @H3 = 3 THEN 1 ELSE 0 END, @STEP + N' | ' + N'1 violation, 2 vessels, 3 rows', N'violations ' + ISNULL(CONVERT(NVARCHAR(10), @H1), N'?') + N', vessels ' + ISNULL(CONVERT(NVARCHAR(10), @H2), N'?') + N', rows ' + ISNULL(CONVERT(NVARCHAR(10), @H3), N'?'));
 
--- ---- S34 unlink the copy (FF_JOB text stays) -------------------------------------------------------------
-SET @STEP = N'S34 unlink the copy (FF_JOB text stays)';
+-- ---- S34 KPI: link the vessel-one parts row to the real job ----------------------------------------------
+SET @STEP = N'S34 KPI: link the vessel-one parts row to the real job';
+SET @RAISED = 0;
+SET @IDS = CONVERT(VARCHAR(20), @RA);
+BEGIN TRY
+    EXEC dbo.USP_EXPT_SHEET_LINK @IDS, @JOB, 'ZZT_ADMIN', N'Self-test admin';
+END TRY
+BEGIN CATCH
+    SELECT @RAISED = 1, @ERRMSG = N'raised: ' + ERROR_MESSAGE();
+    IF XACT_STATE() = 1 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (0, @STEP, @ERRMSG);
+END CATCH
+IF @@TRANCOUNT <> 1 OR XACT_STATE() <> 1 GOTO LOST;
+SELECT @HS = NULL, @HT = NULL, @H1 = NULL, @H2 = NULL, @H3 = NULL;
+SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #EXPT_SHEET_SELFTEST WHERE N > @HN ORDER BY N DESC;
+SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
+INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '100' AND @H1 = 1 THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 100, 1 row linked', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
+
+-- ---- S35 KPI: a linked row keeps the sheet's vessel name (still 1 violation) -----------------------------
+SET @STEP = N'S35 KPI: a linked row keeps the sheet''s vessel name (still 1 violation)';
+SET @RAISED = 0;
+BEGIN TRY
+    EXEC dbo.USP_EXPT_SHEET_KPI @M;
+END TRY
+BEGIN CATCH
+    SELECT @RAISED = 1, @ERRMSG = N'raised: ' + ERROR_MESSAGE();
+    IF XACT_STATE() = 1 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (0, @STEP, @ERRMSG);
+END CATCH
+IF @@TRANCOUNT <> 1 OR XACT_STATE() <> 1 GOTO LOST;
+SELECT @HS = NULL, @HT = NULL, @H1 = NULL, @H2 = NULL, @H3 = NULL;
+SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #EXPT_SHEET_SELFTEST WHERE N > @HN ORDER BY N DESC;
+SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
+INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN @H1 = 1 AND @H2 = 2 AND @H3 = 3 THEN 1 ELSE 0 END, @STEP + N' | ' + N'1 violation, 2 vessels, 3 rows', N'violations ' + ISNULL(CONVERT(NVARCHAR(10), @H1), N'?') + N', vessels ' + ISNULL(CONVERT(NVARCHAR(10), @H2), N'?') + N', rows ' + ISNULL(CONVERT(NVARCHAR(10), @H3), N'?'));
+
+-- ---- S36 KPI: a linked row with no sheet vessel falls back to the Links vessel name ----------------------
+SET @STEP = N'S36 KPI: a linked row with no sheet vessel falls back to the Links vessel name';
+SET @RAISED = 0;
+UPDATE dbo.TBL_EXPT_SHEET_ROW SET VSL_NAME = NULL WHERE ID = @RA;   -- test only, rolled back
+SELECT TOP 1 @KV = VM.VSL_NAME
+FROM   dbo.EXPT_MASTER E
+       LEFT JOIN (SELECT V.VSL_RTNO, MAX(LTRIM(RTRIM(V.VSL_NAME))) AS VSL_NAME FROM dbo.VSL_MASTER V GROUP BY V.VSL_RTNO) VM
+              ON VM.VSL_RTNO = LTRIM(RTRIM(ISNULL(E.EXPT_VESSEL, '')))
+WHERE  LTRIM(RTRIM(E.EXPTNO)) = @JOB
+ORDER  BY E.SYSEXPT_DOCRECD, E.ID;
+BEGIN TRY
+    EXEC dbo.USP_EXPT_SHEET_KPI @M;
+END TRY
+BEGIN CATCH
+    SELECT @RAISED = 1, @ERRMSG = N'raised: ' + ERROR_MESSAGE();
+    IF XACT_STATE() = 1 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (0, @STEP, @ERRMSG);
+END CATCH
+IF @@TRANCOUNT <> 1 OR XACT_STATE() <> 1 GOTO LOST;
+SELECT @HS = NULL, @HT = NULL, @H1 = NULL, @H2 = NULL, @H3 = NULL;
+SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #EXPT_SHEET_SELFTEST WHERE N > @HN ORDER BY N DESC;
+SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
+INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN @H1 = 0 AND @H3 = 3 AND @H2 = CASE WHEN ISNULL(@KV, N'') <> N'' THEN 3 ELSE 2 END THEN 1 ELSE 0 END, @STEP + N' | ' + N'0 violations; 3 vessels when Links names one, else 2', N'violations ' + ISNULL(CONVERT(NVARCHAR(10), @H1), N'?') + N', vessels ' + ISNULL(CONVERT(NVARCHAR(10), @H2), N'?') + N', rows ' + ISNULL(CONVERT(NVARCHAR(10), @H3), N'?') + N', Links vessel ' + ISNULL(@KV, N'(none)'));
+
+-- ---- S37 unlink the copy (FF_JOB text stays) -------------------------------------------------------------
+SET @STEP = N'S37 unlink the copy (FF_JOB text stays)';
 SET @RAISED = 0;
 SET @IDS = CONVERT(VARCHAR(20), @R5);
 BEGIN TRY
@@ -827,8 +883,8 @@ SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '100' AND @H1 = 1 THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 100, 1 row', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN (SELECT EXPTNO FROM dbo.TBL_EXPT_SHEET_ROW WHERE ID = @R5) IS NULL AND (SELECT FF_JOB FROM dbo.TBL_EXPT_SHEET_ROW WHERE ID = @R5) = @JOB THEN 1 ELSE 0 END, @STEP + N' | ' + N'EXPTNO cleared, FF_JOB kept', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S35 convert draft for row 1 -------------------------------------------------------------------------
-SET @STEP = N'S35 convert draft for row 1';
+-- ---- S38 convert draft for row 1 -------------------------------------------------------------------------
+SET @STEP = N'S38 convert draft for row 1';
 SET @RAISED = 0;
 SET @IDS = CONVERT(VARCHAR(20), @R1);
 BEGIN TRY
@@ -844,8 +900,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@H1, 0) >= 1 THEN 1 ELSE 0 END, @STEP + N' | ' + N'ran, sheet values to resolve found', N'values ' + ISNULL(CONVERT(NVARCHAR(10), @H1), N'?') + N', voyages ' + ISNULL(CONVERT(NVARCHAR(10), @H2), N'?'));
 
--- ---- S36 legend: add a status ----------------------------------------------------------------------------
-SET @STEP = N'S36 legend: add a status';
+-- ---- S39 legend: add a status ----------------------------------------------------------------------------
+SET @STEP = N'S39 legend: add a status';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_LEGEND_IU 'ZZTEST', N'Self-test status', N'rolled back', '#123456', NULL, 99, 1, 'ZZT_ADMIN', N'Self-test admin';
@@ -860,8 +916,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '100' AND EXISTS (SELECT 1 FROM dbo.TBL_EXPT_SHEET_STATUS WHERE CODE = 'ZZTEST' AND BG = '#123456') THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 100, row exists', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S37 roles: an unknown Links user is refused ---------------------------------------------------------
-SET @STEP = N'S37 roles: an unknown Links user is refused';
+-- ---- S40 roles: an unknown Links user is refused ---------------------------------------------------------
+SET @STEP = N'S40 roles: an unknown Links user is refused';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_ROLES_IU 'ZZTEST', 'WO', 'ZZ_NOT_A_USER', 'ZZT_ADMIN', N'Self-test admin';
@@ -876,8 +932,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '101' THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 101', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S38 roles: an unknown column key is refused ---------------------------------------------------------
-SET @STEP = N'S38 roles: an unknown column key is refused';
+-- ---- S41 roles: an unknown column key is refused ---------------------------------------------------------
+SET @STEP = N'S41 roles: an unknown column key is refused';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_ROLES_IU 'ZZTEST', 'WO,NOT_A_KEY', '', 'ZZT_ADMIN', N'Self-test admin';
@@ -892,8 +948,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '101' THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 101', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S39 my roles: a Links SA user is ADMIN (IMPLICIT) and may edit all 52 columns -----------------------
-SET @STEP = N'S39 my roles: a Links SA user is ADMIN (IMPLICIT) and may edit all 52 columns';
+-- ---- S42 my roles: a Links SA user is ADMIN (IMPLICIT) and may edit all 52 columns -----------------------
+SET @STEP = N'S42 my roles: a Links SA user is ADMIN (IMPLICIT) and may edit all 52 columns';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_MY_ROLES @SAID;
@@ -908,8 +964,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN @H2 = 1 AND @H1 = 52 THEN 1 ELSE 0 END, @STEP + N' | ' + N'ADMIN, 52 editable columns', N'admin ' + ISNULL(CONVERT(NVARCHAR(10), @H2), N'?') + N', editable ' + ISNULL(CONVERT(NVARCHAR(10), @H1), N'?'));
 
--- ---- S40 my roles: a user without roles may edit only the ALL-owned columns ------------------------------
-SET @STEP = N'S40 my roles: a user without roles may edit only the ALL-owned columns';
+-- ---- S43 my roles: a user without roles may edit only the ALL-owned columns ------------------------------
+SET @STEP = N'S43 my roles: a user without roles may edit only the ALL-owned columns';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_MY_ROLES 'ZZT_NONE';
@@ -924,8 +980,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN @H2 = 0 AND @H1 = (SELECT COUNT(*) FROM dbo.TBL_EXPT_SHEET_ROLE_COL WHERE ROLE_CODE = 'ALL') THEN 1 ELSE 0 END, @STEP + N' | ' + N'not ADMIN, editable = the ALL columns', N'admin ' + ISNULL(CONVERT(NVARCHAR(10), @H2), N'?') + N', editable ' + ISNULL(CONVERT(NVARCHAR(10), @H1), N'?'));
 
--- ---- S41 my roles: the test role -------------------------------------------------------------------------
-SET @STEP = N'S41 my roles: the test role';
+-- ---- S44 my roles: the test role -------------------------------------------------------------------------
+SET @STEP = N'S44 my roles: the test role';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_MY_ROLES 'ZZT_EDITOR';
@@ -940,8 +996,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN @H2 = 0 AND @H1 = (SELECT COUNT(DISTINCT COL_KEY) FROM dbo.TBL_EXPT_SHEET_ROLE_COL WHERE ROLE_CODE IN ('ZZTEST', 'ALL')) THEN 1 ELSE 0 END, @STEP + N' | ' + N'not ADMIN, editable = its columns + the ALL columns', N'admin ' + ISNULL(CONVERT(NVARCHAR(10), @H2), N'?') + N', editable ' + ISNULL(CONVERT(NVARCHAR(10), @H1), N'?'));
 
--- ---- S42 alias: add one ----------------------------------------------------------------------------------
-SET @STEP = N'S42 alias: add one';
+-- ---- S45 alias: add one ----------------------------------------------------------------------------------
+SET @STEP = N'S45 alias: add one';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_ALIAS_IU 'PORT', N'ZZ PORT', 'ZZP', N'Self-test port', 1, 'ZZT_ADMIN', N'Self-test admin';
@@ -956,8 +1012,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '100' AND EXISTS (SELECT 1 FROM dbo.TBL_EXPT_SHEET_ALIAS WHERE KIND = 'PORT' AND SHEET_VALUE = N'ZZ PORT' AND SOURCE = 'admin') THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 100, saved as admin', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S43 alias seed from linked rows (row 1: ZZ CONSIGNEE -> the job's consignee) ------------------------
-SET @STEP = N'S43 alias seed from linked rows (row 1: ZZ CONSIGNEE -> the job''s consignee)';
+-- ---- S46 alias seed from linked rows (row 1: ZZ CONSIGNEE -> the job's consignee) ------------------------
+SET @STEP = N'S46 alias seed from linked rows (row 1: ZZ CONSIGNEE -> the job''s consignee)';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_ALIAS_SEED @JCMP, @JCITY, 'ZZT_ADMIN', N'Self-test admin';
@@ -973,8 +1029,8 @@ SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '100' THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 100', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN EXISTS (SELECT 1 FROM dbo.TBL_EXPT_SHEET_ALIAS WHERE KIND = 'CONSIGNEE' AND SHEET_VALUE = N'ZZ CONSIGNEE' AND LINKS_CODE = @JCONCODE AND SOURCE = 'auto') THEN 1 ELSE 0 END, @STEP + N' | ' + N'auto alias for ZZ CONSIGNEE = the job''s consignee code', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S44 history of the settings (ROW_KIND M, ROW_ID 0) --------------------------------------------------
-SET @STEP = N'S44 history of the settings (ROW_KIND M, ROW_ID 0)';
+-- ---- S47 history of the settings (ROW_KIND M, ROW_ID 0) --------------------------------------------------
+SET @STEP = N'S47 history of the settings (ROW_KIND M, ROW_ID 0)';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_HISTORY 'M', 0;
@@ -991,8 +1047,8 @@ INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN @H1 = (SELECT COUNT(
             AND EXISTS (SELECT 1 FROM dbo.TBL_EXPT_SHEET_LOG WHERE ROW_KIND = 'M' AND ROW_ID = 0 AND COL_KEY = 'LEGEND.ZZTEST')
             AND EXISTS (SELECT 1 FROM dbo.TBL_EXPT_SHEET_LOG WHERE ROW_KIND = 'M' AND ROW_ID = 0 AND COL_KEY = 'ALIAS.PORT' AND USER_ID = 'ZZT_ADMIN') THEN 1 ELSE 0 END, @STEP + N' | ' + N'every settings log row, incl. the legend and alias changes above', N'rows ' + ISNULL(CONVERT(NVARCHAR(10), @H1), N'?'));
 
--- ---- S45 history of the month (ROW_KIND M, ROW_ID = the month) -------------------------------------------
-SET @STEP = N'S45 history of the month (ROW_KIND M, ROW_ID = the month)';
+-- ---- S48 history of the month (ROW_KIND M, ROW_ID = the month) -------------------------------------------
+SET @STEP = N'S48 history of the month (ROW_KIND M, ROW_ID = the month)';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_HISTORY 'M', @M;
@@ -1007,8 +1063,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN @H1 >= 1 AND @H1 = (SELECT COUNT(*) FROM dbo.TBL_EXPT_SHEET_LOG WHERE ROW_KIND = 'M' AND ROW_ID = @M) AND EXISTS (SELECT 1 FROM dbo.TBL_EXPT_SHEET_LOG WHERE ROW_KIND = 'M' AND ROW_ID = @M AND ACTION = 'insert') THEN 1 ELSE 0 END, @STEP + N' | ' + N'the month insert, exactly as logged', N'rows ' + ISNULL(CONVERT(NVARCHAR(10), @H1), N'?'));
 
--- ---- S46 views: save a layout ----------------------------------------------------------------------------
-SET @STEP = N'S46 views: save a layout';
+-- ---- S49 views: save a layout ----------------------------------------------------------------------------
+SET @STEP = N'S49 views: save a layout';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_VIEW_IU 0, @M, 'ZZT', N'zz layout', 'layout', N'{"widths":{"WO":80}}', 'ZZT_EDITOR', N'Self-test editor';
@@ -1023,8 +1079,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '100' AND @H1 IS NOT NULL THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 100', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S47 views: another user cannot delete it ------------------------------------------------------------
-SET @STEP = N'S47 views: another user cannot delete it';
+-- ---- S50 views: another user cannot delete it ------------------------------------------------------------
+SET @STEP = N'S50 views: another user cannot delete it';
 SET @RAISED = 0;
 SET @VIEWID = (SELECT MAX(ID) FROM dbo.TBL_EXPT_SHEET_VIEW WHERE USER_ID = 'ZZT_EDITOR' AND NAME = N'zz layout');
 BEGIN TRY
@@ -1040,8 +1096,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '104' THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 104', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S48 views: the owner deletes it ---------------------------------------------------------------------
-SET @STEP = N'S48 views: the owner deletes it';
+-- ---- S51 views: the owner deletes it ---------------------------------------------------------------------
+SET @STEP = N'S51 views: the owner deletes it';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_VIEW_DEL @VIEWID, 'ZZT_EDITOR', N'Self-test editor';
@@ -1056,8 +1112,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '100' AND NOT EXISTS (SELECT 1 FROM dbo.TBL_EXPT_SHEET_VIEW WHERE ID = @VIEWID) THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 100, gone', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S49 grid: 2 rows on PRICE ---------------------------------------------------------------------------
-SET @STEP = N'S49 grid: 2 rows on PRICE';
+-- ---- S52 grid: 2 rows on PRICE ---------------------------------------------------------------------------
+SET @STEP = N'S52 grid: 2 rows on PRICE';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_GRID_ROWS_OP @M, 'PRICE', 'insert', '', 0, 2, 'ZZT_EDITOR', N'Self-test editor';
@@ -1072,8 +1128,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '100' AND (SELECT COUNT(*) FROM dbo.TBL_EXPT_SHEET_GRIDROW WHERE MONTH_ID = @M AND TAB_CODE = 'PRICE') = 2 THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 100, 2 rows', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S50 grid: save a row --------------------------------------------------------------------------------
-SET @STEP = N'S50 grid: save a row';
+-- ---- S53 grid: save a row --------------------------------------------------------------------------------
+SET @STEP = N'S53 grid: save a row';
 SET @RAISED = 0;
 SET @G1 = (SELECT MIN(ID) FROM dbo.TBL_EXPT_SHEET_GRIDROW WHERE MONTH_ID = @M AND TAB_CODE = 'PRICE');
 BEGIN TRY
@@ -1089,8 +1145,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '100' AND (SELECT ROWVER FROM dbo.TBL_EXPT_SHEET_GRIDROW WHERE ID = @G1) = 2 THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 100, ROWVER 2', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S51 grid format: two cells (lower-case key accepted) ------------------------------------------------
-SET @STEP = N'S51 grid format: two cells (lower-case key accepted)';
+-- ---- S54 grid format: two cells (lower-case key accepted) ------------------------------------------------
+SET @STEP = N'S54 grid format: two cells (lower-case key accepted)';
 SET @RAISED = 0;
 SET @X = REPLACE(N'<f r="#G" k="a" bg="#00FF00"/><f r="#G" k="B" b="1"/>', N'#G', CONVERT(NVARCHAR(10), @G1));
 BEGIN TRY
@@ -1108,8 +1164,8 @@ INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '1
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN (SELECT CELL_FMT FROM dbo.TBL_EXPT_SHEET_GRIDROW WHERE ID = @G1) = N'{"A":{"bg":"#00ff00"},"B":{"b":1}}' AND (SELECT ROWVER FROM dbo.TBL_EXPT_SHEET_GRIDROW WHERE ID = @G1) = 2 THEN 1 ELSE 0 END, @STEP + N' | ' + N'CELL_FMT = {"A":{"bg":"#00ff00"},"B":{"b":1}}, ROWVER not bumped', ISNULL((SELECT CELL_FMT FROM dbo.TBL_EXPT_SHEET_GRIDROW WHERE ID = @G1), N'NULL'));
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN (SELECT COUNT(*) FROM dbo.TBL_EXPT_SHEET_LOG WHERE ROW_KIND = 'G' AND ROW_ID = @G1 AND ACTION = 'fmt') = 2 THEN 1 ELSE 0 END, @STEP + N' | ' + N'logged as G / fmt', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S52 grid format: clear one, refuse a bad key and a *ROW ---------------------------------------------
-SET @STEP = N'S52 grid format: clear one, refuse a bad key and a *ROW';
+-- ---- S55 grid format: clear one, refuse a bad key and a *ROW ---------------------------------------------
+SET @STEP = N'S55 grid format: clear one, refuse a bad key and a *ROW';
 SET @RAISED = 0;
 SET @X = REPLACE(N'<f r="#G" k="A" bg=""/><f r="#G" k="A1" bg="#000000"/><f r="#G" k="*ROW" bg="#000000"/>', N'#G', CONVERT(NVARCHAR(10), @G1));
 BEGIN TRY
@@ -1126,8 +1182,8 @@ SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '101' AND @H1 = 1 AND @H3 = 2 THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 101, 1 cell, 2 refused', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN (SELECT CELL_FMT FROM dbo.TBL_EXPT_SHEET_GRIDROW WHERE ID = @G1) = N'{"B":{"b":1}}' THEN 1 ELSE 0 END, @STEP + N' | ' + N'CELL_FMT = {"B":{"b":1}}', ISNULL((SELECT CELL_FMT FROM dbo.TBL_EXPT_SHEET_GRIDROW WHERE ID = @G1), N'NULL'));
 
--- ---- S53 grid: a stale version is a conflict -------------------------------------------------------------
-SET @STEP = N'S53 grid: a stale version is a conflict';
+-- ---- S56 grid: a stale version is a conflict -------------------------------------------------------------
+SET @STEP = N'S56 grid: a stale version is a conflict';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_GRID_SAVE @M, 'PRICE', @G1, 1, N'{"A":"OTHER"}', 'ZZT_EDITOR', N'Self-test editor';
@@ -1142,8 +1198,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '102' AND (SELECT DATA FROM dbo.TBL_EXPT_SHEET_GRIDROW WHERE ID = @G1) = N'{"A":"ZZ","B":"100"}' THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 102, DATA kept', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S54 grid: load --------------------------------------------------------------------------------------
-SET @STEP = N'S54 grid: load';
+-- ---- S57 grid: load --------------------------------------------------------------------------------------
+SET @STEP = N'S57 grid: load';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_GRID_LOAD @M, 'PRICE';
@@ -1158,8 +1214,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN @RAISED = 0 THEN 1 ELSE 0 END, @STEP + N' | ' + N'ran without error', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S55 tab layout: first save --------------------------------------------------------------------------
-SET @STEP = N'S55 tab layout: first save';
+-- ---- S58 tab layout: first save --------------------------------------------------------------------------
+SET @STEP = N'S58 tab layout: first save';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_TABMETA_IU @M, 'PRICE', N'{"frozenRows":2}', 0, 'ZZT_EDITOR', N'Self-test editor';
@@ -1174,8 +1230,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '100' AND (SELECT ROWVER FROM dbo.TBL_EXPT_SHEET_TABMETA WHERE MONTH_ID = @M AND TAB_CODE = 'PRICE') = 1 THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 100, ROWVER 1', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S56 tab layout: a stale version is a conflict -------------------------------------------------------
-SET @STEP = N'S56 tab layout: a stale version is a conflict';
+-- ---- S59 tab layout: a stale version is a conflict -------------------------------------------------------
+SET @STEP = N'S59 tab layout: a stale version is a conflict';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_TABMETA_IU @M, 'PRICE', N'{"frozenRows":3}', 0, 'ZZT_EDITOR', N'Self-test editor';
@@ -1190,8 +1246,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '102' THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 102', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S57 month: change the title (version check) ---------------------------------------------------------
-SET @STEP = N'S57 month: change the title (version check)';
+-- ---- S60 month: change the title (version check) ---------------------------------------------------------
+SET @STEP = N'S60 month: change the title (version check)';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_MONTH_IU @M, '', '', '', N'Self-test renamed', N'', 1, 0, 0, 'ZZT_ADMIN', N'Self-test admin';
@@ -1206,8 +1262,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '100' AND (SELECT ROWVER FROM dbo.TBL_EXPT_SHEET_MONTH WHERE ID = @M) = 2 THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 100, ROWVER 2', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S58 month: a stale version is a conflict ------------------------------------------------------------
-SET @STEP = N'S58 month: a stale version is a conflict';
+-- ---- S61 month: a stale version is a conflict ------------------------------------------------------------
+SET @STEP = N'S61 month: a stale version is a conflict';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_MONTH_IU @M, '', '', '', N'again', N'', 1, 0, 0, 'ZZT_ADMIN', N'Self-test admin';
@@ -1222,8 +1278,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '102' THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 102', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S59 month: a new month copied from it, WO rows carried ----------------------------------------------
-SET @STEP = N'S59 month: a new month copied from it, WO rows carried';
+-- ---- S62 month: a new month copied from it, WO rows carried ----------------------------------------------
+SET @STEP = N'S62 month: a new month copied from it, WO rows carried';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_MONTH_IU 0, @JCMP, @JCITY, '1900-02', N'Self-test copy', N'', 0, @M, 1, 'ZZT_ADMIN', N'Self-test admin';
@@ -1243,8 +1299,8 @@ INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN (SELECT TABS FROM db
             AND @H2 = 8 AND (SELECT COUNT(*) FROM dbo.TBL_EXPT_SHEET_ROW WHERE MONTH_ID = @H1) = 8
             AND EXISTS (SELECT 1 FROM dbo.TBL_EXPT_SHEET_ROW WHERE MONTH_ID = @H1 AND EXPTNO = @JOB) THEN 1 ELSE 0 END, @STEP + N' | ' + N'TABS, tab layout, PRICE rows and the 8 WO rows copied (none is COMPLETE)', N'carried ' + ISNULL(CONVERT(NVARCHAR(10), @H2), N'?') + N', grid rows ' + ISNULL(CONVERT(NVARCHAR(10), @H3), N'?'));
 
--- ---- S60 changes since the start of the test (deleted rows included) -------------------------------------
-SET @STEP = N'S60 changes since the start of the test (deleted rows included)';
+-- ---- S63 changes since the start of the test (deleted rows included) -------------------------------------
+SET @STEP = N'S63 changes since the start of the test (deleted rows included)';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_CHANGES @M, 'ZZT', @T0;
@@ -1259,8 +1315,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN @H1 = 5 THEN 1 ELSE 0 END, @STEP + N' | ' + N'the 5 rows of the tab', N'rows ' + ISNULL(CONVERT(NVARCHAR(10), @H1), N'?'));
 
--- ---- S61 grid: delete the second PRICE row ---------------------------------------------------------------
-SET @STEP = N'S61 grid: delete the second PRICE row';
+-- ---- S64 grid: delete the second PRICE row ---------------------------------------------------------------
+SET @STEP = N'S64 grid: delete the second PRICE row';
 SET @RAISED = 0;
 SET @G2 = (SELECT MAX(ID) FROM dbo.TBL_EXPT_SHEET_GRIDROW WHERE MONTH_ID = @M AND TAB_CODE = 'PRICE');
 SET @IDS = CONVERT(VARCHAR(20), @G2);
@@ -1277,8 +1333,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN ISNULL(@HS, '') = '100' AND (SELECT ISDELETED FROM dbo.TBL_EXPT_SHEET_GRIDROW WHERE ID = @G2) = 1 THEN 1 ELSE 0 END, @STEP + N' | ' + N'status 100, ISDELETED = 1', N'status ' + ISNULL(@HS, 'none') + N': ' + ISNULL(@HT, N''));
 
--- ---- S62 grid changes since the start of the test (the deleted row included, the tab layout changed) -----
-SET @STEP = N'S62 grid changes since the start of the test (the deleted row included, the tab layout changed)';
+-- ---- S65 grid changes since the start of the test (the deleted row included, the tab layout changed) -----
+SET @STEP = N'S65 grid changes since the start of the test (the deleted row included, the tab layout changed)';
 SET @RAISED = 0;
 BEGIN TRY
     EXEC dbo.USP_EXPT_SHEET_GRID_CHANGES @M, 'PRICE', @T0;
@@ -1293,8 +1349,8 @@ SELECT TOP 1 @HS = STATUS, @HT = STATUSTEXT, @H1 = N1, @H2 = N2, @H3 = N3 FROM #
 SELECT @HN = ISNULL(MAX(N), 0) FROM #EXPT_SHEET_SELFTEST;
 INSERT INTO @RES (OK, CHECK_NAME, DETAIL) VALUES (CASE WHEN @H1 = 2 AND @H2 = 1 THEN 1 ELSE 0 END, @STEP + N' | ' + N'2 rows (one deleted) and the tab layout', N'rows ' + ISNULL(CONVERT(NVARCHAR(10), @H1), N'?') + N', tab layouts ' + ISNULL(CONVERT(NVARCHAR(10), @H2), N'?'));
 
--- ---- S63 grid changes since now: nothing -----------------------------------------------------------------
-SET @STEP = N'S63 grid changes since now: nothing';
+-- ---- S66 grid changes since now: nothing -----------------------------------------------------------------
+SET @STEP = N'S66 grid changes since now: nothing';
 SET @RAISED = 0;
 SET @T1 = DATEADD(SECOND, 5, GETDATE());
 BEGIN TRY
