@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy } fro
 import { DataService } from '../../../shared/service/dataService';
 import { ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../../shared/service/loginService';
+import { isOlspl } from '../../../shared/company-branding';
 @Component({
     templateUrl: 'docket-print.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
@@ -10,6 +11,8 @@ import { LoginService } from '../../../shared/service/loginService';
 export class DocketPrintComponent implements OnInit {
     paramData: any = { exptno: null };
     dataTable: Array<any> = [];
+    /** company 32 (OCEAN LINKS SHIPPING): the export no. starts with the company code */
+    olspl = false;
    // dataTable1: Array<any> = [];
     dataTable2: Array<any> = [];
     dataTable3: Array<any> = [];
@@ -59,6 +62,8 @@ export class DocketPrintComponent implements OnInit {
                     data.Table[0].CARTEDDT = (data.Table[0].CARTEDDT == null) ? '' : data.Table[0].CARTEDDT;
                     data.Table[0].CARTPLACE = (data.Table[0].CARTPLACE == null) ? '' : data.Table[0].CARTPLACE;
                     this.dataTable = (data.Table.length > 0) ? data.Table[0] : [];
+                    const no = String(data.Table[0].EXPTNO ?? '').trim();
+                    this.olspl = isOlspl(no.length >= 2 ? no.slice(0, 2) : this._loginService.getLogin()[0].CMPCODE);
                     this.dataTable1 =  data.Table1;//(data.Table1.length > 0) ? data.Table1[0] :[];
                     this.dataTable2 = (data.Table2.length > 0) ? data.Table2[0] : [];
                     this.dataTable3 = (data.Table3.length > 0) ? data.Table3  : [];

@@ -2,6 +2,7 @@ import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core
 import { Router, ActivatedRoute } from '@angular/router';
 import { DataService } from '../../shared/service/dataService';
 import { LoginService } from '../../shared/service/loginService';
+import { companyLogo, isOlspl } from '../../shared/company-branding';
 import { ToastCommonService } from '../../shared/service/toastService';
 import { LoaderService } from '../../shared/service/loader.service';
 import { HttpClient } from '@angular/common/http';
@@ -26,7 +27,8 @@ export class QuoteSeaPrintComponent implements OnInit {
   quotdate;
   validupto;
    cmpname;
-   cmpimage;
+   cmpimage = companyLogo('');
+   olspl = false;
    clientemail;
    contactperson;
    incoterm;
@@ -44,7 +46,11 @@ export class QuoteSeaPrintComponent implements OnInit {
         private http: HttpClient,
         private _route: ActivatedRoute,
         private _loginService: LoginService,
-      ) { }
+      ) {
+        // company logo (and watermark) from the login, so it is right even before the quotation loads
+        this.olspl = isOlspl(this._loginService.getLogin()?.[0]?.CMPCODE);
+        this.cmpimage = companyLogo(this._loginService.getLogin()?.[0]?.CMPCODE);
+      }
   ngOnInit() {
       this._route.params.subscribe(params => {
         this.quotationno = params["quotno"]
@@ -73,7 +79,8 @@ export class QuoteSeaPrintComponent implements OnInit {
             this.validupto=data.Table[0].VALIDUPTO;
             this.validupto=this.convertDateToHyphenFormat(this.validupto);
             this.cmpname=data.Table[0].CMP_NAME;
-            this.cmpimage="assets/img/Untitled-1.png";// + data.Table[0].CMP_IMAGE;
+            this.olspl = isOlspl(this._loginService.getLogin()[0].CMPCODE);
+            this.cmpimage = companyLogo(this._loginService.getLogin()[0].CMPCODE);// + data.Table[0].CMP_IMAGE;
             this.clientemail=data.Table[0].EMAIL;
             this.quotdtltable= data.Table1;
             this.contactperson=data.Table[0].CONTACT_PERSON;

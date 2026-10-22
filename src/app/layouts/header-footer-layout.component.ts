@@ -1,6 +1,7 @@
 ﻿import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoginService } from '../shared/service/loginService';
+import { navbarLogo, isOlspl } from '../shared/company-branding';
 @Component({
     selector: 'app-header-footer',
     templateUrl: './header-footer-layout.component.html',
@@ -12,6 +13,8 @@ export class HeaderFooterLayoutComponent implements OnInit {
     public disabled = false;
     public status: { isopen: boolean } = { isopen: false };
     public cmpname: string = '';
+    public cmplogo: string = navbarLogo('');
+    public olspl = false;
     public username: string = '';
     public displayName: string = '';
     public cityName: string = '';
@@ -42,6 +45,8 @@ export class HeaderFooterLayoutComponent implements OnInit {
         //     this.imageSrc = 'assets/img/title.png';
         // }
         this.cmpname = this._loginService.getLogin()[0].CMPNAME;
+        this.olspl = isOlspl(this._loginService.getLogin()[0].CMPCODE);
+        this.cmplogo = navbarLogo(this._loginService.getLogin()[0].CMPCODE);
         this.username = this._loginService.getLogin()[0].CMP_USERNAME;
         this.displayName = this._loginService.getLogin()[0].GREETING + ' ' + this._loginService.getLogin()[0].FULLNAME;
         this.cityName = this._loginService.getLogin()[0].CITYNAME;

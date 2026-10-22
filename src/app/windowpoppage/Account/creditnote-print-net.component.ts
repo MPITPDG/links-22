@@ -3,6 +3,7 @@ import { DataService } from '../../shared/service/dataService';
 import { LoaderService } from '../../shared/service/loader.service';
 import { ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../shared/service/loginService';
+import { isOlspl } from '../../shared/company-branding';
 import QRCode from 'qrcode';
 
 
@@ -237,6 +238,7 @@ export class CreditnotePrintNetComponent implements OnInit {
     const cmpboldnm = this.v(c5, 'cmp_boldname') + ''
     const cmpimage = this.t(this.v(c5, 'cmp_image'))
     m.image = cmpimage !== '' ? 'assets/img/' + cmpimage : ''
+    m.olspl = isOlspl(this._loginService.getLogin()[0].CMPCODE)   // OLSPL letterhead keeps its height
     m.boldName = cmpboldnm.trim()
     m.suffixName = cmpboldnm !== '' ? cmpname.split(cmpboldnm).join('') : cmpname
     m.add1 = this.v(c5, 'cmp_add1')

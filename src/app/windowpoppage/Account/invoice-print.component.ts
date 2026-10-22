@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../shared/service/loginService';
+import { isOlspl, OLSPL_LOGO } from '../../shared/company-branding';
 import QRCode from 'qrcode';
 
 
@@ -193,8 +194,13 @@ export class InvoicePrintComponent implements OnInit {
   ackText: string = ""
   serviceTaxReg: string = ""
 
+  /** Letterhead logo: company 32 prints its OLSPL logo; the other companies keep Links_logo1.png. */
+  logo = 'assets/img/Links_logo1.png';
+
   constructor(public _dataService: DataService,
-    private _route: ActivatedRoute, public _loginService: LoginService) { }
+    private _route: ActivatedRoute, public _loginService: LoginService) {
+    if (isOlspl(this._loginService.getLogin()?.[0]?.CMPCODE)) { this.logo = OLSPL_LOGO; }
+  }
 
   ngOnInit() {
     this._route.params.subscribe(params => {

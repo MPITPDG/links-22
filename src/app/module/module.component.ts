@@ -5,6 +5,7 @@ import { AuthService } from '../shared/service/authService';
 import { Router } from '@angular/router';
 import { ToastCommonService } from '../shared/service/toastService';
 import { LoginService } from '../shared/service/loginService';
+import { companyLogo, isOlspl } from '../shared/company-branding';
 import { environment } from '../../environments/environment';
 
 @Component({
@@ -40,6 +41,8 @@ export class ModuleComponent implements OnInit {
 
     get cityName(): string { return this.login()?.CITYNAME ?? ''; }
     get companyName(): string { return this.login()?.CMPNAME ?? ''; }
+    get olspl(): boolean { return isOlspl(this.login()?.CMPCODE); }
+    get companyLogo(): string { return companyLogo(this.login()?.CMPCODE); }
     private login(): any { try { return this._loginService.getLogin()?.[0]; } catch { return null; } }
 
     isSoon(m: any): boolean { return m?.url == null; }
