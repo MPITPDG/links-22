@@ -1,0 +1,132 @@
+<div class="sv-settings">
+  @if (loading) { <div class="sv-note">Loading settings…</div> }
+  @if (error) { <div class="sv-note sv-warn" role="alert">{{ error }}</div> }
+
+  @if (show('legend')) {
+    <section class="card sec">
+      <div class="card-h">
+        <h2>Colour CODE</h2>
+        <span class="meta">row colours on every WO tab · HAZ = YES turns the row text red automatically</span>
+        @if (canEdit) { <button type="button" class="btn g" (click)="addStatus()">Add status</button> }
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th style="width: 70px">Colour</th><th style="width: 70px">Text</th><th>Status</th><th>Meaning</th><th style="width: 110px">Code</th><th style="width: 60px">Order</th><th style="width: 60px">Active</th>@if (canEdit) {<th style="width: 80px"></th>}</tr></thead>
+          <tbody>
+            @for (l of legend; track $index) {
+              <tr>
+                <td>@if (canEdit) {<input type="color" [ngModel]="l.BG || '#ffffff'" (ngModelChange)="l.BG = $event; l.dirty = true" [attr.aria-label]="'Colour of ' + l.LABEL">@if (l.BG) {<button type="button" class="sv-x" (click)="l.BG = ''; l.dirty = true" title="No fill" [attr.aria-label]="'No fill for ' + l.LABEL">×</button>}} @else if (l.BG) {<span class="sv-swatch" [style.background]="l.BG"></span>} @else {<span class="sv-soft">none</span>}</td>
+                <td>@if (canEdit) {<input type="color" [ngModel]="l.FG || '#171717'" (ngModelChange)="l.FG = $event; l.dirty = true" [attr.aria-label]="'Text colour of ' + l.LABEL">} @else if (l.FG) {<span class="sv-swatch" [style.background]="l.FG"></span>}</td>
+                <td>@if (canEdit) {<input type="text" [(ngModel)]="l.LABEL" (ngModelChange)="l.dirty = true" aria-label="Status name">} @else {<b [style.color]="l.FG || null">{{ l.LABEL }}</b>}</td>
+                <td>@if (canEdit) {<input type="text" [(ngModel)]="l.MEANING" (ngModelChange)="l.dirty = true" aria-label="Meaning">} @else { {{ l.MEANING }} }</td>
+                <td>@if (canEdit && l.isNew) {<input type="text" [(ngModel)]="l.CODE" aria-label="Code">} @else {<span class="sv-mono">{{ l.CODE }}</span>}</td>
+                <td>@if (canEdit) {<input type="number" [(ngModel)]="l.SORT" (ngModelChange)="l.dirty = true" aria-label="Order" style="width: 50px">} @else { {{ l.SORT }} }</td>
+                <td><input type="checkbox" [(ngModel)]="l.ACTIVE" (ngModelChange)="l.dirty = true" [disabled]="!canEdit" aria-label="Active"></td>
+                @if (canEdit) {<td><button type="button" class="btn g" [disabled]="!l.dirty || busy" (click)="saveStatus(l)">Save</button></td>}
+              </tr>
+            } @empty {
+              <tr><td colspan="8" class="empty">No statuses yet.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+
+  @if (show('access')) {
+    <section class="card sec">
+      <div class="card-h">
+        <h2>Column Access</h2>
+        <span class="meta">hard lock: a column can be edited only by its owning role and by Admins</span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th style="width: 150px">Role</th><th style="width: 280px">Links users</th><th>Columns owned</th>@if (canEdit) {<th style="width: 150px"></th>}</tr></thead>
+          <tbody>
+            @for (r of roles; track r.code) {
+              <tr>
+                <td><b>{{ r.label }}</b><div class="sv-mono sv-soft">{{ r.code }}</div></td>
+                <td>
+                  @for (u of r.users; track u) {
+                    <span class="chip">{{ userName(u) }}@if (canEdit) {<button type="button" class="sv-x" (click)="removeUser(r, u)" [attr.aria-label]="'Remove ' + userName(u)">×</button>}</span>
+                  }
+                  @if (canEdit) {
+                    <select class="sv-add" [ngModel]="''" (ngModelChange)="addUser(r, $event)" [attr.aria-label]="'Add a user to ' + r.label">
+                      <option value="">+ add user…</option>
+                      @for (u of users; track u.code) { <option [value]="u.code">{{ u.text }}</option> }
+                    </select>
+                  }
+                </td>
+                <td>
+                  @if (r.code === 'ADMIN') {
+                    <span class="sv-soft">every column, Convert / Link to job, settings</span>
+                  } @else if (!r.open) {
+                    @for (h of roleCols(r); track $index) { <span class="chip dash">{{ h }}</span> }
+                    @if (canEdit) { <button type="button" class="btn g" (click)="r.open = true">Change columns</button> }
+                  } @else {
+                    <div class="sv-colpick">
+                      @for (c of columns; track c.key) {
+                        <label><input type="checkbox" [checked]="r.cols.has(c.key)" (change)="toggleCol(r, c.key)"> {{ c.header }}</label>
+                      }
+                    </div>
+                    <button type="button" class="btn g" (click)="r.open = false">Done</button>
+                  }
+                </td>
+                @if (canEdit) {<td><button type="button" class="btn g" [disabled]="!r.dirty || busy" (click)="saveRole(r)">Save</button></td>}
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+
+  @if (show('alias')) {
+    <section class="card sec">
+      <div class="card-h">
+        <h2>Aliases for Convert to job</h2>
+        <span class="meta">the sheet's nicknames (VIPAR, LINKS, ONE, INNSA1…) and the Links codes they stand for</span>
+        @if (canEdit) {
+          <button type="button" class="btn g" [disabled]="busy" (click)="seedAliases()">Learn from linked rows</button>
+          <button type="button" class="btn g" (click)="addAlias()">Add alias</button>
+        }
+      </div>
+      <div class="filters">
+        <div class="f"><label for="sv-ak">Kind</label>
+          <select id="sv-ak" [(ngModel)]="aliasKind"><option value="">All</option>@for (k of kinds; track k.code) {<option [value]="k.code">{{ k.label }}</option>}</select></div>
+        <div class="f"><label for="sv-af">Find</label><input id="sv-af" type="text" [(ngModel)]="aliasFilter" placeholder="sheet value or Links name"></div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th style="width: 190px">Kind</th><th style="width: 160px">Sheet value</th><th>Links value</th><th style="width: 120px">Code</th><th style="width: 80px">Source</th><th style="width: 80px">Confirmed</th>@if (canEdit) {<th style="width: 80px"></th>}</tr></thead>
+          <tbody>
+            @for (a of shownAliases; track $index) {
+              <tr>
+                <td>@if (canEdit && a.isNew) {<select [(ngModel)]="a.KIND" aria-label="Kind">@for (k of kinds; track k.code) {<option [value]="k.code">{{ k.label }}</option>}</select>} @else { {{ kindLabel(a.KIND) }} }</td>
+                <td>@if (canEdit && a.isNew) {<input type="text" [(ngModel)]="a.SHEET_VALUE" aria-label="Sheet value">} @else {<b>{{ a.SHEET_VALUE }}</b>}</td>
+                <td>
+                  @if (canEdit && pickerFor(a.KIND).length) {
+                    <select [ngModel]="a.LINKS_CODE" (ngModelChange)="pickAlias(a, $event)" [attr.aria-label]="'Links value for ' + a.SHEET_VALUE">
+                      <option value="">- pick -</option>
+                      @for (p of pickerFor(a.KIND); track p.code) { <option [value]="p.code">{{ p.text }}</option> }
+                    </select>
+                  } @else if (canEdit) {
+                    <input type="text" [(ngModel)]="a.LINKS_TEXT" (ngModelChange)="a.dirty = true" placeholder="Links name" [attr.aria-label]="'Links name for ' + a.SHEET_VALUE">
+                  } @else {
+                    @if (a.LINKS_TEXT) { {{ a.LINKS_TEXT }} } @else {<i class="sv-warn">not mapped yet</i>}
+                  }
+                </td>
+                <td>@if (canEdit && !pickerFor(a.KIND).length) {<input type="text" [(ngModel)]="a.LINKS_CODE" (ngModelChange)="a.dirty = true" aria-label="Links code">} @else {<span class="sv-mono">{{ a.LINKS_CODE }}</span>}</td>
+                <td><span class="chip" [class.solid]="a.SOURCE === 'admin'">{{ a.SOURCE === 'admin' ? 'admin' : 'learned' }}</span></td>
+                <td><input type="checkbox" [(ngModel)]="a.CONFIRMED" (ngModelChange)="a.dirty = true" [disabled]="!canEdit" aria-label="Confirmed"></td>
+                @if (canEdit) {<td><button type="button" class="btn g" [disabled]="!a.dirty || busy" (click)="saveAlias(a)">Save</button></td>}
+              </tr>
+            } @empty {
+              <tr><td colspan="7" class="empty">No aliases yet{{ canEdit ? ' - use “Learn from linked rows” or add one.' : '.' }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+</div>

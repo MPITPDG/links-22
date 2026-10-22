@@ -92,6 +92,11 @@ const routes: Routes = [
                 path: 'hblupload',
                 loadChildren: () => import('./hblupload/hblupload.module').then(m => m.HblUploadModule),
             },
+            {
+                // Export > Sheet view: the Bajaj monthly workbook inside Links (docs/SHEET_VIEW_SPEC.md).
+                path: 'sheet',
+                loadChildren: () => import('./sheet/sheet-view.module').then(m => m.SheetViewModule),
+            },
         ]
     }
 ];

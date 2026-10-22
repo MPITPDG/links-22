@@ -1,0 +1,66 @@
+<div class="sv-kpi">
+  <p class="sv-kpi-rule"><b>KPI rule:</b> parts and frames must not be loaded on the same vessel. Worked out live from the “Sri Lanka parts and frames” tab.</p>
+
+  @if (loading) {
+    <div class="sv-note">Working out the KPI…</div>
+  } @else if (error) {
+    <div class="sv-note sv-warn">{{ error }}</div>
+  } @else {
+    @if (violations.length) {
+      <div class="sv-banner bad" role="status">{{ violations.length }} violation{{ violations.length === 1 ? '' : 's' }}: {{ violationNames }} carr{{ violations.length === 1 ? 'ies' : 'y' }} both parts and frames</div>
+    } @else {
+      <div class="sv-banner ok" role="status">No violations: no vessel carries both parts and frames</div>
+    }
+
+    <div class="fk-kpis">
+      <div class="sv-tile"><div class="k">Vessels</div><div class="v">{{ vessels.length }}</div><div class="s">in the tab this month</div></div>
+      <div class="sv-tile"><div class="k">Parts shipments</div><div class="v">{{ totalParts }}</div><div class="s">Veh contains PARTS</div></div>
+      <div class="sv-tile"><div class="k">Frames shipments</div><div class="v">{{ totalFrames }}</div><div class="s">Veh contains FRAMES</div></div>
+      <div class="sv-tile"><div class="k">Violations</div><div class="v">{{ violations.length }}</div><div class="s">assigned vessels</div></div>
+    </div>
+
+    <div class="sv-two">
+      <section class="card sec">
+        <div class="card-h"><h2>Full vessel breakdown</h2><span class="meta">all shipments this month</span></div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Vessel</th><th class="num">Parts</th><th class="num">Frames</th><th>KPI status</th></tr></thead>
+            <tbody>
+              @for (v of vessels; track v.name) {
+                <tr>
+                  <td>{{ v.name }}</td><td class="num">{{ v.parts }}</td><td class="num">{{ v.frames }}</td>
+                  <td><span class="chip" [class.solid]="v.status === 'bad'" [class.dash]="v.status === 'none'">{{ v.status === 'bad' ? 'VIOLATION - parts and frames on same vessel' : (v.status === 'none' ? 'No parts / frames' : 'OK') }}</span></td>
+                </tr>
+              } @empty {
+                <tr><td colspan="4" class="empty">No rows in the parts and frames tab this month.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="card sec">
+        <div class="card-h"><h2>Today's KPI</h2><span class="meta">latest stuffing date{{ latestStuffing ? ': ' + latestStuffing : '' }}</span></div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Vessel</th><th class="num">Parts</th><th class="num">Frames</th><th>KPI status</th></tr></thead>
+            <tbody>
+              @for (v of today; track v.name) {
+                <tr>
+                  <td>{{ v.name }}</td><td class="num">{{ v.parts }}</td><td class="num">{{ v.frames }}</td>
+                  <td><span class="chip" [class.solid]="v.status === 'bad'" [class.dash]="v.status === 'none'">{{ v.status === 'bad' ? 'VIOLATION' : (v.status === 'none' ? 'No parts / frames' : 'OK') }}</span></td>
+                </tr>
+              } @empty {
+                <tr><td colspan="4" class="empty">Nothing stuffed on the latest date.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="fk-kpis sv-pad">
+          <div class="sv-tile"><div class="k">WOs today</div><div class="v">{{ todayWos }}</div></div>
+          <div class="sv-tile"><div class="k">Containers today</div><div class="v">{{ todayContainers }}</div></div>
+          <div class="sv-tile"><div class="k">Frames WOs</div><div class="v">{{ todayFrames }}</div></div>
+        </div>
+      </section>
+    </div>
+  }
+</div>

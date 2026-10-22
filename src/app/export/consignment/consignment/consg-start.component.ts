@@ -6,7 +6,8 @@ import { ToastCommonService } from '../../../shared/service/toastService';
 import { LoginService } from '../../../shared/service/loginService';
 import { SharedDataSerice } from '../../export-share-data.service';
 import { LoaderService } from '../../../shared/service/loader.service';
- 
+import { ConsignmentPrefillService, ConsignmentPrefillStart } from './consignment-prefill.service';
+
 @Component({
     selector: 'app-consg-start',
     templateUrl: 'consg-start.component.html',
@@ -115,7 +116,8 @@ export class ConsgStartComponent implements OnInit {
         private _toasterService: ToastCommonService,
         private _loginService: LoginService,
         private _sharedconsig: SharedDataSerice,
-        private _loaderService: LoaderService) {
+        private _loaderService: LoaderService,
+        private _prefill: ConsignmentPrefillService) {
         this.commondrpselected = '-1';
         this.drpShipper = "";
         this.drpManufact = "";
@@ -161,6 +163,9 @@ export class ConsgStartComponent implements OnInit {
                     this.vessels = data.Table4;
                     this.subagents=data.Table5;
                 }
+                // Sheet view pre-fill waits for exactly these lists.
+                this._listsLoaded = true;
+                this.flushPrefill();
             },
                 (error) => {
                     this._toasterService.toast('error', 'Error', error.status + '<br/>' + error.statusText);
@@ -302,7 +307,98 @@ export class ConsgStartComponent implements OnInit {
     //     this.seaShipmentType = chk;
     // }
 
+    // ------------------------------------------------------------------
+    // Pre-fill (Export > Sheet view > Convert to job; MPERPNG-20 applyPrefill
+    // pattern). The workspace hands over the page-1 half; it is held until
+    // Export/GetExportConsignment has returned, then applied through the same
+    // handlers a click runs (fill / drpfill, onChangeNotify / fill1 / consfill,
+    // vsl). A code that is not in the loaded list is left blank and noted in the
+    // workspace banner. Continue stays the admin's: nothing here calls
+    // finalSubmit(). Without a pre-fill none of this runs.
+    // ------------------------------------------------------------------
+    private _pendingPrefill: ConsignmentPrefillStart = null;
+    private _listsLoaded: boolean = false;
+    /** Set by a pre-fill that left the mode of shipment to the admin: Continue then insists on one. */
+    private _prefillNeedsMode: boolean = false;
+
+    applyPrefill(p: ConsignmentPrefillStart): void {
+        if (!p) { return; }
+        this._pendingPrefill = p;
+        if (this._listsLoaded) { this.flushPrefill(); }
+    }
+
+    private flushPrefill(): void {
+        const p = this._pendingPrefill;
+        if (!p) { return; }
+        this._pendingPrefill = null;
+        const has = (v: any) => v !== null && v !== undefined && String(v).trim() !== '';
+        const find = (list: Array<any>, code: any) =>
+            (list || []).filter((x: any) => x && String(x.VALUEFIELD).trim() === String(code).trim())[0];
+        const note = (t: string) => this._prefill.note(t);
+
+        // Exporter / shipper: the "Exporter / Shipper" radio, then the party select.
+        // drpfill sets Bill To to the same party and moves the radio to Bill To.
+        if (has(p.exporterCode)) {
+            const x = find(this.exporters, p.exporterCode);
+            if (x) { this.fill(1); this.drpShipper = x.VALUEFIELD; this.drpfill(this.drpShipper); }
+            else { note('Exporter ' + p.exporterCode + ' is not in the exporter list - pick it.'); }
+        }
+        // A different Bill To: the "Bill To" radio, then the same select.
+        if (has(p.billToCode) && String(p.billToCode).trim() !== String(this.hdexpt_billto || '').trim()) {
+            const x = find(this.exporters, p.billToCode);
+            if (x) { this.fill(2); this.drpShipper = x.VALUEFIELD; this.drpfill(this.drpShipper); }
+            else { note('Bill To ' + p.billToCode + ' is not in the exporter list - pick it.'); }
+        }
+
+        // "Same as consignee" first: its handler clears the consignee select.
+        if (p.buyerSameAsConsignee === true && !this.chknotify) {
+            this.chknotify = true;
+            this.onChangeNotify(this.chknotify);
+        }
+        if (has(p.consigneeCode)) {
+            const x = find(this.consignees, p.consigneeCode);
+            if (x) { this.fill1(1); this.drpexpt_consignee = x.VALUEFIELD; this.consfill(this.drpexpt_consignee); }
+            else { note('Consignee ' + p.consigneeCode + ' is not in the consignee list - pick it.'); }
+        }
+        if (!this.chknotify && !has(this.txtBuyername)) {
+            note('Buyer is not filled - tick Same as consignee or pick the buyer.');
+        }
+
+        // The agent selects have no change handler.
+        if (has(p.agentCode)) {
+            const x = find(this.agents, p.agentCode);
+            if (x) { this.drpAgent = x.VALUEFIELD; }
+            else { note('Agent ' + p.agentCode + ' is not in the agent list - pick it.'); }
+        }
+        if (has(p.subAgentCode)) {
+            const x = find(this.subagents, p.subAgentCode);
+            if (x) { this.drpSubAgent = x.VALUEFIELD; }
+            else { note('Sales person ' + p.subAgentCode + ' is not in the list - pick it.'); }
+        }
+
+        // Mode of shipment through its radio handler, only when the caller chose
+        // one. Otherwise nothing is pre-selected (not even the Docks / Godown
+        // default) and Continue asks for it.
+        if (!this.locked) {
+            const m = (p.stuffingMode == null) ? 0 : Number(p.stuffingMode);
+            if (m === 1) { this.vsl(1, 'SEA'); }
+            else if (m === 2) { this.vsl(2, 'SEA'); }
+            else if (m === 3) { this.vsl(3, 'AIR'); }
+            else { this.rbstuff = null; this._prefillNeedsMode = true; }
+        }
+
+        if (has(p.vesselValue)) {
+            const x = find(this.vessels, p.vesselValue);
+            if (!x) { note('Vessel ' + p.vesselValue + ' is not in the open vessel list - pick it.'); }
+            else if (this.locked || this.drpVesselDisabled == 1) { note('Vessel not set: the mode of shipment is Air.'); }
+            else { this.drpVessel = x.VALUEFIELD; }
+        }
+    }
+
     finalSubmit() {
+
+        // Sheet view pre-fill only (the flag is never set otherwise): no mode of shipment chosen yet.
+        if (this._prefillNeedsMode && this.rbstuff == null) { this._toasterService.toast('error', 'Error', "Please choose the mode of shipment"); return false; }
 
         if (this.txtshipper == undefined || this.txtshipper == "") { this._toasterService.toast('error', 'Error', "Exporter can not be blank"); return false; }
         else if (this.txtexpt_billto == undefined || this.txtexpt_billto == "") { this._toasterService.toast('error', 'Error', "Bill To can not be blank"); return false; }

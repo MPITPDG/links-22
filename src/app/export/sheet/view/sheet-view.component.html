@@ -1,0 +1,404 @@
+<!-- Export › Sheet view (/export/sheet). Page kit root .im-page (global src/styles/kit); the grid styles itself (.sg-host). -->
+<div class="im-page sv-page">
+
+  <div class="crumb">Export / Consignment / <b>Sheet view</b></div>
+  <div class="ph">
+    <div>
+      <h1>Sheet view</h1>
+      <p>Bajaj export tracking: the monthly workbook inside Links. Type here like in Google Sheets; an admin turns rows into Links jobs.</p>
+    </div>
+    @if (phase === 'ready') {
+      <div class="tools">
+        <label class="sv-lbl" for="svMonth">Month</label>
+        <select id="svMonth" class="sv-sel" [ngModel]="monthId" (ngModelChange)="pickMonth($event)">
+          @for (m of months; track m.id) { <option [ngValue]="m.id">{{ m.title || monthLabel(m.month) }}</option> }
+        </select>
+        @if (canModify) { <button type="button" class="btn g" (click)="openNewMonth()">New month</button> }
+        <button type="button" class="btn g" (click)="exportExcel()" [disabled]="!isGridTab || !st || st.loading || !!st.error">Export to Excel</button>
+        <button type="button" class="btn g" (click)="openSettings()" [attr.aria-expanded]="settingsOpen">Settings</button>
+      </div>
+    }
+  </div>
+
+  @switch (phase) {
+    @case ('rights') {
+      <div class="card sec sv-state" role="status">Checking your rights on Sheet view…</div>
+    }
+    @case ('rightsFailed') {
+      <div class="card sec sv-state warn" role="alert">
+        <h2>Your rights could not be checked</h2>
+        <p>The rights check did not answer, so nothing was loaded.</p>
+        <button type="button" class="btn g" (click)="checkRights()">Try again</button>
+      </div>
+    }
+    @case ('denied') {
+      <div class="card sec sv-state" role="alert">
+        <h2>No access to Sheet view</h2>
+        <p>Your Links user has no view right on <b>EXPORT - SHEET VIEW</b> (form 448). Ask an admin to grant it in the user rights.</p>
+      </div>
+    }
+    @case ('months') {
+      <div class="card sec sv-state" role="status">Loading the sheet…</div>
+    }
+    @case ('down') {
+      <div class="card sec sv-state warn" role="alert">
+        <h2>Sheet view's server part is not deployed yet</h2>
+        <p>The Links API {{ downText ? 'refused' : 'did not answer' }} the first Sheet view call (api/Export/Sheet/Months){{ downText ? ': ' + downText : '' }}.
+           Nothing was changed. The page works once the Export / Sheet API and its LinksDB20 scripts are deployed.</p>
+        <button type="button" class="btn g" (click)="retryServer()">Try again</button>
+      </div>
+    }
+    @case ('empty') {
+      <div class="card sec sv-state">
+        <h2>No month yet</h2>
+        <p>Each month is one workbook with the usual tabs. {{ canModify ? 'Create the first one to start.' : 'Someone with the edit right creates the first one.' }}</p>
+        @if (canModify) { <button type="button" class="btn p" (click)="openNewMonth()">New month</button> }
+      </div>
+    }
+    @case ('ready') {
+      @for (n of notices; track n.id) {
+        <div class="sv-notice" [class.warn]="n.kind === 'warn'" role="status">
+          <span>{{ n.text }}</span>
+          @if (n.action) { <button type="button" class="btn g" (click)="noticeAction(n)">Retry</button> }
+          <button type="button" class="sv-x" (click)="dropNotice(n.id)" aria-label="Dismiss">&times;</button>
+        </div>
+      }
+      @if (livePaused) {
+        <div class="sv-notice warn" role="alert">
+          <span>{{ livePaused }} {{ st?.unsaved ? 'Your changes are kept on this page and go out on Retry.' : '' }}</span>
+          <button type="button" class="btn g" (click)="resumeLive()">Retry</button>
+        </div>
+      }
+
+      <div class="card sv-book">
+        <div class="sv-tabs" role="tablist" aria-label="Workbook tabs">
+          @for (t of tabs; track t.code) {
+            <button type="button" role="tab" class="sv-tab" [class.on]="tab?.code === t.code" [attr.aria-selected]="tab?.code === t.code" (click)="openTab(t)">
+              {{ t.title }}@if (tabCounts[t.code] !== undefined) {<span class="n">{{ tabCounts[t.code] }}</span>}
+            </button>
+          }
+        </div>
+
+        @if (tab) {
+          @switch (tab.kind) {
+            @case ('legend') {
+              <div class="sv-pane"><app-sheet-settings section="legend" [canEdit]="canSettings"></app-sheet-settings></div>
+            }
+            @case ('access') {
+              <div class="sv-pane"><app-sheet-settings section="access" [canEdit]="canSettings"></app-sheet-settings></div>
+            }
+            @case ('kpi') {
+              <div class="sv-pane"><app-sheet-kpi [monthId]="monthId"></app-sheet-kpi></div>
+            }
+            @default {
+              <!-- ================= toolbar ================= -->
+              <div class="sv-tb" role="toolbar" aria-label="Sheet tools">
+                @if (st?.kind === 'wo') {
+                  <label class="sv-sr" for="svView">Filter view</label>
+                  <select id="svView" class="sv-sel" [ngModel]="filterViewId" (ngModelChange)="pickFilterView($event)">
+                    <option [ngValue]="0">Filter view: none</option>
+                    @for (v of filterViews; track v.id) { <option [ngValue]="v.id">{{ v.name }}</option> }
+                  </select>
+                  <button type="button" class="btn g" (click)="openSaveView()" title="Save the current sort and filters as one of your filter views">Save view…</button>
+                  @if (filterViewId) { <button type="button" class="btn g" (click)="deleteFilterView()">Delete view</button> }
+                  <button type="button" class="btn g" (click)="transporterFirst()" title="Group the rows by TRANSPORTER, like the workbook's script">Transporter first</button>
+                  <span class="sv-sep"></span>
+                  @if (canConvert) {
+                    <button type="button" class="btn g" [disabled]="!selUnlinked" (click)="toolbarConvert()" title="Open the Export Master form pre-filled from the selected WO">Convert to job</button>
+                    <button type="button" class="btn g" [disabled]="!selCount" (click)="toolbarLink()">Link to job</button>
+                    <button type="button" class="btn g" [disabled]="!selLinked" (click)="toolbarUnlink()">Unlink</button>
+                  }
+                  <button type="button" class="btn g" [disabled]="!selection.active" (click)="toolbarHistory()">History</button>
+                  @if (tab.helper) {
+                    <button type="button" class="btn g" [class.on]="helperOpen" [attr.aria-pressed]="helperOpen" (click)="toggleHelper()">Helper list</button>
+                  }
+                } @else {
+                  <button type="button" class="btn g" [disabled]="!selection.active" (click)="toolbarHistory()">History</button>
+                }
+                <span class="sv-live" [class.warn]="!!st?.unsaved || !!livePaused" aria-live="polite">
+                  @if (!livePaused && !st?.unsaved) { <i class="sv-dot" aria-hidden="true"></i> }{{ liveText }}
+                </span>
+              </div>
+              @if (st?.kind === 'wo' && statuses.length) {
+                <div class="sv-legend" aria-label="Row colours">
+                  @for (l of statuses; track l.code) {
+                    <span class="sv-lg"><i [style.background]="l.bg || '#ffffff'" [style.border-color]="l.fg || null"></i>{{ l.label }}</span>
+                  }
+                  <span class="sv-lg haz">Red text = HAZ</span>
+                </div>
+              }
+
+              <!-- ================= grid + side panels ================= -->
+              <div class="sv-body">
+                <div class="sv-gridwrap">
+                  @if (!st || st.loading) {
+                    <div class="sv-state" role="status">Loading {{ tab.title }}…</div>
+                  } @else if (st.error) {
+                    <div class="sv-state warn" role="alert">
+                      <h2>{{ tab.title }} could not be loaded</h2>
+                      <p>{{ st.error }}</p>
+                      <button type="button" class="btn g" (click)="resumeLive()">Try again</button>
+                    </div>
+                  } @else {
+                    @for (k of gridKeys; track k) {
+                      <app-sheet-grid
+                        [columns]="columns" [rows]="st.rows" [frozenCols]="frozenCols" [frozenRows]="gridFrozenRows" [merges]="gridMerges"
+                        [readOnly]="readOnly" [canEditCell]="canEditCell"
+                        [statuses]="st.kind === 'wo' ? statuses : noStatuses" [contextItems]="contextItems" [viewState]="viewState"
+                        [exportName]="exportName" [tagLabels]="tagLabels"
+                        (edits)="onEdits($event)" (rowOp)="onRowOp($event)" (fmtChange)="onFmt($event)"
+                        (contextAction)="onContext($event)" (layoutChange)="onLayout($event)" (selectionChange)="onSelection($event)">
+                      </app-sheet-grid>
+                    }
+                  }
+                </div>
+
+                @if (history) {
+                  <aside class="sv-side" aria-label="Row history">
+                    <div class="sv-side-h">
+                      <h2>History</h2><span class="meta">{{ history.title }}</span>
+                      <button type="button" class="sv-x" (click)="history = null" aria-label="Close the history">&times;</button>
+                    </div>
+                    @if (history.loading) {
+                      <div class="sv-note">Loading the history…</div>
+                    } @else if (history.error) {
+                      <div class="sv-note sv-warn">{{ history.error }}</div>
+                    } @else {
+                      <ol class="sv-hist">
+                        @for (h of history.rows; track h.id) {
+                          <li>
+                            <div class="sv-hist-h"><b>{{ h.col || h.action }}</b><span>{{ h.at }}</span></div>
+                            <div class="sv-soft">{{ h.who }} · {{ h.action }}</div>
+                            @if (h.action === 'edit' || h.action === 'restore' || h.oldV || h.newV) {
+                              <div class="sv-hist-v"><span class="old">{{ h.oldV || '(empty)' }}</span> → <span>{{ h.newV || '(empty)' }}</span></div>
+                            }
+                            @if (h.canRestore && canModify) {
+                              <button type="button" class="btn g sv-mini" (click)="restore(h)">Restore the old value</button>
+                            }
+                          </li>
+                        } @empty {
+                          <li class="sv-soft">No changes logged for this row yet.</li>
+                        }
+                      </ol>
+                    }
+                  </aside>
+                }
+
+                @if (helperOpen && tab.helper) {
+                  <aside class="sv-side" aria-label="Container type, vehicle and plant combinations">
+                    <div class="sv-side-h">
+                      <h2>Type · Veh · Plant</h2><span class="meta">{{ helper.length }} combination{{ helper.length === 1 ? '' : 's' }}</span>
+                      <button type="button" class="sv-x" (click)="helperOpen = false" aria-label="Close the helper list">&times;</button>
+                    </div>
+                    <div class="tbl-wrap">
+                      <table class="tbl">
+                        <thead><tr><th>Type</th><th>Veh</th><th>Plant</th><th class="num">Rows</th></tr></thead>
+                        <tbody>
+                          @for (h of helper; track $index) {
+                            <tr><td>{{ h.type }}</td><td>{{ h.veh }}</td><td>{{ h.plant }}</td><td class="num">{{ h.count }}</td></tr>
+                          } @empty {
+                            <tr><td colspan="4" class="empty">No container type, Veh or Plant filled in yet.</td></tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  </aside>
+                }
+              </div>
+
+              <div class="sv-sb">
+                <span><b>{{ tab.title }}</b> · {{ st?.rows?.length || 0 }} row{{ st?.rows?.length === 1 ? '' : 's' }}@if (st?.kind === 'wo') { · {{ linkedCount }} linked to Links jobs}</span>
+                @if (st?.kind === 'wo') { <span>Your sheet role: <b>{{ roleNames }}</b></span> }
+                @if (!canModify) { <span>View only</span> }
+              </div>
+            }
+          }
+        }
+      </div>
+
+      @if (st?.kind === 'wo') {
+        <div class="sv-key">
+          <span><i class="sv-tri"></i>Links value: locked once the job has it</span>
+          <span><i class="sv-tri y"></i>Not in Links yet: the sheet value, still editable</span>
+          <span><i class="sv-tri r"></i>Linked job not found or cancelled</span>
+          <span><i class="sv-tri n"></i>Range or note kept as typed (e.g. 26-08/27-08)</span>
+          <span>Padlock: Links value, or a column owned by another role (Column Access)</span>
+        </div>
+      }
+    }
+  }
+
+  <!-- ================= settings panel (aliases) ================= -->
+  @if (settingsOpen && phase === 'ready') {
+    <div class="sv-back" (click)="settingsOpen = false"></div>
+    <aside class="sv-drawer" role="dialog" aria-modal="true" aria-label="Sheet view settings">
+      <div class="sv-side-h">
+        <h2>Sheet view settings</h2>
+        <span class="meta">Colour CODE and Column Access are tabs of the sheet{{ canSettings ? '' : ' · read only (form 450)' }}</span>
+        <button type="button" class="sv-x" (click)="settingsOpen = false" aria-label="Close the settings">&times;</button>
+      </div>
+      <div class="sv-seg" role="tablist" aria-label="Settings">
+        <button type="button" role="tab" class="sv-tab" [class.on]="settingsView === 'alias'" [attr.aria-selected]="settingsView === 'alias'" (click)="showSettingsView('alias')">Aliases</button>
+        <button type="button" role="tab" class="sv-tab" [class.on]="settingsView === 'history'" [attr.aria-selected]="settingsView === 'history'" (click)="showSettingsView('history')">Settings history</button>
+      </div>
+      @if (settingsView === 'alias') {
+        <app-sheet-settings section="alias" [canEdit]="canSettings"></app-sheet-settings>
+      } @else if (setHist) {
+        <section class="card sec sv-sethist">
+          <div class="card-h">
+            <h2>Settings history</h2>
+            <span class="meta">who changed what, newest first</span>
+            <label class="sv-sr" for="svHs">Show</label>
+            <select id="svHs" class="sv-sel" [ngModel]="setHist.scope" (ngModelChange)="loadSettingsHistory($event)">
+              <option value="settings">Colour CODE, Column Access, aliases</option>
+              <option value="month">This month: {{ month?.title || monthLabel(month?.month || '') }}</option>
+            </select>
+          </div>
+          @if (setHist.loading) {
+            <div class="sv-note">Loading the history…</div>
+          } @else if (setHist.error) {
+            <div class="sv-note sv-warn" role="alert">{{ setHist.error }}</div>
+          } @else {
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead><tr><th style="width: 130px">When</th><th style="width: 150px">Who</th><th style="width: 220px">What</th><th>Change</th><th style="width: 110px"></th></tr></thead>
+                <tbody>
+                  @for (h of setHist.rows; track h.id) {
+                    <tr>
+                      <td class="mono">{{ h.at }}</td>
+                      <td>{{ h.who }}</td>
+                      <td><b>{{ h.col }}</b><div class="sv-soft">{{ h.action }}</div></td>
+                      <td class="sv-hist-v">@if (h.oldV) {<span class="old">{{ h.oldV }}</span> → }{{ h.newV || '(empty)' }}</td>
+                      <td>@if (h.canRestore) {<button type="button" class="btn g sv-mini" (click)="restoreSetting(h)">Restore</button>}</td>
+                    </tr>
+                  } @empty {
+                    <tr><td colspan="5" class="empty">Nothing logged yet.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+      }
+    </aside>
+  }
+
+  <!-- ================= dialogs ================= -->
+  @if (newMonth) {
+    <div class="sv-back"></div>
+    <div class="sv-dlg" role="dialog" aria-modal="true" aria-labelledby="svNmT">
+      <h2 id="svNmT">New month</h2>
+      <div class="sv-form">
+        <label for="svNmM">Month</label>
+        <input id="svNmM" type="month" [ngModel]="newMonth.month" (ngModelChange)="newMonthTitle($event)">
+        <label for="svNmTi">Title</label>
+        <input id="svNmTi" type="text" maxlength="100" [(ngModel)]="newMonth.title">
+        <label for="svNmC">Copy from</label>
+        <select id="svNmC" [(ngModel)]="newMonth.copyFrom">
+          <option [ngValue]="0">Nothing (empty tabs)</option>
+          @for (m of months; track m.id) { <option [ngValue]="m.id">{{ m.title || monthLabel(m.month) }}</option> }
+        </select>
+      </div>
+      <label class="sv-check"><input type="checkbox" [(ngModel)]="newMonth.carry" [disabled]="!newMonth.copyFrom"> Carry over the WO rows that are not "Shipment complete" (links kept)</label>
+      <label class="sv-check"><input type="checkbox" [(ngModel)]="newMonth.nigeria"> Add the Nigeria tab</label>
+      <p class="sv-soft">The tabs are the workbook's; copying also takes the Price, DGD and Vehicle wise weights tabs. Bookings Details starts empty.</p>
+      @if (newMonth.error) {
+        <div class="sv-note sv-warn" role="alert">{{ newMonth.error }}
+          @if (newMonth.existingId) { <button type="button" class="btn g sv-mini" (click)="openExisting()">Open it</button> }
+        </div>
+      }
+      <div class="sv-dlg-b">
+        <button type="button" class="btn g" (click)="newMonth = null">Cancel</button>
+        <button type="button" class="btn p" [disabled]="newMonth.busy" (click)="saveNewMonth()">{{ newMonth.busy ? 'Creating…' : 'Create month' }}</button>
+      </div>
+    </div>
+  }
+
+  @if (convertDlg) {
+    <div class="sv-back"></div>
+    <div class="sv-dlg" role="dialog" aria-modal="true" aria-labelledby="svCvT">
+      <h2 id="svCvT">Convert WO {{ convertDlg.wo || '(no WO)' }} to a Links job</h2>
+      <p>The Export Master form opens pre-filled from {{ convertDlg.rows.length === 1 ? 'this row' : 'these ' + convertDlg.rows.length + ' rows' }}
+         (one WO is one job). Check it, choose the mode of shipment and the services, complete what the sheet does not have, then Submit as usual.
+         The new export no. comes back into FF JOB.</p>
+      <ul class="sv-list">
+        @for (r of convertDlg.rows; track r.srv.id) { <li>{{ rowLabel(r) }}</li> }
+      </ul>
+      @if (convertDlg.error) { <div class="sv-note sv-warn" role="alert">{{ convertDlg.error }}</div> }
+      <div class="sv-dlg-b">
+        <button type="button" class="btn g" (click)="convertDlg = null">Cancel</button>
+        <button type="button" class="btn p" [disabled]="convertDlg.busy" (click)="confirmConvert()">{{ convertDlg.busy ? 'Preparing…' : 'Open the form' }}</button>
+      </div>
+    </div>
+  }
+
+  @if (linkDlg) {
+    <div class="sv-back"></div>
+    <div class="sv-dlg" role="dialog" aria-modal="true" aria-labelledby="svLkT">
+      <h2 id="svLkT">Link to an existing job</h2>
+      <p>{{ linkDlg.rowIds.length }} row{{ linkDlg.rowIds.length === 1 ? '' : 's' }} will point to the job; its Links values then replace the sheet's in the Links columns.
+         @if (linkDlg.relink) { <b>{{ linkDlg.relink }} of them {{ linkDlg.relink === 1 ? 'is' : 'are' }} already linked and will be relinked.</b> }</p>
+      <div class="sv-form">
+        <label for="svLkN">Export no.</label>
+        <input id="svLkN" type="text" maxlength="25" [(ngModel)]="linkDlg.exptno" (keydown.enter)="confirmLink()" placeholder="e.g. 301102610004227" autocomplete="off">
+      </div>
+      @if (linkDlg.error) { <div class="sv-note sv-warn" role="alert">{{ linkDlg.error }}</div> }
+      <div class="sv-dlg-b">
+        <button type="button" class="btn g" (click)="linkDlg = null">Cancel</button>
+        <button type="button" class="btn p" [disabled]="linkDlg.busy" (click)="confirmLink()">{{ linkDlg.busy ? 'Linking…' : 'Link' }}</button>
+      </div>
+    </div>
+  }
+
+  @if (unlinkDlg) {
+    <div class="sv-back"></div>
+    <div class="sv-dlg" role="dialog" aria-modal="true" aria-labelledby="svUlT">
+      <h2 id="svUlT">Unlink from {{ unlinkDlg.jobs }}</h2>
+      <p>{{ unlinkDlg.rowIds.length }} row{{ unlinkDlg.rowIds.length === 1 ? '' : 's' }} stop showing the job's Links values; the sheet's own values come back and FF JOB keeps its text.
+         The job itself is not changed.</p>
+      <div class="sv-dlg-b">
+        <button type="button" class="btn g" (click)="unlinkDlg = null">Cancel</button>
+        <button type="button" class="btn p" [disabled]="unlinkDlg.busy" (click)="confirmUnlink()">{{ unlinkDlg.busy ? 'Unlinking…' : 'Unlink' }}</button>
+      </div>
+    </div>
+  }
+
+  @if (saveViewDlg) {
+    <div class="sv-back"></div>
+    <div class="sv-dlg" role="dialog" aria-modal="true" aria-labelledby="svSvT">
+      <h2 id="svSvT">Save filter view</h2>
+      <p>Your current sort and column filters on {{ tab?.title }}, under a name only you see (every month).</p>
+      <div class="sv-form">
+        <label for="svSvN">Name</label>
+        <input id="svSvN" type="text" maxlength="60" [(ngModel)]="saveViewDlg.name" (keydown.enter)="saveFilterView()" autocomplete="off">
+      </div>
+      @if (saveViewDlg.error) { <div class="sv-note sv-warn" role="alert">{{ saveViewDlg.error }}</div> }
+      <div class="sv-dlg-b">
+        <button type="button" class="btn g" (click)="saveViewDlg = null">Cancel</button>
+        <button type="button" class="btn p" [disabled]="saveViewDlg.busy" (click)="saveFilterView()">Save</button>
+      </div>
+    </div>
+  }
+
+  @if (conflictDlg) {
+    <div class="sv-back"></div>
+    <div class="sv-dlg" role="alertdialog" aria-modal="true" aria-labelledby="svCfT">
+      <h2 id="svCfT">Someone else changed {{ conflictDlg.items.length === 1 ? 'this row' : 'these rows' }} meanwhile</h2>
+      <p>Your change was not saved over theirs. Keep yours (it is saved on top of their version) or take theirs.</p>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Cell</th><th>Yours</th><th>Theirs (saved)</th></tr></thead>
+          <tbody>
+            @for (c of conflictDlg.items; track c.rowId + c.key) {
+              <tr><td>{{ c.where }} · {{ c.header }}</td><td>{{ c.mine || '(empty)' }}</td><td>{{ c.theirs || '(empty)' }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="sv-dlg-b">
+        <button type="button" class="btn g" (click)="resolveConflicts('theirs')">Take theirs</button>
+        <button type="button" class="btn p" (click)="resolveConflicts('mine')">Keep mine</button>
+      </div>
+    </div>
+  }
+</div>

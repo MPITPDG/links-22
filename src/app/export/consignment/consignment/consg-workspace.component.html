@@ -14,8 +14,28 @@
   [locked] flips false. "Edit parties & shipment" bumps mainKey, which destroys and
   rebuilds the master so the details typed into it are discarded.
   (MP's "Prefill from invoice" drawer is not ported to Links.)
+  Sheet view > Convert to job pre-fills the page (ConsignmentPrefillService): the
+  banner below shows while that session is active, with its notes and a Discard link.
 -->
 <div class="im-page cs-page">
+
+  <!-- Sheet view > Convert to job: shown only while a pre-fill session is active (ConsignmentPrefillService) -->
+  @if (prefill) {
+    <div class="cs-draftband" role="status" style="flex-wrap: wrap; border-left: 3px solid var(--mp-primary, var(--ink));">
+      <i class="fa fa-table"></i>
+      <span><b>Pre-filled from Sheet view</b>: {{ prefillRows }}. Check every section, choose the mode of shipment and the services, complete what is missing, then Continue and Submit.</span>
+      <span class="r">
+        <a href="#" (click)="$event.preventDefault(); discardPrefill()">Discard pre-fill</a>
+      </span>
+      @if (prefillNotes.length) {
+        <ul style="flex-basis: 100%; margin: 4px 0 0 26px; padding: 0;">
+          @for (n of prefillNotes; track $index) {
+            <li>{{ n }}</li>
+          }
+        </ul>
+      }
+    </div>
+  }
 
   @if (draft) {
     <div class="cs-draftband" role="status">
@@ -73,7 +93,7 @@
     mainKey destroys and rebuilds the master.
   -->
   @for (k of mainKey; track k) {
-    <app-consg-main [embedded]="true" [locked]="!started" [(step)]="step"
+    <app-consg-main [embedded]="true" [locked]="!started" [(step)]="step" [allowDraft]="!prefill"
       (keepDraft)="keepDraftAndLeave()" (beforeSave)="snapshotDraft(true)" (aborted)="onAborted()"></app-consg-main>
   }
 

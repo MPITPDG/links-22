@@ -11,6 +11,13 @@ import { LoaderService } from '../../../shared/service/loader.service';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { UiStep } from '../../../shared/ui';
 import { ConsignmentDraftService } from './consignment-draft.service';
+import { ConsignmentPrefillService, ConsignmentPrefillMain, ConsignmentPrefillOrder } from './consignment-prefill.service';
+
+/** The Type of Packages / Type of Pieces / Nature of Payment options of consg_main.component.html (keep in step with it). */
+const PREFILL_PKG_TYPES: string[] = ['PKG', 'BUNDLES', 'CARTONS', 'BOXES', 'BASES', 'CASES', 'PALLETS', 'ROLL', 'BALES', 'DRUMS', 'CABLE', 'PACKS', 'NOS', 'CRATES', 'BAGS', 'TANKS'];
+const PREFILL_PCS_TYPES: string[] = ['PIECES', 'SETS', 'DOZENS', 'PAIRS', 'BOXES', 'NOS', 'UNIT', 'LOTS', 'MTR', 'PACK', 'KGS', 'KGS/MTRS', 'PCS/PAIR', 'SQ.MTRS', 'PCS/SETS', 'EA', 'PCS/PAIR/KGS', 'AMPOULES', 'MT', 'MATS', 'CASES'];
+const PREFILL_PAYMENT_NATURES: string[] = ['(LC)Letter of credit', '(DA)Delivery against acceptance', '(DP)Delivery against payment', '(AP)Advance payment', '(NA)Not applicable'];
+
 @Component({
     selector: 'app-consg-main',
     templateUrl: 'consg_main.component.html',
@@ -104,6 +111,8 @@ export class ConsgMainComponent implements OnInit , OnChanges{
 
     /** "Keep as draft": the workspace snapshots the draft and leaves. */
     @Output() keepDraft = new EventEmitter<void>();
+    /** False hides "Keep as draft" (a Sheet view pre-fill must not overwrite the user's own stored draft). */
+    @Input() allowDraft: boolean = true;
     /** Fired right before the save request leaves, so the host can take a last draft snapshot. */
     @Output() beforeSave = new EventEmitter<void>();
     /**
@@ -142,6 +151,311 @@ export class ConsgMainComponent implements OnInit , OnChanges{
     keepAsDraft(): void {
         if (this.saving) { return; }
         this.keepDraft.emit();
+    }
+
+    // ------------------------------------------------------------------
+    // Pre-fill (Export > Sheet view > Convert to job; MPERPNG-20 applyPrefill
+    // pattern). The workspace hands the consignment-details half over on
+    // Continue; it is held until Export/GetMainConsignment has returned, then
+    // applied through the handlers the controls run (onTypeChange,
+    // GetTerminal, chgPortDischarge, changeCurrency), each value only when the
+    // form's list has it - otherwise it is left blank and noted in the workspace
+    // banner. Order lines and the package range then go in through the grids'
+    // own endpoints. Without a pre-fill none of this runs.
+    // ------------------------------------------------------------------
+    private _pendingPrefill: ConsignmentPrefillMain = null;
+
+    applyPrefill(p: ConsignmentPrefillMain): void {
+        if (!p) { return; }
+        this._pendingPrefill = p;
+        if (this.commoncities && this.commoncities.length) { this.flushPrefill(); }
+    }
+
+    private flushPrefill(): void {
+        const p = this._pendingPrefill;
+        if (!p) { return; }
+        this._pendingPrefill = null;
+        const has = (v: any) => v !== null && v !== undefined && String(v).trim() !== '';
+        const note = (t: string) => this._prefill.note(t);
+        const city = (code: any) => (this.commoncities || []).filter((x: any) =>
+            x && String(x.CITY_CODE).trim().toUpperCase() === String(code).trim().toUpperCase())[0];
+
+        // Service scope: only the boxes the caller decided, each followed by the
+        // checkbox's own (ngModelChange) handler (EX-WORKS clears the other two).
+        const sv: any = p.services || {};
+        if (sv.exwork && (sv.customclr || sv.freightfrd)) {
+            note('EX-WORKS cannot be combined with customs clearance / freight forwarding - check the services.');
+        }
+        this.prefillService('exwork', 'E', sv.exwork);
+        this.prefillService('customclr', 'C', sv.customclr);
+        this.prefillService('freightfrd', 'F', sv.freightfrd);
+
+        // Packages / pieces (plain inputs; the two types are fixed lists in the template).
+        if (has(p.noOfPackages)) { this.noofpackages = p.noOfPackages; }
+        if (has(p.typeOfPackages)) {
+            const v = String(p.typeOfPackages).trim().toUpperCase();
+            if (PREFILL_PKG_TYPES.indexOf(v) >= 0) { this.typeofpackages = v; }
+            else { note('Type of packages ' + p.typeOfPackages + ' is not one of the form\'s types - pick it.'); }
+        }
+        if (has(p.noOfPieces)) { this.noofpieces = p.noOfPieces; }
+        if (has(p.typeOfPieces)) {
+            const v = String(p.typeOfPieces).trim().toUpperCase();
+            if (PREFILL_PCS_TYPES.indexOf(v) >= 0) { this.typeofpieces = v; }
+            else { note('Type of pieces ' + p.typeOfPieces + ' is not one of the form\'s types - pick it.'); }
+        }
+
+        // Ports. GetTerminal runs first, as the Loading Port select's (change)
+        // does, so the terminal is looked up in that port's own list.
+        if (has(p.loadingPortCode)) {
+            const c = city(p.loadingPortCode);
+            if (c) { this.loadingport = c.CITY_CODE; this.GetTerminal(this.loadingport); }
+            else { note('Loading port ' + p.loadingPortCode + ' is not in the city list - pick it.'); }
+        }
+        if (has(p.terminalId)) {
+            const want = String(p.terminalId).trim();
+            const t = (this.portterminal || []).filter((x: any) =>
+                x && (String(x.ID).trim() === want || String(x.ID).split('|')[0].trim() === want))[0];
+            if (t) { this.loadingportterminal = t.ID; }
+            else { note('Terminal ' + p.terminalId + ' is not a terminal of the loading port - pick it.'); }
+        }
+        if (has(p.podCode)) {
+            const c = city(p.podCode);
+            if (c) { this.podchrg = c.CITY_CODE; this.chgPortDischarge(this.podchrg); }
+            else { note('Port of discharge ' + p.podCode + ' is not in the city list - pick it.'); }
+        }
+        // After the port of discharge, whose handler sets the destination too.
+        if (has(p.destCityCode)) {
+            const c = city(p.destCityCode);
+            if (c) { this.destcity = c.CITY_CODE; }
+            else { note('Destination ' + p.destCityCode + ' is not in the city list - pick it.'); }
+        }
+
+        // Invoice header.
+        if (has(p.docRecdDate)) {
+            const d = this.prefillDate(p.docRecdDate, 'Doc recd. date', true);
+            if (d) { this.docrecdt = d; }
+        }
+        if (has(p.invoiceNo)) {
+            this.expinvno = String(p.invoiceNo).trim();
+            if (this.expinvno.length > 20) { note('Exporter invoice no. ' + this.expinvno + ' is longer than 20 characters - shorten it.'); }
+        }
+        if (has(p.invoiceDate)) {
+            const d = this.prefillDate(p.invoiceDate, 'Invoice date', false);
+            if (d) { this.exptinvdt = d; }
+        }
+        if (has(p.natureOfPayment)) {
+            const want = String(p.natureOfPayment).trim().toUpperCase();
+            const code = want.replace(/[()]/g, '');
+            const hit = PREFILL_PAYMENT_NATURES.filter(n => n.toUpperCase() === want || n.substring(1, 3).toUpperCase() === code)[0];
+            if (hit) { this.natureofpayment = hit; }
+            else { note('Nature of payment ' + p.natureOfPayment + ' is not one of the form\'s options - pick it.'); }
+        }
+        // The currency select is a native <select>: its (change) never fires for a
+        // programmatic write, so changeCurrency is called as the select would.
+        if (has(p.currencyCode)) {
+            const hit = this.prefillCurrency(p.currencyCode);
+            if (hit) { this.currency = hit.VALUEFIELD; this.changeCurrency(this.currency); }
+            else { note('Currency ' + p.currencyCode + ' is not in the currency list - pick it.'); }
+        }
+
+        if (has(p.goodsRemark)) { this.goodsremark = String(p.goodsRemark); }
+        if (has(p.marks)) { this.marksandnumbers = String(p.marks); }
+
+        // Vessel agent: the agents of the vessel chosen on page 1 (sea only).
+        if (has(p.vesselAgentCode)) {
+            const a = (this.agentsname || []).filter((x: any) => x && String(x.VALUEFIELD).trim() === String(p.vesselAgentCode).trim())[0];
+            if (this.isvisiblevessel == null) { note('Vessel agent not set: this is not a vessel shipment.'); }
+            else if (a) { this.agentname = a.VALUEFIELD; }
+            else { note('Vessel agent ' + p.vesselAgentCode + ' is not an agent of the chosen vessel - pick it.'); }
+        }
+
+        this.postPrefillRows(p.orders || [], p.packageRange || null);
+        this.repaint();
+    }
+
+    /** One service checkbox: write it only if it changes, then run its (ngModelChange) handler. */
+    private prefillService(field: 'exwork' | 'customclr' | 'freightfrd', type: string, v: any): void {
+        if (v === undefined || v === null) { return; }
+        const want = !!v;
+        if (!!this[field] === want) { return; }
+        this[field] = want;
+        this.onTypeChange(type);
+    }
+
+    /** dd/mm/yyyy (or d-m-yyyy) -> the my-date-picker value this screen uses; null + a note when it is not a real date. */
+    private prefillDate(v: any, label: string, noFuture: boolean): any {
+        const m = /^\s*(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})\s*$/.exec(String(v));
+        if (m) {
+            const d = +m[1], mo = +m[2], y = +m[3];
+            const dt = new Date(y, mo - 1, d);
+            if (dt.getFullYear() === y && dt.getMonth() === mo - 1 && dt.getDate() === d) {
+                const today = new Date(); today.setHours(0, 0, 0, 0);
+                if (noFuture && dt.getTime() > today.getTime()) {
+                    this._prefill.note(label + ' ' + v + ' is in the future - pick it.');
+                    return null;
+                }
+                const p2 = (n: number) => ('0' + n).slice(-2);
+                return this._dataService.stringdttoArry(p2(d) + '/' + p2(mo) + '/' + y);
+            }
+        }
+        this._prefill.note(label + ' "' + v + '" is not a date (dd/mm/yyyy) - pick it.');
+        return null;
+    }
+
+    /** The currency row ('CR115|INR|rate|inrrate') for a master code, else for a currency name. */
+    private prefillCurrency(code: any): any {
+        const list = this.commoncurrencies || [];
+        const want = String(code).trim().toUpperCase();
+        const part = (o: any, i: number) => (String((o && o.VALUEFIELD) || '').split('|')[i] || '').trim().toUpperCase();
+        return list.filter((o: any) => part(o, 0) === want)[0]
+            || list.filter((o: any) => part(o, 1) === want)[0]
+            || null;
+    }
+
+    /**
+     * Order lines, then the package range LAST: both replies write
+     * hdnoofpkg_total (ConsignmentOrder: TOTAL_PKG, the lines' package sum;
+     * ConsignmentPackage: TOTAL, the ranges' count) and Submit compares No. of
+     * Packages with whichever came last. Same endpoints and payloads as the Order
+     * no. / Package no. Add buttons (exptno = hdexptno, '' before Submit; the
+     * login GUID keys the TMP rows USP_EXP_MST_EXPORT_IU copies on save), one at
+     * a time, grids and totals refreshed from each reply as crudOrder /
+     * crudPackage do. The master's own load empties this login's TMP rows first,
+     * so a fresh master (refresh, Edit parties) never doubles them. A line the
+     * server refuses is noted and left to the admin.
+     */
+    private postPrefillRows(orders: ConsignmentPrefillOrder[], range: { from: any; to: any }): void {
+        const has = (v: any) => v !== null && v !== undefined && String(v).trim() !== '';
+        const num = (v: any) => (has(v) && isFinite(Number(String(v).trim()))) ? Number(String(v).trim()) : NaN;
+        const note = (t: string) => this._prefill.note(t);
+
+        const rows: ConsignmentPrefillOrder[] = [];
+        let pcsSum = 0;
+        (orders || []).forEach((o: any) => {
+            if (!o || !has(o.orderNo)) { return; }
+            if (!(num(o.pieces) > 0)) { note('Order ' + o.orderNo + ': pieces "' + (has(o.pieces) ? o.pieces : '') + '" is not a number - add the line on Order no.'); return; }
+            if (has(o.packages) && !(num(o.packages) >= 0)) { note('Order ' + o.orderNo + ': packages "' + o.packages + '" is not a number - add the line on Order no.'); return; }
+            pcsSum += num(o.pieces);
+            rows.push(o);
+        });
+        if (rows.length && has(this.noofpieces) && pcsSum > Math.abs(Number(this.noofpieces))) {
+            note('The order lines add up to ' + pcsSum + ' pieces, more than No. of Pieces (' + this.noofpieces + ') - check them.');
+        }
+
+        let pkg: { from: string; to: string } = null;
+        if (range && (has(range.from) || has(range.to))) {
+            const f = num(range.from), t = num(range.to);
+            if (!(f > 0) || !(t > 0) || f > t || Math.floor(f) !== f || Math.floor(t) !== t) {
+                note('Package range ' + range.from + '-' + range.to + ' is not valid - add it on Package no.');
+            } else if (has(this.noofpackages) && (t - f + 1) > Math.abs(Number(this.noofpackages))) {
+                note('Package range ' + f + '-' + t + ' is more than No. of Packages (' + this.noofpackages + ') - add it on Package no.');
+            } else {
+                pkg = { from: String(f), to: String(t) };
+            }
+        }
+        if (!rows.length && !pkg) { return; }
+
+        const login: any = this._loginService.getLogin()[0];
+        let addedOrders = 0;
+        let pkgAdded = false;
+
+        const finish = (err: string) => {
+            this._loaderService.display(false);
+            if (err) { note(err); this._toasterService.toast('error', 'Pre-fill', err); }
+            if (addedOrders || pkgAdded) {
+                this._toasterService.toast('success', 'Pre-fill', 'Added ' + addedOrders + ' order line' + (addedOrders === 1 ? '' : 's')
+                    + (pkgAdded ? ' and the package range ' + pkg.from + '-' + pkg.to : '') + ' from the Sheet view.');
+            }
+            this.repaint();
+        };
+
+        const postPkg = () => {
+            if (!pkg) { finish(null); return; }
+            const _pkgsjsonData = {
+                indexid: '0',
+                pkgnoid: '0',
+                exptno: this.hdexptno,
+                pkgtype: 'A',
+                pkgfrom: pkg.from,
+                pkgto: pkg.to,
+                pkgalphabet: '',
+                userid: login.CMPID,
+                guid: login.GUID
+            };
+            this._dataService.Common('Export/ConsignmentPackage', _pkgsjsonData)
+                .subscribe((data: any) => {
+                    const row0 = (data && data.Table && data.Table.length) ? data.Table[0] : null;
+                    if (row0 && row0.STATUS == 100 && row0.TBL_INDEXID !== undefined) {
+                        this.packagelist = data.Table;
+                        this.hdnoofpkg_edit = "0";
+                        this.hdnoofpkg_total = row0.TOTAL;
+                        pkgAdded = true;
+                        finish(null);
+                    } else {
+                        finish('Package range ' + pkg.from + '-' + pkg.to + ' was not added' + ((row0 && row0.STATUSTEXT) ? ': ' + row0.STATUSTEXT : '') + ' - add it on Package no.');
+                    }
+                }, (error: any) => {
+                    finish('Package range ' + pkg.from + '-' + pkg.to + ' was not added (' + (error && error.status) + ') - add it on Package no.');
+                });
+        };
+
+        const nextOrder = (i: number) => {
+            if (i >= rows.length) { postPkg(); return; }
+            const r: any = rows[i];
+            const _orderjsonData = {
+                ordertype: 'A',
+                ordernoid: '0',
+                orderid: '0',
+                exptno: this.hdexptno,
+                orderno: String(r.orderNo).trim(),
+                orderpiece: String(num(r.pieces)),
+                ordertypeofpiece: '',
+                orderwarehouse: '',
+                orderpackage: has(r.packages) ? String(num(r.packages)) : '',
+                ordergrwt: '',
+                ordervolume: '',
+                ordernetwt: '',
+                orderchblwt: '',
+                orderitemdesc: '',
+                orderlsddt: '',
+                orderreferenceno: '',
+                orderfobval: '',
+                ordercurrency: '',
+                orderdrndt: '',
+                userid: login.CMPID,
+                guid: login.GUID,
+                ordercneedept: '',
+                ordercontainerno: '',
+                ordericshscode: '',
+                ordericshsdescription: '',
+                concode: this.tempSession.consigneeid
+            };
+            this._dataService.Common('Export/ConsignmentOrder', _orderjsonData)
+                .subscribe((data: any) => {
+                    const row0 = (data && data.Table && data.Table.length) ? data.Table[0] : null;
+                    // The reply lists this login's lines (also on a refusal): grid and totals as crudOrder sets them.
+                    if (row0 && row0.TBL_INDEXID !== undefined) {
+                        this.orderlist = data.Table;
+                        this.hdnoofpcs_edit = "0";
+                        this.hdnoofpcs_total = row0.TOTAL;
+                        this.hdnoofpkg_total = row0.TOTAL_PKG;
+                        this.hdnoofgrwt_total = row0.TOTAL_GRWT;
+                        this.hdnoofchbl_total = row0.TOTAL_CHBL;
+                    }
+                    if (row0 && row0.STATUS == 100) { addedOrders++; }
+                    else {
+                        const msg = row0 ? (row0.STAUSMSG || row0.STATUSTEXT || '') : '';
+                        note('Order ' + r.orderNo + ' was not added' + (msg ? ': ' + msg : '') + ' - add it on Order no.');
+                    }
+                    nextOrder(i + 1);
+                }, (error: any) => {
+                    // Stop: the package range is not posted after a failed line, Submit's totals would not add up anyway.
+                    finish('Order ' + r.orderNo + ' was not added (' + (error && error.status) + '); the rest of the order lines and the package range were not posted - add them on Order no. / Package no.');
+                });
+        };
+
+        this._loaderService.display(true);
+        nextOrder(0);
     }
     public myDatePickerOptions: IMyDpOptions = {
         dateFormat: 'dd/mm/yyyy',
@@ -454,7 +768,8 @@ export class ConsgMainComponent implements OnInit , OnChanges{
         private _sharedconsig: SharedDataSerice,
         private _loaderService: LoaderService,
         private _cdr: ChangeDetectorRef,
-        private _draft: ConsignmentDraftService) {
+        private _draft: ConsignmentDraftService,
+        private _prefill: ConsignmentPrefillService) {
         this.City = this._loginService.getLogin()[0].CITYCODE;
     }
 
@@ -531,6 +846,7 @@ export class ConsgMainComponent implements OnInit , OnChanges{
                     this.getOrderList(this.tempSession.consigneeid, this.tempSession.exporterid, this.tempSession.airshipmode, this.tempSession.modeofship);
                 }
                 this.Allportterminallist = data.Table7 || [];
+                this.flushPrefill();
                 this.flushDraft();
                 this.repaint();
             },
@@ -1607,12 +1923,18 @@ export class ConsgMainComponent implements OnInit , OnChanges{
                 const row = (data && data.Table && data.Table.length) ? data.Table[0] : null;
                 if (row && row.STATUS == "100") {
                     // saving stays true: we are leaving the page.
-                    this._draft.clear();
+                    // Sheet view pre-fill: hand the new export no. back first (the caller
+                    // writes it into the sheet row), go back to the caller, and leave the
+                    // user's own stored draft alone - it is not this job's.
+                    const fromPrefill = this._prefill.isActive;
+                    const backUrl = fromPrefill ? this._prefill.returnUrl : null;
+                    if (fromPrefill) { this._prefill.onSaved(row["STATUSTEXT"] || ''); } else { this._draft.clear(); }
                     // Hand the new export no. to the search page, which pins it to the top
                     // of its recent list with a "Saved just now" chip (read once, cleared).
-                    this._sharedconsig.justSavedExptno = row["STATUSTEXT"] || '';
+                    if (!backUrl) { this._sharedconsig.justSavedExptno = row["STATUSTEXT"] || ''; }
                     alert("Export Consignment " + row["STATUSTEXT"] + " Gnererated Successfully!");
-                    this._router.navigate(['export/Consignment/search']);
+                    if (backUrl) { this._router.navigateByUrl(backUrl); }
+                    else { this._router.navigate(['export/Consignment/search']); }
                 }
                 else
                 {
@@ -1688,7 +2010,8 @@ export class ConsgMainComponent implements OnInit , OnChanges{
     abort() {
         if (this.saving) { return; }
         // Abort throws the draft away too; "Keep as draft" is the way out that keeps it.
-        this._draft.clear();
+        // During a Sheet view pre-fill the stored draft is the user's own, not this job's: kept.
+        if (!this._prefill.isActive) { this._draft.clear(); }
         const _jsonData = {
             status: 'A',
             pagetype: 'MAIN',
@@ -1699,8 +2022,10 @@ export class ConsgMainComponent implements OnInit , OnChanges{
         this._dataService.Common('Export/ExportLogCompleted', _jsonData)
             .subscribe((data: any) => {
                 this._loaderService.display(false);
-                // Embedded, `start` is the page we are on: the workspace rebuilds a fresh page 1.
+                // Embedded, `start` is the page we are on: the workspace rebuilds a fresh page 1
+                // (and ends a Sheet view pre-fill session there).
                 if (this.embedded) { this.aborted.emit(); return; }
+                this._prefill.onAborted('abort');   // no-op without a pre-fill session
                 this._router.navigate(['export/Consignment/start']);
             },
                 (error) => {

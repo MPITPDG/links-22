@@ -24,7 +24,8 @@
                         {
                             menuid: "3.1", icon: "fa fa-ship", menuname: "Consignment", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
                                 { menuid: "3.1.1", icon: "fa fa-caret-right", menuname: "Export Master", routerlink: "/export/Consignment/start", ischild: 'n', parentid: 0, isactive: 1, data: [] },
-                                { menuid: "3.1.2", icon: "fa fa-caret-right", menuname: "Search", routerlink: "/export/Consignment/search", ischild: 'n', parentid: 0, isactive: 1, data: [] }
+                                { menuid: "3.1.2", icon: "fa fa-caret-right", menuname: "Search", routerlink: "/export/Consignment/search", ischild: 'n', parentid: 0, isactive: 1, data: [] },
+                                { menuid: "3.1.3", icon: "fa fa-caret-right", menuname: "Sheet view", routerlink: "/export/sheet", ischild: 'n', parentid: 0, isactive: 1, data: [] }
                             ]
                         },
                         {

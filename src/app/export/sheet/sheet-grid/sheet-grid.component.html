@@ -1,0 +1,330 @@
+<!--
+  <app-sheet-grid>: generic spreadsheet grid. Layout:
+  toolbar (name box, value of the active cell, sort / filter chips, undo, redo, find, Excel)
+  > scroller (cdkVirtualScrollingElement): sticky header row + CDK virtual viewport
+      viewport content = [frozen overlay layer (sticky)] [scrolling overlay layer] [rows]
+  > status bar (row count or a notice, Sum / Average / Min / Max / Count of the selection)
+  The hidden textarea "sink" holds keyboard focus and receives copy / cut / paste.
+-->
+@if (showToolbar) {
+  <div class="sg-bar">
+    <div class="sg-name" [title]="activeLabel">{{ activeLabel }}</div>
+    <div class="sg-fx" (mousedown)="$event.preventDefault()" (click)="onBarValueClick()" [title]="activeTip || activeValue">
+      <span class="sg-fx-l">fx</span><span class="sg-fx-v">{{ activeValue }}</span>
+    </div>
+    <div class="sg-tools" (mousedown)="$event.preventDefault()">
+      @if (sort) {
+        <span class="sg-chip">Sorted: {{ sortLabel }}<button type="button" (click)="clearSort()" title="Back to the sheet order">&times;</button></span>
+      }
+      @if (filterCount) {
+        <span class="sg-chip">{{ filterCount }} {{ filterCount === 1 ? 'filter' : 'filters' }}<button type="button" (click)="clearFilters()" title="Clear all filters">&times;</button></span>
+      }
+      @if (hiddenCount) {
+        <button type="button" class="sg-tb txt" (click)="unhide(null)" title="Show the hidden columns">{{ hiddenCount }} hidden</button>
+      }
+      <button type="button" class="sg-tb" (click)="undo()" [disabled]="!canUndo" title="Undo (Ctrl+Z)" aria-label="Undo">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 3.5 2.5 6.5l3 3M3 6.5h6.5a3.5 3.5 0 0 1 0 7H7"/></svg>
+      </button>
+      <button type="button" class="sg-tb" (click)="redo()" [disabled]="!canRedo" title="Redo (Ctrl+Y)" aria-label="Redo">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m10.5 3.5 3 3-3 3M13 6.5H6.5a3.5 3.5 0 0 0 0 7H9"/></svg>
+      </button>
+      <button type="button" class="sg-tb" (click)="openFind()" title="Find (Ctrl+F)" aria-label="Find">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.25"/><path d="m10.2 10.2 3.3 3.3"/></svg>
+      </button>
+      <button type="button" class="sg-tb txt" (click)="exportExcel()" title="Export the visible rows to Excel (with colours)">Excel</button>
+    </div>
+  </div>
+}
+
+<div class="sg-wrap">
+  <div #scroller class="sg-scroller" cdkVirtualScrollingElement role="grid"
+       [attr.aria-rowcount]="view.length" [attr.aria-colcount]="cols.length"
+       (mousedown)="onBodyDown($event)" (dblclick)="onBodyDbl($event)" (contextmenu)="onBodyMenu($event)">
+
+    <!-- sticky band: header row + frozen rows -->
+    <div class="sg-top" [style.width.px]="totalW">
+    <div class="sg-head" [style.width.px]="totalW">
+      <div class="sg-corner" (mousedown)="onCornerDown($event)" title="Select all (Ctrl+A)"></div>
+      @for (c of fcols; track c.key) {
+        <div class="sg-h fz" [style.left.px]="c.x" [style.width.px]="c.w" [class.on]="hdrOn(c)" [class.full]="colFull && hdrOn(c)"
+             [class.r]="c.right" [title]="c.header" (mousedown)="onHeaderDown($event, c)" (contextmenu)="onHeaderMenu($event, c)">
+          <span class="sg-hl">{{ c.header }}</span>
+          @if (colLock[c.key]) { <i class="sg-hlk" [title]="'Locked: ' + colLock[c.key]"></i> }
+          @if (sort && sort.key === c.key) { <i class="sg-hsort" [class.desc]="sort.dir === 'desc'"></i> }
+          @if (isFiltered(c)) { <i class="sg-hfil" title="Filtered"></i> }
+          <button type="button" class="sg-hb" [class.open]="hm && hm.col.key === c.key" (mousedown)="onHeaderMenuBtn($event, c)" title="Sort, filter, hide, freeze" aria-label="Column menu"></button>
+          @if (c.hb) { <button type="button" class="sg-unh" (mousedown)="unhide(c.hb, $event)" [title]="'Show ' + c.hb.length + ' hidden column(s)'" aria-label="Show hidden columns"></button> }
+          @if (c.ha) { <button type="button" class="sg-unh end" (mousedown)="unhide(c.ha, $event)" [title]="'Show ' + c.ha.length + ' hidden column(s)'" aria-label="Show hidden columns"></button> }
+          <span class="sg-rs" (mousedown)="onResizeDown($event, c)" (dblclick)="onResizeDbl($event, c)" title="Drag to resize, double-click to fit"></span>
+        </div>
+      }
+      @for (c of scols; track c.key) {
+        <div class="sg-h" [style.left.px]="c.x" [style.width.px]="c.w" [class.on]="hdrOn(c)" [class.full]="colFull && hdrOn(c)"
+             [class.r]="c.right" [title]="c.header" (mousedown)="onHeaderDown($event, c)" (contextmenu)="onHeaderMenu($event, c)">
+          <span class="sg-hl">{{ c.header }}</span>
+          @if (colLock[c.key]) { <i class="sg-hlk" [title]="'Locked: ' + colLock[c.key]"></i> }
+          @if (sort && sort.key === c.key) { <i class="sg-hsort" [class.desc]="sort.dir === 'desc'"></i> }
+          @if (isFiltered(c)) { <i class="sg-hfil" title="Filtered"></i> }
+          <button type="button" class="sg-hb" [class.open]="hm && hm.col.key === c.key" (mousedown)="onHeaderMenuBtn($event, c)" title="Sort, filter, hide, freeze" aria-label="Column menu"></button>
+          @if (c.hb) { <button type="button" class="sg-unh" (mousedown)="unhide(c.hb, $event)" [title]="'Show ' + c.hb.length + ' hidden column(s)'" aria-label="Show hidden columns"></button> }
+          @if (c.ha) { <button type="button" class="sg-unh end" (mousedown)="unhide(c.ha, $event)" [title]="'Show ' + c.ha.length + ' hidden column(s)'" aria-label="Show hidden columns"></button> }
+          <span class="sg-rs" (mousedown)="onResizeDown($event, c)" (dblclick)="onResizeDbl($event, c)" title="Drag to resize, double-click to fit"></span>
+        </div>
+      }
+    </div>
+      @if (nFR) {
+        <div class="sg-frows" [style.height.px]="nFR * rowH">
+          <div class="sg-ovf" [style.width.px]="frozenW"><ng-container *ngTemplateOutlet="paneTpl; context: { $implicit: panes.tf }"></ng-container></div>
+          <div class="sg-ovs"><ng-container *ngTemplateOutlet="paneTpl; context: { $implicit: panes.ts }"></ng-container></div>
+          @for (vm of topView; track vm.id) {
+            <div class="sg-row" [style.background-color]="vm.bg" [style.color]="vm.fg">
+              <ng-container *ngTemplateOutlet="cellsTpl; context: { $implicit: vm }"></ng-container>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <cdk-virtual-scroll-viewport class="sg-vp" [itemSize]="rowH" [minBufferPx]="240" [maxBufferPx]="520" [style.width.px]="totalW">
+
+      <!-- overlays: frozen columns (sticky) and scrolling columns -->
+      <div class="sg-ovf" [style.width.px]="frozenW"><ng-container *ngTemplateOutlet="paneTpl; context: { $implicit: panes.bf }"></ng-container></div>
+      <div class="sg-ovs"><ng-container *ngTemplateOutlet="paneTpl; context: { $implicit: panes.bs }"></ng-container></div>
+
+      <!-- rows -->
+      <div class="sg-row" *cdkVirtualFor="let vm of bodyView; trackBy: trackVm; templateCacheSize: 30"
+           [style.background-color]="vm.bg" [style.color]="vm.fg">
+        <ng-container *ngTemplateOutlet="cellsTpl; context: { $implicit: vm }"></ng-container>
+      </div>
+    </cdk-virtual-scroll-viewport>
+
+    @if (!view.length) {
+      <div class="sg-empty">
+        @if ((rows || []).length) {
+          No row matches the filters. <button type="button" (click)="clearFilters()">Clear filters</button>
+        } @else {
+          No rows yet.
+          @if (!readOnly) { <button type="button" (click)="addRowsAtEnd(1)">Add a row</button> or paste rows here (Ctrl+V). }
+        }
+      </div>
+    } @else if (!readOnly) {
+      <div class="sg-foot">
+        <button type="button" (click)="addRowsAtEnd(addN)">Add</button>
+        <input type="number" min="1" max="500" [(ngModel)]="addN" aria-label="Rows to add">
+        more rows at the bottom
+      </div>
+    }
+  </div>
+</div>
+
+<div class="sg-status">
+  <div class="sg-st-l" aria-live="polite">
+    @if (notice) {
+      <span class="sg-notice" [class.lock]="noticeLock">{{ notice }}</span>
+    } @else {
+      <span>{{ viewInfo }}</span>
+      @if (readOnly) { <span class="sg-ro-tag">Read-only</span> }
+    }
+  </div>
+  <div class="sg-st-r">
+    @if (stats) {
+      @if (stats.numbers) {
+        <span>Sum <b>{{ fmtNum(stats.sum) }}</b></span>
+        <span>Average <b>{{ fmtNum(stats.avg) }}</b></span>
+        <span>Min <b>{{ fmtNum(stats.min) }}</b></span>
+        <span>Max <b>{{ fmtNum(stats.max) }}</b></span>
+      }
+      <span>Count <b>{{ stats.count }}</b></span>
+    }
+  </div>
+</div>
+
+<div #guide class="sg-guide"></div>
+
+<textarea #sink class="sg-sink" autocomplete="off" spellcheck="false" aria-multiline="false"
+          [attr.aria-label]="activeLabel ? activeLabel + ': ' + activeValue : 'Sheet'"
+          (keydown)="onSinkKey($event)" (input)="onSinkInput($event)" (compositionend)="onSinkCompositionEnd()" (focus)="onSinkFocus()"
+          (copy)="onCopy($event)" (cut)="onCut($event)" (paste)="onPaste($event)"></textarea>
+
+<!-- find -->
+@if (findOpen) {
+  <div class="sg-find" (mousedown)="$event.stopPropagation()">
+    <input type="text" placeholder="Find in sheet" [value]="findQ" (input)="onFindInput($any($event.target).value)" (keydown)="onFindKey($event)" aria-label="Find">
+    <span class="sg-fc">{{ findHits.length ? (findIdx + 1) + ' of ' + findHits.length : (findQ ? 'No matches' : '') }}</span>
+    <button type="button" (click)="findStep(-1)" title="Previous (Shift+Enter)" aria-label="Previous match">&lsaquo;</button>
+    <button type="button" (click)="findStep(1)" title="Next (Enter)" aria-label="Next match">&rsaquo;</button>
+    <button type="button" (click)="closeFind()" title="Close (Esc)" aria-label="Close find">&times;</button>
+  </div>
+}
+
+<!-- column menu -->
+@if (hm) {
+  <div class="sg-menu sg-hm" [style.left.px]="hm.x" [style.top.px]="hm.y" (mousedown)="$event.stopPropagation()" (contextmenu)="$event.preventDefault()" (keydown)="onMenuKey($event)" role="menu">
+    <div class="mt">{{ hm.col.header }}</div>
+    <button type="button" class="mi" (click)="sortBy(hm.col, 'asc')">Sort A &rarr; Z</button>
+    <button type="button" class="mi" (click)="sortBy(hm.col, 'desc')">Sort Z &rarr; A</button>
+    @if (sort) { <button type="button" class="mi" (click)="hmClearSort()">Clear sort (sheet order)</button> }
+    <div class="sep"></div>
+    <div class="mh">Filter by condition</div>
+    <div class="mf">
+      <select [(ngModel)]="hm.op" aria-label="Condition">
+        @for (o of condOps; track o.op) { <option [value]="o.op">{{ o.label }}</option> }
+      </select>
+      @if (hmCondArg) {
+        <input type="text" [(ngModel)]="hm.arg" [placeholder]="hm.op.startsWith('date') ? 'dd-mm-yyyy' : 'Value'" (keydown.enter)="hmApply()" aria-label="Condition value">
+      }
+    </div>
+    <div class="mh">Filter by values
+      <span class="ml"><a (click)="hmAll(true)">Select all</a> &middot; <a (click)="hmAll(false)">Clear</a></span>
+    </div>
+    <div class="mf"><input type="text" [(ngModel)]="hm.search" placeholder="Search values" aria-label="Search values"></div>
+    <div class="vals">
+      @for (v of hmList; track v.value) {
+        <label class="val"><input type="checkbox" [(ngModel)]="v.on"><span>{{ v.value || '(Blanks)' }}</span><em>{{ v.count }}</em></label>
+      }
+      @if (hmMore) { <div class="more">+{{ hmMore }} more values - refine the search</div> }
+    </div>
+    <div class="acts">
+      <button type="button" class="b" (click)="hmClearFilter()">Clear filter</button>
+      <button type="button" class="b p" (click)="hmApply()">Apply</button>
+    </div>
+    <div class="sep"></div>
+    <button type="button" class="mi" (click)="hideColumn(hm.col)">Hide column</button>
+    @if (hiddenCount) { <button type="button" class="mi" (click)="unhide(null)">Show all hidden columns ({{ hiddenCount }})</button> }
+    <button type="button" class="mi" (click)="freezeTo(hm.col)">Freeze up to {{ hm.col.header }}</button>
+    @if (nF) { <button type="button" class="mi" (click)="freezeTo(null)">Unfreeze columns</button> }
+    <button type="button" class="mi" (click)="hmFit(hm.col.key)">Fit width to data</button>
+  </div>
+}
+
+<!-- row / cell menu -->
+@if (cm) {
+  <div class="sg-menu sg-cm" [class.subl]="cmSubLeft" [class.subu]="cmSubUp" [style.left.px]="cm.x" [style.top.px]="cm.y" (mousedown)="$event.stopPropagation(); $event.preventDefault()" (contextmenu)="$event.preventDefault()" (keydown)="onMenuKey($event)" role="menu">
+    <button type="button" class="mi" (mouseenter)="cm.sub = null" (click)="copyViaMenu(true)" [disabled]="readOnly">Cut<kbd>Ctrl+X</kbd></button>
+    <button type="button" class="mi" (mouseenter)="cm.sub = null" (click)="copyViaMenu(false)">Copy<kbd>Ctrl+C</kbd></button>
+    <button type="button" class="mi" (mouseenter)="cm.sub = null" (click)="pasteViaMenu()" [disabled]="readOnly">Paste<kbd>Ctrl+V</kbd></button>
+    @if (!readOnly) {
+      <div class="sep"></div>
+      <button type="button" class="mi" (mouseenter)="cm.sub = null" (click)="insertRows('above')">Insert {{ cmRowsLabel }} above</button>
+      <button type="button" class="mi" (mouseenter)="cm.sub = null" (click)="insertRows('below')">Insert {{ cmRowsLabel }} below</button>
+      <button type="button" class="mi" (mouseenter)="cm.sub = null" (click)="duplicateRows()">Duplicate {{ cmRowsLabel }}</button>
+      <button type="button" class="mi" (mouseenter)="cm.sub = null" (click)="moveRows('up')" [disabled]="!cm.canMove" [title]="cm.canMove ? '' : 'Clear the sort and filters to move rows'">Move {{ cmRowsLabel }} up</button>
+      <button type="button" class="mi" (mouseenter)="cm.sub = null" (click)="moveRows('down')" [disabled]="!cm.canMove" [title]="cm.canMove ? '' : 'Clear the sort and filters to move rows'">Move {{ cmRowsLabel }} down</button>
+      <button type="button" class="mi danger" (mouseenter)="cm.sub = null" (click)="askDelete()">Delete {{ cmRowsLabel }}</button>
+      <div class="sep"></div>
+      @if (statuses.length) {
+        <div class="mi sub" tabindex="-1" data-sub="status" (mouseenter)="cm.sub = 'status'" (click)="cm.sub = 'status'">Row colour<i class="arr"></i>
+          @if (cm.sub === 'status') {
+            <div class="sg-menu sg-sub">
+              @for (s of statuses; track s.code) {
+                <button type="button" class="mi" (click)="setStatus(s.code)">
+                  <span class="sw" [style.background-color]="s.bg" [style.color]="s.fg">A</span>{{ s.label }}
+                  @if (currentStatus === s.code) { <i class="tick"></i> }
+                </button>
+              }
+              <div class="sep"></div>
+              <button type="button" class="mi" (click)="setStatus(null)"><span class="sw none"></span>No colour</button>
+            </div>
+          }
+        </div>
+      }
+      <div class="mi sub" tabindex="-1" data-sub="fmt" (mouseenter)="cm.sub = 'fmt'" (click)="cm.sub = 'fmt'">Format cells<i class="arr"></i>
+        @if (cm.sub === 'fmt') {
+          <div class="sg-menu sg-sub">
+            <button type="button" class="mi" (click)="toggleBold(); closeMenus(); focus()">Bold<kbd>Ctrl+B</kbd></button>
+            <div class="mh">Text colour</div>
+            <div class="pal">
+              @for (c of textColours; track c) { <button type="button" class="pc" [style.background-color]="c" [title]="c" (click)="setCellColour('fg', c)"></button> }
+              <button type="button" class="pc none" title="Default" (click)="setCellColour('fg', null)"></button>
+            </div>
+            <div class="mh">Fill colour</div>
+            <div class="pal">
+              @for (c of fillColours; track c) { <button type="button" class="pc" [style.background-color]="c" [title]="c" (click)="setCellColour('bg', c)"></button> }
+              <button type="button" class="pc none" title="None" (click)="setCellColour('bg', null)"></button>
+            </div>
+            <div class="sep"></div>
+            <button type="button" class="mi" (click)="clearFormat()">Clear formatting</button>
+          </div>
+        }
+      </div>
+      <div class="sep"></div>
+      <button type="button" class="mi" (mouseenter)="cm.sub = null" (click)="clearSelection(); closeMenus(); focus()">Clear cells<kbd>Delete</kbd></button>
+    }
+    @for (it of cmItems; track it.action) {
+      @if (it.divider || $first) { <div class="sep"></div> }
+      <button type="button" class="mi" (mouseenter)="cm.sub = null" [disabled]="it.disabled" (click)="runContext(it)">{{ it.label }}</button>
+    }
+  </div>
+}
+
+<!-- delete confirmation -->
+@if (confirmDel) {
+  <div class="sg-modal" (mousedown)="$event.stopPropagation()">
+    <div class="sg-dlg" role="dialog" aria-modal="true">
+      <h4>Delete {{ confirmDel.rowIds.length === 1 ? 'this row' : confirmDel.rowIds.length + ' rows' }}?</h4>
+      <p>The {{ confirmDel.rowIds.length === 1 ? 'row is' : 'rows are' }} removed from the sheet with every value in {{ confirmDel.rowIds.length === 1 ? 'it' : 'them' }}.</p>
+      <div class="acts">
+        <button type="button" class="b" (click)="confirmDel = null; focus()">Cancel</button>
+        <button type="button" class="b p danger" (click)="doDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- one row's cells: gutter, frozen cells (sticky), the rendered window of scrolling cells -->
+<ng-template #cellsTpl let-vm>
+  <div class="sg-g">{{ vm.n }}</div>
+  @for (c of fcols; track c.key) {
+    @let f = vm.f[c.key];
+    <div class="sg-c fz" [style.left.px]="c.x" [style.width.px]="c.w" [class.r]="c.right" [class.ctr]="c.center"
+         [class.b]="f?.bold" [style.background-color]="f?.bg" [style.color]="f?.fg"
+         [class.lk]="vm.lk[c.key]" [attr.data-t]="vm.tg[c.key]" [attr.title]="vm.tt[c.key]">{{ vm.v[c.key] }}</div>
+  }
+  @for (c of scols; track c.key) {
+    @let f = vm.f[c.key];
+    <div class="sg-c" [style.left.px]="c.x" [style.width.px]="c.w" [class.r]="c.right" [class.ctr]="c.center"
+         [class.b]="f?.bold" [style.background-color]="f?.bg" [style.color]="f?.fg"
+         [class.lk]="vm.lk[c.key]" [attr.data-t]="vm.tg[c.key]" [attr.title]="vm.tt[c.key]">{{ vm.v[c.key] }}</div>
+  }
+</ng-template>
+
+<!-- one overlay pane: merged cells, row highlight, selection, copy marquee, fill preview, active cell, fill handle, editor -->
+<ng-template #paneTpl let-p>
+  @for (m of p.merges; track m.k) {
+    <div class="sg-merge" [class.r]="m.right" [class.ctr]="m.center" [class.b]="m.bold" [class.multi]="m.multi"
+         [style.left.px]="m.x" [style.top.px]="m.y - p.off" [style.width.px]="m.w" [style.height.px]="m.h"
+         [style.background-color]="m.bg" [style.color]="m.fg" [attr.title]="m.tip">{{ m.text }}</div>
+  }
+  @if (p.gut) {
+    <div class="sg-gsel" [class.full]="selMode === 'rows'" [style.top.px]="p.gut.y" [style.height.px]="p.gut.h"></div>
+  }
+  @if (p.sel) {
+    <div class="sg-sel" [class]="p.selCls" [style.left.px]="p.sel.x" [style.top.px]="p.sel.y" [style.width.px]="p.sel.w" [style.height.px]="p.sel.h"></div>
+  }
+  @if (p.mark) {
+    <div class="sg-mark" [class]="p.markCls" [style.left.px]="p.mark.x" [style.top.px]="p.mark.y" [style.width.px]="p.mark.w" [style.height.px]="p.mark.h"></div>
+  }
+  @if (p.fill) {
+    <div class="sg-fillp" [class]="p.fillCls" [style.left.px]="p.fill.x" [style.top.px]="p.fill.y" [style.width.px]="p.fill.w" [style.height.px]="p.fill.h"></div>
+  }
+  @if (p.act) {
+    <div class="sg-act" [class]="p.actCls" [style.left.px]="p.act.x" [style.top.px]="p.act.y" [style.width.px]="p.act.w" [style.height.px]="p.act.h"></div>
+  }
+  @if (p.hdl) {
+    <div class="sg-hdl" [style.left.px]="p.hdl.x" [style.top.px]="p.hdl.y" (mousedown)="onHandleDown($event)" title="Drag to fill, double-click to fill down"></div>
+  }
+  @if (p.ed && editing) {
+    <textarea #ed class="sg-ed" [class.ml]="editing.kind === 'ml'" [style.left.px]="p.ed.x" [style.top.px]="p.ed.y" [style.min-width.px]="p.ed.w"
+              spellcheck="false" autocomplete="off" [attr.aria-label]="editing.header"></textarea>
+    @if (editing.kind === 'choice' && edListOpen) {
+      <div class="sg-list" [class.up]="edListUp" [style.left.px]="p.ed.x" [style.top.px]="edListUp ? p.ed.y : p.ed.y + rowH + 1" [style.min-width.px]="p.ed.w">
+        @for (v of edList; track v; let i = $index) {
+          <div class="li" [class.on]="i === edListIdx" (mousedown)="onListDown($event, v)">{{ v }}</div>
+        }
+      </div>
+    }
+    @if (editing.kind === 'date' && edPreview) {
+      <div class="sg-hint" [style.left.px]="p.ed.x" [style.top.px]="p.ed.y + rowH + 1">{{ edPreview }}</div>
+    }
+  }
+</ng-template>

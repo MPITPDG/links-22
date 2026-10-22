@@ -1,7 +1,8 @@
-import { Component, ChangeDetectionStrategy, ViewChild, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ViewChild, OnInit, OnDestroy, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastCommonService } from '../../../shared/service/toastService';
 import { ConsignmentDraftService, ConsignmentDraft, ConsignmentDraftBody, DRAFT_START_FIELDS, DRAFT_MAIN_FIELDS } from './consignment-draft.service';
+import { ConsignmentPrefillService, ConsignmentPrefill } from './consignment-prefill.service';
 import { UiStep } from '../../../shared/ui';
 import { SharedDataSerice } from '../../export-share-data.service';
 import { ConsgStartComponent } from './consg-start.component';
@@ -26,6 +27,12 @@ import { ConsgMainComponent } from './consg_main.component';
  * Links: MP's "Prefill from invoice" drawer is NOT ported (it needs an external
  * service with a hard-coded key; deferred). The draft band (per-login
  * localStorage, `links_` key prefix) is ported.
+ *
+ * Sheet view pre-fill (ConsignmentPrefillService): Export > Sheet view >
+ * Convert to job opens this page with a payload. While that session is active
+ * a banner says so, page 1 and (on Continue) the master are filled through
+ * their own handlers, and the user's stored draft is neither offered, nor
+ * snapshotted over, nor cleared. Without a session nothing here changes.
  */
 @Component({
     selector: 'app-consg-workspace',
@@ -35,13 +42,14 @@ import { ConsgMainComponent } from './consg_main.component';
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
-export class ConsgWorkspaceComponent implements OnInit, OnDestroy {
+export class ConsgWorkspaceComponent implements OnInit, AfterViewInit, OnDestroy {
 
     constructor(private _sharedconsig: SharedDataSerice,
                 private _draftSvc: ConsignmentDraftService,
                 private _router: Router,
                 private _toaster: ToastCommonService,
-                private _cdr: ChangeDetectorRef) { }
+                private _cdr: ChangeDetectorRef,
+                private _prefillSvc: ConsignmentPrefillService) { }
 
     // ------------------------------------------------------------------
     // Draft. One draft per login in localStorage. Snapshotted every 1.5 s
@@ -63,12 +71,72 @@ export class ConsgWorkspaceComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this._draftSvc.reset();
         this.seenGeneration = this._draftSvc.generation;
-        this.draft = this._draftSvc.load();
+        // A Sheet view pre-fill takes the page: the stored draft is not offered meanwhile.
+        const pre = this._prefillSvc.take();
+        this.draft = pre ? null : this._draftSvc.load();
         this.draftTimer = setInterval(() => this.snapshotDraft(), 1500);
+    }
+
+    /**
+     * Page 1's half of a pre-fill. Handed over once the child exists, a tick
+     * after this first check (nothing bound changes inside it); the child holds
+     * it until its own lists have loaded.
+     */
+    ngAfterViewInit(): void {
+        const pre = this._prefillSvc.active;
+        if (!pre) { return; }
+        setTimeout(() => {
+            if (this._prefillSvc.active === pre && this.startChild) { this.startChild.applyPrefill(pre.start || {}); }
+        });
     }
 
     ngOnDestroy(): void {
         if (this.draftTimer) { clearInterval(this.draftTimer); this.draftTimer = null; }
+        // Left without Submit / Abort (Search, the sidebar ...): the session ends, so the
+        // next Export Master opens blank. A browser refresh never gets here, so the
+        // session's sessionStorage copy survives it. No-op without a session.
+        this._prefillSvc.onAborted('left');
+    }
+
+    // ------------------------------------------------------------------
+    // Sheet view pre-fill banner.
+    // ------------------------------------------------------------------
+
+    /** The active pre-fill session; null = none (the page behaves as before). */
+    get prefill(): ConsignmentPrefill { return this._prefillSvc.active; }
+
+    get prefillRows(): string {
+        const s: any = (this.prefill && this.prefill.source) || {};
+        const ids: any[] = Array.isArray(s.rowIds) ? s.rowIds : [];
+        let t = ids.length ? ((ids.length === 1 ? 'row ' : 'rows ') + ids.join(', ')) : 'one row';
+        if (s.tabCode) { t += ' (' + s.tabCode + ')'; }
+        return t;
+    }
+
+    get prefillNotes(): string[] { return this._prefillSvc.notes; }
+
+    /**
+     * "Discard pre-fill": end the session (the sheet row stays unconverted) and
+     * carry on with a blank consignment, as a fresh page would - including the
+     * offer of the user's own stored draft, untouched meanwhile. The master's
+     * TMP order / package lines go with its next load, as after Edit parties.
+     */
+    discardPrefill(): void {
+        if (!this._prefillSvc.isActive) { return; }
+        if (this.mainChild && this.mainChild.saving) { return; }
+        if (!confirm('Discard the values pre-filled from the Sheet view and start a blank consignment? The sheet row stays unconverted.')) { return; }
+        this._prefillSvc.onAborted('discard');
+        this.restartAfterPrefill();
+    }
+
+    /** A pre-fill session just ended here: rebuild both halves blank and offer the stored draft again. */
+    private restartAfterPrefill(): void {
+        this.started = false;
+        this.step = 'main';
+        this.startKey = [this.startKey[0] + 1];
+        this.mainKey = [this.mainKey[0] + 1];
+        this.draft = this._draftSvc.load();
+        window.scrollTo(0, 0);
     }
 
     get draftWhen(): string {
@@ -100,6 +168,7 @@ export class ConsgWorkspaceComponent implements OnInit, OnDestroy {
     }
 
     snapshotDraft(force: boolean = false): void {
+        if (this._prefillSvc.isActive) { return; }          // Sheet view pre-fill: never over the user's draft
         if (this.draft) { return; }                         // band still open
         if (!this.startChild) { return; }
         if (this.mainChild && this.mainChild.saving && !force) { return; }
@@ -151,6 +220,7 @@ export class ConsgWorkspaceComponent implements OnInit, OnDestroy {
 
     /** Save bar "Keep as draft": write the draft now and leave. */
     keepDraftAndLeave(): void {
+        if (this._prefillSvc.isActive) { return; }          // button hidden during a pre-fill (allowDraft)
         this.draft = null;
         this.snapshotDraft(true);
         this._toaster.toast('info', 'Draft', 'Draft kept in this browser. Open Export Master to restore it.');
@@ -227,6 +297,14 @@ export class ConsgWorkspaceComponent implements OnInit, OnDestroy {
     onContinued(): void {
         this.step = 'main';
         this.started = true;
+        // Sheet view pre-fill: the master holds its half until its lists arrive.
+        // Every Continue opens a freshly built master (Edit parties rebuilds it)
+        // whose own load empties this login's TMP order / package lines, so the
+        // half is handed to each one.
+        const pre = this._prefillSvc.active;
+        if (pre && pre.main && this.mainChild) {
+            this.mainChild.applyPrefill(pre.main);
+        }
         // The master's own load starts on this lock -> unlock transition; it
         // holds the draft until its lists arrive. Cleared so it can never be
         // written twice.
@@ -245,6 +323,16 @@ export class ConsgWorkspaceComponent implements OnInit, OnDestroy {
     startKey: number[] = [0];
 
     onAborted(): void {
+        // Sheet view pre-fill: Abort ends the session and goes back to where
+        // Convert to job came from (without a returnUrl: a fresh page, as below,
+        // which offers the user's untouched stored draft again).
+        if (this._prefillSvc.isActive) {
+            const back = this._prefillSvc.returnUrl;
+            this._prefillSvc.onAborted('abort');
+            if (back) { this._router.navigateByUrl(back); return; }
+            this.restartAfterPrefill();
+            return;
+        }
         this.draft = null;
         this.started = false;
         this.step = 'main';
