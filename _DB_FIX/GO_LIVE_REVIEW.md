@@ -1,14 +1,31 @@
 # Go-live review - what is left, in order, with every query
 
-Prepared 2026-10-22 for one last read-through before the final deploy. `DEPLOY_ORDER.md` stays the master list;
-this file walks through what is still open, and puts every check query in one place, ready to paste into SSMS.
+Prepared 2026-10-22, updated 2026-10-23, for one last read-through before the final deploy. `DEPLOY_ORDER.md`
+stays the master list; this file walks through what is still open, and puts every check query in one place,
+ready to paste into SSMS.
 
-Commits to deploy from `main`:
+Commits to deploy from `main` (both repos checked 2026-10-23: local = GitHub, nothing unpushed):
 
 | Repo | Commit | What |
 |---|---|---|
-| links-22 | `18abfe7` (includes `b0e66ef`) | Front end incl. Export › Sheet view; `_DB_FIX` scripts |
+| links-22 | `2f940d4` | Front end. New since the last publish: Export › Sheet view (`b0e66ef`, KPI fix `e73eb7a`), company 32 OLSPL logo (`f79c5ab`), file uploads fixed (`2f940d4`); plus the `_DB_FIX` scripts |
 | Links_v5_API | `91ab5c0` | `ExportSheetController` (api/Export/Sheet/*) on top of everything published on 2026-10-21 |
+
+**The order, in one line each** (details in the numbered sections below):
+
+1. Decide the company scope of a sheet month (section 1).
+2. Publish the Links API from `main` `91ab5c0` (section 2).
+3. Run `EXPORT_SHEET_VIEW_LINKSDB20_20261021.sql` on LinksDB20 (section 3). **Done 2026-10-23**, no errors.
+4. Optional: run `TEST_EXPORT_SHEET_VIEW_LINKSDB20_20261021.sql` at a quiet moment (section 4). **Done
+   2026-10-23**: 123 checks passed, 0 failed, no rows left behind.
+5. Build and publish the front end from `main` `2f940d4` (section 5).
+6. Grant forms 448-450 in Form-wise Rights (section 6).
+7. Assign the sheet roles in Sheet view › Column Access (section 7).
+8. Cut-over: import the live workbook once (section 8).
+9. Smoke test (section 9).
+
+Nothing else is pending: the dashboard fixes (5c, 5d) and every other database step are already live, and the
+company 32 logo and the upload fix need only the front-end publish in step 5.
 
 ## 0. Already live - nothing to do
 
@@ -111,11 +128,18 @@ forms 448-450 with any rights granted on them, and drops the tables **only while
   commit on closing.
 * Only IDENTITY counters move (the next real ids are a few numbers higher); the script prints them.
 
-## 5. Front end - links-22 `18abfe7`
+## 5. Front end - links-22 `2f940d4`
 
 1. `src/app/app.constants.ts` must point at the production API before building.
 2. `npm ci && npx ng build --configuration production`, then publish `publish/` as usual.
 3. New in the menu: Consignment › Consignment › **Sheet view** (`/export/sheet`), after Search.
+4. Company 32 (OCEAN LINKS SHIPPING) shows its OLSPL logo: the ribbon emblem in both navbars, the full logo on
+   the module picker, Tax Invoice, Export Docket and Sales Quotations, and a new `HEADER_OCEAN_LINKS.JPG`
+   letterhead on Proforma / Purchase / vouchers / JV / Credit Note. Same file name as before, so no database
+   change; a browser that cached the old letterhead may need one hard refresh (Ctrl+F5). Companies 30 and 31
+   are unchanged.
+5. File uploads work again: the shared interceptor no longer forces JSON on file uploads (Upload IRN, HBL
+   upload, bank statement, TDS 26AS, Client EDI file upload, company logo, user photo, client master).
 
 ## 6. Rights - Admin › Form-wise Rights
 
@@ -212,6 +236,9 @@ cut-over numbers will differ by whatever was added since.
    mode of shipment and services are empty until you choose; Submit returns to the sheet with FF JOB filled.
    Use a real shipment that needs a job anyway - a job created here is a real Links job.
 6. History panel shows each change with Restore; KPI tab works out the parts / frames rule.
+7. Company 32: choose Ocean Links Shipping; the navbar shows the ribbon emblem, and a Tax Invoice and a Proforma
+   show the OLSPL logo and letterhead (Ctrl+F5 once if the old letterhead still shows).
+8. One real file upload (for example Upload IRN or a bank statement) reaches the API and comes back with rows.
 
 Activity checks (read-only), any time after go-live:
 
@@ -239,7 +266,7 @@ SELECT TOP 5 * FROM dbo.TBL_EXPT_JOB_STATE_RUNLOG ORDER BY run_id DESC;
 | October import | Its generated `ROLLBACK_IMPORT_...sql` (refuses once anyone has edited the month) |
 | Sheet view database | `ROLLBACK_EXPORT_SHEET_VIEW_LINKSDB20_20261021.sql` (keeps tables that hold data unless forced) |
 | API | Republish the previous build; the page then shows "not deployed yet" |
-| Front end | Republish the previous `publish/`; the menu entry disappears |
+| Front end | Republish the previous `publish/`; the Sheet view menu entry, the company 32 logo and the upload fix go with it |
 | Dashboards (already live) | `ROLLBACK_PAYABLE_DASHBOARD_PERF_...sql`, `ROLLBACK_FINANCE_DASHBOARD_PERF_...sql` |
 
 ## 11. Still open, not part of this deploy
