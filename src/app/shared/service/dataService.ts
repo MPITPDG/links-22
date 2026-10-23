@@ -639,7 +639,14 @@ ConvertNumberToWordsNew(number) {
 export class CustomInterceptor implements HttpInterceptor {
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        if (!req.headers.has('Content-Type')) {
+        // Never force JSON on a FormData (file upload), Blob or URLSearchParams body: the browser
+        // must set that Content-Type itself (multipart needs its boundary), otherwise the API
+        // receives no file and returns an empty dataset. This broke every upload page that posts
+        // through the shared HttpClient (Upload IRN, HBL upload, bank statement, TDS 26AS,
+        // Client EDI file upload, company logo, user photo, client master).
+        const ownContentType = req.body instanceof FormData || req.body instanceof Blob
+            || req.body instanceof URLSearchParams;
+        if (!req.headers.has('Content-Type') && !ownContentType) {
             req = req.clone({ headers: req.headers.set('Content-Type', 'application/json') });
         }
 
