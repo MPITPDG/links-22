@@ -1,0 +1,166 @@
+<!--
+  Export job view > History (phase 1, read-only, Links SA only). Sits inside the page's "History" card
+  (cong-main-view.component.html, id mv-history). Everything shown is built by job-history.logic.ts from
+  USP_EXPT_JOB_HISTORY: the Created card (day-1 snapshot), then the save sessions with before -> after per field.
+-->
+<div class="jh">
+  @switch (state) {
+    @case ('idle') {
+      <div class="cs-pad jh-soft">
+        The history loads when this section comes into view.
+        <button type="button" class="btn sm g" (click)="ensureLoaded()">Show history</button>
+      </div>
+    }
+    @case ('loading') {
+      <div class="cs-pad jh-soft">Loading the history…</div>
+    }
+    @case ('undeployed') {
+      <div class="cs-note">History is not deployed yet.</div>
+    }
+    @case ('denied') {
+      <div class="cs-note">{{ message }}</div>
+    }
+    @case ('notfound') {
+      <div class="cs-note">{{ message }}</div>
+    }
+    @case ('empty') {
+      <div class="cs-note">No history recorded for this job.</div>
+    }
+    @case ('error') {
+      <div class="cs-note jh-err">
+        <span>The history could not be loaded: {{ message }}</span>
+        <button type="button" class="btn sm g" (click)="retry()">Try again</button>
+      </div>
+    }
+    @case ('ready') {
+      <!-- ===== created ===== -->
+      <div class="cs-sub">Created</div>
+      <div class="cs-pad jh-line">
+        @if (model.created) {
+          <b>{{ model.created.modeLabel }}</b>
+          <span [title]="model.created.atFull">{{ model.created.atText }}</span>
+          <span>by {{ who(model.created) }}</span>
+          @if (model.created.ip) { <span class="jh-soft">from <span class="mono">{{ model.created.ip }}</span></span> }
+        } @else {
+          <span class="jh-soft">No creation snapshot was recorded for this job (the job audit starts in April 2020).</span>
+          @if (model.header?.createdWho) { <span>Job owner: {{ model.header.createdWho }}</span> }
+        }
+        @if (model.header?.docRecd) { <span class="jh-soft">· documents received {{ model.header.docRecd }}</span> }
+      </div>
+      @if (model.created) {
+        @for (g of model.createdGroups; track g.section) {
+          <div class="jh-gh">{{ g.label }}</div>
+          <div class="kv4">
+            @for (v of g.values; track v.column) {
+              <div class="kv"><span class="k" [title]="v.column">{{ v.label }}</span><span class="v">{{ v.value }}</span></div>
+            }
+          </div>
+        } @empty {
+          <div class="cs-pad jh-soft">The creation snapshot holds no values.</div>
+        }
+      }
+
+      <!-- ===== changes ===== -->
+      <div class="cs-sub">Changes</div>
+      @if (model.sessions.length) {
+        <div class="filters jh-filters">
+          <div class="f">
+            <label for="jhSection">Section</label>
+            <select id="jhSection" class="form-control" [(ngModel)]="filter.section" (ngModelChange)="applyFilter()">
+              <option value="">All sections</option>
+              @for (s of model.sections; track s.id) { <option [value]="s.id">{{ s.label }}</option> }
+            </select>
+          </div>
+          <div class="f">
+            <label for="jhUser">User</label>
+            <select id="jhUser" class="form-control" [(ngModel)]="filter.user" (ngModelChange)="applyFilter()">
+              <option value="">All users</option>
+              @for (u of model.users; track u.id) { <option [value]="u.id">{{ u.label }}</option> }
+            </select>
+          </div>
+          <div class="f f-wide">
+            <label for="jhSearch">Search</label>
+            <input id="jhSearch" type="search" class="form-control" placeholder="Field, value, user or IP" autocomplete="off"
+                   [(ngModel)]="filter.q" (ngModelChange)="applyFilter()" />
+          </div>
+        </div>
+        <div class="toolbar jh-tools">
+          <span class="count">{{ view.length }} session{{ view.length === 1 ? '' : 's' }} · {{ shownChanges }} field change{{ shownChanges === 1 ? '' : 's' }}</span>
+          <div class="tb-r">
+            <label class="jh-chk"><input type="checkbox" [(ngModel)]="filter.hideBare" (ngModelChange)="applyFilter()" /> Hide saves without details</label>
+            @if (filtered) { <button type="button" class="btn sm g" (click)="clearFilters()">Clear filters</button> }
+            <button type="button" class="btn sm g" (click)="toggleOrder()" [title]="filter.newestFirst ? 'Show the oldest first' : 'Show the newest first'">
+              {{ filter.newestFirst ? 'Newest first' : 'Oldest first' }} <i class="fa fa-sort"></i>
+            </button>
+          </div>
+        </div>
+
+        @for (v of view; track v.s.id) {
+          <div class="jh-s">
+            <div class="jh-sh">
+              <b>{{ v.s.who }}</b>
+              <span class="jh-when" [title]="v.s.whenFull">{{ v.s.whenText }}</span>
+              @for (src of v.s.sources; track src) { <span class="chip">{{ sourceLabels[src] }}</span> }
+              @for (m of v.s.modes; track m) { <span class="chip dash">{{ m }}</span> }
+              @if (v.s.ips.length) { <span class="jh-soft mono">{{ v.s.ips.join(', ') }}</span> }
+            </div>
+            <div class="tbl-wrap">
+              <table class="tbl jh-t">
+                <tbody>
+                  @for (r of v.rows; track trackRow($index, r)) {
+                    @if (r.kind === 'section') {
+                      <tr class="jh-sec"><td colspan="4">{{ r.label }}</td></tr>
+                    } @else if (r.kind === 'change') {
+                      <tr>
+                        <td class="jh-fl" [title]="r.c.column">
+                          {{ r.c.label }}
+                          @if (r.c.where) { <span class="jh-where">{{ r.c.where }}</span> }
+                        </td>
+                        <td class="jh-old">
+                          @if (r.c.beforeUnknown) { <span class="jh-soft">not recorded</span> }
+                          @else if (r.c.before === '') { <span class="jh-soft">(empty)</span> }
+                          @else { <span class="old">{{ r.c.before }}</span> }
+                        </td>
+                        <td class="jh-arr" aria-hidden="true">&rarr;</td>
+                        <td class="jh-new">
+                          @if (r.c.after === '') { <span class="jh-soft">(empty)</span> } @else { {{ r.c.after }} }
+                          @if (r.c.times > 1) { <span class="jh-where">{{ r.c.times }} saves</span> }
+                          @if (r.c.back) { <span class="chip dash">changed back</span> }
+                        </td>
+                      </tr>
+                    } @else {
+                      <tr class="jh-item">
+                        <td colspan="4">
+                          @switch (r.e.kind) {
+                            @case ('raw') {
+                              <div class="jh-soft">{{ r.e.modeLabel }}@if (tableText(r.e)) { ({{ tableText(r.e) }}) }: the stored field list and values do not line up, so they are shown as recorded.</div>
+                              <div class="jh-raw mono"><span class="k">Fields</span>{{ r.e.raw?.columns }}</div>
+                              <div class="jh-raw mono"><span class="k">Before</span>{{ r.e.raw?.before || '(not recorded)' }}</div>
+                              <div class="jh-raw mono"><span class="k">After</span>{{ r.e.raw?.after || '(empty)' }}</div>
+                            }
+                            @case ('created') {
+                              <div><b>{{ r.e.modeLabel }}</b>@if (tableText(r.e)) { &middot; {{ tableText(r.e) }} }<span class="jh-soft jh-at" [title]="r.e.atFull">{{ r.e.atText }}</span></div>
+                              @if (r.e.values.length) { <div class="jh-vals">{{ valuesText(r.e) }}</div> }
+                            }
+                            @default {
+                              <span class="jh-soft">{{ r.e.note }}@if (r.e.repeat > 1) { &times;{{ r.e.repeat }} }@if (tableText(r.e) && r.e.src === 'JOB') { &middot; {{ tableText(r.e) }} }</span>
+                              <span class="jh-soft jh-at" [title]="r.e.atFull">{{ r.e.atText }}</span>
+                            }
+                          }
+                        </td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        } @empty {
+          <div class="cs-pad jh-soft">No entries match the filters. <button type="button" class="btn sm g" (click)="clearFilters()">Clear filters</button></div>
+        }
+      } @else {
+        <div class="cs-pad jh-soft">No changes recorded after the job was created.</div>
+      }
+    }
+  }
+</div>

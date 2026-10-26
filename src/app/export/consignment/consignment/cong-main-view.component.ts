@@ -29,6 +29,11 @@ export class ConsigneeMainViewComponent implements OnChanges {
     containerno: string = null;
     vessel: string = null;
 
+    /** History card (job-history): Links SA logins only (the procedure checks the role again). */
+    isSa: boolean = false;
+    /** Set by the History nav entry; the card also loads by itself when it scrolls into view. */
+    historyOpen: boolean = false;
+
     constructor(private _dataService: DataService,
         private _loginService: LoginService,
         private route: ActivatedRoute,
@@ -36,6 +41,8 @@ export class ConsigneeMainViewComponent implements OnChanges {
         private _LoaderService : LoaderService
         //private _redirectToEdoc: RedirectPage
     ) {
+        const login = (this._loginService.getLogin() || [])[0] || {};
+        this.isSa = String(login.ROLETYPE ?? '').trim() === 'SA';
         this.route.params.subscribe(params => {
             this.ExptNo = (params["expt_no"]) ? params["expt_no"] : null;
             this.setViewData(this.ExptNo);
@@ -125,6 +132,12 @@ export class ConsigneeMainViewComponent implements OnChanges {
     scrollToSection(id: string) {
         const el = document.getElementById(id);
         if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    }
+
+    /** History nav entry: load the history now and scroll to its card. */
+    openHistory() {
+        this.historyOpen = true;
+        this.scrollToSection('mv-history');
     }
 
     // openWindow(orderno, styleno, concode) {

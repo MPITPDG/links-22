@@ -38,6 +38,7 @@ import {
     
 } from './consig_main_edit_modal.component';
 import { ConsigneeMainViewComponent } from './cong-main-view.component';
+import { JobHistoryComponent } from './job-history/job-history.component';
 
 import { EditActualFlightDateComponent } from './expt-master-edit-actual-flight-date';
 import { EditCo2Component } from './expt-master-edit-co2';
@@ -58,7 +59,7 @@ import {CreateAutoJobComponent} from './consign_create_new.component';
             MainEditComponent,PortEditComponent,InvoiceEditComponent,OrderNoEditComponent,OrderNoQualityCheckingComponent,
             ITCCodeEditComponent, MarksNumberEditComponent,QuotaEditComponent,PackageEditComponent,DocumentEditComponent,
             ConsigneeRemarkEditComponent, ConsigneeViewComponent,MAWBEditComponent, HAWBEditComponent,JobEditComponent,
-            CancelShipmentComponent,MainCalCbmAddComponent,CreateJobComponent,CreateAutoJobComponent],
+            CancelShipmentComponent,MainCalCbmAddComponent,CreateJobComponent,CreateAutoJobComponent,JobHistoryComponent],
     providers: [],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

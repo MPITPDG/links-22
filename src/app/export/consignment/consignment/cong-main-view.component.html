@@ -5,7 +5,8 @@
   (M / I / C / R / CLP), every show() / showClpView() / openEdoc() call and all bindings
   are unchanged. Links: no CSD chip (France-only), no packing-list upload / order-size
   popup (not in the Links API; Links already had them switched off), E-Document opens
-  eDocument-Links.
+  eDocument-Links. Links SA logins also get a History nav entry + card (job-history, read-only
+  audit trail), which loads when it is opened or scrolled to.
 -->
 <div class="im-page cv-page">
 
@@ -49,6 +50,9 @@
         <button type="button" (click)="scrollToSection('mv-air-shipment-details')">Air shipment</button>
         <button type="button" (click)="scrollToSection('mv-transhipment-details')">Air transhipment</button>
         <button type="button" (click)="scrollToSection('mv-arrival-and-delivery')">Arrival &amp; delivery<span class="n">{{viewData?.Table3?.length || 0}}</span></button>
+        @if (isSa) {
+          <button type="button" (click)="openHistory()">History</button>
+        }
       </nav>
     }
   </div>
@@ -313,6 +317,14 @@
         <div class="kv"><span class="k">PSS</span><span class="v">{{viewData?.Table[0]?.EXPT_PSS}}</span></div>
       </div>
       </div>
+
+      <!-- ================= history (Links SA only; loads when opened / scrolled to) ================= -->
+      @if (isSa) {
+        <div class="card sec cv-anchor" id="mv-history">
+          <div class="card-h"><h2>History</h2><span class="meta">Admins only &middot; read-only</span></div>
+          <app-job-history [exptno]="ExptNo" [open]="historyOpen"></app-job-history>
+        </div>
+      }
 
     </div>
   }
