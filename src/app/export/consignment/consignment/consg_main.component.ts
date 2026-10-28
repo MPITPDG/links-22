@@ -1981,6 +1981,8 @@ export class ConsgMainComponent implements OnInit , OnChanges{
         if (this.exptinvdt == null) { this._toasterService.toast('error', 'Error', "Invoice Date can not be blank"); return false; }
         if (this._dataService.DateFromAndToComparision_exp(this.exptinvdt.formatted,this.docrecdt.formatted) == false) { this._toasterService.toast('error', 'Error', "Invoice Date Should be less than or Equal to Doc. Recd Date."); return false; }
         if (this.invamt == null) { this._toasterService.toast('error', 'Error', "Invoice amount can not be blank"); return false; }
+        // '0' is "Please select": saving without a currency sends no @EXPT_CURNAME and USP_EXP_MST_EXPORT_IU fails
+        if (this.currency == null || this.currency == '0') { this._toasterService.toast('error', 'Error', "Currency can not be blank"); return false; }
         if (this.incoterm != null) {
             if ((this.incoterm == "CIF") || (this.incoterm == "C&I")) {
                 if (this.insuramt == null) {
