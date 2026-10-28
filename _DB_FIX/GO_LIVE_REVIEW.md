@@ -141,9 +141,11 @@ forms 448-450 with any rights granted on them, and drops the tables **only while
 5. File uploads work again: the shared interceptor no longer forces JSON on file uploads (Upload IRN, HBL
    upload, bank statement, TDS 26AS, Client EDI file upload, company logo, user photo, client master).
 
-## 6. Rights - Admin › Form-wise Rights
+## 6. Rights - forms 448-450
 
-Grant per user, like any other screen (SA users need nothing):
+Grant per user (SA users need nothing). The new Links has no rights screen: rights are managed in a separate
+application for now (the classic ASP.NET page "USERS RIGHT - FORM WISE ADVANCE" did it before), or by script.
+The 8 users with sheet roles were granted 448 / 449 on 30110 by script (DEPLOY_ORDER steps 1.11 and 1.12).
 
 | Form | Name | Gives |
 |---|---|---|

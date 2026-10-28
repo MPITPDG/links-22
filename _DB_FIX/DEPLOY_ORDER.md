@@ -23,6 +23,8 @@ failed prerequisite, and has a matching `ROLLBACK_` script in this folder.
 | 8b | `CLEANUP_SHEET_MONTH_202610_TEST_LINKSDB20_20261023.sql` (removes the October 2026 sheet month that was entered by hand on the page to try it, so the one-time workbook import can create that month; every row is first copied into `BAK_EXPT_SHEET_202610_TEST_*` tables, which its `ROLLBACK_` restores with the same ids) | normal login | done 2026-10-23 (month 3, 1,079 rows, 3,470 history entries removed and backed up; Sheet view now holds no month). Drop the six backup tables once the import is in and checked |
 | 9 | `EXPORT_JOB_HISTORY_LINKSDB20_20261024.sql` (Export job view › History, phase 1, read-only: creates `USP_EXPT_JOB_HISTORY` behind api/Export/JobHistory - a job's audit rows from TBL_USERTRACK_EXPTMASTER, EXPT_JOB_TRACKING_LOG and TBL_EXPT_SHEET_LOG, Links SA users only - and index `IX_TBL_USERTRACK_EXPTMASTER_CODE` on TBL_USERTRACK_EXPTMASTER (CODE, DATETIME) when absent). Building the index blocks inserts into that audit table for a few seconds (job saves wait): run it at a quiet moment. No row is written | normal login | done 2026-10-26 (index built in 1.1 s; a job's history in 6-80 ms; non-admins get 104) |
 | 10 | `COMPANY32_FULLNAME_ADDRESS_LINKSDB20_20261028.sql` (company 32 / MUM row of `cmp_address` only: `cmp_fullname` NULL → 'OCEAN LINKS SHIPPING PVT. LTD.', so the Tax Invoice header and the Proforma "For ..." line print the whole name; `cmp_add1` '601/602, Star Hub, Tower 1,' → '601, Star Hub, Tower 1,'. Companies 30 and 31 keep 601/602) | normal login | done 2026-10-28 (1 row; re-run says nothing to do) |
+| 11 | `GRANT_SHEET_VIEW_YOGESH_LINKSDB20_20261028.sql` (P YOGESH, cmpid 82: forms 448 View/Add/Modify and 449 View on 30110, 28-Oct-2026 to 31-Dec-2027) | normal login | done 2026-10-28 (2 rows) |
+| 12 | `GRANT_SHEET_VIEW_ROLE_USERS_LINKSDB20_20261028.sql` (the same two rights for the other 7 sheet-role users: 19 LUISED, 22 YUGA, 45 LRAJESH, 71 YJaywant, 79 PEKTA, 80 PSAGAR, 81 JYASH) | normal login | done 2026-10-28 (14 rows; all 8 users current today) |
 
 Already applied on live by the finance port (PR nalini-mp/links-22#1, per its notes), so do not re-run. They are listed here for the record, each with its `ROLLBACK_` twin:
 `REGISTER_EXPORT_PROC_FIXES_20261017.sql`, `PURCHASE_REGISTER_SUPINVNO_FIX_20261018.sql`, `TRIALBALANCE_DATEWISE_BLANK_PURCHASE_AMOUNT_FIX_20261018.sql`, `TRIALBALANCE_FAMILY_BLANK_PURCHASE_AMOUNT_FIX_20261018.sql`. `REVIEW_INVOICES_BROKEN_DATE_20261017.sql` is a review query, not a fix.
@@ -38,7 +40,6 @@ Already applied on live by the finance port (PR nalini-mp/links-22#1, per its no
    - `ACC_creditNote_AUTHORISATION_CHECK`: credit note authorisation check.
    - `fn_Acc_Rpt_CN_Register_AcctDetail_XL`: Credit Note register Excel export.
 6. New endpoint `POST api/Export/JobHistory` { ExptNo, UserId } (ExportJobHistoryController, Export job view › History card, read-only). It needs step 1.9; until both are deployed the card says "History is not deployed yet".
-
 ## 3. Front end (links-22)
 
 1. Make sure `src/app/app.constants.ts` points at the production API before building (it is switched locally during development).
