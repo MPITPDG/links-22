@@ -1,0 +1,175 @@
+<!--
+  Admin -> Opening Balance -> Carry Forward.
+  Transfer tab: "To year" select + company / city grid with tick boxes (cmpCityList, select-all via allSelected),
+  Submit in the sticky bar (submit(), confirm() before the run). Result text in resultOk / resultFail.
+  History tab (only when historyAvailable, i.e. the audit log is installed): runs from logList; "View changes"
+  opens one run's ledger changes (openLog -> logDetail, Back = closeLog).
+  Links V22 port of the Angular 8 screen (kit .im-page + host class kit-accreport); .ts logic unchanged.
+-->
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>{{Header}}</h1>
+      <p>Copy each ledger's closing balance of the previous year into the opening balance of the chosen year</p>
+    </div>
+    <div class="tools">
+      @if (activeTab=='HISTORY' && selectedLog) {
+        <button class="btn g" type="button" (click)="closeLog()">Back to history</button>
+      }
+      @if (historyAvailable) {
+        <div class="fk-seg fk-tabs">
+          <button type="button" [class.on]="activeTab=='TRANSFER'" (click)="showTab('TRANSFER')">Transfer</button>
+          <button type="button" [class.on]="activeTab=='HISTORY'" (click)="showTab('HISTORY')">History</button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- ===================================================== TRANSFER -->
+  @if (activeTab=='TRANSFER') {
+    @if (resultOk) {
+      <div class="card fk-alert">{{resultOk}}</div>
+    }
+    @if (resultFail) {
+      <div class="card fk-alert fk-strong">{{resultFail}}</div>
+    }
+
+    <div class="card sec">
+      <div class="card-h"><h2>Transfer</h2><span class="meta"><b>*</b> required</span></div>
+      <div class="fk-note nb">
+        Copies the closing balance of the <b>previous</b> financial year into the opening balance of the
+        <b>To year</b> you choose, for every company / city ticked below. Any opening balance already stored
+        for that company / city and year is <b>replaced</b>. Run it after the year-end closing entries are
+        posted, and again if entries dated in the earlier year are added or changed afterwards.
+      </div>
+      <div class="filters">
+        <div class="f">
+          <label for="opbYear">To year <span class="req">*</span></label>
+          <select id="opbYear" name="opbYear" [(ngModel)]="selectedYear">
+            <option value="0">Select account year</option>
+            @for (y of yearList; track y.yearcode) {
+              <option [value]="y.yearcode">{{y.AcctYear}}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <span class="count">{{cmpCityList.length}} {{cmpCityList.length === 1 ? 'company / city' : 'companies / cities'}}</span>
+        <span class="sub-t">{{selectedCount}} selected</span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th class="ck"><input type="checkbox" name="opbAll" [(ngModel)]="allSelected" (change)="toggleAll()" aria-label="Select all" title="Select all"></th>
+              <th>Company</th>
+              <th>City</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of cmpCityList; track r.cmpcitycode; let i = $index) {
+              <tr [class.fk-sel]="r.selected">
+                <td class="ck"><input type="checkbox" [name]="'opbRow'+i" [(ngModel)]="r.selected" (change)="onRowToggle()" [attr.aria-label]="r.cmp_name + ' - ' + r.cityname"></td>
+                <td>{{r.cmp_name}}</td>
+                <td>{{r.cityname}}</td>
+              </tr>
+            } @empty {
+              <tr><td class="empty" colspan="3">No company / city found.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="bar">
+      <span class="note">{{selectedCount}} selected @if (selectedYearText) { &middot; into {{selectedYearText}} }</span>
+      <div class="r">
+        <button class="btn p" type="button" (click)="submit()">Submit</button>
+      </div>
+    </div>
+  }
+
+  <!-- ===================================================== HISTORY -->
+  @if (activeTab=='HISTORY') {
+    @if (!selectedLog) {
+      <div class="card sec">
+        <div class="card-h"><h2>Transfer history</h2><span class="meta">{{logList.length}} {{logList.length === 1 ? 'run' : 'runs'}}</span></div>
+        <div class="fk-note nb">
+          Every opening-balance transfer is recorded: who ran it, from which machine, when, and how many
+          ledgers it changed. A run still showing <b>STARTED</b> with no completed time did not finish.
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th class="num">#</th><th>Company-city</th><th>Year</th><th>Status</th><th>User</th><th>Machine</th>
+                <th>Started</th><th>Completed</th><th class="num">Ledgers changed</th><th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (l of logList; track l.LOG_ID) {
+                <tr>
+                  <td class="num">{{l.LOG_ID}}</td>
+                  <td class="mono">{{l.CMPCODE}}{{l.CITYCODE}}</td>
+                  <td>{{l.YEARID}}</td>
+                  <td>
+                    @if (l.STATUS=='OK') { <span class="chip solid">OK</span> }
+                    @else if (l.STATUS=='STARTED') { <span class="chip"><span class="dot"></span>STARTED</span> }
+                    @else { <span class="chip dash">{{l.STATUS}}</span> }
+                  </td>
+                  <td>{{l.APP_USER ? l.APP_USER : '—'}}</td>
+                  <td title="{{l.DB_LOGIN}} / {{l.APP_NAME}}">{{l.HOST_NAME}}</td>
+                  <td>{{l.STARTED_ON}}</td>
+                  <td>{{l.COMPLETED_ON || '—'}}</td>
+                  <td class="num">{{l.LEDGERS_CHANGED}}</td>
+                  <td class="act">
+                    @if (l.STATUS=='OK' && l.LEDGERS_CHANGED > 0) {
+                      <button type="button" (click)="openLog(l)">View changes</button>
+                    }
+                  </td>
+                </tr>
+              } @empty {
+                @if (logLoaded) {
+                  <tr><td class="empty" colspan="10">No transfers recorded yet.</td></tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    } @else {
+      <div class="card sec">
+        <div class="card-h">
+          <h2>Run #{{selectedLog.LOG_ID}} &middot; {{selectedLog.CMPCODE}}{{selectedLog.CITYCODE}} &middot; {{selectedLog.YEARID}}</h2>
+          <span class="meta">{{selectedLog.APP_USER ? selectedLog.APP_USER : 'user not recorded'}} &middot; {{selectedLog.STARTED_ON}}</span>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr><th>Code</th><th>Ledger</th><th class="num">Old opening</th><th class="num">New opening</th><th class="num">Change</th></tr>
+            </thead>
+            <tbody>
+              @for (d of logDetail; track $index) {
+                <tr>
+                  <td class="mono">{{d.CODE}}</td>
+                  <td>{{d.LEDGER}}</td>
+                  <td class="num">{{d.OLD_OP | number:'1.2-2'}}</td>
+                  <td class="num">{{d.NEW_OP | number:'1.2-2'}}</td>
+                  <td class="num">{{d.CHANGE_AMT | number:'1.2-2'}}</td>
+                </tr>
+              }
+              @if (logDetail.length) {
+                <tr class="tot">
+                  <td colspan="4">Net change</td>
+                  <td class="num">{{logDetailNet | number:'1.2-2'}}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="fk-note">Positive = debit (asset) opening increased, negative = credit opening increased.</div>
+      </div>
+    }
+  }
+</div>

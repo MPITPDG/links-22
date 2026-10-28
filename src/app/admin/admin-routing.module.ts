@@ -18,6 +18,10 @@ const routes: Routes = [
             loadChildren: () => import('./companyIU/company-IU.module').then(m => m.CompanyIUModule),
         },       
         {
+            path: 'opbaltransfer',
+            loadChildren: () => import('./opbaltransfer/opbaltransfer.module').then(m => m.OpBalTransferModule),
+        },
+        {
             path: 'financialyear',
             loadChildren: () => import('./adminaccount/adminaccount.module').then(m => m.AdminAccountModule),
         },   

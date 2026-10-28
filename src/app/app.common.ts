@@ -701,6 +701,9 @@
                     { menuid: "3.2", icon: "fa fa-registered", menuname: "Search", routerlink: "/admin/financialyear/FinancialYearsearch", ischild: 'n', parentid: 0, isactive: 1, data: [  ], },
                    
                 ] },
+                { menuid: "6", icon: "fa fa-th-list", menuname: "Opening Balance", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
+                    { menuid: "6.1", icon: "fa fa-registered", menuname: "Carry Forward", routerlink: "/admin/opbaltransfer/transfer", ischild: 'n', parentid: 0, isactive: 1, data: [  ], },
+                ] },
                 // { menuid: "4", icon: "fa fa-th-list", menuname: "Quotation", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
                 //     { menuid: "4.1", icon: "fa fa-registered", menuname: "Master Rate Entry", routerlink: "/admin/Adminacct/QuotRate", ischild: 'n', parentid: 0, isactive: 1, data: [  ], },
                 //     { menuid: "4.2", icon: "fa fa-registered", menuname: "Generate Quotation", routerlink: "/admin/Adminacct/ClientRate/ ", ischild: 'n', parentid: 0, isactive: 1, data: [  ], },
