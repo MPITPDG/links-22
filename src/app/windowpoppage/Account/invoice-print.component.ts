@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DataService } from '../../shared/service/dataService';
 import { ActivatedRoute } from '@angular/router';
 import { LoginService } from '../../shared/service/loginService';
-import { isOlspl, OLS_LOGO } from '../../shared/company-branding';
+import { isOlspl, OLSPL_LOGO } from '../../shared/company-branding';
 import QRCode from 'qrcode';
 
 
@@ -194,12 +194,12 @@ export class InvoicePrintComponent implements OnInit {
   ackText: string = ""
   serviceTaxReg: string = ""
 
-  /** Letterhead logo: company 32 prints its OLS logo; the other companies keep Links_logo1.png. */
+  /** Letterhead logo: company 32 prints its OLSPL logo; the other companies keep Links_logo1.png. */
   logo = 'assets/img/Links_logo1.png';
 
   constructor(public _dataService: DataService,
     private _route: ActivatedRoute, public _loginService: LoginService) {
-    if (isOlspl(this._loginService.getLogin()?.[0]?.CMPCODE)) { this.logo = OLS_LOGO; }
+    if (isOlspl(this._loginService.getLogin()?.[0]?.CMPCODE)) { this.logo = OLSPL_LOGO; }
   }
 
   ngOnInit() {
@@ -433,8 +433,9 @@ export class InvoicePrintComponent implements OnInit {
     }
 
     /* letterhead: logo + company name (Old English, proper-cased) + address from the company resultset */
-    const cmpFull = this.t(this.v(c0, 'cmp_fullname'))
     const bold = this.t(this.v(c0, 'cmp_boldname'))
+    /* company 32 has a bold name but no cmp_fullname: print its whole registered name from cmp_name */
+    const cmpFull = this.t(this.v(c0, 'cmp_fullname')) || (bold !== '' ? this.t(this.v(c0, 'cmp_name')) : '')
     const suffix = cmpFull.replace(new RegExp('^\\s*' + bold.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), '')
     const add1 = this.t(this.v(c0, 'cmp_add1')).replace(/,+$/, '').trim()
     const add2 = this.t(this.v(c0, 'cmp_add2')).replace(/,+$/, '').trim()
