@@ -1,0 +1,232 @@
+/* ============================================================
+   Finance dashboard - C2 "ledger with charts" (approved mock ConceptC2).
+   Listed AFTER finance-dashboard-page.css in the Finance dashboard's styleUrls only.
+   Day-End shares the page css and its root classes but never carries .fd-c2, so every
+   rule here is scoped to :host ::ng-deep .fd-c2 and Day-End is untouched. (.fd-c2 alone,
+   not .fd-page.fd-c2: the prefix is on ~235 selectors and the longer one pushes the file
+   over the 20 kB component-style budget. Equal-specificity ties with the page css are won
+   by load order - this file is listed after it.)
+   Colours: theme tokens only (--mp-*, plus the page css's local --ink / --soft / --line /
+   --band / --sheet / --box). Green and amber have no token yet: --mp-ok / --mp-warn with
+   fallbacks. Shades are color-mix() of a token with the surface, so every palette works.
+   Age ramp: t1..t5 = primary tints, young -> old; d1..d3 = danger, the "old" buckets.
+   ============================================================ */
+:host ::ng-deep .fd-c2{--p:var(--mp-primary);--dn:var(--mp-danger);--ok:var(--mp-ok,#2E7D32);--wn:var(--mp-warn,#A06A0B);--dnT:color-mix(in srgb,var(--dn) 82%,var(--ink));--okT:color-mix(in srgb,var(--ok) 85%,var(--ink));--wnT:color-mix(in srgb,var(--wn) 85%,var(--ink))}
+:host ::ng-deep .fd-c2 .f-p,:host ::ng-deep .fd-c2 .t5{background:var(--p)}
+:host ::ng-deep .fd-c2 .f-dn,:host ::ng-deep .fd-c2 .d3{background:var(--dn)}
+:host ::ng-deep .fd-c2 .f-ok{background:var(--ok)}
+:host ::ng-deep .fd-c2 .f-wn{background:var(--wn)}
+:host ::ng-deep .fd-c2 .f-c1{background:var(--mp-chart-1)}
+:host ::ng-deep .fd-c2 .f-c2{background:var(--mp-chart-2)}
+:host ::ng-deep .fd-c2 .f-c3{background:var(--mp-chart-3)}
+:host ::ng-deep .fd-c2 .f-c4{background:var(--mp-chart-4)}
+:host ::ng-deep .fd-c2 .f-mute{background:var(--box)}
+:host ::ng-deep .fd-c2 .t1{background:color-mix(in srgb,var(--p) 30%,var(--sheet))}
+:host ::ng-deep .fd-c2 .t2{background:color-mix(in srgb,var(--p) 46%,var(--sheet))}
+:host ::ng-deep .fd-c2 .t3{background:color-mix(in srgb,var(--p) 64%,var(--sheet))}
+:host ::ng-deep .fd-c2 .t4{background:color-mix(in srgb,var(--p) 82%,var(--sheet))}
+:host ::ng-deep .fd-c2 .d1{background:color-mix(in srgb,var(--dn) 62%,var(--sheet))}
+:host ::ng-deep .fd-c2 .d2{background:color-mix(in srgb,var(--dn) 80%,var(--sheet))}
+:host ::ng-deep .fd-c2 .cx-late{color:var(--dnT)}
+
+/* ---------- header, section jump-nav, filters (bare on the page ground) ---------- */
+:host ::ng-deep .fd-c2>.ph{align-items:center;padding-bottom:0;margin-bottom:0;border-bottom:0}
+:host ::ng-deep .fd-c2>.ph h1{font-weight:700}
+:host ::ng-deep .fd-c2>.ph .btn,:host ::ng-deep .fd-c2 .cx-filt .btn{border-radius:6px;border-color:var(--box)}
+:host ::ng-deep .fd-c2>.ph .btn.p,:host ::ng-deep .fd-c2>.ph .btn:hover,:host ::ng-deep .fd-c2 .cx-filt .btn.p,:host ::ng-deep .fd-c2 .cx-filt .btn:hover{border-color:var(--p)}
+:host ::ng-deep .fd-c2 .cx-asof{gap:6px;padding:0;border:0;background:none;color:var(--soft);font-weight:500}
+:host ::ng-deep .fd-c2 .cx-asof i{width:7px;height:7px;border-radius:50%}
+:host ::ng-deep .fd-c2 .cx-nav{display:flex;flex-wrap:wrap;gap:0 22px;margin-top:16px;border-bottom:1px solid var(--line)}
+:host ::ng-deep .fd-c2 .cx-nav button{font:inherit;font-weight:500;color:var(--soft);background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;padding:9px 0;cursor:pointer}
+:host ::ng-deep .fd-c2 .cx-nav button:hover,:host ::ng-deep .fd-c2 .cx-nav button:focus-visible{color:var(--ink);border-bottom-color:var(--p);outline:0}
+:host ::ng-deep .fd-c2 .card.cx-filt{margin:0;border:0;background:none}
+:host ::ng-deep .fd-c2 .cx-filt .filters.fk-f{padding:14px 0 6px}
+:host ::ng-deep .fd-c2 .cx-filt .fk-note{padding:0 0 6px;border:0}
+
+/* ---------- sections: uppercase primary label with a rule, description under it ---------- */
+:host ::ng-deep .fd-c2 .fd-sec{margin:0}
+:host ::ng-deep .fd-c2 .fd-sech{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:4px 12px;margin:32px 0 12px;padding:0;border:0;border-radius:0;background:none}
+:host ::ng-deep .fd-c2 .fd-sech::after{content:"";grid-area:1/2;border-top:1px solid var(--line)}
+:host ::ng-deep .fd-c2 .fd-sech h2{font-size:12px;letter-spacing:.09em;color:var(--p);white-space:nowrap}
+:host ::ng-deep .fd-c2 .fd-sech span{grid-column:1/-1;font-size:12.5px}
+:host ::ng-deep .fd-c2 .fd-secnote,:host ::ng-deep .fd-c2 .fd-subband{margin:0 0 12px;padding:0;border:0;background:none;color:var(--soft);font-size:12.5px;font-weight:400;letter-spacing:0;text-transform:none}
+
+/* ---------- KPI strips: attention = one joined 6-cell strip, workload = joined 3 x 2 ---------- */
+:host ::ng-deep .fd-c2 .fd-sec .fd-tile{border-top:1px solid var(--line);border-radius:8px}
+:host ::ng-deep .fd-c2 .fd-sec .fk-kpis>.fd-tile:first-child{background:var(--sheet)}
+:host ::ng-deep .fd-c2 .cx-strip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;margin:0;border:1px solid var(--line);border-radius:8px;background:var(--sheet);overflow:hidden}
+:host ::ng-deep .fd-c2 .cx-strip.w3{grid-template-columns:repeat(3,minmax(0,1fr))}
+:host ::ng-deep .fd-c2 .cx-strip>.fd-tile,:host ::ng-deep .fd-c2 .cx-strip>.fd-tile:first-child{display:flex;flex-direction:column;gap:6px;min-width:0;min-height:156px;padding:14px 16px 13px;border:0;border-left:1px solid var(--line);border-radius:0;background:none}
+:host ::ng-deep .fd-c2 .cx-strip>.fd-tile:first-child{border-left:0}
+:host ::ng-deep .fd-c2 .cx-strip>.fd-tile.fd-kpi-click:hover{background:var(--mp-primary-soft);border-color:var(--line)}
+:host ::ng-deep .fd-c2 .cx-strip.w3>.fd-tile{min-height:170px;padding:16px 20px 15px}
+:host ::ng-deep .fd-c2 .cx-strip.w3>.fd-tile:nth-child(4){border-left:0}
+:host ::ng-deep .fd-c2 .cx-strip.w3>.fd-tile:nth-child(n+4){border-top:1px solid var(--line)}
+:host ::ng-deep .fd-c2 .cx-strip .k{display:flex;align-items:center;gap:6px}
+:host ::ng-deep .fd-c2 .cx-strip .k svg{flex:none;color:var(--p)}
+:host ::ng-deep .fd-c2 .cx-strip .k .go{margin-left:auto;font-weight:500;letter-spacing:0;text-transform:none}
+:host ::ng-deep .fd-c2 .cx-strip .v{margin:0;font-size:24px;letter-spacing:-.015em}
+:host ::ng-deep .fd-c2 .cx-strip.w3 .v{font-size:26px}
+:host ::ng-deep .fd-c2 .cx-strip .s{margin:0}
+:host ::ng-deep .fd-c2 .cx-vrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+:host ::ng-deep .fd-c2 .cx-pill{align-self:flex-start;display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:999px;background:var(--band);color:var(--soft);font-size:11px;font-weight:600;white-space:nowrap}
+:host ::ng-deep .fd-c2 .cx-pill.dn{color:var(--dnT);background:color-mix(in srgb,var(--dn) 11%,var(--sheet))}
+:host ::ng-deep .fd-c2 .cx-pill.ok{color:var(--okT);background:color-mix(in srgb,var(--ok) 11%,var(--sheet))}
+:host ::ng-deep .fd-c2 .cx-pill.wn{color:var(--wnT);background:color-mix(in srgb,var(--wn) 12%,var(--sheet))}
+:host ::ng-deep .fd-c2 .cx-foot{display:grid;gap:5px;margin-top:auto;padding-top:4px}
+:host ::ng-deep .fd-c2 .cx-sub{display:flex;justify-content:space-between;gap:6px}
+:host ::ng-deep .fd-c2 .cx-sub b,:host ::ng-deep .fd-c2 .cx-ml b,:host ::ng-deep .fd-c2 .cx-stkl b{color:var(--ink);font-weight:600}
+:host ::ng-deep .fd-c2 .cx-ml{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 10px;font-size:11px}
+:host ::ng-deep .fd-c2 .cx-mm,:host ::ng-deep .fd-c2 .cx-ms{display:flex;gap:2px;height:6px;border-radius:3px;overflow:hidden}
+:host ::ng-deep .fd-c2 .cx-mm{background:var(--band)}
+:host ::ng-deep .fd-c2 .cx-ms.h8{height:8px}
+:host ::ng-deep .fd-c2 .cx-mm>span,:host ::ng-deep .fd-c2 .cx-ms>span{border-radius:2px}
+:host ::ng-deep .fd-c2 .cx-lg i,:host ::ng-deep .fd-c2 .cx-ml i,:host ::ng-deep .fd-c2 .cx-stkl i,:host ::ng-deep .fd-c2 .cx-tp i,:host ::ng-deep .fd-c2 .cx-dli i{display:inline-block;flex:none;width:9px;height:9px;margin-right:5px;border-radius:2px;vertical-align:-1px}
+:host ::ng-deep .fd-c2 .cx-bl{position:relative;display:block;height:12px}
+:host ::ng-deep .fd-c2 .cx-bl>span{position:absolute;top:3px;height:6px;border-radius:3px}
+:host ::ng-deep .fd-c2 .cx-bl .tk{left:0;right:0;background:var(--band)}
+:host ::ng-deep .fd-c2 .cx-bl .ac{left:0}
+:host ::ng-deep .fd-c2 .cx-bl .mk{top:0;width:2px;height:12px;border-radius:1px;background:var(--ink)}
+:host ::ng-deep .fd-c2 .cx-rows2{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:22px;margin:0}
+:host ::ng-deep .fd-c2 .cx-rows2>div{display:flex;flex-direction:column;gap:2px}
+:host ::ng-deep .fd-c2 .cx-rows2 .fd-kpi-row--sum{margin-top:auto}
+:host ::ng-deep .fd-c2 .cx-rows2 .fd-kpi-foot{display:block;grid-column:1/-1}
+
+/* ---------- 12-column grid, equal-height cards, pagers and notes pinned to the bottom ---------- */
+:host ::ng-deep .fd-c2 .cx-g12{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;margin:0}
+:host ::ng-deep .fd-c2 .cx-strip+.cx-g12{margin-top:14px}
+:host ::ng-deep .fd-c2 .cx-g12>.card{margin:0}
+:host ::ng-deep .fd-c2 .s3{grid-column:span 3}
+:host ::ng-deep .fd-c2 .s4{grid-column:span 4}
+:host ::ng-deep .fd-c2 .s5{grid-column:span 5}
+:host ::ng-deep .fd-c2 .s6{grid-column:span 6}
+:host ::ng-deep .fd-c2 .s7{grid-column:span 7}
+:host ::ng-deep .fd-c2 .s8{grid-column:span 8}
+:host ::ng-deep .fd-c2 .s12{grid-column:span 12}
+:host ::ng-deep .fd-c2 .fd-sec .card.sec{display:flex;flex-direction:column;min-width:0;border-color:var(--line);border-radius:8px;overflow:hidden}
+:host ::ng-deep .fd-c2 .fd-sec .card-h{justify-content:flex-start;gap:4px 10px;min-height:46px;padding:12px 16px 8px;border:0;background:none}
+:host ::ng-deep .fd-c2 .fd-sec .card-h h2{font-size:13.5px;font-weight:650;letter-spacing:0;text-transform:none;color:var(--ink)}
+:host ::ng-deep .fd-c2 .fd-sec .card-h .fk-seg{margin-left:auto}
+:host ::ng-deep .fd-c2 .fd-sec .card.sec>.pager,:host ::ng-deep .fd-c2 .fd-sec .card.sec>.fk-note:last-child{margin-top:auto}
+:host ::ng-deep .fd-c2 .fd-sec .fd-top-note{padding:0 16px 8px;border:0;font-size:12.5px}
+:host ::ng-deep .fd-c2 .cx-lg{display:inline-flex;flex-wrap:wrap;gap:4px 14px;margin-left:auto;font-size:11.5px;color:var(--soft)}
+:host ::ng-deep .fd-c2 .cx-lg>span{display:inline-flex;align-items:center}
+
+/* ---------- tables: micro bars, risk chips, utilisation ---------- */
+:host ::ng-deep .fd-c2 .s6 table.tbl{min-width:520px}
+:host ::ng-deep .fd-c2 .cx-ib{display:inline-block;position:relative;width:48px;height:5px;margin-right:8px;border-radius:3px;background:var(--band);vertical-align:middle;overflow:hidden}
+:host ::ng-deep .fd-c2 .cx-ib>span{position:absolute;top:0;bottom:0;left:0;border-radius:3px}
+/* risk column: coloured square + label, no pill */
+:host ::ng-deep .fd-c2 .chip.cx-rk{border:0;background:none;padding:0;gap:6px;color:var(--soft);font-weight:600}
+:host ::ng-deep .fd-c2 .chip.cx-rk::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--mp-strong)}
+:host ::ng-deep .fd-c2 .chip.cx-red{color:var(--dnT)}:host ::ng-deep .fd-c2 .chip.cx-red::before{background:var(--dn)}
+:host ::ng-deep .fd-c2 .chip.cx-amb{color:var(--wnT)}:host ::ng-deep .fd-c2 .chip.cx-amb::before{background:var(--wn)}
+:host ::ng-deep .fd-c2 .chip.cx-grn{color:var(--okT)}:host ::ng-deep .fd-c2 .chip.cx-grn::before{background:var(--ok)}
+:host ::ng-deep .fd-c2 .fd-meter.cx-near div{background:var(--wn)}
+:host ::ng-deep .fd-c2 .fd-meter.cx-over div{background:var(--dn)}
+
+/* ---------- this week: falling-due trio, day list, forecast bars ---------- */
+:host ::ng-deep .fd-c2 .cx-mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin:0;padding:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+:host ::ng-deep .fd-c2 .cx-mini>.fd-tile,:host ::ng-deep .fd-c2 .cx-mini>.fd-tile:first-child{min-width:0;padding:10px 16px;border:0;border-left:1px solid var(--line);border-radius:0;background:none}
+:host ::ng-deep .fd-c2 .cx-mini>.fd-tile:first-child{border-left:0}
+:host ::ng-deep .fd-c2 .cx-mini .v.sm{margin-top:3px;font-size:19px}
+:host ::ng-deep .fd-c2 .fd-sec .card .fd-band{padding:12px 16px 0;border:0;background:none}
+:host ::ng-deep .fd-c2 .cx-dlist{max-height:176px;overflow-y:auto;border-top:1px solid var(--line)}
+:host ::ng-deep .fd-c2 .cx-dlist .fd-dayrow{border:0}
+:host ::ng-deep .fd-c2 .cx-trkh{width:38%}
+:host ::ng-deep .fd-c2 .cx-trk{display:grid;gap:3px;min-width:120px}
+:host ::ng-deep .fd-c2 .cx-trk>span{display:block;height:10px;min-width:2px;border-radius:0 4px 4px 0}
+
+/* ---------- column charts: one value axis, gridlines, CSS-only hover tooltip ---------- */
+:host ::ng-deep .fd-c2 .cx-vch{padding:4px 16px 12px 58px}
+:host ::ng-deep .fd-c2 .cx-vp{position:relative;height:184px;border-bottom:1px solid var(--box)}
+:host ::ng-deep .fd-c2 .cx-vp.sm{height:150px}
+:host ::ng-deep .fd-c2 .cx-vp.lg{height:230px}
+:host ::ng-deep .fd-c2 .cx-gl{position:absolute;left:0;right:0;border-top:1px solid var(--line)}
+:host ::ng-deep .fd-c2 .cx-gl span{position:absolute;top:-8px;left:-50px;width:42px;text-align:right;white-space:nowrap;font-size:11px;color:var(--soft);font-variant-numeric:tabular-nums}
+:host ::ng-deep .fd-c2 .cx-vcs{position:absolute;inset:0;display:flex;align-items:flex-end;gap:6px}
+:host ::ng-deep .fd-c2 .cx-vc{position:relative;flex:1 1 0;min-width:0;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:2px;border-radius:4px 4px 0 0}
+:host ::ng-deep .fd-c2 .cx-vc:hover{background:color-mix(in srgb,var(--p) 7%,transparent)}
+:host ::ng-deep .fd-c2 .cx-bar{width:min(38px,72%);min-height:2px;border-radius:4px 4px 0 0}
+:host ::ng-deep .fd-c2 .cx-bar.w2{width:min(12px,42%);border-radius:3px 3px 0 0}
+:host ::ng-deep .fd-c2 .cx-vc:hover .cx-bar{filter:brightness(.92)}
+:host ::ng-deep .fd-c2 .cx-tp{position:absolute;z-index:3;top:2px;left:calc(50% + 8px);padding:6px 9px;border:1px solid var(--box);border-radius:6px;background:var(--sheet);box-shadow:0 6px 18px color-mix(in srgb,var(--ink) 12%,transparent);font-size:11.5px;line-height:1.35;white-space:nowrap;opacity:0;transition:opacity .12s;pointer-events:none}
+:host ::ng-deep .fd-c2 .cx-vc.r .cx-tp{left:auto;right:calc(50% + 8px)}
+:host ::ng-deep .fd-c2 .cx-vc:hover .cx-tp{opacity:1}
+:host ::ng-deep .fd-c2 .cx-tp>b{display:block;font-size:12px}
+:host ::ng-deep .fd-c2 .cx-tp span{color:var(--soft)}
+:host ::ng-deep .fd-c2 .cx-tp .tl{display:flex;justify-content:space-between;gap:14px;padding-top:2px}
+:host ::ng-deep .fd-c2 .cx-vx{display:flex;gap:6px;margin-top:6px}
+:host ::ng-deep .fd-c2 .cx-vx>span{flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;font-size:11px;color:var(--soft)}
+:host ::ng-deep .fd-c2 .cx-vx.wr>span{white-space:normal}
+:host ::ng-deep .fd-c2 .cx-vx b{display:block;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+:host ::ng-deep .fd-c2 .cx-vx .fd-old{font-weight:700}
+:host ::ng-deep .fd-c2 .cx-stk{display:flex;gap:2px;height:10px;margin:2px 16px 0}
+:host ::ng-deep .fd-c2 .cx-stk>span{border-radius:2px}
+:host ::ng-deep .fd-c2 .cx-stkl{display:flex;flex-wrap:wrap;gap:4px 16px;padding:7px 16px 6px;font-size:11.5px;color:var(--soft)}
+
+/* ---------- horizontal bars: margin by party from a zero line, top exposure ---------- */
+:host ::ng-deep .fd-c2 .cx-hbs{display:grid;gap:2px;padding:2px 16px 14px}
+:host ::ng-deep .fd-c2 .cx-hb{display:grid;grid-template-columns:140px minmax(0,1fr) 112px;align-items:center;gap:12px;padding:5px 0;font-size:12.5px}
+:host ::ng-deep .fd-c2 .cx-hb.x{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 92px}
+:host ::ng-deep .fd-c2 .cx-hb.fk-click{cursor:pointer}
+:host ::ng-deep .fd-c2 .cx-hb.fk-click:hover .fd-name{color:var(--p);text-decoration:underline}
+:host ::ng-deep .fd-c2 .cx-hb .t{position:relative;height:8px;border-radius:4px;background:var(--band)}
+:host ::ng-deep .fd-c2 .cx-hb .t>div{position:absolute;top:0;bottom:0}
+:host ::ng-deep .fd-c2 .cx-hb .bf{left:0;border-radius:0 4px 4px 0;background:var(--p)}
+:host ::ng-deep .fd-c2 .cx-hb .bf.fd-negbar{border-radius:4px 0 0 4px;background:var(--dn)}
+:host ::ng-deep .fd-c2 .cx-hb .t>.zl{top:-4px;bottom:-4px;width:1px;background:var(--soft)}
+:host ::ng-deep .fd-c2 .cx-hb .n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+:host ::ng-deep .fd-c2 .cx-hb.neg .n{color:var(--dnT);font-weight:600}
+
+/* ---------- quick snapshot rings, revenue donut, funnel ---------- */
+:host ::ng-deep .fd-c2 .cx-rings{flex:1 1 auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:center;gap:16px 10px;padding:6px 14px 16px}
+:host ::ng-deep .fd-c2 .cx-rg{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;font-size:11px;line-height:1.3;color:var(--soft)}
+:host ::ng-deep .fd-c2 .cx-rg .nm{font-size:12.5px;font-weight:600;color:var(--ink)}
+:host ::ng-deep .fd-c2 .cx-ring{--rc:var(--p);position:relative;display:grid;place-items:center;width:82px;height:82px;margin-bottom:4px;border-radius:50%;background:conic-gradient(var(--rc) 0 calc(var(--pc,0)*1%),var(--band) 0)}
+:host ::ng-deep .fd-c2 .cx-ring.dn{--rc:var(--dn)}
+:host ::ng-deep .fd-c2 .cx-ring.wn{--rc:var(--wn)}
+:host ::ng-deep .fd-c2 .cx-ring::before,:host ::ng-deep .fd-c2 .cx-donut::before{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--sheet)}
+:host ::ng-deep .fd-c2 .cx-ring b{position:relative;font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
+:host ::ng-deep .fd-c2 .cx-dn{flex:1 1 auto;display:flex;align-items:center;gap:20px;padding:6px 16px 16px}
+:host ::ng-deep .fd-c2 .cx-donut{position:relative;flex:none;display:grid;place-items:center;width:150px;height:150px;border-radius:50%}
+:host ::ng-deep .fd-c2 .cx-donut::before{inset:22px}
+:host ::ng-deep .fd-c2 .cx-donut div{position:relative;text-align:center;line-height:1.25;font-size:11px;color:var(--soft)}
+:host ::ng-deep .fd-c2 .cx-donut b{display:block;font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums}
+:host ::ng-deep .fd-c2 .cx-dl{flex:1 1 auto;display:grid;gap:9px;min-width:0}
+:host ::ng-deep .fd-c2 .cx-dli{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:2px 8px;font-size:12.5px}
+:host ::ng-deep .fd-c2 .cx-dli b{text-align:right;font-variant-numeric:tabular-nums}
+:host ::ng-deep .fd-c2 .cx-dli small{grid-column:2/4;margin-top:-2px;font-size:11px;color:var(--soft)}
+:host ::ng-deep .fd-c2 .cx-fn{padding:4px 16px 12px}
+:host ::ng-deep .fd-c2 .cx-fs,:host ::ng-deep .fd-c2 .cx-fcv{display:grid;grid-template-columns:150px minmax(0,1fr) 92px;align-items:center;gap:12px}
+:host ::ng-deep .fd-c2 .cx-fs{padding:6px 0}
+:host ::ng-deep .fd-c2 .cx-fs b{display:block;font-size:12.5px}
+:host ::ng-deep .fd-c2 .cx-fs span{font-size:11.5px;color:var(--soft)}
+:host ::ng-deep .fd-c2 .cx-fs .bt{display:flex;justify-content:center;height:22px}
+:host ::ng-deep .fd-c2 .cx-fs .bt>span{border-radius:4px}
+:host ::ng-deep .fd-c2 .cx-fs .n{text-align:right}
+:host ::ng-deep .fd-c2 .cx-fcv{font-size:11px;color:var(--soft)}
+:host ::ng-deep .fd-c2 .cx-fcv span{grid-column:2;text-align:center}
+
+/* ---------- detail tabs and the payables view switch: underline tabs ---------- */
+:host ::ng-deep .fd-c2 .fd-tabbar{margin-bottom:12px;padding:0;border-bottom:1px solid var(--line)}
+:host ::ng-deep .fd-c2 .fd-tabbar>.fk-opts,:host ::ng-deep .fd-c2 .fd-tabbar>.tb-r{padding-bottom:10px}
+:host ::ng-deep .fd-c2 .fk-seg.fd-tabs{gap:0 22px;min-height:0;border:0;border-radius:0;overflow:visible}
+:host ::ng-deep .fd-c2 .fk-seg.fd-tabs button{flex:none;height:auto;margin-bottom:-1px;padding:9px 0;border:0;border-bottom:2px solid transparent;background:none;color:var(--soft);font-size:13px;font-weight:500}
+:host ::ng-deep .fd-c2 .fk-seg.fd-tabs button.on{border-bottom-color:var(--p);background:none;color:var(--ink);font-weight:600}
+
+@media (max-width:1240px){
+:host ::ng-deep .fd-c2 .cx-strip{grid-template-columns:repeat(3,minmax(0,1fr))}
+:host ::ng-deep .fd-c2 .cx-strip>.fd-tile:nth-child(4){border-left:0}
+:host ::ng-deep .fd-c2 .cx-strip>.fd-tile:nth-child(n+4){border-top:1px solid var(--line)}
+:host ::ng-deep .fd-c2 .s3,:host ::ng-deep .fd-c2 .s4,:host ::ng-deep .fd-c2 .s5,:host ::ng-deep .fd-c2 .s6,:host ::ng-deep .fd-c2 .s7,:host ::ng-deep .fd-c2 .s8{grid-column:span 6}
+:host ::ng-deep .fd-c2 .t12{grid-column:span 12}
+}
+@media (max-width:860px){
+:host ::ng-deep .fd-c2 .cx-strip,:host ::ng-deep .fd-c2 .cx-strip.w3,:host ::ng-deep .fd-c2 .cx-mini,:host ::ng-deep .fd-c2 .cx-rows2{grid-template-columns:minmax(0,1fr)}
+:host ::ng-deep .fd-c2 .cx-strip>.fd-tile,:host ::ng-deep .fd-c2 .cx-mini>.fd-tile{border-left:0;border-top:1px solid var(--line)}
+:host ::ng-deep .fd-c2 .cx-strip>.fd-tile:first-child,:host ::ng-deep .fd-c2 .cx-mini>.fd-tile:first-child{border-top:0}
+:host ::ng-deep .fd-c2 .s3,:host ::ng-deep .fd-c2 .s4,:host ::ng-deep .fd-c2 .s5,:host ::ng-deep .fd-c2 .s6,:host ::ng-deep .fd-c2 .s7,:host ::ng-deep .fd-c2 .s8,:host ::ng-deep .fd-c2 .t12{grid-column:span 12}
+:host ::ng-deep .fd-c2 .cx-hb,:host ::ng-deep .fd-c2 .cx-fs,:host ::ng-deep .fd-c2 .cx-fcv{grid-template-columns:96px minmax(0,1fr) 92px}
+:host ::ng-deep .fd-c2 .cx-dn{flex-direction:column}
+}

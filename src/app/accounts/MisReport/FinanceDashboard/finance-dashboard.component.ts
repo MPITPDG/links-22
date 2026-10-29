@@ -7,14 +7,19 @@ import { LoaderService } from '../../../shared/service/loader.service';
 import { ExportexcelService } from 'src/app/shared/service/exportexcel.service';
 
 import { FinPager, finFigure } from '../../Accreport/fin-kit';
+
+/** Value axis of a C2 column chart: top of the scale, gridlines as % of it with their labels. */
+type FinAxis = { top: number; ticks: { b: number; l: string }[] };
+
 /*  Links port of the MPERPNG-20 Finance dashboard (MP commits 2c9513f / 297bee6 / cddd6de).
     import-page.css and accreport-page.css are GLOBAL in Links (src/styles/kit/*); the host
     class "kit-accreport" opts this page into the accreport add-on. Only the page's own
-    stylesheet stays component-scoped.                                                      */
+    stylesheets stay component-scoped: finance-dashboard-page.css (shared with Day-End) and
+    finance-dashboard-c2.css (the C2 "ledger with charts" look, Finance dashboard only).    */
 @Component({
     selector: 'app-FinanceDashboard',
     templateUrl: './finance-dashboard.component.html',
-    styleUrls: ['./finance-dashboard-page.css'],
+    styleUrls: ['./finance-dashboard-page.css', './finance-dashboard-c2.css'],
     host: { class: 'kit-accreport' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
@@ -1734,15 +1739,78 @@ export class FinanceDashboardComponent implements OnInit {
             { label: 'Over 60 days', value: this.num(cv.LAG_60P) },
             { label: 'Still unbilled', value: this.num(cv.UNBILLED_JOBS) }
         ]) : [];
+
+        /* C2 column charts and donut: value axes and the revenue-mix conic gradient */
+        const maxOf = (vals: number[]) => Math.max(0, ...vals);
+        this.AgeAxis = this.axis(maxOf(this.AgeingBars.map(a => a.value)));
+        this.CovAxis = this.axis(maxOf(this.CoverageBars.map(c => c.value)), v => v.toLocaleString('en-IN'));
+        this.UnbAxis = this.axis(maxOf((this.UnbilledAge || []).map(u => this.num(u.COST_VALUE))));
+        this.RecAxis = this.axis(maxOf(this.RecoveryBars.map(b => Math.max(b.credit, b.actual))), v => v + ' d');
+        let at = 0;
+        const stops = this.MixBars.map((m, i) => {
+            const a = at; at += m.pct;
+            return `var(--mp-chart-${i % 5 + 1}) ${a.toFixed(2)}% ${Math.max(a, at - 0.5).toFixed(2)}%, var(--mp-surface) 0 ${at.toFixed(2)}%`;
+        });
+        this.MixGrad = at > 0 ? 'conic-gradient(' + stops.join(', ') + ', var(--mp-band) 0)' : 'var(--mp-band)';
     }
     unbilledAgeMax(): number { return Math.max(1, ...(this.UnbilledAge || []).map(u => this.num(u.COST_VALUE))); }
+
+    /* ---- C2 ledger-with-charts helpers (display only: they reshape figures the page already has) ---- */
+    AgeAxis: FinAxis = { top: 1, ticks: [] };
+    CovAxis: FinAxis = { top: 1, ticks: [] };
+    UnbAxis: FinAxis = { top: 1, ticks: [] };
+    RecAxis: FinAxis = { top: 1, ticks: [] };
+    PayAgeAxis: FinAxis = { top: 1, ticks: [] };
+    WeekAxis: FinAxis = { top: 1, ticks: [] };
+    WeekCols: { l: string; v: number; n: number }[] = [];   // one per day, today .. +7, from the bills in WeekBills
+    FlowMax = 1;                                            // biggest money-in / money-out bucket of the forecast
+    MixGrad = '';                                           // revenue composition donut
+    MarginZero = 0;                                         // where zero sits on the margin-by-party bars (%)
+    readonly covShort = ['≤ 7 d', '8-15 d', '16-30 d', '31-60 d', '60+ d', 'Unbilled'];
+
+    /* a "nice" value axis (about 4 steps) for a column chart: top of scale and gridlines in % of it */
+    axis(max: number, fmt: (v: number) => string = v => this.tick(v)): FinAxis {
+        if (!(max > 0)) { return { top: 1, ticks: [{ b: 0, l: '0' }] }; }
+        const raw = max / 4, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+        const step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
+        const n = Math.ceil(max / step - 1e-9), top = n * step;
+        return { top, ticks: Array.from({ length: n + 1 }, (_, i) => ({ b: i / n * 100, l: i ? fmt(i * step) : '0' })) };
+    }
+    /* compact axis label: 2.50 Cr -> 2.5 Cr, 50.00 L -> 50 L */
+    tick(v: number): string { return this.fmtShort(v).replace(/\.?0+ /, ' '); }
+    /* sum of one column over rows[from..to] */
+    sumOf(rows: any[], key: string, from = 0, to = 9999): number {
+        return (rows || []).slice(from, to + 1).reduce((s, r) => s + this.num(r[key]), 0);
+    }
+    absPct(v: any): number { return Math.min(100, Math.abs(this.num(v))); }
+    nonTaxPct(): number {
+        if (!this.Kpi) { return 0; }
+        const nt = this.num(this.Kpi.NONTAXABLE_INR) + this.num(this.Kpi.NONTAXABLE_FX_INR);
+        const all = nt + this.num(this.Kpi.TAXABLE_INR) + this.num(this.Kpi.TAXABLE_FX_INR);
+        return all > 0 ? nt / all * 100 : 0;
+    }
+    /* recovery bullet: actual days and the credit-period tick on one 0 .. 1.25 x max scale */
+    recPct(v: any): number {
+        const k: any = this.Kpi || {};
+        const s = Math.max(this.num(k.AVG_COLLECTION_DAYS), this.num(k.AVG_CREDIT_PERIOD), 1) * 1.25;
+        return Math.max(0, Math.min(100, this.num(v) / s * 100));
+    }
+    /* age ramp: young -> old = primary tints t1..t5 getting darker; over 180 days = danger d1..d3 */
+    ageTone(i: number): string { return i < 5 ? 't' + (i + 1) : 'd' + Math.min(3, i - 4); }
+    /* payables: 0-30 / 31-60 / 61-90 in primary tints, the "old" buckets over 90 days in danger */
+    payTone(a: any): string {
+        const s = this.num(a.SORTORDER);
+        return s >= 4 ? 'd' + Math.min(3, s - 2) : 't' + Math.max(1, s * 2 - 1);
+    }
+    /* n buckets young -> old onto the darkest end of t1..t5 */
+    ramp(i: number, n: number): string { return 't' + Math.max(1, Math.min(5, i + 6 - n)); }
 
     /* ---- priority layout: Act now / This week / Workload / Reference (display only) ---- */
     actRecPager = new FinPager<any>(10);
     actPayPager = new FinPager<any>(10);
     actUnbPager = new FinPager<any>(10);
     WeekBills: { day: string; total: number; rows: any[] }[] = [];
-    MarginBars: { name: string; rev: number; margin: number; mpct: number; pct: number }[] = [];
+    MarginBars: { name: string; rev: number; margin: number; mpct: number; pct: number; x: number; w: number }[] = [];
     RefExplainOpen = false;
     RefAuditOpen = false;
     readonly ExplainKeys = ['EXPOSURE', 'OUTSTANDING', 'RECOVERY', 'BILLED', 'UNBILLED', 'MARGIN',
@@ -1769,6 +1837,12 @@ export class FinanceDashboardComponent implements OnInit {
             .sort((a, b) => this.num(b.OVERDUE_DAYS) - this.num(a.OVERDUE_DAYS)));
         const today = new Date(); today.setHours(0, 0, 0, 0);
         const groups: { [k: string]: { day: string; t: number; total: number; rows: any[] } } = {};
+        /* C2: the same bills as day columns, today .. +7, empty days included */
+        const dn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const cols = Array.from({ length: 8 }, (_, i) => {
+            const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
+            return { l: dn[d.getDay()] + ' ' + ('0' + d.getDate()).slice(-2), v: 0, n: 0 };
+        });
         for (const b of bills) {
             if (this.num(b.OVERDUE_DAYS) > 0) { continue; }
             const d = this.parseDay(b.DUE_DATE);
@@ -1779,9 +1853,16 @@ export class FinanceDashboardComponent implements OnInit {
             if (!groups[k]) { groups[k] = { day: k, t: d.getTime(), total: 0, rows: [] }; }
             groups[k].rows.push(b);
             groups[k].total += this.num(b.PENDING);
+            cols[diff].v += this.num(b.PENDING);
+            cols[diff].n++;
         }
         this.WeekBills = Object.keys(groups).map(k => groups[k]).sort((a, b) => a.t - b.t)
             .map(g => ({ day: g.day, total: g.total, rows: g.rows }));
+        this.WeekCols = cols;
+        this.WeekAxis = this.axis(Math.max(0, ...cols.map(c => c.v)));
+        this.PayAgeAxis = this.axis(Math.max(0, ...(this.PayAge || []).map(a => this.num(a.AMOUNT))));
+        this.FlowMax = Math.max(1, ...(this.PayFlow || []).map(f => Math.max(this.num(f.OUTFLOW),
+            this.num(f.INFLOW_INCLUDED) === 1 ? this.num(f.INFLOW) : 0)));
     }
     /* dd/mm/yyyy, dd-mm-yyyy or dd-Mon-yyyy */
     private parseDay(v: any): Date {
@@ -1806,10 +1887,18 @@ export class FinanceDashboardComponent implements OnInit {
         }
         const top = Object.keys(by).map(k => by[k]).sort((a, b) => b.rev - a.rev).slice(0, 8);
         const max = Math.max(1, ...top.map(x => Math.abs(x.margin)));
-        this.MarginBars = top.map(x => ({
-            name: x.name, rev: x.rev, margin: x.margin,
-            mpct: x.rev !== 0 ? x.margin / x.rev * 100 : null,
-            pct: Math.abs(x.margin) / max * 100
-        }));
+        /* C2: bars run from a zero line - losses to its left, profits to its right */
+        const pos = Math.max(0, ...top.map(x => x.margin)), neg = Math.max(0, ...top.map(x => -x.margin));
+        const span = (pos + neg) || 1;
+        this.MarginZero = neg / span * 100;
+        this.MarginBars = top.map(x => {
+            const w = Math.abs(x.margin) / span * 100;
+            return {
+                name: x.name, rev: x.rev, margin: x.margin,
+                mpct: x.rev !== 0 ? x.margin / x.rev * 100 : null,
+                pct: Math.abs(x.margin) / max * 100,
+                x: x.margin < 0 ? this.MarginZero - w : this.MarginZero, w
+            };
+        });
     }
 }

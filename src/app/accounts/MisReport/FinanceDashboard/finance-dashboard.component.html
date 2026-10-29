@@ -12,7 +12,9 @@
   Every figure binds to the same Kpi / Exposure / Ageing / Margin / JobPL / UnbilledJobs fields as
   before; the reminder composer (mailto / copy) and the client drawer are unchanged in behaviour.
 -->
-<div class="im-page fd-kit fd-page">
+<!-- C2 "ledger with charts" look: finance-dashboard-c2.css, scoped under .fd-c2 (Finance dashboard only;
+     Day-End shares finance-dashboard-page.css but not this class). Display only - every figure, binding and id is as before. -->
+<div class="im-page fd-kit fd-page fd-c2">
   <div class="ph">
     <div>
       <h1>Finance dashboard</h1>
@@ -24,7 +26,8 @@
         <button type="button" class="btn g" (click)="ClearClient()">Show all clients</button>
       }
       @if (Searched && CacheInfo) {
-        <span class="chip" [class.dash]="num(CacheInfo.IS_CACHED) === 1">
+        <span class="chip cx-asof" [class.dash]="num(CacheInfo.IS_CACHED) === 1">
+          <i [class.f-wn]="num(CacheInfo.IS_CACHED) === 1" [class.f-ok]="num(CacheInfo.IS_CACHED) !== 1" aria-hidden="true"></i>
           Data as of {{ CacheInfo.CACHED_AT }} &middot; {{ num(CacheInfo.IS_CACHED) === 1 ? cacheAge() : 'live' }}
         </span>
       }
@@ -32,12 +35,24 @@
         <button type="button" class="btn g" (click)="SyncNow()" [disabled]="Loading" title="Bypass the 2-hour cache and pull fresh figures for everyone">Sync now</button>
       }
       <button type="button" class="btn g" (click)="ShowLegend()" title="Legend - what the badges, colours and abbreviations mean">Legend</button>
-      <button type="button" class="btn g" (click)="ExportExposure()" [disabled]="!Searched">Export</button>
+      <button type="button" class="btn g p" (click)="ExportExposure()" [disabled]="!Searched">Export</button>
     </div>
   </div>
 
+  <!-- section jump-nav: the same ScrollTo the tiles use (no active-state tracking) -->
+  @if (Searched) {
+    <nav class="cx-nav" aria-label="Sections">
+      <button type="button" (click)="ScrollTo('fd-s-attn')">Needs attention</button>
+      <button type="button" (click)="ScrollTo('fd-s-act')">Act now</button>
+      <button type="button" (click)="ScrollTo('fd-s-week')">This week</button>
+      <button type="button" (click)="ScrollTo('fd-s-work')">Workload</button>
+      <button type="button" (click)="ScrollTo('fd-s-detail')">Detail</button>
+      <button type="button" (click)="ScrollTo('fd-s-ref')">Reference</button>
+    </nav>
+  }
+
   <!-- ============================ FILTERS ============================ -->
-  <div class="card sec">
+  <div class="card sec cx-filt">
     <div class="filters fk-f">
       <div class="f">
         <label>From date</label>
@@ -121,27 +136,52 @@
     <!-- ======================= NEEDS ATTENTION ======================= -->
     <section class="fd-sec" id="fd-s-attn">
       <div class="fd-sech"><h2>Needs attention</h2><span>The numbers that need action today, most urgent first. Select a tile for its list or its calculation.</span></div>
-      <div class="fk-kpis fd-attn">
+      <div class="fk-kpis fd-attn cx-strip">
         <div class="fd-tile fd-kpi-click" (click)="ScrollTo('fd-act-rec')" title="Receivables past their due date, as on the To date. Click for the list.">
-          <div class="k">Overdue receivables</div>
+          <div class="k"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Overdue receivables</div>
           <div class="v"><span class="u">&#8377;</span>{{ fig(fmtShort(Kpi.OVERDUE_AMT)).n }}<span class="u">{{ fig(fmtShort(Kpi.OVERDUE_AMT)).u }}</span></div>
-          <div class="s">{{ actRecPager.rows.length }} clients overdue &middot; {{ pctOf(Kpi.OVERDUE_AMT, Kpi.TOTAL_OUTSTANDING) | number:'1.0-0' }}% of outstanding</div>
+          <span class="cx-pill dn">{{ pctOf(Kpi.OVERDUE_AMT, Kpi.TOTAL_OUTSTANDING) | number:'1.0-0' }}% of outstanding</span>
+          <div class="cx-foot">
+            <span class="cx-mm"><span class="f-dn" [style.width.%]="pctOf(Kpi.OVERDUE_AMT, Kpi.TOTAL_OUTSTANDING)"></span></span>
+            <div class="s cx-sub"><span><b>{{ actRecPager.rows.length }}</b> clients overdue</span><span aria-hidden="true">&rarr;</span></div>
+          </div>
         </div>
         <div class="fd-tile fd-kpi-click" (click)="OpenExplain('OUTSTANDING')" title="Money held from clients with no open bill left to set it against. Click for how it is worked out.">
-          <div class="k">Stranded credits</div>
+          <div class="k"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h15a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7z"></path><path d="M3 7l12-4v4"></path></svg>Stranded credits</div>
           <div class="v"><span class="u">&#8377;</span>{{ fig(fmtShort(CreditStranded())).n }}<span class="u">{{ fig(fmtShort(CreditStranded())).u }}</span></div>
-          <div class="s">Credit left over &middot; cannot reduce anybody else's dues</div>
+          <span class="cx-pill">Credit left over</span>
+          <div class="s">Cannot reduce anybody else's dues</div>
+          <div class="cx-foot">
+            <!-- unused share of all on-account credit = left over / (applied + left over) -->
+            <span class="cx-mm"><span class="f-c2" [style.width.%]="pctOf(CreditStranded(), CreditApplied() + CreditStranded())"></span></span>
+            <div class="s cx-sub"><span><b>{{ pctOf(CreditStranded(), CreditApplied() + CreditStranded()) | number:'1.0-0' }}%</b> of credit unused</span><span aria-hidden="true">&rarr;</span></div>
+          </div>
         </div>
         <div class="fd-tile fd-kpi-click" (click)="ScrollTo('fd-act-unb')" title="Jobs with cost booked and no invoice. Click for the oldest.">
-          <div class="k">Unbilled jobs</div>
+          <div class="k"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="12" height="17" rx="2"></rect><path d="M9 12h6M9 16h4"></path></svg>Unbilled jobs</div>
           <div class="v">{{ Kpi.UNBILLED_JOBS | number }}<span class="u">jobs</span></div>
-          <div class="s">Cost booked {{ fmtShort(Kpi.UNBILLED_VALUE) }} &middot; to invoice</div>
+          <span class="cx-pill wn">Cost booked {{ fmtShort(Kpi.UNBILLED_VALUE) }}</span>
+          <div class="cx-foot">
+            <!-- open jobs by age (Unbilled ageing), young -> old = lighter -> darker -->
+            <span class="cx-ms">
+              @for (u of UnbilledAge; track $index; let i = $index, n = $count) {
+                <span [class]="ramp(i, n)" [style.width.%]="pctOf(u.JOBS, sumOf(UnbilledAge, 'JOBS'))"></span>
+              }
+            </span>
+            <div class="s cx-sub">
+              <span>To invoice @if (UnbilledAge.length) {&middot; <b>{{ UnbilledAge[UnbilledAge.length - 1].JOBS | number }}</b> at {{ UnbilledAge[UnbilledAge.length - 1].AGE_BUCKET }}}</span><span aria-hidden="true">&rarr;</span>
+            </div>
+          </div>
         </div>
         <div class="fd-tile fd-kpi-click" (click)="ScrollTo('fd-act-pay')" title="Share of the net payable past its due date. Click for the overdue bills.">
-          <div class="k">Payables overdue</div>
+          <div class="k"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"></path><path d="M9 8h6M9 12h6"></path></svg>Payables overdue</div>
           @if (PayKpi) {
             <div class="v">{{ payOverduePct() | number:'1.0-0' }}<span class="u">%</span></div>
-            <div class="s">{{ fmtShort(PayKpi.OVERDUE_AMT) }} of {{ fmtShort(PayKpi.TOTAL_PAYABLE) }} payable</div>
+            <span class="cx-pill dn">{{ fmtShort(PayKpi.OVERDUE_AMT) }} overdue</span>
+            <div class="cx-foot">
+              <span class="cx-mm"><span class="f-dn" [style.width.%]="payOverduePct()"></span></span>
+              <div class="s cx-sub"><span>of <b>{{ fmtShort(PayKpi.TOTAL_PAYABLE) }}</b> payable</span><span aria-hidden="true">&rarr;</span></div>
+            </div>
           } @else if (PayLoading) {
             <div class="fk-skel h24 w60"></div><div class="s">Loading payables&hellip;</div>
           } @else {
@@ -149,10 +189,14 @@
           }
         </div>
         <div class="fd-tile fd-kpi-click" (click)="GoDetail('PAYABLES')" title="Purchase lines in the period with no job number - never reaches a job P&amp;L. Click for the payables detail.">
-          <div class="k">Cost not linked to a job</div>
+          <div class="k"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"></path><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path><path d="M4 4l16 16"></path></svg>Cost not linked to a job</div>
           @if (PayUnlinked) {
             <div class="v"><span class="u">&#8377;</span>{{ fig(fmtShort(PayUnlinked.UNLINKED_VALUE)).n }}<span class="u">{{ fig(fmtShort(PayUnlinked.UNLINKED_VALUE)).u }}</span></div>
-            <div class="s">{{ PayUnlinked.UNLINKED_PCT | number:'1.0-0' }}% of cost &middot; {{ PayUnlinked.UNLINKED_LINES | number }} lines</div>
+            <span class="cx-pill wn">{{ PayUnlinked.UNLINKED_PCT | number:'1.0-0' }}% of cost</span>
+            <div class="cx-foot">
+              <span class="cx-mm"><span class="f-wn" [style.width.%]="absPct(PayUnlinked.UNLINKED_PCT)"></span></span>
+              <div class="s cx-sub"><span><b>{{ PayUnlinked.UNLINKED_LINES | number }}</b> lines</span><span aria-hidden="true">&rarr;</span></div>
+            </div>
           } @else if (PayLoading) {
             <div class="fk-skel h24 w60"></div><div class="s">Loading payables&hellip;</div>
           } @else {
@@ -160,9 +204,16 @@
           }
         </div>
         <div class="fd-tile fd-kpi-click" (click)="OpenExplain('MARGIN')" title="Job-wise income less expense. Click for how it is worked out.">
-          <div class="k">Margin</div>
+          <div class="k"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path><path d="M15 7h6v6"></path></svg>Margin</div>
           <div class="v">{{ Kpi.MARGIN_PCT | number:'1.1-1' }}<span class="u">%</span></div>
-          <div class="s">Income {{ fmtShort(Kpi.REVENUE_PERIOD) }} &middot; expense {{ fmtShort(Kpi.COST_PERIOD) }}</div>
+          @if (num(Kpi.MARGIN_PCT) > 0) { <span class="cx-pill ok">In profit</span> }
+          @else if (num(Kpi.MARGIN_PCT) < 0) { <span class="cx-pill dn">In loss</span> }
+          @else { <span class="cx-pill">Break-even</span> }
+          <div class="cx-foot">
+            <!-- expense share of income, then the margin share (a loss runs in the danger colour) -->
+            <span class="cx-ms"><span class="f-mute" [style.width.%]="100 - absPct(Kpi.MARGIN_PCT)"></span><span [class.f-ok]="num(Kpi.MARGIN_PCT) >= 0" [class.f-dn]="num(Kpi.MARGIN_PCT) < 0" [style.width.%]="absPct(Kpi.MARGIN_PCT)"></span></span>
+            <div class="s cx-sub"><span>Income <b>{{ fmtShort(Kpi.REVENUE_PERIOD) }}</b> &middot; expense <b>{{ fmtShort(Kpi.COST_PERIOD) }}</b></span><span aria-hidden="true">&rarr;</span></div>
+          </div>
         </div>
       </div>
     </section>
@@ -170,9 +221,10 @@
     <!-- ======================= ACT NOW ======================= -->
     <section class="fd-sec" id="fd-s-act">
       <div class="fd-sech"><h2>Act now</h2><span>Overdue receivables, overdue supplier bills and the oldest unbilled jobs. 10 per page.</span></div>
-      <div class="fd-grid">
-        <div class="card sec" id="fd-act-rec">
-          <div class="card-h"><h2>Overdue receivables</h2><span class="meta">biggest overdue first &middot; select a row for the client</span></div>
+      <div class="fd-grid cx-g12">
+        <div class="card sec s12" id="fd-act-rec">
+          <div class="card-h"><h2>Overdue receivables</h2><span class="meta">{{ actRecPager.rows.length | number }} &middot; biggest overdue first &middot; select a row for the client</span>
+            <div class="cx-lg"><span><i class="f-dn"></i>Overdue share of the client's outstanding</span></div></div>
           <div class="tbl-wrap">
             <table class="tbl">
               <thead><tr><th>Client</th><th>Risk</th><th class="num">Credit days</th><th class="num">Recovery gap</th><th class="num">Overdue</th><th class="num">Outstanding</th><th>Action</th></tr></thead>
@@ -180,10 +232,10 @@
                 @for (r of actRecPager.paged; track $index) {
                   <tr class="fk-click" (click)="OpenDrill(r)">
                     <td>{{ r.CLIENTNAME }} @if (r.CLIENT_FLAG) {<span class="chip dash">{{ r.CLIENT_FLAG }}</span>}</td>
-                    <td><span class="chip" [class.solid]="r.RISK_STATUS === 'RED'" [class.dash]="r.RISK_STATUS === 'AMBER'">{{ r.RISK_STATUS }}</span></td>
+                    <td><span class="chip cx-rk" [class.solid]="r.RISK_STATUS === 'RED'" [class.dash]="r.RISK_STATUS === 'AMBER'" [class.cx-red]="r.RISK_STATUS === 'RED'" [class.cx-amb]="r.RISK_STATUS === 'AMBER'" [class.cx-grn]="r.RISK_STATUS === 'GREEN'">{{ r.RISK_STATUS }}</span></td>
                     <td class="num">{{ r.CREDIT_PERIOD }}</td>
                     <td class="num">{{ r.RECOVERY_GAP === null ? '-' : (r.RECOVERY_GAP | number:'1.0-0') }}</td>
-                    <td class="num fd-late"><b>{{ r.OVERDUE | number:'1.0-0' }}</b></td>
+                    <td class="num fd-late"><span class="cx-ib"><span class="f-dn" [style.width.%]="pctOf(r.OVERDUE, r.OUTSTANDING)"></span></span><b>{{ r.OVERDUE | number:'1.0-0' }}</b></td>
                     <td class="num">{{ r.OUTSTANDING | number:'1.0-0' }}</td>
                     <td><button type="button" class="btn g" title="Compose a payment reminder for this client" (click)="OpenReminder(r, $event)">Remind</button></td>
                   </tr>
@@ -207,8 +259,8 @@
           </div>
         }
         </div>
-        <div class="card sec" id="fd-act-pay">
-          <div class="card-h"><h2>Bills to pay &middot; overdue</h2><span class="meta">most overdue first</span></div>
+        <div class="card sec s6 t12" id="fd-act-pay">
+          <div class="card-h"><h2>Bills to pay &middot; overdue</h2><span class="meta">@if (PayKpi) { {{ actPayPager.rows.length | number }} &middot; }most overdue first</span></div>
           @if (PayLoading) {
             <div class="fd-pad">@for (k of [1,2,3]; track k) { <div class="fk-skel h24"></div> }</div>
           } @else {
@@ -221,7 +273,7 @@
                       <td>{{ b.PUR_CODE }}</td>
                       <td>{{ b.SUPNAME }}</td>
                       <td>{{ b.DUE_DATE }} @if (num(b.HAS_TERMS) === 0) {<span class="chip dash" title="No usable due date on the bill - assumed 30 days">Assumed</span>}</td>
-                      <td class="num fd-late">{{ b.OVERDUE_DAYS | number }}d</td>
+                      <td class="num fd-late"><span class="cx-ib" title="Full bar = 90 days overdue"><span class="f-dn" [style.width.%]="pctOf(b.OVERDUE_DAYS, 90)"></span></span>{{ b.OVERDUE_DAYS | number }}d</td>
                       <td class="num"><b>{{ b.PENDING | number:'1.0-0' }}</b></td>
                     </tr>
                   } @empty {
@@ -245,8 +297,8 @@
         }
           }
         </div>
-        <div class="card sec" id="fd-act-unb">
-          <div class="card-h"><h2>Unbilled jobs</h2><span class="meta">oldest first &middot; value is cost already spent</span></div>
+        <div class="card sec s6 t12" id="fd-act-unb">
+          <div class="card-h"><h2>Unbilled jobs</h2><span class="meta">{{ actUnbPager.rows.length | number }} &middot; oldest first &middot; value is cost already spent</span></div>
           <div class="tbl-wrap">
             <table class="tbl">
               <thead><tr><th>Job no.</th><th>Client</th><th>Job date</th><th class="num">Age (days)</th><th class="num">Total cost</th></tr></thead>
@@ -256,7 +308,7 @@
                     <td><a href="javascript:void(0);" class="lnk" (click)="OpenJobDrawer(j.JOBNO)" title="Open the Job Profit statement here">{{ j.JOBNO }}</a></td>
                     <td>{{ j.CLIENTNAME }}</td>
                     <td>{{ j.JOB_DATE }}</td>
-                    <td class="num"><b>{{ j.AGE_DAYS }}</b></td>
+                    <td class="num"><span class="cx-ib" title="Full bar = 180 days"><span class="f-wn" [style.width.%]="pctOf(j.AGE_DAYS, 180)"></span></span><b>{{ j.AGE_DAYS }}</b></td>
                     <td class="num">{{ j.TOTAL_COST | number:'1.0-0' }}</td>
                   </tr>
                 } @empty {
@@ -282,20 +334,36 @@
       </div>
     </section>
 
-    <!-- ======================= THIS WEEK ======================= -->
+<!-- ======================= THIS WEEK ======================= -->
     <section class="fd-sec" id="fd-s-week">
       <div class="fd-sech"><h2>This week</h2><span>What falls due in the next 7 days, and the cash forecast.</span></div>
       <div class="fk-note fd-secnote">Receivables due this week are not shown: the dashboard data carries no per-invoice due date, only ageing buckets (see Workload picture).</div>
       @if (PayKpi) {
-        <div class="fd-grid">
-          <div class="card sec">
+        <div class="fd-grid cx-g12">
+          <div class="card sec s5 t12">
             <div class="card-h"><h2>Payables falling due</h2><span class="meta">not yet overdue, cumulative from today</span></div>
-            <div class="fd-tiles fd-pad">
+            <div class="fd-tiles fd-pad cx-mini">
               <div class="fd-tile flat fd-kpi-click" (click)="OpenExplain('PAY_DUE')"><div class="k">Next 7 days</div><div class="v sm">{{ fmtShort(PayKpi.DUE_7) }}</div></div>
               <div class="fd-tile flat"><div class="k">Within 15 days</div><div class="v sm">{{ fmtShort(PayKpi.DUE_15) }}</div></div>
               <div class="fd-tile flat"><div class="k">Within 30 days</div><div class="v sm">{{ fmtShort(PayKpi.DUE_30) }}</div></div>
             </div>
             <div class="fd-band">Bills due in the next 7 days, by day</div>
+            @if (WeekBills.length) {
+              <!-- one column per day from today, totals of the bills listed below -->
+              <div class="cx-vch">
+                <div class="cx-vp sm" role="img" aria-label="Bills due in the next 7 days, by day">
+                  @for (g of WeekAxis.ticks; track $index) { <div class="cx-gl" [style.bottom.%]="g.b"><span>{{ g.l }}</span></div> }
+                  <div class="cx-vcs">
+                    @for (c of WeekCols; track $index; let i = $index, n = $count) {
+                      <div class="cx-vc" [class.r]="i >= n / 2"><div class="cx-bar f-p" [style.height.%]="pctOf(c.v, WeekAxis.top)"></div>
+                        <div class="cx-tp"><b>{{ c.l }}</b><span>{{ c.n ? (c.n + ' bill' + (c.n === 1 ? '' : 's') + ' · ' + fmtShort(c.v)) : 'nothing due' }}</span></div></div>
+                    }
+                  </div>
+                </div>
+                <div class="cx-vx">@for (c of WeekCols; track $index) { <span>{{ c.l }}</span> }</div>
+              </div>
+            }
+            <div class="cx-dlist">
             @for (g of WeekBills; track g.day) {
               <div class="fd-day"><b>{{ g.day }}</b><span>{{ g.rows.length }} bill{{ g.rows.length === 1 ? '' : 's' }} &middot; {{ g.total | number:'1.0-0' }}</span></div>
               @for (b of g.rows; track $index) {
@@ -304,24 +372,30 @@
             } @empty {
               <div class="fk-note nb">No bill in the loaded bill list falls due in the next 7 days (the list holds up to {{ PayKpi.BILL_LIST_CAP | number }} bills, most overdue first; the 7-day total above is complete).</div>
             }
+            </div>
           </div>
-          <div class="card sec">
-            <div class="card-h"><h2>Cash forecast</h2><span class="meta">what must go out, and (with money-in on) what should come in</span></div>
+          <div class="card sec s7 t12">
+            <div class="card-h"><h2>Cash forecast</h2><span class="meta">what must go out, and (with money-in on) what should come in</span>
+              <div class="cx-lg"><span><i class="f-p"></i>Money out</span><span><i class="f-dn"></i>Already overdue</span><span><i class="f-c2"></i>Money in (when ticked)</span></div></div>
             <div class="tbl-wrap">
               <table class="tbl">
                 <thead>
-                  <tr><th>When</th><th class="num">Money in</th><th class="num">Money out</th><th class="num">Gap</th></tr>
+                  <tr><th>When</th><th class="cx-trkh">Money in vs out</th><th class="num">Money in</th><th class="num">Money out</th><th class="num">Gap</th></tr>
                 </thead>
                 <tbody>
                   @for (f of PayFlow; track $index) {
                     <tr>
                       <td>{{ f.BUCKET }}</td>
+                      <td class="cx-trkh"><div class="cx-trk">
+                        @if (num(f.INFLOW_INCLUDED) === 1) { <span class="f-c2" [style.width.%]="pctOf(f.INFLOW, FlowMax)"></span> }
+                        <span [class.f-dn]="num(f.SORTORDER) === 0" [class.f-p]="num(f.SORTORDER) !== 0" [style.width.%]="pctOf(f.OUTFLOW, FlowMax)"></span>
+                      </div></td>
                       <td class="num">{{ num(f.INFLOW_INCLUDED) === 1 ? (f.INFLOW | number:'1.0-0') : '-' }}</td>
                       <td class="num">{{ f.OUTFLOW | number:'1.0-0' }}</td>
                       <td class="num">{{ num(f.INFLOW_INCLUDED) === 1 ? (f.NET_GAP | number:'1.0-0') : '-' }}</td>
                     </tr>
                   } @empty {
-                    <tr><td colspan="4" class="empty">No forecast.</td></tr>
+                    <tr><td colspan="5" class="empty">No forecast.</td></tr>
                   }
                 </tbody>
               </table>
@@ -338,22 +412,31 @@
       }
     </section>
 
-    <!-- ======================= WORKLOAD PICTURE ======================= -->
+<!-- ======================= WORKLOAD PICTURE ======================= -->
     <section class="fd-sec" id="fd-s-work">
       <div class="fd-sech"><h2>Workload picture</h2><span>Headline figures, ageing, margin, cash flow and billing speed for the selected period.</span></div>
       <div class="fd-band fd-subband">Headline figures &middot; select a card for how it is calculated and the rows behind it</div>
-      <div class="fk-kpis fd-kpis">
+      <div class="fk-kpis fd-kpis cx-strip w3">
         <div class="fd-tile fd-kpi-click" (click)="OpenExplain('EXPOSURE')" title="Net outstanding plus cost booked on jobs not yet invoiced, as on the To Date. Click to see how it is worked out, and the rows behind it.">
-          <div class="k">Total exposure</div>
+          <div class="k">Total exposure<span class="go">How &rarr;</span></div>
           <div class="v"><span class="u">&#8377;</span>{{ fig(fmtShort(Kpi.TOTAL_EXPOSURE)).n }}<span class="u">{{ fig(fmtShort(Kpi.TOTAL_EXPOSURE)).u }}</span></div>
-          <div class="s">Outstanding {{ fmtShort(Kpi.TOTAL_OUTSTANDING) }} &middot; unbilled {{ fmtShort(Kpi.UNBILLED_VALUE) }}</div>
+          <div class="cx-foot">
+            <span class="cx-ms h8"><span class="f-p" [style.width.%]="pctOf(Kpi.TOTAL_OUTSTANDING, Kpi.TOTAL_EXPOSURE)"></span><span class="f-wn" [style.width.%]="pctOf(Kpi.UNBILLED_VALUE, Kpi.TOTAL_EXPOSURE)"></span></span>
+            <div class="s cx-ml">
+              <span><i class="f-p"></i>Outstanding <b>{{ fmtShort(Kpi.TOTAL_OUTSTANDING) }}</b> &middot; {{ pctOf(Kpi.TOTAL_OUTSTANDING, Kpi.TOTAL_EXPOSURE) | number:'1.0-0' }}%</span>
+              <span><i class="f-wn"></i>Unbilled <b>{{ fmtShort(Kpi.UNBILLED_VALUE) }}</b> &middot; {{ pctOf(Kpi.UNBILLED_VALUE, Kpi.TOTAL_EXPOSURE) | number:'1.0-0' }}%</span>
+            </div>
+          </div>
         </div>
         <div class="fd-tile fd-kpi-click" (click)="OpenExplain('OUTSTANDING')" title="Bills pending less credits never applied to a bill. Click to see how it is worked out, and the rows behind it.">
-          <div class="k">Outstanding (net)</div>
+          <div class="k">Outstanding (net)<span class="go">How &rarr;</span></div>
           <div class="v"><span class="u">&#8377;</span>{{ fig(fmtShort(Kpi.TOTAL_OUTSTANDING)).n }}<span class="u">{{ fig(fmtShort(Kpi.TOTAL_OUTSTANDING)).u }}</span></div>
           <!-- bills pending (split by the date filter) less credit applied = the headline;
-               credit left over is shown apart because it cannot reduce another client's dues -->
-          <div class="fd-kpi-rows">
+               credit left over is shown apart because it cannot reduce another client's dues.
+               C2: bills on the left, credit and overdue on the right, the ledger note under both -->
+          <div class="cx-foot">
+          <div class="fd-kpi-rows cx-rows2">
+            <div>
             @if (HasPeriodSplit()) {
               <div class="fd-kpi-row" title="Bills dated inside the From / To dates you selected that are not yet paid"><span>Raised in selected dates</span><b>{{ fmtShort(PendingPeriod()) }}</b></div>
               <div class="fd-kpi-row" title="Bills raised before the From date that are still unpaid - they stay in Outstanding until they are paid or written off"><span>Raised before {{ FromLabel() }}</span><b>{{ fmtShort(PendingOlder()) }}</b></div>
@@ -365,124 +448,203 @@
               }
             }
             <div class="fd-kpi-row fd-kpi-row--sum" title="This is the line to compare with a ledger or Billwise Outstanding statement. The headline above is lower because it also deducts credit held on account."><span>Bills pending</span><b>{{ fmtShort(Kpi.GROSS_PENDING) }}</b></div>
-            <div class="fd-kpi-foot">Compare <b>Bills pending</b> with a ledger closing &mdash; and remember the ledger shows this financial year only.</div>
+            </div>
+            <div>
             <div class="fd-kpi-row" title="Receipts on account that did knock off open bills of the same client"><span>Credit applied</span><b>{{ fmtShort(CreditApplied()) }}</b></div>
             <div class="fd-kpi-row" title="Money held from clients who have no open bill left to set it against - it cannot reduce anybody else's dues"><span>Credit left over</span><b>{{ fmtShort(CreditStranded()) }}</b></div>
             @if (CnUnlinked() > 0.5) {
               <div class="fd-kpi-row" title="Credit notes raised for a client but never linked to an invoice, so nothing knocks the bill off. They count as the client's credit here; Accounts still has to open each one and attach it to its bill."><span>of which credit notes not linked to a bill</span><b>{{ fmtShort(CnUnlinked()) }}</b></div>
             }
-            <div class="fd-kpi-row"><span>Overdue</span><b>{{ fmtShort(Kpi.OVERDUE_AMT) }}</b></div>
+            <div class="fd-kpi-row fd-kpi-row--sum"><span>Overdue</span><b>{{ fmtShort(Kpi.OVERDUE_AMT) }}</b></div>
+            </div>
+            <div class="fd-kpi-foot">Compare <b>Bills pending</b> with a ledger closing &mdash; and remember the ledger shows this financial year only.</div>
+          </div>
           </div>
         </div>
         <div class="fd-tile fd-kpi-click" (click)="OpenExplain('RECOVERY')" title="Value-weighted days from invoice to last receipt, against the agreed credit period. Click to see how it is worked out, and the rows behind it.">
-          <div class="k">Recovery</div>
-          <div class="v">{{ Kpi.AVG_COLLECTION_DAYS | number:'1.0-1' }}<span class="u">days</span></div>
-          <div class="s">Credit period {{ Kpi.AVG_CREDIT_PERIOD | number:'1.0-1' }} d &middot; gap {{ deltaArrow(Kpi.RECOVERY_GAP) }} {{ Kpi.RECOVERY_GAP | number:'1.1-1' }} d</div>
-          <!-- range: fastest / slowest settled bill in the period (needs the proc with FASTEST_ / SLOWEST_ columns) -->
-          <div class="fd-kpi-rows">
-            @if (Kpi.FASTEST_DAYS !== undefined && Kpi.FASTEST_DAYS !== null) {
-              <div class="fd-kpi-row" [title]="'Inv ' + Kpi.FASTEST_INV + ' - ' + Kpi.FASTEST_CLIENT"><span>Fastest bill paid</span><b>{{ Kpi.FASTEST_DAYS | number }} days</b></div>
-            }
-            @if (Kpi.SLOWEST_DAYS !== undefined && Kpi.SLOWEST_DAYS !== null) {
-              <div class="fd-kpi-row" [title]="'Inv ' + Kpi.SLOWEST_INV + ' - ' + Kpi.SLOWEST_CLIENT"><span>Slowest bill paid</span><b>{{ Kpi.SLOWEST_DAYS | number }} days</b></div>
-            }
+          <div class="k">Recovery<span class="go">How &rarr;</span></div>
+          <div class="cx-vrow">
+            <div class="v">{{ Kpi.AVG_COLLECTION_DAYS | number:'1.0-1' }}<span class="u">days</span></div>
+            <span class="cx-pill" [class.dn]="num(Kpi.RECOVERY_GAP) > 0" [class.ok]="num(Kpi.RECOVERY_GAP) < 0">gap {{ deltaArrow(Kpi.RECOVERY_GAP) }} {{ Kpi.RECOVERY_GAP | number:'1.1-1' }} d</span>
           </div>
-        </div>
-        <div class="fd-tile fd-kpi-click" (click)="OpenExplain('BILLED')" title="Invoice value raised between the From and To dates. Click to see how it is worked out, and the rows behind it.">
-          <div class="k">Billed in period</div>
-          <div class="v"><span class="u">&#8377;</span>{{ fig(fmtShort(Kpi.BILLED_PERIOD)).n }}<span class="u">{{ fig(fmtShort(Kpi.BILLED_PERIOD)).u }}</span></div>
-          <div class="s">{{ Kpi.INVOICE_COUNT | number }} invoices &middot; GST {{ fmtShort(Kpi.GST_AMT) }}</div>
-        </div>
-        <div class="fd-tile fd-kpi-click" (click)="OpenExplain('UNBILLED')" title="Cost already booked against jobs with no invoice. A cost figure, not revenue. Click to see how it is worked out, and the rows behind it.">
-          <div class="k">Unbilled (cost)</div>
-          <div class="v"><span class="u">&#8377;</span>{{ fig(fmtShort(Kpi.UNBILLED_VALUE)).n }}<span class="u">{{ fig(fmtShort(Kpi.UNBILLED_VALUE)).u }}</span></div>
-          <div class="s">{{ Kpi.UNBILLED_JOBS | number }} open jobs &middot; basis: cost incurred</div>
-        </div>
-        <div class="fd-tile fd-kpi-click" (click)="OpenExplain('MARGIN')" title="Job-wise income less expense. Duty billed to clients sits outside job income, so clearance work can read negative. Click to see how it is worked out, and the rows behind it.">
-          <div class="k">Margin</div>
-          <div class="v">{{ Kpi.MARGIN_PCT | number:'1.1-1' }}<span class="u">%</span></div>
-          <div class="s">Income {{ fmtShort(Kpi.REVENUE_PERIOD) }} &middot; expense {{ fmtShort(Kpi.COST_PERIOD) }}</div>
-        </div>
-      </div>
-      <div class="fd-grid">
-        <div class="card sec">
-          <div class="card-h"><h2>Receivable ageing</h2><span class="meta">net of unapplied credit, oldest bucket first</span></div>
-          <div class="fk-hbars">
-            @for (a of AgeingBars; track $index; let i = $index) {
-              <div class="fk-hbar" [attr.data-sev]="i < 4 ? i : 4"><span>{{ a.label }}</span><div class="t"><div [style.width.%]="a.pct"></div></div><span class="n">{{ fmtShort(a.value) }}</span></div>
-            }
-          </div>
-        </div>
-        @if (PayKpi) {
-          <div class="card sec">
-            <div class="card-h"><h2>Payable ageing</h2><span class="meta">gross of money paid without naming a bill</span></div>
-            <div class="fk-hbars">
-              @for (a of PayAge; track $index; let i = $index, n = $count) {
-                <div class="fk-hbar" [class.fd-old]="num(a.SORTORDER) >= 4" [attr.data-sev]="n - 1 - i < 4 ? n - 1 - i : 4">
-                  <span>{{ a.BUCKET }}</span><div class="t"><div [style.width.%]="payAgeWidth(a)"></div></div><span class="n">{{ fmtShort(a.AMOUNT) }}</span>
-                </div>
-              } @empty {
-                <div class="empty">No open bills.</div>
+          <div class="cx-foot">
+            <!-- bullet: actual recovery days against a tick at the agreed credit period -->
+            <span class="cx-bl" aria-hidden="true"><span class="tk"></span><span class="ac" [class.f-dn]="num(Kpi.RECOVERY_GAP) > 0" [class.f-ok]="num(Kpi.RECOVERY_GAP) <= 0" [style.width.%]="recPct(Kpi.AVG_COLLECTION_DAYS)"></span><span class="mk" [style.left.%]="recPct(Kpi.AVG_CREDIT_PERIOD)"></span></span>
+            <div class="s cx-ml">
+              <span><i [class.f-dn]="num(Kpi.RECOVERY_GAP) > 0" [class.f-ok]="num(Kpi.RECOVERY_GAP) <= 0"></i>Actual <b>{{ Kpi.AVG_COLLECTION_DAYS | number:'1.0-1' }} d</b></span>
+              <span>&#9475; Credit period <b>{{ Kpi.AVG_CREDIT_PERIOD | number:'1.0-1' }} d</b></span>
+            </div>
+            <!-- range: fastest / slowest settled bill in the period (needs the proc with FASTEST_ / SLOWEST_ columns) -->
+            <div class="fd-kpi-rows">
+              @if (Kpi.FASTEST_DAYS !== undefined && Kpi.FASTEST_DAYS !== null) {
+                <div class="fd-kpi-row" [title]="'Inv ' + Kpi.FASTEST_INV + ' - ' + Kpi.FASTEST_CLIENT"><span>Fastest bill paid</span><b>{{ Kpi.FASTEST_DAYS | number }} days</b></div>
+              }
+              @if (Kpi.SLOWEST_DAYS !== undefined && Kpi.SLOWEST_DAYS !== null) {
+                <div class="fd-kpi-row" [title]="'Inv ' + Kpi.SLOWEST_INV + ' - ' + Kpi.SLOWEST_CLIENT"><span>Slowest bill paid</span><b>{{ Kpi.SLOWEST_DAYS | number }} days</b></div>
               }
             </div>
           </div>
-        }
+        </div>
+        <div class="fd-tile fd-kpi-click" (click)="OpenExplain('BILLED')" title="Invoice value raised between the From and To dates. Click to see how it is worked out, and the rows behind it.">
+          <div class="k">Billed in period<span class="go">How &rarr;</span></div>
+          <div class="v"><span class="u">&#8377;</span>{{ fig(fmtShort(Kpi.BILLED_PERIOD)).n }}<span class="u">{{ fig(fmtShort(Kpi.BILLED_PERIOD)).u }}</span></div>
+          <div class="cx-foot">
+            <!-- taxable vs non-taxable share of billing, INR and foreign combined -->
+            <span class="cx-ms h8"><span class="f-c1" [style.width.%]="taxablePct()"></span><span class="f-c2" [style.width.%]="nonTaxPct()"></span></span>
+            <div class="s cx-ml">
+              <span><i class="f-c1"></i>Taxable <b>{{ taxablePct() | number:'1.0-0' }}%</b></span>
+              <span><i class="f-c2"></i>Non-taxable <b>{{ nonTaxPct() | number:'1.0-0' }}%</b></span>
+              <span><b>{{ Kpi.INVOICE_COUNT | number }}</b> invoices &middot; GST <b>{{ fmtShort(Kpi.GST_AMT) }}</b></span>
+            </div>
+          </div>
+        </div>
+        <div class="fd-tile fd-kpi-click" (click)="OpenExplain('UNBILLED')" title="Cost already booked against jobs with no invoice. A cost figure, not revenue. Click to see how it is worked out, and the rows behind it.">
+          <div class="k">Unbilled (cost)<span class="go">How &rarr;</span></div>
+          <div class="v"><span class="u">&#8377;</span>{{ fig(fmtShort(Kpi.UNBILLED_VALUE)).n }}<span class="u">{{ fig(fmtShort(Kpi.UNBILLED_VALUE)).u }}</span></div>
+          <div class="cx-foot">
+            <!-- cost booked on open jobs by age, young -> old = lighter -> darker -->
+            <span class="cx-ms h8">
+              @for (u of UnbilledAge; track $index; let i = $index, n = $count) {
+                <span [class]="ramp(i, n)" [style.width.%]="pctOf(u.COST_VALUE, sumOf(UnbilledAge, 'COST_VALUE'))"></span>
+              }
+            </span>
+            <div class="s cx-ml">
+              <span><b>{{ Kpi.UNBILLED_JOBS | number }}</b> open jobs &middot; basis: cost incurred</span>
+              @if (UnbilledAge.length > 1) {
+                <span><i [class]="ramp(0, UnbilledAge.length)"></i>{{ UnbilledAge[0].AGE_BUCKET }} &rarr; <i [class]="ramp(UnbilledAge.length - 1, UnbilledAge.length)"></i>{{ UnbilledAge[UnbilledAge.length - 1].AGE_BUCKET }}</span>
+              }
+            </div>
+          </div>
+        </div>
+        <div class="fd-tile fd-kpi-click" (click)="OpenExplain('MARGIN')" title="Job-wise income less expense. Duty billed to clients sits outside job income, so clearance work can read negative. Click to see how it is worked out, and the rows behind it.">
+          <div class="k">Margin<span class="go">How &rarr;</span></div>
+          <div class="cx-vrow">
+            <div class="v">{{ Kpi.MARGIN_PCT | number:'1.1-1' }}<span class="u">%</span></div>
+            @if (num(Kpi.MARGIN_PCT) > 0) { <span class="cx-pill ok">In profit</span> }
+            @else if (num(Kpi.MARGIN_PCT) < 0) { <span class="cx-pill dn">In loss</span> }
+          </div>
+          <div class="cx-foot">
+            <span class="cx-ms h8"><span class="f-mute" [style.width.%]="100 - absPct(Kpi.MARGIN_PCT)"></span><span [class.f-ok]="num(Kpi.MARGIN_PCT) >= 0" [class.f-dn]="num(Kpi.MARGIN_PCT) < 0" [style.width.%]="absPct(Kpi.MARGIN_PCT)"></span></span>
+            <div class="s cx-ml">
+              <span><i class="f-mute"></i>Expense <b>{{ fmtShort(Kpi.COST_PERIOD) }}</b></span>
+              <span><i [class.f-ok]="num(Kpi.MARGIN_PCT) >= 0" [class.f-dn]="num(Kpi.MARGIN_PCT) < 0"></i>Margin <b>{{ fmtShort(num(Kpi.REVENUE_PERIOD) - num(Kpi.COST_PERIOD)) }}</b></span>
+              <span>of income <b>{{ fmtShort(Kpi.REVENUE_PERIOD) }}</b></span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="fd-grid">
-        <div class="card sec">
+
+      <!-- one 12-column grid for every workload card (spans per the C2 mock; t12 = full width below 1240px) -->
+      <div class="fd-grid cx-g12">
+        <div class="card sec s8 t12" [class.s12]="!PayKpi">
+          <div class="card-h"><h2>Receivable ageing</h2><span class="meta">net of unapplied credit &middot; {{ fmtShort(sumOf(AgeingBars, 'value')) }}</span>
+            <div class="cx-lg"><span><i class="t3"></i>Up to 180 days (darker = older)</span><span><i class="d3"></i>Over 180 days</span></div></div>
+          <!-- the nine buckets summed into three bands -->
+          <div class="cx-stk">
+            <span class="t2" [style.width.%]="pctOf(sumOf(AgeingBars, 'value', 0, 2), sumOf(AgeingBars, 'value'))"></span>
+            <span class="t5" [style.width.%]="pctOf(sumOf(AgeingBars, 'value', 3, 4), sumOf(AgeingBars, 'value'))"></span>
+            <span class="d3" [style.width.%]="pctOf(sumOf(AgeingBars, 'value', 5, 8), sumOf(AgeingBars, 'value'))"></span>
+          </div>
+          <div class="cx-stkl">
+            <span><i class="t2"></i>Within 90 days <b>{{ fmtShort(sumOf(AgeingBars, 'value', 0, 2)) }} &middot; {{ pctOf(sumOf(AgeingBars, 'value', 0, 2), sumOf(AgeingBars, 'value')) | number:'1.0-0' }}%</b></span>
+            <span><i class="t5"></i>91&ndash;180 days <b>{{ fmtShort(sumOf(AgeingBars, 'value', 3, 4)) }} &middot; {{ pctOf(sumOf(AgeingBars, 'value', 3, 4), sumOf(AgeingBars, 'value')) | number:'1.0-0' }}%</b></span>
+            <span><i class="d3"></i>Over 180 days <b>{{ fmtShort(sumOf(AgeingBars, 'value', 5, 8)) }} &middot; {{ pctOf(sumOf(AgeingBars, 'value', 5, 8), sumOf(AgeingBars, 'value')) | number:'1.0-0' }}%</b></span>
+          </div>
+          <div class="cx-vch">
+            <div class="cx-vp" role="img" aria-label="Receivable ageing by bucket">
+              @for (g of AgeAxis.ticks; track $index) { <div class="cx-gl" [style.bottom.%]="g.b"><span>{{ g.l }}</span></div> }
+              <div class="cx-vcs">
+                @for (a of AgeingBars; track $index; let i = $index, n = $count) {
+                  <div class="cx-vc" [class.r]="i >= n / 2"><div class="cx-bar" [class]="ageTone(i)" [style.height.%]="pctOf(a.value, AgeAxis.top)"></div>
+                    <div class="cx-tp"><b>{{ a.label }}</b><span>{{ fmtShort(a.value) }} &middot; {{ a.pct | number:'1.0-1' }}% of the total</span></div></div>
+                }
+              </div>
+            </div>
+            <div class="cx-vx">@for (a of AgeingBars; track $index; let i = $index) { <span>{{ ageingLabels[i] }}<b>{{ fmtShort(a.value) }}</b></span> }</div>
+          </div>
+        </div>
+        @if (PayKpi) {
+          <div class="card sec s4 t12">
+            <div class="card-h"><h2>Payable ageing</h2><span class="meta">gross of money paid without naming a bill &middot; {{ fmtShort(sumOf(PayAge, 'AMOUNT')) }}</span></div>
+            @if (PayAge.length) {
+              <div class="cx-stk">
+                <span class="t3" [style.width.%]="pctOf(sumOf(PayAge, 'AMOUNT', 0, 2), sumOf(PayAge, 'AMOUNT'))"></span>
+                <span class="d3" [style.width.%]="pctOf(sumOf(PayAge, 'AMOUNT', 3), sumOf(PayAge, 'AMOUNT'))"></span>
+              </div>
+              <div class="cx-stkl">
+                <span><i class="t3"></i>Within 90 d <b>{{ pctOf(sumOf(PayAge, 'AMOUNT', 0, 2), sumOf(PayAge, 'AMOUNT')) | number:'1.0-0' }}%</b></span>
+                <span><i class="d3"></i>Over 90 d (old) <b>{{ fmtShort(sumOf(PayAge, 'AMOUNT', 3)) }} &middot; {{ pctOf(sumOf(PayAge, 'AMOUNT', 3), sumOf(PayAge, 'AMOUNT')) | number:'1.0-0' }}%</b></span>
+              </div>
+              <div class="cx-vch">
+                <div class="cx-vp" role="img" aria-label="Payable ageing by bucket">
+                  @for (g of PayAgeAxis.ticks; track $index) { <div class="cx-gl" [style.bottom.%]="g.b"><span>{{ g.l }}</span></div> }
+                  <div class="cx-vcs">
+                    @for (a of PayAge; track $index; let i = $index, n = $count) {
+                      <div class="cx-vc" [class.r]="i >= n / 2"><div class="cx-bar" [class]="payTone(a)" [style.height.%]="pctOf(a.AMOUNT, PayAgeAxis.top)"></div>
+                        <div class="cx-tp"><b>{{ a.BUCKET }}</b><span>{{ fmtShort(a.AMOUNT) }} &middot; {{ pctOf(a.AMOUNT, sumOf(PayAge, 'AMOUNT')) | number:'1.0-1' }}%</span></div></div>
+                    }
+                  </div>
+                </div>
+                <div class="cx-vx">@for (a of PayAge; track $index) { <span [class.fd-old]="num(a.SORTORDER) >= 4">{{ a.BUCKET.replace(' days', '') }}<b>{{ fmtShort(a.AMOUNT) }}</b></span> }</div>
+              </div>
+              <div class="fk-note">Bars over 90 days are flagged old.</div>
+            } @else {
+              <div class="empty">No open bills.</div>
+            }
+          </div>
+        }
+
+        <div class="card sec s5 t12">
           <div class="card-h"><h2>Margin by {{ MarginBy === 'SHIPPER' ? 'shipper' : 'billed party' }}</h2>
+            <span class="meta">top 8 by income &middot; select for the margin table</span>
             <span class="fk-seg">
               <button type="button" [class.on]="MarginBy === 'BILLED'" (click)="SetMarginBy('BILLED')">Billed party</button>
               <button type="button" [class.on]="MarginBy === 'SHIPPER'" (click)="SetMarginBy('SHIPPER')">Shipper</button>
-            </span>
-            <span class="meta">top 8 by income &middot; select for the margin table</span></div>
-          <div class="fk-hbars">
+            </span></div>
+          <div class="cx-hbs">
             @for (m of MarginBars; track $index) {
-              <div class="fk-hbar fk-click" (click)="GoDetail('MARGIN')" [title]="m.name + ': income ' + (m.rev | number:'1.0-0') + ', margin ' + (m.margin | number:'1.0-0')">
+              <div class="cx-hb fk-click" [class.neg]="m.margin < 0" (click)="GoDetail('MARGIN')" [title]="m.name + ': income ' + (m.rev | number:'1.0-0') + ', margin ' + (m.margin | number:'1.0-0')">
                 <span class="fd-name">{{ m.name }}</span>
-                <div class="t"><div [class.fd-negbar]="m.margin < 0" [style.width.%]="m.pct"></div></div>
+                <div class="t"><div class="zl" [style.left.%]="MarginZero"></div><div class="bf" [class.fd-negbar]="m.margin < 0" [style.left.%]="m.x" [style.width.%]="m.w"></div></div>
                 <span class="n">{{ fmtShort(m.margin) }} &middot; {{ m.mpct === null ? '-' : (m.mpct | number:'1.0-0') + '%' }}</span>
               </div>
             } @empty {
               <div class="empty">No margin rows.</div>
             }
           </div>
+          <div class="fk-note"><span class="cx-lg"><span><i class="f-p"></i>Margin</span><span><i class="f-dn"></i>Loss</span></span> &middot; Bars run from zero; a loss runs left.</div>
         </div>
-        <!-- quick snapshot -->
-        <div class="card sec">
+        <!-- quick snapshot: one ring per figure, its share of the whole -->
+        <div class="card sec s3">
           <div class="card-h"><h2>Quick snapshot</h2><span class="meta">portfolio health</span></div>
-          <div class="fk-hbars">
-            <div class="fk-hbar" title="Share of net outstanding past its due date">
-              <span>Overdue</span>
-              <div class="t"><div [style.width.%]="pctOf(Kpi.OVERDUE_AMT, Kpi.TOTAL_OUTSTANDING)"></div></div>
-              <span class="n">{{ pctOf(Kpi.OVERDUE_AMT, Kpi.TOTAL_OUTSTANDING) | number:'1.0-0' }}% &middot; {{ fmtShort(Kpi.OVERDUE_AMT) }}</span>
+          <div class="cx-rings">
+            <div class="cx-rg" title="Share of net outstanding past its due date">
+              <div class="cx-ring dn" [style.--pc]="pctOf(Kpi.OVERDUE_AMT, Kpi.TOTAL_OUTSTANDING)"><b>{{ pctOf(Kpi.OVERDUE_AMT, Kpi.TOTAL_OUTSTANDING) | number:'1.0-0' }}%</b></div>
+              <div class="nm">Overdue</div><div>{{ fmtShort(Kpi.OVERDUE_AMT) }} past due</div>
             </div>
-            <div class="fk-hbar" title="Clients flagged RED">
-              <span>At risk</span>
-              <div class="t"><div [style.width.%]="pctOf(Kpi.RED_CLIENTS, Kpi.CLIENT_COUNT)"></div></div>
-              <span class="n">{{ Kpi.RED_CLIENTS }} of {{ Kpi.CLIENT_COUNT }}</span>
+            <div class="cx-rg" title="Clients flagged RED">
+              <div class="cx-ring dn" [style.--pc]="pctOf(Kpi.RED_CLIENTS, Kpi.CLIENT_COUNT)"><b>{{ Kpi.RED_CLIENTS }}</b></div>
+              <div class="nm">At risk</div><div>of {{ Kpi.CLIENT_COUNT }} clients RED</div>
             </div>
-            <div class="fk-hbar" title="Taxable share of billing, INR and foreign combined">
-              <span>Taxable mix</span>
-              <div class="t"><div [style.width.%]="taxablePct()"></div></div>
-              <span class="n">{{ taxablePct() | number:'1.0-0' }}% &middot; GST {{ fmtShort(Kpi.GST_AMT) }}</span>
+            <div class="cx-rg" title="Taxable share of billing, INR and foreign combined">
+              <div class="cx-ring" [style.--pc]="taxablePct()"><b>{{ taxablePct() | number:'1.0-0' }}%</b></div>
+              <div class="nm">Taxable mix</div><div>GST {{ fmtShort(Kpi.GST_AMT) }}</div>
             </div>
-            <div class="fk-hbar" title="Clients with no agreed credit period on file">
-              <span>No terms</span>
-              <div class="t"><div [style.width.%]="pctOf(Kpi.NOTERMS_CLIENTS, Kpi.CLIENT_COUNT)"></div></div>
-              <span class="n">{{ Kpi.NOTERMS_CLIENTS }} clients</span>
+            <div class="cx-rg" title="Clients with no agreed credit period on file">
+              <div class="cx-ring wn" [style.--pc]="pctOf(Kpi.NOTERMS_CLIENTS, Kpi.CLIENT_COUNT)"><b>{{ Kpi.NOTERMS_CLIENTS }}</b></div>
+              <div class="nm">No terms</div><div>{{ Kpi.NOTERMS_CLIENTS }} clients, no credit period</div>
             </div>
           </div>
         </div>
 
         <!-- top exposure -->
-        <div class="card sec">
-          <div class="card-h"><h2>Top exposure</h2><span class="meta">select a client for detail</span></div>
-          <div class="fk-hbars">
+        <div class="card sec s4">
+          <div class="card-h"><h2>Top exposure</h2><span class="meta">share of {{ fmtShort(Kpi.TOTAL_EXPOSURE) }} &middot; select a client for detail</span></div>
+          <div class="cx-hbs">
             @for (r of Exposure.slice(0, 7); track $index) {
-              <div class="fk-hbar fk-click" (click)="OpenDrill(r)">
+              <div class="cx-hb x fk-click" (click)="OpenDrill(r)">
                 <span class="fd-name">{{ r.CLIENTNAME }}</span>
-                <div class="t"><div [style.width.%]="pctOf(r.TOTAL_EXPOSURE, Kpi.TOTAL_EXPOSURE)"></div></div>
+                <div class="t"><div class="bf" [style.width.%]="pctOf(r.TOTAL_EXPOSURE, Kpi.TOTAL_EXPOSURE)"></div></div>
                 <span class="n">{{ fmtShort(r.TOTAL_EXPOSURE) }} &middot; {{ pctOf(r.TOTAL_EXPOSURE, Kpi.TOTAL_EXPOSURE) | number:'1.0-0' }}%</span>
               </div>
             } @empty {
@@ -490,20 +652,20 @@
             }
           </div>
         </div>
-      </div>
-      <div class="fd-grid">
+
         <!-- cash flow funnel -->
-        <div class="card sec">
+        <div class="card sec s6 t12">
           <div class="card-h"><h2>Cash flow funnel</h2><span class="meta">work done &rarr; billed &rarr; collected</span></div>
-          <div class="fd-funnel">
+          <div class="cx-fn">
             @for (f of Funnel; track $index; let i = $index) {
-              <div class="fd-stage" [attr.data-i]="i % 3" [style.width.%]="funnelWidth(f)">
-                <span>{{ f.STAGE }} &middot; {{ f.JOBS | number }} jobs</span>
-                <b>{{ fmtShort(f.VALUE_INR) }} <small>{{ f.VALUE_LABEL }}</small></b>
-              </div>
               @if (i > 0 && f.PCT_OF_PREV !== null) {
-                <div class="fd-drop">{{ f.PCT_OF_PREV | number:'1.0-1' }}% of previous stage</div>
+                <div class="cx-fcv"><span>&darr; {{ f.PCT_OF_PREV | number:'1.0-1' }}% of previous stage</span></div>
               }
+              <div class="cx-fs">
+                <div><b>{{ f.STAGE }}</b><span>{{ f.JOBS | number }} jobs</span></div>
+                <div class="bt"><span [class]="'t' + (i % 3 + 3)" [style.width.%]="funnelWidth(f)"></span></div>
+                <div class="n"><b>{{ fmtShort(f.VALUE_INR) }}</b><span>{{ f.VALUE_LABEL }}</span></div>
+              </div>
             } @empty {
               <div class="empty">No funnel data.</div>
             }
@@ -512,76 +674,100 @@
         </div>
 
         <!-- billing speed -->
-        <div class="card sec">
-          <div class="card-h"><h2>Billing speed</h2><span class="meta">jobs by days from job to first invoice</span></div>
+        <div class="card sec s6 t12">
+          <div class="card-h"><h2>Billing speed</h2><span class="meta">jobs by days from job to first invoice</span>
+            <div class="cx-lg"><span><i class="f-p"></i>Invoiced</span><span><i class="f-wn"></i>Still unbilled</span></div></div>
           @if (Coverage) {
             <div class="fk-note fd-top-note">
               Of {{ Coverage.TOTAL_JOBS | number }} shipment jobs in this period, {{ Coverage.BILLED_JOBS | number }} are invoiced
               ({{ Coverage.COVERAGE_PCT | number:'1.1-1' }}%), on average {{ Coverage.AVG_LAG_DAYS | number:'1.0-1' }} days from job to first invoice.
               @if (num(Coverage.UNBILLED_JOBS) > 0) { Oldest unbilled: {{ Coverage.OLDEST_UNBILLED_DAYS }} days. }
             </div>
-            <div class="fk-hbars">
-              @for (c of CoverageBars; track $index) {
-                <div class="fk-hbar"><span>{{ c.label }}</span><div class="t"><div [style.width.%]="c.pct"></div></div><span class="n">{{ c.value | number }}</span></div>
-              }
+            <div class="cx-vch">
+              <div class="cx-vp" role="img" aria-label="Jobs by days from job to first invoice">
+                @for (g of CovAxis.ticks; track $index) { <div class="cx-gl" [style.bottom.%]="g.b"><span>{{ g.l }}</span></div> }
+                <div class="cx-vcs">
+                  @for (c of CoverageBars; track $index; let i = $index, n = $count, last = $last) {
+                    <div class="cx-vc" [class.r]="i >= n / 2"><div class="cx-bar" [class.f-wn]="last" [class.f-p]="!last" [style.height.%]="pctOf(c.value, CovAxis.top)"></div>
+                      <div class="cx-tp"><b>{{ c.label }}</b><span>{{ c.value | number }} jobs &middot; {{ c.pct | number:'1.0-1' }}%</span></div></div>
+                  }
+                </div>
+              </div>
+              <div class="cx-vx">@for (c of CoverageBars; track $index; let i = $index) { <span>{{ covShort[i] }}<b>{{ c.value | number }}</b></span> }</div>
             </div>
           } @else {
             <div class="empty">No billing-coverage data.</div>
           }
         </div>
-      </div>
-      <!-- credit period vs actual recovery -->
-      <div class="card sec">
-        <div class="card-h">
-          <h2>Credit period vs actual recovery</h2>
-          <div class="fd-legend"><span><i class="fd-sw lite"></i>Credit period</span><span><i class="fd-sw"></i>Actual recovery (days)</span></div>
-        </div>
-        <div class="fk-chart">
-          @if (RecoveryBars.length) {
-            <svg [attr.viewBox]="'0 0 ' + recW + ' ' + recH" role="img" aria-label="Credit period versus actual recovery days by client">
-              @for (g of RecoveryGrid; track $index) {
-                <line class="gl" x1="40" [attr.x2]="recW - 10" [attr.y1]="g.y" [attr.y2]="g.y"></line>
-                <text class="ax" x="34" [attr.y]="g.y + 3" text-anchor="end">{{ g.label }}</text>
-              }
-              @for (b of RecoveryBars; track $index) {
-                <rect class="fb neg" [attr.x]="b.x" [attr.y]="b.ch" [attr.width]="b.cw" [attr.height]="recH - 40 - b.ch"><title>{{ b.label }} credit period: {{ b.credit }} d</title></rect>
-                <rect class="fb" [attr.x]="b.x + b.cw + 2" [attr.y]="b.ah" [attr.width]="b.aw" [attr.height]="recH - 40 - b.ah"><title>{{ b.label }} actual: {{ b.actual | number:'1.0-1' }} d</title></rect>
-                <text class="ax" [attr.x]="b.x + b.cw" [attr.y]="recH - 26" text-anchor="end" [attr.transform]="'rotate(-35 ' + (b.x + b.cw) + ' ' + (recH - 26) + ')'">{{ b.label }}</text>
-              }
-            </svg>
-          } @else {
-            <div class="empty">No recovery data for this period.</div>
-          }
-        </div>
-      </div>
-      <div class="fd-grid">
-        <div class="card sec">
-          <div class="card-h"><h2>Revenue composition</h2><span class="meta">normalised to INR</span></div>
-          <div class="fk-hbars">
-            @for (m of MixBars; track $index; let i = $index) {
-              <div class="fk-hbar" [attr.data-ser]="i % 5"><span>{{ m.label }}</span><div class="t"><div [style.width.%]="m.pct"></div></div><span class="n">{{ fmtShort(m.value) }} &middot; {{ m.pct | number:'1.0-0' }}%</span></div>
+
+        <!-- credit period vs actual recovery: grouped columns, hover a client for both figures and the gap -->
+        <div class="card sec s12">
+          <div class="card-h">
+            <h2>Credit period vs actual recovery</h2><span class="meta">top {{ RecoveryBars.length }} clients by billing &middot; hover a client</span>
+            <div class="cx-lg"><span><i class="t1"></i>Credit period</span><span><i class="f-p"></i>Actual recovery (days)</span></div>
+          </div>
+            @if (RecoveryBars.length) {
+              <div class="cx-vch">
+                <div class="cx-vp lg" role="img" aria-label="Credit period versus actual recovery days by client">
+                  @for (g of RecAxis.ticks; track $index) { <div class="cx-gl" [style.bottom.%]="g.b"><span>{{ g.l }}</span></div> }
+                  <div class="cx-vcs">
+                    @for (b of RecoveryBars; track $index; let i = $index, n = $count) {
+                      <div class="cx-vc" [class.r]="i >= n / 2">
+                        <div class="cx-bar w2 t1" [style.height.%]="pctOf(b.credit, RecAxis.top)"></div><div class="cx-bar w2 f-p" [style.height.%]="pctOf(b.actual, RecAxis.top)"></div>
+                        <div class="cx-tp"><b>{{ b.label }}</b>
+                          <div class="tl"><span><i class="t1"></i>Credit period</span><b>{{ b.credit }} d</b></div>
+                          <div class="tl"><span><i class="f-p"></i>Actual</span><b>{{ b.actual | number:'1.0-1' }} d</b></div>
+                          <div class="tl"><span>Gap</span><b [class.cx-late]="b.actual - b.credit > 0">{{ b.actual - b.credit > 0 ? '+' : '' }}{{ b.actual - b.credit | number:'1.0-1' }} d</b></div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+                <div class="cx-vx">@for (b of RecoveryBars; track $index) { <span>{{ b.label }}</span> }</div>
+              </div>
+            } @else {
+              <div class="empty">No recovery data for this period.</div>
             }
+        </div>
+
+        <div class="card sec s5 t12">
+          <div class="card-h"><h2>Revenue composition</h2><span class="meta">normalised to INR</span></div>
+          <div class="cx-dn">
+            <div class="cx-donut" [style.background]="MixGrad" role="img" aria-label="Revenue composition"><div><b>{{ fmtShort(sumOf(MixBars, 'value')) }}</b>billed before GST</div></div>
+            <div class="cx-dl">
+              @for (m of MixBars; track $index; let i = $index) {
+                <div class="cx-dli"><i [class]="'f-c' + (i % 5 + 1)"></i><span>{{ m.label }}</span><b>{{ fmtShort(m.value) }}</b><small>{{ m.pct | number:'1.0-0' }}% of billing</small></div>
+              }
+            </div>
           </div>
         </div>
-        <div class="card sec">
-        <div class="card-h"><h2>Unbilled ageing</h2><span class="meta">open jobs by age, valued at cost already booked</span></div>
-        <div class="fk-hbars">
-          @for (u of UnbilledAge; track $index) {
-            <div class="fk-hbar">
-              <span>{{ u.AGE_BUCKET }} <span class="fk-sub">&middot; {{ u.JOBS }} jobs, {{ u.JOBS_WITH_COST }} costed</span></span>
-              <div class="t"><div [style.width.%]="num(u.COST_VALUE) / unbilledAgeMax() * 100"></div></div>
-              <span class="n">{{ u.COST_VALUE | number:'1.0-0' }}</span>
+        <div class="card sec s7 t12">
+          <div class="card-h"><h2>Unbilled ageing</h2><span class="meta">open jobs by age, valued at cost already booked</span>
+            @if (UnbilledAge.length > 1) {
+              <div class="cx-lg"><span><i [class]="ramp(0, UnbilledAge.length)"></i>Younger</span><span><i [class]="ramp(UnbilledAge.length - 1, UnbilledAge.length)"></i>Older</span></div>
+            }</div>
+          @if (UnbilledAge.length) {
+            <div class="cx-vch">
+              <div class="cx-vp" role="img" aria-label="Unbilled jobs by age, at cost">
+                @for (g of UnbAxis.ticks; track $index) { <div class="cx-gl" [style.bottom.%]="g.b"><span>{{ g.l }}</span></div> }
+                <div class="cx-vcs">
+                  @for (u of UnbilledAge; track $index; let i = $index, n = $count) {
+                    <div class="cx-vc" [class.r]="i >= n / 2"><div class="cx-bar" [class]="ramp(i, n)" [style.height.%]="pctOf(u.COST_VALUE, UnbAxis.top)"></div>
+                      <div class="cx-tp"><b>{{ u.AGE_BUCKET }}</b><span>{{ u.COST_VALUE | number:'1.0-0' }} &middot; {{ u.JOBS }} jobs, {{ u.JOBS_WITH_COST }} costed</span></div></div>
+                  }
+                </div>
+              </div>
+              <div class="cx-vx wr">@for (u of UnbilledAge; track $index) { <span>{{ u.AGE_BUCKET }} &middot; {{ u.JOBS }} jobs, {{ u.JOBS_WITH_COST }} costed<b>{{ u.COST_VALUE | number:'1.0-0' }}</b></span> }</div>
             </div>
-          } @empty {
+          } @else {
             <div class="empty">No open jobs in this period.</div>
           }
-        </div>
         </div>
       </div>
       <div class="fk-note fd-secnote">A month-by-month trend is not shown: the dashboard procedure returns period totals, not a monthly series.</div>
     </section>
 
-    <!-- ======================= DETAIL ======================= -->
+<!-- ======================= DETAIL ======================= -->
     <section class="fd-sec" id="fd-s-detail">
       <div class="fd-sech"><h2>Detail</h2><span>The full tables. Column headers sort; rows expand to the jobs and vouchers behind them.</span></div>
       <div class="toolbar fd-tabbar">
@@ -594,7 +780,8 @@
       </div>
       @if (Tab === 'RECEIVABLES') {
       <div class="card sec">
-        <div class="card-h"><h2>Client exposure &amp; risk</h2><span class="meta">suggested limit is derived from billing history &mdash; not an approved credit limit</span></div>
+        <div class="card-h"><h2>Client exposure &amp; risk</h2><span class="meta">suggested limit is derived from billing history &mdash; not an approved credit limit</span>
+          <div class="cx-lg"><span>Utilisation of the suggested limit:</span><span><i class="f-c1"></i>below 80%</span><span><i class="f-wn"></i>80&ndash;100%</span><span><i class="f-dn"></i>over 100%</span></div></div>
         <div class="toolbar">
           <span><span class="count">{{ Exposure.length }} clients</span></span>
           <span class="tb-r"><button type="button" class="btn g" (click)="ExportExposure()">Export</button></span>
@@ -632,10 +819,10 @@
                   <td class="num"><b>{{ r.TOTAL_EXPOSURE | number:'1.0-0' }}</b></td>
                   <td class="num">
                     {{ r.UTILISATION_PCT === null ? '-' : (r.UTILISATION_PCT | number:'1.0-0') + '%' }}
-                    <div class="fd-meter"><div [style.width.%]="utilWidth(r.UTILISATION_PCT)"></div></div>
+                    <div class="fd-meter" [class.cx-near]="num(r.UTILISATION_PCT) >= 80 && num(r.UTILISATION_PCT) <= 100" [class.cx-over]="num(r.UTILISATION_PCT) > 100"><div [style.width.%]="utilWidth(r.UTILISATION_PCT)"></div></div>
                   </td>
                   <td class="num">{{ r.RECOVERY_GAP === null ? '-' : (r.RECOVERY_GAP | number:'1.0-0') }}</td>
-                  <td><span class="chip" [class.solid]="r.RISK_STATUS === 'RED'" [class.dash]="r.RISK_STATUS === 'AMBER'">{{ r.RISK_STATUS }}</span></td>
+                  <td><span class="chip cx-rk" [class.solid]="r.RISK_STATUS === 'RED'" [class.dash]="r.RISK_STATUS === 'AMBER'" [class.cx-red]="r.RISK_STATUS === 'RED'" [class.cx-amb]="r.RISK_STATUS === 'AMBER'" [class.cx-grn]="r.RISK_STATUS === 'GREEN'">{{ r.RISK_STATUS }}</span></td>
                   <td>
                     @if (num(r.OVERDUE) > 0.01) {
                       <button type="button" class="btn g" title="Compose a payment reminder for this client" (click)="OpenReminder(r, $event)">Remind</button>
@@ -1361,9 +1548,9 @@
 
           <div class="sub-t">Client risk (Receivables tab)</div>
           <table class="fd-lg-table">
-            <tr><td><span class="chip solid">RED</span></td><td>Act now: risk score &ge; 60, or over half the balance is older than a year, or the client is marked DEFAULT / COURT CASE in the master.</td></tr>
-            <tr><td><span class="chip dash">AMBER</span></td><td>Watch: risk score 30&ndash;59, or half the balance is older than 180 days.</td></tr>
-            <tr><td><span class="chip">GREEN</span></td><td>Fine: within the suggested limit, paying roughly on time, little old balance.</td></tr>
+            <tr><td><span class="chip solid cx-rk cx-red">RED</span></td><td>Act now: risk score &ge; 60, or over half the balance is older than a year, or the client is marked DEFAULT / COURT CASE in the master.</td></tr>
+            <tr><td><span class="chip dash cx-rk cx-amb">AMBER</span></td><td>Watch: risk score 30&ndash;59, or half the balance is older than 180 days.</td></tr>
+            <tr><td><span class="chip cx-rk cx-grn">GREEN</span></td><td>Fine: within the suggested limit, paying roughly on time, little old balance.</td></tr>
             <tr><td><span class="chip">NO-TERMS</span></td><td>No credit period on file for this client &mdash; measured against a 30-day default, so "late" is an assumption. Never shown GREEN.</td></tr>
             <tr><td><span class="chip">SETTLED</span></td><td>Nothing outstanding and nothing unbilled.</td></tr>
           </table>
@@ -1380,9 +1567,9 @@
           <table class="tbl fd-lg-score">
             <thead><tr><th>Score / condition</th><th>Status</th></tr></thead>
             <tbody>
-              <tr><td>&ge; 60, <i>or</i> &gt; 50 % of balance older than 1 year, <i>or</i> client master = DEFAULT / COURT CASE</td><td><span class="chip solid">RED</span></td></tr>
-              <tr><td>30 &ndash; 59, <i>or</i> &ge; 50 % of balance older than 180 days</td><td><span class="chip dash">AMBER</span></td></tr>
-              <tr><td>below 30</td><td><span class="chip">GREEN</span></td></tr>
+              <tr><td>&ge; 60, <i>or</i> &gt; 50 % of balance older than 1 year, <i>or</i> client master = DEFAULT / COURT CASE</td><td><span class="chip solid cx-rk cx-red">RED</span></td></tr>
+              <tr><td>30 &ndash; 59, <i>or</i> &ge; 50 % of balance older than 180 days</td><td><span class="chip dash cx-rk cx-amb">AMBER</span></td></tr>
+              <tr><td>below 30</td><td><span class="chip cx-rk cx-grn">GREEN</span></td></tr>
               <tr><td>no credit period on file (checked before AMBER / GREEN)</td><td><span class="chip">NO-TERMS</span></td></tr>
               <tr><td>nothing outstanding and nothing unbilled</td><td><span class="chip">SETTLED</span></td></tr>
             </tbody>
