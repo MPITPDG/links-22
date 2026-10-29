@@ -7,6 +7,7 @@ import { MyDatePickerModule } from 'mydatepicker';
 import {NgSelectModule} from '@ng-select/ng-select';
 import{financialYearIU} from './financialYear-IU.component';
 import {financialYearsearch} from './financialYear-search.component';
+import { UserRightsAdvanceComponent } from './userrights-advance.component';
 // import {ClientOriginRateEntryComponent} from './client-origin-rate-entry.component';
 // import{ClientOriginRateSearchComponent} from './client-origin-rate-search.component';
 // import{QuotRateEntryComponent} from './quot-rate-master-entry.component';
@@ -16,7 +17,7 @@ import { DatePipe } from '@angular/common';
 import {SharedModule} from '../../shared/shared.module';
 //import { QuotationPrintComponent } from '../../windowpoppage/Account/Admin-Quotation-Print.component';
 @NgModule({
-  declarations: [financialYearIU,financialYearsearch],
+  declarations: [financialYearIU,financialYearsearch,UserRightsAdvanceComponent],
   imports: [AdminAccountRoutingModule,
     CommonModule,
      FormsModule,
