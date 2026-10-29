@@ -1,0 +1,162 @@
+<!--
+  Admin > User Rights (Advance) (V4 UI/Admin/frm_Admin_UserRights_Form_Advance.aspx).
+  Page kit (import/_import-page-kit.scss, global) + userrights-advance.component.css.
+-->
+<div class="im-page">
+  <div class="ura-wrap">
+    <div class="ph">
+      <div>
+        <h1><i class="fa fa-key"></i> {{Header}}</h1>
+        <p>Give a user View / Add / Modify / Delete rights on the forms of a module, for a period, in the chosen company / branches</p>
+      </div>
+    </div>
+
+    @if (rightsChecked && !canModify) {
+      <div class="ura-msg ura-msg--fail">You do not have Modify rights on this page (form 327). You can look, but Submit is disabled.</div>
+    }
+
+    <div class="card sec">
+      <div class="card-h"><h2>User Details</h2></div>
+      <div class="fields">
+        <div class="fld">
+          <label for="uraUser">User Name <span class="req">*</span></label>
+          <select id="uraUser" name="uraUser" class="form-control" [ngModel]="selectedUser" (ngModelChange)="selectedUser = $event; onSelectionChange()">
+            <option value="0">--Select--</option>
+            @for (u of userList; track $index) {
+              <option [value]="u.CMPID">{{u.CMP_USERNAME}}</option>
+            }
+          </select>
+        </div>
+        <div class="fld">
+          <label for="uraModule">Module <span class="req">*</span></label>
+          <select id="uraModule" name="uraModule" class="form-control" [ngModel]="selectedModule" (ngModelChange)="selectedModule = $event; onSelectionChange()">
+            <option value="0">--Select--</option>
+            @for (m of moduleList; track $index) {
+              <option [value]="m.PK_MODULEID">{{m.MODULENAME}}</option>
+            }
+          </select>
+        </div>
+        <div class="fld">
+          <label>From Date <span class="req">*</span></label>
+          <my-date-picker name="uraFromDate" [options]="myDatePickerOptions" [(ngModel)]="FromDate"></my-date-picker>
+        </div>
+        <div class="fld">
+          <label>To Date <span class="req">*</span></label>
+          <my-date-picker name="uraToDate" [options]="myDatePickerOptions" [(ngModel)]="ToDate"></my-date-picker>
+        </div>
+      </div>
+    </div>
+
+    <div class="card sec">
+      <div class="card-h">
+        <h2>Company Details</h2>
+        <span class="meta">{{branchCount}} of {{branchList.length}} selected</span>
+      </div>
+      <div class="tbl-wrap ura-branches">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th class="ura-chk">
+                <input type="checkbox" [checked]="allBranches" (change)="toggleAllBranches($any($event.target).checked)" title="Select all" aria-label="Select all company / branches">
+              </th>
+              <th>Company and Branch Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (b of branchList; track $index; let i = $index) {
+              <tr [class.ura-sel]="b.selected" (click)="b.selected = !b.selected">
+                <td class="ura-chk">
+                  <input type="checkbox" [name]="'uraBr'+i" [(ngModel)]="b.selected" (click)="$event.stopPropagation()" [attr.aria-label]="'Select ' + b.COMPANY">
+                </td>
+                <td>{{b.COMPANY}} <span class="ura-code">{{b.CMP_CODE}}</span></td>
+              </tr>
+            } @empty {
+              <tr><td colspan="2" class="empty">No company / branch found.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card sec">
+      <div class="card-h">
+        <h2>Form Details</h2>
+        <span class="meta">{{viewCount}} of {{formList.length}} forms with View</span>
+      </div>
+
+      @if (formList.length > 0) {
+        <div class="ura-filter">
+          <input type="text" class="form-control" name="uraFilter" [(ngModel)]="formFilter" placeholder="Filter by form name or id..." aria-label="Filter forms">
+          @if (formFilter) {
+            <span class="ura-hint">Showing {{filteredForms.length}} of {{formList.length}}. Column ticks in the header apply to the shown rows only.</span>
+          }
+        </div>
+      }
+
+      <div class="tbl-wrap ura-forms">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th class="ura-chk">
+                <label class="ura-hd"><input type="checkbox" [checked]="isColumnAll('view')" [disabled]="filteredForms.length == 0" (change)="toggleColumn('view', $any($event.target).checked)"> View</label>
+              </th>
+              <th class="ura-chk">
+                <label class="ura-hd"><input type="checkbox" [checked]="isColumnAll('add')" [disabled]="filteredForms.length == 0" (change)="toggleColumn('add', $any($event.target).checked)"> Add</label>
+              </th>
+              <th class="ura-chk">
+                <label class="ura-hd"><input type="checkbox" [checked]="isColumnAll('modify')" [disabled]="filteredForms.length == 0" (change)="toggleColumn('modify', $any($event.target).checked)"> Modify</label>
+              </th>
+              <th class="ura-chk">
+                <label class="ura-hd"><input type="checkbox" [checked]="isColumnAll('del')" [disabled]="filteredForms.length == 0" (change)="toggleColumn('del', $any($event.target).checked)"> Delete</label>
+              </th>
+              <th>Form Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (f of filteredForms; track f.PK_FORMID) {
+              <tr [class.ura-sel]="f.view">
+                <td class="ura-chk"><input type="checkbox" [name]="'uraV'+f.PK_FORMID" [ngModel]="f.view" (ngModelChange)="f.view = $event; onViewToggle(f)" [attr.aria-label]="'View ' + f.DISPLAYNAME"></td>
+                <td class="ura-chk"><input type="checkbox" [name]="'uraA'+f.PK_FORMID" [ngModel]="f.add" (ngModelChange)="f.add = $event; onRightToggle(f, 'add')" [attr.aria-label]="'Add ' + f.DISPLAYNAME"></td>
+                <td class="ura-chk"><input type="checkbox" [name]="'uraM'+f.PK_FORMID" [ngModel]="f.modify" (ngModelChange)="f.modify = $event; onRightToggle(f, 'modify')" [attr.aria-label]="'Modify ' + f.DISPLAYNAME"></td>
+                <td class="ura-chk"><input type="checkbox" [name]="'uraD'+f.PK_FORMID" [ngModel]="f.del" (ngModelChange)="f.del = $event; onRightToggle(f, 'del')" [attr.aria-label]="'Delete ' + f.DISPLAYNAME"></td>
+                <td>
+                  {{f.DISPLAYNAME}}
+                  <span class="ura-code" title="Form Id">#{{f.PK_FORMID}}</span>
+                  @if (f.ISREPORT == '1' || f.ISREPORT === true || f.ISREPORT == 1) {
+                    <span class="chip dash ura-rpt">Report</span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="empty">
+                  @if (loadingForms) { Loading forms... }
+                  @else if (selectedUser == '0' || selectedModule == '0') { Select a user and a module to list the forms. }
+                  @else if (formList.length > 0) { No form matches the filter. }
+                  @else { No forms found for this module. }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    @if (resultOk) {
+      <div class="ura-msg ura-msg--ok">{{resultOk}}</div>
+    }
+    @if (resultFail) {
+      <div class="ura-msg ura-msg--fail">{{resultFail}}</div>
+    }
+
+    <div class="bar">
+      <span class="note">All fields marked (<span class="req">*</span>) are mandatory. Only forms with View ticked are saved.</span>
+      <div class="r">
+        <button class="btn g" type="button" (click)="reset()">Reset</button>
+        <button class="btn p" type="button" [disabled]="!canModify || saving" [title]="canModify ? '' : 'Modify rights on form 327 are required'" (click)="submit()">
+          <i class="fa fa-check"></i> Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
