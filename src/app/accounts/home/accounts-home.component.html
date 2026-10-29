@@ -1,13 +1,16 @@
 <!--  Accounts home, MPERPNG-20's six-section dashboard (global kit .im-dash, see
 src/styles/kit/import-home.css): header row, Needs attention, Act now, This week, Workload
-picture, Detail, Reference. Greyscale, no look mode. Every figure, table and chart of the
-previous Links page is still here: branch scope, month-to-date vs last month bars, the
-"what is this" popup behind every icon (draggable), the pipeline boxes, cash forecast,
-DSO vs DPO, the Chart.js trend, watch list, top clients, quick links and the drill-downs.
+picture, Detail, Reference. Every figure, table and chart of the previous Links page is
+still here: branch scope, month-to-date vs last month bars, the "what is this" popup behind
+every icon (draggable), the pipeline boxes, cash forecast, DSO vs DPO, the 30-day trend,
+watch list, top clients, quick links and the drill-downs.
+Look: the Finance dashboard's C2 "ledger with charts" (accounts-home.component.css) -
+joined KPI strips, a 12-column grid (ah-g12 / s4..s12), tinted pills, micro bars that only
+draw a figure already printed beside them, and the trend as a CSS column chart.
 Renders only with the View right on VIEW_GATE_FORM_ID (or as SA). Without it this stays
 empty, and the home page is the blank one it has always been.                          -->
 @if (canView) {
-  <div class="im-dash ah-page">
+  <div class="im-dash ah-page ah">
     <!-- ================= HEADER ================= -->
     <div class="im-ph">
       <div>
@@ -60,15 +63,19 @@ empty, and the home page is the blank one it has always been.                   
     Most urgent first. Every tile drills into the rows behind it or scrolls to its section. -->
     <div class="ah-band" id="ah-att"><span>Needs attention</span><small>the figures to act on today; click a tile for the rows behind it</small></div>
     @if (scope == 'accounts') {
-      <div class="td-tiles">
+      <div class="td-tiles ah-strip">
         <button type="button" class="td-tile strong" (click)="openDrill('OVERDUE', $event)" title="Clients and bills behind this figure">
           <span class="k">Overdue receivable</span>
           <span class="v" [title]="money($safeNavigationMigration(kpi?.OVERDUE_AMT))">&#8377; {{short($safeNavigationMigration(kpi?.OVERDUE_AMT))}}</span>
+          <!-- micro bar: the overdue % printed below -->
+          <span class="ah-mm" aria-hidden="true"><span class="f-dn" [style.width.%]="kpi?.OVERDUE_PCT || 0"></span></span>
           <span class="s">{{kpi?.OVERDUE_PCT || 0}}% of &#8377; {{short($safeNavigationMigration(kpi?.TOTAL_OUTSTANDING))}} outstanding is past the credit period</span>
         </button>
         <button type="button" class="td-tile" (click)="go('ah-week')" title="See when supplier bills fall due">
           <span class="k">Overdue payable</span>
           <span class="v" [title]="money($safeNavigationMigration(cash?.PAY_OVERDUE))">&#8377; {{short($safeNavigationMigration(cash?.PAY_OVERDUE))}}</span>
+          <!-- micro bar: the overdue part of the payable printed below -->
+          <span class="ah-mm" aria-hidden="true"><span class="f-dn" [style.width.%]="barW(cash?.PAY_OVERDUE, toNum(cash?.PAYABLE))"></span></span>
           <span class="s">supplier bills past their due date, of &#8377; {{short($safeNavigationMigration(cash?.PAYABLE))}} we owe</span>
         </button>
         <button type="button" class="td-tile" (click)="go('ah-act')" title="Earned but not yet collected">
@@ -91,6 +98,8 @@ empty, and the home page is the blank one it has always been.                   
           <span class="v">{{ kpi ? kpi.MARGIN_PCT_COSTED_MTD : '-' }}@if (kpi) {
             <small>%</small>
           }</span>
+          <!-- micro bar: the margin % above (a loss draws in the danger colour) -->
+          <span class="ah-mm" aria-hidden="true"><span class="f-p" [class.f-dn]="toNum(kpi?.MARGIN_PCT_COSTED_MTD) < 0" [style.width.%]="barW(kpi?.MARGIN_PCT_COSTED_MTD, 100)"></span></span>
           <span class="s">GOP &divide; revenue &middot; last month {{ kpi ? kpi.MARGIN_PCT_COSTED_PM : '-' }}%</span>
         </button>
       </div>
@@ -128,7 +137,7 @@ empty, and the home page is the blank one it has always been.                   
                   <tr>
                     <td class="ah-client" [title]="w.CLIENTCODE + ' - outstanding ' + money(w.OUTSTANDING)">{{w.CLIENTNAME}}</td>
                     <td class="num ah-strong" [title]="money(w.OVERDUE)">&#8377; {{short(w.OVERDUE)}}</td>
-                    <td class="num" [title]="money(w.OVER_180)">&#8377; {{short(w.OVER_180)}} <span class="ah-pct">({{w.PCT_OVER_180}}%)</span></td>
+                    <td class="num" [title]="money(w.OVER_180)"><span class="ah-ib" aria-hidden="true"><span class="f-dn" [style.width.%]="w.PCT_OVER_180"></span></span>&#8377; {{short(w.OVER_180)}} <span class="ah-pct">({{w.PCT_OVER_180}}%)</span></td>
                     <td class="num" [title]="'Agreed credit period ' + w.CREDIT_PERIOD + ' days'">
                       @if (w.PAY_DAYS != null) {
                         <span>{{days(w.PAY_DAYS)}} d <span class="ah-pct" [class.ah-neg]="w.RECOVERY_GAP > 0">({{w.RECOVERY_GAP > 0 ? '+' : ''}}{{days(w.RECOVERY_GAP)}})</span></span>
@@ -217,8 +226,8 @@ empty, and the home page is the blank one it has always been.                   
     <div class="ah-band" id="ah-week"><span>This week</span><small>what falls due in and out, by when, and how fast each side settles</small></div>
     <!-- ================= CASH POSITION + DSO vs DPO ================= -->
     @if (scope == 'accounts') {
-      <div class="im-grid ah-rowcash">
-        <div class="im-card">
+      <div class="ah-g12">
+        <div class="im-card s8">
           <div class="im-card-h">
             <div class="ah-h">
               <button type="button" class="ah-ico" [class.open]="info == 'cash'" (click)="toggleInfo('cash')" title="What is this?"><i class="fa fa-university" aria-hidden="true"></i></button>
@@ -258,9 +267,10 @@ empty, and the home page is the blank one it has always been.                   
                 <thead>
                   <tr>
                     <th>When</th>
-                    <th class="num">Money in</th>
+                    <!-- the swatches are the legend of the two bar colours -->
+                    <th class="num"><i class="ah-sw ah-bar-in" aria-hidden="true"></i>Money in</th>
                     <th class="ah-flowbar"></th>
-                    <th class="num">Money out</th>
+                    <th class="num"><i class="ah-sw ah-bar-out" aria-hidden="true"></i>Money out</th>
                     <th class="ah-flowbar"></th>
                     <th class="num">Net</th>
                   </tr>
@@ -286,7 +296,7 @@ empty, and the home page is the blank one it has always been.                   
             </div>
           </div>
         </div>
-        <div class="im-card">
+        <div class="im-card s4">
           <div class="im-card-h">
             <div class="ah-h">
               <button type="button" class="ah-ico" [class.open]="info == 'days'" (click)="toggleInfo('days')" title="What is this?"><i class="fa fa-exchange" aria-hidden="true"></i></button>
@@ -299,11 +309,14 @@ empty, and the home page is the blank one it has always been.                   
               <div class="ah-days-stat">
                 <span class="ah-days-k"><span class="ah-ico ah-ico-s" [class.open]="info == 'ddso'" (click)="toggleInfo('ddso')" title="What is this?" role="button"><i class="fa fa-hourglass-half" aria-hidden="true"></i></span>Clients pay us in</span>
                 <span class="ah-days-v">{{days($safeNavigationMigration(cash?.DSO_DAYS))}}<span class="u">days</span></span>
+                <!-- bullet: these days and the agreed period (tick), on one scale shared with the bar beside it -->
+                <span class="ah-bl" aria-hidden="true"><span class="ah-bl-ac f-p" [style.width.%]="daysPct(cash?.DSO_DAYS)"></span>@if (cash?.AVG_CREDIT_PERIOD != null) {<span class="ah-bl-mk" [style.left.%]="daysPct(cash?.AVG_CREDIT_PERIOD)"></span>}</span>
                 <span class="ah-days-s">{{count($safeNavigationMigration(cash?.DSO_BILLS))}} settled invoices &middot; agreed {{days($safeNavigationMigration(cash?.AVG_CREDIT_PERIOD))}} days</span>
               </div>
               <div class="ah-days-stat">
                 <span class="ah-days-k"><span class="ah-ico ah-ico-s" [class.open]="info == 'ddpo'" (click)="toggleInfo('ddpo')" title="What is this?" role="button"><i class="fa fa-credit-card" aria-hidden="true"></i></span>We pay suppliers in</span>
                 <span class="ah-days-v">{{days($safeNavigationMigration(cash?.DPO_DAYS))}}<span class="u">days</span></span>
+                <span class="ah-bl" aria-hidden="true"><span class="ah-bl-ac f-p" [style.width.%]="daysPct(cash?.DPO_DAYS)"></span></span>
                 <span class="ah-days-s">{{count($safeNavigationMigration(cash?.DPO_BILLS))}} settled bills</span>
               </div>
             </div>
@@ -336,7 +349,7 @@ empty, and the home page is the blank one it has always been.                   
     Six figures, each with its change against the same period last month. The prior
     value is printed in words underneath so nobody has to reverse a percentage.      -->
     @if (scope == 'accounts' && loading && !kpi) {
-      <div class="im-grid im-kpis ah-kpis">
+      <div class="ah-strip w3 ah-kpis">
         @for (k of [1,2,3,4,5,6]; track k) {
           <div class="im-card im-kpi">
             <div class="ah-skel w40"></div><div class="ah-skel h24 w60"></div><div class="ah-skel"></div><div class="ah-skel w40"></div>
@@ -345,7 +358,7 @@ empty, and the home page is the blank one it has always been.                   
       </div>
     }
     @if (scope == 'accounts' && !(loading && !kpi)) {
-      <div class="im-grid im-kpis ah-kpis">
+      <div class="ah-strip w3 ah-kpis">
         <div class="im-card im-kpi">
           <div class="ah-kpi-top">
             <span class="k">Invoiced <span class="ah-hint">this month</span></span>
@@ -387,6 +400,8 @@ empty, and the home page is the blank one it has always been.                   
           </div>
           <div class="v" [title]="money($safeNavigationMigration(kpi?.TOTAL_OUTSTANDING))"><span class="u">&#8377;</span>{{amt($safeNavigationMigration(kpi?.TOTAL_OUTSTANDING)).n}}<span class="u">{{amt($safeNavigationMigration(kpi?.TOTAL_OUTSTANDING)).u}}</span></div>
           <div class="ah-kpi-foot">
+            <!-- micro bar: the overdue % printed beside it -->
+            <span class="ah-mm" aria-hidden="true"><span class="f-dn" [style.width.%]="kpi?.OVERDUE_PCT || 0"></span></span>
             <span class="s">{{kpi?.OVERDUE_PCT || 0}}% of it is overdue &middot; net of unapplied credit</span>
           </div>
         </div>
@@ -522,7 +537,7 @@ empty, and the home page is the blank one it has always been.                   
                   <td class="num">{{ count(y.BILLS) }}</td>
                   <td class="num">{{ rs(y.GROSS_PENDING) }}</td>
                   <td class="num">{{ toNum(y.CREDIT_APPLIED) > 0 ? rs(y.CREDIT_APPLIED) : '-' }}</td>
-                  <td class="num"><b>{{ rs(y.OUTSTANDING) }}</b></td>
+                  <td class="num"><span class="ah-ib" aria-hidden="true"><span class="f-p" [style.width.%]="share(y.OUTSTANDING, fyYears, 'OUTSTANDING')"></span></span><b>{{ rs(y.OUTSTANDING) }}</b></td>
                   <td class="num">{{ toNum(y.NOT_YET_DUE) > 0.5 ? rs(y.NOT_YET_DUE) : '-' }}</td>
                   <td class="num">{{ rs(y.OVERDUE) }}</td>
                   <td>{{ y.OLDEST_BILL || '-' }}
@@ -569,8 +584,8 @@ empty, and the home page is the blank one it has always been.                   
       </div>
     }
     <!-- ================= JOBS BY MODE + 30-DAY TREND ================= -->
-    <div class="im-grid ah-row2">
-      <div class="im-card">
+    <div class="ah-g12">
+      <div class="im-card s7">
         <div class="im-card-h">
           <div class="ah-h">
             <button type="button" class="ah-ico" [class.open]="info == 'jobs'" (click)="toggleInfo('jobs')" title="What is this?"><i class="fa fa-cubes" aria-hidden="true"></i></button>
@@ -633,7 +648,7 @@ empty, and the home page is the blank one it has always been.                   
         </div>
       </div>
       @if (scope == 'accounts') {
-        <div class="im-card">
+        <div class="im-card s5">
           <div class="im-card-h">
             <div class="ah-h">
               <button type="button" class="ah-ico" [class.open]="info == 'trend'" (click)="toggleInfo('trend')" title="What is this?"><i class="fa fa-bar-chart" aria-hidden="true"></i></button>
@@ -644,10 +659,20 @@ empty, and the home page is the blank one it has always been.                   
           <p class="ah-card-note ah-note-pad">Value of tax invoices raised on each of the last 30 days. Point at a bar for the count and amount.</p>
           <div class="ah-chart">
             @if (trendOptions && daily.length > 0) {
-              <div class="ah-chart-box">
-                <canvas baseChart type="bar"
-                  [datasets]="trendData" [labels]="trendLabels"
-                [options]="trendOptions" [legend]="false"></canvas>
+              <!-- the same 30 bars the Chart.js canvas drew, as a CSS column chart so it takes the
+                   palette: one value axis (trendAxis, short() units), the dd/MM labels every 4th day,
+                   and the hover tooltip (date, day, invoice count, amount) -->
+              <div class="ah-vch">
+                <div class="ah-vp" role="img" aria-label="Value of tax invoices raised on each of the last 30 days">
+                  @for (g of trendAxis.ticks; track $index) { <div class="ah-gl" [style.bottom.%]="g.b"><span>{{ g.l }}</span></div> }
+                  <div class="ah-vcs">
+                    @for (d of daily; track $index; let i = $index, n = $count) {
+                      <div class="ah-vc" [class.r]="i >= n / 2"><div class="ah-col" [style.height.%]="barW(toNum(d.INV_VALUE), trendAxis.top)"></div>
+                        <div class="ah-tp"><b>{{ d.INV_DT }} ({{ d.DOW }})</b><span>{{ count(d.INV_COUNT) }} invoices, &#8377; {{ money(d.INV_VALUE) }}</span></div></div>
+                    }
+                  </div>
+                </div>
+                <div class="ah-vx" aria-hidden="true">@for (l of trendLabels; track $index; let i = $index) { <span>{{ i % 4 === 0 ? l : '' }}</span> }</div>
               </div>
             }
             @if (loading && daily.length == 0) {
@@ -671,9 +696,9 @@ empty, and the home page is the blank one it has always been.                   
     }
     <!-- ================= REFERENCE ================= -->
     <div class="ah-band" id="ah-ref"><span>Reference</span><small>largest balances, shortcuts and how the page works</small></div>
-    <div class="im-grid ah-rowref">
+    <div class="ah-g12">
       @if (scope == 'accounts') {
-        <div class="im-card">
+        <div class="im-card s7">
           <div class="im-card-h">
             <div class="ah-h">
               <button type="button" class="ah-ico" [class.open]="info == 'top'" (click)="toggleInfo('top')" title="What is this?"><i class="fa fa-users" aria-hidden="true"></i></button>
@@ -716,7 +741,7 @@ empty, and the home page is the blank one it has always been.                   
           </div>
         </div>
       }
-      <div class="im-card ah-sec">
+      <div class="im-card ah-sec s5">
         <div class="im-card-h">
           <div class="ah-h">
             <button type="button" class="ah-ico" [class.open]="info == 'quick'" (click)="toggleInfo('quick')" title="What is this?"><i class="fa fa-th-large" aria-hidden="true"></i></button>
@@ -745,7 +770,7 @@ empty, and the home page is the blank one it has always been.                   
           <div class="ah-help-item"><b>Collected</b><span>Receipts and journal adjustments applied against invoices in the period. Money received but not yet matched to a bill is not here.</span></div>
           <div class="ah-help-item"><b>Outstanding</b><span>What all clients still owe today, after receipts and credit notes already applied. A balance, not a monthly figure.</span></div>
           <div class="ah-help-item"><b>Overdue</b><span>The part of Outstanding that has crossed the client's credit period. Follow these up first.</span></div>
-          <div class="ah-help-item"><b>Ageing</b><span>Outstanding split by days since the invoice date. The lightest bar is fresh; the darkest has been unpaid for more than 180 days.</span></div>
+          <div class="ah-help-item"><b>Ageing</b><span>Outstanding split by days since the invoice date. The lightest bar is fresh, each older bucket is darker, and the red bar has been unpaid for more than 180 days.</span></div>
           <div class="ah-help-item"><b>Jobs opened</b><span>Shipments registered in the period, by mode. Billed means at least one tax invoice exists on the job; Unbilled means none yet.</span></div>
           <div class="ah-help-item"><b>GOP</b><span>Gross operating profit: billed value minus purchase cost on jobs opened in the period. Costs are often booked before the sale invoice, so early in the month GOP can look low or negative.</span></div>
           <div class="ah-help-item"><b>Margin</b><span>GOP as a percentage of revenue. 20% means 20 rupees kept from every 100 rupees billed.</span></div>
@@ -754,7 +779,7 @@ empty, and the home page is the blank one it has always been.                   
           <div class="ah-help-item"><b>Days to collect / pay</b><span>How long invoices and supplier bills of the last 90 days took to settle, weighted by value. If we pay faster than we collect, the gap is funded from our own cash.</span></div>
           <div class="ah-help-item"><b>Clients to ask about</b><span>Overdue clients ranked by money unpaid for over 180 days. "Pays in" is their actual settlement time against the agreed credit period.</span></div>
           <div class="ah-help-item"><b>Earned but not collected</b><span>Invoices waiting for authorisation (the same list as the Authorisation screen, for this branch), proformas not converted, shipments still unbilled after 15 days, and receipts not matched to a bill. Each line opens the screen that clears it.</span></div>
-          <div class="ah-help-item"><b>Change pills</b><span>A solid black pill means worse than last month, an outlined pill better, a dashed pill no real change. For Overdue and Cost, going up is worse.</span></div>
+          <div class="ah-help-item"><b>Change pills</b><span>A red pill means worse than last month, a green outlined pill better, a dashed pill no real change. For Overdue and Cost, going up is worse.</span></div>
           <div class="ah-help-item"><b>As of</b><span>Figures are computed once and reused for 10 minutes. Refresh recomputes them now.</span></div>
           <div class="ah-help-item"><b>Source</b><span>All numbers use the same rules as the Finance Dashboard, so the two agree for the same period.</span></div>
         </div>

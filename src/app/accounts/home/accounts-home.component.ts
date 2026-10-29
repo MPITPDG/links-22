@@ -17,7 +17,8 @@ import { finFigure } from '../Accreport/fin-kit';
     earned but not collected), This week (cash position, forecast, DSO vs DPO), Workload
     picture (KPI cards, ageing, jobs by mode, 30-day trend), Detail (the drill-down tables,
     10 rows a page) and Reference (top clients, quick links, a collapsed "How this page works").
-    Greyscale house style, no look mode. Styles: the global dashboard kit (.im-dash,
+    Look: the Finance dashboard's C2 "ledger with charts", in theme tokens only, so every
+    palette applies; no look mode. Styles: the global dashboard kit (.im-dash,
     src/styles/kit/import-home.css) plus accounts-home.component.css.
 
     Rights-gated (see VIEW_GATE_FORM_ID). If the user has no View right on the gate form,
@@ -96,6 +97,11 @@ export class AccountsHomeComponent implements OnInit, OnDestroy {
     trendData: any[] = [];
     trendOptions: any = null;
     trendTotal: number = 0;
+    /*  The page now draws the trend as a CSS column chart (C2 look, so it takes the palette)
+        from daily / trendLabels and this value axis - top of the scale and the gridlines as
+        % of it. trendData / trendOptions are the former canvas config; trendOptions still
+        gates the chart block in the template (it is set once the data is in).              */
+    trendAxis: { top: number; ticks: { b: number; l: string }[] } = { top: 1, ticks: [] };
 
     quickLinks = [
         { label: 'Invoice Search',      icon: 'fa-search',      link: '/accounts/transaction/invoice/invoicesearch' },
@@ -654,6 +660,25 @@ export class AccountsHomeComponent implements OnInit, OnDestroy {
         return Math.round(Number(this.cash.DSO_DAYS) - Number(this.cash.DPO_DAYS));
     }
 
+    /** DSO / DPO bullets: days as % of one scale shared by both bars (1.15 x the largest of
+        DSO, DPO and the agreed credit period), so the two bars and the tick compare.       */
+    daysPct(v: any): number {
+        const c = this.cash || {};
+        const top = Math.max(this.toNum(c.DSO_DAYS), this.toNum(c.DPO_DAYS), this.toNum(c.AVG_CREDIT_PERIOD), 1) * 1.15;
+        return Math.max(0, Math.min(100, this.toNum(v) / top * 100));
+    }
+
+    /** A "nice" value axis for a column chart (about four steps): the top of the scale, and
+        each gridline as % of it with its label in short() units (2.50 Cr -> 2.5 Cr).       */
+    private valueAxis(max: number): { top: number; ticks: { b: number; l: string }[] } {
+        if (!(max > 0)) { return { top: 1, ticks: [{ b: 0, l: '0' }] }; }
+        const raw = max / 4, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+        const step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
+        const n = Math.ceil(max / step - 1e-9), top = n * step;
+        return { top, ticks: Array.from({ length: n + 1 }, (_, i) => ({
+            b: i / n * 100, l: i ? this.short(i * step).replace(/\.?0+ /, ' ') : '0' })) };
+    }
+
     /** Share of a forecast row against the larger of the two legs, for the paired bars. */
     flowShare(v: any): number {
         let max = 0;
@@ -962,6 +987,7 @@ export class AccountsHomeComponent implements OnInit, OnDestroy {
         }
 
         this.trendLabels = cats;
+        this.trendAxis = this.valueAxis(Math.max(0, ...vals.map(v => Math.abs(v))));
         this.trendData = [{
             data: vals, label: 'Invoiced',
             backgroundColor: '#0A0A0A', hoverBackgroundColor: '#6B6B6B', borderWidth: 0,
