@@ -1,0 +1,145 @@
+<div class="card sec kyc">
+  <div class="card-h">
+    <h2>KYC documents</h2>
+    @if (hdr) {
+      <span class="chip" [class.solid]="hdr.KYC_STATUS == 'V'" [class.dash]="hdr.KYC_STATUS != 'V'">{{hdr.KYC_STATUS_TEXT}}</span>
+    }
+  </div>
+
+  @if (loading) {
+    <div class="kyc-note">Loading KYC...</div>
+  }
+  @if (message) {
+    <div class="kyc-note">{{message}}</div>
+  }
+
+  @if (hdr) {
+    <div class="kyc-sum">
+      <span><b>{{hdr.PARTY_NAME}}</b> &middot; {{hdr.CODE}} &middot; {{hdr.REGION}}</span>
+      <span>Mandatory documents: <b>{{hdr.DOCS_MANDATORY_DONE}} / {{hdr.DOCS_MANDATORY}}</b> &middot; Files: <b>{{hdr.FILES}}</b></span>
+      @if (hdr.REQUESTED_ON) {
+        <span>Requested by {{hdr.REQUESTED_BY}} on {{hdr.REQUESTED_ON}}</span>
+      }
+      @if (hdr.AGE_HOURS != null && !locked) {
+        <span [class.kyc-late]="late">Waiting {{hdr.AGE_HOURS}} h (limit {{hdr.SLA_HOURS}} h)</span>
+      }
+      @if (locked) {
+        <span>Verified by {{hdr.VERIFIED_BY}} on {{hdr.VERIFIED_ON}}</span>
+      }
+    </div>
+    @if (hdr.REMARK) {
+      <div class="kyc-remark" [class.kyc-returned]="hdr.KYC_STATUS == 'R'">Accounts remark: {{hdr.REMARK}}</div>
+    }
+
+    <div class="kyc-cols">
+      <!-- checklist -->
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr><th>DOCUMENT</th><th>MANDATORY</th><th>FILES</th></tr>
+          </thead>
+          <tbody>
+            @for (d of docs; track d.PK_DOCUMENTID) {
+              <tr>
+                <td>{{d.DOCUMENTNAME}}</td>
+                <td>{{d.IS_MANDATORY == 'Y' ? 'Yes' : ''}}</td>
+                <td>
+                  @if (d.FILES > 0) { <span class="kyc-ok">{{d.FILES}}</span> }
+                  @else if (d.IS_MANDATORY == 'Y') { <span class="kyc-miss">missing</span> }
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="3" class="empty">No document titles set up for this party type.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- upload -->
+      @if (!locked) {
+        <div class="kyc-up">
+          <div class="fld">
+            <label>Document title <span class="req">*</span></label>
+            <select class="form-control" [(ngModel)]="selDoc">
+              <option value="">-- choose --</option>
+              @for (d of docs; track d.PK_DOCUMENTID) {
+                <option [value]="d.PK_DOCUMENTID">{{d.DOCUMENTNAME}}{{d.IS_MANDATORY == 'Y' ? ' *' : ''}}</option>
+              }
+            </select>
+          </div>
+          <div class="fld">
+            <label>File (PDF, image, Word, Excel - max 10 MB) <span class="req">*</span></label>
+            <input #kycFile type="file" (change)="onFile($event)" accept=".pdf,.jpg,.jpeg,.png,.tif,.tiff,.doc,.docx,.xls,.xlsx">
+          </div>
+          <div class="fld">
+            <label>Remark</label>
+            <input type="text" class="form-control" [(ngModel)]="upRemark" maxlength="200">
+          </div>
+          <div class="kyc-btns">
+            <button class="btn p" type="button" [disabled]="busy" (click)="upload()">{{busy ? 'Uploading...' : 'Upload to eDocument'}}</button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- files -->
+    <div class="tbl-wrap kyc-files">
+      <table class="tbl">
+        <thead>
+          <tr><th>DOCUMENT</th><th>FILE</th><th>REMARK</th><th>UPLOADED BY</th><th>ON</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (f of files; track f.PK_UPLOADID) {
+            <tr>
+              <td>{{f.DOCUMENTNAME}}</td>
+              <td><a class="lnk" [href]="fileUrl(f)" target="_blank" rel="noopener">{{f.ACTUAL_FILENAME || f.FILENAME}}</a></td>
+              <td>{{f.REMARKS}}</td>
+              <td>{{f.UPLOADED_BY}}</td>
+              <td>{{f.UPLOADED_ON}}</td>
+              <td class="act">
+                @if (!locked) { <button type="button" (click)="removeFile(f)">Remove</button> }
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="empty">No KYC file uploaded yet.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Accounts: verify / return -->
+    @if (canVerify) {
+      <div class="kyc-verify">
+        <div class="fld full">
+          <label>Remark (required to return to Ops)</label>
+          <input type="text" class="form-control" [(ngModel)]="verifyRemark" maxlength="500">
+        </div>
+        <div class="kyc-btns">
+          <button class="btn g" type="button" [disabled]="busy" (click)="decide('R')">Return to Ops</button>
+          <button class="btn p" type="button" [disabled]="busy || locked || hdr.IS_OWN_REQUEST == 'Y'" (click)="decide('V')">Verify KYC</button>
+        </div>
+        @if (hdr.IS_OWN_REQUEST == 'Y' && !locked) {
+          <span class="sub-t">You raised this request - another person with the KYC right must verify it.</span>
+        }
+      </div>
+    }
+
+    @if (hist.length > 0) {
+      <div class="kyc-hist">
+        <a class="lnk" (click)="showHist = !showHist">{{showHist ? 'Hide' : 'Show'}} history ({{hist.length}})</a>
+        @if (showHist) {
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>ACTION</th><th>REMARK</th><th>BY</th><th>ON</th></tr></thead>
+              <tbody>
+                @for (h of hist; track $index) {
+                  <tr><td>{{h.ACTION}}</td><td>{{h.REMARK}}</td><td>{{h.DONE_BY}}</td><td>{{h.DONE_ON}}</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

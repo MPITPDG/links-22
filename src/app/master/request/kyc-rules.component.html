@@ -1,0 +1,79 @@
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>KYC DOCUMENT RULES</h1>
+      <p>Documents a new client or supplier must have before Accounts can verify its KYC.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="filters">
+      <div class="f">
+        <label>Party</label>
+        <select class="form-control" [(ngModel)]="partyType" (change)="load()">
+          <option value="E">Clients</option>
+          <option value="S">Suppliers</option>
+        </select>
+      </div>
+      @if (info) {
+        <div class="f">
+          <label>Time limit to verify</label>
+          <span>{{info.SLA_HOURS}} hours</span>
+        </div>
+        <div class="f">
+          <label>Existing parties blocked without KYC from</label>
+          <span>{{info.ENFORCE_FROM}}</span>
+        </div>
+      }
+    </div>
+
+    <div class="toolbar">
+      <span class="count">{{rules.length}} document titles &middot; {{mandatoryCount}} mandatory</span>
+      @if (!canEdit) {
+        <span class="sub-t">Read only - editing needs Modify on KYC VERIFICATION.</span>
+      }
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr><th>DOCUMENT TITLE</th><th>MANDATORY</th><th>APPLIES TO</th><th>CHANGED BY</th><th>ON</th></tr>
+        </thead>
+        <tbody>
+          @for (r of rules; track r.PK_DOCUMENTID) {
+            <tr>
+              <td>{{r.DOCUMENTNAME}}</td>
+              <td>
+                <input type="checkbox" [checked]="r.IS_MANDATORY == 'Y'" [disabled]="!canEdit"
+                       (change)="toggleMandatory(r, $any($event.target).checked)">
+              </td>
+              <td>
+                <select class="form-control" [(ngModel)]="r.REGION" [disabled]="!canEdit || r.IS_MANDATORY != 'Y'" (change)="save(r)">
+                  <option value="AL">India and overseas</option>
+                  <option value="IN">India only</option>
+                  <option value="OV">Overseas only</option>
+                </select>
+              </td>
+              <td>{{r.UPDATED_BY}}</td>
+              <td>{{r.UPDATED_ON}}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="empty">No document titles for this party type yet{{info && info.EDOC_FORMID == 0 ? ' (eDocument form not set up)' : ''}}.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (canEdit) {
+      <div class="filters">
+        <div class="f full">
+          <label>New document title</label>
+          <input type="text" class="form-control" [(ngModel)]="newTitle" maxlength="100" (keyup.enter)="addTitle()">
+        </div>
+        <div class="f">
+          <button class="btn p" type="button" (click)="addTitle()">Add title</button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

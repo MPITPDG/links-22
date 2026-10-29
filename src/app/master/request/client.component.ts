@@ -62,6 +62,7 @@ export class clientmaster  implements OnInit  {
     crperiodair:string;
     isoverseasagent:string="0";
     overseasagent: boolean=false;
+    kycStatus: string = '';
     uploadResult: any=[];
     res: Array<string>;
     ISSEZCLIENT: boolean=false;
@@ -583,8 +584,21 @@ fileChangeEvent(fileInput: any)
         else{return false;  this.loaderService.display(false);}
         }
   */
+    // KYC panel: on a request being authorised (TEMP + code) and on an existing client (edit)
+    get kycCode(): string {
+        const code = (this.quryParamsExpCode || '').trim();
+        return (code != '' && (this.queryParamsReqType == 'TEMP' || this.queryParamsReqType == ' ')) ? code : '';
+    }
+    // authorise waits for verified KYC; 'X' = panel could not load KYC, the API check then decides
+    get kycBlocksSubmit(): boolean {
+        return this.queryParamsReqType == 'TEMP' && this.kycCode != '' && this.kycStatus != 'V' && this.kycStatus != 'X';
+    }
     Add_Main()
     {
+        if (this.kycBlocksSubmit) {
+           this._toasterService.toast('warning', 'warning', 'KYC of this request is not verified yet. Accounts must verify the KYC documents before it can be authorised.');
+           return false;
+        }
         if(this.ShrtName.normalize()==""){
            this._toasterService.toast('warning', 'warning', 'Short name could not be blank !');
            return false;
@@ -716,8 +730,11 @@ fileChangeEvent(fileInput: any)
         this._dataService.Common("Master/exporter_Main_IU", jsonmaster)
         .subscribe((data: any) => {
             if (data.Table[0].STATUS == "100") {
+                // a new request goes straight to its KYC upload
+                const newRequestCode = (this.queryParamsReqType =='TEMP' && this.quryParamsExpCode ==' ') ? String(data.Table[0].EXPCODE || '').trim() : '';
+                if (data.Table[0].KYCTEXT) { this._toasterService.toast('warning', 'warning', data.Table[0].KYCTEXT); }
                 if (this.queryParamsReqType =='TEMP' && this.quryParamsExpCode ==' ')
-                    { this._toasterService.toast('success', 'success', 'Requst Expoter/Impoter saved successfully !');   }
+                    { this._toasterService.toast('success', 'success', 'Requst Expoter/Impoter saved successfully ! Now upload its KYC documents.');   }
                 else  if (this.queryParamsReqType =='TEMP' && this.quryParamsExpCode !=' ')
                     { this._toasterService.toast('success', 'success', 'Requst Expoter/Impoter Authorised successfully !');}
                 else  if (this.queryParamsReqType ==' ' && this.quryParamsExpCode !=' ')
@@ -726,6 +743,7 @@ fileChangeEvent(fileInput: any)
                     { this._toasterService.toast('success', 'success', 'Expoter/Impoter saved successfully !');   }
                this.loaderService.display(false);
                this.RestMain();
+               if (newRequestCode != '') { this._router.navigate(['/master/request/kyc/E/' + newRequestCode]); }
            }
 
            else   if (data.Table[0].STATUS == "105")
@@ -735,8 +753,11 @@ fileChangeEvent(fileInput: any)
                 this._dataService.Common("Master/exporter_Main_IU", jsonmaster)
                 .subscribe((data: any) => {
                    if (data.Table[0].STATUS == "100") {
+                        // a new request goes straight to its KYC upload
+                        const newRequestCode = (this.queryParamsReqType =='TEMP' && this.quryParamsExpCode ==' ') ? String(data.Table[0].EXPCODE || '').trim() : '';
+                        if (data.Table[0].KYCTEXT) { this._toasterService.toast('warning', 'warning', data.Table[0].KYCTEXT); }
                         if (this.queryParamsReqType =='TEMP' && this.quryParamsExpCode ==' ')
-                            { this._toasterService.toast('success', 'success', 'Requst Expoter/Impoter saved successfully !');   }
+                            { this._toasterService.toast('success', 'success', 'Requst Expoter/Impoter saved successfully ! Now upload its KYC documents.');   }
                         else  if (this.queryParamsReqType =='TEMP' && this.quryParamsExpCode !=' ')
                             { this._toasterService.toast('success', 'success', 'Requst Expoter/Impoter Authorised successfully !');}
                         else  if (this.queryParamsReqType ==' ' && this.quryParamsExpCode !=' ')
@@ -745,6 +766,7 @@ fileChangeEvent(fileInput: any)
                             { this._toasterService.toast('success', 'success', 'Expoter/Impoter saved successfully !');   }
                        this.loaderService.display(false);
                        this.RestMain();
+                       if (newRequestCode != '') { this._router.navigate(['/master/request/kyc/E/' + newRequestCode]); }
                                        
             }
             else if (data.Table[0].STATUS == "105") {

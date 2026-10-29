@@ -7,6 +7,8 @@ import{ ReqMastersearch} from './request-search.component'
 import {suppliermaster} from './supplier.component';
 import {vesselAgentmaster} from './vessel_Agent.component';
 import {Linermaster} from './liner.component';
+import { KycRequestsComponent } from './kyc-requests.component';
+import { KycRulesComponent } from './kyc-rules.component';
 const routes: Routes = [
     {
         path: '',
@@ -21,6 +23,8 @@ const routes: Routes = [
             { path: 'supplier/:ReqType/:SupCode', component: suppliermaster, data: { title: 'Supplier' },pathMatch: 'full' },
             { path: 'AgentVessel/:ReqType/:VslAgtC', component: vesselAgentmaster, data: { title: 'AGENT(VESSEL)' },pathMatch: 'full' },
             { path: 'Liner/:ReqType/:linerC', component: Linermaster, data: { title: 'Liner' },pathMatch: 'full' },
+            { path: 'kyc/:PartyType/:Code', component: KycRequestsComponent, data: { title: 'KYC documents' }, pathMatch: 'full' },
+            { path: 'kyc-rules', component: KycRulesComponent, data: { title: 'KYC document rules' }, pathMatch: 'full' },
              
         ]
     }

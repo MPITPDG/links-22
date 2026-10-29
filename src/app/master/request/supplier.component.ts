@@ -38,6 +38,7 @@
         Citylist:any=[];gstlist:any=[];citybranchlict:any[];  
         TmpcitybranchObject: any = {};
         childrecdid: string="0";sup_id: string="0"; queryParamsReqType: string = "";quryParamsSupCode:string="";
+        kycStatus: string = '';
         validEmail:boolean = false;
         exphousedt   : any = ""; exphouse : any =""; bnkDivision: string="";
         sup_city :any=[]; 
@@ -437,8 +438,21 @@
        else{return false; }
        this.loaderService.display(false);
     } 
+     // KYC panel: on a request being authorised (TEMP + code) and on an existing supplier (edit)
+     get kycCode(): string {
+         const code = (this.quryParamsSupCode || '').trim();
+         return (code != '' && (this.queryParamsReqType == 'TEMP' || this.queryParamsReqType == ' ')) ? code : '';
+     }
+     // authorise waits for verified KYC; 'X' = panel could not load KYC, the API check then decides
+     get kycBlocksSubmit(): boolean {
+         return this.queryParamsReqType == 'TEMP' && this.kycCode != '' && this.kycStatus != 'V' && this.kycStatus != 'X';
+     }
      Add_Main()
      {
+         if (this.kycBlocksSubmit) {
+            this._toasterService.toast('warning', 'warning', 'KYC of this request is not verified yet. Accounts must verify the KYC documents before it can be authorised.');
+            return false;
+         }
          if(this.ShrtName.normalize()==""){
             this._toasterService.toast('warning', 'warning', 'Short name could not be blank !');
             return false;
@@ -523,8 +537,11 @@
          this._dataService.Common("Master/SUPPLIER_MASTER_IU", jsonmaster)
          .subscribe((data: any) => {
             if (data.Table[0].STATUS == "100") {
+                 // a new request goes straight to the KYC list (the save does not return the request code)
+                 const newRequest = (this.queryParamsReqType =='TEMP' && this.quryParamsSupCode ==' ');
+                 if (data.Table[0].KYCTEXT) { this._toasterService.toast('warning', 'warning', data.Table[0].KYCTEXT); }
                  if (this.queryParamsReqType =='TEMP' && this.quryParamsSupCode ==' ')
-                     { this._toasterService.toast('success', 'success', 'Requst Supplier added successfully !');   }
+                     { this._toasterService.toast('success', 'success', 'Requst Supplier added successfully ! Now upload its KYC documents.');   }
                  else  if (this.queryParamsReqType =='TEMP' && this.quryParamsSupCode !=' ')
                      { this._toasterService.toast('success', 'success', 'Requst Supplier Authorised successfully !');}
                  else  if (this.queryParamsReqType ==' ' && this.quryParamsSupCode !=' ')
@@ -533,6 +550,7 @@
                      { this._toasterService.toast('success', 'success', 'Supplier added successfully !');   }
                 this.loaderService.display(false);
                 this.RestMain();
+                if (newRequest) { this._router.navigate(['/master/request/kyc/S/ ']); }
             }
             else{   this._toasterService.toast("warning","warning" ,data.Table[0].STATUSTEXT )
                 this.loaderService.display(false);}

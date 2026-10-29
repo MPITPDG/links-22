@@ -604,6 +604,7 @@
                     { menuid: "1.3", icon: "fa fa-registered", menuname: "Supplier", routerlink: "/master/request/supplier/TEMP/ ", ischild: 'n', parentid: 0, isactive: 1, data: [  ], },
                     { menuid: "1.4", icon: "fa fa-registered", menuname: "Vessel Agent", routerlink: "/master/request/AgentVessel/TEMP/ ", ischild: 'n', parentid: 0, isactive: 1, data: [  ], },
                     { menuid: "1.5", icon: "fa fa-registered", menuname: "Shipping Line", routerlink: "/master/request/Liner/TEMP/ ", ischild: 'n', parentid: 0, isactive: 1, data: [  ], },
+                    { menuid: "1.6", icon: "fa fa-id-card-o", menuname: "KYC documents", routerlink: "/master/request/kyc/A/ ", ischild: 'n', parentid: 0, isactive: 1, data: [  ], },
                    
                 ] },
                 { menuid: "2", icon: "fa fa-th-list", menuname: "Master", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [
@@ -647,6 +648,7 @@
                      
 
                     ],}, 
+                    { menuid: "2.7", icon: "fa fa-check-square-o", menuname: "KYC document rules", routerlink: "/master/request/kyc-rules", ischild: 'n', parentid: 0, isactive: 1, data: [  ], },
                 ] },
 
                 { menuid: "3", icon: "fa fa fa-building", menuname: "City", routerlink: "", ischild: 'y', parentid: 0, isactive: 1, data: [

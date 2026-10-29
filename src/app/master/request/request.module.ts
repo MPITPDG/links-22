@@ -15,6 +15,10 @@ import { UiButton } from '../../shared/ui/button';
 import {suppliermaster} from './supplier.component';
 import {vesselAgentmaster} from './vessel_Agent.component';
 import {Linermaster} from './liner.component';
+import { KycService } from './kyc.service';
+import { KycPanelComponent } from './kyc-panel.component';
+import { KycRequestsComponent } from './kyc-requests.component';
+import { KycRulesComponent } from './kyc-rules.component';
 @NgModule({
     imports: [RequestRouting,
         FormsModule,
@@ -23,9 +27,10 @@ import {Linermaster} from './liner.component';
         MyDatePickerModule,
         NgSelectModule,NgxPaginationModule, UiButton ],
     declarations: [clientmaster,RequestComponent,
-        consigneemaster,ReqMastersearch,suppliermaster,vesselAgentmaster,Linermaster
+        consigneemaster,ReqMastersearch,suppliermaster,vesselAgentmaster,Linermaster,
+        KycPanelComponent, KycRequestsComponent, KycRulesComponent
     ],
-    providers: [
+    providers: [KycService
 	],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

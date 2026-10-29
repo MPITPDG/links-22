@@ -1,0 +1,89 @@
+<div class="im-page">
+  <div class="ph">
+    <div>
+      <h1>KYC DOCUMENTS</h1>
+      <p>New client and supplier requests: upload the KYC papers here. A request can be authorised only after Accounts verify its KYC.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="filters">
+      <div class="f">
+        <label>Party</label>
+        <select class="form-control" [(ngModel)]="partyType" (change)="load()">
+          <option value="">Clients and suppliers</option>
+          <option value="E">Clients</option>
+          <option value="S">Suppliers</option>
+        </select>
+      </div>
+      <div class="f">
+        <label>KYC status</label>
+        <select class="form-control" [(ngModel)]="status" (change)="load()">
+          <option value="">All</option>
+          <option value="P">Pending</option>
+          <option value="R">Returned to Ops</option>
+          <option value="V">Verified (not yet authorised)</option>
+        </select>
+      </div>
+      <div class="f">
+        <button class="btn g" type="button" (click)="load()">Refresh</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <span class="count">{{list.length}} {{list.length === 1 ? 'request' : 'requests'}}</span>
+      <span class="sub-t">{{pending}} waiting for KYC &middot; {{late}} past the time limit</span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>PARTY</th>
+            <th>REQUEST</th>
+            <th>NAME</th>
+            <th>REGION</th>
+            <th>REQUESTED BY</th>
+            <th>ON</th>
+            <th>WAITING</th>
+            <th>MANDATORY</th>
+            <th>FILES</th>
+            <th>KYC</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of list; track r.PARTY_TYPE + r.REQ_CODE) {
+            <tr [class.kyc-sel]="r.PARTY_TYPE == selType && r.REQ_CODE == selCode">
+              <td>{{r.PARTY_TYPE_NAME}}</td>
+              <td><a class="lnk" (click)="select(r)">{{r.REQ_CODE}}</a></td>
+              <td>{{r.PARTY_NAME}}</td>
+              <td>{{r.REGION}}</td>
+              <td>{{r.REQUESTED_BY}}</td>
+              <td>{{r.REQUESTED_ON}}</td>
+              <td [class.kyc-red]="r.AGE_FLAG == 'RED'" [class.kyc-amber]="r.AGE_FLAG == 'AMBER'">{{r.AGE_HOURS}} h</td>
+              <td>{{r.DOCS_MANDATORY_DONE}} / {{r.DOCS_MANDATORY}}</td>
+              <td>{{r.FILES}}</td>
+              <td>
+                <span class="chip" [class.solid]="r.KYC_STATUS == 'V'" [class.dash]="r.KYC_STATUS == 'P'">{{r.KYC_STATUS_TEXT}}</span>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="10" class="empty">{{loaded ? 'No pending client or supplier request.' : 'Loading...'}}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  @if (selCode) {
+    <app-kyc-panel [partyType]="selType" [code]="selCode" (statusChange)="onPanelStatus($event)"></app-kyc-panel>
+    @if (selStatus == 'V') {
+      <div class="bar">
+        <span class="note">KYC verified. The request can now be authorised on the request screen.</span>
+        <div class="r">
+          <button class="btn p" type="button" (click)="openRequest()">Open request</button>
+        </div>
+      </div>
+    }
+  }
+</div>

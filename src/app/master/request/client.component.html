@@ -559,11 +559,19 @@
     </div>
   </div>
 
+  @if (kycCode) {
+    <app-kyc-panel partyType="E" [code]="kycCode" (statusChange)="kycStatus = $event"></app-kyc-panel>
+  }
+
   <div class="bar">
-    <span class="note">Nothing is saved until you choose {{text}}.</span>
+    @if (kycBlocksSubmit) {
+      <span class="note">This request can be authorised only after Accounts verify its KYC documents.</span>
+    } @else {
+      <span class="note">Nothing is saved until you choose {{text}}.</span>
+    }
     <div class="r">
       <button class="btn g" type="reset" (click)="RestMain();">Reset</button>
-      <button class="btn p" type="submit" (click)="Add_Main()">{{text}}</button>
+      <button class="btn p" type="submit" [disabled]="kycBlocksSubmit" (click)="Add_Main()">{{text}}</button>
     </div>
   </div>
 </div>

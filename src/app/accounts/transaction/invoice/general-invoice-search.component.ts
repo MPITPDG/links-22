@@ -240,41 +240,31 @@ InvoicePrint(Invoiceno) {
     alert("Enter 15 digit Invoice No !")
     return false
   }
-  // let theTop = (screen.height / 2) - (483 / 2);
-  // let theLeft = (screen.width / 2) - (780 / 2);
-  // let toolbar = 'resizable=no,scrollbars=no,width=800,height=450,status=no,left=' + theLeft + ',top=' + theTop;
-  // window.open('./#/popup/Account-Invoice-print/' + Invoiceno + '/' , "Invoice Print", toolbar);
-  let theTop = (screen.height / 2) - (483 / 2);
-  let theLeft = (screen.width / 2) - (780 / 2);
-  let toolbar = 'resizable=no,scrollbars=no,width=800,height=450,status=no,left=' + theLeft + ',top=' + theTop;
-  let URL = "http://180.179.207.163/Linkserp-ac/UI/Accounts/frm_Acc_Tran_Invoice_Print.aspx?" +
-  "huhpnk=" + this._loginService.getLogin()[0].GUID
-  + "&citycode=" + this._loginService.getLogin()[0].CITYCODE1
-  + "&Userid=" + this._loginService.getLogin()[0].CMPID
-  + "&cmp_code=" + this._loginService.getLogin()[0].CMPCODE
-  + "&InvoiceNo=" + Invoiceno
-  + "&DisplayMode=" + "0"
-  +"&cmp_username=" + this._loginService.getLogin()[0].CMP_USERNAME
-      window.open(URL,  "Invoice Print", toolbar);
-      return false;
+  this.OpenInvoicePrint(Invoiceno);
+  return false;
+}
+/*  Angular TAX INVOICE print - the same page as View > Print, reading this app's API.
+    The legacy Linkserp-ac .aspx print always read the live server, whatever Server was set to. */
+OpenInvoicePrint(Invoiceno) {
+  let url = window.location.origin + window.location.pathname + '#/popup/Account-Invoice-print/' + Invoiceno + '/';
+  let theTop = Math.max(0, (screen.height / 2) - (620 / 2));
+  let theLeft = Math.max(0, (screen.width / 2) - (900 / 2));
+  let toolbar = 'resizable=yes,scrollbars=yes,status=no,width=900,height=620,left=' + theLeft + ',top=' + theTop;
+  let win = window.open(url, "InvoicePrint", toolbar);
+  if (!win) {
+    alert('The pop-up was blocked by the browser. Allow pop-ups for this site and try again.');
+    return;
+  }
+  // A window reused by name keeps its old document, so the location is set explicitly.
+  try { win.location.href = url; } catch (e) { }
+  win.focus();
 }
 ListOnclick(INVOICENO) {
   let  authby ;
    let updateItem = this.Searchdata_list.find(item => item.INV_NO === INVOICENO);
    authby=updateItem.AUTHORISEDBY.trim();
-   let theTop = (screen.height / 2) - (483 / 2);
-  let theLeft = (screen.width / 2) - (780 / 2);
-  let toolbar = 'resizable=no,scrollbars=no,width=800,height=450,status=no,left=' + theLeft + ',top=' + theTop;
    if (confirm('Click Ok to Print or Click Cancel to Edit ?')) {
-     let URL = "http://180.179.207.163/Linkserp-ac/UI/Accounts/frm_Acc_Tran_Invoice_Print.aspx?" +
-     "huhpnk=" + this._loginService.getLogin()[0].GUID
-     + "&citycode=" + this._loginService.getLogin()[0].CITYCODE1
-     + "&Userid=" + this._loginService.getLogin()[0].CMPID
-     + "&cmp_code=" + this._loginService.getLogin()[0].CMPCODE
-     + "&InvoiceNo=" + INVOICENO
-     + "&DisplayMode=" + "0"
-     +"&cmp_username=" + this._loginService.getLogin()[0].CMP_USERNAME
-         window.open(URL,  "Invoice Print", toolbar);
+         this.OpenInvoicePrint(INVOICENO);
          return false;
      }
      else
