@@ -42,8 +42,9 @@
             <div class="h">
               @if (selfilename) {
                 {{ selfilename }}
-                @if (stmtPeriodText) { &middot; file period: {{ stmtPeriodText }} }
+                @if (stmtPeriodText) { &middot; file period: {{ stmtPeriodText }} <a href="javascript:void(0)" (click)="useFilePeriod()">use file period</a> }
                 @else { &middot; no date column recognised in this file, the period check will be skipped }
+                @if (stmtAccount) { &middot; account: {{ stmtAccount }} }
               } @else { .csv, .xls or .xlsx }
             </div>
           </div>
@@ -51,6 +52,9 @@
         </div>
       </div>
     </div>
+    @if (bankCheckMessage(); as bankMsg) {
+      <div class="fk-pad"><span class="note" style="color:#b42318;font-weight:600">{{ bankMsg }}</span></div>
+    }
     <div class="bar">
       <span class="note">{{ selfilename || 'No file chosen' }}</span>
       <div class="r">
