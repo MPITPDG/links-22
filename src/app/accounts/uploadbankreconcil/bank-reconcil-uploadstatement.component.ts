@@ -66,6 +66,10 @@ import * as XLSX from 'xlsx';
     stmtFrom: Date = null;
     stmtTo: Date = null;
     stmtPeriodText: string = "";
+    // Account number / currency found in the chosen file; used to stop a statement going against the wrong bank.
+    stmtAccount: string = "";
+    stmtAccountFromSheet: boolean = false;
+    stmtCurrency: string = "";
    myForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
     file: new FormControl('', [Validators.required]),
@@ -112,6 +116,12 @@ import * as XLSX from 'xlsx';
            Every failure path here is silent on purpose: a detection miss must
            never stop a valid upload. */
         private readStatementPeriod(file: File) {
+          this.stmtAccount = "";
+          this.stmtAccountFromSheet = false;
+          this.stmtCurrency = "";
+          // the file name of both banks carries the account number; a number read from inside the sheet replaces it
+          const nameRuns = (file.name || '').replace(/\.[^.]+$/, '').match(/\d{9,}/g);
+          if (nameRuns) { this.stmtAccount = nameRuns.reduce((a, b) => (b.length > a.length ? b : a), ''); }
           const reader = new FileReader();
           reader.onload = () => {
             try {
@@ -120,6 +130,7 @@ import * as XLSX from 'xlsx';
               const ws = wb.Sheets[wb.SheetNames[0]];
               if (!ws) { return; }
               const rows: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, blankrows: false });
+              this.readAccountInfo(rows, file.name);
               const col = this.findDateColumn(rows);
               if (col < 0) { return; }
               let min: Date = null;
@@ -134,6 +145,8 @@ import * as XLSX from 'xlsx';
                 this.stmtFrom = min;
                 this.stmtTo = max;
                 this.stmtPeriodText = this._dataService.datechnge(min) + ' to ' + this._dataService.datechnge(max);
+                // fill the dates from the file when the user has not typed any
+                if (!this.FromDate && !this.ToDate) { this.useFilePeriod(); }
               }
             } catch (e) {
               // unreadable, protected, or an unexpected layout -- skip the check
@@ -149,7 +162,7 @@ import * as XLSX from 'xlsx';
           for (let r = 0; r < scan; r++) {
             const row = rows[r] || [];
             for (let c = 0; c < row.length; c++) {
-              if (typeof row[c] === 'string' && /^\s*(txn\s*|value\s*|tran\s*)?date\s*$/i.test(row[c])) {
+              if (typeof row[c] === 'string' && /^\s*(txn\s*|transaction\s*|value\s*|tran\s*)?date\s*$/i.test(row[c])) {
                 return c;
               }
             }
@@ -174,6 +187,14 @@ import * as XLSX from 'xlsx';
         private toDate(v: any): Date {
           if (v instanceof Date && !isNaN(v.getTime())) { return v; }
           if (typeof v === 'string') {
+            const mon = v.trim().match(/^(\d{1,2})[\- ]([A-Za-z]{3})[\- ](\d{4})$/);
+            if (mon) {
+              const idx = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'].indexOf(mon[2].toLowerCase());
+              if (idx >= 0) {
+                const d = new Date(+mon[3], idx, +mon[1]);
+                if (d.getFullYear() === +mon[3] && d.getMonth() === idx && d.getDate() === +mon[1]) { return d; }
+              }
+            }
             const m = v.trim().match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/);
             if (m) {
               const dd = +m[1], mm = +m[2], yyyy = +m[3];
@@ -189,16 +210,117 @@ import * as XLSX from 'xlsx';
         /* Warn, never block. Bank statement cycles legitimately straddle month
            ends, so a strict range check would lock users out of valid uploads.
            The goal is catching the wrong FILE, not policing a day of drift. */
+        useFilePeriod() {
+          if (!this.stmtFrom || !this.stmtTo) { return; }
+          this.FromDate = this._dataService.datechnge(this.stmtFrom);
+          this.ToDate = this._dataService.datechnge(this.stmtTo);
+        }
+
+        /* Rule 1: transactions outside From..To are refused (they would never be matched).
+           Rule 2: a range wider than the file by more than a few days asks for confirmation. */
         private confirmStatementPeriod(): boolean {
           if (!this.stmtFrom || !this.stmtTo) { return true; }
           const from = this.toDate(this.FromDate);
           const to = this.toDate(this.ToDate);
           if (!from || !to) { return true; }
-          if (this.stmtFrom >= from && this.stmtTo <= to) { return true; }
-          return confirm(
-            'The selected file contains transactions from ' + this.stmtPeriodText + '.\n\n'
-            + 'That is outside the period you selected (' + this.FromDate + ' to ' + this.ToDate + ').\n\n'
-            + 'Upload anyway?');
+          const day = 24 * 60 * 60 * 1000;
+          const t = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+          if (t(this.stmtFrom) < t(from) || t(this.stmtTo) > t(to)) {
+            alert('The file contains transactions from ' + this.stmtPeriodText + ', which is outside the period you entered ('
+              + this.FromDate + ' to ' + this.ToDate + ').\n\nWiden the dates (or use the file period) and try again.\n\nNothing was uploaded.');
+            return false;
+          }
+          const slack = 3 * day;
+          if (t(this.stmtFrom) - t(from) > slack || t(to) - t(this.stmtTo) > slack) {
+            return confirm('The file covers ' + this.stmtPeriodText + ', but you entered ' + this.FromDate + ' to ' + this.ToDate + '.\n\n'
+              + 'A wider period than the statement can block a later upload for the missing dates.\n\nUpload with these dates anyway?');
+          }
+          return true;
+        }
+
+        /* ---- Which bank is this statement for? ----
+           Read from inside the workbook (a "Account Number" cell, or "Account Details for" followed by the number),
+           otherwise from the file name. The API repeats this check and is the one that refuses the upload; this copy only
+           warns early. Same rule: the number in the file must belong to the bank selected above. */
+        private readAccountInfo(rows: any[][], fileName: string) {
+          const longestRun = (text: string, min: number): string => {
+            let best = '';
+            const runs = (text || '').match(/\d+/g) || [];
+            for (const r of runs) { if (r.length >= min && r.length > best.length) { best = r; } }
+            return best;
+          };
+          const fromText = (text: string): string => {
+            const digits = longestRun(text, 9);
+            if (digits) { return digits; }
+            const mask = (text || '').match(/[Xx*]{2,}\d{3,6}/);
+            return mask ? mask[0] : '';
+          };
+          const scan = Math.min(rows.length, 40);
+          for (let r = 0; r < scan; r++) {
+            const row = rows[r] || [];
+            const low: string[] = [];
+            for (let c = 0; c < row.length; c++) {
+              low[c] = (row[c] === undefined || row[c] === null) ? '' : String(row[c]).trim().toLowerCase();
+            }
+            if (low.indexOf('debit') >= 0 && low.indexOf('credit') >= 0) { break; }   // the transactions start here
+            const next = (c: number): string => {
+              for (let k = c + 1; k < row.length; k++) {
+                const v = (row[k] === undefined || row[k] === null) ? '' : String(row[k]).trim();
+                if (v) { return v; }
+              }
+              return '';
+            };
+            for (let c = 0; c < row.length; c++) {
+              const label = (low[c] || '').replace(/\s+/g, ' ').replace(/[:\s]+$/, '');
+              if (!label) { continue; }
+              if (!this.stmtAccountFromSheet && /^account (number|no\.?|no|#)$/.test(label)) {
+                const acc = fromText(next(c));
+                if (acc) { this.stmtAccount = acc; this.stmtAccountFromSheet = true; }
+              } else if (!this.stmtAccountFromSheet && label === 'account details for') {
+                const v = next(c);
+                const acc = fromText(v);
+                if (acc) { this.stmtAccount = acc; this.stmtAccountFromSheet = true; }
+                const cur = v.match(/\b([A-Z]{3})\s*$/);
+                if (cur && !this.stmtCurrency) { this.stmtCurrency = cur[1]; }
+              } else if (label === 'currency' && !this.stmtCurrency) {
+                const v = next(c).toUpperCase();
+                if (/^[A-Z]{3}$/.test(v)) { this.stmtCurrency = v; }
+              }
+            }
+          }
+        }
+
+        private sameAccount(expected: string, detected: string): boolean {
+          if (!expected || !detected) { return false; }
+          if (/[Xx*]/.test(detected)) {
+            const m = detected.match(/\d+$/);
+            return !!m && m[0].length >= 3 && expected.endsWith(m[0]);
+          }
+          return expected.replace(/^0+/, '') === detected.replace(/^0+/, '');
+        }
+
+        /* '' when the file may be uploaded against the selected bank, otherwise the message to show. */
+        bankCheckMessage(): string {
+          if (!this.stmtAccount || !this.ourbank) { return ''; }
+          const banks: any[] = this.BankList || [];
+          const sel = banks.find(b => b.acctcodename === this.ourbank);
+          if (!sel) { return ''; }
+          const clean = (n: string) => (n || '').replace(/\s*\[[^\]]*\]\s*$/, '').trim();
+          const numbers = (n: string): string[] => (n || '').match(/\d{6,}/g) || [];
+          const expected = numbers(sel.acctname);
+          if (expected.some(e => this.sameAccount(e, this.stmtAccount))) {
+            const cm = (sel.acctname || '').match(/\b(INR|USD|EUR|GBP|AED|SGD|JPY|CNY|AUD|CAD|CHF|HKD)\b/i);
+            if (cm && this.stmtCurrency && cm[1].toUpperCase() !== this.stmtCurrency.toUpperCase()) {
+              return 'The statement currency is ' + this.stmtCurrency + ', but the selected bank is ' + clean(sel.acctname)
+                + '. Select the bank the statement belongs to.';
+            }
+            return '';
+          }
+          const other = banks.find(b => numbers(b.acctname).some(e => this.sameAccount(e, this.stmtAccount)));
+          const reject = this.stmtAccountFromSheet ? (expected.length > 0 || !!other) : !!other;
+          if (!reject) { return ''; }
+          return 'This statement is for account ' + this.stmtAccount + (other ? ' (' + clean(other.acctname) + ')' : '')
+            + ', but the selected bank is ' + clean(sel.acctname) + '. Select the bank the statement belongs to.';
         }
 
         private resetFileInput() {
@@ -207,6 +329,9 @@ import * as XLSX from 'xlsx';
           this.stmtFrom = null;
           this.stmtTo = null;
           this.stmtPeriodText = "";
+          this.stmtAccount = "";
+          this.stmtAccountFromSheet = false;
+          this.stmtCurrency = "";
           if (this.myInputVariable && this.myInputVariable.nativeElement) {
             this.myInputVariable.nativeElement.value = "";
           }
@@ -248,6 +373,11 @@ import * as XLSX from 'xlsx';
           }
           if(this.selectedFile== undefined || this.selectedFile== null){
             alert('Please select file to upload');
+            return false;
+          }
+          const bankMsg = this.bankCheckMessage();
+          if (bankMsg) {
+            alert(bankMsg + '\n\nNothing was uploaded.');
             return false;
           }
           if(!this.confirmStatementPeriod()){
