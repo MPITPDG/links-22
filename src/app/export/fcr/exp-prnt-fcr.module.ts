@@ -11,6 +11,8 @@ import {ExportprntfcrRoutingModule} from './exp-prnt-fcr.routing';
 import { ExptFCRGenerate } from './exp_prt_fcr_generate.component';
 import { ExptFCRPrintview, ExptMTOprintview, ExptPrintview } from './exp_prt_fcr_printview.component';
 import { ExptFCRPrint, ExptMTOprint, ExptPrint } from './exp_prt_print.component';
+import { MtdSheetComponent } from './mtd-sheet.component';
+import { DescFieldComponent } from './desc-field.component';
 //import { ExptfcrpPreview } from './expt_fcrppreview.component';
 
 @NgModule({
@@ -23,7 +25,7 @@ import { ExptFCRPrint, ExptMTOprint, ExptPrint } from './exp_prt_print.component
         NgSelectModule,
         SharedModule],
     declarations: [ExptFCRGenerate, ExptFCRPrintview, ExptMTOprintview, ExptPrintview,
-        ExptFCRPrint, ExptMTOprint, ExptPrint],
+        ExptFCRPrint, ExptMTOprint, ExptPrint, MtdSheetComponent, DescFieldComponent],
     providers: [],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

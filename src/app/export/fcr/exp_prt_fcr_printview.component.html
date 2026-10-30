@@ -2,16 +2,23 @@
   Export -> House B/L / FCR / MTO editor (host). Page kit recipe 2, ported from
   MPERPNG-20 (fcr-form.css). The FCR and MTO forms are the inline templates in
   exp_prt_fcr_printview.component.ts.
-  Links keeps its own options and print path: Express Bill and watermark
-  checkboxes, Update / Draft print / Print through the existing handlers
-  (the .aspx print). MP's SeaWay Bill option and HTML print are not ported.
+  FCR / House B/L (F, H): Express Bill and watermark checkboxes and Update / Draft
+  print / Print in the bar below, through the existing handlers (the .aspx print).
+  MTO (M): layout B - the form beside a live print preview; its options and
+  actions sit above the preview and come back through the same handlers here
+  (mtoExpress / mtoWatermark / mtoUpdate / mtoDraft / mtoPrint). The MTD is
+  printed by Links itself (mtd-sheet.ts). MP's SeaWay Bill option is not ported.
 -->
 <div class="im-page">
 
   <div class="ph">
     <div>
       <h1>{{ pageTitle }}</h1>
-      <p>Enter the document details, update, then take a draft or the final print.</p>
+      @if (Type == 'M') {
+        <p>Fill the form on the left; the print on the right updates as you type.</p>
+      } @else {
+        <p>Enter the document details, update, then take a draft or the final print.</p>
+      }
       <div class="chips">
         @if (DocNo) {
           <span class="chip">{{ DocNo }}</span>
@@ -24,9 +31,7 @@
         }
       </div>
     </div>
-    @if (Type == 'M') {
-      <div class="letterhead"><img src="assets/img/Export/MTO_Header.jpg" alt="MTO letterhead"></div>
-    } @else if (Type == 'F' || Type == 'H') {
+    @if (Type == 'F' || Type == 'H') {
       <div class="letterhead"><img src="assets/img/Export/FCR_header.jpg" alt="FCR letterhead"></div>
     }
   </div>
@@ -34,7 +39,9 @@
   @if (Type == 'F' || Type == 'H') {
     <app-fcr-printview [hbltype]="Type"></app-fcr-printview>
   } @else if (Type == 'M') {
-    <app-mto-printview [hbltype]="Type"></app-mto-printview>
+    <app-mto-printview [hbltype]="Type"
+                       (mtoExpress)="checkValue($event)" (mtoWatermark)="getwatermarkvalue($event)"
+                       (mtoUpdate)="printUpdate()" (mtoDraft)="Printdraft()" (mtoPrint)="Print()"></app-mto-printview>
   } @else {
     <div class="card sec">
       <div class="state">
@@ -48,7 +55,7 @@
     </div>
   }
 
-  @if (Type == 'F' || Type == 'H' || Type == 'M') {
+  @if (Type == 'F' || Type == 'H') {
     <div class="bar">
       <span class="note" style="display:flex;align-items:center;gap:16px;margin:0;">
         <label style="display:inline-flex;align-items:center;gap:6px;margin:0;">
