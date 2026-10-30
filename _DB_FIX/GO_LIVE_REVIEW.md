@@ -146,6 +146,7 @@ forms 448-450 with any rights granted on them, and drops the tables **only while
 Grant per user (SA users need nothing). The new Links has no rights screen: rights are managed in a separate
 application for now (the classic ASP.NET page "USERS RIGHT - FORM WISE ADVANCE" did it before), or by script.
 The 8 users with sheet roles were granted 448 / 449 on 30110 by script (DEPLOY_ORDER steps 1.11 and 1.12).
+JYASH, PYOGESH and LRAJESH also get 450 and the ADMIN sheet role (step 1.13): sheet admins, every column.
 
 | Form | Name | Gives |
 |---|---|---|
